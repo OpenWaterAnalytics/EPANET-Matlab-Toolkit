@@ -4886,7 +4886,7 @@ function [warn1] = rmLink(obj,LinkID)
     %%%%%%%%
     if sum(t)+sum(tttt)==0 || sum(tt)+sum(ttt)==0                  
         if ~isempty(char(from_node)) || ~isempty(char(to_node))
-            if ~sum(strcmp(from_node,nodes.ReservoirsID))
+            if ~sum(strcmp(from_node,nodes.ReservoirsID)) || ~sum(strcmp(from_node,nodes.TanksID))
                 warn1=0;
             else 
                 warn1=1;
