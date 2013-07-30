@@ -1,7 +1,7 @@
 %{
  Copyright 2013 KIOS Research Center for Intelligent Systems and Networks, University of Cyprus (www.kios.org.cy)
 
- Licensed under the EUPL, Version 1.1 or � as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
+ Licensed under the EUPL, Version 1.1 or ï¿½ as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
  You may not use this work except in compliance with the Licence.
  You may obtain a copy of the Licence at:
 
@@ -1433,7 +1433,7 @@ classdef Epanet <handle
         %%%% New Functions
         % Get
         function value=getCurveInfo(obj)
-        	[value.CurvesID,value.CurveX,value.CurveY]=CurveInfo(obj);
+         [value.CurvesID,value.CurveX,value.CurveY]=CurveInfo(obj);
         end
         function value=getLinksInfo(obj)
             value=LinksInfo(obj);
@@ -5002,8 +5002,12 @@ function [warn1] = rmLink(obj,LinkID)
     %%%%%%%%
     if sum(t)+sum(tttt)==0 || sum(tt)+sum(ttt)==0                  
         if ~isempty(char(from_node)) || ~isempty(char(to_node))
+<<<<<<< HEAD
             if ~sum(strcmp(from_node,nodes.ReservoirsID)) || ~sum(strcmp(from_node,nodes.TanksID))...
                || ~sum(strcmp(to_node,nodes.ReservoirsID)) || ~sum(strcmp(to_node,nodes.TanksID))
+=======
+            if ~sum(strcmp(from_node,nodes.ReservoirsID)) || ~sum(strcmp(from_node,nodes.TanksID))
+>>>>>>> 3a0675f27645e9e2d390ea0b77082834e15910c3
                 warn1=0;
             else 
                 warn1=1;
