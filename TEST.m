@@ -3,6 +3,7 @@ fclose all;
 clc;
 clear all;
 clear class;
+% unloadlibrary('epanet2')
 
 %  TEST - EPANET
 % Input Files
@@ -14,10 +15,74 @@ d=Epanet('Net1_Rossman2000.inp')
 d.plot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Links Pipe Pump & Valves
+%PIPE
+d.getTimeSimulationDuration
+d.setTimeSimulationDuration(100)
+d.addPipe('P1','32','10')   
+d.getTimeSimulationDuration
+d.plot('nodes','yes','fontsize',20)
+%PUMP
+d.getTimeSimulationDuration
+d.setTimeSimulationDuration(2102)
+d.addPump('PUMP','23','32','1')   
+d.getTimeSimulationDuration
+d.plot('nodes','yes')
+%VALVES
+%PRV OR..
+d.addValvePRV('P1','11','22') 
+%PSV OR..
+d.addValvePSV('P2','32','10') 
+d.plot('nodes','yes')
+%PBV 
+d.addValvePBV('P3','12','23') 
+d.plot('nodes','yes')
+%FCV
+d.addValveFCV('P4','21','9') 
+d.plot('nodes','yes')
+d.addValveFCV('P4','31','12') 
+d.plot('nodes','yes')
+%TCV
+d.addValveTCV('P5','22','13') 
+d.plot('nodes','yes')
+%GPV
+d.addValveGPV('P6','23','32') %%%%%%%%%%%%ERROR
+d.plot('nodes','yes')
+
+
+% SET UNITS examples
 d.setFlowUnitsLPM % Net1.. GPM to LPM
-d.setHeadlossDW
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsGPM % Net1.. LPM to GPM
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsCFS % Net1.. GPM to CFS    
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsMGD % Net1.. CFS to MGD
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsIMGD % Net1..MGD to IMGD
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsAFD % Net1.. IMGD to AFD
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsLPS % Net1.. AFD to LPS
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsLPM % Net1.. LPS to LPM      
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsMLD % Net1.. LPM to MLD
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsCMD % Net1.. MLD to CMD
+d.getFlowUnitsHeadlossFormula  
+d.setFlowUnitsCMH % Net1.. CMD to CMH
+d.getFlowUnitsHeadlossFormula  
+
+% HeadlossFormula
+d.setHeadlossDW    
+d.getFlowUnitsHeadlossFormula  
 d.setHeadlossCM
+d.getFlowUnitsHeadlossFormula  
 d.setHeadlossHW
+d.getFlowUnitsHeadlossFormula  
+
 
 % Remove - functions
 % Nodes
@@ -66,13 +131,13 @@ d.getTimeSimulationDuration
 v=d.getControlsInfo
 d.setTimeSimulationDuration(500)
 % LINK x status IF NODE y ABOVE/BELOW z
-d.addNewControl('10','OPEN','10','ABOVE',100)
+d.addControl('10','OPEN','10','ABOVE',100)
 d.getTimeSimulationDuration
 
 % LINK x status AT TIME t
-d.addNewControl('10','OPEN','10.00')
+d.addControl('10','OPEN','10.00')
 % LINK x status AT CLOCKTIME c AM/PM
-d.addNewControl('10','OPEN','12.00','AM')
+d.addControl('10','OPEN','12.00','AM')
 
 v=d.getControlsInfo
 d.setTimeSimulationDuration(10000)
@@ -97,24 +162,24 @@ d.getPumpInfo % for the specific Pump curve
 d.setTimeSimulationDuration(5000)
 d.plot
 [x,y]=ginput
-d.addNewJunction('J1',x,y)
-d.addNewPipe('P1','9','J1')
+d.addJunction('J1',x,y)
+d.addPipe('P1','9','J1')
 d.plot
 d.getTimeSimulationDuration
 
 d.setTimeSimulationDuration(35000)
 d.plot
 [x,y]=ginput
-d.addNewReservoir('S1',x,y)
-d.addNewPipe('P2','J1','S1')
+d.addReservoir('S1',x,y)
+d.addPipe('P2','J1','S1')
 d.plot
 d.getTimeSimulationDuration
 
 d.setTimeSimulationDuration(15000)
 d.plot
 [x,y]=ginput
-d.addNewTank('T1',x,y)
-d.addNewPipe('P3','32','T1')   
+d.addTank('T1',x,y)
+d.addPipe('P3','32','T1')   
 d.plot
 d.getTimeSimulationDuration
 
@@ -124,7 +189,7 @@ d.plot
 d.getTimeSimulationDuration
 
 d.setTimeSimulationDuration(5000)
-d.addNewPipe('MSK','23','32')
+d.addPipe('MSK','23','32')
 d.plot
 d.getTimeSimulationDuration
 
