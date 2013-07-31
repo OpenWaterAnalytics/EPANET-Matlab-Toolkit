@@ -3706,27 +3706,6 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
         return
     end
     
-    % Valve illegally connected to a tank or reservoir
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    i=1;ifFromReservoir=0;ifToReservoir=0;
-    while i<length(Nodes.ReservoirsID)+1
-        ifFromReservoir(i) = strcmp(fromNode,char(Nodes.ReservoirsID{i}));
-        ifToReservoir(i) = strcmp(toNode,char(Nodes.ReservoirsID{i}));
-        i=i+1; 
-    end
-    i=1;ifFromTank=0;ifToTank=0;
-    while i<length(Nodes.TanksID)+1
-        ifFromTank(i) = strcmp(fromNode,char(Nodes.TanksID{i}));
-        ifToTank(i) = strcmp(toNode,char(Nodes.TanksID{i}));
-        i=i+1; 
-    end
-    if sum(ifFromReservoir)==1 || sum(ifFromTank)==1 || sum(ifToReservoir)==1 || sum(ifToTank)==1
-        s = sprintf('Valve "%s" illegally connected to a tank.',newLink);
-        warning(s);
-        return
-    end
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
     i=1;existsFrom=0;existsTo=0;
     while i<length(Nodes.NodesAll)+1
         existsFrom(i) = strcmp(fromNode,char(Nodes.NodesAll{i}));
@@ -3761,6 +3740,29 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
         end
     end
 
+    % Valve illegally connected to a tank or reservoir
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if typecode==3
+        i=1;ifFromReservoir=0;ifToReservoir=0;
+        while i<length(Nodes.ReservoirsID)+1
+            ifFromReservoir(i) = strcmp(fromNode,char(Nodes.ReservoirsID{i}));
+            ifToReservoir(i) = strcmp(toNode,char(Nodes.ReservoirsID{i}));
+            i=i+1; 
+        end
+        i=1;ifFromTank=0;ifToTank=0;
+        while i<length(Nodes.TanksID)+1
+            ifFromTank(i) = strcmp(fromNode,char(Nodes.TanksID{i}));
+            ifToTank(i) = strcmp(toNode,char(Nodes.TanksID{i}));
+            i=i+1; 
+        end
+        if sum(ifFromReservoir)==1 || sum(ifFromTank)==1 || sum(ifToReservoir)==1 || sum(ifToTank)==1
+            s = sprintf('Valve "%s" illegally connected to a tank.',newLink);
+            warning(s);
+            return
+        end
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
     crvs = obj.getCurveInfo;
     % Check if newLink already exists
     Links = obj.getLinksInfo;
@@ -3887,7 +3889,6 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
     [errcode] = Epanet('tempInpFile.inp');
     obj.saveInputFile('tempInpFile.inp'); % OK %
     movefile('tempInpFile.inp',[pwd,'\Results']);
-    
     tmp=0;
     save([pwd,'\Results\','tmpInp'],'tmp','-mat')
 
