@@ -46,9 +46,9 @@ d.plot('nodes','yes')
 %TCV
 d.addValveTCV('P5','22','13') 
 d.plot('nodes','yes')
-%GPV
-d.addValveGPV('P6','23','32') %%%%%%%%%%%%ERROR
-d.plot('nodes','yes')
+% %GPV
+% d.addValveGPV('P6','23','32') %%%%%%%%%%%%ERROR
+% d.plot('nodes','yes')
 
 
 % SET UNITS examples
