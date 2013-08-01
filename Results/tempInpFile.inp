@@ -1,7 +1,7 @@
 [TITLE]
-EPANET          Example         Network         1                
-A               simple          example         of              modeling       
-wall            reactions       are             included.        
+EPANET             Example            Network            1                   
+A                  simple             example            of                 mod
+wall               reactions          are                included.           
 
 [JUNCTIONS]
  10                                  710.0000
@@ -21,6 +21,7 @@ wall            reactions       are             included.
  2                                   850.0000     120.0000     100.0000     150.0000      50.5000  200296.1666 
 
 [PIPES]
+ P1                              32                              10                                 1000.0000      12.0000     100.0000       0.0000 
  10                              10                              11                                10530.0000      18.0000     100.0000       0.0000 
  11                              11                              12                                 5280.0000      14.0000     100.0000       0.0000 
  12                              12                              13                                 5280.0000      10.0000     100.0000       0.0000 
@@ -95,7 +96,7 @@ wall            reactions       are             included.
  DEMAND CHARGE       0.0000
 
 [TIMES]
- DURATION            24:00:00
+ DURATION            0:01:40
  HYDRAULIC TIMESTEP  1:00:00
  QUALITY TIMESTEP    0:05:00
  REPORT TIMESTEP     1:00:00
@@ -146,42 +147,38 @@ wall            reactions       are             included.
  State               NO
  Setting             NO
  Reaction            NO
-[TAGS]          
+[TAGS]             
 
-[RULES]         
+[RULES]            
 
-[COORDINATES]   
-;Node           X-Coord         Y-Coord         
-10              20.00           70.00           
-11              30.00           70.00           
-12              50.00           70.00           
-13              70.00           70.00           
-21              30.00           40.00           
-22              50.00           40.00           
-23              70.00           40.00           
-31              30.00           10.00           
-32              50.00           10.00           
-9               10.00           70.00           
-2               50.00           90.00           
+[COORDINATES]      
+;Node              X-Coord            Y-Coord            
+10                 20.00              70.00              
+11                 30.00              70.00              
+12                 50.00              70.00              
+13                 70.00              70.00              
+21                 30.00              40.00              
+22                 50.00              40.00              
+23                 70.00              40.00              
+31                 30.00              10.00              
+32                 50.00              10.00              
+9                  10.00              70.00              
+2                  50.00              90.00              
 
-[VERTICES]      
-;Link           X-Coord         Y-Coord         
+[VERTICES]         
+;Link              X-Coord            Y-Coord            
 
-[LABELS]        
-;X-Coord        Y-Coord         Label           &               Anchor          Node            
-6.99            73.63           "Source"        
-13.48           68.13           "Pump"          
-43.85           91.21           "Tank"          
+[LABELS]           
+;X-Coord           Y-Coord            Label              &                  Anchor             Node               
+6.99               73.63              "Source"           
+13.48              68.13              "Pump"             
+43.85              91.21              "Tank"             
 
-[BACKDROP]      
-DIMENSIONS      7.00            6.00            73.00           94.00           
-UNITS           None            
-FILE            
-OFFSET          0.00            0.00            
-
-
-
-
+[BACKDROP]         
+DIMENSIONS         7.00               6.00               73.00              94.00              
+UNITS              None               
+FILE               
+OFFSET             0.00               0.00               
 
 
 

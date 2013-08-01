@@ -11,7 +11,7 @@ clear class;
 % d=Epanet('example.inp')
 % d=Epanet('Template.inp')
 d=Epanet('Net1_Rossman2000.inp')
-% d=Epanet('BWSN1_Ostfeld2008.inp')
+% d=Epanet('Net1AllCURVES.inp')
 d.plot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
