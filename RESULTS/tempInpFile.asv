@@ -1,6 +1,6 @@
 [TITLE]         
 EPANET          Example         Network         1               
-A               simple          example         of              modeling        
+A               simple          example         of              modeling        chlorine        decay.          Both            bulk            and             
 wall            reactions       are             included.       
 
 [JUNCTIONS]     
@@ -61,12 +61,11 @@ wall            reactions       are             included.
 [CURVES]
 
 
-1               1500            250             
+ 1               	1500        	250         
       
 [CONTROLS]      
 LINK            9               1.0000          IF              NODE            2               BELOW           110.0000        
 LINK            9               0.0000          IF              NODE            2               ABOVE           140.0000        
-LINK            10              open            IF              NODE            10              ABOVE           100.0000        
 
 [QUALITY]       
 10              0.500000        
@@ -98,7 +97,7 @@ GLOBAL          EFFIC           75.0000
 DEMAND          CHARGE          0.0000          
 
 [TIMES]         
-DURATION        0:08:20         
+DURATION        24:00:00        
 HYDRAULIC       TIMESTEP        1:00:00         
 QUALITY         TIMESTEP        0:05:00         
 REPORT          TIMESTEP        1:00:00         
@@ -139,7 +138,7 @@ Elevation       NO
 Demand          PRECISION       2               
 Head            PRECISION       2               
 Pressure        PRECISION       2               
-Quality         NO              
+Quality         PRECISION       2               
 Length          NO              
 Diameter        NO              
 Flow            PRECISION       2               
@@ -160,11 +159,11 @@ Reaction        NO
 12              50.00           70.00           
 13              70.00           70.00           
 21              30.00           40.00           
-
+22              50.00           40.00           
 23              70.00           40.00           
 31              30.00           10.00           
 32              50.00           10.00           
-
+9               10.00           70.00           
 2               50.00           90.00           
 
 [VERTICES]      
@@ -181,10 +180,6 @@ DIMENSIONS      7.00            6.00            73.00           94.00
 UNITS           None            
 FILE            
 OFFSET          0.00            0.00            
-
-
-
-
 
 
 [END]           

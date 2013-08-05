@@ -43,7 +43,7 @@ wall reactions are included.
  9               	9               	10              	HEAD 1	;
 
 [VALVES]
-;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss   
+;ID              	Node1           	Node2           	Diameter                            Type        Setting             MinorLoss   
 
 [TAGS]
 

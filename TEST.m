@@ -15,43 +15,82 @@ d=Epanet('Net1_Rossman2000.inp')
 d.plot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% Curves 
+d.setTimeSimulationDuration(22500)
+d.removeCurveID('1') % must be removed the pump 9, Warning: Pump 9 refers to undefined curve. Automatos svinei kai to antistoixo Pump, diagrafwntas to curve.
+% Warning: Node 9 disconnected. 
+d.removeLinkID('9')
+d.removeNodeID('9')
+d.getTimeSimulationDuration
+d.getCurveInfo
+d.addCurvePump('C-1',1955,250)
+d.getCurveInfo
+d.getTimeSimulationDuration
+d.addCurveEfficiency('C-2',1500,250)
+d.getTimeSimulationDuration
+d.addCurveVolume('C-3',1500,250)
+d.getTimeSimulationDuration
+d.addCurveHeadloss('C-4',1500,250)
+d.getTimeSimulationDuration
+        
+d.removeCurveID('C-1')
+d.removeCurveID('C-2')
+d.removeCurveID('C-3')
+d.removeCurveID('C-4')
 
+d.addCurvePump('C-1',[1500 1800 2000],[250 200 0])%Flow-Head
+d.addCurveEfficiency('C-2',[1500 1800 2000],[250 200 0])%Flow-Efficiency
+d.addCurveVolume('C33',[1500 1800 2000],[250 200 0])%Heigh-Volume
+d.addCurveHeadloss('C44',[1500 1800 2000],[250 200 0])%Flow-Headloss
+d.removeCurveID('C-1')
+
+
+% warning Flow & Heigh
+d.addCurvePump('C-11',[2000 1500 1800],[250 200 0])
+d.addCurveEfficiency('C-22',[1500 2000 1800],[250 200 0])%Flow-Efficiency
+d.addCurveVolume('C333',[1500 2000 1800],[250 200 0])%Heigh-Volume
+d.addCurveHeadloss('C244',[1500 2000 1800],[250 200 0])%Flow-Headloss
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Links Pipe Pump & Valves
 %PIPE
 d.getTimeSimulationDuration
 d.setTimeSimulationDuration(100)
-d.addPipe('P1','32','10')   
+d.addPipe('Ppp1','32','10')   
 d.getTimeSimulationDuration
 d.plot('nodes','yes','fontsize',20)
 %PUMP
 d.getTimeSimulationDuration
 d.setTimeSimulationDuration(2102)
-d.addPump('PUMP','23','32','1')   
+d.addCurvePump('C-1',1955,250)
+d.addPump('PUMP','23','32','C-1')   
 d.getTimeSimulationDuration
 d.plot('nodes','yes')
 %VALVES
 %PRV OR..
-d.addValvePRV('P1','11','22') 
+d.addValvePRV('Pp1','11','22') 
 %PSV OR..
-d.addValvePSV('P2','32','10') 
+d.addValvePSV('Pp2','32','10') 
 d.plot('nodes','yes')
 %PBV 
-d.addValvePBV('P3','12','23') 
+d.addValvePBV('Pp3','12','23') 
 d.plot('nodes','yes')
 %FCV
-d.addValveFCV('P4','21','9') 
+d.addValveFCV('Pp4','21','9') 
 d.plot('nodes','yes')
-d.addValveFCV('P4','31','12') 
+d.addValveFCV('Pp4','31','12') 
 d.plot('nodes','yes')
 %TCV
-d.addValveTCV('P5','22','13') 
+d.addValveTCV('Pp5','22','13') 
 d.plot('nodes','yes')
 % %GPV
-% d.addValveGPV('P6','23','32') %%%%%%%%%%%%ERROR
+% d.addValveGPV('Pp6','23','32') %%%%%%%%%%%%ERROR
 % d.plot('nodes','yes')
 
 
-% SET UNITS examples
+% SET UNITS examples %%%%%%%%%%%%%%%%%%%%%%%%%%%%%ERROR in section [TANKS]
+% if the MinVolume==0 then in the function ENsaveinpfile --> MinVolume==200296.1666
 d.setFlowUnitsLPM % Net1.. GPM to LPM
 d.getFlowUnitsHeadlossFormula  
 d.setFlowUnitsGPM % Net1.. LPM to GPM
@@ -87,8 +126,8 @@ d.getFlowUnitsHeadlossFormula
 % Remove - functions
 % Nodes
 d.getNodesInfo
-d.removeNodeID('9') 
 d.removeNodeID('2') 
+d.plot
 
 % d.removeNodeID('A') %example.inp
 % d.addNewPipe('PP','Source','C');
@@ -106,6 +145,7 @@ d.plot
 d.removeNodeID('22') %"Net1_Rossman2000.inp"
 d.plot
 d.getTimeSimulationDuration
+d.removeNodeID('2')
 
 % Links
 d.setTimeSimulationDuration(10500)
@@ -114,18 +154,6 @@ d.removeLinkID('9') %pump of "Net1_Rossman2000.inp"
 d.removeNodeID('9') %"Net1_Rossman2000.inp"
 d.getTimeSimulationDuration
 d.plot
-
-% Curves
-d.setTimeSimulationDuration(22500)
-d.removeCurveID('1') % must be removed the pump 9, Warning: Pump 9 refers to undefined curve. Automatos svinei kai to antistoixo Pump, diagrafwntas to curve.
-% Warning: Node 9 disconnected. 
-d.removeNodeID('9')
-d.getTimeSimulationDuration
-d.getCurveInfo
-d.addNewCurve('new',1995,290)
-d.getCurveInfo
-d.getTimeSimulationDuration
-
 
 % Controls
 v=d.getControlsInfo

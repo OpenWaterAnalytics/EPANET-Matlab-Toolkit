@@ -127,6 +127,7 @@ classdef Epanet <handle
         TYPESOURCE={'CONCEN','MASS', 'SETPOINT', 'FLOWPACED'};
         TYPEREPORT={'YES','NO','FULL'};
         TYPEPUMP={'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM'};
+        TYPECURVE={'PUMP','EFFICIENCY','VOLUME','HEADLOSS'};
 
         %% Units %%
         FlowUnits;
@@ -210,6 +211,7 @@ classdef Epanet <handle
                 
             %%%%%%%%%%%%%%%%%
             if ~strcmp(inpfile,'tempInpFile.inp')
+%                 unloadlibrary('epanet2');           
                 copyfile([pwd,'\NETWORKS\',inpfile],[pwd,'\RESULTS\tempInpFile.inp']);
             end
             tmp=1;  
@@ -226,16 +228,14 @@ classdef Epanet <handle
             obj.InputFile=inpfile;
 
             %Curves
-            value=getCurveInfo(obj);
-            load([pwd,'\RESULTS\','typeCodeCurves'],'typeCurve','-mat')   
+            value=obj.getCurveInfo;
             obj.CurvesNameID=value.CurvesID;
             obj.CurvesX=value.CurveX;
             obj.CurvesY=value.CurveY;
-            obj.CurvesType = typeCurve;
+            obj.CurvesType =value.typeCurve;
             
             % ENsaveinpfile
             obj.saveInputFile('tempInpFile.inp'); % OK %
-            movefile('tempInpFile.inp',[pwd,'\RESULTS']);
         
             %ENgetcount  
             [obj.errorCode, obj.CountNodes] = ENgetcount(0);
@@ -694,32 +694,7 @@ classdef Epanet <handle
             [obj.errorCode] = ENsetreport(value);
         end
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
         %%%%%%%%%%%%%%%%% GET FUNCTIONS %%%%%%%%%%%%%%%%%
         
         function value = getControls(obj)
@@ -1358,6 +1333,10 @@ classdef Epanet <handle
         %ENsaveinpfile
         function saveInputFile(obj,inpname)
             [obj.errorCode] = ENsaveinpfile(inpname);
+            value=obj.getCurveInfo;
+            movefile('tempInpFile.inp',[pwd,'\RESULTS']);
+            obj.removeMCurvesID(value.CurvesID)
+            obj.addAllCurves(value.Clines)
         end
         
         %ENwriteline
@@ -1434,7 +1413,7 @@ classdef Epanet <handle
         %%%% New Functions
         % Get
         function value=getCurveInfo(obj)
-         [value.CurvesID,value.CurveX,value.CurveY]=CurveInfo(obj);
+         [value.CurvesID,value.CurveX,value.CurveY,value.Clines,value.typeCurve]=CurveInfo(obj);
         end
         function value=getLinksInfo(obj)
             value=LinksInfo(obj);
@@ -1453,9 +1432,22 @@ classdef Epanet <handle
         end
         
         % Add
-        function addNewCurve(obj,newCurveID,CurveX,CurveY)
-        	addCurve(obj,newCurveID,CurveX,CurveY);  
+        function addCurvePump(obj,newCurveID,CurveX,CurveY)
+        	addCurve(obj,newCurveID,CurveX,CurveY,0);  %ID Flow-Headloss
         end
+        function addCurveEfficiency(obj,newCurveID,CurveX,CurveY)
+        	addCurve(obj,newCurveID,CurveX,CurveY,1);  %ID Flow-Efficiency
+        end
+        function addCurveVolume(obj,newCurveID,CurveX,CurveY)
+        	addCurve(obj,newCurveID,CurveX,CurveY,2);  %ID Heigh-Volume
+        end    
+        function addCurveHeadloss(obj,newCurveID,CurveX,CurveY)
+        	addCurve(obj,newCurveID,CurveX,CurveY,3);  %ID Flow-Headloss
+        end
+        function addAllCurves(obj,Clines)
+            remAddCurve(obj,Clines,1);
+        end
+        
         function addPipe(obj,newLink,fromNode,toNode)
             addLink(obj,1,newLink,fromNode,toNode);
         end 
@@ -1504,6 +1496,9 @@ classdef Epanet <handle
         % Remove
         function removeCurveID(obj,CurveID)
         	rmCurveID(obj,CurveID);
+        end
+        function removeMCurvesID(obj,CurveID)            
+            remAddCurve(obj,CurveID,0);
         end
         function removeControlLinkID(obj,ID)
         	rmControl(obj,1,ID);
@@ -2414,18 +2409,6 @@ function [errcode] = ENopen(inpname,repname,binname,varargin)
         end
 %         ENerror(errcode); 
 %     end
-%     [nnodes,ntanks,nlinks,npats,ncurves,ncontrols,errcode] = ENgetnetsize();
-%     if errcode 
-%         ENerror(errcode); 
-%     end
-%     delete(repname,binname);
-%     EN_SIZE = struct(...
-%         'nnodes', nnodes,...
-%         'ntanks', ntanks,...
-%         'nlinks', nlinks,...
-%         'npats',  npats,...
-%         'ncurves',ncurves,...
-%         'ncontrols',ncontrols);
 end
 
 
@@ -2888,7 +2871,7 @@ function [vx,vy,vertx,verty] = getNodeCoord(obj)
         % Get first token in the line
         tok = strtok(tline);
 
-        % Skip blank lines and comments
+        % Skip blank Clines and comments
         if isempty(tok), continue, end
         if (tok(1) == ';'), continue, end
 
@@ -3330,7 +3313,7 @@ function  [Terms,Pipes,Tanks] = GetFormulas(msxname)
         % Get first token in the line
         tok = strtok(tline);
 
-        % Skip blank lines and comments
+        % Skip blank Clines and comments
         if isempty(tok), continue, end
         if (tok(1) == ';'), continue, end
 
@@ -3377,7 +3360,7 @@ function  [Terms,Pipes,Tanks] = GetFormulas(msxname)
 end
         
         
-function [curvesID,X,Y,sectCurve]=CurveInfo(obj)
+function [curvesID,X,Y,Clines,typeCurve,sectCurve]=CurveInfo(obj)
     % Open epanet input file
     [fid,message] = fopen(obj.PathFile,'rt');
     if fid < 0
@@ -3390,7 +3373,8 @@ function [curvesID,X,Y,sectCurve]=CurveInfo(obj)
     curvesID={};
     X={};
     Y={};
-    sect=0; i=1; sectCurve=0;sctP_E_V_H=0;
+    Clines={}; 
+    sect=0; i=1; u=1; sectCurve=0; 
     % Read each line from msx file.
     while 1
         tline = fgetl(fid);
@@ -3398,15 +3382,17 @@ function [curvesID,X,Y,sectCurve]=CurveInfo(obj)
         if ~ischar(tline),   break,   end
         % Get first token in the line
         tok = strtok(tline);
-        % Skip blank lines and comments
-        if isempty(tok), continue, end 
-        if strcmp(a{1},';PUMP:') || strcmp(a{1},';EFFICIENCY:') || strcmp(a{1},';VOLUME:') || strcmp(a{1},';HEADLOSS:')
-            if strcmp(a{1},';PUMP:'), typecode=0;  end % PUMP
-            if strcmp(a{1},';EFFICIENCY:'), typecode=1;  end % EFFICIENCY
-            if strcmp(a{1},';VOLUME:'), typecode=2;  end % VOLUME
-            if strcmp(a{1},';HEADLOSS:'), typecode=3;  end % HEADLOSS
-            sctP_E_V_H=1;
+        % Skip blank Clines and comments
+        if isempty(tok), continue, end
+        
+        ee=regexp(tline,'\w*EFFICIENCY*\w','match');
+        nn=regexp(tline,'\w*VOLUME*\w','match');
+        kk=regexp(tline,'\w*HEADLOSS*\w','match');
+        if strcmp(ee,'EFFICIENCY'), %typecode=1;   % EFFICIENCY
+        elseif strcmp(nn,'VOLUME'), %typecode=2;   % VOLUME
+        elseif strcmp(kk,'HEADLOSS'), %typecode=3; % HEADLOSS
         else
+%             typecode=0;
             if (tok(1) == ';'), continue, end
         end
         
@@ -3430,32 +3416,58 @@ function [curvesID,X,Y,sectCurve]=CurveInfo(obj)
 
         % Curves
         elseif sect == 1
-            if strcmp(a{1},';PUMP:') || strcmp(a{1},';EFFICIENCY:') || strcmp(a{1},';VOLUME:') || strcmp(a{1},';HEADLOSS:')
-                typeCurve(i)=typecode; continue;
-            elseif sctP_E_V_H==0
-                typeCurve(i)=0;
+            ee=regexp(tline,'\w*EFFICIENCY*\w','match');
+            nn=regexp(tline,'\w*VOLUME*\w','match');
+            kk=regexp(tline,'\w*HEADLOSS*\w','match');
+            
+            if strcmp(ee,'EFFICIENCY'), typecode=1;   % EFFICIENCY
+                Clines{u}=tline;u=u+1;continue;
+            elseif strcmp(nn,'VOLUME'), typecode=2;   % VOLUME
+                Clines{u}=tline;u=u+1;continue;
+            elseif strcmp(kk,'HEADLOSS'), typecode=3; % HEADLOSS
+                Clines{u}=tline;u=u+1;continue;
+            elseif (~length(strcmp(nn,'VOLUME')) || ~length(strcmp(ee,'EFFICIENCY')) || ~length(strcmp(kk,'HEADLOSS'))) &&  (tok(1)==';'), typecode=0; % HEADLOSS
+                Clines{u}=tline;u=u+1;continue;
+            else
+                typeCurve(i)=typecode; 
             end
             a = textscan(tline,'%s %f %f');
             curvesID(i)=a{1};
             X(i)=a(2);
             Y(i)=a(3);
-            i=i+1;
+            Clines{u}=tline;
+            i=i+1;u=u+1; 
         end
     end
-    save([pwd,'\RESULTS\','typeCodeCurves'],'typeCurve','-mat')   
 end
 
 
-function addCurve(obj,newCurveID,CurveX,CurveY)  
+function addCurve(obj,newCurveID,CurveX,CurveY,typecode,varargin)  
+    % PUMP 0
+    % EFFICIENCY 1
+    % VOLUME 2
+    % HEADLOSS 3
+ 
+    for i=1:length(CurveX)
+        if i+1<length(CurveX)+1
+            if CurveX(i)>=CurveX(i+1)
+                if strfind([0 1 3],typecode)
+                    warning('Flow values are not in ascending order.');
+                    return;
+                elseif typecode==2
+                    warning('Heigh values are not in ascending order.');
+                    return;
+                end
+            end
+        end
+    end
     load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat') 
-    if tmp==1
+    if tmp==1 
         obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
     end
     % Check if new ID already exists
-    [pCurveID,~,~,sectCurve]=CurveInfo(obj);
-    sect=0;
-    
+    [pCurveID,~,~,~,~,sectCurve]=CurveInfo(obj);
+
     i=1;exists=0;
     while i<length(pCurveID)+1
         exists(i) = strcmp(newCurveID,char(pCurveID(i)));
@@ -3467,6 +3479,8 @@ function addCurve(obj,newCurveID,CurveX,CurveY)
         warning(s);
         return
     end
+    
+    sect=0;
 
     % Open and read inpname
     fid = fopen(obj.PathFile,'r+');
@@ -3494,16 +3508,12 @@ function addCurve(obj,newCurveID,CurveX,CurveY)
         j = sum(j);
         if j == length(a)
             % skip
-            i=i+1;
         elseif isempty(c)
             % skip
-            i=i+1;
         else
-            i=i+1;
-
-        u=1;
+            u=1;
             while u < length(a)+1
-                if strcmp(a{u},'[CURVES]') && sectCurve==0
+                if strcmp(a{u},'[CURVES]')  
                     fprintf(fid2,'[CURVES]');
                     sect=1; break;
                 end
@@ -3520,16 +3530,25 @@ function addCurve(obj,newCurveID,CurveX,CurveY)
                 ch1 = strcmp(check_brackets,'[');
                 ch2 = strcmp(check_brackets,']');
 
-                if (ch1(1)==1 && ch2(2)==1 && (sectCurve~=0 && nn==0))
+                if (ch1(1)==1 && ch2(2)==1 && nn==0)
                     if yy==0
                         if sect==0
                             fprintf(fid2,'[CURVES]\n;ID                X-Value            Y-Value\n');
                         end
-                        fprintf(fid2,';PUMP:%sX-Value%sY-Value\n',sps{:},sps{:}); yy=1;
+                        if typecode==0
+                            fprintf(fid2,';PUMP: PUMP:%sX-Value%sY-Value\n',sps{:},sps{:}); yy=1;
+                        elseif typecode==1
+                            fprintf(fid2,';PUMP: EFFICIENCY:\n'); yy=1;
+                        elseif typecode==2
+                            fprintf(fid2,';PUMP: VOLUME:\n'); yy=1;
+                        elseif typecode==3
+                            fprintf(fid2,';PUMP: HEADLOSS:\n'); yy=1;
+                        end
                     end
-                    fprintf(fid2, '%s%s%d%s%d', newCurveID,sps{:},CurveX,sps{:},CurveY);
-                    fprintf(fid2,'\r\n');
-                    fprintf(fid2,'\r\n');
+                    for i=1:length(CurveX)
+                        fprintf(fid2, '%s%s%d%s%d', newCurveID,sps{:},CurveX(i),sps{:},CurveY(i));
+                        fprintf(fid2,'\r\n');
+                    end
                     fprintf(fid2,'%s',a{u});
                     fprintf(fid2,'\r\n');
                     nn=1;
@@ -3549,18 +3568,14 @@ function addCurve(obj,newCurveID,CurveX,CurveY)
     fclose all;
     
     [errcode] = Epanet('tempInpFile.inp');
-    obj.saveInputFile('tempInpFile.inp'); % OK %
-    movefile('tempInpFile.inp',[pwd,'\RESULTS']);
 end
 
 
-function rmCurveID(obj,CurveID)
-
+function rmCurveID(obj,CurveID,varargin)
+            
     obj.saveInputFile('tempInpFile.inp'); % OK %
-    movefile('tempInpFile.inp',[pwd,'\RESULTS']);
-    
     % Check if id new already exists
-    [pCurveID,~,~,sectCurve]=CurveInfo(obj);
+    [pCurveID,~,~,~,~,sectCurve]=CurveInfo(obj);
     if length(pCurveID)==0 
         s = sprintf('There is no such object in the network.');
         warning(s);
@@ -3573,7 +3588,7 @@ function rmCurveID(obj,CurveID)
         i=i+1;
     end
 
-    if (sum(exists)~=1)
+    if (sum(exists)==0)
         s = sprintf('There is no such object in the network.');
         warning(s);
         return
@@ -3586,14 +3601,21 @@ function rmCurveID(obj,CurveID)
         p = strcmp(CurveID,pp.PumpCurveID{i});
 
         if p==1
-%             s = sprintf('Pump %s refers to undefined curve.',value.PumpsID{i});
-            obj.removeLinkID(value.PumpsID{i})
-%             warning(s);
+%             tmp=0;
+%             save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
+            s = sprintf('Pump %s refers to undefined curve.',value.PumpsID{i});
+%             obj.removeLinkID(value.PumpsID{i})
+            warning(s);
+            tmp=0;
+            save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
+        else
+            tmp=1;
+            save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
         end
-
         i=i+1;
     end
-
+    if length(pp.PumpCurveID)==0, tmp=1; else tmp=0; end
+    
     % Open and read inpname
     fid = fopen(obj.PathFile,'r+');
 
@@ -3607,7 +3629,7 @@ function rmCurveID(obj,CurveID)
     
     fid2 = fopen(obj.PathFile,'w');
 
-    i=1;e=0;n=0;
+    e=0;n=0;
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
@@ -3619,69 +3641,73 @@ function rmCurveID(obj,CurveID)
         j = sum(j);
         if j == length(a)
             % skip
-            i=i+1;
         elseif isempty(c)
             % skip
-            i=i+1;
         else
-            i=i+1;
+            u=1; 
+            while u < length(a)+1
 
-        u=1; 
-        while u < length(a)+1
+                spaces= 10 - length(a{u});
+                k=1;sps={' '};
+                while k < spaces+1
+                    sps = strcat(sps,{' '});
+                    k=k+1;
+                end
 
-            spaces= 10 - length(a{u});
-            k=1;sps={' '};
-            while k < spaces+1
-                sps = strcat(sps,{' '});
-                k=k+1;
-            end
+                rr = regexp(a,'\w*[\w*]\w*','split');
+                check_brackets = rr{:};
+                ch1 = strcmp(check_brackets,'[');
+                ch2 = strcmp(check_brackets,']');
 
-            rr = regexp(a,'\w*[\w*]\w*','split');
-            check_brackets = rr{:};
-            ch1 = strcmp(check_brackets,'[');
-            ch2 = strcmp(check_brackets,']');
+                if strcmp(a{u},'[CURVES]')  
+                    fprintf(fid2,'%s',a{u}); 
+                    n=1; 
+                elseif ch1(1)==1 && ch2(2)==1 && n==1
+                    if (isempty(a{u})&& n==1) break; end
+                    e=1;
+                end
+                if strcmp(a{u},'[END]')  e=1; fprintf(fid2,'%s',a{u});break;   end
 
-            if strcmp(a{u},'[CURVES]')
-                fprintf(fid2,'%s',a{u}); 
-                n=1; 
-            elseif ch1(1)==1 && ch2(2)==1 && n==1
-                if (isempty(a{u})&& n==1) break; end
-                e=1;
-            end
-            if strcmp(a{u},'[END]')  e=1; fprintf(fid2,'%s',a{u});break;   end
-
-            if n==1 && e==0  
-                if strcmp(a{u},'[CURVES]') break; end
-                if isempty(a{u})                
-                elseif strfind(a{u},';')
-                    u = length(a)+1; break;
-                else 
-                        tt = strcmp(a{u},CurveID);  
-                        if tt==1
-                            u = length(a)+1; break;
+                if n==1 && e==0  
+                    if strcmp(a{u},'[CURVES]') break; end
+                    if isempty(a{u}) 
+                        u=u+1;continue;
+                    elseif strfind(a{u},';') 
+                            ee=regexp(tline,'\w*EFFICIENCY*\w','match');
+                            nn=regexp(tline,'\w*VOLUME*\w','match');
+                            kk=regexp(tline,'\w*HEADLOSS*\w','match');
+                        if length(strcmp(ee,'EFFICIENCY')) || length(strcmp(nn,'VOLUME')) || length(strcmp(kk,'HEADLOSS')) || length(strcmp(a{1},';PUMP:'))
+                            fprintf(fid2,'%s%s',a{u},sps{:});
                         else
-                        fprintf(fid2,'%s%s',a{u},sps{:});
+                            u = length(a)+1; break;
                         end
+                    else 
+                        tt = strcmp(a{u},CurveID);  
+                        if tt==1 
+                            u = length(a)+1; 
+                        else
+                            fprintf(fid2,'%s%s',a{u},sps{:});
+                        end
+                    end
+                else
+                    if isempty(a{u})
+                    else 
+                        fprintf(fid2,'%s%s',a{u},sps{:});
+                    end
                 end
-            else
-                if isempty(a{u})
-                else 
-                    fprintf(fid2,'%s%s',a{u},sps{:});
-                end
-            end
-            u=u+1;
+                u=u+1;
 
-        end
+            end
         end
             fprintf(fid2,'\n');
     end
 
     fclose all;
-    tmp=0;
-    save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
+
 %     [errcode] = Epanet('tempInpFile.inp');
-%     obj.saveInputFile('tempInpFile.inp'); % OK %
-%     movefile('tempInpFile.inp',[pwd,'\RESULTS']);
+%     obj.saveInputFile('tempInpFile.inp'); 
+%     tmp=0;
+%     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')  
 end
 
 
@@ -3699,7 +3725,6 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
     load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
     if tmp==1
         obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
     end
     
     % Initial PIPE
@@ -3717,7 +3742,7 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
         vdiameter=304.8; %valves
     end
     proughness=100;
-    vsetting=0; %valves
+    vsetting=100; %valves
 
     % Check if id new already exists
     Nodes = obj.getNodesInfo;
@@ -3812,7 +3837,7 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
     fid2 = fopen(obj.PathFile,'w');
 
     % Add pipe
-    i=1;nn=0;
+    nn=0;
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
@@ -3824,13 +3849,9 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
         j = sum(j);
         if j == length(a)
             % skip
-            i=i+1;
         elseif isempty(c)
             % skip
-            i=i+1;
         else
-            i=i+1;
-
             u=1;
             while u < length(a)+1
 
@@ -3870,7 +3891,7 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
                     if isempty(char(crvs.CurvesID))
                         s = sprintf('No head curve supplied for pump %s.',newLink);
                         warning(s);
-                        warning('addNewCurve must be called after this function.');
+                        warning('addCurve.. must be called after this function.');
                         fclose(fid2);
                         return
                     else
@@ -3906,8 +3927,7 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
     fclose all;
     
     [errcode] = Epanet('tempInpFile.inp');
-    obj.saveInputFile('tempInpFile.inp'); % OK %
-    movefile('tempInpFile.inp',[pwd,'\RESULTS']);
+%     obj.saveInputFile('tempInpFile.inp'); % OK %
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
 
@@ -3940,7 +3960,7 @@ function value=LinksInfo(obj)
         if ~ischar(tline),   break,   end
         % Get first token in the line
         tok = strtok(tline);
-        % Skip blank lines and comments
+        % Skip blank Clines and comments
         if isempty(tok), continue, end
         if (tok(1) == ';'), continue, end
         if (tok(1) == '[')
@@ -4053,7 +4073,7 @@ function value=NodesInfo(obj)
         if ~ischar(tline),   break,   end
         % Get first token in the line
         tok = strtok(tline);
-        % Skip blank lines and comments
+        % Skip blank Clines and comments
         if isempty(tok), continue, end
         if (tok(1) == ';'), continue, end
         if (tok(1) == '[')
@@ -4156,7 +4176,7 @@ function value=ControlsInfo(obj)
         if ~ischar(tline),   break,   end
         % Get first token in the line
         tok = strtok(tline);
-        % Skip blank lines and comments
+        % Skip blank Clines and comments
         if isempty(tok), continue, end
         if (tok(1) == ';'), continue, end
         if (tok(1) == '[')
@@ -4222,7 +4242,7 @@ function value=FlowUnitsHeadlossFormula(obj)
         if ~ischar(tline),   break,   end
         % Get first token in the line
         tok = strtok(tline);
-        % Skip blank lines and comments
+        % Skip blank Clines and comments
         if isempty(tok), continue, end
         if (tok(1) == ';'), continue, end
         if (tok(1) == '[')
@@ -4357,6 +4377,7 @@ function value=PumpInfo(obj)
     value.PumpsID={};
     value.fromNodePumps={};
     value.toNodePumps={};
+    value.PumpCurveID={};
     sect=0; i=1; value.sectPump=0;
     % Read each line from msx file.
     while 1
@@ -4364,7 +4385,7 @@ function value=PumpInfo(obj)
         if ~ischar(tline),   break,   end
         % Get first token in the line
         tok = strtok(tline);
-        % Skip blank lines and comments
+        % Skip blank Clines and comments
         if isempty(tok), continue, end
         if (tok(1) == ';'), continue, end
         if (tok(1) == '[')
@@ -4420,7 +4441,6 @@ function addNode(obj,typecode,newID,X,Y,varargin)
     load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
     if tmp==1
         obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
     end
     v=obj.getFlowUnitsHeadlossFormula;
 
@@ -4508,7 +4528,7 @@ function addNode(obj,typecode,newID,X,Y,varargin)
     fid2 = fopen(obj.PathFile,'w');
 
     % Initiality
-    i=1;qualch=0;
+    qualch=0;
     qq=0;
     Coordch=0;
     onetime=1;
@@ -4527,10 +4547,8 @@ function addNode(obj,typecode,newID,X,Y,varargin)
         j = sum(j);
         if j == length(a)
             % skip
-            i=i+1;
         elseif isempty(c)
             % skip
-            i=i+1;
         else
             i=i+1;
 
@@ -4599,7 +4617,6 @@ function addNode(obj,typecode,newID,X,Y,varargin)
 %                         fclose all;
 %                         [errcode] = Epanet('tempInpFile.inp');
 %                         obj.saveInputFile('tempInpFile.inp'); % OK %
-%                         movefile('tempInpFile.inp',[pwd,'\RESULTS']);
 %                         return
 %                     end
 %                 end
@@ -4677,7 +4694,6 @@ function addNode(obj,typecode,newID,X,Y,varargin)
     fclose all;
 %     [errcode] = Epanet('tempInpFile.inp');
 %     obj.saveInputFile('tempInpFile.inp'); % OK %
-%     movefile('tempInpFile.inp',[pwd,'\RESULTS']);
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
 end
@@ -4715,7 +4731,6 @@ function addNewControl(obj,x,status,y_t_c,param,z,varargin)
     load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
     if tmp==1
         obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
     end
     
     % syntax
@@ -4795,12 +4810,9 @@ function addNewControl(obj,x,status,y_t_c,param,z,varargin)
         j = sum(j);
         if j == length(a)
             % skip
-            i=i+1;
         elseif isempty(c)
             % skip
-            i=i+1;
         else
-            i=i+1;
 
             u=1;
             while u < length(a)+1
@@ -4851,8 +4863,7 @@ function addNewControl(obj,x,status,y_t_c,param,z,varargin)
 
     fclose all;
     [errcode] = Epanet('tempInpFile.inp');
-    obj.saveInputFile('tempInpFile.inp'); % OK %
-    movefile('tempInpFile.inp',[pwd,'\RESULTS']);
+%     obj.saveInputFile('tempInpFile.inp'); % OK %
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
 end
@@ -4863,7 +4874,6 @@ function [warn1] = rmLink(obj,LinkID)
     load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
     if tmp==1
         obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
     end
     % Check if id new already exists
     links = obj.getLinksInfo;
@@ -4913,7 +4923,7 @@ function [warn1] = rmLink(obj,LinkID)
     fid2 = fopen(obj.PathFile,'w');
 
     % section [JUNCTIONS]
-    i=1;out=0;YY=0;
+    out=0;YY=0;
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
@@ -4925,12 +4935,9 @@ function [warn1] = rmLink(obj,LinkID)
         j = sum(j);
         if j == length(a)
             % skip
-            i=i+1;
         elseif isempty(c)
             % skip
-            i=i+1;
         else
-            i=i+1;
 
             u=1;x=0;xx=0;q=0;
             while u < length(a)+1
@@ -4952,25 +4959,25 @@ function [warn1] = rmLink(obj,LinkID)
                 if strcmp(a{u},'[PIPES]') YY=1;end
                 if YY==1   
                     if isempty(a{u}) && (x==0)
-                     u=u+1; x=1;xx=1;
-                     if u==length(a)+1
+                        u=u+1; x=1;xx=1;
+                        if u==length(a)+1
                          break
-                     end
+                        end
                     end
 
-                if strcmp(a{u},'[TAGS]') out=1; end
-                if strcmp(a{u},'[STATUS]') out=1; end
-                if strcmp(a{u},'[DEMANDS]') out=1; end
-                if strcmp(a{u},'[PATTERNS]') out=1; end
+                    if strcmp(a{u},'[TAGS]') out=1; end
+                    if strcmp(a{u},'[STATUS]') out=1; end
+                    if strcmp(a{u},'[DEMANDS]') out=1; end
+                    if strcmp(a{u},'[PATTERNS]') out=1; end
 
-                if strcmp(a{u},LinkID) && q~=1 && out==0
-                    if xx==1 || strcmp(a{u},LinkID)
-                    u=length(a)+1;
+                    if strcmp(a{1},LinkID) && q~=1 && out==0
+                        if xx==1 || strcmp(a{1},LinkID)
+                            u=length(a)+1;
+                        end
+                    else
+                        q=1;
+                        fprintf(fid2,'%s%s',a{u},sps{:});
                     end
-                else
-                    q=1;
-                    fprintf(fid2,'%s%s',a{u},sps{:});
-                end
                 else
                     if isempty(a{u})
                         u=u+1;
@@ -5035,14 +5042,12 @@ function [warn1] = rmLink(obj,LinkID)
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
 %     [errcode] = Epanet('tempInpFile.inp');
 %     obj.saveInputFile('tempInpFile.inp'); % OK %
-%     movefile('tempInpFile.inp',[pwd,'\RESULTS']);
 end
 
 function rmNode(obj,NodeID)
     load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
     if tmp==1
         obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
     end
     % Remove node from the network. 
     checklinks='';
@@ -5060,14 +5065,25 @@ function rmNode(obj,NodeID)
         i=i+1;
     end
 
-    if (sum(exists)~=1)
+    if (sum(exists)==0)
         s = sprintf('There is no such object in the network.');
         warning(s);
         return;
-    elseif length(char(nodes.ReservoirsID))+length(char(nodes.TanksID))<2
-        warning('One or more errors in input file.')
-        warning('This tank/reservoir has not removed.')
-        return;
+    end
+   
+    if length(char(nodes.ReservoirsID)) 
+        if strcmp(NodeID,char(nodes.ReservoirsID))
+            warning('One or more errors in input file.');
+            warning('This tank/reservoir has not removed.');
+            return;
+        end
+        
+    elseif length(char(nodes.TanksID))
+        if strcmp(NodeID,char(nodes.TanksID))
+            warning('One or more errors in input file.');
+            warning('This tank/reservoir has not removed.');
+            return;
+        end
     end
     % Get links which delete with function Remove Link
     links = obj.getLinksInfo;
@@ -5126,7 +5142,7 @@ function rmNode(obj,NodeID)
 
     fid2 = fopen(obj.PathFile,'w');
 
-    i=1;out=0;
+    out=0;
     for t = 1:length(info)
         c = info{t};
         a = regexp(c,'\s*','split');
@@ -5138,12 +5154,9 @@ function rmNode(obj,NodeID)
         j = sum(j);
         if j == length(a)
             % skip
-            i=i+1;
         elseif isempty(c)
             % skip
-            i=i+1;
         else
-            i=i+1;
 
             u=1;x=0;xx=0;q=0;
             while u < length(a)+1
@@ -5177,8 +5190,8 @@ function rmNode(obj,NodeID)
                 if strcmp(a{u},'[MIXING]') out=0; end
                 if strcmp(a{u},'[COORDINATES]') out=0; end
 
-                if strcmp(a{u},NodeID) && q~=1 && out==0
-                    if xx==1 || strcmp(a{u},NodeID)
+                if strcmp(a{1},NodeID) && q~=1 && out==0
+                    if xx==1 || strcmp(a{1},NodeID)
                         u=length(a)+1;
                     end
                 else
@@ -5223,8 +5236,7 @@ function rmNode(obj,NodeID)
     
     if sum(warn1)~=0
         [errcode] = Epanet('tempInpFile.inp');
-        obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
+%         obj.saveInputFile('tempInpFile.inp'); % OK %
     end
 end
 
@@ -5233,7 +5245,6 @@ function rmControl(obj,type,id)
     load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
     if tmp==1
         obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
     end
     
     exists=0;
@@ -5297,7 +5308,7 @@ function rmControl(obj,type,id)
     
     fid2 = fopen(obj.PathFile,'w');
 
-    i=1;e=0;n=0;kk=1; 
+    e=0;n=0;kk=1; 
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
@@ -5309,12 +5320,9 @@ function rmControl(obj,type,id)
         j = sum(j);
         if j == length(a)
             % skip
-            i=i+1;
         elseif isempty(c)
             % skip
-            i=i+1;
         else
-            i=i+1;
 
             u=1; 
             while u < length(a)+1
@@ -5399,8 +5407,7 @@ function rmControl(obj,type,id)
     fclose all;
     if tmp==1
         [errcode] = Epanet('tempInpFile.inp');
-        obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
+%         obj.saveInputFile('tempInpFile.inp'); % OK %
     end
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
@@ -5423,7 +5430,6 @@ function Options(obj,newFlowUnits,headloss,varargin)
     load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
     if tmp==1
         obj.saveInputFile('tempInpFile.inp'); % OK %
-        movefile('tempInpFile.inp',[pwd,'\RESULTS']);
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     value=obj.getFlowUnitsHeadlossFormula;
@@ -5471,9 +5477,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
     nodes = obj.getNodesInfo;
     links = obj.getLinksInfo;
     controls=obj.getControlsInfo;
-    load([pwd,'\RESULTS\','typeCodeCurves'],'typeCurve','-mat')   
     curves=obj.getCurveInfo;
-    curves.typeCurve=typeCurve;
     
     % Open and read inpname
     fid = fopen(obj.PathFile,'r+');
@@ -5489,7 +5493,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                     
     sections=[0 0 0 0 0 0 0 0 0];
     
-    nn=0;i=1;pp=1;
+    nn=0;pp=1;
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
@@ -5501,12 +5505,9 @@ function Options(obj,newFlowUnits,headloss,varargin)
         j = sum(j);
         if j == length(a)
             % skip
-            i=i+1;
         elseif isempty(c)
             % skip
-            i=i+1;
         else
-            i=i+1;
 
             u=1;
             while u < length(a)+1
@@ -5541,7 +5542,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                     break;  
                 elseif strcmp(a{u},'[CURVES]') && ((Units || ~changes) && nheadl)
                     fprintf(fid2,'[CURVES]');
-                    nn=0;pp=1;    
+                    nn=0;pp=1;ww=1;    
                     sections=[0 0 0 0 0 0 1 0 0];
                     break;                     
                 elseif strcmp(a{u},'[CONTROLS]') && Units
@@ -5659,7 +5660,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                         if pp<length(char(links.PipesID))+1 
                             if strcmp(a{mm},links.PipesID{pp})  
                                 pp=pp+1;
-                                for mm=mm:4
+                                for mm=mm:(mm+2)
                                     fprintf(fid2,'%s%s',char(a{mm}),sps{:});
                                 end
                                 if changes==1
@@ -5691,7 +5692,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                         if pp<length(char(links.ValvesID))+1 
                             if strcmp(a{mm},links.ValvesID{pp})  
                                 pp=pp+1;
-                                for mm=mm:4
+                                for mm=mm:(mm+2)
                                     fprintf(fid2,'%s%s',char(a{mm}),sps{:});
                                 end
                                 if changes==1
@@ -5699,7 +5700,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                                 elseif changes==2
                                     fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.03937007874),sps{:});
                                 end
-                                for mm=(mm+1):(mm+4)
+                                for mm=(mm+2):(mm+4)
                                     fprintf(fid2,'%s%s',char(a{mm}),sps{:});
                                 end
                             end
@@ -5739,29 +5740,59 @@ function Options(obj,newFlowUnits,headloss,varargin)
                         % skip
                             mm=mm+1;
                         end
-                        if pp<length(curves.CurvesID)+1 
-                            if curves.typeCurve(pp)==0% PUMP
-                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
-                                setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
-                                if changes==1
-                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps{:});
-                                elseif changes==2
-                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*3.281),sps{:}); 
-                                else
+                        if pp<length(curves.Clines)+1  % PUMP % EFFICIENCY % VOLUME
+                            if ww<length(curves.CurvesID)+1
+                                if curves.typeCurve(ww)==0 
+                                    if strcmp(a{1},';PUMP:')
+                                        fprintf(fid2,c);break;
+                                    end
+                                    fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                    setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
+                                    if changes==1
+                                        fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps{:});
+                                    elseif changes==2
+                                        fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*3.281),sps{:}); 
+                                    else
+                                        fprintf(fid2,'%s%s',char(a{mm+2}),sps{:});
+                                    end
+                                elseif curves.typeCurve(ww)==1 
+                                    ee=regexp(c,'\w*EFFICIENCY*\w','match');
+                                    if length(strcmp(ee,'EFFICIENCY'))
+                                        fprintf(fid2,c);break;
+                                    end
+                                    fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                    setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
                                     fprintf(fid2,'%s%s',char(a{mm+2}),sps{:});
+                                elseif curves.typeCurve(ww)==2
+                                    gg=regexp(c,'\w*VOLUME*\w','match');
+                                    if length(strcmp(gg,'VOLUME')) 
+                                        fprintf(fid2,c);break;
+                                    end
+                                    fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                    if changes==1
+                                        fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*2.831685e-02),sps{:});
+                                        fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps{:});
+                                    else
+                                        fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+                                        fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})),sps{:});
+                                    end
+                                elseif curves.typeCurve(ww)==3  % HEADLOSS
+                                    kk=regexp(c,'\w*HEADLOSS*\w','match');
+                                    if length(strcmp(kk,'HEADLOSS'))
+                                        fprintf(fid2,c);break;
+                                    end
+                                    fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                    if changes==1
+                                        fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps{:});
+                                    elseif changes==2
+                                        fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps{:}); 
+                                    else
+                                        fprintf(fid2,'%s%s',char(a{mm+1}),sps{:});
+                                    end
+                                    mm=mm+1;
+                                    setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
                                 end
-                            elseif curves.typeCurve(pp)==1 % EFFICIENCY 
-          % VOLUME
-         % HEADLOSS
-                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
-                                setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
-                                if changes==1
-                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps{:});
-                                elseif changes==2
-                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*3.281),sps{:}); 
-                                else
-                                    fprintf(fid2,'%s%s',char(a{mm+2}),sps{:});
-                                end
+                                ww=ww+1;
                             end
                             pp=pp+1;
                         else
@@ -5840,8 +5871,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
     end
     fclose all;
     [errcode] = Epanet('tempInpFile.inp');
-    obj.saveInputFile('tempInpFile.inp');  
-    movefile('tempInpFile.inp',[pwd,'\RESULTS']);
+%     obj.saveInputFile('tempInpFile.inp');  
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
 end
@@ -6078,4 +6108,90 @@ function setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
                 fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});   
         end                                    
     end
+end
+
+function remAddCurve(obj,Curves,varargin)
+ 
+    % Open and read inpname
+    fid = fopen(obj.PathFile,'r+');
+
+    t=0;
+    % Read all file and save in variable info
+    while ~feof(fid)
+        tline=fgetl(fid);
+        t = t+1;
+        info{t} = tline;
+    end
+    fid2 = fopen(obj.PathFile,'w');
+                    
+    sect=0;
+    t=1;
+    nn=0; 
+    while t<length(info)+1
+        c = info{t};
+        a = regexp(c, '\s*','split');
+        y=1;
+        while y < length(a)+1
+            j(y) = isempty(a{y});
+            y=y+1;
+        end
+        j = sum(j);
+        if j == length(a)
+            % skip
+%             if (sect==1), t=t+1; end
+        elseif isempty(c)
+            % skip
+%             if (sect==1), t=t+1; end
+        else
+            u=1;
+            while u < length(a)+1
+                if strcmp(a{u},'[CURVES]') 
+                    fprintf(fid2,'[CURVES]');
+                    nn=0;      
+                    sect=1;%pp=1;
+                    break;                     
+                end
+                
+                spaces= 15 - length(a{u});
+                k=1;sps={' '};
+                while k < spaces+1
+                    sps = strcat(sps,{' '});
+                    k=k+1;
+                end
+
+
+                % section [CURVES]
+                if (sect==1) && (nn==0) 
+                    if ~strcmp(a{u},'[CONTROLS]')  || varargin{1}
+                        if varargin{1}
+                            for i=1:length(Curves)
+                                fprintf(fid2,'%s\n',char(Curves{i}),sps{:});
+                            end
+                            fprintf(fid2,'%s%s',a{u},sps{:});nn=1;sect=0;
+                            break;
+                        end
+%                         pp=pp+1;
+                    else
+%                         if pp==1, nn=1; t=t-10;sect=0;break; end
+                        fprintf(fid2,'%s%s',a{u},sps{:});nn=1;sect=0;
+                        break;
+                    end
+%                     fprintf(fid2,'%s%s',a{u},sps{:}); 
+%                     nn=1;sect=0;
+%                     break;
+                elseif isempty(a{u}) && nn==0
+                else
+                    if isempty(a{u}) && nn==1
+                    else
+                    fprintf(fid2,'%s%s',a{u},sps{:});
+                    end
+                end  
+                u=u+1; 
+            end
+        end
+        t=t+1;
+        fprintf(fid2,'\n');
+    end
+    fclose all;
+
 end
