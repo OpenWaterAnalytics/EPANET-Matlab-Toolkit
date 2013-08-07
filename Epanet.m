@@ -2393,22 +2393,22 @@ function [errcode, tstep] = ENnextQ()
     tstep = double(tstep);
 end
 
-function [errcode] = ENopen(inpname,repname,binname,varargin)
-%     global EN_SIZE;
-    
+function [errcode] = ENopen(inpname,repname,binname,varargin) 
     repname='';
     binname='';
     
     errcode=calllib('epanet2','ENopen',inpname,repname,binname);
-%     if errcode 
-        while errcode~=0
-            try
-                errcode=calllib('epanet2','ENopen',inpname,repname,binname);
-            catch err
+
+    while errcode~=0
+        try
+            errcode=calllib('epanet2','ENopen',inpname,repname,binname);
+            if errcode==302
+                unloadlibrary('epanet2');
+                ENMatlabSetup('epanet2','epanet2.h');
             end
+        catch err
         end
-%         ENerror(errcode); 
-%     end
+    end
 end
 
 
@@ -4880,7 +4880,8 @@ function [warn1] = rmLink(obj,LinkID)
     if length(links.LinksAll)==0 
         s = sprintf('There is no such object in the network.');
         warning(s);
-        return
+        [errcode] = Epanet('tempInpFile.inp');
+        return;
     end
 
     i=1;
@@ -4895,7 +4896,8 @@ function [warn1] = rmLink(obj,LinkID)
     if (sum(exists)~=1)
         s = sprintf('There is no such object in the network.');
         warning(s);
-        return
+        [errcode] = Epanet('tempInpFile.inp');
+        return;
     end
 
     nodes = obj.getNodesInfo;
@@ -5068,23 +5070,19 @@ function rmNode(obj,NodeID)
     if (sum(exists)==0)
         s = sprintf('There is no such object in the network.');
         warning(s);
+        [errcode] = Epanet('tempInpFile.inp');
         return;
     end
    
-    if length(char(nodes.ReservoirsID)) 
-        if strcmp(NodeID,char(nodes.ReservoirsID))
+    if sum(strcmp(NodeID,nodes.ReservoirsID)) || sum(strcmp(NodeID,nodes.TanksID))
+        if (length(char(nodes.ReservoirsID))+length(char(nodes.TanksID))-1)==0;
             warning('One or more errors in input file.');
             warning('This tank/reservoir has not removed.');
-            return;
-        end
-        
-    elseif length(char(nodes.TanksID))
-        if strcmp(NodeID,char(nodes.TanksID))
-            warning('One or more errors in input file.');
-            warning('This tank/reservoir has not removed.');
+            [errcode] = Epanet('tempInpFile.inp');
             return;
         end
     end
+        
     % Get links which delete with function Remove Link
     links = obj.getLinksInfo;
     checklinks_index=0;
@@ -5182,13 +5180,15 @@ function rmNode(obj,NodeID)
                      end
                 end
 
-                if strcmp(a{u},'[TANKS]') out=0; end
-                if strcmp(a{u},'[PIPES]') out=1; end
-                if strcmp(a{u},'[DEMANDS]') out=0; end %out=0; delete line
-                if strcmp(a{u},'[QUALITY]') out=0; end
-                if strcmp(a{u},'[SOURCES]') out=1; end 
-                if strcmp(a{u},'[MIXING]') out=0; end
-                if strcmp(a{u},'[COORDINATES]') out=0; end
+                if strcmp(a{u},'[JUNCTIONS]'), out=0; end
+                if strcmp(a{u},'[RESERVOIRS]'), out=0; end
+                if strcmp(a{u},'[TANKS]'), out=0; end
+                if strcmp(a{u},'[PIPES]'), out=1; end
+                if strcmp(a{u},'[DEMANDS]'), out=0; end %out=0; delete line
+                if strcmp(a{u},'[QUALITY]'), out=0; end
+                if strcmp(a{u},'[SOURCES]'), out=1; end 
+                if strcmp(a{u},'[MIXING]'), out=0; end
+                if strcmp(a{u},'[COORDINATES]'), out=0; end
 
                 if strcmp(a{1},NodeID) && q~=1 && out==0
                     if xx==1 || strcmp(a{1},NodeID)
@@ -5256,7 +5256,8 @@ function rmControl(obj,type,id)
         if length(char(controls.linksID))==0 
             s = sprintf('There is no such object in the network.');
             warning(s);
-            return
+            [errcode] = Epanet('tempInpFile.inp');
+            return;
         end
 
         i=1;
@@ -5264,8 +5265,9 @@ function rmControl(obj,type,id)
             if type==1
                 exists(i) = strcmp(controls.linksID{i},char(id));
             else
-                warning('Type is NODE(0) or LINK(1)');
-                return
+                warning('Type is NODE(0) or LINK(1)');          
+                [errcode] = Epanet('tempInpFile.inp');
+                return;
             end
             i=i+1;
         end
@@ -5275,7 +5277,8 @@ function rmControl(obj,type,id)
         if length(char(controls.nodesID))==0 
             s = sprintf('There is no such object in the network.');
             warning(s);
-            return
+            [errcode] = Epanet('tempInpFile.inp');
+            return;
         end
 
         i=1;
@@ -5284,17 +5287,22 @@ function rmControl(obj,type,id)
                 exists1(i) = strcmp(controls.nodesID{i},char(id));
             else
                 warning('Type is NODE(0) or LINK(1)');
-                return
+                [errcode] = Epanet('tempInpFile.inp');
+                return;
             end
             i=i+1;
         end
     end
 
-    if (sum(exists)==0) && (sum(exists1)==0)
+    if (sum(exists)==0) && (sum(exists1)==0) && tmp==1
         warning('There are no Controls in the network.');
-        return
+        [errcode] = Epanet('tempInpFile.inp');
+        return;
+    elseif (sum(exists)==0) && (sum(exists1)==0)
+        warning('There are no Controls in the network.');
+        return;
     end
-
+    
     % Open and read inpname
     fid = fopen(obj.PathFile,'r+');
 
@@ -5343,13 +5351,13 @@ function rmControl(obj,type,id)
                     fprintf(fid2,'%s',a{u}); 
                     n=1; 
                 elseif ch1(1)==1 && ch2(2)==1 && n==1
-                    if (isempty(a{u})&& n==1) break; end
+                    if (isempty(a{u})&& n==1), break; end
                     e=1;
                 end
-                if strcmp(a{u},'[END]')  e=1; fprintf(fid2,'%s',a{u});break;   end
+                if strcmp(a{u},'[END]'),  e=1; fprintf(fid2,'%s',a{u});break;   end
 
                 if n==1 && e==0 && kk==1
-                    if strcmp(a{u},'[CONTROLS]') break; end
+                    if strcmp(a{u},'[CONTROLS]'), break; end
                     if isempty(a{u})
                     elseif strfind(a{u},';')
                         u = length(a)+1;break;
@@ -5744,7 +5752,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                             if ww<length(curves.CurvesID)+1
                                 if curves.typeCurve(ww)==0 
                                     if strcmp(a{1},';PUMP:')
-                                        fprintf(fid2,c);break;
+                                        fprintf(fid2,c);pp=pp+1;break;
                                     end
                                     fprintf(fid2,'%s%s',char(a{mm}),sps{:});
                                     setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
@@ -5758,7 +5766,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                                 elseif curves.typeCurve(ww)==1 
                                     ee=regexp(c,'\w*EFFICIENCY*\w','match');
                                     if length(strcmp(ee,'EFFICIENCY'))
-                                        fprintf(fid2,c);break;
+                                        fprintf(fid2,c);pp=pp+1;break;
                                     end
                                     fprintf(fid2,'%s%s',char(a{mm}),sps{:});
                                     setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
@@ -5766,7 +5774,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                                 elseif curves.typeCurve(ww)==2
                                     gg=regexp(c,'\w*VOLUME*\w','match');
                                     if length(strcmp(gg,'VOLUME')) 
-                                        fprintf(fid2,c);break;
+                                        fprintf(fid2,c);pp=pp+1;break;
                                     end
                                     fprintf(fid2,'%s%s',char(a{mm}),sps{:});
                                     if changes==1
@@ -5779,7 +5787,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                                 elseif curves.typeCurve(ww)==3  % HEADLOSS
                                     kk=regexp(c,'\w*HEADLOSS*\w','match');
                                     if length(strcmp(kk,'HEADLOSS'))
-                                        fprintf(fid2,c);break;
+                                        fprintf(fid2,c);pp=pp+1;break;
                                     end
                                     fprintf(fid2,'%s%s',char(a{mm}),sps{:});
                                     if changes==1

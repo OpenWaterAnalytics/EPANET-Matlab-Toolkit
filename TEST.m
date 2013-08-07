@@ -156,12 +156,6 @@ d.getTimeSimulationDuration
 d.plot
 
 % Controls
-v=d.getControlsInfo
-d.setTimeSimulationDuration(500)
-% LINK x status IF NODE y ABOVE/BELOW z
-d.addControl('10','OPEN','10','ABOVE',100)
-d.getTimeSimulationDuration
-
 % LINK x status AT TIME t
 d.addControl('10','OPEN','10.00')
 % LINK x status AT CLOCKTIME c AM/PM
@@ -173,12 +167,16 @@ d.removeControlLinkID(v.linksID{1});
 d.getTimeSimulationDuration
 
 v=d.getControlsInfo
-d.removeControlNodeID(v.nodesID{1});
+d.setTimeSimulationDuration(500)
+% LINK x status IF NODE y ABOVE/BELOW z
+d.addControl('12','OPEN','12','ABOVE',100)
 d.getTimeSimulationDuration
 
 v=d.getControlsInfo
-d.removeControlLinkID(v.linksID{1});
+d.removeControlNodeID(v.nodesID{1});
 d.getTimeSimulationDuration
+v=d.getControlsInfo
+
 
 
 % Nodes & Link Info
@@ -189,15 +187,15 @@ d.getPumpInfo % for the specific Pump curve
 % Add node & pipe
 d.setTimeSimulationDuration(5000)
 d.plot
-[x,y]=ginput
+[x,y]=ginput(1);
 d.addJunction('J1',x,y)
-d.addPipe('P1','9','J1')
+d.addPipe('P1','10','J1')
 d.plot
 d.getTimeSimulationDuration
 
 d.setTimeSimulationDuration(35000)
 d.plot
-[x,y]=ginput
+[x,y]=ginput(1);
 d.addReservoir('S1',x,y)
 d.addPipe('P2','J1','S1')
 d.plot
@@ -205,7 +203,7 @@ d.getTimeSimulationDuration
 
 d.setTimeSimulationDuration(15000)
 d.plot
-[x,y]=ginput
+[x,y]=ginput(1);
 d.addTank('T1',x,y)
 d.addPipe('P3','32','T1')   
 d.plot
@@ -289,9 +287,9 @@ d.setLinkInitialStatus(0*d.getLinkInitialStatus)
 d.getLinkInitialStatus
 
 tmp=d.getLinkInitialSettings
-tmp(2)=105
+tmp(2)=108
 d.setLinkInitialSettings(tmp)
-tmp(13)=0
+tmp(13)=100
 d.setLinkInitialSettings(tmp)
 d.getLinkInitialSettings
 
@@ -355,7 +353,7 @@ d.addPattern('NewPat1')
 d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7])
 
 d.getPatternID
-d.getPatternID([2])
+d.getPatternID(2)
 
 d.getPatternIndex
 d.getPatternIndex('NewPat1')
@@ -427,7 +425,7 @@ d.getTimeRuleControlStep
 
 
 d.saveInputFile('Netmodified.inp')
-movefile('Netmodified.inp',[pwd,'\Results']);
+movefile('Netmodified.inp',[pwd,'\RESULTS']);
 
 % d.getPumpType
 
@@ -545,34 +543,57 @@ d.setNodeSourcePatternIndex(values)
 d.getNodeSourcePatternIndex
 
 values = d.getPattern
-values(3,end)=800;
+values(1,end)=800;
 d.setPatternMatrix(values)
 d.getPattern
 
-%%%
-
-
 d.getCurveInfo
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Simulate all times
+d.solveCompleteHydraulics
+d.solveCompleteQuality
+
+
+% Runs Quality Step-by-step
+d.solveCompleteHydraulics
+d.saveHydraulicFile('hydraulics.hyd')
+d.useHydraulicFile('hydraulics.hyd')
+d.saveHydraulicsOutputReportingFile
+d.openQualityAnalysis
+d.initializeQualityAnalysis
+tleft=1; P=[];T=[]; D=[]; H=[]; Q=[]; M=[];
+while (tleft>0)
+    t=d.runQualityAnalysis;
+    P=[P; d.getNodePressure];
+    Q=[Q; d.getNodeActualQuality];
+    T=[T; t];
+    %tstep=d.nextQualityAnalysisStep; %%% CHECK, DOES NOT SEEM TO CHANGE
+    %WITH SETTIMEQUALITYSTEP
+    tleft = d.stepQualityAnalysisTimeLeft;
+end
+d.closeQualityAnalysis;
+
 d.setQualityType('chem','mg/L')
-    
-v=d.getComputedQualityTimeSeries('time','demand')
-v=d.getComputedQualityTimeSeries('quality')
-v=d.getComputedQualityTimeSeries('mass')
-v=d.getComputedQualityTimeSeries('qualitySensingNodes',1:d.CountNodes)
+d.getQualityType
 
-v=d.getComputedHydraulicTimeSeries 
+% Runs hydraulics Step-by-step
+d.openHydraulicAnalysis;
+d.initializeHydraulicAnalysis;
+tstep=1; P=[];T=[]; D=[]; H=[]; Q=[]; M=[];F=[];
+while (tstep>0)
+    t=d.runHydraulicAnalysis;
+    P=[P; d.getNodePressure];
+    D=[D; d.getNodeActualDemand];
+    H=[H; d.getNodeHydaulicHead];
+    F=[F; d.getLinkFlows];
+    T=[T; t];
+    tstep=d.nextHydraulicAnalysisStep;
+end
+d.closeHydraulicAnalysis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% d.solveCompleteHydraulics;
-% d.saveHydraulicFile('hydraulics.hyd')
-% 
-% for i=1:d.CountNodes
-%     d.setNodeSourceType(i,'SETPOINT');
-% end
-%    
-% movefile('hydraulics.hyd',[pwd,'\Results']);
-% 
-% d.useHydraulicFile('hydraulics.hyd');
 
 % TEST - MSX
 % d.LoadMSX('Net2_Rossman2000.msx')
@@ -671,9 +692,7 @@ d.unloadMsx
 
 d.unload
 
-
-%%%% delete s-files 
-    %Delete s files 
+%Delete s files 
 a='abcdefghijklmnoqrstuvwxyz';
 for i=1:length(a)
     s=sprintf('s%s*',a(i));
@@ -685,47 +704,4 @@ for i=1:9
 end
 
 rmpath(genpath(pwd));
-
-
-% TEST - EPANET
-
-% % Simulate all times
-% d.solveCompleteHydraulics
-% d.solveCompleteQuality
-% 
-% 
-% % Runs Quality Step-by-step
-% d.solveCompleteHydraulics
-% d.saveHydraulicFile('hydraulics.hyd')
-% d.useHydraulicFile('hydraulics.hyd')
-% d.saveHydraulicsOutputReportingFile
-% d.openQualityAnalysis
-% d.initializeQualityAnalysis
-% tleft=1; P=[];T=[]; D=[]; H=[]; Q=[]; M=[];
-% while (tleft>0)
-%     t=d.runQualityAnalysis;
-%     P=[P; d.getNodePressure];
-%     Q=[Q; d.getNodeActualQuality];
-%     T=[T; t];
-%     %tstep=d.nextQualityAnalysisStep; %%% CHECK, DOES NOT SEEM TO CHANGE
-%     %WITH SETTIMEQUALITYSTEP
-%     tleft = d.stepQualityAnalysisTimeLeft;
-% end
-% d.closeQualityAnalysis;
-% 
-% 
-% % Runs hydraulics Step-by-step
-% d.openHydraulicAnalysis;
-% d.initializeHydraulicAnalysis;
-% tstep=1; P=[];T=[]; D=[]; H=[]; Q=[]; M=[];F=[];
-% while (tstep>0)
-%     t=d.runHydraulicAnalysis;
-%     P=[P; d.getNodePressure];
-%     D=[D; d.getNodeActualDemand];
-%     H=[H; d.getNodeHydaulicHead];
-%     F=[F; d.getLinkFlows];
-%     T=[T; t];
-%     tstep=d.nextHydraulicAnalysisStep;
-% end
-% d.closeHydraulicAnalysis
-    
+   
