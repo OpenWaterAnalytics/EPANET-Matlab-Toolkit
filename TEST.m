@@ -7,11 +7,8 @@ clear class;
 
 %  TEST - EPANET
 % Input Files
-% d=Epanet('Net2_Rossman2000.inp')
-% d=Epanet('example.inp')
-% d=Epanet('Template.inp')
-d=Epanet('Net1_Rossman2000.inp')
-% d=Epanet('Net1AllCURVES.inp')
+d=Epanet('Net2_Rossman2000.inp')
+% d=Epanet('Net1_Rossman2000.inp')
 d.plot
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -129,15 +126,6 @@ d.getNodesInfo
 d.removeNodeID('2') 
 d.plot
 
-% d.removeNodeID('A') %example.inp
-% d.addNewPipe('PP','Source','C');
-% d.plot
-
-% d.removeNodeID('C') %example.inp
-% d.plot
-% d.removeNodeID('D')
-% d.plot
-
 d.getTimeSimulationDuration
 d.setTimeSimulationDuration(86500)
 d.removeNodeID('9') %"Net1_Rossman2000.inp"
@@ -176,8 +164,6 @@ v=d.getControlsInfo
 d.removeControlNodeID(v.nodesID{1});
 d.getTimeSimulationDuration
 v=d.getControlsInfo
-
-
 
 % Nodes & Link Info
 d.getNodesInfo
@@ -423,10 +409,6 @@ d.getTimeRuleControlStep
 d.setTimeRuleControlStep(300)
 d.getTimeRuleControlStep
 
-
-d.saveInputFile('Netmodified.inp')
-movefile('Netmodified.inp',[pwd,'\RESULTS']);
-
 % d.getPumpType
 
 %%%
@@ -551,6 +533,8 @@ d.getCurveInfo
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+d=Epanet('Net2_Rossman2000.inp') % input file
+
 % Simulate all times
 d.solveCompleteHydraulics
 d.solveCompleteQuality
@@ -596,8 +580,8 @@ d.closeHydraulicAnalysis
 
 
 % TEST - MSX
-% d.LoadMSX('Net2_Rossman2000.msx')
-d.LoadMSX('example.msx')
+d.LoadMSX('Net2_Rossman2000.msx')
+d
 
 % Hydraulic analysis
 d.getCountSpeciesMsx     
@@ -679,7 +663,6 @@ d.getInitqualNodeValueMsx
 d.getErrorMsx(501)
 
 d.saveMsxFile('msxsavedtest.msx');                  
-% movefile('msxsavedtest.msx',[pwd,'\Results']);
 
 d.getReportMsx   
 
@@ -702,6 +685,7 @@ for i=1:9
     s=sprintf('s%.f*',i);
     delete(s)
 end
+movefile('msxsavedtest.msx',[pwd,'\RESULTS']);
 
 rmpath(genpath(pwd));
    

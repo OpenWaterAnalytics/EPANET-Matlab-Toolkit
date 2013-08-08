@@ -216,6 +216,8 @@ classdef Epanet <handle
             end
             tmp=1;  
             save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
+            cntrm=0;
+            save([pwd,'\RESULTS\','CountLinksRemove'],'cntrm','-mat')
             %%%%%%%%%%%%%%%%%
             
             %ENMatlabSetup  
@@ -700,7 +702,7 @@ classdef Epanet <handle
         function value = getControls(obj)
             for i=1:obj.getCountControls
                 [obj.errorCode, obj.ControlTypeIndex(i),obj.ControlLink(i),obj.ControlSeetting(i),obj.ControlNodeIndex(i),obj.ControlLevel(i)] = ENgetcontrol(i);
-                obj.ControlType(i)=obj.TYPECONTROL(obj.ControlTypeIndex(i)+1);
+                obj.ControlType={obj.TYPECONTROL(obj.ControlTypeIndex(i)+1)};
             end
             obj.ControlAll={obj.ControlType,obj.ControlTypeIndex,obj.ControlLink,obj.ControlSeetting,obj.ControlNodeIndex,obj.ControlLevel};
             value=obj.ControlAll;
@@ -788,7 +790,7 @@ classdef Epanet <handle
         
         %ENgetlinktype
         function value = getLinkType(obj)
-            for i=1:obj.CountLinks
+            for i=1:obj.getCountLinks
                 [obj.errorCode,obj.LinkTypeIndex(i)] = ENgetlinktype(i);
                 if obj.LinkTypeIndex(i)>2
                     obj.LinkTypeIndex(i)=9; %Valve  
@@ -801,88 +803,88 @@ classdef Epanet <handle
         
         %ENgetlinkvalue
         function value = getLinkDiameter(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,0);
             end
         end
         function value = getLinkLength(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,1);
             end
         end
         function value = getLinkRoughness(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,2);
             end
         end
         function value = getLinkMinorLossCoeff(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,3);
             end
         end
         function value = getLinkInitialStatus(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,4);
             end
         end
         function value = getLinkInitialSettings(obj)
             %Roughness for pipes,initial speed for pumps,initial setting
             %for valves
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,5);
             end
         end
         function value = getLinkBulkReactionCoeff(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,6);
             end
         end
         function value = getLinkWallReactionCoeff(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,7);
             end
         end
         function value = getLinkFlows(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,8);
             end
         end
         function value = getLinkVelocity(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,9);
             end
         end
         function value = getLinkHeadloss(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,10);
             end
         end
         function value = getLinkStatus(obj)
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,11);
             end
         end
         function value = getLinkSettings(obj) %Roughness for pipes, actual speed for pumps, actual setting for valves
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,12);
             end
         end
         function value = getLinkEnergy(obj) %in kwatts
-            value=zeros(1,obj.CountLinks);
-            for i=1:obj.CountLinks
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
                 [obj.errorCode, value(i)] = ENgetlinkvalue(i,13);
             end
         end
@@ -1710,7 +1712,7 @@ classdef Epanet <handle
                 value{1}(1)=0;
                 return;
             end
-            for i=1:obj.CountLinks
+            for i=1:obj.getCountLinks
                 for j=1:obj.getCountSpeciesMsx
                    [obj.errorCode, value{i}(j)] = MSXgetinitqual(1,i,j);   
                 end
@@ -2930,9 +2932,16 @@ function [obj] = MSXMatlabSetup(obj,msxname)
     if ~libisloaded('epanetmsx')
        loadlibrary('epanetmsx','epanetmsx.h');
     end
-    [obj.errorCode, obj.MsxPathFile, obj.MsxFile] = MSXopen(msxname);
+    obj.MsxPathFile = which(msxname);
+    obj.MsxFile = msxname;
+    initial_d = cd;
+    cd(obj.MsxPathFile(1:(length(obj.MsxPathFile)-length(msxname))))
+    copyfile(obj.MsxFile,initial_d)   
+    cd(initial_d)
+    [obj.errorCode] = MSXopen(msxname);
     %%%%%%%%%%%%%%%%%%%% EPANET - MSX %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     [obj.TermsFormula,obj.PipesFormula,obj.TanksFormula] = GetFormulas(msxname);
+    delete(msxname)
 
     %MSXgetcount  
     [obj.errorCode, obj.CountSpeciesMsx] = MSXgetcount(3);
@@ -3009,8 +3018,8 @@ function [obj] = MSXMatlabSetup(obj,msxname)
     obj.SourceAllMsx={obj.SourceTypeMsx,obj.SourceLevelMsx,obj.SourcePatternIndexMsx,obj.SourcePatternIDMsx,obj.SourceNodeIDMsx};        
 end
 
-function [errcode, pathfile, msxname] = MSXopen(msxname)
-    pathfile = which(msxname);
+function [errcode] = MSXopen(pathfile)
+    
     [errcode] = calllib('epanetmsx','MSXopen',pathfile);
     if errcode 
         MSXerror(errcode); 
@@ -3567,7 +3576,7 @@ function addCurve(obj,newCurveID,CurveX,CurveY,typecode,varargin)
     end
     fclose all;
     
-    [errcode] = Epanet('tempInpFile.inp');
+    obj = Epanet('tempInpFile.inp');
 end
 
 
@@ -3704,7 +3713,7 @@ function rmCurveID(obj,CurveID,varargin)
 
     fclose all;
 
-%     [errcode] = Epanet('tempInpFile.inp');
+%     obj = Epanet('tempInpFile.inp');
 %     obj.saveInputFile('tempInpFile.inp'); 
 %     tmp=0;
 %     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')  
@@ -3926,7 +3935,7 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
 
     fclose all;
     
-    [errcode] = Epanet('tempInpFile.inp');
+    obj = Epanet('tempInpFile.inp');
 %     obj.saveInputFile('tempInpFile.inp'); % OK %
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
@@ -4615,7 +4624,7 @@ function addNode(obj,typecode,newID,X,Y,varargin)
 %                         fprintf(fid2,'%s',a{u});
 %                         fprintf(fid2,'\r\n');
 %                         fclose all;
-%                         [errcode] = Epanet('tempInpFile.inp');
+%                         obj = Epanet('tempInpFile.inp');
 %                         obj.saveInputFile('tempInpFile.inp'); % OK %
 %                         return
 %                     end
@@ -4692,7 +4701,7 @@ function addNode(obj,typecode,newID,X,Y,varargin)
     end
 
     fclose all;
-%     [errcode] = Epanet('tempInpFile.inp');
+%     obj = Epanet('tempInpFile.inp');
 %     obj.saveInputFile('tempInpFile.inp'); % OK %
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
@@ -4862,13 +4871,14 @@ function addNewControl(obj,x,status,y_t_c,param,z,varargin)
     end
 
     fclose all;
-    [errcode] = Epanet('tempInpFile.inp');
+    obj = Epanet('tempInpFile.inp');
 %     obj.saveInputFile('tempInpFile.inp'); % OK %
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
 end
 
 function [warn1] = rmLink(obj,LinkID)
+    load([pwd,'\RESULTS\','CountLinksRemove'],'cntrm','-mat')
     warn1=0;
     % Remove link from the network. 
     load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
@@ -4880,12 +4890,17 @@ function [warn1] = rmLink(obj,LinkID)
     if length(links.LinksAll)==0 
         s = sprintf('There is no such object in the network.');
         warning(s);
-        [errcode] = Epanet('tempInpFile.inp');
+        obj = Epanet('tempInpFile.inp');
         return;
     end
-
+    countLinksRm=length(LinkID);
+    cntrm=cntrm+1;
+    if cntrm<countLinksRm+1;
+        save([pwd,'\RESULTS\','CountLinksRemove'],'cntrm','-mat')
+    end
+    countLinks=length(links.LinksAll);
     i=1;
-    while i<length(links.LinksAll)+1
+    while i<countLinks+1
         exists(i) = strcmp(LinkID,char(links.LinksAll(i)));
         if exists(i)==1
             index_rmvlink=i;
@@ -4896,7 +4911,7 @@ function [warn1] = rmLink(obj,LinkID)
     if (sum(exists)~=1)
         s = sprintf('There is no such object in the network.');
         warning(s);
-        [errcode] = Epanet('tempInpFile.inp');
+        obj = Epanet('tempInpFile.inp');
         return;
     end
 
@@ -5042,7 +5057,7 @@ function [warn1] = rmLink(obj,LinkID)
     %%%%%%%%
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
-%     [errcode] = Epanet('tempInpFile.inp');
+%     obj = Epanet('tempInpFile.inp');
 %     obj.saveInputFile('tempInpFile.inp'); % OK %
 end
 
@@ -5070,7 +5085,7 @@ function rmNode(obj,NodeID)
     if (sum(exists)==0)
         s = sprintf('There is no such object in the network.');
         warning(s);
-        [errcode] = Epanet('tempInpFile.inp');
+        obj = Epanet('tempInpFile.inp');
         return;
     end
    
@@ -5078,7 +5093,7 @@ function rmNode(obj,NodeID)
         if (length(char(nodes.ReservoirsID))+length(char(nodes.TanksID))-1)==0;
             warning('One or more errors in input file.');
             warning('This tank/reservoir has not removed.');
-            [errcode] = Epanet('tempInpFile.inp');
+            obj = Epanet('tempInpFile.inp');
             return;
         end
     end
@@ -5233,10 +5248,9 @@ function rmNode(obj,NodeID)
     else
         warn1=sum(warn1)+1;
     end
-    
-    if sum(warn1)~=0
-        [errcode] = Epanet('tempInpFile.inp');
-%         obj.saveInputFile('tempInpFile.inp'); % OK %
+    load([pwd,'\RESULTS\','CountLinksRemove'],'cntrm','-mat')
+    if sum(warn1)~=0 || cntrm==length(checklinks)
+        obj = Epanet('tempInpFile.inp');
     end
 end
 
@@ -5253,20 +5267,19 @@ function rmControl(obj,type,id)
     controls = obj.getControlsInfo;
     
     if type==1
-        if length(char(controls.linksID))==0 
+        if length(controls.linksID)==0 
             s = sprintf('There is no such object in the network.');
             warning(s);
-            [errcode] = Epanet('tempInpFile.inp');
             return;
         end
 
         i=1;
-        while i<length(char(controls.linksID))+1
+        while i<length(controls.linksID)+1
             if type==1
                 exists(i) = strcmp(controls.linksID{i},char(id));
             else
                 warning('Type is NODE(0) or LINK(1)');          
-                [errcode] = Epanet('tempInpFile.inp');
+                obj = Epanet('tempInpFile.inp');
                 return;
             end
             i=i+1;
@@ -5274,20 +5287,20 @@ function rmControl(obj,type,id)
     end
 
     if type==0
-        if length(char(controls.nodesID))==0 
+        if length(controls.nodesID)==0 
             s = sprintf('There is no such object in the network.');
             warning(s);
-            [errcode] = Epanet('tempInpFile.inp');
+            obj = Epanet('tempInpFile.inp');
             return;
         end
 
         i=1;
-        while i<length(char(controls.nodesID))+1
+        while i<length(controls.nodesID)+1
             if type==0
                 exists1(i) = strcmp(controls.nodesID{i},char(id));
             else
                 warning('Type is NODE(0) or LINK(1)');
-                [errcode] = Epanet('tempInpFile.inp');
+                obj = Epanet('tempInpFile.inp');
                 return;
             end
             i=i+1;
@@ -5296,7 +5309,7 @@ function rmControl(obj,type,id)
 
     if (sum(exists)==0) && (sum(exists1)==0) && tmp==1
         warning('There are no Controls in the network.');
-        [errcode] = Epanet('tempInpFile.inp');
+        obj = Epanet('tempInpFile.inp');
         return;
     elseif (sum(exists)==0) && (sum(exists1)==0)
         warning('There are no Controls in the network.');
@@ -5414,7 +5427,7 @@ function rmControl(obj,type,id)
     end
     fclose all;
     if tmp==1
-        [errcode] = Epanet('tempInpFile.inp');
+        obj = Epanet('tempInpFile.inp');
 %         obj.saveInputFile('tempInpFile.inp'); % OK %
     end
     tmp=0;
@@ -5878,7 +5891,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
         fprintf(fid2,'\n');
     end
     fclose all;
-    [errcode] = Epanet('tempInpFile.inp');
+    obj = Epanet('tempInpFile.inp');
 %     obj.saveInputFile('tempInpFile.inp');  
     tmp=0;
     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
