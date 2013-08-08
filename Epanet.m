@@ -1001,7 +1001,7 @@ classdef Epanet <handle
         end
         function value = getNodeMassFlowRate(obj) %Mass flow rate per minute of a chemical source
             value=zeros(1,obj.getCountNodes);
-            for i=1:obj.CountNodes
+            for i=1:obj.getCountNodes
                 [obj.errorCode, value(i)] = ENgetnodevalue(i,13);
             end
         end
@@ -1685,7 +1685,7 @@ classdef Epanet <handle
         
         %MSXgetsource
         function value = getSourcesMsx(obj)
-            for i=1:obj.CountNodes
+            for i=1:obj.getCountNodes
                 for j=1:obj.CountSpeciesMsx 
                    [obj.errorCode, obj.SourceTypeMsx{i}{j},obj.SourceLevelMsx{i}(j),obj.SourcePatternIndexMsx{i}(j)] = MSXgetsource(i,j);
                 end
@@ -1700,7 +1700,7 @@ classdef Epanet <handle
                 value{1}(1)=0;
                 return;
             end
-            for i=1:obj.CountNodes
+            for i=1:obj.getCountNodes
                 for j=1:obj.getCountSpeciesMsx
                    [obj.errorCode, value{i}(j)] = MSXgetinitqual(0,i,j);   
                 end
@@ -1984,7 +1984,7 @@ classdef Epanet <handle
                 value=0;
                 return;
             end
-            for i=1:obj.CountNodes
+            for i=1:obj.getCountNodes
                 % Obtain a hydraulic solution
                 obj.solveCompleteHydraulicsMsx();
                 % Run a step-wise water quality analysis
@@ -2993,19 +2993,19 @@ function [obj] = MSXMatlabSetup(obj,msxname)
     end
 
     %MSXgetinitqual
-    for i=1:obj.CountNodes
+    for i=1:obj.getCountNodes
         for j=1:obj.CountSpeciesMsx
            [obj.errorCode, obj.NodeInitqualValueMsx{i}(j)] = MSXgetinitqual(0,i,j);   
         end
     end
-    for i=1:obj.CountLinks
+    for i=1:obj.getCountLinks
         for j=1:obj.CountSpeciesMsx
            [obj.errorCode, obj.LinkInitqualValueMsx{i}(j)] = MSXgetinitqual(1,i,j);   
         end
     end
 
     %MSXgetsource
-    for i=1:obj.CountNodes
+    for i=1:obj.getCountNodes
         for j=1:obj.CountSpeciesMsx 
            [obj.errorCode, obj.SourceTypeMsx{i}{j},obj.SourceLevelMsx{i}(j),obj.SourcePatternIndexMsx{i}(j)] = MSXgetsource(i,j);
            [obj.errorCode, len] = MSXgetIDlen(7,j);
