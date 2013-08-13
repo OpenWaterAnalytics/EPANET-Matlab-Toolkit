@@ -7,15 +7,15 @@ clear class;
 
 %  TEST - EPANET
 % Input Files
-d=Epanet('Net2_Rossman2000.inp')
-% d=Epanet('Net1_Rossman2000.inp')
-d.plot
+d=Epanet('Net1_Rossman2000.inp');%d.plot
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+value=d.getInputFileInfo;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % Curves 
 d.setTimeSimulationDuration(22500)
-d.removeCurveID('1') % must be removed the pump 9, Warning: Pump 9 refers to undefined curve. Automatos svinei kai to antistoixo Pump, diagrafwntas to curve.
+d.removeCurveID('1') % must be removed the pump 9, Warning: Pump 9 refers to undefined curve.
 % Warning: Node 9 disconnected. 
 d.removeLinkID('9')
 d.removeNodeID('9')
@@ -30,18 +30,19 @@ d.addCurveVolume('C-3',1500,250)
 d.getTimeSimulationDuration
 d.addCurveHeadloss('C-4',1500,250)
 d.getTimeSimulationDuration
-        
+d.getCurveInfo  
 d.removeCurveID('C-1')
 d.removeCurveID('C-2')
 d.removeCurveID('C-3')
 d.removeCurveID('C-4')
+d.getCurveInfo  
 
 d.addCurvePump('C-1',[1500 1800 2000],[250 200 0])%Flow-Head
 d.addCurveEfficiency('C-2',[1500 1800 2000],[250 200 0])%Flow-Efficiency
 d.addCurveVolume('C33',[1500 1800 2000],[250 200 0])%Heigh-Volume
 d.addCurveHeadloss('C44',[1500 1800 2000],[250 200 0])%Flow-Headloss
 d.removeCurveID('C-1')
-
+d.getCurveInfo
 
 % warning Flow & Heigh
 d.addCurvePump('C-11',[2000 1500 1800],[250 200 0])
@@ -201,7 +202,7 @@ d.plot
 d.getTimeSimulationDuration
 
 d.setTimeSimulationDuration(5000)
-d.addPipe('MSK','23','32')
+d.addPipe('MSK1','12','32')
 d.plot
 d.getTimeSimulationDuration
 
@@ -533,12 +534,19 @@ d.getCurveInfo
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-d=Epanet('Net2_Rossman2000.inp') % input file
+fclose all;
+clc;
+clear all;
+clear class;
+% Input Files
+d=Epanet('Net1_Rossman2000.inp');%d.plot
 
 % Simulate all times
 d.solveCompleteHydraulics
 d.solveCompleteQuality
 
+d.setQualityType('chem','mg/L')
+d.getQualityType
 
 % Runs Quality Step-by-step
 d.solveCompleteHydraulics
@@ -558,29 +566,17 @@ while (tleft>0)
     tleft = d.stepQualityAnalysisTimeLeft;
 end
 d.closeQualityAnalysis;
-
-d.setQualityType('chem','mg/L')
-d.getQualityType
-
-% Runs hydraulics Step-by-step
-d.openHydraulicAnalysis;
-d.initializeHydraulicAnalysis;
-tstep=1; P=[];T=[]; D=[]; H=[]; Q=[]; M=[];F=[];
-while (tstep>0)
-    t=d.runHydraulicAnalysis;
-    P=[P; d.getNodePressure];
-    D=[D; d.getNodeActualDemand];
-    H=[H; d.getNodeHydaulicHead];
-    F=[F; d.getLinkFlows];
-    T=[T; t];
-    tstep=d.nextHydraulicAnalysisStep;
-end
-d.closeHydraulicAnalysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % TEST - MSX
-d.LoadMSX('Net2_Rossman2000.msx')
+%% Testing
+fclose all;
+clc;
+clear all;
+clear class;
+d=Epanet('Net2_Rossman2000.inp');
+d.LoadMSX('Net2_Rossman2000.msx');
 d
 
 % Hydraulic analysis
@@ -675,6 +671,39 @@ d.unloadMsx
 
 d.unload
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fclose all;
+clc;
+clear all;
+clear class;
+% Input Files
+d=Epanet('Net1_Rossman2000.inp');%d.plot
+
+% Simulate all times
+d.solveCompleteHydraulics
+d.solveCompleteQuality
+
+d.setQualityType('chem','mg/L')
+d.getQualityType
+
+% Runs hydraulics Step-by-step
+d.openHydraulicAnalysis;
+d.initializeHydraulicAnalysis;
+tstep=1; P=[];T=[]; D=[]; H=[]; Q=[]; M=[];F=[];
+while (tstep>0)
+    t=d.runHydraulicAnalysis;
+    P=[P; d.getNodePressure];
+    D=[D; d.getNodeActualDemand];
+    H=[H; d.getNodeHydaulicHead];
+    F=[F; d.getLinkFlows];
+    T=[T; t];
+    tstep=d.nextHydraulicAnalysisStep;
+end
+d.closeHydraulicAnalysis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 %Delete s files 
 a='abcdefghijklmnoqrstuvwxyz';
 for i=1:length(a)
@@ -686,6 +715,8 @@ for i=1:9
     delete(s)
 end
 movefile('msxsavedtest.msx',[pwd,'\RESULTS']);
+movefile('hydraulics.hyd',[pwd,'\RESULTS']);
+% movefile('Net2_Rossman2000.msx',[pwd,'\RESULTS']);
 
 rmpath(genpath(pwd));
    

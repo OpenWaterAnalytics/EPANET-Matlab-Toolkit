@@ -211,7 +211,6 @@ classdef Epanet <handle
                 
             %%%%%%%%%%%%%%%%%
             if ~strcmp(inpfile,'tempInpFile.inp')
-%                 unloadlibrary('epanet2');           
                 copyfile([pwd,'\NETWORKS\',inpfile],[pwd,'\RESULTS\tempInpFile.inp']);
             end
             tmp=1;  
@@ -228,13 +227,6 @@ classdef Epanet <handle
             %ENopen  
             [obj.errorCode] = ENopen(obj.PathFile, strcat('tempInpFile.inp','.rpt'), strcat('tempInpFile.inp','.out'));
             obj.InputFile=inpfile;
-
-            %Curves
-            value=obj.getCurveInfo;
-            obj.CurvesNameID=value.CurvesID;
-            obj.CurvesX=value.CurveX;
-            obj.CurvesY=value.CurveY;
-            obj.CurvesType =value.typeCurve;
             
             % ENsaveinpfile
             obj.saveInputFile('tempInpFile.inp'); % OK %
@@ -412,11 +404,23 @@ classdef Epanet <handle
             %ENgetVersion
             [obj.errorCode, obj.Version] = ENgetversion();
             
-            %Coordinates
-            [obj.CoordinatesXY{1},obj.CoordinatesXY{2},obj.CoordinatesXY{3},obj.CoordinatesXY{4}]=getNodeCoord(obj);      
+            %Curves
+%             value=obj.getCurveInfo;
+            value=obj.getInputFileInfo;
+
+            obj.CurvesNameID=value.CurveID;
+            obj.CurvesX=value.CurveX;
+            obj.CurvesY=value.CurveY;
+            obj.CurvesType =value.typeCurve;
             
+            %Coordinates
+%             [obj.CoordinatesXY{1},obj.CoordinatesXY{2},obj.CoordinatesXY{3},obj.CoordinatesXY{4}]=getNodeCoord(obj);      
+            obj.CoordinatesXY{1} = value.vx;
+            obj.CoordinatesXY{2} = value.vy;
+            obj.CoordinatesXY{3} = value.vertx;
+            obj.CoordinatesXY{4} = value.verty;
             %Units
-            value=obj.getFlowUnitsHeadlossFormula;
+%             value=obj.getFlowUnitsHeadlossFormula;
             obj.FlowUnits=value.FlowUnits;
             obj.ConcentrationUnits=value.ConcentrationUnits;
             obj.Headloss=value.Headloss;
@@ -1337,8 +1341,9 @@ classdef Epanet <handle
             [obj.errorCode] = ENsaveinpfile(inpname);
             value=obj.getCurveInfo;
             movefile('tempInpFile.inp',[pwd,'\RESULTS']);
-            obj.removeMCurvesID(value.CurvesID)
-            obj.addAllCurves(value.Clines)
+            if ~isempty(value.CurvesID)
+                obj.remAddCurvesID(value.CurvesID,value.Clines);
+            end
         end
         
         %ENwriteline
@@ -1414,6 +1419,9 @@ classdef Epanet <handle
         
         %%%% New Functions
         % Get
+        function value=getInputFileInfo(obj)
+            value=InputFileInfo(obj);
+        end
         function value=getCurveInfo(obj)
          [value.CurvesID,value.CurveX,value.CurveY,value.Clines,value.typeCurve]=CurveInfo(obj);
         end
@@ -1445,9 +1453,6 @@ classdef Epanet <handle
         end    
         function addCurveHeadloss(obj,newCurveID,CurveX,CurveY)
         	addCurve(obj,newCurveID,CurveX,CurveY,3);  %ID Flow-Headloss
-        end
-        function addAllCurves(obj,Clines)
-            remAddCurve(obj,Clines,1);
         end
         
         function addPipe(obj,newLink,fromNode,toNode)
@@ -1499,8 +1504,8 @@ classdef Epanet <handle
         function removeCurveID(obj,CurveID)
         	rmCurveID(obj,CurveID);
         end
-        function removeMCurvesID(obj,CurveID)            
-            remAddCurve(obj,CurveID,0);
+        function remAddCurvesID(obj,CurveID,Clines)            
+            remAddCurve(obj,CurveID,Clines);
         end
         function removeControlLinkID(obj,ID)
         	rmControl(obj,1,ID);
@@ -2674,11 +2679,17 @@ function CoordinatesXY=ENplot(obj,varargin)
 
     cla
     % Get node names and x, y coordiantes
-    CoordinatesXY = obj.getCoordinates;
-    nodes = obj.getNodesInfo;
+%     CoordinatesXY = obj.getCoordinates;
+%     nodes = obj.getNodesInfo;
+    value=obj.getInputFileInfo;
+
+    CoordinatesXY{1} = value.vx;
+    CoordinatesXY{2} = value.vy;
+    CoordinatesXY{3} = value.vertx;
+    CoordinatesXY{4} = value.verty;
     if isa(highlightnode,'cell')       
         for i=1:length(highlightnode)
-            n = strcmp(obj.getNodeID,highlightnode{i});
+            n = strcmp(value.NodesAll,highlightnode{i});
             if sum(n)==0
                 warning('Undefined node with id "%s" in function call therefore the index is zero.', char(highlightnode{i})); 
             else
@@ -2689,7 +2700,7 @@ function CoordinatesXY=ENplot(obj,varargin)
 
     if isa(highlightlink,'cell') 
         for i=1:length(highlightlink)
-            n = strcmp(obj.getLinkID,highlightlink{i});
+            n = strcmp(value.LinksAll,highlightlink{i});
             if sum(n)==0
                 warning('Undefined link with id "%s" in function call therefore the index is zero.', char(highlightlink{i})); 
             else
@@ -2699,7 +2710,7 @@ function CoordinatesXY=ENplot(obj,varargin)
     end
 
     % Coordinates for node FROM
-    for i=1:nodes.CountNodes
+    for i=1:value.CountNodes
         [x] = double(CoordinatesXY{1}(i));
         [y] = double(CoordinatesXY{2}(i));
 
@@ -2710,7 +2721,7 @@ function CoordinatesXY=ENplot(obj,varargin)
         legendString{1}= char('Junctions');
 
         % Plot Reservoirs
-        if sum(strfind(nodes.NodeReservoirIndex,i))
+        if sum(strfind(value.NodeReservoirIndex,i))
             colornode = 'g';
             if length(hh)
                 colornode = 'r';
@@ -2725,7 +2736,7 @@ function CoordinatesXY=ENplot(obj,varargin)
            legendString{2} = char('Reservoirs');
         end
         % Plot Tanks
-        if sum(strfind(nodes.NodeTankIndex,i)) 
+        if sum(strfind(value.NodeTankIndex,i)) 
             colornode = 'k';
             if length(hh)
                 colornode = 'r';
@@ -2743,7 +2754,7 @@ function CoordinatesXY=ENplot(obj,varargin)
 
         % Show Node id
         if (strcmp(lower(Node),'yes') && ~length(hh))
-            text(x,y,nodes.NodesAll(i),'Fontsize',fontsize);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+            text(x,y,value.NodesAll(i),'Fontsize',fontsize);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
         end
 
         if length(hh) 
@@ -2751,15 +2762,15 @@ function CoordinatesXY=ENplot(obj,varargin)
                       'MarkerFaceColor','r',...
                       'MarkerSize',10)
 
-            text(x,y,nodes.NodesAll(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+            text(x,y,value.NodesAll(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
         end
         hold on
     end
-    links = obj.getLinksInfo;
+%     links = obj.getLinksInfo;
 
-    for i=1:links.CountLinks
-        FromNode=strfind(strcmp(links.FromNode{i},nodes.NodesAll),1);
-        ToNode=strfind(strcmp(links.ToNode{i},nodes.NodesAll),1);
+    for i=1:value.CountLinks
+        FromNode=strfind(strcmp(value.FromNode{i},value.NodesAll),1);
+        ToNode=strfind(strcmp(value.ToNode{i},value.NodesAll),1);
         
         if FromNode
             x1 = double(CoordinatesXY{1}(FromNode));
@@ -2777,7 +2788,7 @@ function CoordinatesXY=ENplot(obj,varargin)
         
         legendString{4} = char('Pipes');
         % Plot Pumps
-        if sum(strfind(links.LinkPumpIndex,i)) 
+        if sum(strfind(value.LinkPumpIndex,i)) 
             colornode = 'b';
             if length(hh)
                 colornode = 'r';
@@ -2793,7 +2804,7 @@ function CoordinatesXY=ENplot(obj,varargin)
         end
 
         % Plot Valves
-        if sum(strfind(links.LinkValveIndex,i)) 
+        if sum(strfind(value.LinkValveIndex,i)) 
             h(:,6)=plot((x1+x2)/2,(y1+y2)/2,'b*','LineWidth',2,'MarkerEdgeColor','b',...
                       'MarkerFaceColor','b',...
                       'MarkerSize',7);
@@ -2802,12 +2813,12 @@ function CoordinatesXY=ENplot(obj,varargin)
 
         % Show Link id
         if (strcmp(lower(Link),'yes') && ~length(hh))
-            text((x1+x2)/2,(y1+y2)/2,links.LinksAll(i),'Fontsize',fontsize);
+            text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize);
         end
 
         if length(hh) 
             line([x1,x2],[y1,y2],'LineWidth',2,'Color','g');
-            text((x1+x2)/2,(y1+y2)/2,links.LinksAll(i),'Fontsize',fontsize);
+            text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize);
         end
         hold on
     end
@@ -2856,7 +2867,6 @@ function [vx,vy,vertx,verty] = getNodeCoord(obj)
     vertx = cell(links.CountLinks,1);
     verty = cell(links.CountLinks,1);
     nvert = zeros(links.CountLinks,1);
-
     % Open epanet input file
     [fid,message]=fopen(obj.PathFile,'rt');
     if fid < 0
@@ -2864,7 +2874,7 @@ function [vx,vy,vertx,verty] = getNodeCoord(obj)
         return
     end
 
-    sect = 0;i=1;t=1;
+    sect = 0;i=1; 
     % Read each line from input file.
     while 1
         tline = fgetl(fid);
@@ -2902,25 +2912,24 @@ function [vx,vy,vertx,verty] = getNodeCoord(obj)
         % Coordinates
         elseif sect == 1
             A = textscan(tline,'%s %f %f');
-%             % get the node index
-%             [errcode,index] = ENgetnodeindex(char(A{1}));
-%             if errcode ~=0 
-%                 return; 
-%             end
-            vx(i) = A{2};
-            vy(i) = A{3};
-            i=i+1;
+            % get the node index
+            a=strcmp(A{1},nodes.NodesAll);
+            index=strfind(a,1);
+            if length(index)==0 
+                return; 
+            end
+            vx(index) = A{2};
+            vy(index) = A{3};
         % Vertices
         elseif sect == 2
             A = textscan(tline,'%s %f %f');
-%             [errcode,index] = ENgetlinkindex(char(A{1}));
-%             if errcode ~=0 
-%                 return; 
-%             end
-            nvert(t) = nvert(t) + 1;
-            vertx{t}(nvert(t)) = A{2};
-            verty{t}(nvert(t)) = A{3};
-            t=t+1;
+            [errcode,index] = ENgetlinkindex(char(A{1}));
+            if errcode ~=0 
+                return; 
+            end
+            nvert(index) = nvert(index) + 1;
+            vertx{index}(nvert(index)) = A{2};
+            verty{index}(nvert(index)) = A{3};
         end
     end
 end
@@ -2934,14 +2943,16 @@ function [obj] = MSXMatlabSetup(obj,msxname)
     end
     obj.MsxPathFile = which(msxname);
     obj.MsxFile = msxname;
+    msxname = 'tempMsxFile.msx';
     initial_d = cd;
-    cd(obj.MsxPathFile(1:(length(obj.MsxPathFile)-length(msxname))))
-    copyfile(obj.MsxFile,initial_d)   
+    cd(obj.MsxPathFile(1:(length(obj.MsxPathFile)-length(obj.MsxFile))));
+    copyfile(obj.MsxFile,[initial_d,'\',msxname]); 
     cd(initial_d)
     [obj.errorCode] = MSXopen(msxname);
     %%%%%%%%%%%%%%%%%%%% EPANET - MSX %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     [obj.TermsFormula,obj.PipesFormula,obj.TanksFormula] = GetFormulas(msxname);
-    delete(msxname)
+    fclose all;
+    movefile('tempMsxFile.msx',[pwd,'\RESULTS\tempMsxFile.msx']);
 
     %MSXgetcount  
     [obj.errorCode, obj.CountSpeciesMsx] = MSXgetcount(3);
@@ -3504,18 +3515,12 @@ function addCurve(obj,newCurveID,CurveX,CurveY,typecode,varargin)
     
     % write
     fid2 = fopen(obj.PathFile,'w');
-
+    sps={'                  '};
     nn=0;yy=0;
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        if isempty(a)
             % skip
         elseif isempty(c)
             % skip
@@ -3525,13 +3530,6 @@ function addCurve(obj,newCurveID,CurveX,CurveY,typecode,varargin)
                 if strcmp(a{u},'[CURVES]')  
                     fprintf(fid2,'[CURVES]');
                     sect=1; break;
-                end
-
-                spaces= 15 - length(a{u});
-                k=1;sps={' '};
-                while k < spaces+1
-                    sps = strcat(sps,{' '});
-                    k=k+1;
                 end
 
                 rr = regexp(a,'\w*[\w*]\w*','split');
@@ -3638,30 +3636,17 @@ function rmCurveID(obj,CurveID,varargin)
     
     fid2 = fopen(obj.PathFile,'w');
 
-    e=0;n=0;
+    e=0;n=0;sps={'                '};
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        if isempty(a)
             % skip
         elseif isempty(c)
             % skip
         else
             u=1; 
             while u < length(a)+1
-
-                spaces= 10 - length(a{u});
-                k=1;sps={' '};
-                while k < spaces+1
-                    sps = strcat(sps,{' '});
-                    k=k+1;
-                end
 
                 rr = regexp(a,'\w*[\w*]\w*','split');
                 check_brackets = rr{:};
@@ -3712,11 +3697,12 @@ function rmCurveID(obj,CurveID,varargin)
     end
 
     fclose all;
-
-%     obj = Epanet('tempInpFile.inp');
-%     obj.saveInputFile('tempInpFile.inp'); 
-%     tmp=0;
-%     save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')  
+    load([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')
+    if tmp==1
+        obj = Epanet('tempInpFile.inp'); % OK %
+        tmp=0;
+        save([pwd,'\RESULTS\','tmpInp'],'tmp','-mat')  
+    end
 end
 
 
@@ -3846,31 +3832,17 @@ function addLink(obj,typecode,newLink,fromNode,toNode,curveID,varargin)
     fid2 = fopen(obj.PathFile,'w');
 
     % Add pipe
-    nn=0;
+    nn=0;sps={'                   '};
     for t = 1:length(info)
         c = info{t};
-        a = regexp(c, '\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        a = regexp(c, '\s*','split');               
+        if isempty(a)
             % skip
         elseif isempty(c)
             % skip
         else
             u=1;
             while u < length(a)+1
-
-                spaces= 18 - length(a{u});
-                k=1;sps={' '};
-                while k < spaces+1
-                    sps = strcat(sps,{' '});
-                    k=k+1;
-                end
-
                 t =  regexp(a{u}, '[(\w*)]','split');
                 y=1;cnt=0;
                 while y<length(t)+1
@@ -4245,7 +4217,7 @@ function value=FlowUnitsHeadlossFormula(obj)
     value.UScustomary=0;
     value.ConcentrationUnits={};
     
-    sect=0;i=1;u=1;t=1;
+    sect=0;i=1;t=1; 
     while 1
         tline = fgetl(fid);
         if ~ischar(tline),   break,   end
@@ -4255,7 +4227,7 @@ function value=FlowUnitsHeadlossFormula(obj)
         if isempty(tok), continue, end
         if (tok(1) == ';'), continue, end
         if (tok(1) == '[')
-            % [CONTROLS] section
+            % [OPTIONS] section
             if strcmpi(tok(1:5),'[OPTI')
                 sect=1;
                 value.sectOptions=value.sectOptions+1;
@@ -4272,7 +4244,7 @@ function value=FlowUnitsHeadlossFormula(obj)
         if sect == 0
             continue;
 
-        % Controls
+        % Options
         elseif sect == 1
             atline={};
             a = regexp(tline,'\s*','split');uu=1;
@@ -4287,7 +4259,6 @@ function value=FlowUnitsHeadlossFormula(obj)
             end
             if strcmp(upper(atline{1}),'UNITS')
                 value.FlowUnits{i}=atline{2};
-                u=u+1;
             end
             if strcmp(upper(atline{1}),'HEADLOSS')
                 value.Headloss{t}=atline{2};
@@ -4298,8 +4269,10 @@ function value=FlowUnitsHeadlossFormula(obj)
             end
             if strcmp(upper(atline{1}),'QUALITY')
                 if ~strcmp(upper(atline{2}),'NONE')
-                    value.ConcentrationUnits=atline{3};
-                else
+                    if length(atline)==3
+                        value.ConcentrationUnits=atline{3};
+                    end
+                    else
                     value.ConcentrationUnits='NONE';
                 end
             end
@@ -4524,14 +4497,7 @@ function addNode(obj,typecode,newID,X,Y,varargin)
     % Read all file and save in variable info
     while ~feof(fid)
         tline=fgetl(fid);
-%         a=regexp(tline,'\s*','split');
-%         for i=1:length(a)
-%             if isempty(a{i})
-%             else
-                info{t} = tline;
-%                 t=t+1;
-%             end
-%         end
+        info{t}=tline;
         t=t+1;
     end
     fid2 = fopen(obj.PathFile,'w');
@@ -4542,19 +4508,13 @@ function addNode(obj,typecode,newID,X,Y,varargin)
     Coordch=0;
     onetime=1;
     gg=0;
-
+    sps1={'                   '};
     for t = 1:length(info)
         c = info{t};
         if ~isempty(c)
             a = regexp(c, '\s*','split');
         end
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        if isempty(a)
             % skip
         elseif isempty(c)
             % skip
@@ -4563,14 +4523,6 @@ function addNode(obj,typecode,newID,X,Y,varargin)
 
             u=1;
             while u < length(a)+1
-
-                % Spaces
-                spaces1= 18 - length(a{u});
-                k=1;sps1={' '};
-                while k < spaces1+1
-                    sps1 = strcat(sps1,{' '});
-                    k=k+1;
-                end
 
                 % Find [brackets] cnt=2;
                 t =  regexp(a{u}, '[(\w*)]','split');
@@ -4807,36 +4759,21 @@ function addNewControl(obj,x,status,y_t_c,param,z,varargin)
     end
     fid2 = fopen(obj.PathFile,'w');
 
-    noo=0;s=0;yy=0;
+    noo=0;s=0;yy=0;sps={'                   '};
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        if isempty(a)
             % skip
         elseif isempty(c)
             % skip
         else
-
             u=1;
             while u < length(a)+1
                 if strcmp(a{u},type_n);
                     fprintf(fid2,'[CONTROLS]');
                     s=1; break;
                 end
-
-                spaces= 15 - length(a{u});
-                k=1;sps={' '};
-                while k < spaces+1
-                    sps = strcat(sps,{' '});
-                    k=k+1;
-                end
-
                 rr = regexp(a,'\w*[\w*]\w*','split');
                 check_brackets = rr{:};
                 ch1 = strcmp(check_brackets,'[');
@@ -4940,39 +4877,17 @@ function [warn1] = rmLink(obj,LinkID)
     fid2 = fopen(obj.PathFile,'w');
 
     % section [JUNCTIONS]
-    out=0;YY=0;
+    out=0;YY=0;sps={'                   '};
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        if isempty(a)
             % skip
         elseif isempty(c)
             % skip
         else
-
             u=1;x=0;xx=0;q=0;
             while u < length(a)+1
-
-                spaces= 10 - length(a{u});
-                k=1;sps={' '};
-                while k < spaces+1
-                    sps = strcat(sps,{' '});
-                    k=k+1;
-                end
-
-                spaces1= 18 - length(a{u});
-                k=1;sps1={' '};
-                while k < spaces1+1
-                    sps1 = strcat(sps1,{' '});
-                    k=k+1;
-                end
-
                 if strcmp(a{u},'[PIPES]') YY=1;end
                 if YY==1   
                     if isempty(a{u}) && (x==0)
@@ -5007,16 +4922,11 @@ function [warn1] = rmLink(obj,LinkID)
                 u=u+1;
             end
         end
-
         fprintf(fid2,'\n');
-
     end
-
     fclose all;
-
     % Get nodes which delete with function Remove Node
     links = obj.getLinksInfo;
-
     i=1; 
     while i<length(links.LinksAll)+1
         t(i) = strcmp(from_node,char(links.FromNode(i)));
@@ -5155,58 +5065,34 @@ function rmNode(obj,NodeID)
 
     fid2 = fopen(obj.PathFile,'w');
 
-    out=0;
+    out=0; sps={'           '};
     for t = 1:length(info)
         c = info{t};
         a = regexp(c,'\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        if isempty(a)
             % skip
         elseif isempty(c)
             % skip
         else
-
             u=1;x=0;xx=0;q=0;
             while u < length(a)+1
 
-                spaces= 10 - length(a{u});
-                k=1;sps={' '};
-                while k < spaces+1
-                    sps = strcat(sps,{' '});
-                    k=k+1;
-                end
-
-                spaces1= 18 - length(a{u});
-                k=1;sps1={' '};
-                while k < spaces1+1
-                    sps1 = strcat(sps1,{' '});
-                    k=k+1;
-                end
-
                 if isempty(a{u}) && (x==0)
-                     u=u+1; x=1;xx=1;
-                     if u==length(a)+1
-                         break
-                     end
+                    u=u+1; x=1;xx=1;
+                    if u==length(a)+1
+                        break;
+                    end
                 end
 
-                if strcmp(a{u},'[JUNCTIONS]'), out=0; end
-                if strcmp(a{u},'[RESERVOIRS]'), out=0; end
-                if strcmp(a{u},'[TANKS]'), out=0; end
                 if strcmp(a{u},'[PIPES]'), out=1; end
                 if strcmp(a{u},'[DEMANDS]'), out=0; end %out=0; delete line
                 if strcmp(a{u},'[QUALITY]'), out=0; end
                 if strcmp(a{u},'[SOURCES]'), out=1; end 
                 if strcmp(a{u},'[MIXING]'), out=0; end
                 if strcmp(a{u},'[COORDINATES]'), out=0; end
-
-                if strcmp(a{1},NodeID) && q~=1 && out==0
-                    if xx==1 || strcmp(a{1},NodeID)
+                
+                if strcmp(a{u},NodeID) && q~=1 && out==0
+                    if xx==1 || strcmp(a{u},NodeID)
                         u=length(a)+1;
                     end
                 else
@@ -5329,32 +5215,17 @@ function rmControl(obj,type,id)
     
     fid2 = fopen(obj.PathFile,'w');
 
-    e=0;n=0;kk=1; 
+    e=0;n=0;kk=1;sps={'                 '};
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        if isempty(a)
             % skip
         elseif isempty(c)
             % skip
         else
-
             u=1; 
             while u < length(a)+1
-
-                spaces= 10 - length(a{u});
-                k=1;sps={' '};
-                while k < spaces+1
-                    sps = strcat(sps,{' '});
-                    k=k+1;
-                end
-
                 rr = regexp(a,'\w*[\w*]\w*','split');
                 check_brackets = rr{:};
                 ch1 = strcmp(check_brackets,'[');
@@ -5383,7 +5254,6 @@ function rmControl(obj,type,id)
                             else
                             fprintf(fid2,'%s%s',a{u},sps{:});
                             end
-
                         elseif type==0
                             tt = strcmp(a{u+5},id); kk=0;
                             if tt==1
@@ -5399,12 +5269,10 @@ function rmControl(obj,type,id)
                         fprintf(fid2,'%s%s',a{u},sps{:});
                     end
                 end
-
                 u=u+1;
-
             end
         end
-            fprintf(fid2,'\n');kk=1;
+        fprintf(fid2,'\n');kk=1;
     end
 
     if n==1
@@ -5514,22 +5382,15 @@ function Options(obj,newFlowUnits,headloss,varargin)
                     
     sections=[0 0 0 0 0 0 0 0 0];
     
-    nn=0;pp=1;
+    nn=0;pp=1;sps={'                  '};
     for t = 1:length(info)
         c = info{t};
         a = regexp(c, '\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        if isempty(a)
             % skip
         elseif isempty(c)
             % skip
         else
-
             u=1;
             while u < length(a)+1
                 if strcmp(a{u},'[JUNCTIONS]') && Units
@@ -5576,14 +5437,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                     sections=[0 0 0 0 0 0 0 0 1];nn=0;
                     break;
                 end
-                
-                spaces= 15 - length(a{u});
-                k=1;sps={' '};
-                while k < spaces+1
-                    sps = strcat(sps,{' '});
-                    k=k+1;
-                end
-                 
+
                 if length(strfind(sections,1))==0
                     sect=0;
                 else
@@ -5761,7 +5615,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                         % skip
                             mm=mm+1;
                         end
-                        if pp<length(curves.Clines)+1  % PUMP % EFFICIENCY % VOLUME
+                        if pp<length(curves.Clines)+1 && ~isempty(char(a)) % PUMP % EFFICIENCY % VOLUME
                             if ww<length(curves.CurvesID)+1
                                 if curves.typeCurve(ww)==0 
                                     if strcmp(a{1},';PUMP:')
@@ -5784,7 +5638,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                                     fprintf(fid2,'%s%s',char(a{mm}),sps{:});
                                     setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
                                     fprintf(fid2,'%s%s',char(a{mm+2}),sps{:});
-                                elseif curves.typeCurve(ww)==2
+                                elseif curves.typeCurve(ww)==2 
                                     gg=regexp(c,'\w*VOLUME*\w','match');
                                     if length(strcmp(gg,'VOLUME')) 
                                         fprintf(fid2,c);pp=pp+1;break;
@@ -5797,7 +5651,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                                         fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
                                         fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})),sps{:});
                                     end
-                                elseif curves.typeCurve(ww)==3  % HEADLOSS
+                                elseif curves.typeCurve(ww)==3 % HEADLOSS
                                     kk=regexp(c,'\w*HEADLOSS*\w','match');
                                     if length(strcmp(kk,'HEADLOSS'))
                                         fprintf(fid2,c);pp=pp+1;break;
@@ -5872,7 +5726,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
                             fprintf(fid2,'%s%s',char(headloss),sps{:});
                             nn=1;
                         else
-                           fprintf(fid2,'%s%s',char(a{1}),sps{:});
+                           fprintf(fid2,c);
                         end
                     end
                     break;
@@ -6131,7 +5985,7 @@ function setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
     end
 end
 
-function remAddCurve(obj,Curves,varargin)
+function remAddCurve(obj,CurvesID,Cline,varargin)
  
     % Open and read inpname
     fid = fopen(obj.PathFile,'r+');
@@ -6147,59 +6001,40 @@ function remAddCurve(obj,Curves,varargin)
                     
     sect=0;
     t=1;
-    nn=0; 
+    nn=0; sps = {'                  '};
     while t<length(info)+1
         c = info{t};
         a = regexp(c, '\s*','split');
-        y=1;
-        while y < length(a)+1
-            j(y) = isempty(a{y});
-            y=y+1;
-        end
-        j = sum(j);
-        if j == length(a)
+        if isempty(a)
             % skip
-%             if (sect==1), t=t+1; end
         elseif isempty(c)
             % skip
-%             if (sect==1), t=t+1; end
         else
             u=1;
             while u < length(a)+1
-                if strcmp(a{u},'[CURVES]') 
+                
+                if strcmp(a{u},'[CURVES]')
                     fprintf(fid2,'[CURVES]');
                     nn=0;      
-                    sect=1;%pp=1;
-                    break;                     
+                    sect=1; 
+                    fprintf(fid2,'\n');break;                  
+                elseif sect==0
+                    fprintf(fid2,'%s%s',c,sps{:});
+                    fprintf(fid2,'\n');break;
                 end
-                
-                spaces= 15 - length(a{u});
-                k=1;sps={' '};
-                while k < spaces+1
-                    sps = strcat(sps,{' '});
-                    k=k+1;
-                end
-
 
                 % section [CURVES]
                 if (sect==1) && (nn==0) 
-                    if ~strcmp(a{u},'[CONTROLS]')  || varargin{1}
-                        if varargin{1}
-                            for i=1:length(Curves)
-                                fprintf(fid2,'%s\n',char(Curves{i}),sps{:});
-                            end
-                            fprintf(fid2,'%s%s',a{u},sps{:});nn=1;sect=0;
-                            break;
-                        end
-%                         pp=pp+1;
-                    else
-%                         if pp==1, nn=1; t=t-10;sect=0;break; end
-                        fprintf(fid2,'%s%s',a{u},sps{:});nn=1;sect=0;
-                        break;
+                    while ~strcmp(a{u},'[CONTROLS]')  
+                        t=t+1;
+                        c = info{t};
+                        a = regexp(c, '\s*','split');
                     end
-%                     fprintf(fid2,'%s%s',a{u},sps{:}); 
-%                     nn=1;sect=0;
-%                     break;
+                    for i=1:length(Cline)
+                        fprintf(fid2,'%s\n',char(Cline{i}),sps{:});
+                    end
+                    fprintf(fid2,'%s%s',a{u},sps{:});nn=1;sect=0;
+                    fprintf(fid2,'\n');break;
                 elseif isempty(a{u}) && nn==0
                 else
                     if isempty(a{u}) && nn==1
@@ -6211,8 +6046,414 @@ function remAddCurve(obj,Curves,varargin)
             end
         end
         t=t+1;
-        fprintf(fid2,'\n');
+%         fprintf(fid2,'\n');
     end
     fclose all;
+end
 
+function value=InputFileInfo(obj)
+    % Open epanet input file
+    [fid,message] = fopen(obj.PathFile,'rt');
+    if fid < 0
+        disp(message)
+        return
+    end
+    %Nodes
+    value.JunctionsID={};
+    value.ReservoirsID={};
+    value.TanksID={};
+    value.NodeReservoirIndex=0;
+    value.NodeTankIndex=0;
+    value.NodeJunctionIndex=0;
+    value.CountNodes=0;
+    value.sectTanks=0;
+    value.sectJunctions=0;
+    value.sectReservoirs=0;
+    k=1;p=1;r=1;
+    
+    %Links
+    value.PipesID={};
+    value.PumpsID={};
+    value.ValvesID={};
+    value.LinkPipeIndex=0;
+    value.LinkPumpIndex=0;
+    value.LinkValveIndex=0;
+    value.FromNode={};
+    value.ToNode={};
+    value.CountLinks=0;
+    value.sectPipes=0;
+    value.sectPumps=0;
+    value.sectValves=0;
+    sect=0; i=1;t=1;q=1;
+    
+    %Curves
+    value.typeCurve=[];
+    typecode=0;
+    value.CurveID={};
+    value.CurveX={};
+    value.CurveY={};
+    value.Clines={}; sectCurve=0; x=1; b=1;
+    
+    %Controls
+    value.controlsInfo={};
+    value.linksID={};
+    value.nodesID={};
+    value.sectControls=0; d=1;
+    
+    %Options
+    value.FlowUnits={};
+    value.Headloss={};
+    value.sectOptions=0;
+    value.SImetric=0;
+    value.UScustomary=0;
+    value.ConcentrationUnits={}; g=1; f=1;
+    
+    while 1
+        tline = fgetl(fid);
+        if ~ischar(tline),   break,   end
+        % Get first token in the line
+        tok = strtok(tline);
+        % Skip blank Clines and comments
+        if isempty(tok), continue, end
+        if (tok(1) == ';'), continue, end
+        if (tok(1) == '[')
+            % [JUNCTIONS] section
+            if strcmpi(tok(1:5),'[JUNC')
+                sect=1;
+                value.sectJunctions=value.sectJunctions+1;
+                continue;
+            % [RESERVOIRS] section
+            elseif strcmpi(tok(1:5),'[RESE')
+                sect=2;
+                value.sectReservoirs=value.sectReservoirs+1;
+                continue;      
+            % [TANKS] section
+            elseif strcmpi(tok(1:5),'[TANK')
+                sect=3;
+                value.sectTanks=value.sectTanks+1;
+                continue; 
+            % [PIPES] section
+            elseif strcmpi(tok(1:5),'[PIPE')
+                sect=4;
+                value.sectPipes=value.sectPipes+1;
+                continue;
+            % [PUMPS] section
+            elseif strcmpi(tok(1:5),'[PUMP')
+                sect=5;
+                value.sectPumps=value.sectPumps+1;
+                continue;      
+            % [VALVES] section
+            elseif strcmpi(tok(1:5),'[VALV')
+                sect=6;
+                value.sectValves=value.sectValves+1;
+                continue;  
+            % [CURVES] section
+            elseif strcmpi(tok(1:5),'[CURV')
+                sect=7;
+                sectCurve= sectCurve+1;
+                continue;
+            % [CONTROLS] section
+            elseif strcmpi(tok(1:5),'[CONT')
+                sect=8;
+                value.sectControls=value.sectControls+1;
+                continue;
+            % [OPTIONS] section
+            elseif strcmpi(tok(1:5),'[OPTI')
+                sect=9;
+                value.sectOptions=value.sectOptions+1;
+                value.LinksAll=[value.PipesID value.PumpsID value.ValvesID];
+                value.NodesAll=[value.JunctionsID value.ReservoirsID value.TanksID];
+                value.vx = NaN(value.CountNodes,1);
+                value.vy = NaN(value.CountNodes,1);
+                value.vertx = cell(value.CountLinks,1);
+                value.verty = cell(value.CountLinks,1);
+                nvert = zeros(value.CountLinks,1);
+                continue;
+            % [COORDINATES] section
+            elseif strcmpi(tok(1:5),'[COOR')
+                sect=10;
+                continue;
+            % [VERTICES] section
+            elseif strcmpi(tok(1:5),'[VERT')
+                sect=11;
+                continue;                
+            % [END]
+            elseif strcmpi(tok(1:4),'[END')
+                break;
+            else
+                sect = 0;
+                continue;
+            end
+        end
+
+        if sect==0
+            continue;
+        % Nodes
+        elseif sect==1
+            a = regexp(tline, '\s*','split');uu=1;
+            for tt=1:length(a)
+                if isempty(a{tt}) 
+                    %skip
+                elseif (a{tt}==';')
+                    %skip
+                else
+                    atline{uu}=a{tt}; uu=uu+1;
+                end
+            end
+            value.JunctionsID{k}=atline{1};
+            value.NodeJunctionIndex(k)=k;
+            k=k+1;  
+            value.CountNodes=value.CountNodes+1;
+        elseif sect==2
+            a = regexp(tline, '\s*','split');uu=1;
+            for tt=1:length(a)
+                if isempty(a{tt}) 
+                    %skip
+                elseif (a{tt}==';')
+                    %skip
+                else
+                    atline{uu}=a{tt}; uu=uu+1;
+                end
+            end
+            value.ReservoirsID{r}=atline{1};
+            value.NodeReservoirIndex(r)=k;
+            k=k+1;
+            r=r+1;
+            value.CountNodes=value.CountNodes+1;
+        elseif sect==3
+            a = regexp(tline, '\s*','split');uu=1;
+            for tt=1:length(a)
+                if isempty(a{tt}) 
+                    %skip
+                elseif (a{tt}==';')
+                    %skip
+                else
+                    atline{uu}=a{tt}; uu=uu+1;
+                end
+            end
+            value.TanksID{p}=atline{1};
+            value.NodeTankIndex(p)=k;
+            k=k+1;
+            p=p+1;
+            value.CountNodes=value.CountNodes+1;
+
+        % Links
+        elseif sect==4
+            a = regexp(tline, '\s*','split');uu=1;
+            for tt=1:length(a)
+                if isempty(a{tt}) 
+                    %skip
+                elseif (a{tt}==';')
+                    %skip
+                else
+                    atline{uu}=a{tt}; uu=uu+1;
+                end
+            end
+            value.PipesID{t}=atline{1};
+            value.LinkPipeIndex(t)=t;
+          	value.FromNode{t}=atline{2}; 
+            value.ToNode{t}=atline{3}; 
+            t=t+1;
+            value.CountLinks= value.CountLinks+1;
+        elseif sect==5
+            a = regexp(tline, '\s*','split');uu=1;
+            for tt=1:length(a)
+                if isempty(a{tt}) 
+                    %skip
+                elseif (a{tt}==';')
+                    %skip
+                else
+                    atline{uu}=a{tt}; uu=uu+1;
+                end
+            end
+            value.PumpsID{q}=atline{1};
+            value.LinkPumpIndex(q)=t;
+          	value.FromNode{t}=atline{2}; 
+            value.ToNode{t}=atline{3};
+            t=t+1;
+            q=q+1;
+            value.CountLinks= value.CountLinks+1;
+        elseif sect==6
+            a = regexp(tline, '\s*','split');uu=1;
+            for tt=1:length(a)
+                if isempty(a{tt}) 
+                    %skip
+                elseif (a{tt}==';')
+                    %skip
+                else
+                    atline{uu}=a{tt}; uu=uu+1;
+                end
+            end
+            value.ValvesID{i}=atline{1};
+            value.LinkValveIndex(i)=t;
+          	value.FromNode{t}=atline{2}; 
+            value.ToNode{t}=atline{3};
+            t=t+1;
+            i=i+1;
+            value.CountLinks= value.CountLinks+1;
+        % Curves
+        elseif sect==7
+            ee=regexp(tline,'\w*EFFICIENCY*\w','match');
+            nn=regexp(tline,'\w*VOLUME*\w','match');
+            kk=regexp(tline,'\w*HEADLOSS*\w','match');
+            
+            if strcmp(ee,'EFFICIENCY'), typecode=1;   % EFFICIENCY
+                value.Clines{b}=tline;b=b+1;continue;
+            elseif strcmp(nn,'VOLUME'), typecode=2;   % VOLUME
+                value.Clines{b}=tline;b=b+1;continue;
+            elseif strcmp(kk,'HEADLOSS'), typecode=3; % HEADLOSS
+                value.Clines{b}=tline;b=b+1;continue;
+            elseif (~length(strcmp(nn,'VOLUME')) || ~length(strcmp(ee,'EFFICIENCY')) || ~length(strcmp(kk,'HEADLOSS'))) &&  (tok(1)==';'), typecode=0; % HEADLOSS
+                value.Clines{b}=tline;b=b+1;continue;
+            else
+                value.typeCurve(x)=typecode; 
+            end
+            a = textscan(tline,'%s %f %f');
+            value.CurveID(x)=a{1};
+            value.CurveX(x)=a(2);
+            value.CurveY(x)=a(3);
+            value.Clines{b}=tline;
+            x=x+1;b=b+1; 
+        % Controls
+        elseif sect==8
+            atline={};
+            a = regexp(tline,'\s*','split');uu=1;
+            for tt=1:length(a)
+                if isempty(a{tt}) 
+                    %skip
+                elseif (a{tt}==';')
+                    %skip
+                else
+                    atline{uu}=a{tt}; uu=uu+1;
+                end
+            end
+            value.controlsInfo{d}=atline;
+            value.linksID{d}=atline{2};
+            t = regexp(tline, '\w*TIME\w*','match');
+            if length(t)==0
+                value.nodesID{d}=atline{6};
+            end
+            d=d+1;  
+        % Options
+        elseif sect==9
+            atline={};
+            a = regexp(tline,'\s*','split');uu=1;
+            for tt=1:length(a)
+                if isempty(a{tt}) 
+                    %skip
+                elseif (a{tt}==';')
+                    %skip
+                else
+                    atline{uu}=a{tt}; uu=uu+1;
+                end
+            end
+            if strcmp(upper(atline{1}),'UNITS')
+                value.FlowUnits{f}=atline{2};
+            end
+            if strcmp(upper(atline{1}),'HEADLOSS')
+                value.Headloss{g}=atline{2};
+                g=g+1;
+            end
+            if strcmp(upper(atline{1}),'PRESSURE')
+                value.PressureUnits=atline{2};
+            end
+            if strcmp(upper(atline{1}),'QUALITY')
+                if ~strcmp(upper(atline{2}),'NONE')
+                    if length(atline)==3
+                        value.ConcentrationUnits=atline{3};
+                    end
+                else
+                    value.ConcentrationUnits='NONE';
+                end
+            end
+            f=f+1;
+        % Coordinates
+        elseif sect==10
+            A = textscan(tline,'%s %f %f');
+            % get the node index
+            a=strcmp(A{1},value.NodesAll);
+            index=strfind(a,1);
+            if length(index)==0 
+                return; 
+            end
+            value.vx(index) = A{2};
+            value.vy(index) = A{3};
+        % Vertices
+        elseif sect==11
+            A = textscan(tline,'%s %f %f');
+            [errcode,index] = ENgetlinkindex(char(A{1}));
+            if errcode ~=0 
+                return; 
+            end
+            nvert(index) = nvert(index) + 1;
+            value.vertx{index}(nvert(index)) = A{2};
+            value.verty{index}(nvert(index)) = A{3};
+        end
+    end
+
+    %     US Customary - SI metric 
+    switch char(value.FlowUnits)
+        case 'CFS'
+            value.UScustomary=1;
+        case 'GPM'
+            value.UScustomary=1;
+        case 'MGD'
+            value.UScustomary=1;
+        case 'IMGD'
+            value.UScustomary=1;
+        case 'AFD'
+            value.UScustomary=1;
+        case 'LPS'
+            value.SImetric=1;
+        case 'LPM'
+            value.SImetric=1;
+        case 'MLD'
+            value.SImetric=1;
+        case 'CMH'
+            value.SImetric=1;
+        case 'CMD'
+            value.SImetric=1;
+    end
+    
+    if value.UScustomary==1;
+        value.DemandsUnits=value.FlowUnits;
+        value.DiameterPipesUnits='inches';
+        value.DiameterTanksUnits='feet';
+        value.EfficiencyUnits='percent'; 
+        value.ElevationUnits='feet';        
+        value.EmitterCoeffUnits='flow units @ 1 psi drop';
+        value.EnergyUnits='kwatt-hours'; 
+        value.FrictionFactorUnits='unitless'; 
+        value.HeadUnits='feet';
+        value.LengthUnits='feet';
+        value.MinorLossCoeffUnits='unitless'; 
+        value.PowerUnits='horsepower';
+        value.ReactionCoeffBulkUnits='1/day (1st-order)'; 
+        value.ReactionCoeffWallUnits='mass/sq-ft/day (0-order), ft/day (1st-order)'; 
+        value.RoughnessCoeffUnits='millifeet(Darcy-Weisbach), unitless otherwise';
+        value.SourceMassInjectionUnits='mass/minute';
+        value.VelocityUnits='ft/sec';
+        value.VolumeUnits='cubic feet';
+        value.WaterAgeUnits='hours'; 
+    else % SI Metric
+        value.DemandsUnits=value.FlowUnits;
+        value.DiameterPipesUnits='millimeters';
+        value.DiameterTanksUnits='meters';
+        value.EfficiencyUnits='percent'; 
+        value.ElevationUnits='meters';        
+        value.EmitterCoeffUnits='flow units @ 1 meter drop';
+        value.EnergyUnits='kwatt-hours'; 
+        value.FrictionFactorUnits='unitless'; 
+        value.HeadUnits='meters';
+        value.LengthUnits='meters';
+        value.MinorLossCoeffUnits='unitless'; 
+        value.PowerUnits='kwatts';
+        value.ReactionCoeffBulkUnits='1/day (1st-order)'; 
+        value.ReactionCoeffWallUnits='mass/sq-m/day(0-order), meters/day (1st-order)'; 
+        value.RoughnessCoeffUnits='mm(Darcy-Weisbach), unitless otherwise';
+        value.SourceMassInjectionUnits='mass/minute';
+        value.VelocityUnits='meters/sec';
+        value.VolumeUnits='cubic meters';
+        value.WaterAgeUnits='hours';        
+    end
 end

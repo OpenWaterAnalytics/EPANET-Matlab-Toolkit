@@ -1,0 +1,661 @@
+[TITLE]
+
+
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern         
+ JUNCTION-0      	376.06999999999999	0.763534    	PATTERN-0       	;
+ JUNCTION-1      	192.0       	0           	                	;
+ JUNCTION-2      	363.13999999999999	0.830000    	PATTERN-0       	;
+ JUNCTION-3      	428.06999999999999	4.400000    	PATTERN-0       	;
+ JUNCTION-4      	477.81      	3.836466    	PATTERN-0       	;
+ JUNCTION-5      	494.23000000000002	3.529833    	PATTERN-0       	;
+ JUNCTION-6      	505.0       	1.850000    	PATTERN-0       	;
+ JUNCTION-7      	535.23000000000002	0           	                	;
+ JUNCTION-8      	493.42000000000002	1.540000    	PATTERN-0       	;
+ JUNCTION-9      	488.29000000000002	0           	                	;
+ JUNCTION-10     	333.62      	0.341497    	PATTERN-0       	;
+ JUNCTION-11     	344.10000000000002	1.049859    	PATTERN-0       	;
+ JUNCTION-12     	379.5       	0.025149    	PATTERN-0       	;
+ JUNCTION-13     	325.94999999999999	0           	                	;
+ JUNCTION-14     	416.85000000000002	0           	                	;
+ JUNCTION-15     	423.49000000000001	1.320167    	PATTERN-0       	;
+ JUNCTION-16     	383.0       	0           	                	;
+ JUNCTION-17     	385.06      	25.715680   	PATTERN-0       	;
+ JUNCTION-18     	478.14999999999998	6.182285    	PATTERN-0       	;
+ JUNCTION-19     	558.92999999999995	4.603554    	PATTERN-0       	;
+ JUNCTION-20     	617.73000000000002	2.580000    	PATTERN-0       	;
+ JUNCTION-21     	652.41999999999996	0           	                	;
+ JUNCTION-22     	625.96000000000004	4.290000    	PATTERN-0       	;
+ JUNCTION-23     	604.34000000000003	3.194580    	PATTERN-0       	;
+ JUNCTION-24     	636.61000000000001	0           	                	;
+ JUNCTION-25     	653.92999999999995	5.970000    	PATTERN-0       	;
+ JUNCTION-26     	683.42999999999995	0           	                	;
+ JUNCTION-27     	690.64999999999998	12.442156   	PATTERN-0       	;
+ JUNCTION-28     	701.69000000000005	2.092553    	PATTERN-0       	;
+ JUNCTION-29     	846.27999999999997	0           	                	;
+ JUNCTION-30     	636.0       	116.764931  	PATTERN-0       	;
+ JUNCTION-31     	600.42999999999995	2.370000    	PATTERN-0       	;
+ JUNCTION-32     	625.85000000000002	6.160000    	PATTERN-0       	;
+ JUNCTION-33     	622.77999999999997	0.958345    	PATTERN-0       	;
+ JUNCTION-34     	200.0       	37.035069   	PATTERN-0       	;
+ JUNCTION-35     	651.97000000000003	9.239535    	PATTERN-0       	;
+ JUNCTION-36     	634.11000000000001	0           	                	;
+ JUNCTION-37     	677.04999999999995	3.286911    	PATTERN-0       	;
+ JUNCTION-38     	646.50999999999999	0           	                	;
+ JUNCTION-39     	703.19000000000005	4.907129    	PATTERN-0       	;
+ JUNCTION-40     	741.63      	3.393717    	PATTERN-0       	;
+ JUNCTION-41     	700.22000000000003	3.052871    	PATTERN-0       	;
+ JUNCTION-42     	728.04999999999995	11.414126   	PATTERN-0       	;
+ JUNCTION-43     	653.09000000000003	3.310000    	PATTERN-0       	;
+ JUNCTION-44     	678.5       	5.167447    	PATTERN-0       	;
+ JUNCTION-45     	747.32000000000005	9.354966    	PATTERN-0       	;
+ JUNCTION-46     	820.24000000000001	4.365034    	PATTERN-0       	;
+ JUNCTION-47     	640.47000000000003	0           	                	;
+ JUNCTION-48     	637.45000000000005	0           	                	;
+ JUNCTION-49     	623.89999999999998	1.140000    	PATTERN-0       	;
+ JUNCTION-50     	611.08000000000004	3.811622    	PATTERN-0       	;
+ JUNCTION-51     	623.67999999999995	3.010000    	PATTERN-0       	;
+ JUNCTION-52     	613.26999999999998	4.918378    	PATTERN-0       	;
+ JUNCTION-53     	607.63      	3.030000    	PATTERN-0       	;
+ JUNCTION-54     	602.11000000000001	4.190000    	PATTERN-0       	;
+ JUNCTION-55     	603.34000000000003	3.080000    	PATTERN-0       	;
+ JUNCTION-56     	606.94000000000005	0           	                	;
+ JUNCTION-57     	617.97000000000003	0.431655    	PATTERN-0       	;
+ JUNCTION-58     	610.21000000000004	22.020000   	PATTERN-0       	;
+ JUNCTION-59     	620.95000000000005	0           	                	;
+ JUNCTION-60     	623.99000000000001	0           	                	;
+ JUNCTION-61     	625.38      	0           	                	;
+ JUNCTION-62     	625.39999999999998	0           	                	;
+ JUNCTION-63     	623.95000000000005	0           	                	;
+ JUNCTION-64     	623.13      	0           	                	;
+ JUNCTION-65     	619.37      	0           	                	;
+ JUNCTION-66     	619.72000000000003	0           	                	;
+ JUNCTION-67     	624.5       	0           	                	;
+ JUNCTION-68     	617.08000000000004	20.900000   	PATTERN-0       	;
+ JUNCTION-69     	626.0       	2.460000    	PATTERN-0       	;
+ JUNCTION-70     	619.11000000000001	6.250000    	PATTERN-0       	;
+ JUNCTION-71     	632.17999999999995	2.030000    	PATTERN-0       	;
+ JUNCTION-72     	622.35000000000002	2.793147    	PATTERN-0       	;
+ JUNCTION-73     	620.37      	2.630000    	PATTERN-0       	;
+ JUNCTION-74     	622.34000000000003	1.070000    	PATTERN-0       	;
+ JUNCTION-75     	629.15999999999997	2.546853    	PATTERN-0       	;
+ JUNCTION-76     	622.54999999999995	2.670000    	PATTERN-0       	;
+ JUNCTION-77     	624.63999999999999	1.820000    	PATTERN-0       	;
+ JUNCTION-78     	618.01999999999998	0           	                	;
+ JUNCTION-79     	617.88999999999999	0           	                	;
+ JUNCTION-80     	616.88999999999999	0           	                	;
+ JUNCTION-81     	623.58000000000004	3.460000    	PATTERN-0       	;
+ JUNCTION-82     	618.75999999999999	10.220000   	PATTERN-0       	;
+ JUNCTION-83     	617.71000000000004	7.541160    	PATTERN-0       	;
+ JUNCTION-84     	619.92999999999995	2.878840    	PATTERN-0       	;
+ JUNCTION-85     	620.25      	0           	                	;
+ JUNCTION-86     	623.48000000000002	0           	                	;
+ JUNCTION-87     	622.25999999999999	0           	                	;
+ JUNCTION-88     	621.69000000000005	0           	                	;
+ JUNCTION-89     	626.80999999999995	7.340000    	PATTERN-0       	;
+ JUNCTION-90     	644.09000000000003	0           	                	;
+ JUNCTION-91     	637.44000000000005	0           	                	;
+ JUNCTION-92     	628.24000000000001	0           	                	;
+ JUNCTION-93     	643.74000000000001	13.990000   	PATTERN-0       	;
+ JUNCTION-94     	633.48000000000002	2.130000    	PATTERN-0       	;
+ JUNCTION-95     	630.86000000000001	2.969609    	PATTERN-0       	;
+ JUNCTION-96     	629.13999999999999	6.100391    	PATTERN-0       	;
+ JUNCTION-97     	628.99000000000001	4.450000    	PATTERN-0       	;
+ JUNCTION-98     	643.04999999999995	5.966633    	PATTERN-0       	;
+ JUNCTION-99     	641.88999999999999	7.173367    	PATTERN-0       	;
+ JUNCTION-100    	637.89999999999998	5.888099    	PATTERN-0       	;
+ JUNCTION-101    	645.09000000000003	0.661901    	PATTERN-0       	;
+ JUNCTION-102    	1094.0699999999999	102.100000  	PATTERN-0       	;
+ JUNCTION-103    	1031.73     	0.755915    	PATTERN-1       	;
+ JUNCTION-104    	860.63999999999999	0.044085    	PATTERN-1       	;
+ JUNCTION-105    	0.0         	0           	                	;
+ JUNCTION-106    	0.0         	0           	                	;
+ JUNCTION-109    	0.0         	0           	                	;
+ JUNCTION-110    	0.0         	0           	                	;
+ JUNCTION-111    	418.0       	0           	                	;
+ JUNCTION-112    	418.0       	0           	                	;
+ JUNCTION-113    	359.0       	0           	                	;
+ JUNCTION-114    	359.0       	0.313495    	PATTERN-0       	;
+ JUNCTION-115    	533.0       	0           	                	;
+ JUNCTION-116    	533.0       	4.567715    	PATTERN-0       	;
+ JUNCTION-117    	404.0       	49.284320   	PATTERN-0       	;
+ JUNCTION-118    	404.0       	105.365812  	PATTERN-0       	;
+ JUNCTION-119    	849.0       	0           	                	;
+ JUNCTION-120    	849.0       	0           	                	;
+ JUNCTION-121    	957.0       	0           	                	;
+ JUNCTION-122    	957.0       	1.446928    	PATTERN-0       	;
+ JUNCTION-123    	758.0       	3.243072    	PATTERN-0       	;
+ JUNCTION-124    	758.0       	1.015420    	PATTERN-0       	;
+ JUNCTION-125    	434.0       	0           	                	;
+ JUNCTION-126    	434.0       	197.664188  	PATTERN-0       	;
+ JUNCTION-128    	0.0         	0           	                	;
+
+[RESERVOIRS]
+;ID              	Head        	Pattern         
+ RESERVOIR-129   	425.0       	                	;
+
+[TANKS]
+;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
+ TANK-130        	843.89999999999998	15.159000   	0.000000    	32.100000   	186.000000  	0.000000    	                	;
+ TANK-131        	1137.0999999999999	17.945000   	0.000000    	41.900000   	106.000000  	0.000000    	                	;
+
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ LINK-0          	JUNCTION-118    	JUNCTION-126    	7401.000000 	20.453411   	138.000000  	0.000000    	Open  	;
+ LINK-1          	JUNCTION-17     	JUNCTION-0      	359.000000  	7.999894    	139.000000  	0.000000    	Open  	;
+ LINK-2          	JUNCTION-0      	JUNCTION-2      	324.000000  	7.999894    	139.000000  	0.000000    	Open  	;
+ LINK-3          	JUNCTION-3      	JUNCTION-4      	697.000000  	7.999810    	139.000000  	0.000000    	Open  	;
+ LINK-6          	JUNCTION-5      	JUNCTION-4      	574.000000  	7.999807    	139.000000  	0.000000    	Open  	;
+ LINK-7          	JUNCTION-5      	JUNCTION-6      	238.000000  	7.999912    	139.000000  	0.000000    	Open  	;
+ LINK-8          	JUNCTION-6      	JUNCTION-7      	502.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-9          	JUNCTION-8      	JUNCTION-6      	396.000000  	7.999894    	139.000000  	0.000000    	Open  	;
+ LINK-10         	JUNCTION-9      	JUNCTION-8      	377.000000  	7.999894    	139.000000  	0.000000    	Open  	;
+ LINK-11         	JUNCTION-18     	JUNCTION-9      	308.000000  	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-12         	JUNCTION-9      	JUNCTION-8      	837.000000  	7.999841    	139.000000  	0.000000    	Open  	;
+ LINK-13         	JUNCTION-2      	JUNCTION-113    	56.000000   	8.000000    	138.000000  	0.000000    	Open  	;
+ LINK-14         	JUNCTION-114    	JUNCTION-10     	599.000000  	7.999901    	138.000000  	0.000000    	Open  	;
+ LINK-15         	JUNCTION-1      	JUNCTION-109    	125.000000  	16.000000   	138.000000  	0.000000    	Open  	;
+ LINK-16         	JUNCTION-10     	JUNCTION-11     	409.000000  	7.999841    	138.000000  	0.000000    	Open  	;
+ LINK-17         	JUNCTION-110    	JUNCTION-34     	124.000000  	12.000000   	138.000000  	0.000000    	Open  	;
+ LINK-18         	JUNCTION-128    	JUNCTION-1      	320.000000  	30.000000   	138.000000  	0.000000    	Open  	;
+ LINK-19         	RESERVOIR-129   	JUNCTION-128    	51.000000   	30.000000   	138.000000  	0.000000    	Open  	;
+ LINK-20         	JUNCTION-12     	JUNCTION-13     	597.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-21         	JUNCTION-12     	JUNCTION-11     	671.000000  	7.999810    	138.000000  	0.000000    	Open  	;
+ LINK-22         	JUNCTION-14     	JUNCTION-12     	332.000000  	7.999863    	139.000000  	0.000000    	Open  	;
+ LINK-23         	JUNCTION-5      	JUNCTION-15     	2089.000000 	7.999852    	139.000000  	0.000000    	Open  	;
+ LINK-24         	JUNCTION-15     	JUNCTION-3      	50.000000   	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-25         	JUNCTION-15     	JUNCTION-111    	57.000000   	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-26         	JUNCTION-112    	JUNCTION-14     	69.000000   	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-27         	JUNCTION-14     	JUNCTION-16     	928.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-28         	JUNCTION-17     	JUNCTION-18     	1382.000000 	16.000290   	138.000000  	0.000000    	Open  	;
+ LINK-29         	JUNCTION-18     	JUNCTION-116    	731.000000  	16.000150   	138.000000  	0.000000    	Open  	;
+ LINK-30         	JUNCTION-0      	JUNCTION-4      	1570.000000 	7.999764    	139.000000  	0.000000    	Open  	;
+ LINK-31         	JUNCTION-29     	JUNCTION-28     	1402.000000 	24.000489   	138.000000  	0.000000    	Open  	;
+ LINK-32         	JUNCTION-45     	JUNCTION-46     	1811.000000 	7.999830    	140.000000  	0.000000    	Open  	;
+ LINK-33         	JUNCTION-23     	JUNCTION-124    	1845.000000 	12.000000   	140.000000  	0.000000    	Open  	;
+ LINK-34         	JUNCTION-122    	JUNCTION-123    	2433.000000 	12.000000   	140.000000  	0.000000    	Open  	;
+ LINK-35         	JUNCTION-34     	JUNCTION-30     	10260.284142	24.000979   	138.000000  	0.000000    	Open  	;
+ LINK-36         	JUNCTION-41     	JUNCTION-39     	1066.000000 	7.999947    	138.000000  	0.000000    	Open  	;
+ LINK-37         	JUNCTION-2      	JUNCTION-3      	1066.000000 	7.999796    	139.000000  	0.000000    	Open  	;
+ LINK-38         	JUNCTION-11     	JUNCTION-10     	1000.000000 	7.999805    	138.000000  	0.000000    	Open  	;
+ LINK-39         	JUNCTION-117    	JUNCTION-17     	1537.000000 	16.000075   	138.000000  	0.000000    	Open  	;
+ LINK-40         	JUNCTION-20     	JUNCTION-21     	2125.000000 	20.000594   	138.000000  	0.000000    	Open  	;
+ LINK-41         	JUNCTION-20     	JUNCTION-115    	3227.000000 	16.000327   	138.000000  	0.000000    	Open  	;
+ LINK-42         	JUNCTION-19     	JUNCTION-125    	2125.000000 	20.000167   	138.000000  	0.000000    	Open  	;
+ LINK-43         	JUNCTION-19     	JUNCTION-20     	942.000000  	20.000000   	138.000000  	0.000000    	Open  	;
+ LINK-44         	JUNCTION-21     	JUNCTION-22     	1257.000000 	20.000439   	138.000000  	0.000000    	Open  	;
+ LINK-45         	JUNCTION-22     	JUNCTION-23     	1101.000000 	24.000739   	138.000000  	0.000000    	Open  	;
+ LINK-46         	JUNCTION-23     	JUNCTION-30     	1175.000000 	24.000727   	138.000000  	0.000000    	Open  	;
+ LINK-47         	JUNCTION-22     	JUNCTION-24     	292.000000  	24.000000   	138.000000  	0.000000    	Open  	;
+ LINK-48         	JUNCTION-24     	JUNCTION-25     	178.000000  	24.000000   	138.000000  	0.000000    	Open  	;
+ LINK-49         	JUNCTION-25     	JUNCTION-26     	336.000000  	24.000000   	138.000000  	0.000000    	Open  	;
+ LINK-50         	JUNCTION-26     	JUNCTION-27     	76.000000   	24.000000   	138.000000  	0.000000    	Open  	;
+ LINK-51         	JUNCTION-27     	JUNCTION-28     	144.000000  	24.000000   	138.000000  	0.000000    	Open  	;
+ LINK-52         	JUNCTION-30     	JUNCTION-31     	1146.000000 	12.000000   	138.000000  	0.000000    	Open  	;
+ LINK-53         	JUNCTION-31     	JUNCTION-32     	1699.000000 	12.000000   	138.000000  	0.000000    	Open  	;
+ LINK-54         	JUNCTION-32     	JUNCTION-33     	645.000000  	12.000000   	138.000000  	0.000000    	Open  	;
+ LINK-55         	JUNCTION-33     	JUNCTION-57     	754.000000  	8.413870    	138.000000  	0.000000    	Open  	;
+ LINK-56         	JUNCTION-19     	JUNCTION-35     	1113.000000 	7.999903    	140.000000  	0.000000    	Open  	;
+ LINK-57         	JUNCTION-35     	JUNCTION-36     	507.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-58         	JUNCTION-35     	JUNCTION-37     	246.000000  	7.999947    	140.000000  	0.000000    	Open  	;
+ LINK-59         	JUNCTION-37     	JUNCTION-20     	739.000000  	7.999947    	138.000000  	0.000000    	Open  	;
+ LINK-60         	JUNCTION-35     	JUNCTION-38     	552.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-61         	JUNCTION-37     	JUNCTION-39     	348.000000  	8.000000    	138.000000  	0.000000    	Open  	;
+ LINK-62         	JUNCTION-39     	JUNCTION-40     	998.000000  	8.296935    	139.000000  	0.000000    	Open  	;
+ LINK-63         	JUNCTION-40     	JUNCTION-41     	619.000000  	8.000000    	138.000000  	0.000000    	Open  	;
+ LINK-64         	JUNCTION-40     	JUNCTION-42     	538.000000  	7.999947    	138.000000  	0.000000    	Open  	;
+ LINK-65         	JUNCTION-42     	JUNCTION-41     	668.000000  	8.000000    	138.000000  	0.000000    	Open  	;
+ LINK-66         	JUNCTION-42     	JUNCTION-27     	2581.000000 	8.019783    	138.000000  	0.000000    	Open  	;
+ LINK-67         	JUNCTION-24     	JUNCTION-43     	544.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-68         	JUNCTION-43     	JUNCTION-25     	420.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-69         	JUNCTION-43     	JUNCTION-44     	373.000000  	7.999947    	140.000000  	0.000000    	Open  	;
+ LINK-70         	JUNCTION-44     	JUNCTION-26     	556.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-71         	JUNCTION-44     	JUNCTION-28     	752.000000  	7.999947    	140.000000  	0.000000    	Open  	;
+ LINK-72         	JUNCTION-29     	TANK-130        	242.000000  	24.000000   	138.000000  	0.000000    	Open  	;
+ LINK-73         	JUNCTION-21     	JUNCTION-47     	91.000000   	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-74         	JUNCTION-47     	JUNCTION-48     	805.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-75         	JUNCTION-48     	JUNCTION-49     	574.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-76         	JUNCTION-49     	JUNCTION-22     	158.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-77         	JUNCTION-49     	JUNCTION-50     	577.000000  	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-78         	JUNCTION-50     	JUNCTION-51     	388.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-79         	JUNCTION-51     	JUNCTION-48     	236.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-80         	JUNCTION-51     	JUNCTION-52     	393.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-81         	JUNCTION-52     	JUNCTION-47     	549.000000  	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-82         	JUNCTION-52     	JUNCTION-50     	1381.000000 	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-83         	JUNCTION-23     	JUNCTION-53     	919.000000  	9.999941    	139.000000  	0.000000    	Open  	;
+ LINK-84         	JUNCTION-53     	JUNCTION-54     	386.000000  	9.999970    	139.000000  	0.000000    	Open  	;
+ LINK-85         	JUNCTION-54     	JUNCTION-31     	229.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-86         	JUNCTION-53     	JUNCTION-56     	232.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-87         	JUNCTION-56     	JUNCTION-55     	390.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-88         	JUNCTION-55     	JUNCTION-54     	254.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-89         	JUNCTION-55     	JUNCTION-56     	873.000000  	7.999947    	140.000000  	0.000000    	Open  	;
+ LINK-90         	JUNCTION-32     	JUNCTION-57     	945.000000  	7.999947    	140.000000  	0.000000    	Open  	;
+ LINK-91         	JUNCTION-57     	JUNCTION-33     	230.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-92         	JUNCTION-31     	JUNCTION-58     	1155.000000 	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-93         	JUNCTION-58     	JUNCTION-59     	413.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-94         	JUNCTION-59     	JUNCTION-60     	943.000000  	7.999947    	140.000000  	0.000000    	Open  	;
+ LINK-95         	JUNCTION-60     	JUNCTION-59     	196.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-96         	JUNCTION-60     	JUNCTION-61     	133.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-97         	JUNCTION-61     	JUNCTION-62     	138.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-98         	JUNCTION-62     	JUNCTION-63     	187.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-99         	JUNCTION-63     	JUNCTION-64     	134.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-100        	JUNCTION-64     	JUNCTION-65     	300.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-101        	JUNCTION-65     	JUNCTION-66     	65.000000   	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-102        	JUNCTION-66     	JUNCTION-67     	420.000000  	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-103        	JUNCTION-67     	JUNCTION-61     	209.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-104        	JUNCTION-66     	JUNCTION-67     	398.000000  	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-105        	JUNCTION-68     	JUNCTION-58     	381.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-106        	JUNCTION-64     	JUNCTION-65     	872.000000  	7.999947    	140.000000  	0.000000    	Open  	;
+ LINK-107        	JUNCTION-65     	JUNCTION-68     	199.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-108        	JUNCTION-63     	JUNCTION-62     	713.000000  	7.999947    	140.000000  	0.000000    	Open  	;
+ LINK-109        	JUNCTION-68     	JUNCTION-69     	1095.000000 	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-110        	JUNCTION-69     	JUNCTION-70     	231.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-111        	JUNCTION-70     	JUNCTION-71     	695.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-112        	JUNCTION-70     	JUNCTION-72     	528.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-113        	JUNCTION-73     	JUNCTION-69     	938.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-114        	JUNCTION-72     	JUNCTION-74     	169.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-115        	JUNCTION-74     	JUNCTION-73     	127.000000  	8.000000    	140.000000  	0.000000    	Open  	;
+ LINK-116        	JUNCTION-72     	JUNCTION-75     	928.000000  	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-117        	JUNCTION-75     	JUNCTION-74     	336.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-118        	JUNCTION-75     	JUNCTION-76     	772.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-119        	JUNCTION-76     	JUNCTION-77     	417.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-120        	JUNCTION-77     	JUNCTION-73     	655.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-121        	JUNCTION-76     	JUNCTION-78     	167.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-122        	JUNCTION-78     	JUNCTION-79     	169.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-123        	JUNCTION-79     	JUNCTION-80     	195.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-124        	JUNCTION-80     	JUNCTION-81     	333.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-125        	JUNCTION-81     	JUNCTION-77     	60.000000   	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-126        	JUNCTION-78     	JUNCTION-71     	895.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-127        	JUNCTION-80     	JUNCTION-82     	372.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-128        	JUNCTION-82     	JUNCTION-83     	205.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-129        	JUNCTION-83     	JUNCTION-84     	430.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-130        	JUNCTION-84     	JUNCTION-81     	152.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-131        	JUNCTION-84     	JUNCTION-83     	1586.000000 	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-132        	JUNCTION-82     	JUNCTION-85     	174.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-133        	JUNCTION-85     	JUNCTION-86     	456.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-134        	JUNCTION-86     	JUNCTION-87     	341.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-135        	JUNCTION-87     	JUNCTION-85     	507.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-136        	JUNCTION-87     	JUNCTION-88     	195.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-137        	JUNCTION-88     	JUNCTION-79     	250.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-138        	JUNCTION-88     	JUNCTION-89     	191.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-139        	JUNCTION-89     	JUNCTION-86     	926.000000  	7.999947    	140.000000  	0.000000    	Open  	;
+ LINK-140        	JUNCTION-89     	JUNCTION-90     	464.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-141        	JUNCTION-90     	JUNCTION-91     	178.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-142        	JUNCTION-91     	JUNCTION-92     	167.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-143        	JUNCTION-92     	JUNCTION-33     	403.000000  	10.000000   	139.000000  	0.000000    	Open  	;
+ LINK-144        	JUNCTION-90     	JUNCTION-93     	143.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-145        	JUNCTION-93     	JUNCTION-94     	331.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-146        	JUNCTION-94     	JUNCTION-92     	157.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-147        	JUNCTION-93     	JUNCTION-94     	1805.000000 	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-148        	JUNCTION-92     	JUNCTION-95     	177.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-149        	JUNCTION-95     	JUNCTION-96     	332.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-150        	JUNCTION-96     	JUNCTION-95     	1432.000000 	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-151        	JUNCTION-91     	JUNCTION-97     	489.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-152        	JUNCTION-97     	JUNCTION-96     	122.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-153        	JUNCTION-97     	JUNCTION-98     	285.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-154        	JUNCTION-98     	JUNCTION-99     	597.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-155        	JUNCTION-99     	JUNCTION-100    	148.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-156        	JUNCTION-100    	JUNCTION-101    	812.000000  	7.999900    	139.000000  	0.000000    	Open  	;
+ LINK-157        	JUNCTION-101    	JUNCTION-98     	152.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-158        	JUNCTION-100    	JUNCTION-101    	620.000000  	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-159        	JUNCTION-98     	JUNCTION-99     	784.000000  	7.999947    	139.000000  	0.000000    	Open  	;
+ LINK-160        	JUNCTION-97     	JUNCTION-71     	1214.000000 	8.000000    	139.000000  	0.000000    	Open  	;
+ LINK-161        	JUNCTION-45     	JUNCTION-46     	718.000000  	10.000000   	138.000000  	0.000000    	Open  	;
+ LINK-162        	JUNCTION-46     	JUNCTION-120    	315.000000  	10.000000   	138.000000  	0.000000    	Open  	;
+ LINK-163        	JUNCTION-119    	JUNCTION-104    	76.000000   	10.000000   	138.000000  	0.000000    	Open  	;
+ LINK-164        	JUNCTION-103    	JUNCTION-102    	930.000000  	12.000000   	140.000000  	0.000000    	Open  	;
+ LINK-165        	JUNCTION-102    	TANK-131        	559.000000  	16.000000   	140.000000  	0.000000    	Open  	;
+ LINK-166        	JUNCTION-29     	JUNCTION-105    	169.000000  	11.974181   	140.000000  	800.000000  	Open  	;
+ LINK-167        	JUNCTION-106    	JUNCTION-104    	84.000000   	8.000000    	138.000000  	0.000000    	Open  	;
+ LINK-168        	JUNCTION-103    	JUNCTION-121    	291.000000  	12.000000   	140.000000  	0.000000    	Open  	;
+ LINK-169        	JUNCTION-103    	JUNCTION-104    	4700.000000 	10.121698   	138.000000  	0.000000    	Open  	;
+
+[PUMPS]
+;ID              	Node1           	Node2           	Parameters
+ PUMP-170        	JUNCTION-105    	JUNCTION-106    	HEAD CURVE-0	;
+ PUMP-172        	JUNCTION-109    	JUNCTION-110    	HEAD CURVE-2	;
+
+[VALVES]
+;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss   
+ VALVE-173       	JUNCTION-111    	JUNCTION-112    	6.000000    	PRV 	70.000000   	0.000000    	;
+ VALVE-174       	JUNCTION-113    	JUNCTION-114    	6.000000    	PRV 	80.000000   	0.000000    	;
+ VALVE-175       	JUNCTION-115    	JUNCTION-116    	10.000000   	PRV 	55.000000   	0.000000    	;
+ VALVE-176       	JUNCTION-117    	JUNCTION-118    	6.000000    	PRV 	29.762000   	0.000000    	;
+ VALVE-177       	JUNCTION-119    	JUNCTION-120    	6.000000    	PRV 	45.000000   	0.000000    	;
+ VALVE-178       	JUNCTION-121    	JUNCTION-122    	6.000000    	PRV 	37.000000   	0.000000    	;
+ VALVE-179       	JUNCTION-123    	JUNCTION-124    	8.000000    	PRV 	40.000000   	0.000000    	;
+ VALVE-180       	JUNCTION-125    	JUNCTION-126    	8.000000    	PRV 	16.450000   	0.000000    	;
+
+[TAGS]
+
+[DEMANDS]
+;Junction        	Demand      	Pattern         	Category
+ JUNCTION-45     	9.354966    	PATTERN-0       	;   
+ JUNCTION-45     	0.200000    	PATTERN-1       	;   
+ JUNCTION-122    	1.446928    	PATTERN-0       	;   
+ JUNCTION-122    	0.076960    	PATTERN-1       	;   
+ JUNCTION-123    	3.243072    	PATTERN-0       	;   
+ JUNCTION-123    	0.923040    	PATTERN-1       	;   
+
+[STATUS]
+;ID              	Status/Setting
+
+[PATTERNS]
+;ID              	Multipliers
+;
+ PATTERN-0       	1.560000    	1.360000    	1.170000    	1.130000    	1.080000    	1.040000    
+ PATTERN-0       	1.200000    	0.640000    	1.080000    	0.530000    	0.290000    	0.900000    
+ PATTERN-0       	1.110000    	1.060000    	1.000000    	1.650000    	0.550000    	0.740000    
+ PATTERN-0       	0.640000    	0.460000    	0.580000    	0.640000    	0.710000    	0.660000    
+ PATTERN-0       	0.680000    	0.430000    	0.370000    	0.330000    	0.230000    	0.210000    
+ PATTERN-0       	0.060000    	0.100000    	0.100000    	0.140000    	0.090000    	0.100000    
+ PATTERN-0       	0.090000    	0.090000    	0.030000    	0.230000    	0.270000    	0.720000    
+ PATTERN-0       	0.930000    	1.130000    	1.390000    	1.940000    	1.900000    	1.830000    
+ PATTERN-0       	2.730000    	1.740000    	1.290000    	1.410000    	1.390000    	1.350000    
+ PATTERN-0       	1.190000    	1.340000    	0.950000    	1.270000    	1.280000    	1.090000    
+ PATTERN-0       	1.010000    	1.130000    	1.000000    	0.770000    	0.670000    	0.760000    
+ PATTERN-0       	0.760000    	0.710000    	0.580000    	0.860000    	0.960000    	0.970000    
+ PATTERN-0       	0.820000    	0.710000    	0.650000    	0.620000    	0.440000    	0.480000    
+ PATTERN-0       	0.550000    	0.560000    	0.610000    	0.600000    	0.440000    	0.460000    
+ PATTERN-0       	0.440000    	0.400000    	0.440000    	0.690000    	0.760000    	1.190000    
+ PATTERN-0       	1.330000    	1.730000    	1.970000    	2.370000    	2.280000    	2.100000    
+;
+ PATTERN-1       	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   
+ PATTERN-1       	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   
+ PATTERN-1       	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	0.000000    	80.000000   	80.000000   
+ PATTERN-1       	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   
+ PATTERN-1       	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   
+ PATTERN-1       	80.000000   	80.000000   	80.000000   	80.000000   	80.000000   	0.000000    
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    	0.000000    
+ PATTERN-1       	0.000000    	0.000000    	0.000000    	80.000000   	80.000000   	80.000000   
+;
+ PATTERN-2       	0.800000    	0.840000    	0.880000    	0.970000    	1.070000    	1.010000    
+ PATTERN-2       	0.960000    	0.970000    	0.990000    	1.080000    	1.180000    	1.190000    
+ PATTERN-2       	1.190000    	1.220000    	1.250000    	1.250000    	1.260000    	1.220000    
+ PATTERN-2       	1.190000    	1.160000    	1.140000    	1.120000    	1.110000    	1.100000    
+ PATTERN-2       	1.100000    	1.060000    	1.020000    	1.010000    	1.010000    	1.000000    
+ PATTERN-2       	1.000000    	0.850000    	0.710000    	0.700000    	0.690000    	0.740000    
+ PATTERN-2       	0.790000    	0.800000    	0.800000    	0.800000    	0.810000    	0.770000    
+ PATTERN-2       	0.740000    	0.740000    	0.750000    	0.780000    	0.810000    	0.800000    
+;
+ PATTERN-3       	423.300000  	225.000000  	26.700000   	26.700000   	26.700000   	26.700000   
+ PATTERN-3       	26.700000   	26.700000   	26.700000   	202.100000  	377.500000  	202.100000  
+ PATTERN-3       	25.800000   	25.900000   	25.900000   	26.000000   	26.000000   	26.100000   
+ PATTERN-3       	26.100000   	26.100000   	26.200000   	26.300000   	26.300000   	26.300000   
+ PATTERN-3       	26.300000   	26.300000   	26.400000   	239.900000  	453.500000  	240.500000  
+ PATTERN-3       	27.400000   	267.800000  	508.100000  	462.100000  	416.000000  	327.500000  
+ PATTERN-3       	238.900000  	133.000000  	27.100000   	27.100000   	27.100000   	27.100000   
+ PATTERN-3       	27.100000   	248.000000  	468.900000  	360.700000  	252.400000  	449.500000  
+ PATTERN-3       	646.500000  	336.600000  	26.800000   	198.900000  	371.100000  	198.400000  
+ PATTERN-3       	25.800000   	25.800000   	25.800000   	25.800000   	25.800000   	25.900000   
+ PATTERN-3       	26.000000   	26.000000   	26.000000   	26.100000   	26.200000   	26.200000   
+ PATTERN-3       	26.200000   	26.200000   	26.300000   	26.300000   	26.300000   	26.300000   
+ PATTERN-3       	26.300000   	228.300000  	430.200000  	657.200000  	884.200000  	884.200000  
+ PATTERN-3       	884.300000  	884.400000  	884.500000  	884.500000  	884.500000  	663.300000  
+ PATTERN-3       	442.100000  	234.200000  	26.300000   	47.200000   	68.000000   	352.200000  
+ PATTERN-3       	636.400000  	331.200000  	26.000000   	26.100000   	26.100000   	224.700000  
+
+[CURVES]
+;ID              	X-Value     	Y-Value
+;PUMP:   
+ CURVE-0         	0.000000    	445.000000  
+ CURVE-0         	790.000000  	365.000000  
+ CURVE-0         	1460.000000 	120.000000  
+;PUMP:   
+ CURVE-1         	0.000000    	730.000000  
+ CURVE-1         	1000.000000 	500.000000  
+ CURVE-1         	1350.000000 	260.000000  
+;PUMP:   
+ CURVE-2         	0.000000    	740.000000  
+ CURVE-2         	2000.000000 	530.000000  
+ CURVE-2         	3240.000000 	205.000000  
+
+[CONTROLS]
+LINK VALVE-180 Closed At Time 0.000000
+
+
+
+
+[RULES]
+
+RULE RULE-0
+IF TANK TANK-130 LEVEL >= 16.000000
+THEN PUMP PUMP-172 STATUS IS CLOSED
+PRIORITY 1.000000
+
+RULE RULE-1
+IF TANK TANK-130 LEVEL <= 12.100000
+THEN PUMP PUMP-172 STATUS IS OPEN
+PRIORITY 1.000000
+
+RULE RULE-3
+IF TANK TANK-131 LEVEL >= 18.400000
+THEN PUMP PUMP-170 STATUS IS CLOSED
+PRIORITY 1.000000
+
+RULE RULE-4
+IF TANK TANK-131 LEVEL <= 15.400000
+THEN PUMP PUMP-170 STATUS IS OPEN
+Priority 1.000000
+
+
+
+
+[ENERGY]
+ Global Efficiency  	75.000000
+ Global Price       	0
+ Demand Charge      	0.000000
+
+[EMITTERS]
+;Junction        	Coefficient
+
+[QUALITY]
+;Node            	InitQual
+
+[SOURCES]
+;Node            	Type        	Quality     	Pattern
+
+[REACTIONS]
+;Type     	Pipe/Tank       	Coefficient
+
+
+[REACTIONS]
+ Order Bulk            	1
+ Order Tank            	1
+ Order Wall            	1
+ Global Bulk           	0.000000
+ Global Wall           	0.000000
+ Limiting Potential    	0
+ Roughness Correlation 	0
+
+[MIXING]
+;Tank            	Model
+
+[TIMES]
+ Duration           	96:00 
+ Hydraulic Timestep 	0:30 
+ Quality Timestep   	0:05
+ Pattern Timestep   	0:30 
+ Pattern Start      	0:00 
+ Report Timestep    	1:00 
+ Report Start       	0:00 
+ Start ClockTime    	8:00 AM
+ Statistic          	NONE
+
+[REPORT]
+ Status             	No
+ Summary            	No
+ Page               	0
+
+[OPTIONS]
+ Units              	GPM
+ Headloss           	H-W
+ Specific Gravity   	1.000000
+ Viscosity          	1.1e-005
+ Trials             	40
+ Accuracy           	0.005
+ Unbalanced         	Stop
+ Pattern            	PATTERN-0
+ Demand Multiplier  	1.000000
+ Emitter Exponent   	0.500000
+ Quality            	Chemical TIME
+ Diffusivity        	100
+ Tolerance          	0.010000
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ JUNCTION-0      	10660.89        	12699.67        
+ JUNCTION-1      	232.34          	198.38          
+ JUNCTION-2      	10096.30        	12963.00        
+ JUNCTION-3      	8407.85         	12291.24        
+ JUNCTION-4      	9496.42         	11972.35        
+ JUNCTION-5      	9011.59         	11369.17        
+ JUNCTION-6      	9013.79         	11080.51        
+ JUNCTION-7      	9250.29         	11199.54        
+ JUNCTION-8      	9581.36         	10752.81        
+ JUNCTION-9      	10733.82        	11618.76        
+ JUNCTION-10     	9928.19         	13544.98        
+ JUNCTION-11     	8807.74         	13153.79        
+ JUNCTION-12     	7701.69         	12907.40        
+ JUNCTION-13     	6876.11         	12848.50        
+ JUNCTION-14     	8251.47         	12444.71        
+ JUNCTION-15     	8259.98         	12265.86        
+ JUNCTION-16     	6336.78         	11924.32        
+ JUNCTION-17     	11390.23        	12721.86        
+ JUNCTION-18     	11057.11        	11140.34        
+ JUNCTION-19     	18876.92        	11353.89        
+ JUNCTION-20     	17934.43        	10606.32        
+ JUNCTION-21     	17059.69        	8043.82         
+ JUNCTION-22     	17247.33        	6999.27         
+ JUNCTION-23     	17410.54        	5888.57         
+ JUNCTION-24     	17999.87        	7351.33         
+ JUNCTION-25     	18109.38        	7395.83         
+ JUNCTION-26     	19053.01        	7351.84         
+ JUNCTION-27     	19106.85        	7553.33         
+ JUNCTION-28     	19686.69        	7293.81         
+ JUNCTION-29     	21853.72        	7382.88         
+ JUNCTION-30     	17071.34        	5128.88         
+ JUNCTION-31     	15171.37        	5740.90         
+ JUNCTION-32     	13238.08        	6332.93         
+ JUNCTION-33     	12424.38        	7418.33         
+ JUNCTION-34     	1250.49         	498.88          
+ JUNCTION-35     	19673.06        	10686.87        
+ JUNCTION-36     	20403.76        	10472.92        
+ JUNCTION-37     	18985.90        	10631.23        
+ JUNCTION-38     	18607.97        	10713.49        
+ JUNCTION-39     	19166.06        	10506.15        
+ JUNCTION-40     	19099.54        	10176.22        
+ JUNCTION-41     	17861.02        	9889.20         
+ JUNCTION-42     	18385.78        	9430.10         
+ JUNCTION-43     	18490.35        	6790.82         
+ JUNCTION-44     	18645.08        	7129.68         
+ JUNCTION-45     	21195.36        	8702.78         
+ JUNCTION-46     	21278.01        	7694.47         
+ JUNCTION-47     	16855.92        	8656.03         
+ JUNCTION-48     	16904.90        	7714.24         
+ JUNCTION-49     	16927.55        	6903.29         
+ JUNCTION-50     	16551.63        	7560.14         
+ JUNCTION-51     	16614.08        	8245.07         
+ JUNCTION-52     	16228.29        	7895.69         
+ JUNCTION-53     	15807.37        	6484.02         
+ JUNCTION-54     	15143.01        	5790.53         
+ JUNCTION-55     	15452.25        	5855.21         
+ JUNCTION-56     	15614.75        	6241.36         
+ JUNCTION-57     	12641.61        	7580.16         
+ JUNCTION-58     	12889.67        	5314.84         
+ JUNCTION-59     	14170.10        	5753.98         
+ JUNCTION-60     	13812.99        	6116.38         
+ JUNCTION-61     	13623.60        	5755.55         
+ JUNCTION-62     	13553.54        	5928.47         
+ JUNCTION-63     	13138.41        	6329.93         
+ JUNCTION-64     	12860.32        	6023.02         
+ JUNCTION-65     	12449.32        	5619.02         
+ JUNCTION-66     	12955.43        	5888.95         
+ JUNCTION-67     	13301.09        	5801.58         
+ JUNCTION-68     	12578.78        	5441.85         
+ JUNCTION-69     	10677.34        	4900.98         
+ JUNCTION-70     	10181.06        	5473.86         
+ JUNCTION-71     	11140.24        	5728.02         
+ JUNCTION-72     	9885.02         	5770.85         
+ JUNCTION-73     	8969.76         	5646.52         
+ JUNCTION-74     	9308.85         	5671.41         
+ JUNCTION-75     	9946.22         	6083.37         
+ JUNCTION-76     	9607.47         	6199.74         
+ JUNCTION-77     	9051.85         	6450.38         
+ JUNCTION-78     	10166.55        	6572.87         
+ JUNCTION-79     	9485.75         	6648.12         
+ JUNCTION-80     	9568.49         	6824.95         
+ JUNCTION-81     	8741.43         	6287.84         
+ JUNCTION-82     	8978.26         	6693.00         
+ JUNCTION-83     	8345.05         	6938.19         
+ JUNCTION-84     	8751.56         	6635.61         
+ JUNCTION-85     	9279.58         	7087.57         
+ JUNCTION-86     	9876.13         	7369.96         
+ JUNCTION-87     	9804.94         	7308.79         
+ JUNCTION-88     	9879.39         	6704.35         
+ JUNCTION-89     	10235.12        	6748.13         
+ JUNCTION-90     	10216.80        	7677.21         
+ JUNCTION-91     	11071.02        	7420.24         
+ JUNCTION-92     	11350.46        	7397.70         
+ JUNCTION-93     	10935.56        	7058.08         
+ JUNCTION-94     	11167.17        	7199.21         
+ JUNCTION-95     	11919.97        	7225.08         
+ JUNCTION-96     	12279.69        	6864.49         
+ JUNCTION-97     	12009.44        	6806.61         
+ JUNCTION-98     	11504.57        	6811.20         
+ JUNCTION-99     	10798.43        	6305.49         
+ JUNCTION-100    	10495.63        	6494.15         
+ JUNCTION-101    	11456.95        	7127.08         
+ JUNCTION-102    	25891.06        	3341.73         
+ JUNCTION-103    	24306.48        	3387.26         
+ JUNCTION-104    	22275.22        	7224.91         
+ JUNCTION-105    	22205.02        	7496.88         
+ JUNCTION-106    	22698.70        	7650.31         
+ JUNCTION-109    	695.63          	0.00            
+ JUNCTION-110    	862.27          	205.84          
+ JUNCTION-111    	8270.97         	12259.89        
+ JUNCTION-112    	8176.75         	12053.87        
+ JUNCTION-113    	9457.16         	13032.31        
+ JUNCTION-114    	9711.67         	13144.65        
+ JUNCTION-115    	12096.99        	10755.48        
+ JUNCTION-116    	11965.70        	10646.33        
+ JUNCTION-117    	14008.10        	13489.78        
+ JUNCTION-118    	13980.49        	13520.62        
+ JUNCTION-119    	22395.73        	7684.44         
+ JUNCTION-120    	22300.21        	7726.14         
+ JUNCTION-121    	23322.75        	3866.35         
+ JUNCTION-122    	23012.94        	4255.69         
+ JUNCTION-123    	20282.88        	5465.74         
+ JUNCTION-124    	20326.50        	5404.05         
+ JUNCTION-125    	21576.64        	13167.78        
+ JUNCTION-126    	21563.80        	13128.27        
+ JUNCTION-128    	269.38          	602.32          
+ RESERVOIR-129   	21.20           	583.42          
+ TANK-130        	21873.08        	6912.07         
+ TANK-131        	25900.14        	3983.02         
+
+[VERTICES]
+;Link            	X-Coord         	Y-Coord
+
+[LABELS]
+;X-Coord           Y-Coord          Label & Anchor Node
+
+[BACKDROP]
+ DIMENSIONS     	-1295.01        	-677.25         	27195.15        	14222.23        
+ UNITS          	None
+ FILE           	
+ OFFSET         	0.00            	0.00            
+
+[END]
+  	
+ OFFSET         	0.00            	0.00            
+
+[END]
