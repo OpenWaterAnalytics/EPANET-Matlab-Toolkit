@@ -1,13 +1,15 @@
-%% Testing
+%% EPANET Matlab Class Test
+% This file is provided to ensure that all functions can be executed
+% correctly.
+% Press F10 for step-by-step execution. You may also use the breakpoints, 
+% indicated with a short dash (-) on the right of each line number.
+
 fclose all;
 clc;
 clear all;
 clear class;
-% unloadlibrary('epanet2')
-
-%  TEST - EPANET
-% Input Files
-d=Epanet('Net1_Rossman2000.inp');%d.plot
+d=epanet('Net1_Rossman2000.inp');
+%d.plot
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
