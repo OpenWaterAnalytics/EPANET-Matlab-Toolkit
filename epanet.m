@@ -228,31 +228,23 @@ classdef epanet <handle
                 inpfile=pathfile;
             end
             obj.inputfile=inpfile;
-            
             %Load EPANET Library
             [obj.errorcode]=ENLoadLibrary;
-            
             %Open the file
             [obj.errorcode] = ENopen([pwd,'\NETWORKS\',inpfile], '', '');
-            
             %Set path of temporary file
             obj.pathfile=[pwd,'\RESULTS\temp.inp'];
-            
             %Save the temporary input file
             obj.saveInputFile(obj.pathfile);
-            
             %Close input file
             ENclose;
-            
             %Load temporary file
             [obj.errorcode] = ENopen(obj.pathfile, [pwd,'\RESULTS\temp.rpt'], [pwd,'\RESULTS\temp.out']);
-
             %initialize temporary variables
             tmp=1;  
             save([pwd,'\RESULTS\','tmpinp'],'tmp','-mat')
             cntrm=0;
             save([pwd,'\RESULTS\','cntrm'],'cntrm','-mat')
-            
             %Get all the countable network parameters
             [obj.errorcode, obj.NodeCount] = ENgetcount(0);
             [obj.errorcode, obj.NodeTankReservoirCount] = ENgetcount(1);
@@ -274,7 +266,6 @@ classdef epanet <handle
             obj.LinkPipeCount=sum(strcmp(tmpLinkTypes,'PIPE'))+sum(strcmp(tmpLinkTypes,'CVPIPE'));
             obj.LinkPumpCount=sum(strcmp(tmpLinkTypes,'PUMP'));
             obj.LinkValveCount=obj.LinkCount - (obj.LinkPipeCount + obj.LinkPumpCount);
-         
             %Get all the controls
             if obj.ControlRulesCount
                 obj.ControlTypes{obj.ControlRulesCount}=[];
@@ -289,12 +280,9 @@ classdef epanet <handle
                 obj.ControlTypes(i)=obj.TYPECONTROL(obj.ControlTypesIndex(i)+1);
             end
             obj.ControlRules={obj.ControlTypes,obj.ControlTypesIndex,obj.ControlLinkIndex,obj.ControlSettings,obj.ControlNodeIndex,obj.ControlLevelValues};
-            
             %Get the flow units
             [obj.errorcode, flowunitsindex] = ENgetflowunits();
             obj.LinkFlowUnits=obj.TYPEUNITS(flowunitsindex+1);
-            
-            
             %Get all the link data
             obj.LinkTypeID={};
             obj.NodesConnectingLinksID={};
@@ -316,7 +304,6 @@ classdef epanet <handle
                 [obj.errorcode, obj.LinkBulkReactionCoeff(i)] = ENgetlinkvalue(i,6);
                 [obj.errorcode, obj.LinkWallReactionCoeff(i)] = ENgetlinkvalue(i,7);
             end
-            
             %Get all the node data
             obj.NodeTypeID={};
             for i=1:obj.NodeCount
@@ -333,15 +320,12 @@ classdef epanet <handle
                 [obj.errorcode, obj.NodeSourcePatternIndex(i)] = ENgetnodevalue(i, 6);
                 [obj.errorcode, obj.NodeSourceTypeIndex(i)] = ENgetnodevalue(i, 7);
             end
-                        
             obj.NodeReservoirNameID=obj.NodeNameID(obj.NodeReservoirIndex);
             obj.NodeTankNameID=obj.NodeNameID(obj.NodeTankIndex);
             obj.NodeJunctionNameID=obj.NodeNameID(obj.NodeJunctionIndex);
             obj.LinkPipeNameID=obj.LinkNameID(obj.LinkPipeIndex);            
             obj.LinkPumpNameID=obj.LinkNameID(obj.LinkPumpIndex);            
             obj.LinkValveNameID=obj.LinkNameID(obj.LinkValveIndex);   
-            
-            
             %Get all tank data
             obj.NodeTankInitialLevel=nan(1,obj.NodeCount);
             obj.NodeTankInitialWaterVolume=nan(1,obj.NodeCount);
@@ -370,14 +354,12 @@ classdef epanet <handle
                 [obj.errorcode, obj.NodeTankMinimumFraction(i)] = ENgetnodevalue(i, 22);
                 [obj.errorcode, obj.NodeTankBulkReactionCoeff(i)] = ENgetnodevalue(i, 23);
             end
-            
             %Get all options
             [obj.errorcode, obj.OptionsMaxTrials] = ENgetoption(0);
             [obj.errorcode, obj.OptionsAccuracyValue] = ENgetoption(1);
             [obj.errorcode, obj.OptionsQualityTolerance] = ENgetoption(2);
             [obj.errorcode, obj.OptionsEmmiterExponent] = ENgetoption(3);
             [obj.errorcode, obj.OptionsPatternDemandMultiplier] = ENgetoption(4);
-            
             %Get pattern data
             obj.PatternID={};
             for i=1:obj.getCountPatterns
@@ -385,11 +367,9 @@ classdef epanet <handle
                 [obj.errorcode, obj.PatternIndex(i)] = ENgetpatternindex(obj.PatternID{i});
                 [obj.errorcode, obj.PatternLengths(i)] = ENgetpatternlen(i);
             end
-            
             %Get quality types
             [obj.errorcode, obj.QualityCode,obj.QualityTraceNodeIndex] = ENgetqualtype();
             obj.QualityType=obj.TYPEQUALITY(obj.QualityCode+1);
-            
             %Get time parameters
             [obj.errorcode, obj.TimeSimulationDuration] = ENgettimeparam(0);
             [obj.errorcode, obj.TimeHydraulicStep] = ENgettimeparam(1);
@@ -402,26 +382,21 @@ classdef epanet <handle
             [obj.errorcode, obj.TimeStatisticsIndex] = ENgettimeparam(8);
             obj.TimeStatisticsType=obj.TYPESTATS(obj.TimeStatisticsIndex+1);
             [obj.errorcode, obj.TimeReportingPeriods] = ENgettimeparam(9);
-            
             %Get current EPANET version
             [obj.errorcode, obj.version] = ENgetversion();
-            
             %Get data from raw file (for information which cannot be
             %accessed by the epanet library)
             value=obj.getInputFileInfo;
-
             %Get curves
             obj.CurveNameID=value.CurveID;
             obj.CurveXvalue=value.CurveX;
             obj.CurveYvalue=value.CurveY;
             obj.CurveTypes =value.typeCurve;
-            
             %Get coordinates
             obj.NodeCoordinates{1} = value.vx;
             obj.NodeCoordinates{2} = value.vy;
             obj.NodeCoordinates{3} = value.vertx;
             obj.NodeCoordinates{4} = value.verty;
-
             %Get Units
             obj.LinkFlowUnits=value.LinkFlowUnits;
             obj.QualityUnits=value.QualityUnits;
@@ -448,7 +423,626 @@ classdef epanet <handle
             obj.QualityWaterAgeUnits=value.QualityWaterAgeUnits;
         end % End of epanet class constructor 
         
-
+        function value = getControls(obj)
+            %Retrieves the parameters of all control statements 
+            for i=1:obj.getCountControls
+                [obj.errorcode, obj.ControlTypesIndex(i),obj.ControlLinkIndex(i),obj.ControlSettings(i),obj.ControlNodeIndex(i),obj.ControlLevelValues(i)] = ENgetcontrol(i);
+                obj.ControlTypes={obj.TYPECONTROL(obj.ControlTypesIndex(i)+1)};
+            end
+            obj.ControlRules={obj.ControlTypes,obj.ControlTypesIndex,obj.ControlLinkIndex,obj.ControlSettings,obj.ControlNodeIndex,obj.ControlLevelValues};
+            value=obj.ControlRules;
+        end
+        function value  =  getCountNodes(obj)
+            % Retrieves the number of nodes
+            [obj.errorcode, value] = ENgetcount(0);
+        end
+        function value  =  getCountTanksReservoirs(obj)
+            % Retrieves the number of tanks
+            [obj.errorcode, value] = ENgetcount(1);
+        end
+        function value  =  getCountLinks(obj)
+            % Retrieves the number of links
+            [obj.errorcode, value] = ENgetcount(2);
+        end
+        function value  =  getCountPatterns(obj)
+            % Retrieves the number of patterns
+            [obj.errorcode, value] = ENgetcount(3);
+        end
+        function value  =  getCountCurves(obj)
+            % Retrieves the number of curves
+            [obj.errorcode, value] = ENgetcount(4);
+        end
+        function value  =  getCountControls(obj)
+            % Retrieves the number of controls
+            [obj.errorcode, value] = ENgetcount(5);
+        end
+        function value = getError(obj,errcode)
+            %Retrieves the text of the message associated with a particular error or warning code.
+            [obj.errorcode, value] = ENgeterror(errcode);
+        end
+        function value = getFlowUnits(obj)
+            %Retrieves flow units used to express all flow rates.  
+            [obj.errorcode, flowunitsindex] = ENgetflowunits();
+            obj.LinkFlowUnits=obj.TYPEUNITS(flowunitsindex+1);
+            value=obj.LinkFlowUnits;
+        end
+        function value = getLinkID(obj,varargin)
+            % Retrieves the ID label(s) of all links, or the IDs of an index set of links 
+            if isempty(varargin)
+                value{obj.getCountLinks}=[];
+                for i=1:obj.getCountLinks
+                    [obj.errorcode, value{i}]=ENgetlinkid(i);
+                end
+            else
+                k=1;
+                value{length(varargin{1})}=[];
+                for i=varargin{1}
+                    [obj.errorcode, value{k}]=ENgetlinkid(i);
+                    k=k+1;
+                end
+            end
+        end
+        function value = getLinkIndex(obj,varargin)
+            %Retrieves the indices of all links, or the indices of an ID set of links  
+            if isempty(varargin)
+                value=1:obj.getCountLinks;
+            elseif isa(varargin{1},'cell')
+                k=1;
+                value{length(varargin{1})}=[];
+                for j=1:length(varargin{1})
+                    [obj.errorcode, value(k)] = ENgetlinkindex(varargin{1}{j});
+                    k=k+1;
+                end
+            elseif isa(varargin{1},'char')
+                [obj.errorcode, value] = ENgetlinkindex(varargin{1});
+            end
+        end
+        function value = getLinkNodesIndex(obj)
+            %Retrieves the indexes of the from/to nodes of all links. 
+            value(obj.getCountLinks,1:2)=[nan nan];
+            for i=1:obj.getCountLinks
+                [obj.errorcode,linkFromNode,linkToNode] = ENgetlinknodes(i);
+                value(i,:)= [linkFromNode,linkToNode];
+            end
+        end
+        function value = getLinkType(obj)
+            %Retrieves the link-type code for all links.
+            value(obj.getCountLinks)=[];
+            for i=1:obj.getCountLinks
+                [obj.errorcode,obj.LinkTypeIndex(i)] = ENgetlinktype(i);
+                if obj.LinkTypeIndex(i)>2
+                    obj.LinkTypeIndex(i)=9; %Valve  
+                elseif obj.LinkTypeIndex(i)==1
+                    obj.LinkTypeIndex(i)=1; %cvpipe pipe
+                end
+                value(i)=obj.TYPELINK(obj.LinkTypeIndex(i)+1);
+            end
+        end
+        function value = getLinkDiameter(obj)
+            %Retrieves the value of all link diameters
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,0);
+            end
+        end
+        function value = getLinkLength(obj)
+            %Retrieves the value of all link lengths
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,1);
+            end
+        end
+        function value = getLinkRoughness(obj)
+            %Retrieves the value of all link roughness
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,2);
+            end
+        end
+        function value = getLinkMinorLossCoeff(obj)
+            %Retrieves the value of all link minor loss coefficients
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,3);
+            end
+        end
+        function value = getLinkInitialStatus(obj)
+            %Retrieves the value of all link initial status
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,4);
+            end
+        end
+        function value = getLinkInitialSettings(obj)
+            %Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,5);
+            end
+        end
+        function value = getLinkBulkReactionCoeff(obj)
+            %Retrieves the value of all link bulk reaction coefficients
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,6);
+            end
+        end
+        function value = getLinkWallReactionCoeff(obj)
+            %Retrieves the value of all link wall reaction coefficients
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,7);
+            end
+        end
+        function value = getLinkFlows(obj)
+            %Retrieves the value of all computed link flow rates
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,8);
+            end
+        end
+        function value = getLinkVelocity(obj)
+            %Retrieves the value of all computed link velocities
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,9);
+            end
+        end
+        function value = getLinkHeadloss(obj)
+            %Retrieves the value of all computed link headloss
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,10);
+            end
+        end
+        function value = getLinkStatus(obj)
+            %Retrieves the value of all computed link status (0 = closed, 1 = open) 
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,11);
+            end
+        end
+        function value = getLinkSettings(obj) 
+            %Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves            
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,12);
+            end
+        end
+        function value = getLinkEnergy(obj) %in kwatts
+            %Retrieves the value of all computed link Energy expended in kwatts 
+            value=zeros(1,obj.getCountLinks);
+            for i=1:obj.getCountLinks
+                [obj.errorcode, value(i)] = ENgetlinkvalue(i,13);
+            end
+        end
+        function value = getNodeID(obj,varargin)
+            %Retrieves the ID label of all nodes or some nodes with a specified index.  
+            if isempty(varargin)
+                value{obj.getCountNodes}=[];
+                for i=1:obj.getCountNodes
+                    [obj.errorcode, value{i}]=ENgetnodeid(i);
+                end
+            else
+                k=1;
+                value{length(varargin{1})}=[];
+                for i=varargin{1}
+                    [obj.errorcode, value{k}]=ENgetnodeid(i);
+                    k=k+1;
+                end
+            end
+        end
+        function value = getNodeIndex(obj,varargin)
+            %Retrieves the indices of all nodes or some nodes with a specified ID
+            if isempty(varargin)
+                value=1:obj.getCountNodes;
+            elseif isa(varargin{1},'cell')
+                k=1;
+                value(length(varargin{1}))=[];
+                for j=1:length(varargin{1})
+                    [obj.errorcode, value(k)] = ENgetnodeindex(varargin{1}{j});
+                    k=k+1;
+                end
+            elseif isa(varargin{1},'char')
+                [obj.errorcode, value] = ENgetnodeindex(varargin{1});
+            end
+        end
+        function value = getNodeType(obj)
+            %Retrieves the node-type code for all nodes
+            value(obj.getCountNodes)=[];
+            for i=1:obj.getCountNodes
+                [obj.errorcode,obj.NodeTypeIndex(i)] = ENgetnodetype(i);
+                value(i)=obj.TYPENODE(obj.NodeTypeIndex(i)+1);
+            end
+        end
+        function value = getNodeElevation(obj)
+            %Retrieves the value of all node elevations
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,0);
+            end
+        end
+        function value = getNodeBaseDemand(obj)
+            %Retrieves the value of all node base demands
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,1);
+            end
+        end
+        function value = getNodeDemandPatternIndex(obj)
+            %Retrieves the value of all node demand pattern indices
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,2);
+            end
+        end
+        function value = getNodeEmitterCoeff(obj)
+            %Retrieves the value of all node emmitter coefficients
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,3);
+            end
+        end
+        function value = getNodeInitialQuality(obj)
+            %Retrieves the value of all node initial quality
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,4);
+            end
+        end
+        function value = getNodeSourceQuality(obj)
+            %Retrieves the value of all nodes source quality
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,5);
+            end
+        end
+        function value = getNodeSourcePatternIndex(obj)
+            %Retrieves the value of all node source pattern index
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,6);
+            end
+        end
+        function value = getNodeSourceType(obj)
+            %Retrieves the value of all node source type
+            value=cell(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, temp] = ENgetnodevalue(i,7);
+                if ~isnan(temp)
+                    value(i)=obj.TYPESOURCE(temp+1);
+                end
+            end
+        end
+        function value = getTankLevelInitial(obj)
+            %Retrieves the value of all tank initial water levels
+            value=nan(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,8);
+            end
+        end
+        function value = getNodeActualDemand(obj)
+            %Retrieves the computed value of all actual demands
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,9);
+            end
+        end
+        function value = getNodeActualDemandSensingNodes(obj,varargin)
+            %Retrieves the computed demand values at some sensing nodes
+            value=zeros(1,obj.getCountNodes);
+            for i=1:length(varargin{1})
+                [obj.errorcode, value(varargin{1}(i))] = ENgetnodevalue(varargin{1}(i),9);
+            end
+        end
+        function value = getNodeHydaulicHead(obj)
+            %Retrieves the computed values of all hydraulic heads
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,10);
+            end
+        end
+        function value = getNodePressure(obj)
+            %Retrieves the computed values of all node pressures
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,11);
+            end
+        end
+        function value = getNodeActualQuality(obj)
+            %Retrieves the computed values of the actual quality for all nodes
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,12);
+            end
+        end
+        function value = getNodeMassFlowRate(obj) 
+            %Retrieves the computed mass flow rates per minute of chemical sources
+            value=zeros(1,obj.getCountNodes);
+            for i=1:obj.getCountNodes
+                [obj.errorcode, value(i)] = ENgetnodevalue(i,13);
+            end
+        end
+        function value = getNodeActualQualitySensingNodes(obj,varargin)
+            %Retrieves the computed quality values at some sensing nodes
+            value=zeros(1,obj.getCountNodes);
+            for i=1:length(varargin{1})
+                [obj.errorcode, value(varargin{1}(i))] = ENgetnodevalue(varargin{1}(i),12);
+            end
+        end
+        function value = getTankInitialVolume(obj) 
+            %Retrieves the tank initial volume
+            value=-1;
+        end
+        function value = getTankMixiningModel(obj) 
+            %Retrieves the tank mixing mode (mix1, mix2, fifo, lifo)
+            value=-1;
+        end        
+        function value = getTankMixiningZoneVolume(obj) 
+            %Retrieves the tank mixing zone volume
+            value=-1;
+        end  
+        function value = getTankDiameter(obj) 
+            %Retrieves the tank diameters
+            value=-1;
+        end 
+        function value = getTankMinimumVolume(obj) 
+            %Retrieves the tank minimum volume
+            value=-1;
+        end         
+        function value = getTankVolumeCurveIndex(obj) 
+            %Retrieves the tank volume curve index
+            value=-1;
+        end  
+        function value = getTankMinimumWaterLevel(obj) 
+            %Retrieves the tank minimum water level
+            value=-1;
+        end          
+        function value = getTankMaximumWaterLevel(obj) 
+            %Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank 
+            value=-1;
+        end  
+        function value = getTankBulkRateCoeff(obj) 
+            %Retrieves the tank bulk rate coefficient
+            value=-1;
+        end  
+        function value = getOptionTrial(obj)
+            % Retrieve maximum number of analysis trials
+            [obj.errorcode, value] = ENgetoption(0);
+        end
+        function value = getOptionAccuracy(obj)
+            % Retrieve the analysis convergence criterion (0.001)
+            [obj.errorcode, value] = ENgetoption(1);
+        end
+        function value = getOptionTolerance(obj)
+            % Retrieve the water quality analysis tolerance
+            [obj.errorcode, value] = ENgetoption(2);
+        end
+        function value = getOptionEmitterExponent(obj)
+            % Retrieve power exponent for the emmitters (0.5)
+            [obj.errorcode, value] = ENgetoption(3);
+        end
+        function value = getOptionDemandMult(obj)
+            % Retrieve the demand multiplier (x1)
+            [obj.errorcode, value] = ENgetoption(4);
+        end
+        function value = getPatternID(obj,varargin)
+            %Retrieves the ID label of all or some time patterns indices
+            if isempty(varargin)
+                value{obj.getCountPatterns}=[];
+                for i=1:obj.getCountPatterns
+                    [obj.errorcode, value{i}]=ENgetpatternid(i);
+                end
+            else
+                k=1;
+                value{length(varargin{1})}=[];
+                for i=varargin{1}
+                    [obj.errorcode, value{k}]=ENgetpatternid(i);
+                    k=k+1;
+                end
+            end
+        end
+        function value = getPatternIndex(obj,varargin)
+            %Retrieves the index of all or some time patterns IDs
+            if isempty(varargin)
+                value=1:obj.getCountPatterns;
+            elseif isa(varargin{1},'cell')
+                k=1;
+                value{length(varargin{1})}=[];
+                for j=1:length(varargin{1})
+                    [obj.errorcode, value(k)] = ENgetpatternindex(varargin{1}{j});
+                    k=k+1;
+                end
+            elseif isa(varargin{1},'char')
+                [obj.errorcode, value] = ENgetpatternindex(varargin{1});
+            end
+        end
+        function value = getPatternLength(obj,varargin)
+            %Retrieves the number of time periods in all or some patterns
+            if isempty(varargin)
+                tmpPatterns=1:obj.getCountPatterns;
+                for i=tmpPatterns
+                    [obj.errorcode, value(i)]=ENgetpatternlen(i);
+                end
+            elseif isa(varargin{1},'cell')
+                k=1;
+                for j=1:length(varargin{1})
+                    [obj.errorcode, value(k)] = ENgetpatternlen(obj.getPatternIndex(varargin{1}{j}));
+                    k=k+1;
+                end
+            elseif isa(varargin{1},'char')
+                [obj.errorcode, value] = ENgetpatternlen(obj.getPatternIndex(varargin{1}));
+            elseif isa(varargin{1},'numeric')
+                k=1;
+                for i=varargin{1}
+                    [obj.errorcode, value(k)]=ENgetpatternlen(i);
+                    k=k+1;
+                end
+            end
+        end
+        function value = getPattern(obj) 
+            %Retrieves the multiplier factor for all patterns and all times
+            tmpmaxlen=max(obj.getPatternLength);
+            value=nan(obj.getCountPatterns,tmpmaxlen);
+            for i=1:obj.getCountPatterns
+                tmplength=obj.getPatternLength(i);
+                for j=1:tmplength
+                    [obj.errorcode, value(i,j)] = ENgetpatternvalue(i, j);
+                end
+                if tmplength<tmpmaxlen
+                    for j=(tmplength+1):tmpmaxlen
+                        value(i,j)=value(i,j-tmplength);
+                    end
+                end
+                    
+            end
+        end
+        function value = getPatternValue(obj,patternIndex, patternStep) 
+            %Retrieves the multiplier factor for a certain pattern and time
+            [obj.errorcode, value] = ENgetpatternvalue(patternIndex, patternStep);
+        end
+        function value = getQualityType(obj)
+            %Retrieves the type of water quality analysis type
+            [obj.errorcode, obj.QualityCode,obj.QualityTraceNodeIndex] = ENgetqualtype();
+            value=obj.TYPEQUALITY(obj.QualityCode+1);
+        end
+        function value = getTimeSimulationDuration(obj)
+            %Retrieves the value of simulation duration
+            [obj.errorcode, value] = ENgettimeparam(0);
+        end
+        function value = getTimeHydraulicStep(obj)
+            %Retrieves the value of the hydraulic time step
+            [obj.errorcode, value] = ENgettimeparam(1);
+        end
+        function value = getTimeQualityStep(obj)
+            %Retrieves the value of the water quality time step
+            [obj.errorcode, value] = ENgettimeparam(2);
+        end
+        function value = getTimePatternStep(obj)
+            %Retrieves the value of the pattern time step
+            [obj.errorcode, value] = ENgettimeparam(3);
+        end
+        function value = getTimePatternStart(obj)
+            %Retrieves the value of pattern start time
+            [obj.errorcode, value] = ENgettimeparam(4);
+        end
+        function value = getTimeReportingStep(obj)
+            %Retrieves the value of the reporting time step
+            [obj.errorcode, value] = ENgettimeparam(5);
+        end
+        function value = getTimeReportingStart(obj)
+            %Retrieves the value of the reporting start time
+            [obj.errorcode, value] = ENgettimeparam(6);
+        end
+        function value = getTimeRuleControlStep(obj)
+            %Retrieves the time step for evaluating rule-based controls
+            [obj.errorcode, value] = ENgettimeparam(7);
+        end
+        function value = getTimeStatistics(obj)
+            %Retrieves the type of time series post-processing ('NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE')
+            [obj.errorcode, obj.TimeStatisticsIndex] = ENgettimeparam(8);
+            value=obj.TYPESTATS(obj.TimeStatisticsIndex+1);
+        end
+        function value = getTimeReportingPeriods(obj)
+            %Retrieves the number of reporting periods saved to the binary
+            %output file
+            [obj.errorcode, value] = ENgettimeparam(9);
+        end
+        function value=getVersion(obj)
+            % Retrieve the current EPANET version
+            [obj.errorcode, value] = ENgetversion();
+        end
+        
+         function value=getComputedHydraulicTimeSeries(obj)
+             % Compute hydraulic simulation and retrieve all time-series
+            obj.openHydraulicAnalysis;
+            obj.initializeHydraulicAnalysis
+            tstep=1; 
+            totalsteps=obj.getTimeSimulationDuration/obj.getTimeHydraulicStep+1;
+            initnodematrix=zeros(totalsteps, obj.getCountNodes);
+            initlinkmatrix=zeros(totalsteps, obj.getCountLinks);
+            value.Time=zeros(totalsteps,1); 
+            value.Pressure=initnodematrix;
+            value.Demand=initnodematrix; 
+            value.Head=initnodematrix; 
+            value.Flow=initlinkmatrix;
+            value.Velocity=initlinkmatrix; 
+            value.HeadLoss=initlinkmatrix; 
+            value.Status=initlinkmatrix; 
+            value.Setting=initlinkmatrix; 
+            value.Energy=initlinkmatrix;
+            k=1;
+            while (tstep>0)
+                t=obj.runHydraulicAnalysis;
+                value.Time(k,:)=t; 
+                value.Pressure(k,:)=obj.getNodePressure;
+                value.Demand(k,:)=obj.getNodeActualDemand; 
+                value.Head(k,:)=obj.getNodeHydaulicHead; 
+                value.Flow(k,:)=obj.getLinkFlows;
+                value.Velocity(k,:)=obj.getLinkVelocity; 
+                value.HeadLoss(k,:)=obj.getLinkHeadloss; 
+                value.Status(k,:)=obj.getLinkStatus; 
+                value.Setting(k,:)=obj.getLinkSettings; 
+                value.Energy(k,:)=obj.getLinkEnergy;   
+                tstep = obj.nextHydraulicAnalysisStep;
+                k=k+1;
+            end
+            obj.closeHydraulicAnalysis;
+        end       
+        function value=getComputedQualityTimeSeries(obj,varargin)
+            % Compute Quality simulation and retrieve all or some time-series
+            obj.openQualityAnalysis
+            obj.initializeQualityAnalysis
+            tleft=1; 
+            totalsteps=obj.getTimeSimulationDuration/obj.getTimeQualityStep;
+            initnodematrix=zeros(totalsteps, obj.getCountNodes);
+            if size(varargin,2)==0
+                varargin={'time', 'quality', 'mass'};
+            end
+            if find(strcmpi(varargin,'time'))
+                value.Time=zeros(totalsteps,1);
+            end
+            if find(strcmpi(varargin,'quality'))
+                value.Quality=initnodematrix;
+            end
+            if find(strcmpi(varargin,'mass'))
+                value.MassFlowRate=initnodematrix;
+            end
+            if find(strcmpi(varargin,'demand'))
+                value.Demand=initnodematrix;
+            end
+            if find(strcmpi(varargin,'qualitySensingNodes'))
+                value.Demand=initnodematrix;
+            end
+            k=1;
+            while (tleft>0)
+                t=obj.runQualityAnalysis;
+                if find(strcmpi(varargin,'time'))
+                    value.Time(k,:)=t;
+                end
+                if find(strcmpi(varargin,'quality'))
+                    value.Quality(k,:)=obj.getNodeActualQuality;
+                end
+                if find(strcmpi(varargin,'mass'))
+                    value.MassFlowRate(k,:)=obj.getNodeMassFlowRate;
+                end
+                if find(strcmpi(varargin,'demand'))
+                    value.Demand(k,:)=obj.getNodeActualDemand;
+                end
+                if find(strcmpi(varargin,'qualitySensingNodes'))
+                    value.Quality(k,:)=obj.getNodeActualQualitySensingNodes(varargin{2});
+                end
+                tleft = obj.stepQualityAnalysisTimeLeft;
+                k=k+1;
+            end
+            obj.closeQualityAnalysis;
+        end        
+        
+        
+        
+        
+        
+        
         %CONTROLS: EPANET cannot add new controls
        
         %ENsolveH
@@ -707,554 +1301,7 @@ classdef epanet <handle
         end
         
 
-        %%%%%%%%%%%%%%%%% GET FUNCTIONS %%%%%%%%%%%%%%%%%
-        
-        function value = getControls(obj)
-            for i=1:obj.getCountControls
-                [obj.errorcode, obj.ControlTypesIndex(i),obj.ControlLinkIndex(i),obj.ControlSettings(i),obj.ControlNodeIndex(i),obj.ControlLevelValues(i)] = ENgetcontrol(i);
-                obj.ControlTypes={obj.TYPECONTROL(obj.ControlTypesIndex(i)+1)};
-            end
-            obj.ControlRules={obj.ControlTypes,obj.ControlTypesIndex,obj.ControlLinkIndex,obj.ControlSettings,obj.ControlNodeIndex,obj.ControlLevelValues};
-            value=obj.ControlRules;
-        end
-        
-        %ENgetcount
-        function value  =  getCountNodes(obj)
-            % Nodes, Tanks/Reservoirs, Links, Patterns, Curves, Controls
-            [obj.errorcode, value] = ENgetcount(0);
-        end
-        function value  =  getCountTanksReservoirs(obj)
-            [obj.errorcode, value] = ENgetcount(1);
-        end
-        function value  =  getCountLinks(obj)
-            [obj.errorcode, value] = ENgetcount(2);
-        end
-        function value  =  getCountPatterns(obj)
-            [obj.errorcode, value] = ENgetcount(3);
-        end
-        function value  =  getCountCurves(obj)
-            [obj.errorcode, value] = ENgetcount(4);
-        end
-        function value  =  getCountControls(obj)
-            [obj.errorcode, value] = ENgetcount(5);
-        end
-        
-        
-        %ENgeterror
-        function value = getError(obj,errcode)
-            [obj.errorcode, value] = ENgeterror(errcode);
-        end
-        
-        %ENgetflowunits
-        function value = getFlowUnits(obj)
-            [obj.errorcode, flowunitsindex] = ENgetflowunits();
-            obj.LinkFlowUnits=obj.TYPEUNITS(flowunitsindex+1);
-            value=obj.LinkFlowUnits;
-        end
-        
-        %ENgetlinkid
-        function value = getLinkID(obj,varargin)
-            if isempty(varargin)
-                for i=1:obj.getCountLinks
-                    [obj.errorcode, value{i}]=ENgetlinkid(i);
-                end
-            else
-                k=1;
-                for i=varargin{1}
-                    [obj.errorcode, value{k}]=ENgetlinkid(i);
-                    k=k+1;
-                end
-            end
-        end
-        
-        %ENgetlinkindex
-        function value = getLinkIndex(obj,varargin)
-            if isempty(varargin)
-                value=1:obj.getCountLinks;
-            elseif isa(varargin{1},'cell')
-                k=1;
-                for j=1:length(varargin{1})
-                    [obj.errorcode, value(k)] = ENgetlinkindex(varargin{1}{j});
-                    k=k+1;
-                end
-            elseif isa(varargin{1},'char')
-                [obj.errorcode, value] = ENgetlinkindex(varargin{1});
-            end
-        end
-        
-        %ENgetlinknodes
-        function value = getLinkNodes(obj)
-            for i=1:obj.getCountNodes
-                [obj.errorcode,linkFromNode,linkToNode] = ENgetlinknodes(i);
-                value(i,:)= [linkFromNode,linkToNode];
-            end
-        end
-        
-        %ENgetlinknodes
-        function value = getLinkNodesIndex(obj)
-            for i=1:obj.getCountLinks
-                [obj.errorcode,linkFromNode,linkToNode] = ENgetlinknodes(i);
-                value(i,:)= [linkFromNode,linkToNode];
-            end
-        end
-        
-        %ENgetlinktype
-        function value = getLinkType(obj)
-            for i=1:obj.getCountLinks
-                [obj.errorcode,obj.LinkTypeIndex(i)] = ENgetlinktype(i);
-                if obj.LinkTypeIndex(i)>2
-                    obj.LinkTypeIndex(i)=9; %Valve  
-                elseif obj.LinkTypeIndex(i)==1
-                    obj.LinkTypeIndex(i)=1; %cvpipe pipe
-                end
-                value(i)=obj.TYPELINK(obj.LinkTypeIndex(i)+1);
-            end
-        end
-        
-        %ENgetlinkvalue
-        function value = getLinkDiameter(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,0);
-            end
-        end
-        function value = getLinkLength(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,1);
-            end
-        end
-        function value = getLinkRoughness(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,2);
-            end
-        end
-        function value = getLinkMinorLossCoeff(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,3);
-            end
-        end
-        function value = getLinkInitialStatus(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,4);
-            end
-        end
-        function value = getLinkInitialSettings(obj)
-            %Roughness for pipes,initial speed for pumps,initial setting
-            %for valves
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,5);
-            end
-        end
-        function value = getLinkBulkReactionCoeff(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,6);
-            end
-        end
-        function value = getLinkWallReactionCoeff(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,7);
-            end
-        end
-        function value = getLinkFlows(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,8);
-            end
-        end
-        function value = getLinkVelocity(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,9);
-            end
-        end
-        function value = getLinkHeadloss(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,10);
-            end
-        end
-        function value = getLinkStatus(obj)
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,11);
-            end
-        end
-        function value = getLinkSettings(obj) %Roughness for pipes, actual speed for pumps, actual setting for valves
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,12);
-            end
-        end
-        function value = getLinkEnergy(obj) %in kwatts
-            value=zeros(1,obj.getCountLinks);
-            for i=1:obj.getCountLinks
-                [obj.errorcode, value(i)] = ENgetlinkvalue(i,13);
-            end
-        end
-        
-        
-        %ENgetnodeid
-        function value = getNodeID(obj,varargin)
-            if isempty(varargin)
-                for i=1:obj.getCountNodes
-                    [obj.errorcode, value{i}]=ENgetnodeid(i);
-                end
-            else
-                k=1;
-                for i=varargin{1}
-                    [obj.errorcode, value{k}]=ENgetnodeid(i);
-                    k=k+1;
-                end
-            end
-        end
-        
-        %ENgetnodeindex
-        function value = getNodeIndex(obj,varargin)
-            if isempty(varargin)
-                value=1:obj.getCountNodes;
-            elseif isa(varargin{1},'cell')
-                k=1;
-                for j=1:length(varargin{1})
-                    [obj.errorcode, value(k)] = ENgetnodeindex(varargin{1}{j});
-                    k=k+1;
-                end
-            elseif isa(varargin{1},'char')
-                [obj.errorcode, value] = ENgetnodeindex(varargin{1});
-            end
-        end
-        
-        %ENgetnodetype
-        function value = getNodeType(obj)
-            for i=1:obj.getCountNodes
-                [obj.errorcode,obj.NodeTypeIndex(i)] = ENgetnodetype(i);
-                value(i)=obj.TYPENODE(obj.NodeTypeIndex(i)+1);
-            end
-        end
-        
-        %ENgetnodevalue
-        function value = getNodeElevation(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,0);
-            end
-        end
-        function value = getNodeBaseDemand(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,1);
-            end
-        end
-        function value = getNodeDemandPatternIndex(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,2);
-            end
-        end
-        function value = getNodeEmitterCoeff(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,3);
-            end
-        end
-        function value = getNodeInitialQuality(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,4);
-            end
-        end
-        
-        
-        
-        function value = getTankLevelInitial(obj)
-            value=nan(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,8);
-            end
-        end
-        
-        function value = getNodeActualDemand(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,9);
-            end
-        end
-        function value = getNodeActualDemandSensingNodes(obj,varargin)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:length(varargin{1})
-                [obj.errorcode, value(varargin{1}(i))] = ENgetnodevalue(varargin{1}(i),12);
-            end
-        end
-        function value = getNodeHydaulicHead(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,10);
-            end
-        end
-        function value = getNodePressure(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,11);
-            end
-        end
-        function value = getNodeActualQuality(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,12);
-            end
-        end
-        function value = getNodeMassFlowRate(obj) %Mass flow rate per minute of a chemical source
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,13);
-            end
-        end
-        function value = getNodeActualQualitySensingNodes(obj,varargin)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:length(varargin{1})
-                [obj.errorcode, value(varargin{1}(i))] = ENgetnodevalue(varargin{1}(i),12);
-            end
-        end
-        
-        %ENgetoption
-        function value = getOptionTrial(obj)
-            [obj.errorcode, value] = ENgetoption(0);
-        end
-        function value = getOptionAccuracy(obj)
-            [obj.errorcode, value] = ENgetoption(1);
-        end
-        function value = getOptionTolerance(obj)
-            [obj.errorcode, value] = ENgetoption(2);
-        end
-        function value = getOptionEmitterExponent(obj)
-            [obj.errorcode, value] = ENgetoption(3);
-        end
-        function value = getOptionDemandMult(obj)
-            [obj.errorcode, value] = ENgetoption(4);
-        end
-        
-        
-        
-        %ENgetpatternid
-        function value = getPatternID(obj,varargin)
-            if isempty(varargin)
-                for i=1:obj.getCountPatterns
-                    [obj.errorcode, value{i}]=ENgetpatternid(i);
-                end
-            else
-                k=1;
-                for i=varargin{1}
-                    [obj.errorcode, value{k}]=ENgetpatternid(i);
-                    k=k+1;
-                end
-            end
-        end
-        
-        %ENgetpatternindex
-        function value = getPatternIndex(obj,varargin)
-            if isempty(varargin)
-                value=1:obj.getCountPatterns;
-            elseif isa(varargin{1},'cell')
-                k=1;
-                for j=1:length(varargin{1})
-                    [obj.errorcode, value(k)] = ENgetpatternindex(varargin{1}{j});
-                    k=k+1;
-                end
-            elseif isa(varargin{1},'char')
-                [obj.errorcode, value] = ENgetpatternindex(varargin{1});
-            end
-        end
-        
-        %ENgetpatternlen
-        function value = getPatternLength(obj,varargin)
-            if isempty(varargin)
-                tmpPatterns=1:obj.getCountPatterns;
-                for i=tmpPatterns
-                    [obj.errorcode, value(i)]=ENgetpatternlen(i);
-                end
-            elseif isa(varargin{1},'cell')
-                k=1;
-                for j=1:length(varargin{1})
-                    [obj.errorcode, value(k)] = ENgetpatternlen(obj.getPatternIndex(varargin{1}{j}));
-                    k=k+1;
-                end
-            elseif isa(varargin{1},'char')
-                [obj.errorcode, value] = ENgetpatternlen(obj.getPatternIndex(varargin{1}));
-            elseif isa(varargin{1},'numeric')
-                k=1;
-                for i=varargin{1}
-                    [obj.errorcode, value(k)]=ENgetpatternlen(i);
-                    k=k+1;
-                end
-            end
-        end
-        
-        %ENgetpatternvalue
-        function value = getPattern(obj) %Mass flow rate per minute of a chemical source
-            tmpmaxlen=max(obj.getPatternLength);
-            value=nan(obj.getCountPatterns,tmpmaxlen);
-            for i=1:obj.getCountPatterns
-                tmplength=obj.getPatternLength(i);
-                for j=1:tmplength
-                    [obj.errorcode, value(i,j)] = ENgetpatternvalue(i, j);
-                end
-                if tmplength<tmpmaxlen
-                    for j=(tmplength+1):tmpmaxlen
-                        value(i,j)=value(i,j-tmplength);
-                    end
-                end
-                    
-            end
-        end
-        
-        %ENgetpatternvalue
-        function value = getPatternValue(obj,patternIndex, patternStep) %Mass flow rate per minute of a chemical source
-            [obj.errorcode, value] = ENgetpatternvalue(patternIndex, patternStep);
-        end
-        
-        
-        %ENgetqualtype
-        function value = getQualityType(obj)
-            [obj.errorcode, obj.QualityCode,obj.QualityTraceNodeIndex] = ENgetqualtype();
-            value=obj.TYPEQUALITY(obj.QualityCode+1);
-        end
-        
-        
-        %ENgettimeparam
-        function value = getTimeSimulationDuration(obj)
-            [obj.errorcode, value] = ENgettimeparam(0);
-        end
-        function value = getTimeHydraulicStep(obj)
-            [obj.errorcode, value] = ENgettimeparam(1);
-        end
-        function value = getTimeQualityStep(obj)
-            [obj.errorcode, value] = ENgettimeparam(2);
-        end
-        function value = getTimePatternStep(obj)
-            [obj.errorcode, value] = ENgettimeparam(3);
-        end
-        function value = getTimePatternStart(obj)
-            [obj.errorcode, value] = ENgettimeparam(4);
-        end
-        function value = getTimeReportingStep(obj)
-            [obj.errorcode, value] = ENgettimeparam(5);
-        end
-        function value = getTimeReportingStart(obj)
-            [obj.errorcode, value] = ENgettimeparam(6);
-        end
-        function value = getTimeStatistics(obj)
-            [obj.errorcode, obj.TimeStatisticsIndex] = ENgettimeparam(8);
-            %tmpStats={'NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE'};
-            value=obj.TYPESTATS(obj.TimeStatisticsIndex+1);
-        end
-        function value = getTimeReportingPeriods(obj)
-            [obj.errorcode, value] = ENgettimeparam(9);
-        end
-        
-        
-        
-        %ENreport
-        function getReport(obj)
-            [obj.errorcode]=ENreport();
-        end
-        
-        function value=getVersion(obj)
-            [obj.errorcode, value] = ENgetversion();
-        end
-        
-         function value=getComputedHydraulicTimeSeries(obj)
-            obj.openHydraulicAnalysis;
-            obj.initializeHydraulicAnalysis
-            tstep=1; 
-            totalsteps=obj.getTimeSimulationDuration/obj.getTimeHydraulicStep+1;
-            initnodematrix=zeros(totalsteps, obj.getCountNodes);
-            initlinkmatrix=zeros(totalsteps, obj.getCountLinks);
-            value.Time=zeros(totalsteps,1); 
-            value.Pressure=initnodematrix;
-            value.Demand=initnodematrix; 
-            value.Head=initnodematrix; 
-            value.Flow=initlinkmatrix;
-            value.Velocity=initlinkmatrix; 
-            value.HeadLoss=initlinkmatrix; 
-            value.Status=initlinkmatrix; 
-            value.Setting=initlinkmatrix; 
-            value.Energy=initlinkmatrix;
-            k=1;
-            while (tstep>0)
-                t=obj.runHydraulicAnalysis;
-                value.Time(k,:)=t; 
-                value.Pressure(k,:)=obj.getNodePressure;
-                value.Demand(k,:)=obj.getNodeActualDemand; 
-                value.Head(k,:)=obj.getNodeHydaulicHead; 
-                value.Flow(k,:)=obj.getLinkFlows;
-                value.Velocity(k,:)=obj.getLinkVelocity; 
-                value.HeadLoss(k,:)=obj.getLinkHeadloss; 
-                value.Status(k,:)=obj.getLinkStatus; 
-                value.Setting(k,:)=obj.getLinkSettings; 
-                value.Energy(k,:)=obj.getLinkEnergy;   
-                tstep = obj.nextHydraulicAnalysisStep;
-                k=k+1;
 
-            end
-            obj.closeHydraulicAnalysis;
-        end       
-        
-        
-        
-        function value=getComputedQualityTimeSeries(obj,varargin)
-            obj.openQualityAnalysis
-            obj.initializeQualityAnalysis
-            tleft=1; 
-            totalsteps=obj.getTimeSimulationDuration/obj.getTimeQualityStep;
-            initnodematrix=zeros(totalsteps, obj.getCountNodes);
-            if size(varargin,2)==0
-                varargin={'time', 'quality', 'mass'};
-            end
-            if find(strcmpi(varargin,'time'))
-                value.Time=zeros(totalsteps,1);
-            end
-            if find(strcmpi(varargin,'quality'))
-                value.Quality=initnodematrix;
-            end
-            if find(strcmpi(varargin,'mass'))
-                value.MassFlowRate=initnodematrix;
-            end
-            if find(strcmpi(varargin,'demand'))
-                value.Demand=initnodematrix;
-            end
-            if find(strcmpi(varargin,'qualitySensingNodes'))
-                value.Demand=initnodematrix;
-            end
-            k=1;
-            while (tleft>0)
-                t=obj.runQualityAnalysis;
-                if find(strcmpi(varargin,'time'))
-                    value.Time(k,:)=t;
-                end
-                if find(strcmpi(varargin,'quality'))
-                    value.Quality(k,:)=obj.getNodeActualQuality;
-                end
-                if find(strcmpi(varargin,'mass'))
-                    value.MassFlowRate(k,:)=obj.getNodeMassFlowRate;
-                end
-                if find(strcmpi(varargin,'demand'))
-                    value.Demand(k,:)=obj.getNodeActualDemand;
-                end
-                if find(strcmpi(varargin,'qualitySensingNodes'))
-                    value.Quality(k,:)=obj.getNodeActualQualitySensingNodes(varargin{2});
-                end
-                tleft = obj.stepQualityAnalysisTimeLeft;
-                %tstep=obj.nextQualityAnalysisStep;
-                k=k+1;
-            end
-            obj.closeQualityAnalysis;
-        end
         
         
         %%%%%%%%%%%%%%%%% OPERATIONS %%%%%%%%%%%%%%%%%%%
@@ -1358,7 +1405,11 @@ classdef epanet <handle
             [obj.errorcode] = ENwriteline (line);
         end
         
-
+        function writeReport(obj)
+            %Writes a formatted text report on simulation results to the Report file
+            [obj.errorcode]=ENreport();
+        end
+        
         function LoadMSX(obj,msxname)
            [obj] = MSXMatlabSetup(obj,msxname);
         end
@@ -1366,45 +1417,45 @@ classdef epanet <handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function value = getNodeSourceQuality(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,5);
-            end
-        end
+%         function value = getNodeSourceQuality(obj)
+%             value=zeros(1,obj.getCountNodes);
+%             for i=1:obj.getCountNodes
+%                 [obj.errorcode, value(i)] = ENgetnodevalue(i,5);
+%             end
+%         end
         function setNodeSourceQuality(obj, value)
             for i=1:length(value)
                 [obj.errorcode] = ENsetnodevalue(i, 5, value(i));
             end
         end
-        function value = getNodeSourcePatternIndex(obj)
-            value=zeros(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, value(i)] = ENgetnodevalue(i,6);
-            end
-        end
+%         function value = getNodeSourcePatternIndex(obj)
+%             value=zeros(1,obj.getCountNodes);
+%             for i=1:obj.getCountNodes
+%                 [obj.errorcode, value(i)] = ENgetnodevalue(i,6);
+%             end
+%         end
         function setNodeSourcePatternIndex(obj, value)
             for i=1:length(value)
                 [obj.errorcode] = ENsetnodevalue(i, 6, value(i));
             end
         end
-        function value = getNodeSourceType(obj)
-            %value=zeros(1,obj.getCountNodes);
-            value=cell(1,obj.getCountNodes);
-            for i=1:obj.getCountNodes
-                [obj.errorcode, temp] = ENgetnodevalue(i,7);
-                if ~isnan(temp)
-                    value(i)=obj.TYPESOURCE(temp+1);
-                end
-            end
-        end
+%         function value = getNodeSourceType(obj)
+%             %value=zeros(1,obj.getCountNodes);
+%             value=cell(1,obj.getCountNodes);
+%             for i=1:obj.getCountNodes
+%                 [obj.errorcode, temp] = ENgetnodevalue(i,7);
+%                 if ~isnan(temp)
+%                     value(i)=obj.TYPESOURCE(temp+1);
+%                 end
+%             end
+%         end
         function setNodeSourceType(obj, index, value)
             value=find(strcmpi(obj.TYPESOURCE,value)==1)-1;
             [obj.errorcode] = ENsetnodevalue(index, 7, value);
         end
-        function value = getTimeRuleControlStep(obj)
-            [obj.errorcode, value] = ENgettimeparam(7);
-        end
+%         function value = getTimeRuleControlStep(obj)
+%             [obj.errorcode, value] = ENgettimeparam(7);
+%         end
         function setTimeRuleControlStep(obj,value)
             [obj.errorcode] = ENsettimeparam(7,value);
             [obj.errorcode, obj.ControlRuleEvalTimeStep] = ENgettimeparam(7);

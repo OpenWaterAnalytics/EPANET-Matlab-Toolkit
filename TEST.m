@@ -241,7 +241,7 @@ d.setReportFormatReset
 d.setReport('NODES ALL')
 d.setReportStatus('full')
 d.writeLineInReportFile('Line-writting testing')
-d.getReport
+d.writeReport
 
 %CONTROLS: EPANET cannot add new controls
 d.getControls
