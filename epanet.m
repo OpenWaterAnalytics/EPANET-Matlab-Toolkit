@@ -39,8 +39,8 @@ classdef epanet <handle
     %   permissions and limitations under the Licence.
     properties 
         %EPANET-MSX
-        ConstantNameIDMSX;
-        ConstantValueMSX;
+        ConstantNameIDMSX; % 
+        ConstantValueMSX; 
         CountConstantsMSX;
         CountParametersMSX;
         CountPatternsMSX;
@@ -168,11 +168,9 @@ classdef epanet <handle
         PatternStartTime; %Pattern start time
         PatternStepTime; %Pattern Step
         EnergyEfficiencyUnits; % Units for efficiency        
-        EnergyUnits; %Units for energy
-        OptionsFlowUnits; % Units for flow
+        EnergyUnits; %Units for energy 
         OptionsHeadloss; %Headloss formula (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)
         OptionsHydraulics; %Save or Use hydraulic soltion. *** Not implemented *** 
-        OptionsQualityTraceID; %*** Not implemented *** 
         OptionsViscosity; %*** Not implemented *** 
         OptionsSpecificGravity; %*** Not implemented *** 
         OptionsMaxTrials; % Maximum number of trials (40 is default)
@@ -293,8 +291,8 @@ classdef epanet <handle
             obj.ControlRules={obj.ControlTypes,obj.ControlTypesIndex,obj.ControlLinkIndex,obj.ControlSettings,obj.ControlNodeIndex,obj.ControlLevelValues};
             
             %Get the flow units
-            [obj.errorcode, obj.OptionsFlowUnits] = ENgetflowunits();
-            obj.LinkFlowUnits=obj.TYPEUNITS(obj.OptionsFlowUnits+1);
+            [obj.errorcode, flowunitsindex] = ENgetflowunits();
+            obj.LinkFlowUnits=obj.TYPEUNITS(flowunitsindex+1);
             
             
             %Get all the link data
@@ -425,7 +423,7 @@ classdef epanet <handle
             obj.NodeCoordinates{4} = value.verty;
 
             %Get Units
-            obj.OptionsFlowUnits=value.OptionsFlowUnits;
+            obj.LinkFlowUnits=value.LinkFlowUnits;
             obj.QualityUnits=value.QualityUnits;
             obj.OptionsHeadloss=value.OptionsHeadloss;
             obj.PatternDemandsUnits=value.PatternDemandsUnits;
@@ -749,8 +747,8 @@ classdef epanet <handle
         
         %ENgetflowunits
         function value = getFlowUnits(obj)
-            [obj.errorcode, obj.OptionsFlowUnits] = ENgetflowunits();
-            obj.LinkFlowUnits=obj.TYPEUNITS(obj.OptionsFlowUnits+1);
+            [obj.errorcode, flowunitsindex] = ENgetflowunits();
+            obj.LinkFlowUnits=obj.TYPEUNITS(flowunitsindex+1);
             value=obj.LinkFlowUnits;
         end
         
@@ -1347,8 +1345,9 @@ classdef epanet <handle
         %ENsaveinpfile
         function saveInputFile(obj,inpname)
             [obj.errorcode] = ENsaveinpfile(inpname);
+            % The code below is because of a bug in EPANET 2.00.12
+            % When saving using ENsaveinpfile, it does not save the type of the curves.
             value=obj.getCurveInfo;
-            %movefile('temp.inp',[pwd,'\RESULTS']);
             if ~isempty(value.CurvesID)
                 obj.remAddCurvesID(value.CurvesID,value.Clines);
             end
@@ -2176,8 +2175,8 @@ function [e, errmsg] = ENgeterror(errcode)
     end
 end
 
-function [errcode,OptionsFlowUnits] = ENgetflowunits()
-    [errcode, OptionsFlowUnits]=calllib('epanet2','ENgetflowunits',0);
+function [errcode,flowunitsindex] = ENgetflowunits()
+    [errcode, flowunitsindex]=calllib('epanet2','ENgetflowunits',0);
     if errcode 
         ENerror(errcode); 
     end
@@ -4174,7 +4173,7 @@ function value=FlowUnitsHeadlossFormula(obj)
         disp(message)
         return
     end
-    value.OptionsFlowUnits={};
+    value.LinkFlowUnits={};
     value.OptionsHeadloss={};
     value.sectOptions=0;
     value.SImetric=0;
@@ -4222,7 +4221,7 @@ function value=FlowUnitsHeadlossFormula(obj)
                 end
             end
             if strcmp(upper(atline{1}),'UNITS')
-                value.OptionsFlowUnits{i}=atline{2};
+                value.LinkFlowUnits{i}=atline{2};
             end
             if strcmp(upper(atline{1}),'HEADLOSS')
                 value.OptionsHeadloss{t}=atline{2};
@@ -4246,7 +4245,7 @@ function value=FlowUnitsHeadlossFormula(obj)
     end
     
 %     US Customary - SI metric
-    switch char(value.OptionsFlowUnits)
+    switch char(value.LinkFlowUnits)
         case 'CFS'
             value.UScustomary=1;
         case 'GPM'
@@ -4270,7 +4269,7 @@ function value=FlowUnitsHeadlossFormula(obj)
     end
     
     if value.UScustomary==1;
-        value.PatternDemandsUnits=value.OptionsFlowUnits;
+        value.PatternDemandsUnits=value.LinkFlowUnits;
         value.LinkPipeDiameterUnits='inches';
         value.NodeTankDiameterUnits='feet';
         value.EnergyEfficiencyUnits='percent'; 
@@ -4290,7 +4289,7 @@ function value=FlowUnitsHeadlossFormula(obj)
         value.NodeTankVolumeUnits='cubic feet';
         value.QualityWaterAgeUnits='hours'; 
     else % SI Metric
-        value.PatternDemandsUnits=value.OptionsFlowUnits;
+        value.PatternDemandsUnits=value.LinkFlowUnits;
         value.LinkPipeDiameterUnits='millimeters';
         value.NodeTankDiameterUnits='meters';
         value.EnergyEfficiencyUnits='percent'; 
@@ -5267,7 +5266,7 @@ function Options(obj,newFlowUnits,headloss,varargin)
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     value=obj.getFlowUnitsHeadlossFormula;
-    previousFlowUnits=value.OptionsFlowUnits;
+    previousFlowUnits=value.LinkFlowUnits;
     
     newUScustomary=0;
     newSImetric=0;
@@ -6046,7 +6045,7 @@ function value=InputFileInfo(obj)
     value.sectControls=0; d=1;
     
     %Options
-    value.OptionsFlowUnits={};
+    value.LinkFlowUnits={};
     value.OptionsHeadloss={};
     value.sectOptions=0;
     value.SImetric=0;
@@ -6293,7 +6292,7 @@ function value=InputFileInfo(obj)
                 end
             end
             if strcmp(upper(atline{1}),'UNITS')
-                value.OptionsFlowUnits{f}=atline{2};
+                value.LinkFlowUnits{f}=atline{2};
             end
             if strcmp(upper(atline{1}),'HEADLOSS')
                 value.OptionsHeadloss{g}=atline{2};
@@ -6337,7 +6336,7 @@ function value=InputFileInfo(obj)
     end
 
     %     US Customary - SI metric
-    switch char(value.OptionsFlowUnits)
+    switch char(value.LinkFlowUnits)
         case 'CFS'
             value.UScustomary=1;
         case 'GPM'
@@ -6361,7 +6360,7 @@ function value=InputFileInfo(obj)
     end
     
     if value.UScustomary==1;
-        value.PatternDemandsUnits=value.OptionsFlowUnits;
+        value.PatternDemandsUnits=value.LinkFlowUnits;
         value.LinkPipeDiameterUnits='inches';
         value.NodeTankDiameterUnits='feet';
         value.EnergyEfficiencyUnits='percent'; 
@@ -6381,7 +6380,7 @@ function value=InputFileInfo(obj)
         value.NodeTankVolumeUnits='cubic feet';
         value.QualityWaterAgeUnits='hours'; 
     else % SI Metric
-        value.PatternDemandsUnits=value.OptionsFlowUnits;
+        value.PatternDemandsUnits=value.LinkFlowUnits;
         value.LinkPipeDiameterUnits='millimeters';
         value.NodeTankDiameterUnits='meters';
         value.EnergyEfficiencyUnits='percent'; 

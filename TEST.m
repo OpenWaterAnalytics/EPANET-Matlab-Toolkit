@@ -4,11 +4,27 @@
 % Press F10 for step-by-step execution. You may also use the breakpoints, 
 % indicated with a short dash (-) on the right of each line number.
 
+disp('Start environment')
 fclose all;
 clc;
 clear all;
 clear class;
-d=epanet('Net1_Rossman2000.inp');
+
+
+disp('Create EPANET Class')
+d=epanet('Net1_Rossman2000.inp')
+
+disp('')
+
+
+
+
+
+
+
+
+
+
 %d=epanet('BWSN2_Ostfeld2008.inp');
 %d.plot
 

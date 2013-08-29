@@ -169,20 +169,29 @@ classdef epanet <handle
         PatternStepTime; %Pattern Step
         EnergyEfficiencyUnits; % Units for efficiency        
         EnergyUnits; %Units for energy
+        
         OptionsFlowUnits; % Units for flow
+        
         OptionsHeadloss; %Headloss formula (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)
         OptionsHydraulics; %Save or Use hydraulic soltion. *** Not implemented *** 
+        
         OptionsQualityTraceID; %*** Not implemented *** 
+        
         OptionsViscosity; %*** Not implemented *** 
         OptionsSpecificGravity; %*** Not implemented *** 
         OptionsMaxTrials; % Maximum number of trials (40 is default)
         OptionsAccuracyValue; %Convergence value (0.001 is default)
+        
         OptionsPattern; % *** Not implemented ***
         OptionsPatternDemandMultiplier; %Multiply demand values (1 is default)
+        
         OptionsEmmiterExponent; %Exponent of pressure at an emmiter node (0.5 is default)
+        
         OptionsQualityTolerance; %Tolerance for water quality (0.01 is default)
+        
         OptionsUnbalanced; %*** Not implemented ***
         OptionsUnbalancedContinueN; % *** Not implemented ***
+        
         QualityCode; % Water quality analysis code (None:0/Chemical:1/Age:2/Trace:3)
         QualityTraceNodeIndex; %Index of trace node (0 if QualityCode<3)
         QualityType; % Water quality analysis type (None/Chemical/Age/Trace)
@@ -293,8 +302,8 @@ classdef epanet <handle
             obj.ControlRules={obj.ControlTypes,obj.ControlTypesIndex,obj.ControlLinkIndex,obj.ControlSettings,obj.ControlNodeIndex,obj.ControlLevelValues};
             
             %Get the flow units
-            [obj.errorcode, obj.OptionsFlowUnits] = ENgetflowunits();
-            obj.LinkFlowUnits=obj.TYPEUNITS(obj.OptionsFlowUnits+1);
+            [obj.errorcode, flowunitsindex] = ENgetflowunits();
+            obj.LinkFlowUnits=obj.TYPEUNITS(flowunitsindex+1);
             
             
             %Get all the link data
@@ -450,16 +459,7 @@ classdef epanet <handle
             obj.QualityWaterAgeUnits=value.QualityWaterAgeUnits;
         end % End of epanet class constructor 
         
-        
 
-        
-        
-        
-        
-        
-        
-        
-        
         %CONTROLS: EPANET cannot add new controls
        
         %ENsolveH
@@ -758,7 +758,7 @@ classdef epanet <handle
         
         %ENgetflowunits
         function value = getFlowUnits(obj)
-            [obj.errorcode, obj.OptionsFlowUnits] = ENgetflowunits();
+            [obj.errorcode, flowunitsinde] = ENgetflowunits();
             obj.LinkFlowUnits=obj.TYPEUNITS(obj.OptionsFlowUnits+1);
             value=obj.LinkFlowUnits;
         end
