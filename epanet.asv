@@ -450,7 +450,16 @@ classdef epanet <handle
             obj.QualityWaterAgeUnits=value.QualityWaterAgeUnits;
         end % End of epanet class constructor 
         
+        
 
+        
+        
+        
+        
+        
+        
+        
+        
         %CONTROLS: EPANET cannot add new controls
        
         %ENsolveH

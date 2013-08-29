@@ -9,6 +9,7 @@ clc;
 clear all;
 clear class;
 d=epanet('Net1_Rossman2000.inp');
+%d=epanet('BWSN2_Ostfeld2008.inp');
 %d.plot
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17,6 +18,7 @@ value=d.getInputFileInfo;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % Curves 
 d.setTimeSimulationDuration(22500)
+d.getTimeSimulationDuration
 d.removeCurveID('1') % must be removed the pump 9, Warning: Pump 9 refers to undefined curve.
 % Warning: Node 9 disconnected. 
 d.removeLinkID('9')
