@@ -12,9 +12,79 @@ clear class;
 
 
 disp('Create EPANET Class')
-d=epanet('Net1_Rossman2000.inp')
+d=epanet('Net2_Rossman2000.inp')
+d.msx('Net2_Rossman2000.msx')
 
-disp('')
+d.getControls
+d.getCountNodes
+d.getCountTanksReservoirs
+d.getCountLinks
+d.getCountPatterns
+d.getCountCurves
+d.getCountControls   
+d.getError(0) %bug at epanet lever, triggers a 251 issue
+d.getError(1)
+d.getError(2)
+d.getError(3)
+d.getError(4)
+d.getError(5)
+d.getError(6)
+d.getError(101)
+d.getError(102)
+d.getError(103)
+d.getError(104)
+d.getError(105)
+d.getError(106)
+d.getError(110)
+d.getError(120)
+d.getError(200)
+d.getError(202)
+d.getError(203)
+d.getError(204)
+d.getError(205)
+d.getError(207)
+d.getError(223)
+d.getError(224)
+d.getError(240)
+d.getError(241)
+d.getError(250)
+d.getError(251)
+d.getError(301)
+d.getError(302)
+d.getError(303)
+d.getError(304)
+d.getError(305)
+d.getError(306)
+d.getError(307)
+d.getError(308)
+d.getError(309)
+ 
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+305 
+ Cannot open hydraulics file 
+ 
+306 
+ Invalid hydraulics file 
+ 
+307 
+ Cannot read hydraulics file 
+ 
+308 
+ Cannot save results to file 
+ 
+309 
+ Cannot write report to file 
+ 
 
 
 
@@ -22,6 +92,7 @@ disp('')
 
 
 
+%% Old testing
 
 
 
@@ -249,12 +320,7 @@ d.setControl(1,1,13,1,11,150)
 d.getControls
 
 
-d.getCountNodes
-d.getCountTanksReservoirs
-d.getCountLinks
-d.getCountPatterns
-d.getCountCurves
-d.getCountControls        
+     
 
 d.getError(101)
 
