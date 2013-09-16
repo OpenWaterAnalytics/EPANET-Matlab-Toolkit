@@ -543,7 +543,7 @@ open('TestReport7.txt');
 d.unload 
 
 %%%%%%%%%%%%%%%%%%%%%%Solve Functions%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fclose all;close all;
+fclose all;
 clc;
 clear all;
 clear class;
@@ -577,7 +577,7 @@ while (tleft>0)
 end
 d.closeQualityAnalysis;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fclose all;close all;
+fclose all;
 clc;
 clear all;
 clear class;
@@ -609,7 +609,7 @@ d.closeHydraulicAnalysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %MSX
-fclose all;close all;
+fclose all;
 clc;
 clear all;
 clear class;
@@ -697,7 +697,7 @@ copyfile([pwd,'\LIBRARIES\','epanetmsx.dll'],[pwd,'\RESULTS\','epanetmsx.dll']);
 copyfile([pwd,'\LIBRARIES\','epanet2.dll'],[pwd,'\RESULTS\','epanet2.dll']);
 fid = fopen('ReportMsx.bat','w');
 r = sprintf('cd RESULTS \nepanetmsx %s %s %s','temp.inp','temp.msx','temp.txt'); 
-fprintf(fid,'%s \n',r);fclose all;close all;
+fprintf(fid,'%s \n',r);fclose all;
 !ReportMsx.bat
 movefile('ReportMsx.bat',[pwd,'\RESULTS\','ReportMsx.bat']);
 copyfile([pwd,'\RESULTS\','temp.txt'],[pwd,'\RESULTS\','TestMsxReport2.txt']);
