@@ -1,0 +1,82 @@
+  Page 1                                    Mon Sep 16 02:58:04 2013
+
+  ******************************************************************
+  *                           E P A N E T                          *
+  *                   Hydraulic and Water Quality                  *
+  *                   Analysis for Pipe Networks                   *
+  *                         Version 2.00.12                        *
+  ******************************************************************
+  
+  EPANET Example Network 2  
+  Example of modeling a 55-hour fluoride tracer study.  
+  Measured fluoride data is contained in the file Net2-FL.dat  
+   
+      Input Data File ................... C:\Documents and Settings\mkiria01\Desktop\GitHub\EPANET-Matlab-Class\RESULTS\temp.inp
+      Number of Junctions................ 35
+      Number of Reservoirs............... 0
+      Number of Tanks ................... 1
+      Number of Pipes ................... 40
+      Number of Pumps ................... 0
+      Number of Valves .................. 0
+      Headloss Formula .................. Hazen-Williams
+      Hydraulic Timestep ................ 1.00 hrs
+      Hydraulic Accuracy ................ 0.001000
+      Status Check Frequency ............ 2
+      Maximum Trials Checked ............ 10
+      Damping Limit Threshold ........... 0.000000
+      Maximum Trials .................... 40
+      Quality Analysis .................. Fluoride
+      Water Quality Time Step ........... 5.00 min
+      Water Quality Tolerance ........... 0.01 mg/L
+      Specific Gravity .................. 1.00
+      Relative Kinematic Viscosity ...... 1.00
+      Relative Chemical Diffusivity ..... 1.00
+      Demand Multiplier ................. 1.00
+      Total Duration .................... 55.00 hrs
+      Reporting Criteria:
+         All Nodes
+         No Links
+   
+   
+  MINIMUM Node Results:
+  --------------------------------------------------------
+                     Demand      Head  Pressure  Fluoride
+  Node                  gpm        ft       psi      mg/L
+  --------------------------------------------------------
+  1                    0.00    321.96    117.84      1.00
+  2                   19.68    316.93     94.00      1.00
+  3                   34.44    316.31    111.06      1.00
+  4                   19.68    315.77    110.83      1.00
+  5                   19.68    315.71     93.47      1.00
+  6                   12.30    313.27     81.58      1.00
+  7                    9.84    307.81     64.05      1.00
+  8                   22.14    307.81     85.71      1.00
+  9                   34.44    307.02     55.04      1.00
+  10                  12.30    307.81     77.05      1.00
+  11                  85.56    305.64     52.27      1.00
+  12                  39.36    302.01     39.87      1.00
+  13                   4.92    300.88     39.38      1.00
+  14                   4.92    300.31     43.47      1.00
+  15                   4.92    300.03     47.67      1.00
+  16                  49.20    300.31     65.13      1.00
+  17                  49.20    300.22     52.09      1.00
+  18                  49.20    300.23     86.76      1.00
+  19                  12.30    300.25     65.10      1.00
+  20                  46.74    300.31     56.46      1.00
+  21                  39.36    300.31     65.13      1.00
+  22                  24.60    300.31     43.46      1.00
+  23                  19.68    300.08     30.37      1.00
+  24                  27.06    300.04     47.68      1.00
+  25                  14.76    300.10     30.38      1.00
+  27                  19.68    300.10     73.70      1.00
+  28                   0.00    300.09     82.37      1.00
+  29                  17.22    300.09     82.37      1.00
+  30                   7.38    300.09     73.70      1.00
+  31                  41.82    300.10     47.71      1.00
+  32                  41.82    300.23     82.43      1.00
+  33                   3.69    300.31     52.13      1.00
+  34                   3.69    300.31     47.80      1.00
+  35                   0.00    300.09     82.37      1.00
+  36                   2.46    300.09     82.37      1.00
+  26                 594.34    300.13     28.22      1.00  Tank
+   

@@ -5,337 +5,176 @@
 % indicated with a short dash (-) on the right of each line number.
 
 disp('Start environment')
-fclose all;
+fclose all;close all;
 clc;
 clear all;
 clear class;
 
 
 disp('Create EPANET Class')
-d=epanet('Net2_Rossman2000.inp')
-d.msx('Net2_Rossman2000.msx')
+% inpname='Net1_Rossman2000'; 
+% inpname='ky11_Jolly2013';  
+inpname='Net2_Rossman2000';  
+d=epanet([inpname,'.inp']);
+% d.msx([inpname,'.msx']);
 
+d.plot;
+
+%%EPANET
 d.getControls
-d.getCountNodes
-d.getCountTanksReservoirs
-d.getCountLinks
-d.getCountPatterns
-d.getCountCurves
-d.getCountControls   
+d.getNodeCount
+d.getNodeTankReservoirCount
+d.getLinkCount
+d.getPatternCount
+d.getCurveCount
+d.getControlRulesCount
+d.getNodeTankCount
+d.getNodeReservoirCount
+d.getNodeJunctionsCount
+d.getLinkPipeCount
+d.getLinkPumpCount
+d.getLinkValveCount
 d.getError(0) %bug at epanet lever, triggers a 251 issue
-d.getError(1)
-d.getError(2)
+d.getError(1) 
+d.getError(2) 
 d.getError(3)
 d.getError(4)
 d.getError(5)
 d.getError(6)
-d.getError(101)
-d.getError(102)
-d.getError(103)
-d.getError(104)
-d.getError(105)
-d.getError(106)
-d.getError(110)
+d.getError(101) %similar sense,Insufficient memory 
+d.getError(102) %No network data to process
+d.getError(103) %Hydraulics solver not initialized 
+d.getError(104) %No hydraulic results available 
+d.getError(105) %Water quality solver not initialized 
+d.getError(106) %No results to report on 
+d.getError(110) 
 d.getError(120)
 d.getError(200)
-d.getError(202)
-d.getError(203)
-d.getError(204)
-d.getError(205)
-d.getError(207)
+d.getError(202) %Illegal numeric value in function call 
+d.getError(203) %Undefined node in function call 
+d.getError(204) %Undefined link in function call 
+d.getError(205) %Undefined time pattern in function call 
+d.getError(207) %Attempt made to control a check valve 
 d.getError(223)
 d.getError(224)
-d.getError(240)
-d.getError(241)
-d.getError(250)
-d.getError(251)
+d.getError(240) %Undefined source in function call 
+d.getError(241) %Undefined control statement in function call 
+d.getError(250) %Function argument has invalid format 
+d.getError(251) %Illegal parameter code in function call 
 d.getError(301)
 d.getError(302)
 d.getError(303)
 d.getError(304)
 d.getError(305)
-d.getError(306)
+d.getError(306) %Invalid hydraulics file 
 d.getError(307)
 d.getError(308)
-d.getError(309)
- 
- 
-
- 
-
- 
-
-
- 
-
-
- 
-305 
- Cannot open hydraulics file 
- 
-306 
- Invalid hydraulics file 
- 
-307 
- Cannot read hydraulics file 
- 
-308 
- Cannot save results to file 
- 
-309 
- Cannot write report to file 
- 
-
-
-
-
-
-
-
-%% Old testing
-
-
-
-%d=epanet('BWSN2_Ostfeld2008.inp');
-%d.plot
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-value=d.getInputFileInfo;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% Curves 
-d.setTimeSimulationDuration(22500)
-d.getTimeSimulationDuration
-d.removeCurveID('1') % must be removed the pump 9, Warning: Pump 9 refers to undefined curve.
-% Warning: Node 9 disconnected. 
-d.removeLinkID('9')
-d.removeNodeID('9')
-d.getTimeSimulationDuration
-d.getCurveInfo
-d.addCurvePump('C-1',1955,250)
-d.getCurveInfo
-d.getTimeSimulationDuration
-d.addCurveEfficiency('C-2',1500,250)
-d.getTimeSimulationDuration
-d.addCurveVolume('C-3',1500,250)
-d.getTimeSimulationDuration
-d.addCurveHeadloss('C-4',1500,250)
-d.getTimeSimulationDuration
-d.getCurveInfo  
-d.removeCurveID('C-1')
-d.removeCurveID('C-2')
-d.removeCurveID('C-3')
-d.removeCurveID('C-4')
-d.getCurveInfo  
-
-d.addCurvePump('C-1',[1500 1800 2000],[250 200 0])%Flow-Head
-d.addCurveEfficiency('C-2',[1500 1800 2000],[250 200 0])%Flow-Efficiency
-d.addCurveVolume('C33',[1500 1800 2000],[250 200 0])%Heigh-Volume
-d.addCurveHeadloss('C44',[1500 1800 2000],[250 200 0])%Flow-Headloss
-d.removeCurveID('C-1')
-d.getCurveInfo
-
-% warning Flow & Heigh
-d.addCurvePump('C-11',[2000 1500 1800],[250 200 0])
-d.addCurveEfficiency('C-22',[1500 2000 1800],[250 200 0])%Flow-Efficiency
-d.addCurveVolume('C333',[1500 2000 1800],[250 200 0])%Heigh-Volume
-d.addCurveHeadloss('C244',[1500 2000 1800],[250 200 0])%Flow-Headloss
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Links Pipe Pump & Valves
-%PIPE
-d.getTimeSimulationDuration
-d.setTimeSimulationDuration(100)
-d.addPipe('Ppp1','32','10')   
-d.getTimeSimulationDuration
-d.plot('nodes','yes','fontsize',20)
-%PUMP
-d.getTimeSimulationDuration
-d.setTimeSimulationDuration(2102)
-d.addCurvePump('C-1',1955,250)
-d.addPump('PUMP','23','32','C-1')   
-d.getTimeSimulationDuration
-d.plot('nodes','yes')
-%VALVES
-%PRV OR..
-d.addValvePRV('Pp1','11','22') 
-%PSV OR..
-d.addValvePSV('Pp2','32','10') 
-d.plot('nodes','yes')
-%PBV 
-d.addValvePBV('Pp3','12','23') 
-d.plot('nodes','yes')
-%FCV
-d.addValveFCV('Pp4','21','9') 
-d.plot('nodes','yes')
-d.addValveFCV('Pp4','31','12') 
-d.plot('nodes','yes')
-%TCV
-d.addValveTCV('Pp5','22','13') 
-d.plot('nodes','yes')
-% %GPV
-% d.addValveGPV('Pp6','23','32') %%%%%%%%%%%%ERROR
-% d.plot('nodes','yes')
-
-
-% SET UNITS examples %%%%%%%%%%%%%%%%%%%%%%%%%%%%%ERROR in section [TANKS]
-% if the MinVolume==0 then in the function ENsaveinpfile --> MinVolume==200296.1666
-d.setFlowUnitsLPM % Net1.. GPM to LPM
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsGPM % Net1.. LPM to GPM
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsCFS % Net1.. GPM to CFS    
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsMGD % Net1.. CFS to MGD
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsIMGD % Net1..MGD to IMGD
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsAFD % Net1.. IMGD to AFD
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsLPS % Net1.. AFD to LPS
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsLPM % Net1.. LPS to LPM      
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsMLD % Net1.. LPM to MLD
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsCMD % Net1.. MLD to CMD
-d.getFlowUnitsHeadlossFormula  
-d.setFlowUnitsCMH % Net1.. CMD to CMH
-d.getFlowUnitsHeadlossFormula  
-
-% HeadlossFormula
-d.setHeadlossDW    
-d.getFlowUnitsHeadlossFormula  
-d.setHeadlossCM
-d.getFlowUnitsHeadlossFormula  
-d.setHeadlossHW
-d.getFlowUnitsHeadlossFormula  
-
-
-% Remove - functions
-% Nodes
-d.getNodesInfo
-d.removeNodeID('2') 
-d.plot
-
-d.getTimeSimulationDuration
-d.setTimeSimulationDuration(86500)
-d.removeNodeID('9') %"Net1_Rossman2000.inp"
-d.plot
-d.removeNodeID('22') %"Net1_Rossman2000.inp"
-d.plot
-d.getTimeSimulationDuration
-d.removeNodeID('2')
-
-% Links
-d.setTimeSimulationDuration(10500)
-d.plot('links','yes','nodes','yes')
-d.removeLinkID('9') %pump of "Net1_Rossman2000.inp"
-d.removeNodeID('9') %"Net1_Rossman2000.inp"
-d.getTimeSimulationDuration
-d.plot
-
-% Controls
-% LINK x status AT TIME t
-d.addControl('10','OPEN','10.00')
-% LINK x status AT CLOCKTIME c AM/PM
-d.addControl('10','OPEN','12.00','AM')
-
-v=d.getControlsInfo
-d.setTimeSimulationDuration(10000)
-d.removeControlLinkID(v.linksID{1});
-d.getTimeSimulationDuration
-
-v=d.getControlsInfo
-d.setTimeSimulationDuration(500)
-% LINK x status IF NODE y ABOVE/BELOW z
-d.addControl('12','OPEN','12','ABOVE',100)
-d.getTimeSimulationDuration
-
-v=d.getControlsInfo
-d.removeControlNodeID(v.nodesID{1});
-d.getTimeSimulationDuration
-v=d.getControlsInfo
-
-% Nodes & Link Info
-d.getNodesInfo
-d.getLinksInfo
-d.getPumpInfo % for the specific Pump curve
-
-% Add node & pipe
-d.setTimeSimulationDuration(5000)
-d.plot
-[x,y]=ginput(1);
-d.addJunction('J1',x,y)
-d.addPipe('P1','10','J1')
-d.plot
-d.getTimeSimulationDuration
-
-d.setTimeSimulationDuration(35000)
-d.plot
-[x,y]=ginput(1);
-d.addReservoir('S1',x,y)
-d.addPipe('P2','J1','S1')
-d.plot
-d.getTimeSimulationDuration
-
-d.setTimeSimulationDuration(15000)
-d.plot
-[x,y]=ginput(1);
-d.addTank('T1',x,y)
-d.addPipe('P3','32','T1')   
-d.plot
-d.getTimeSimulationDuration
-
-d.setTimeSimulationDuration(25000)   
-d.removeNodeID('T1');
-d.plot
-d.getTimeSimulationDuration
-
-d.setTimeSimulationDuration(5000)
-d.addPipe('MSK1','12','32')
-d.plot
-d.getTimeSimulationDuration
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-H=d.getComputedHydraulicTimeSeries
-
-d.setTimeQualityStep(3600);
-Q = d.getComputedQualityTimeSeries;
-
-d.setReportFormatReset
-d.setReport('NODES ALL')
-d.setReportStatus('full')
-d.writeLineInReportFile('Line-writting testing')
-d.writeReport
-
-%CONTROLS: EPANET cannot add new controls
-d.getControls
-d.setControl(1,1,13,1,11,150)
-d.getControls
-
-
-     
-
-d.getError(101)
-
-d.getFlowUnits 
-d.getFlowUnitsHeadlossFormula %read from inp file
-
-d.getLinkID
-d.getLinkID([1 3 6])
-
-d.getLinkIndex(d.getLinkID)
-d.getLinkIndex('121')
-d.getLinkIndex({'121' '31'})
-
-d.getLinkNodes
+d.getError(309) %Cannot write report to file 
+d.getFlowUnits
+d.getLinkNameID
+d.getLinkPipeNameID
+d.getLinkPumpNameID
+d.getLinkValveNameID
+d.getLinkIndex
+d.getLinkPipeIndex
+d.getLinkPumpIndex
+d.getLinkValveIndex
+d.getLinkNodesIndex
+d.getNodesConnectingLinksID
 d.getLinkType
+d.getLinkTypeIndex
+d.getLinkDiameter
+d.getLinkLength
+d.getLinkRoughnessCoeff
+d.getLinkMinorLossCoeff
+d.getLinkInitialStatus
+d.getLinkInitialSetting
+d.getLinkBulkReactionCoeff
+d.getLinkWallReactionCoeff
+d.getLinkFlows%dynamic
+d.getLinkVelocity
+d.getLinkHeadloss
+d.getLinkStatus
+d.getLinkSettings
+d.getLinkPumpEnergy 
+
+d.getNodeNameID
+d.getNodeReservoirNameID
+d.getNodeJunctionNameID
+d.getNodeIndex
+d.getNodeReservoirIndex
+d.getNodeJunctionIndex
+d.getNodeType
+d.getNodeTypeIndex
+d.getNodeElevations
+d.getNodeBaseDemands
+d.getNodeDemandPatternIndex
+d.getNodeEmitterCoeff
+d.getNodeInitialQuality
+d.getNodeSourceQuality
+d.getNodeSourcePatternIndex
+d.getNodeSourceType
+d.getNodeTankInitialLevel
+
+d.getNodeActualDemand%dynamic
+d.getNodeActualDemandSensingNodes([1 2 34 25 5])  
+d.getNodeHydaulicHead
+d.getNodePressure
+d.getNodeActualQuality
+d.getNodeMassFlowRate
+d.getNodeActualQualitySensingNodes([1 2 34 25 5]) 
+
+d.getNodeTankInitialWaterVolume% bug  & in ENsaveinpfile
+d.getNodeTankMixiningModel
+d.getNodeTankMixingModelCode
+d.getNodeTankMixingModelType
+d.getNodeTankMixZoneVolume% bug
+d.getNodeTankDiameter% bug
+d.getNodeTankMinimumWaterVolume 
+d.getNodeTankVolumeCurveIndex
+d.getNodeTankMinimumWaterLevel
+d.getNodeTankMaximumWaterLevel
+d.getNodeTankMinimumFraction
+d.getNodeTankBulkReactionCoeff
+d.getNodeTankIndex
+d.getNodeTankNameID
+d.getOptionsMaxTrials
+d.getOptionsAccuracyValue
+d.getOptionsQualityTolerance
+d.getOptionsEmitterExponent
+d.getOptionsPatternDemandMultiplier
+d.getPatternID
+d.getPatternIndex
+d.getPatternLengths
+d.getPattern
+d.getPatternValue(1,12)
+d.getQualityType
+d.getQualityCode
+d.getQualityTraceNodeIndex
+d.getTimeSimulationDuration
+d.getTimeHydraulicStep
+d.getTimeQualityStep
+d.getTimePatternStep
+d.getTimePatternStart
+d.getTimeReportingStep
+d.getTimeReportingStart
+d.getTimeRuleControlStep% bug
+d.getTimeStatisticsType
+d.getTimeStatisticsIndex
+d.getTimeReportingPeriods% :s
+d.getVersion
+d.getComputedHydraulicTimeSeries % obj.openHydraulicAnalysis;obj.initializeHydraulicAnalysis;obj.runHydraulicAnalysis;obj.nextHydraulicAnalysisStep;obj.closeHydraulicAnalysis;
+d.getComputedQualityTimeSeries% obj.openQualityAnalysis;obj.initializeQualityAnalysis;obj.runQualityAnalysis;obj.stepQualityAnalysisTimeLeft;obj.closeQualityAnalysis;
+% % d.solveCompleteHydraulics  
+% % d.solveCompleteQuality      
+
+d.addPattern('NewPat1')
+d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]); 
+d.getPattern
+
+d.getControls
+d.setControl(1,1,13,1,11,150); 
+d.getControls
 
 d.getLinkDiameter
 d.setLinkDiameter(2*d.getLinkDiameter);
@@ -345,26 +184,22 @@ d.getLinkLength
 d.setLinkLength(2*d.getLinkLength)
 d.getLinkLength
 
-
-d.getLinkRoughness
-d.setLinkRoughness(2*d.getLinkRoughness)
-d.getLinkRoughness
+d.getLinkRoughnessCoeff
+d.setLinkRoughnessCoeff(2*d.getLinkRoughnessCoeff)
+d.getLinkRoughnessCoeff
 
 d.getLinkMinorLossCoeff
 d.setLinkMinorLossCoeff(d.getLinkMinorLossCoeff+1)
 d.getLinkMinorLossCoeff
 
-
 d.getLinkInitialStatus
 d.setLinkInitialStatus(0*d.getLinkInitialStatus)
 d.getLinkInitialStatus
 
-tmp=d.getLinkInitialSettings
-tmp(2)=108
-d.setLinkInitialSettings(tmp)
-tmp(13)=100
-d.setLinkInitialSettings(tmp)
-d.getLinkInitialSettings
+tmp=d.getLinkInitialSetting
+tmp(end)=108
+d.setLinkInitialSetting(tmp)
+d.getLinkInitialSetting
 
 d.getLinkBulkReactionCoeff
 d.setLinkBulkReactionCoeff(d.getLinkBulkReactionCoeff-0.055)
@@ -378,79 +213,127 @@ d.getLinkStatus %dynamic
 d.setLinkStatus(0*d.getLinkStatus)
 d.getLinkStatus 
 
+values = d.getLinkSettings %dynamic
+values(end)=111;
+d.setLinkSettings(values)
+d.getLinkSettings
 
-d.getLinkFlows %dynamic
-d.getLinkVelocity %dynamic
-d.getLinkHeadloss %dynamic
-d.getLinkStatus %dynamic
-d.getLinkEnergy %dynamic
+values = d.getNodeElevations
+values(end)=720;
+d.setNodeElevations(values)
+d.getNodeElevations
 
+values = d.getNodeBaseDemands
+values(2)=160;
+d.setNodeBaseDemands(values)
+d.getNodeBaseDemands
 
-d.getNodeID
-d.getNodeID([1 3 5])
+values = d.getNodeDemandPatternIndex
+values(2)=0;
+d.setNodeDemandPatternIndex(values)
+d.getNodeDemandPatternIndex
 
-d.getNodeIndex(d.getNodeID)
-d.getNodeIndex('12')
-d.getNodeIndex('A')
+values = d.getNodeEmitterCoeff
+values(2)=0.5;
+d.setNodeEmitterCoeff(values)
+d.getNodeEmitterCoeff
 
-d.getNodeType
+values = d.getNodeInitialQuality
+values(2)=0.6;
+d.setNodeInitialQuality(values)
+d.getNodeInitialQuality
 
-d.getNodeActualDemand % dynamic
-d.getNodeHydaulicHead % dynamic
-d.getNodePressure % dynamic
-d.getNodeActualQuality % dynamic
-d.getNodeMassFlowRate % dynamic
+values = d.getNodeTankInitialLevel
+values(end)=100; 
+d.setNodeTankLevelInitial(values)  
+d.getNodeTankInitialLevel
 
+values = d.getNodeTankMixingModelType 
+d.getNodeTankMixingModelCode
+values{end}='MIX2';
+d.setNodeTankMixingModelType(values);
+d.getNodeTankMixingModelType 
+d.getNodeTankMixingModelCode
+values = d.getNodeTankMixingModelType 
+values{end}='FIFO';
+d.setNodeTankMixingModelType(values);
+d.getNodeTankMixingModelType 
+d.getNodeTankMixingModelCode
+values = d.getNodeTankMixingModelType 
+values{end}='LIFO';
+d.setNodeTankMixingModelType(values);
+d.getNodeTankMixingModelType 
+d.getNodeTankMixingModelCode
 
-d.getOptionTrial
-d.setOptionTrial(45)
-d.getOptionTrial
+values = d.getNodeTankDiameter 
+values(end)= 60;
+d.setNodeTankDiameter(values) % bug
+d.getNodeTankDiameter % bug
 
-d.getOptionAccuracy
-d.setOptionAccuracy(0.015)
-d.getOptionAccuracy
+values = d.getNodeTankMinimumWaterLevel
+values(end)= 10;
+d.setNodeTankMinimumWaterLevel(values)  
+d.getNodeTankMinimumWaterLevel
 
-d.getOptionTolerance
-d.setOptionTolerance(0.02)
-d.getOptionTolerance
+values = d.getNodeTankMinimumWaterVolume
+values(end)= 10;
+d.setNodeTankMinimumWaterVolume(values) 
+d.getNodeTankMinimumWaterVolume
 
-d.getOptionEmitterExponent
-d.setOptionEmitterExponent(0.55)
-d.getOptionEmitterExponent
+values = d.getNodeTankMaximumWaterLevel
+values(end)= 210;
+d.setNodeTankMaximumWaterLevel(values) 
+d.getNodeTankMaximumWaterLevel
 
-d.getOptionDemandMult
-d.setOptionDemandMult(1.1)
-d.getOptionDemandMult
+values = d.getNodeTankMinimumFraction
+values(end)= 1; % for 2 not work..
+d.setNodeTankMinimumFraction(values) 
+d.getNodeTankMinimumFraction
 
-d.addPattern('NewPat1')
-d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7])
+values = d.getNodeTankBulkReactionCoeff
+values(end)= 1; 
+d.setNodeTankBulkReactionCoeff(values) 
+d.getNodeTankBulkReactionCoeff
 
-d.getPatternID
-d.getPatternID(2)
+d.getNodeSourceType
+d.setNodeSourceType(2,'MASS')
+d.getNodeSourceType
+d.setNodeSourceType(2,'CONCEN')
+d.getNodeSourceType
+d.setNodeSourceType(2,'SETPOINT')
+d.getNodeSourceType
+d.setNodeSourceType(2,'FLOWPACED')
+d.getNodeSourceType
 
-d.getPatternIndex
-d.getPatternIndex('NewPat1')
+values = d.getNodeSourceQuality
+values(2)=0.5;
+d.setNodeSourceQuality(values)
+d.getNodeSourceQuality
 
-d.getPatternLength
-d.getPatternLength(1)
-d.getPatternLength([1 2])
-d.getPatternLength('1')
-d.getPatternLength({'1' 'NewPat2'})
+values = d.getNodeSourcePatternIndex
+values(6)=1; 
+d.setNodeSourcePatternIndex(values)
+d.getNodeSourcePatternIndex
 
-d.getPattern % Change this to repeat smaller length patterns
-d.setPattern(1,1:0.01:2)
-d.getPattern
-% 
-d.getPatternValue(1,10)
-d.setPatternValue(1,10,1.2)
-d.getPatternValue(1,10)
+d.getOptionsMaxTrials
+d.setOptionsMaxTrials(45)
+d.getOptionsMaxTrials
 
-d.getQualityType
-d.setQualityType('age')
-d.getQualityType
-d.setQualityType('chem','mg/L')
-d.setQualityType('trace','11')
-d.getQualityType
+d.getOptionsAccuracyValue
+d.setOptionsAccuracyValue(0.015)
+d.getOptionsAccuracyValue
+
+d.getOptionsQualityTolerance
+d.setOptionsQualityTolerance(0.02)
+d.getOptionsQualityTolerance
+
+d.getOptionsEmitterExponent
+d.setOptionsEmitterExponent(0.55)
+d.getOptionsEmitterExponent
+
+d.getOptionsPatternDemandMultiplier
+d.setOptionsPatternDemandMultiplier(1.1)
+d.getOptionsPatternDemandMultiplier
 
 d.getTimeSimulationDuration
 d.setTimeSimulationDuration(86500)
@@ -471,7 +354,7 @@ d.getTimePatternStep
 d.getTimePatternStart
 d.setTimePatternStart(100)
 d.getTimePatternStart
-% 
+
 d.getTimeReportingStep
 d.setTimeReportingStep(3500)
 d.getTimeReportingStep
@@ -480,152 +363,193 @@ d.getTimeReportingStart
 d.setTimeReportingStart(200)
 d.getTimeReportingStart
 
+d.getTimeStatisticsType
+d.getTimeStatisticsIndex
+d.setTimeStatisticsType('MINIMUM')
+d.getTimeStatisticsType
+d.getTimeStatisticsIndex
+d.setTimeStatisticsType('MAXIMUM')
+d.getTimeStatisticsType
+d.getTimeStatisticsIndex
+d.setTimeStatisticsType('RANGE')
+d.getTimeStatisticsType
+d.getTimeStatisticsIndex
+d.setTimeStatisticsType('AVERAGE')
+d.getTimeStatisticsType
+d.getTimeStatisticsIndex
+d.setTimeStatisticsType('NONE')
+d.getTimeStatisticsType
+d.getTimeStatisticsIndex
 
-
-d.getTimeStatistics
-d.setTimeStatistics('MINIMUM')
-d.getTimeStatistics
-
-d.getTimeReportingPeriods
-
-d.getNodeSourceType
-d.setNodeSourceType(2,'MASS')
-d.getNodeSourceType
-
+d.getTimeRuleControlStep % bug
+d.setTimeRuleControlStep(100) % bug
 d.getTimeRuleControlStep
-d.setTimeRuleControlStep(300)
-d.getTimeRuleControlStep
 
-% d.getPumpType
-
-%%%
-d.getCoordinates
-
-d.plot
-d.plot('highlightnode',{'A'})
-d.plot('highlightnode',{'2'})
-d.plot('highlightnode',{'A'},'Nodes','yes')
-d.plot('highlightnode',{'10'},'Nodes','yes')
-d.plot('highlightlink',{'2','111'})
-d.plot('Nodes','yes')
-d.plot('Links','yes')
-d.plot('Nodes','yes','highlightnode',{'10'})
-d.plot('Nodes','yes','highlightnode',{'A'})
-
-values = d.getLinkDiameter
-values(1) = 91;
-d.setLinkDiameter(values)
-d.getLinkDiameter
-
-values = d.getLinkLength
-values(1)=91;
-d.setLinkLength(values)
-d.getLinkLength
-
-
-values = d.getLinkRoughness
-values(1)=91;
-d.setLinkRoughness(values)
-d.getLinkRoughness
-
-values = d.getLinkMinorLossCoeff
-values(1:end)=0.1;
-d.setLinkMinorLossCoeff(values)
-d.getLinkMinorLossCoeff
-
-values = d.getLinkInitialStatus
-values(1)=0;%0 or 1
-d.setLinkInitialStatus(values)
-d.getLinkInitialStatus
-
-values = d.getLinkInitialSettings
-values(2)=105;
-d.setLinkInitialSettings(values)
-d.getLinkInitialSettings
-values(13)=0;
-d.setLinkInitialSettings(values)
-d.getLinkInitialSettings
-
-values = d.getLinkBulkReactionCoeff
-values(2)=-0.55;
-d.setLinkBulkReactionCoeff(values)
-d.getLinkBulkReactionCoeff
-
-values = d.getLinkWallReactionCoeff
-values(2)=-1.1;
-d.setLinkWallReactionCoeff(values)
-d.getLinkWallReactionCoeff
-
-values = d.getLinkStatus %dynamic
-values(2)=1;
-d.setLinkStatus(values)
-d.getLinkStatus 
-
-values = d.getLinkSettings %dynamic
-values(2)=111;
-d.setLinkSettings(values)
-d.getLinkSettings
-
-values = d.getNodeElevation
-values(2)=720;
-d.setNodeElevation(values)
-d.getNodeElevation
-
-values = d.getNodeBaseDemand
-values(2)=160;
-d.setNodeBaseDemand(values)
-d.getNodeBaseDemand
-
-values = d.getNodeDemandPatternIndex
-values(2)=0;
-d.setNodeDemandPatternIndex(values)
-d.getNodeDemandPatternIndex
-
-values = d.getNodeEmitterCoeff
-values(2)=0.5;
-d.setNodeEmitterCoeff(values)
-d.getNodeEmitterCoeff
-
-values = d.getNodeInitialQuality
-values(2)=0.6;
-d.setNodeInitialQuality(values)
-d.getNodeInitialQuality
-
-values = d.getTankLevelInitial
-values(11)=125;
-d.setTankLevelInitial(values)
-d.getTankLevelInitial
-
-
-d.getNodeSourceType
-d.setNodeSourceType(2,'MASS')
-d.getNodeSourceType
-
-values = d.getNodeSourceQuality
-values(2)=0.5;
-d.setNodeSourceQuality(values)
-d.getNodeSourceQuality
-
-values = d.getNodeSourcePatternIndex
-values(6)=1; 
-d.setNodeSourcePatternIndex(values)
-d.getNodeSourcePatternIndex
+d.getPattern % Change this to repeat smaller length patterns
+d.setPattern(1,1:0.01:2)
+d.getPattern
 
 values = d.getPattern
 values(1,end)=800;
 d.setPatternMatrix(values)
 d.getPattern
 
-d.getCurveInfo
+d.getPatternValue(1,10)
+d.setPatternValue(1,10,1.2)
+d.getPatternValue(1,10)
+
+d.getQualityType
+d.getQualityCode
+d.setQualityType('none')
+d.getQualityCode
+d.getQualityType
+d.setQualityType('age')
+d.getQualityType
+d.getQualityCode
+d.setQualityType('chem','mg/L')
+d.getQualityType
+d.getQualityCode
+a=d.getNodeTankNameID 
+d.setQualityType('trace',a{1})
+d.getQualityType
+d.getQualityCode
+d.saveInputFile([pwd,'\RESULTS\','TestInpFile.inp']);
+% have been applied in the end of the function
+% % d.closeHydraulicAnalysis
+% % d.closeQualityAnalysis
+% % d.saveHydraulicFile 
+% % d.useHydraulicFile 
+% % d.initializeHydraulicAnalysis
+% % d.initializeQualityAnalysis
+% % d.tstep = nextHydraulicAnalysisStep
+% % d.tstep = nextQualityAnalysisStep
+% % d.openHydraulicAnalysis
+% % d.openQualityAnalysis
+% % d.tstep = runHydraulicAnalysis
+% % d.tstep = runQualityAnalysis
+% % tleft=d.stepQualityAnalysisTimeLeft
+
+d=epanet([inpname,'.inp']);
+
+d.writeLineInReportFile('Line-writting testing')
+open('temprpt.txt'); % bug, write in status report > tmprpt.txt
+
+% Compute ranges (max - min) 
+% d.setTimeStatisticsType('RANGE')
+d.setTimeStatisticsType('MAXIMUM')
+% d.setTimeStatisticsType('MINIMUM')
+% StatisticsType('AVERAGE')
+% d.setTimeStatisticsType('NONE')
+
+% Solve hydraulics 
+d.solveCompleteHydraulics
+d.saveHydraulicsOutputReportingFile
+
+% Define contents of the report
+d.setReportFormatReset
+d.setReport('FILE TestReport.txt');
+d.setReport('PAGESIZE 0')
+d.setReport('NODES ALL')%/ALL/node1 node2 
+d.setReport('LINKS ALL')%/ALL/link1 link2
+d.setReport('PRESSURE PRECISION 1')
+d.setReport('PRESSURE ABOVE 20')
+d.setReport('STATUS YES')%YES/NO/FULL 
+d.setReport('SUMMARY YES')%YES/NO 
+d.setReport('MESSAGES YES')%YES/NO 
+d.setReport('ENERGY YES')%YES/NO 
+%Nodes parameters
+%YES/NO/BELOW/ABOVE/PRECISION
+d.setReport('ELEVATION YES')
+d.setReport('DEMAND YES')
+d.setReport('HEAD YES') 
+d.setReport('PRESSURE YES') 
+d.setReport('QUALITY YES') 
+%Links parameters
+%BELOW/ABOVE/PRECISION
+d.setReport('LENGTH YES')
+d.setReport('DIAMETER YES')
+d.setReport('FLOW YES')
+d.setReport('LENGTH YES')
+d.setReport('VELOCITY YES')
+d.setReport('HEADLOSS YES')
+d.setReport('QUALITY PRECISION 1')
+d.setReport('STATUS YES')
+d.setReport('SETTING YES')
+d.setReport('REACTION YES')
+d.setReport('F-FACTOR YES')
+
+%Write the report to file 
+d.writeReport
+movefile('TestReport.txt',[pwd,'\RESULTS\','TestReport.txt']);
+open('TestReport.txt');
+
+d.setReportFormatReset
+d.setReport('FILE TestReport2.txt'); 
+d.setTimeStatisticsType('AVERAGE')
+d.setReport('NODES 10')
+d.setReport('HEAD YES')
+d.setReport('DEMAND NO')
+d.setReport('PRESSURE NO')
+d.setReport('QUALITY NO')
+d.writeReport
+movefile('TestReport2.txt',[pwd,'\RESULTS\','TestReport2.txt']);
+open('TestReport2.txt');
+
+d.setReportFormatReset
+d.setReport('FILE TestReport3.txt'); 
+d.setReport('NODES ALL')
+d.setReport('LINKS ALL')
+d.writeReport
+movefile('TestReport3.txt',[pwd,'\RESULTS\','TestReport3.txt']);
+open('TestReport3.txt')
+
+d.setReportFormatReset
+d.setReport('FILE TestReport4.txt'); 
+d.setReport('STATUS YES') 
+d.writeReport
+movefile('TestReport4.txt',[pwd,'\RESULTS\','TestReport4.txt']);
+open('TestReport4.txt')
+
+d.setReportFormatReset
+d.setReport('FILE TestReport5.txt'); 
+d.setTimeStatisticsType('NONE')
+d.setReport('LINKS 10')
+d.setReport('LINKS 11')
+d.setReport('LINKS 12')
+d.setReport('FLOW YES')
+d.setReport('HEADLOSS NO') %bug
+d.setReport('VELOCITY NO')
+d.writeReport
+movefile('TestReport5.txt',[pwd,'\RESULTS\','TestReport5.txt']);
+open('TestReport5.txt');
+
+d.setReportFormatReset
+d.setReport('FILE TestReport6.txt'); 
+d.setTimeStatisticsType('MINIMUM')
+d.setReport('NODES ALL')
+d.writeReport
+movefile('TestReport6.txt',[pwd,'\RESULTS\','TestReport6.txt']);
+open('TestReport6.txt'); 
+
+d.setReportFormatReset
+d.setReport('FILE TestReport7.txt'); 
+d.setTimeStatisticsType('NONE')
+d.setReport('LINKS ALL')
+d.writeReport
+movefile('TestReport7.txt',[pwd,'\RESULTS\','TestReport7.txt']);
+open('TestReport7.txt'); 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fclose all;
+d.unload 
+
+%%%%%%%%%%%%%%%%%%%%%%Solve Functions%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fclose all;close all;
 clc;
 clear all;
 clear class;
 % Input Files
-d=Epanet('Net1_Rossman2000.inp');%d.plot
+inpname='Net1_Rossman2000';
+d=epanet([inpname,'.inp']);
 
 % Simulate all times
 d.solveCompleteHydraulics
@@ -636,12 +560,12 @@ d.getQualityType
 
 % Runs Quality Step-by-step
 d.solveCompleteHydraulics
-d.saveHydraulicFile('hydraulics.hyd')
-d.useHydraulicFile('hydraulics.hyd')
+d.saveHydraulicFile([pwd,'\RESULTS\','hydraulics.hyd'])
+d.useHydraulicFile([pwd,'\RESULTS\','hydraulics.hyd'])
 d.saveHydraulicsOutputReportingFile
 d.openQualityAnalysis
 d.initializeQualityAnalysis
-tleft=1; P=[];T=[]; D=[]; H=[]; Q=[]; M=[];
+tleft=1; P=[];T=[];Q=[];  
 while (tleft>0)
     t=d.runQualityAnalysis;
     P=[P; d.getNodePressure];
@@ -652,119 +576,14 @@ while (tleft>0)
     tleft = d.stepQualityAnalysisTimeLeft;
 end
 d.closeQualityAnalysis;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-% TEST - MSX
-%% Testing
-fclose all;
-clc;
-clear all;
-clear class;
-d=Epanet('Net2_Rossman2000.inp');
-d.LoadMSX('Net2_Rossman2000.msx');
-d
-
-% Hydraulic analysis
-d.getCountSpeciesMsx     
-d.getCountConstantsMsx            
-d.getCountParametersMsx           
-d.getCountPatternsMsx 
-
-% Patterns
-d.addPatternMsx('testpat',[2 .3 .4 6 5 2 4]);
-d.getPatternLengthMsx
-d.getPatternIndexMsx
-d.getPatternsIDMsx                 
-
-d.setPatternMatrixMsx([.1 .2 .5 .2 1 .9]);
-d.getPatternMsx 
-
-d.setPatternValueMsx(1,1,2);
-d.getPatternMsx 
-
-d.setPatternMsx(1,[1 0.5 0.8 2 1.5]);
-d.getPatternMsx 
-d.getPatternValueMsx(1,5)%1.5
-
-% Sources
-% SourceTypeMsx,SourceLevelMsx,SourcePatternIndexMsx,SourceNodeIDMsx
-v=d.getSourcesMsx
-node = 1;
-spec=1;
-type = 0;
-level=0.2;
-pat = 1;
-d.setSourceMsx(node, spec, type, level, pat)
-v=d.getSourcesMsx
-
-% Species
-d.getSpeciesIndexMsx
-d.getSpeciesIDMsx
-% d.getSpeciesConcentration(type, index, species)
-d.getSpeciesConcentration(0,1,1)
-
-% Constants
-d.getConstantValueMsx     
-value = [2 10 8];%index[1 2 3]
-d.setConstantValueMsx(value);
-d.getConstantValueMsx     
-d.getConstantsIDMsx                                         
-d.getConstantsIndexMsx 
-
-% Parameters
-d.getParametersIDMsx              
-d.getParametersIndexMsx 
-
-d.getParameterPipeValueMsx        
-d.getParameterTankValueMsx        
-
-if d.getCountParametersMsx 
-    % d.setParameterPipeValueMsx(pipeIndex,value) 
-    d.setParameterPipeValueMsx(1,[1.5 2]) 
-    d.getParameterPipeValueMsx{1}        
-
-    d.TankIndex
-    d.setParameterTankValueMsx(d.TankIndex(1),100)  
-    d.getParameterTankValueMsx{d.TankIndex(1)}  
-end
-
-% Initial Quality
-values = d.getInitqualLinkValueMsx
-nodeIndex=1; speciesIndex=1;
-values{nodeIndex}(speciesIndex)=1000;%
-d.setInitqualLinkValueMsx(values)     
-d.getInitqualLinkValueMsx 
-
-linkIndex=1; speciesIndex=1;
-values = d.getInitqualNodeValueMsx
-values{linkIndex}(speciesIndex)=1500;%
-d.setInitqualNodeValueMsx(values)
-d.getInitqualNodeValueMsx   
-
-d.getErrorMsx(501)
-
-d.saveMsxFile('msxsavedtest.msx');                  
-
-d.getReportMsx   
-
-
-l = d.getComputedQualityLinkMsx                                  
-n = d.getComputedQualityNodeMsx                                                
-          
-
-d.unloadMsx 
-
-d.unload
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-fclose all;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fclose all;close all;
 clc;
 clear all;
 clear class;
 % Input Files
-d=Epanet('Net1_Rossman2000.inp');%d.plot
+inpname='Net1_Rossman2000';
+d=epanet([inpname,'.inp']);
 
 % Simulate all times
 d.solveCompleteHydraulics
@@ -776,7 +595,7 @@ d.getQualityType
 % Runs hydraulics Step-by-step
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis;
-tstep=1; P=[];T=[]; D=[]; H=[]; Q=[]; M=[];F=[];
+tstep=1; P=[];T=[]; D=[]; H=[];F=[];
 while (tstep>0)
     t=d.runHydraulicAnalysis;
     P=[P; d.getNodePressure];
@@ -789,9 +608,187 @@ end
 d.closeHydraulicAnalysis
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%MSX
+fclose all;close all;
+clc;
+clear all;
+clear class;
+inpname='example';
+% inpname='Net2_Rossman2000';
+
+d=epanet([inpname,'.inp']);
+d.msx([inpname,'.msx'])
+d
+d.getMsxEquationsTerms
+d.getMsxEquationsPipes
+d.getMsxEquationsTanks
+d.getMsxSpeciesCount
+d.getMsxConstantsCount
+d.getMsxParametersCount
+d.getMsxPatternsCount
+d.getMsxSpeciesNameID
+d.getMsxSpeciesType
+d.getMsxSpeciesUnits
+d.getMsxSpeciesATOL  
+d.getMsxSpeciesRTOL
+d.getMsxSpeciesIndex
+d.getMsxConstantsNameID
+d.getMsxConstantsValue
+d.getMsxConstantsIndex
+d.getMsxParametersNameID
+d.getMsxParametersIndex
+d.getMsxParametersTanksValue
+d.getMsxParametersPipesValue
+d.getMsxPatternsNameID
+d.getMsxPatternsIndex
+d.getMsxPatternsLengths
+d.getMsxNodeInitqualValue
+d.getMsxLinkInitqualValue
+d.getMsxSources
+d.getMsxSourceType
+d.getMsxSourceLevel
+d.getMsxSourcePatternIndex
+d.getMsxPattern %Mass flow rate per minute of a chemical source
+d.getMsxPatternValue(1,5) %Mass flow rate per minute of a chemical source
+% % d.getMsxSpeciesConcentration
+d.setTimeHydraulicStep(3600)
+d.setTimeQualityStep(3600)
+d.getMsxComputedQualityNode
+d.MsxPlotConcentrationSpeciesOfNodes
+d.getMsxComputedQualityLink
+d.MsxPlotConcentrationSpeciesOfLinks
+d.getMsxError(0)   % bug, no error
+d.getMsxError(200) % bug, cannot read EPANET-MSX file
+d.getMsxError(501)
+d.getMsxError(502)
+d.getMsxError(503)
+d.getMsxError(504)
+d.getMsxError(505)
+d.getMsxError(506)
+d.getMsxError(507)
+d.getMsxError(508)
+d.getMsxError(509)
+d.getMsxError(510) % bug, could not open algebraic "equation" solver.
+d.getMsxError(511)
+d.getMsxError(512)
+d.getMsxError(513)
+d.getMsxError(514)
+d.getMsxError(515)
+d.getMsxError(516)
+d.getMsxError(517)
+d.getMsxError(518)
+d.getMsxError(519)
+d.getMsxError(520)
+d.getMsxError(521)
+d.getMsxError(522)
+d.getMsxError(523)
+d.getMsxError(524)
+
+% Solve for hydraulics & water quality
+d.MsxSolveCompleteHydraulics
+d.MsxSolveCompleteQuality
+% Write results to the “TestMsxReport” file
+d.MsxWriteReport %a specific water quality report file is named in the [REPORT] section of the MSX input file. %BUG
+copyfile([pwd,'\RESULTS\','temprpt.txt'],[pwd,'\RESULTS\','TestMsxReport.txt']);
+open('TestMsxReport.txt');
+%or
+copyfile([pwd,'\LIBRARIES\','epanetmsx.exe'],[pwd,'\RESULTS\','epanetmsx.exe']);
+copyfile([pwd,'\LIBRARIES\','epanetmsx.dll'],[pwd,'\RESULTS\','epanetmsx.dll']);
+copyfile([pwd,'\LIBRARIES\','epanet2.dll'],[pwd,'\RESULTS\','epanet2.dll']);
+fid = fopen('ReportMsx.bat','w');
+r = sprintf('cd RESULTS \nepanetmsx %s %s %s','temp.inp','temp.msx','temp.txt'); 
+fprintf(fid,'%s \n',r);fclose all;close all;
+!ReportMsx.bat
+movefile('ReportMsx.bat',[pwd,'\RESULTS\','ReportMsx.bat']);
+copyfile([pwd,'\RESULTS\','temp.txt'],[pwd,'\RESULTS\','TestMsxReport2.txt']);
+open('TestMsxReport2.txt')
+    
+d.MsxAddPattern('testpat',[2 .3 .4 6 5 2 4]);
+d.getMsxPatternsNameID
+d.getMsxPatternsIndex
+d.getMsxPatternsLengths  
+
+v=d.getMsxSources
+node = 1;
+spec=1;
+type = 0;
+level=0.2;
+pat = 1;
+d.setMsxSources(node, spec, type, level, pat)
+v=d.getMsxSources
+
+d.getMsxConstantsValue     
+value = [2 10 8];%index[1 2 3]
+d.setMsxConstantsValue(value);
+d.getMsxConstantsNameID
+d.getMsxConstantsValue
+d.getMsxConstantsIndex
+
+d.getMsxParametersTanksValue
+d.getMsxParametersPipesValue      
+
+if d.getMsxParametersCount 
+    % d.setMsxParametersPipesValue(pipeIndex,value) 
+    d.setMsxParametersPipesValue(1,[1.5 2]) 
+    d.getMsxParametersPipesValue{1}        
+
+    a=d.getNodeTankIndex
+    d.setMsxParametersTanksValue(a(1),100)  
+    d.getMsxParametersTanksValue{a(1)}  
+end
+
+values = d.getMsxLinkInitqualValue
+nodeIndex=1; speciesIndex=1;
+values{nodeIndex}(speciesIndex)=1000;%
+d.setMsxLinkInitqualValue(values)     
+d.getMsxLinkInitqualValue 
+
+linkIndex=1; speciesIndex=1;
+values = d.getMsxNodeInitqualValue
+values{linkIndex}(speciesIndex)=1500;%
+d.setMsxNodeInitqualValue(values)
+d.getMsxNodeInitqualValue   
+
+d.setMsxPatternMatrix([.1 .2 .5 .2 1 .9]);
+d.getMsxPattern
+
+d.setMsxPatternValue(1,1,2);
+d.getMsxPattern 
+
+d.setMsxPattern(1,[1 0.5 0.8 2 1.5]);
+d.getMsxPattern 
+d.getMsxPatternValue(1,5) 
+
+d.MsxSaveFile([pwd,'\RESULTS\','testMsx.msx']);                                                               
+          
+d.MsxSaveQualityFile([pwd,'\RESULTS\','testMsxQuality.bin'])
+
+d.saveHydraulicsOutputReportingFile
+d.saveHydraulicFile([pwd,'\RESULTS\','testMsxHydraulics.hyd'])
+
+d.MsxUseHydraulicFile([pwd,'\RESULTS\','testMsxHydraulics.msx'])
+
+% % MsxInitializeQualityAnalysis
+% % MsxStepQualityAnalysisTimeLeft
+
+d.MsxUnload 
+d.unload
+
+% OTHER FUNCTIONS
+inpname='Net1_Rossman2000';
+d=epanet([inpname,'.inp']);
+
+NodeCoordinates = d.getCoordinates
+d.getInputFileInfo
+d.getCurveInfo
+d.getLinksInfo
+d.getNodesInfo
+d.getControlsInfo
+d.getFlowUnitsHeadlossFormula
+
 
 %Delete s files 
-a='abcdefghijklmnoqrstuvwxyz';
+a='abcdefghijklmnopqrstuvwxyz';
 for i=1:length(a)
     s=sprintf('s%s*',a(i));
     delete(s)
@@ -800,9 +797,4 @@ for i=1:9
     s=sprintf('s%.f*',i);
     delete(s)
 end
-movefile('msxsavedtest.msx',[pwd,'\RESULTS']);
-movefile('hydraulics.hyd',[pwd,'\RESULTS']);
-% movefile('Net2_Rossman2000.msx',[pwd,'\RESULTS']);
-
 rmpath(genpath(pwd));
-   
