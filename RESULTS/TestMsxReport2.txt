@@ -1,4 +1,4 @@
-  Page 1                                    Thu Sep 19 12:19:50 2013
+  Page 1                                    Thu Sep 19 15:36:22 2013
 
   ******************************************************************
   *                           E P A N E T                          *
@@ -7,7 +7,7 @@
   *                         Version 2.00.12                        *
   ******************************************************************
   
-  Analysis begun Thu Sep 19 12:19:50 2013
+  Analysis begun Thu Sep 19 15:36:22 2013
 
   Processing MSX input file temp.msx
   
@@ -334,4 +334,4 @@ Page 1                                               EPANET-MSX 1.1
     46:00        0.00        9.64        9.64       48.98        0.57
     48:00        0.00        9.75        9.75       48.99        0.57
   
-  Analysis ended Thu Sep 19 12:19:50 2013
+  Analysis ended Thu Sep 19 15:36:23 2013

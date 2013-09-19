@@ -1,4 +1,4 @@
-  Page 1                                    Thu Sep 19 12:19:19 2013
+  Page 1                                    Thu Sep 19 15:35:59 2013
 
   ******************************************************************
   *                           E P A N E T                          *
@@ -7,11 +7,11 @@
   *                         Version 2.00.12                        *
   ******************************************************************
   
-  Analysis begun Thu Sep 19 12:19:19 2013
+  Analysis begun Thu Sep 19 15:35:59 2013
 
-  Processing MSX input file C:\Documents and Settings\mkiria01\Desktop\GitHub\EPANET-Matlab-Class\NETWORKS\example.msx
+  Processing MSX input file C:\Users\eldemet\Dropbox\github\EPANET-Matlab-Class\NETWORKS\example.msx
   
-  Processing MSX input file C:\Documents and Settings\mkiria01\Desktop\GitHub\EPANET-Matlab-Class\RESULTS\temp.msx
+  Processing MSX input file C:\Users\eldemet\Dropbox\github\EPANET-Matlab-Class\RESULTS\temp.msx
   
   
 Page 1                                               EPANET-MSX 1.1
@@ -288,4 +288,4 @@ Page 1                                               EPANET-MSX 1.1
     12:00        0.00       10.03       10.03       49.02        1.59
     14:00        0.00       10.03       10.03       49.02        1.59
     16:00        0.00       10.03       10.03       49.02        1.59
-    18:00        0.00       10.
+    18:00        0.00       10.03       10.03       49.02        1.

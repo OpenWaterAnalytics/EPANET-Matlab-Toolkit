@@ -417,6 +417,18 @@ d.saveInputFile([pwd,'\RESULTS\','TestInpFile.inp']);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 d.writeLineInReportFile('Line-writting testing')
 open('temp.txt'); % bug, write in status report > tmprpt.txt
 
@@ -505,7 +517,7 @@ d.setReport('LINKS 10')
 d.setReport('LINKS 11')
 d.setReport('LINKS 12')
 d.setReport('FLOW YES')
-d.setReport('HEADLOSS NO') %bug: It shoes Headloss even though it shouldn't
+d.setReport('HEADLOSS NO') %bug
 d.setReport('VELOCITY NO')
 d.writeReport
 movefile('TestReport5.txt',[pwd,'\RESULTS\','TestReport5.txt']);
@@ -679,9 +691,7 @@ d.MsxSolveCompleteQuality
 d.MsxWriteReport %a specific water quality report file is named in the [REPORT] section of the MSX input file. %BUG
 copyfile([pwd,'\RESULTS\','temp.txt'],[pwd,'\RESULTS\','TestMsxReport.txt']);
 open('TestMsxReport.txt');
-
 %or
-
 copyfile([pwd,'\LIBRARIES\','epanetmsx.exe'],[pwd,'\RESULTS\','epanetmsx.exe']);
 copyfile([pwd,'\LIBRARIES\','epanetmsx.dll'],[pwd,'\RESULTS\','epanetmsx.dll']);
 copyfile([pwd,'\LIBRARIES\','epanet2.dll'],[pwd,'\RESULTS\','epanet2.dll']);

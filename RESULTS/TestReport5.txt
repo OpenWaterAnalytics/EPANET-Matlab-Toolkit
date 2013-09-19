@@ -1,4 +1,4 @@
-  Page 1                                    Thu Sep 19 12:19:13 2013
+  Page 1                                    Thu Sep 19 15:34:58 2013
 
   ******************************************************************
   *                           E P A N E T                          *
@@ -11,7 +11,7 @@
   Example of modeling a 55-hour fluoride tracer study.  
   Measured fluoride data is contained in the file Net2-FL.dat  
    
-      Input Data File ................... C:\Documents and Settings\mkiria01\Desktop\GitHub\EPANET-Matlab-Class\RESULTS\temp.inp
+      Input Data File ................... C:\Users\eldemet\Dropbox\github\EPANET-Matlab-Class\RESULTS\temp.inp
       Number of Junctions................ 35
       Number of Reservoirs............... 0
       Number of Tanks ................... 1
