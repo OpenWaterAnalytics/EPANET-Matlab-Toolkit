@@ -430,7 +430,7 @@ d.saveInputFile([pwd,'\RESULTS\','TestInpFile.inp']);
 % % tleft=d.stepQualityAnalysisTimeLeft
 
 d.writeLineInReportFile('Line-writting testing')
-open('temprpt.txt'); % bug, write in status report > tmprpt.txt
+open('temp.txt'); % bug, write in status report > tmprpt.txt
 
 d=epanet([inpname,'.inp']);
 
@@ -689,7 +689,7 @@ d.MsxSolveCompleteHydraulics
 d.MsxSolveCompleteQuality
 % Write results to the “TestMsxReport” file
 d.MsxWriteReport %a specific water quality report file is named in the [REPORT] section of the MSX input file. %BUG
-copyfile([pwd,'\RESULTS\','temprpt.txt'],[pwd,'\RESULTS\','TestMsxReport.txt']);
+copyfile([pwd,'\RESULTS\','temp.txt'],[pwd,'\RESULTS\','TestMsxReport.txt']);
 open('TestMsxReport.txt');
 %or
 copyfile([pwd,'\LIBRARIES\','epanetmsx.exe'],[pwd,'\RESULTS\','epanetmsx.exe']);

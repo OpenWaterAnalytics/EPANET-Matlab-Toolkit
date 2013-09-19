@@ -242,7 +242,7 @@ classdef epanet <handle
             %Close input file
             ENclose;
             %Load temporary file
-            [obj.errcode] = ENopen(obj.pathfile, [pwd,'\RESULTS\temprpt.txt'], [pwd,'\RESULTS\tempout.txt']);
+            [obj.errcode] = ENopen(obj.pathfile, [pwd,'\RESULTS\temp.txt'], [pwd,'\RESULTS\temp.out']);
             % Get type of the parameters
             obj.LinkType=obj.getLinkType;
             obj.NodeType=obj.getNodeType;
