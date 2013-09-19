@@ -73,8 +73,8 @@ classdef epanet <handle
         MsxSpeciesUnits;
         MsxEquationsTanks;
         MsxEquationsTerms;
-        MsxComputedQualityNode;
-        MsxComputedQualityLink;
+%         MsxComputedQualityNode;
+%         MsxComputedQualityLink;
         %EPANET
         NodeCoordinates; % Coordinates for each node (long/lat & intermediate pipe coordinates)
         NodeJunctionsCount; %Number of junctions
@@ -2762,8 +2762,6 @@ obj.MsxSourceLevel = obj.getMsxSourceLevel;
 obj.MsxSourcePatternIndex = obj.getMsxSourcePatternIndex;
 obj.MsxSourceNodeNameID = obj.getMsxSourceNodeNameID;
 obj.MsxPattern = obj.getMsxPattern;
-obj.MsxComputedQualityNode = obj.getMsxComputedQualityNode;
-obj.MsxComputedQualityLink = obj.getMsxComputedQualityLink;
 end
 function [errcode] = MSXopen(pathfile)
 

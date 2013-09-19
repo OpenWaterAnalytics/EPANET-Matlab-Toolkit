@@ -1,4 +1,4 @@
-  Page 1                                    Mon Sep 16 13:30:21 2013
+  Page 1                                    Thu Sep 19 12:11:27 2013
 
   ******************************************************************
   *                           E P A N E T                          *
@@ -7,7 +7,7 @@
   *                         Version 2.00.12                        *
   ******************************************************************
   
-  Analysis begun Mon Sep 16 13:30:21 2013
+  Analysis begun Thu Sep 19 12:11:27 2013
 
   Processing MSX input file C:\Documents and Settings\mkiria01\Desktop\GitHub\EPANET-Matlab-Class\NETWORKS\example.msx
   

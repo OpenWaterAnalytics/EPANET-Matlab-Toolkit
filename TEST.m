@@ -429,10 +429,10 @@ d.saveInputFile([pwd,'\RESULTS\','TestInpFile.inp']);
 % % d.tstep = runQualityAnalysis
 % % tleft=d.stepQualityAnalysisTimeLeft
 
-d=epanet([inpname,'.inp']);
-
 d.writeLineInReportFile('Line-writting testing')
 open('temprpt.txt'); % bug, write in status report > tmprpt.txt
+
+d=epanet([inpname,'.inp']);
 
 % Compute ranges (max - min) 
 % d.setTimeStatisticsType('RANGE')
@@ -798,3 +798,4 @@ for i=1:9
     delete(s)
 end
 rmpath(genpath(pwd));
+% close all
