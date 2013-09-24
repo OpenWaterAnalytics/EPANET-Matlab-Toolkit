@@ -1898,38 +1898,44 @@ classdef epanet <handle
         end
         function MsxPlotConcentrationSpeciesOfNodes(obj)
             s=obj.getMsxComputedQualityNode;
-            for l=1:obj.getNodeCount
-                figure;
-                for i=1:obj.getMsxSpeciesCount
-                    nodeID=obj.getNodeNameID(l);
+            nodesID=obj.getNodeNameID;
+            SpeciesNameID=obj.getMsxSpeciesNameID;
+            SpCnt=obj.getMsxSpeciesCount;
+            NodCnt=obj.getNodeCount;
+            for l=1:NodCnt
+                for i=1:SpCnt
+                    nodeID=nodesID(l);
                     hold on;
                     specie(:,i)=s.Quality{i,l};
                     time(:,i)=s.Time;
-                    String(i) = obj.getMsxSpeciesNameID(i);
                 end
-                plot(time,specie)
-                title(['NODE ',char(nodeID)])
+                figure('Name',['NODE ',char(nodeID)]);
+                plot(time,specie);
+                title(['NODE ',char(nodeID)]);
                 ylabel('Quantity');
                 xlabel('Time(s)');
-                legend(String);
+                legend(SpeciesNameID);
             end
         end
         function MsxPlotConcentrationSpeciesOfLinks(obj)
             s=obj.getMsxComputedQualityLink;
-            for l=1:obj.getLinkCount
-                figure;
-                for i=1:obj.getMsxSpeciesCount
-                    linkID=obj.getLinkNameID(l);
+            linksID=obj.getLinkNameID;
+            SpeciesNameID=obj.getMsxSpeciesNameID;
+            SpCnt=obj.getMsxSpeciesCount;
+            LinkCnt=obj.getLinkCount;
+            for l=1:LinkCnt
+                for i=1:SpCnt
+                    linkID=linksID(l);
                     hold on;
                     specie(:,i)=s.Quality{i,l};
                     time(:,i)=s.Time;
-                    String(i) = obj.getMsxSpeciesNameID(i);
                 end
-                plot(time,specie)
-                title(['LINK ',char(linkID)])
+                figure('Name',['LINK ',char(linkID)]);
+                plot(time,specie);
+                title(['LINK ',char(linkID)]);
                 ylabel('Quantity');
                 xlabel('Time(s)');
-                legend(String);
+                legend(SpeciesNameID);
             end
         end
         function value = getMsxError(obj,errcode)
