@@ -232,9 +232,9 @@ classdef epanet <handle
             end
             obj.inputfile=inpfile;
             %Load EPANET Library
-            [obj.errcode]=ENLoadLibrary;
+            [obj.errcode]=obj.epanetLoadLibrary;
             %Open the file
-            [obj.errcode] = ENopen([pwd,'\NETWORKS\',inpfile], '', '');
+            obj.LoadInpFile([pwd,'\NETWORKS\',inpfile], '', '');
             %Set path of temporary file
             obj.pathfile=[pwd,'\RESULTS\temp.inp'];
             %Save the temporary input file
@@ -242,7 +242,7 @@ classdef epanet <handle
             %Close input file
             ENclose;
             %Load temporary file
-            [obj.errcode] = ENopen(obj.pathfile, [pwd,'\RESULTS\temp.txt'], [pwd,'\RESULTS\temp.out']);
+            obj.LoadInpFile(obj.pathfile,[pwd,'\RESULTS\temp.txt'], [pwd,'\RESULTS\temp.out']);
             % Get type of the parameters
             obj.LinkType=obj.getLinkType;
             obj.NodeType=obj.getNodeType;
@@ -380,6 +380,12 @@ classdef epanet <handle
             obj.NodeTankVolumeUnits=value.NodeTankVolumeUnits;
             obj.QualityWaterAgeUnits=value.QualityWaterAgeUnits;
         end % End of epanet class constructor
+        function errcode = LoadInpFile(obj,inpname,repname,binname,varargin)
+            [errcode] = ENopen(inpname,repname,binname);
+        end
+        function errcode = epanetLoadLibrary(obj)
+            [errcode] = ENLoadLibrary;
+        end
         function plot(obj,varargin)
             ENplot(obj,varargin{:});
         end
