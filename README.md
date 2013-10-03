@@ -24,6 +24,7 @@ Keep in mind that some bugs may exist in the `EPANET` libraries, in case you are
 # Acknowledgements #
 * Marios Kyriakou
 * Demetrios Eliades
+* 
 The `EPANET-Matlab Class` is based/inspired on the [EPANET-Matlab Toolkit](http://www.mathworks.com/matlabcentral/fileexchange/25100-epanet-matlab-toolkit) as well as the OpenWaterAnalytics [EPANET-Matlab Wrappers](https://github.com/OpenWaterAnalytics/epanet-matlab)
 
 
