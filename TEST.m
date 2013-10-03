@@ -2,7 +2,7 @@
 % This file is provided to ensure that all functions can be executed
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints, 
-% indicated with a short dash (-) on the right of each line number.
+% indicated with a short dash (-) on the left of each line number.
 
 disp('Start environment')
 fclose all;close all;
@@ -675,7 +675,7 @@ d.getMsxError(524)
 % Solve for hydraulics & water quality
 d.MsxSolveCompleteHydraulics
 d.MsxSolveCompleteQuality
-% Write results to the “TestMsxReport” file
+% Write results to the ï¿½TestMsxReportï¿½ file
 d.MsxWriteReport %a specific water quality report file is named in the [REPORT] section of the MSX input file. %BUG
 copyfile([pwd,'\RESULTS\','temp.txt'],[pwd,'\RESULTS\','TestMsxReport.txt']);
 open('TestMsxReport.txt');
