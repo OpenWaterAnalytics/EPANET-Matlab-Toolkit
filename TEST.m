@@ -403,7 +403,7 @@ d.getQualityCode
 d.setQualityType('none')
 d.getQualityCode
 d.getQualityType
-d.setQualityType('age')
+d.setQualityType('age') %bug
 d.getQualityType
 d.getQualityCode
 d.setQualityType('chem','mg/L')
