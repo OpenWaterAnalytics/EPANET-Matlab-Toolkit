@@ -10,7 +10,6 @@ clc;
 clear all;
 clear class;
 
-
 disp('Create EPANET Class')
 % inpname='Net1_Rossman2000'; 
 % inpname='ky11_Jolly2013';  
