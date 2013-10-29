@@ -2503,65 +2503,6 @@ if isa(highlightlink,'cell')
     end
 end
 
-% Coordinates for node FROM
-for i=1:value.NodeCount
-    [x] = double(NodeCoordinates{1}(i));
-    [y] = double(NodeCoordinates{2}(i));
-    
-    hh=strfind(highlightnodeindex,i);
-    h(:,1)=plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','b',...
-        'MarkerFaceColor','b',...
-        'MarkerSize',5);
-    legendString{1}= char('Junctions');
-    
-    % Plot Reservoirs
-    if sum(strfind(value.NodeReservoirIndex,i))
-        colornode = 'g';
-        if length(hh)
-            colornode = 'r';
-        end
-        h(:,2)=plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','r',...
-            'MarkerFaceColor','g',...
-            'MarkerSize',13);
-        plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','r',...
-            'MarkerFaceColor',colornode,...
-            'MarkerSize',13);
-        
-        legendString{2} = char('Reservoirs');
-    end
-    % Plot Tanks
-    if sum(strfind(value.NodeTankIndex,i))
-        colornode = 'k';
-        if length(hh)
-            colornode = 'r';
-        end
-        h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','r',...
-            'MarkerFaceColor','k',...
-            'MarkerSize',16);
-        
-        plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','r',...
-            'MarkerFaceColor',colornode,...
-            'MarkerSize',16);
-        
-        legendString{3} = char('Tanks');
-    end
-    
-    % Show Node id
-    if (strcmp(lower(Node),'yes') && ~length(hh))
-        text(x,y,value.NodesAll(i),'Fontsize',fontsize);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
-    end
-    
-    if length(hh)
-        plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','r',...
-            'MarkerFaceColor','r',...
-            'MarkerSize',10)
-        
-        text(x,y,value.NodesAll(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
-    end
-    hold on
-end
-%     links = obj.getLinksInfo;
-
 for i=1:value.LinkCount
     FromNode=strfind(strcmp(value.FromNode{i},value.NodesAll),1);
     ToNode=strfind(strcmp(value.ToNode{i},value.NodesAll),1);
@@ -2583,14 +2524,14 @@ for i=1:value.LinkCount
     legendString{4} = char('Pipes');
     % Plot Pumps
     if sum(strfind(value.LinkPumpIndex,i))
-        colornode = 'b';
+        colornode = 'm';
         if length(hh)
             colornode = 'r';
         end
-        h(:,5)=plot((x1+x2)/2,(y1+y2)/2,'bv','LineWidth',2,'MarkerEdgeColor','b',...
-            'MarkerFaceColor','b',...
+        h(:,5)=plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor','m',...
+            'MarkerFaceColor','m',...
             'MarkerSize',5);
-        plot((x1+x2)/2,(y1+y2)/2,'bv','LineWidth',2,'MarkerEdgeColor',colornode,...
+        plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor',colornode,...
             'MarkerFaceColor',colornode,...
             'MarkerSize',5);
         
@@ -2599,9 +2540,12 @@ for i=1:value.LinkCount
     
     % Plot Valves
     if sum(strfind(value.LinkValveIndex,i))
-        h(:,6)=plot((x1+x2)/2,(y1+y2)/2,'b*','LineWidth',2,'MarkerEdgeColor','b',...
-            'MarkerFaceColor','b',...
-            'MarkerSize',7);
+        colornode = 'k';
+        if length(hh)
+            colornode = 'r';
+        end
+        h(:,6)=plot((x1+x2)/2,(y1+y2)/2,'k*','LineWidth',2,'MarkerEdgeColor',colornode,...
+            'MarkerFaceColor',colornode,'MarkerSize',7);
         legendString{6} = char('Valves');
     end
     
@@ -2611,8 +2555,66 @@ for i=1:value.LinkCount
     end
     
     if length(hh)
-        line([x1,x2],[y1,y2],'LineWidth',2,'Color','g');
+        line([x1,x2],[y1,y2],'LineWidth',2,'Color','r');
         text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize);
+    end
+    hold on
+end
+
+% Coordinates for node FROM
+for i=1:value.NodeCount
+    [x] = double(NodeCoordinates{1}(i));
+    [y] = double(NodeCoordinates{2}(i));
+    
+    hh=strfind(highlightnodeindex,i);
+    h(:,1)=plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','b',...
+        'MarkerFaceColor','b',...
+        'MarkerSize',5);
+    legendString{1}= char('Junctions');
+    
+    % Plot Reservoirs
+    if sum(strfind(value.NodeReservoirIndex,i))
+        colornode = 'g';
+        if length(hh)
+            colornode = 'r';
+        end
+        h(:,2)=plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','g',...
+            'MarkerFaceColor','g',...
+            'MarkerSize',13);
+        plot(x,y,'s','LineWidth',2,'MarkerEdgeColor',colornode,...
+            'MarkerFaceColor',colornode,...
+            'MarkerSize',13);
+        
+        legendString{2} = char('Reservoirs');
+    end
+    % Plot Tanks
+    if sum(strfind(value.NodeTankIndex,i))
+        colornode = 'c';
+        if length(hh)
+            colornode = 'r';
+        end
+        h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','c',...
+            'MarkerFaceColor','c',...
+            'MarkerSize',16);
+        
+        plot(x,y,'p','LineWidth',2,'MarkerEdgeColor',colornode,...
+            'MarkerFaceColor',colornode,...
+            'MarkerSize',16);
+        
+        legendString{3} = char('Tanks');
+    end
+    
+    % Show Node id
+    if (strcmp(lower(Node),'yes') && ~length(hh))
+        text(x,y,value.NodesAll(i),'Fontsize',fontsize);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+    end
+    
+    if length(hh)
+        plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','r',...
+            'MarkerFaceColor','r',...
+            'MarkerSize',10)
+        
+        text(x,y,value.NodesAll(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
     end
     hold on
 end
