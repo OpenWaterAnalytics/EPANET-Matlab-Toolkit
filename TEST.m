@@ -399,10 +399,12 @@ d.getPatternValue(1,10)
 
 d.getQualityType
 d.getQualityCode
-d.setQualityType('none')
+d.getOptionsQualityTolerance %0.0200
+d.setQualityType('none')%bug 
+d.getOptionsQualityTolerance % 0.5663
 d.getQualityCode
 d.getQualityType
-d.setQualityType('age') %bug
+d.setQualityType('age') 
 d.getQualityType
 d.getQualityCode
 d.setQualityType('chem','mg/L')

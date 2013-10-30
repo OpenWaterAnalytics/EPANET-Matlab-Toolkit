@@ -1861,17 +1861,15 @@ classdef epanet <handle
                 % Run a step-wise water quality analysis without saving
                 % RESULTS to file
                 obj.MsxInitializeQualityAnalysis(0);
-                
-                [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                
+                                
                 % Retrieve species concentration at node
-                k=1;
+                k=1; tleft=1;
                 while(tleft>0 && obj.errcode==0)
                     [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                    value.Time(k,:)=t;
                     for j=1:obj.getMsxSpeciesCount
                         value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, i, j);%node code0
                     end
+                    value.Time(k,:)=t;
                     k=k+1;
                 end
             end
@@ -1887,17 +1885,15 @@ classdef epanet <handle
                 % Run a step-wise water quality analysis without saving
                 % RESULTS to file
                 obj.MsxInitializeQualityAnalysis(0);
-                
-                [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                
+                                
                 % Retrieve species concentration at node
-                k=1;
+                k=1;tleft=1;
                 while(tleft>0 && obj.errcode==0)
                     [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                    value.Time(k,:)=t;
                     for j=1:obj.getMsxSpeciesCount
                         value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, i, j);%node code0
                     end
+                    value.Time(k,:)=t;
                     k=k+1;
                 end
             end
@@ -1909,13 +1905,12 @@ classdef epanet <handle
             SpCnt=obj.getMsxSpeciesCount;
             NodCnt=obj.getNodeCount;
             for l=1:NodCnt
+                nodeID=nodesID(l);
+                figure('Name',['NODE ',char(nodeID)]);
                 for i=1:SpCnt
-                    nodeID=nodesID(l);
-                    hold on;
                     specie(:,i)=s.Quality{i,l};
                     time(:,i)=s.Time;
                 end
-                figure('Name',['NODE ',char(nodeID)]);
                 plot(time,specie);
                 title(['NODE ',char(nodeID)]);
                 ylabel('Quantity');
@@ -1930,13 +1925,12 @@ classdef epanet <handle
             SpCnt=obj.getMsxSpeciesCount;
             LinkCnt=obj.getLinkCount;
             for l=1:LinkCnt
+                linkID=linksID(l);
+                figure('Name',['LINK ',char(linkID)]);
                 for i=1:SpCnt
-                    linkID=linksID(l);
-                    hold on;
                     specie(:,i)=s.Quality{i,l};
                     time(:,i)=s.Time;
                 end
-                figure('Name',['LINK ',char(linkID)]);
                 plot(time,specie);
                 title(['LINK ',char(linkID)]);
                 ylabel('Quantity');
