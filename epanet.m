@@ -203,6 +203,7 @@ classdef epanet <handle
         TimeStatisticsType; %Type of time series post-processing ('NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE')
         errcode; %Code for the EPANET error message
         pathfile;   % The path of the input file
+        pathfileMsx;
         inputfile;  % Name of the input file
         version; %EPANET library version
     end
@@ -1153,6 +1154,8 @@ classdef epanet <handle
         end
         function value = getComputedQualityTimeSeries(obj,varargin)
             % Compute Quality simulation and retrieve all or some time-series
+            obj.solveCompleteHydraulics
+            obj.solveCompleteQuality
             obj.openQualityAnalysis
             obj.initializeQualityAnalysis
             tleft=1;
@@ -1176,8 +1179,8 @@ classdef epanet <handle
             if find(strcmpi(varargin,'qualitySensingNodes'))
                 value.Demand=initnodematrix;
             end
-            k=1;
-            while (tleft>0)
+            k=1;t=1;
+            while (tleft>0)||(t<obj.getTimeSimulationDuration)
                 t=obj.runQualityAnalysis;
                 if find(strcmpi(varargin,'time'))
                     value.Time(k,:)=t;
@@ -1196,6 +1199,9 @@ classdef epanet <handle
                 end
                 tleft = obj.stepQualityAnalysisTimeLeft;
                 k=k+1;
+                if t==obj.getTimeSimulationDuration
+                    t=obj.getTimeSimulationDuration+1;
+                end
             end
             obj.closeQualityAnalysis;
         end
@@ -1687,9 +1693,8 @@ classdef epanet <handle
         end
         function value = getMsxParametersTanksValue(obj)
             value={};
-            if ~obj.getMsxParametersCount
-                value=0;return;
-            end
+            if ~obj.getMsxParametersCount, value=0;return;end
+            if ~length(obj.NodeTankIndex), value=0;return;end
             for i=1:length(obj.getNodeTankCount)
                 for j=1:obj.MsxParametersCount
                     [obj.errcode, value{obj.NodeTankIndex(i)}(j)] = MSXgetparameter(0,obj.NodeTankIndex(i),j);
@@ -2733,12 +2738,17 @@ obj.MSXFile = msxname;
 %Open the file
 [obj.errcode] = MSXopen(obj.MSXPathFile);
 %Set path of temporary file
-obj.pathfile=[pwd,'\RESULTS\temp.msx'];
+obj.pathfileMsx=[pwd,'\RESULTS\temp.msx'];
+if ~strcmpi(msxname,'temp.msx')
+    dir_struct = dir(strcat(obj.pathfileMsx));
+    [~,sorted_index] = sortrows({dir_struct.name}');
+    if length(sorted_index), delete(obj.pathfileMsx); end
+end
 %Save the temporary input file
-obj.MsxSaveFile(obj.pathfile);
+obj.MsxSaveFile(obj.pathfileMsx);
 %Close msx file
 MSXclose;
-[obj.errcode] = MSXopen(obj.pathfile);
+[obj.errcode] = MSXopen(obj.pathfileMsx);
 obj.MsxEquationsTerms = obj.getMsxEquationsTerms;
 obj.MsxEquationsPipes = obj.getMsxEquationsPipes;
 obj.MsxEquationsTanks = obj.getMsxEquationsTanks;

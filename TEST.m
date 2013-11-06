@@ -452,7 +452,7 @@ d.setReport('ELEVATION YES')
 d.setReport('DEMAND YES')
 d.setReport('HEAD YES') 
 d.setReport('PRESSURE YES') 
-d.setReport('QUALITY YES') 
+d.setReport('QUALITY YES') % bug.
 %Links parameters
 %BELOW/ABOVE/PRECISION
 d.setReport('LENGTH YES')
@@ -528,6 +528,21 @@ d.writeReport
 movefile('TestReport7.txt',[pwd,'\RESULTS\','TestReport7.txt']);
 open('TestReport7.txt'); 
 
+
+% or 
+d.setReportFormatReset
+d.setReport('NODES ALL')
+d.setReport('LINKS ALL') 
+d.saveInputFile([pwd,'\NETWORKS\','InputFileRep.inp']);open('InputFileRep.inp');
+d=epanet('InputFileRep.inp');
+copyfile([pwd,'\LIBRARIES\','epanet2d.exe'],[pwd,'\RESULTS\','epanet2d.exe']);
+fid = fopen('ReportEpanet.bat','w');
+r = sprintf('cd RESULTS \nepanet2d %s %s','temp.inp','temp.txt'); 
+fprintf(fid,'%s \n',r);fclose all;
+!ReportEpanet.bat
+movefile('ReportEpanet.bat',[pwd,'\RESULTS\','ReportEpanet.bat']);
+copyfile([pwd,'\RESULTS\','temp.txt'],[pwd,'\RESULTS\','TestReport8.txt']);
+open('TestReport8.txt')
 
 d.unload 
 
