@@ -2819,8 +2819,12 @@ if errcode
     MSXerror(errcode);
 end
 end
-function [errcode, index] = MSXgetindex(obj,varargin)
+function [errcode, index] = MSXgetindex(varargin)
 index =0;
+if ~isnumeric(varargin{1})
+    varargin{1}=varargin{2};
+    varargin{2}=varargin{3};
+end
 [errcode,id,index]=calllib('epanetmsx','MSXgetindex',varargin{1},varargin{2},index);
 if errcode
     MSXerror(errcode);

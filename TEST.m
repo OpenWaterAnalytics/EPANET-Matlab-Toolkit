@@ -636,9 +636,11 @@ d.getMsxSpeciesUnits
 d.getMsxSpeciesATOL  
 d.getMsxSpeciesRTOL
 d.getMsxSpeciesIndex
+d.getMsxSpeciesIndex('AS5') 
 d.getMsxConstantsNameID
 d.getMsxConstantsValue
 d.getMsxConstantsIndex
+d.getMsxConstantsIndex('K2')
 d.getMsxParametersNameID
 d.getMsxParametersIndex
 d.getMsxParametersTanksValue
