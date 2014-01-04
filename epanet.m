@@ -1996,7 +1996,7 @@ classdef epanet <handle
             end
         end
         function setMsxLinkInitqualValue(obj, value)
-            for i=1:size(value,1)
+            for i=1:length(value)
                 for j=1:size(value{1},2)
                     [obj.errcode] = MSXsetinitqual(1, i, j, value{i}(j));
                 end
