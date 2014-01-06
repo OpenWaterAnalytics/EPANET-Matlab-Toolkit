@@ -1855,10 +1855,13 @@ classdef epanet <handle
         function value = getMsxSpeciesConcentration(obj, type, index, species)
             [obj.errcode, value] = MSXgetqual(type, index, species);
         end
-        function value = getMsxComputedQualityNode(obj)
+        function value = getMsxComputedQualityNode(obj,varargin)
             if obj.getMsxSpeciesCount==0
                 value=0;
                 return;
+            end
+            if ~isempty(varargin)
+                uu=varargin{1};
             end
             for i=1:obj.getNodeCount
                 % Obtain a hydraulic solution
@@ -1868,21 +1871,30 @@ classdef epanet <handle
                 obj.MsxInitializeQualityAnalysis(0);
                                 
                 % Retrieve species concentration at node
-                k=1; tleft=1;
-                while(tleft>0 && obj.errcode==0)
+                k=1; tleft=1;t=0;
+                timeSmle=obj.getTimeSimulationDuration;%bug at time
+                while(tleft>0 && obj.errcode==0 && timeSmle~=t)
                     [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                    for j=1:obj.getMsxSpeciesCount
-                        value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, i, j);%node code0
+                    if isempty(varargin)
+                        for j=1:obj.getMsxSpeciesCount
+                            value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, i, j);%node code0
+                        end
+                    else
+                        j=1;
+                        value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, i, uu);%node code0
                     end
                     value.Time(k,:)=t;
                     k=k+1;
                 end
             end
         end
-        function value = getMsxComputedQualityLink(obj)
+        function value = getMsxComputedQualityLink(obj,varargin)
             if obj.getMsxSpeciesCount==0
                 value=0;
                 return;
+            end
+            if ~isempty(varargin)
+                uu=varargin{1};
             end
             for i=1:obj.LinkCount
                 % Obtain a hydraulic solution
@@ -1895,8 +1907,13 @@ classdef epanet <handle
                 k=1;tleft=1;
                 while(tleft>0 && obj.errcode==0)
                     [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                    for j=1:obj.getMsxSpeciesCount
-                        value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, i, j);%node code0
+                    if isempty(varargin)
+                        for j=1:obj.getMsxSpeciesCount
+                            value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, i, j); 
+                        end
+                    else
+                        j=1;
+                        value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, i, uu); 
                     end
                     value.Time(k,:)=t;
                     k=k+1;
