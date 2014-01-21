@@ -18,6 +18,8 @@ d=epanet([inpname,'.inp']);
 % d.msx([inpname,'.msx']);
 
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
+figure;
+d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);
 
 %%EPANET
 d.getControls
@@ -659,10 +661,15 @@ d.getMsxPatternValue(1,5) %Mass flow rate per minute of a chemical source
 % % d.getMsxSpeciesConcentration
 d.setTimeHydraulicStep(3600)
 d.setTimeQualityStep(3600)
-d.getMsxComputedQualityNode
-d.MsxPlotConcentrationSpeciesOfNodes
-d.getMsxComputedQualityLink
-d.MsxPlotConcentrationSpeciesOfLinks
+d.getMsxComputedQualityNode(1)%index node
+d.getMsxComputedQualityNode(1,1)%index node, index species
+d.MsxPlotConcentrationSpeciesOfNodes(1,1:d.MsxSpeciesCount)
+d.MsxPlotConcentrationSpeciesOfNodes(2,1:d.MsxSpeciesCount)
+d.MsxPlotConcentrationSpeciesOfNodes(3,1:d.MsxSpeciesCount)
+d.MsxPlotConcentrationSpeciesOfNodes(4,1:d.MsxSpeciesCount)
+d.MsxPlotConcentrationSpeciesOfNodes(5,1:d.MsxSpeciesCount)
+d.getMsxComputedQualityLink(1,1:d.MsxSpeciesCount)%index link, index species
+d.MsxPlotConcentrationSpeciesOfLinks(1,1:d.MsxSpeciesCount)
 d.getMsxError(0)   % bug, no error
 d.getMsxError(200) % bug, cannot read EPANET-MSX file
 d.getMsxError(501)
@@ -693,7 +700,7 @@ d.getMsxError(524)
 % Solve for hydraulics & water quality
 d.MsxSolveCompleteHydraulics
 d.MsxSolveCompleteQuality
-% Write results to the �TestMsxReport� file
+% Write results to the TestMsxReport file
 d.MsxWriteReport %a specific water quality report file is named in the [REPORT] section of the MSX input file. %BUG
 copyfile([pwd,'\RESULTS\','temp.txt'],[pwd,'\RESULTS\','TestMsxReport.txt']);
 open('TestMsxReport.txt');
@@ -705,8 +712,8 @@ copyfile([pwd,'\LIBRARIES\','epanetmsx.dll'],[pwd,'\RESULTS\','epanetmsx.dll']);
 copyfile([pwd,'\LIBRARIES\','epanet2.dll'],[pwd,'\RESULTS\','epanet2.dll']);
 fid = fopen('ReportMsx.bat','w');
 r = sprintf('cd RESULTS \nepanetmsx %s %s %s','temp.inp','temp.msx','temp.txt'); 
-fprintf(fid,'%s \n',r);fclose all;
 !ReportMsx.bat
+fclose all;
 movefile('ReportMsx.bat',[pwd,'\RESULTS\','ReportMsx.bat']);
 copyfile([pwd,'\RESULTS\','temp.txt'],[pwd,'\RESULTS\','TestMsxReport2.txt']);
 open('TestMsxReport2.txt')
