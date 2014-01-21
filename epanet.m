@@ -388,7 +388,7 @@ classdef epanet <handle
             [errcode] = ENLoadLibrary;
         end
         function plot(obj,varargin)
-            ENplot(obj,varargin{:});
+           ENplot(obj,varargin{:});
         end
         function value = getControls(obj)
             %Retrieves the parameters of all control statements
@@ -1861,31 +1861,29 @@ classdef epanet <handle
                 return;
             end
             if ~isempty(varargin)
-                uu=varargin{1};
-            end
-            for i=1:obj.getNodeCount
-                % Obtain a hydraulic solution
-                obj.MsxSolveCompleteHydraulics();
-                % Run a step-wise water quality analysis without saving
-                % RESULTS to file
-                obj.MsxInitializeQualityAnalysis(0);
-                                
-                % Retrieve species concentration at node
-                k=1; tleft=1;t=0;
-                timeSmle=obj.getTimeSimulationDuration;%bug at time
-                while(tleft>0 && obj.errcode==0 && timeSmle~=t)
-                    [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                    if isempty(varargin)
-                        for j=1:obj.getMsxSpeciesCount
-                            value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, i, j);%node code0
-                        end
-                    else
-                        j=1;
-                        value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, i, uu);%node code0
-                    end
-                    value.Time(k,:)=t;
-                    k=k+1;
+                if length(varargin)==1 
+                    ss=varargin{1};%index node
+                    uu=1:obj.getMsxSpeciesCount;
+                elseif length(varargin)==2
+                    ss=varargin{1};%index node
+                    uu=varargin{2};%index species
                 end
+            end
+            % Obtain a hydraulic solution
+            obj.MsxSolveCompleteHydraulics();
+            % Run a step-wise water quality analysis without saving
+            % RESULTS to file
+            obj.MsxInitializeQualityAnalysis(0);
+            % Retrieve species concentration at node
+            k=1; tleft=1;t=0;i=1;
+            timeSmle=obj.getTimeSimulationDuration;%bug at time
+            while(tleft>0 && obj.errcode==0 && timeSmle~=t)
+                [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
+                for j=uu
+                    value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, ss, j);%node code0
+                end
+                value.Time(k,:)=t;
+                k=k+1;
             end
         end
         function value = getMsxComputedQualityLink(obj,varargin)
@@ -1894,70 +1892,71 @@ classdef epanet <handle
                 return;
             end
             if ~isempty(varargin)
-                uu=varargin{1};
-            end
-            for i=1:obj.LinkCount
-                % Obtain a hydraulic solution
-                obj.MsxSolveCompleteHydraulics();
-                % Run a step-wise water quality analysis without saving
-                % RESULTS to file
-                obj.MsxInitializeQualityAnalysis(0);
-                                
-                % Retrieve species concentration at node
-                k=1;tleft=1;
-                while(tleft>0 && obj.errcode==0)
-                    [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                    if isempty(varargin)
-                        for j=1:obj.getMsxSpeciesCount
-                            value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, i, j); 
-                        end
-                    else
-                        j=1;
-                        value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, i, uu); 
-                    end
-                    value.Time(k,:)=t;
-                    k=k+1;
+                if length(varargin)==1 
+                    ss=varargin{1};%index node
+                    uu=1:obj.getMsxSpeciesCount;
+                elseif length(varargin)==2
+                    ss=varargin{1};%index node
+                    uu=varargin{2};%index species
                 end
             end
+            % Obtain a hydraulic solution
+            obj.MsxSolveCompleteHydraulics();
+            % Run a step-wise water quality analysis without saving
+            % RESULTS to file
+            obj.MsxInitializeQualityAnalysis(0);
+
+            % Retrieve species concentration at node
+            k=1;tleft=1;i=1;
+            while(tleft>0 && obj.errcode==0)
+                [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
+                for j=uu
+                    value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, ss, j); 
+                end
+                value.Time(k,:)=t;
+                k=k+1;
+            end
         end
-        function MsxPlotConcentrationSpeciesOfNodes(obj)
-            s=obj.getMsxComputedQualityNode;
+        function MsxPlotConcentrationSpeciesOfNodes(obj,varargin)
+            s=obj.getMsxComputedQualityNode(varargin{1},varargin{2});
             nodesID=obj.getNodeNameID;
             SpeciesNameID=obj.getMsxSpeciesNameID;
-            SpCnt=obj.getMsxSpeciesCount;
-            NodCnt=obj.getNodeCount;
-            for l=1:NodCnt
+%             SpCnt=obj.getMsxSpeciesCount;
+%             NodCnt=obj.getNodeCount;
+            for l=varargin{1}
                 nodeID=nodesID(l);
                 figure('Name',['NODE ',char(nodeID)]);
-                for i=1:SpCnt
-                    specie(:,i)=s.Quality{i,l};
+                for i=varargin{2}
+                    specie(:,i)=s.Quality{i,1};
                     time(:,i)=s.Time;
                 end
                 plot(time,specie);
                 title(['NODE ',char(nodeID)]);
                 ylabel('Quantity');
                 xlabel('Time(s)');
-                legend(SpeciesNameID);
+                legend(SpeciesNameID(varargin{2}));
             end
         end
-        function MsxPlotConcentrationSpeciesOfLinks(obj)
-            s=obj.getMsxComputedQualityLink;
+        function MsxPlotConcentrationSpeciesOfLinks(obj,varargin)
+            s=obj.getMsxComputedQualityLink(varargin{1},varargin{2});
             linksID=obj.getLinkNameID;
             SpeciesNameID=obj.getMsxSpeciesNameID;
-            SpCnt=obj.getMsxSpeciesCount;
-            LinkCnt=obj.getLinkCount;
-            for l=1:LinkCnt
+%             SpCnt=obj.getMsxSpeciesCount;
+%             LinkCnt=obj.getLinkCount;
+%             for l=1:LinkCnt
+            for l=varargin{1}
                 linkID=linksID(l);
                 figure('Name',['LINK ',char(linkID)]);
-                for i=1:SpCnt
-                    specie(:,i)=s.Quality{i,l};
+%                 for i=1:SpCnt
+                for i=varargin{2}
+                    specie(:,i)=s.Quality{i,1};
                     time(:,i)=s.Time;
                 end
                 plot(time,specie);
                 title(['LINK ',char(linkID)]);
                 ylabel('Quantity');
                 xlabel('Time(s)');
-                legend(SpeciesNameID);
+                legend(SpeciesNameID(varargin{2}));
             end
         end
         function value = getMsxError(obj,errcode)
@@ -2281,7 +2280,7 @@ catch err
 end
 errcode=0;
 if ~libisloaded('epanet2')
-    loadlibrary('epanet2','epanet2.h');
+    loadlibrary('epanet2','epanet2.h')
 end
 end
 function [errcode, tstep] = ENnextH()
@@ -2460,6 +2459,8 @@ highlightlinkindex=[];
 Node=char('no');
 Link=char('no');
 fontsize=10;
+selectColorNode={''};
+selectColorLink={''};
 
 for i=1:(nargin/2)
     argument =lower(varargin{2*(i-1)+1});
@@ -2482,12 +2483,28 @@ for i=1:(nargin/2)
             highlightlink=varargin{2*i};
         case 'fontsize' % font size
             fontsize=varargin{2*i};
+        case 'colornode' % color
+            selectColorNode=varargin{2*i};
+        case 'colorlink' % color
+            selectColorLink=varargin{2*i};
         otherwise
             warning('Invalid property found.');
             return
     end
 end
 
+if cellfun('isempty',selectColorNode)==1
+    init={'r'};
+    for i=1:length(highlightnode)
+        selectColorNode=[init selectColorNode];
+    end
+end
+if cellfun('isempty',selectColorLink)==1
+    init={'r'};
+    for i=1:length(highlightlink)
+        selectColorLink=[init selectColorLink];
+    end
+end
 cla
 % Get node names and x, y coordiantes
 %     NodeCoordinates = obj.getCoordinates; nodes = obj.getNodesInfo;
@@ -2541,7 +2558,7 @@ for i=1:value.LinkCount
     % Plot Pumps
     if sum(strfind(value.LinkPumpIndex,i))
         colornode = 'm';
-        if length(hh)
+        if length(hh) && isempty(selectColorLink)
             colornode = 'r';
         end
         h(:,5)=plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor','m',...
@@ -2557,7 +2574,7 @@ for i=1:value.LinkCount
     % Plot Valves
     if sum(strfind(value.LinkValveIndex,i))
         colornode = 'k';
-        if length(hh)
+        if length(hh) && isempty(selectColorLink)
             colornode = 'r';
         end
         h(:,6)=plot((x1+x2)/2,(y1+y2)/2,'k*','LineWidth',2,'MarkerEdgeColor',colornode,...
@@ -2570,10 +2587,32 @@ for i=1:value.LinkCount
         text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize);
     end
     
-    if length(hh)
+    if length(hh) && isempty(selectColorLink)
         line([x1,x2],[y1,y2],'LineWidth',2,'Color','r');
         text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize);
+    elseif length(hh) && ~isempty(selectColorLink)
+        try 
+            tt=length(selectColorLink{hh});
+        catch err
+            tt=2;
+        end
+       if tt>1
+            if length(selectColorLink(hh))==1
+                nm{1}=selectColorLink(hh);
+            else
+                nm=selectColorLink(hh);
+            end
+            if iscell(nm{1}) 
+                line([x1 NodeCoordinates{3}{i} x2],[y1 NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1}{1});
+            else
+                line([x1 NodeCoordinates{3}{i} x2],[y1 NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1});
+            end
+        else
+            line([x1 NodeCoordinates{3}{i} x2],[y1 NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',char(selectColorLink(hh)));
+        end
+        text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize);
     end
+    
     hold on
 end
 
@@ -2591,23 +2630,24 @@ for i=1:value.NodeCount
     % Plot Reservoirs
     if sum(strfind(value.NodeReservoirIndex,i))
         colornode = 'g';
-        if length(hh)
+        if length(hh) && isempty(selectColorNode)
             colornode = 'r';
         end
         h(:,2)=plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','g',...
             'MarkerFaceColor','g',...
             'MarkerSize',13);
-        plot(x,y,'s','LineWidth',2,'MarkerEdgeColor',colornode,...
-            'MarkerFaceColor',colornode,...
+        plot(x,y,'s','LineWidth',2,'MarkerEdgeColor', colornode,...
+            'MarkerFaceColor', colornode,...
             'MarkerSize',13);
-        
         legendString{2} = char('Reservoirs');
     end
     % Plot Tanks
     if sum(strfind(value.NodeTankIndex,i))
-        colornode = 'c';
-        if length(hh)
-            colornode = 'r';
+        colornode='c';
+        if length(hh) && isempty(selectColorNode)
+            colornode='r';
+        elseif length(hh) && ~isempty(selectColorNode)
+            colornode= 'b';
         end
         h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','c',...
             'MarkerFaceColor','c',...
@@ -2625,11 +2665,32 @@ for i=1:value.NodeCount
         text(x,y,value.NodesAll(i),'Fontsize',fontsize);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
     end
     
-    if length(hh)
+    if length(hh) && isempty(selectColorNode)
         plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','r',...
             'MarkerFaceColor','r',...
             'MarkerSize',10)
-        
+        text(x,y,value.NodesAll(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+    elseif length(hh) && ~isempty(selectColorNode)
+        try 
+            tt=length(selectColorNode{hh});
+        catch err
+            tt=2;
+        end
+       if tt>1
+            if length(selectColorNode(hh))==1
+                nm{1}=selectColorNode(hh);
+            else
+                nm=selectColorNode(hh);
+            end
+            if iscell(nm{1}) 
+                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1}{1},'MarkerFaceColor',nm{1}{1},'MarkerSize',10)
+            else
+                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1},'MarkerFaceColor',nm{1},'MarkerSize',10)
+            end
+       else
+        plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',char(selectColorNode(hh)),'MarkerFaceColor',char(selectColorNode(hh)),...
+            'MarkerSize',10)
+       end
         text(x,y,value.NodesAll(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
     end
     hold on
@@ -2670,6 +2731,7 @@ end
 axis off
 whitebg('w');
 end
+
 function [vx,vy,vertx,verty] = getNodeCoord(obj)
 % Initialize
 nodes=obj.getNodesInfo;
@@ -4142,7 +4204,7 @@ while 1
         Tanks{k} = tline;
         k=k+1;
     end
-    
+%     
 end
 end
 function info = readAllFile(obj)
