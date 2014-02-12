@@ -628,6 +628,7 @@ d
 d.getMsxEquationsTerms
 d.getMsxEquationsPipes
 d.getMsxEquationsTanks
+d.getMsxTimeStep
 d.getMsxSpeciesCount
 d.getMsxConstantsCount
 d.getMsxParametersCount
@@ -790,8 +791,7 @@ d.MsxUnload
 d.unload
 
 % OTHER FUNCTIONS
-inpname='Net1_Rossman2000';
-d=epanet([inpname,'.inp']);
+d=epanet(['Net1_Rossman2000','.inp']);
 
 NodeCoordinates = d.getCoordinates
 d.getInputFileInfo
@@ -801,6 +801,30 @@ d.getNodesInfo
 d.getControlsInfo
 d.getFlowUnitsHeadlossFormula
 
+% SET Flow Units % Valves, - problem?!
+d.setFlowUnitsLPM('Net1_LPM.inp') % Net1.. GPM to LPM
+d=epanet(['Net1_LPM','.inp']);
+d.getFlowUnitsHeadlossFormula
+% similar
+% d.setFlowUnitsGPM('Net1_GPM.inp') % Net1.. LPM to GPM
+% d.setFlowUnitsCFS('Net1_CFS.inp') % Net1.. GPM to CFS    
+% d.setFlowUnitsMGD('Net1_MGD.inp') % Net1.. CFS to MGD
+% d.setFlowUnitsIMGD('Net1_IMGD.inp') % Net1.MGD to IMGD
+% d.setFlowUnitsAFD('Net1_AFD.inp') % Net1.. IMGD to AFD
+% d.setFlowUnitsLPS('Net1_LPS.inp') % Net1.. AFD to LPS
+% d.setFlowUnitsLPM('Net1_LPM.inp') % Net1.. LPS to LPM      
+% d.setFlowUnitsMLD('Net1_MLD.inp') % Net1.. LPM to MLD
+% d.setFlowUnitsCMD('Net1_CMD.inp') % Net1.. MLD to CMD
+% d.setFlowUnitsCMH('Net1_CMH.inp') % Net1.. CMD to CMH
+
+% HeadlossFormula
+d=epanet(['Net1_Rossman2000','.inp']);
+d.setHeadlossDW('Net1_DW.inp');
+d=epanet(['Net1_DW','.inp']);
+d.getFlowUnitsHeadlossFormula
+
+% d.setHeadlossCM('Net1_CM.inp')
+% d.setHeadlossHW('Net1_HW.inp')
 
 %Delete s files 
 a='abcdefghijklmnopqrstuvwxyz';
