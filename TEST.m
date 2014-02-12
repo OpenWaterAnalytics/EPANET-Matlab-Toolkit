@@ -712,10 +712,12 @@ copyfile([pwd,'\LIBRARIES\','epanetmsx.exe'],[pwd,'\RESULTS\','epanetmsx.exe']);
 copyfile([pwd,'\LIBRARIES\','epanetmsx.dll'],[pwd,'\RESULTS\','epanetmsx.dll']);
 copyfile([pwd,'\LIBRARIES\','epanet2.dll'],[pwd,'\RESULTS\','epanet2.dll']);
 fid = fopen('ReportMsx.bat','w');
-r = sprintf('cd RESULTS \nepanetmsx %s %s %s','temp.inp','temp.msx','temp.txt'); 
-!ReportMsx.bat
-fclose all;
+r = sprintf('epanetmsx %s %s %s','temp.inp','temp.msx','temp.txt'); 
+fprintf(fid,'%s \n',r);fclose all;
 movefile('ReportMsx.bat',[pwd,'\RESULTS\','ReportMsx.bat']);
+cd RESULTS
+!ReportMsx.bat
+cd ..
 copyfile([pwd,'\RESULTS\','temp.txt'],[pwd,'\RESULTS\','TestMsxReport2.txt']);
 open('TestMsxReport2.txt')
     
