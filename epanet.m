@@ -1536,6 +1536,45 @@ classdef epanet <handle
             ENclose;
             ENMatlabCleanup;
         end
+        function setFlowUnitsGPM(obj,newinpname)
+            Options(obj,newinpname,'GPM') %gallons per minute
+        end
+        function setFlowUnitsLPS(obj,newinpname)
+            Options(obj,newinpname,'LPS') %liters per second
+        end
+        function setFlowUnitsMGD(obj,newinpname)
+            Options(obj,newinpname,'MGD') %million gallons per day
+        end
+        function setFlowUnitsIMGD(obj,newinpname)
+            Options(obj,newinpname,'IMGD') %Imperial mgd
+        end
+        function setFlowUnitsCFS(obj,newinpname)
+            Options(obj,newinpname,'CFS') %cubic feet per second
+        end
+        function setFlowUnitsAFD(obj,newinpname)
+            Options(obj,newinpname,'AFD') %acre-feet per day
+        end
+        function setFlowUnitsLPM(obj,newinpname)
+            Options(obj,newinpname,'LPM') %liters per minute
+        end
+        function setFlowUnitsMLD(obj,newinpname)
+            Options(obj,newinpname,'MLD') %million liters per day
+        end
+        function setFlowUnitsCMH(obj,newinpname)
+            Options(obj,newinpname,'CMH') %cubic meters per hour
+        end
+        function setFlowUnitsCMD(obj,newinpname)
+            Options(obj,newinpname,'CMD') %cubic meters per day
+        end
+        function setHeadlossHW(obj,newinpname)
+            Options(obj,newinpname,'','H-W')  %Hazen-Wiliams
+        end
+        function setHeadlossDW(obj,newinpname)
+            Options(obj,newinpname,'','D-W')  %Darcy-Weisbach
+        end
+        function setHeadlossCM(obj,newinpname)
+            Options(obj,newinpname,'','C-M')  %Chezy-Manning
+        end
         function msx(obj,msxname)
             [obj] = MSXMatlabSetup(obj,msxname);
         end
@@ -1547,6 +1586,9 @@ classdef epanet <handle
         end
         function value = getMsxEquationsTanks(obj)
             [~,~,value] = getEquations(obj.MSXFile);
+        end
+        function value = getMsxTimeStep(obj)
+            [value] = MsxTimeStep(obj.MSXFile);
         end
         function value = getMsxSpeciesCount(obj)
             % Species, Constants, Parameters, Patterns
@@ -1893,10 +1935,10 @@ classdef epanet <handle
             end
             if ~isempty(varargin)
                 if length(varargin)==1 
-                    ss=varargin{1};%index node
+                    ss=varargin{1};%index link
                     uu=1:obj.getMsxSpeciesCount;
                 elseif length(varargin)==2
-                    ss=varargin{1};%index node
+                    ss=varargin{1};%index link
                     uu=varargin{2};%index species
                 end
             end
@@ -4214,5 +4256,772 @@ while ~feof(fid)
     tline=fgetl(fid);
     info{t} = tline;
     t = t+1;
+end
+end
+function Options(obj,newinpname,newFlowUnits,headloss,varargin)
+% Notes: Flow units codes are as follows: CFS	cubic feet per second
+% GPM	gallons per minute MGD	million gallons per day IMGD
+% Imperial mgd AFD	acre-feet per day LPS	liters per second LPM
+% liters per minute MLD	million liters per day CMH	cubic meters per
+% hour CMD	cubic meters per day
+value=obj.getFlowUnitsHeadlossFormula;
+previousFlowUnits=value.LinkFlowUnits;
+newUScustomary=0;
+newSImetric=0;
+switch newFlowUnits
+    case 'CFS'
+        newUScustomary=1;
+    case 'GPM'
+        newUScustomary=1;
+    case 'MGD'
+        newUScustomary=1;
+    case 'IMGD'
+        newUScustomary=1;
+    case 'AFD'
+        newUScustomary=1;
+    case 'LPS'
+        newSImetric=1;
+    case 'LPM'
+        newSImetric=1;
+    case 'MLD'
+        newSImetric=1;
+    case 'CMH'
+        newSImetric=1;
+    case 'CMD'
+        newSImetric=1;
+end
+if newUScustomary==value.UScustomary || newSImetric==value.SImetric
+    changes=0; newUScustomary=0;
+    newSImetric=0;% feet to feet, meter to meter
+elseif value.UScustomary==1 && newUScustomary==0
+    changes=1; % feet to meter or cubic feet to cubic meter
+elseif value.UScustomary==0 && newUScustomary==1
+    changes=2; % meter to feet or cubic meter to cubic feet
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Units=newUScustomary+newSImetric;
+variables=who;nheadl=0;
+if ~sum(strcmp('headloss',variables))
+    headloss=value.OptionsHeadloss;
+    nheadl=1;
+end
+nodes = obj.getNodesInfo;
+links = obj.getLinksInfo;
+controls=obj.getControlsInfo;
+curves=obj.getCurveInfo;
+
+% Open and read inpname
+% Read all file and save in variable info
+info = readAllFile(obj);
+fid2 = fopen(obj.pathfile,'w');
+
+sections=[0 0 0 0 0 0 0 0 0 0];
+
+nn=0;pp=1;sps={'                  '};
+for t = 1:length(info)
+    c = info{t};
+    a = regexp(c, '\s*','split');
+    if isempty(a)
+        % skip
+    elseif isempty(c)
+        % skip
+    else
+        u=1;
+        while u < length(a)+1
+            if strcmp(a{u},'[JUNCTIONS]') && Units
+                fprintf(fid2,'[JUNCTIONS]');
+                sections=[1 0 0 0 0 0 0 0 0 0];
+                break;
+            elseif strcmp(a{u},'[RESERVOIRS]') && Units
+                fprintf(fid2,'[RESERVOIRS]');
+                nn=0;pp=1;
+                sections=[0 1 0 0 0 0 0 0 0 0];
+                break;
+            elseif strcmp(a{u},'[TANKS]') && Units
+                fprintf(fid2,'[TANKS]');
+                nn=0;pp=1;
+                sections=[0 0 1 0 0 0 0 0 0 0];
+                break;
+            elseif strcmp(a{u},'[PIPES]') && Units
+                fprintf(fid2,'[PIPES]');
+                nn=0;pp=1;
+                sections=[0 0 0 1 0 0 0 0 0 0];
+                break;
+            elseif strcmp(a{u},'[PUMPS]') && Units
+                fprintf(fid2,'[PUMPS]');
+                nn=0;pp=1;
+                sections=[0 0 0 0 1 0 0 0 0 0];
+                break;
+            elseif strcmp(a{u},'[VALVES]') && Units
+                fprintf(fid2,'[VALVES]');
+                nn=0;pp=1;
+                sections=[0 0 0 0 0 1 0 0 0 0];
+                break;
+            elseif strcmp(a{u},'[DEMANDS]') && ((Units || ~changes) && nheadl)
+                fprintf(fid2,'[DEMANDS]');
+                nn=0;pp=1;
+                sections=[0 0 0 0 0 0 1 0 0 0];
+                break;
+            elseif strcmp(a{u},'[CURVES]') && ((Units || ~changes) && nheadl)
+                fprintf(fid2,'[CURVES]');
+                nn=0;pp=1;ww=1;
+                sections=[0 0 0 0 0 0 0 1 0 0];
+                break;
+            elseif strcmp(a{u},'[CONTROLS]') && Units
+                fprintf(fid2,'[CONTROLS]');
+                nn=0;pp=1;
+                sections=[0 0 0 0 0 0 0 0 1 0];
+                break;
+            elseif strcmp(a{u},'[OPTIONS]')
+                fprintf(fid2,'[OPTIONS]');
+                sections=[0 0 0 0 0 0 0 0 0 1];nn=0;
+                break;
+            end
+            
+            if length(strfind(sections,1))==0
+                sect=0;
+            else
+                sect=strfind(sections,1);
+            end
+            
+            % section [JUNCTIONS]
+            if (sect==1) && (nn==0)
+                mm=1;
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if pp<length(char(nodes.JunctionsID))+1
+                        if strcmp(a{mm},nodes.JunctionsID{pp})
+                            pp=pp+1;
+                            fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                            if changes==1
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps{:});
+                            elseif changes==2
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps{:});
+                            end
+                        end
+                    else
+                        nn=1;
+                    end
+                end
+                break;
+                % section [RESERVOIRS]
+            elseif (sect==2) && (nn==0)
+                mm=1;
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if pp<length(char(nodes.ReservoirsID))+1
+                        if strcmp(a{mm},nodes.ReservoirsID{pp})
+                            pp=pp+1;
+                            fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                            if changes==1
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps{:});
+                            elseif changes==2
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps{:});
+                            end
+                        end
+                    else
+                        nn=1;
+                    end
+                end
+                break;
+                % section [TANKS]
+            elseif (sect==3) && (nn==0)
+                mm=1;
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if pp<length(char(nodes.TanksID))+1
+                        if strcmp(a{mm},nodes.TanksID{pp})
+                            pp=pp+1;
+                            fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                            if changes==1
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+3})*0.3048),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+4})*0.3048),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+5})*0.3048),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+6})*0.02831685),sps{:});
+                            elseif changes==2
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*3.281),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+3})*3.281),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+4})*3.281),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+5})*3.281),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+6})*35.3147),sps{:});
+                            end
+                        end
+                    else
+                        nn=1;
+                        fprintf(fid2,'%s%s',char(a{1}),sps{:});
+                    end
+                end
+                break;
+                % section [PIPES]
+            elseif (sect==4) && (nn==0)
+                mm=1;
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if pp<length(char(links.PipesID))+1
+                        if strcmp(a{mm},links.PipesID{pp})
+                            pp=pp+1;
+                            for mm=mm:(mm+2)
+                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                            end
+                            if changes==1
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*25.4),sps{:});
+                            elseif changes==2
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps{:});
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.03937007874),sps{:});
+                            end
+                            for mm=(mm+3):(mm+5)
+                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                            end
+                        end
+                    else
+                        nn=1;
+                        fprintf(fid2,'%s%s',char(a{1}),sps{:});
+                    end
+                end
+                break;
+            % section [PUMPS]
+            elseif (sect==5) && (nn==0)
+                mm=1; 
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if pp<length(char(links.PumpsID))+1
+                        if strcmp(a{mm},links.PumpsID{pp})
+                            pp=pp+1;
+                            for mm=mm:length(a(1:end-1))
+                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                            end
+                            power=regexp(c,'\w*POWER*\w','match');
+                            if strcmpi(upper(power),'POWER')
+                                if changes==1 
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.745699882507324),sps{:});
+                                elseif changes==2
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})/0.745699882507324),sps{:});
+                                end
+                            end
+                        end
+                    else
+                        nn=1;
+                        fprintf(fid2,'%s%s',char(a{1}),sps{:});
+                    end
+                end
+                break;
+                
+            % section [VALVES]
+            elseif (sect==6) && (nn==0)
+                mm=1;
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if pp<length(char(links.ValvesID))+1
+                        if strcmp(a{mm},links.ValvesID{pp})
+                            pp=pp+1;
+                            for mm=mm:(mm+2)
+                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                            end
+                            prv=regexp(c,'\w*PRV*\w','match');
+                            psv=regexp(c,'\w*PSV*\w','match');
+                            pbv=regexp(c,'\w*PBV*\w','match');
+                            fcv=regexp(c,'\w*FCV*\w','match');
+                            if changes==1
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*25.4),sps{:});
+                                fprintf(fid2,'%s%s',char(a{mm+2}),sps{:});
+                                if strcmpi(upper(prv),'PRV') || strcmpi(upper(psv),'PRV') || strcmpi(upper(pbv),'PRV')
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+3})*0.3048),sps{:});
+                                elseif strcmpi(upper(fcv),'FCV')
+                                    setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
+                                end
+                            elseif changes==2
+                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.03937007874),sps{:});
+                                fprintf(fid2,'%s%s',char(a{mm+2}),sps{:});
+                                if strcmpi(upper(prv),'PRV') || strcmpi(upper(psv),'PRV') || strcmpi(upper(pbv),'PRV')
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+3})/0.3048),sps{:});
+                                elseif strcmpi(upper(fcv),'FCV')
+                                    setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
+                                end
+                            end
+                            for mm=(mm+4):length(a)
+                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                            end
+                        end
+                    else
+                        nn=1;
+                        fprintf(fid2,'%s%s',char(a{1}),sps{:});
+                    end
+                end
+                break;
+                
+                % section [DEMANDS]
+            elseif (sect==7) && (nn==0)
+                mm=1;
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if pp<length(char(nodes.JunctionsID))+1
+                        if strcmp(a{mm},nodes.JunctionsID{pp})
+                            pp=pp+1;
+                            fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                            setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
+                            fprintf(fid2,'%s%s',char(a{mm+2}),sps{:});
+                        end
+                    else
+                        nn=1;
+                        fprintf(fid2,'%s%s',char(a{1}),sps{:});
+                    end
+                end
+                break;
+                % section [CURVES]
+            elseif (sect==8) && (nn==0)
+                mm=1;
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if pp<length(curves.Clines)+1 && ~isempty(char(a)) % PUMP % EFFICIENCY % VOLUME
+                        if ww<length(curves.CurvesID)+1
+                            if curves.typeCurve(ww)==0
+                                if strcmp(a{1},';PUMP:')
+                                    fprintf(fid2,c);pp=pp+1;break;
+                                end
+                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
+                                if changes==1
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps{:});
+                                elseif changes==2
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*3.281),sps{:});
+                                else
+                                    fprintf(fid2,'%s%s',char(a{mm+2}),sps{:});
+                                end
+                            elseif curves.typeCurve(ww)==1
+                                ee=regexp(c,'\w*EFFICIENCY*\w','match');
+                                if length(strcmp(ee,'EFFICIENCY'))
+                                    fprintf(fid2,c);pp=pp+1;break;
+                                end
+                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
+                                fprintf(fid2,'%s%s',char(a{mm+2}),sps{:});
+                            elseif curves.typeCurve(ww)==2
+                                gg=regexp(c,'\w*VOLUME*\w','match');
+                                if length(strcmp(gg,'VOLUME'))
+                                    fprintf(fid2,c);pp=pp+1;break;
+                                end
+                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                if changes==1
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*2.831685e-02),sps{:});
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps{:});
+                                else
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})),sps{:});
+                                end
+                            elseif curves.typeCurve(ww)==3 % HEADLOSS
+                                kk=regexp(c,'\w*HEADLOSS*\w','match');
+                                if length(strcmp(kk,'HEADLOSS'))
+                                    fprintf(fid2,c);pp=pp+1;break;
+                                end
+                                fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                if changes==1
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps{:});
+                                elseif changes==2
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps{:});
+                                else
+                                    fprintf(fid2,'%s%s',char(a{mm+1}),sps{:});
+                                end
+                                mm=mm+1;
+                                setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
+                            end
+                            ww=ww+1;
+                        end
+                        pp=pp+1;
+                    else
+                        if ~(ww<length(curves.CurvesID)+1), nn=1; end
+                        fprintf(fid2,'%s%s',char(a{1}),sps{:});
+                    end
+                end
+                break;
+                
+                % section [CONTROLS]
+            elseif (sect==9) && (nn==0)
+                mm=1;
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if pp<length(controls.controlsInfo)+1
+                        pp=pp+1;
+                        if length(a)>4
+                            if strcmp(upper(a{mm+6}),'BELOW') || strcmp(upper(a{mm+6}),'ABOVE')
+                                for mm=mm:(mm+6)
+                                    fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                end
+                                if changes==1
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps{:});
+                                elseif changes==2
+                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps{:});
+                                end
+                            else
+                                for mm=mm:length(a)
+                                    fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                                end
+                            end
+                        end
+                    else
+                        nn=1;
+                        fprintf(fid2,'%s%s',char(a{1}),sps{:});
+                    end
+                end
+                break;
+                
+                % section [OPTIONS]
+            elseif (sect==10) && (nn==0)
+                mm=1;
+                if mm < length(a)+1
+                    if isempty(a{mm})
+                        % skip
+                        mm=mm+1;
+                    end
+                    if strcmp(upper(a{mm}),'UNITS') && (Units || ~changes)
+                        fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                        if nheadl
+                            fprintf(fid2,'%s%s',char(newFlowUnits),sps{:});nn=1;
+                        else
+                            fprintf(fid2,'%s%s',char(previousFlowUnits),sps{:});
+                        end
+                    elseif strcmp(upper(a{mm}),'HEADLOSS')
+                        fprintf(fid2,'%s%s',char(a{mm}),sps{:});
+                        fprintf(fid2,'%s%s',char(headloss),sps{:});
+                        nn=1;
+                    else
+                        fprintf(fid2,c);
+                    end
+                end
+                break;
+                
+                
+            elseif isempty(a{u}) && nn==0
+            else
+                if isempty(a{u}) && nn==1
+                else
+                    fprintf(fid2,'%s%s',a{u},sps{:});
+                end
+            end
+            u=u+1;
+        end
+    end
+    fprintf(fid2,'\n');
+end
+fclose all;
+copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
+% obj=epanet('temp2.inp');
+% obj.saveInputFile([pwd,'\NETWORKS\',newinpname])
+end
+function setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
+if strcmp(previousFlowUnits,'GPM')
+    switch newFlowUnits %(GPM)
+        case 'CFS' 
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00222816399286988),sps{:});
+        case 'MGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00144),sps{:});
+        case 'IMGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00119905),sps{:});
+        case 'AFD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.004419191),sps{:});
+        case 'LPS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0630902),sps{:});
+        case 'LPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.785412),sps{:});
+        case 'MLD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.005450993),sps{:});
+        case 'CMH'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.2271247),sps{:});
+        case 'CMD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*5.450993),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+elseif strcmp(previousFlowUnits,'CFS')
+    switch newFlowUnits
+        case 'GPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*448.8312),sps{:});
+        case 'MGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.6463169),sps{:});
+        case 'IMGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.5381711),sps{:});
+        case 'AFD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.983471),sps{:});
+        case 'LPS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*28.31685),sps{:});
+        case 'LPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1899.011),sps{:});
+        case 'MLD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*2.446576),sps{:});
+        case 'CMH'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*101.9406),sps{:});
+        case 'CMD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*2446.576),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+elseif strcmp(previousFlowUnits,'MGD')
+    switch newFlowUnits
+        case 'CFS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.547229),sps{:});
+        case 'GPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*694.4445),sps{:});
+        case 'IMGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.8326738),sps{:});
+        case 'AFD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.068883),sps{:});
+        case 'LPS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*43.81264),sps{:});
+        case 'LPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*2628.758),sps{:});
+        case 'MLD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.785412),sps{:});
+        case 'CMH'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*157.7255),sps{:});
+        case 'CMD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3785.412),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+elseif strcmp(previousFlowUnits,'IMGD')
+    switch newFlowUnits
+        case 'CFS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.858145),sps{:});
+        case 'GPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*833.9936),sps{:});
+        case 'MGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.200951),sps{:});
+        case 'AFD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.685577),sps{:});
+        case 'LPS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*52.61681),sps{:});
+        case 'LPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3157.008),sps{:});
+        case 'MLD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*4.546092),sps{:});
+        case 'CMH'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*189.4205),sps{:});
+        case 'CMD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*4546.092),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+elseif strcmp(previousFlowUnits,'AFD')
+    switch newFlowUnits
+        case 'CFS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.5041667),sps{:});
+        case 'GPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*226.2857),sps{:});
+        case 'MGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3258514),sps{:});
+        case 'IMGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.271328),sps{:});
+        case 'LPS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*14.27641),sps{:});
+        case 'LPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*856.5846),sps{:});
+        case 'MLD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.233482),sps{:});
+        case 'CMH'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*51.39508),sps{:});
+        case 'CMD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1233.482),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+elseif strcmp(previousFlowUnits,'LPS')
+    switch newFlowUnits
+        case 'CFS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.03531466),sps{:});
+        case 'GPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*15.85032),sps{:});
+        case 'MGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.02282446),sps{:});
+        case 'IMGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.01900533),sps{:});
+        case 'AFD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.07004562),sps{:});
+        case 'LPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*60),sps{:});
+        case 'MLD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0864),sps{:});
+        case 'CMH'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.6),sps{:});
+        case 'CMD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*86.4),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+elseif strcmp(previousFlowUnits,'LPM')
+    switch newFlowUnits
+        case 'CFS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0005885777),sps{:});
+        case 'GPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.264172),sps{:});
+        case 'MGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0003804078),sps{:});
+        case 'IMGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0003167556),sps{:});
+        case 'AFD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0011674272),sps{:});
+        case 'LPS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.01666667),sps{:});
+        case 'MLD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00144),sps{:});
+        case 'CMH'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.06),sps{:});
+        case 'CMD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.44),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+elseif strcmp(previousFlowUnits,'MLD')
+    switch newFlowUnits
+        case 'CFS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.4087345),sps{:});
+        case 'GPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*183.4528),sps{:});
+        case 'MGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.264172),sps{:});
+        case 'IMGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.2199692),sps{:});
+        case 'AFD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.8107132),sps{:});
+        case 'LPS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*11.57407),sps{:});
+        case 'LPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*694.4445),sps{:});
+        case 'CMH'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*41.66667),sps{:});
+        case 'CMD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1000),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+elseif strcmp(previousFlowUnits,'CMH')
+    switch newFlowUnits
+        case 'CFS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.009809635),sps{:});
+        case 'GPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*4.402868),sps{:});
+        case 'MGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.006340129),sps{:});
+        case 'IMGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00527926),sps{:});
+        case 'AFD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.01945712),sps{:});
+        case 'LPS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.2777778),sps{:});
+        case 'LPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*16.66667),sps{:});
+        case 'MLD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.024),sps{:});
+        case 'CMD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*24),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+elseif strcmp(previousFlowUnits,'CMD')
+    switch newFlowUnits
+        case 'CFS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0004087345),sps{:});
+        case 'GPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.1834528),sps{:});
+        case 'MGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.000264172),sps{:});
+        case 'IMGD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0002199692),sps{:});
+        case 'AFD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0008107132),sps{:});
+        case 'LPS'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.01157407),sps{:});
+        case 'LPM'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.6944444),sps{:});
+        case 'MLD'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.001),sps{:});
+        case 'CMH'
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.04166667),sps{:});
+        otherwise
+            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps{:});
+    end
+end
+end
+function value=MsxTimeStep(msxname)
+% Open epanet input file
+[fid,message] = fopen(msxname,'rt');
+if fid < 0
+    disp(message)
+    return
+end
+
+sect=0;
+while 1
+    tline = fgetl(fid);
+    if ~ischar(tline),   break,   end
+    % Get first token in the line
+    tok = strtok(tline);
+    % Skip blank Clines and comments
+    if isempty(tok), continue, end
+    if (tok(1) == ';'), continue, end
+    if (tok(1) == '[')
+        % [OPTIONS] section
+        if strcmpi(tok(1:5),'[OPTI')
+            sect=1;
+            continue;
+            % [END]
+        elseif strcmpi(tok(1:4),'[REP')
+            break;
+        else
+            sect = 0;
+            continue;
+        end
+    end
+    
+    if sect == 0
+        continue;
+        
+        % Options
+    elseif sect == 1
+        atline={};
+        a = regexp(tline,'\s*','split');uu=1;
+        for tt=1:length(a)
+            if isempty(a{tt})
+                %skip
+            elseif (a{tt}==';')
+                %skip
+            else
+                atline{uu}=a{tt}; uu=uu+1;
+            end
+        end
+        if strcmp(upper(atline{1}),'TIMESTEP')
+            value=str2num(atline{2});
+        end
+    end
+    
 end
 end
