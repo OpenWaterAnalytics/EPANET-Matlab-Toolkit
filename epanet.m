@@ -1737,7 +1737,7 @@ classdef epanet <handle
             value={};
             if ~obj.getMsxParametersCount, value=0;return;end
             if ~length(obj.NodeTankIndex), value=0;return;end
-            for i=1:length(obj.getNodeTankCount)
+            for i=1:obj.getNodeTankCount
                 for j=1:obj.MsxParametersCount
                     [obj.errcode, value{obj.NodeTankIndex(i)}(j)] = MSXgetparameter(0,obj.NodeTankIndex(i),j);
                 end
@@ -2689,7 +2689,7 @@ for i=1:value.NodeCount
         if length(hh) && isempty(selectColorNode)
             colornode='r';
         elseif length(hh) && ~isempty(selectColorNode)
-            colornode= 'b';
+            colornode= 'c';
         end
         h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','c',...
             'MarkerFaceColor','c',...
