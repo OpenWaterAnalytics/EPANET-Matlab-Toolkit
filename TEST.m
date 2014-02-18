@@ -16,7 +16,14 @@ disp('Create EPANET Class')
 inpname='Net2_Rossman2000'; 
 d=epanet([inpname,'.inp']);
 
-figure;
+%%%%%%%%%%%%%%%%%%%-18/2/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tic;
+d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);toc
+tic;
+g=figure('Name','PlotB_without read file');
+axesid=d.plotB('axes',g,'nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);
+toc
+
 nodeSet1={'10','11','22'};
 nodeSet2={'21','23','31'};
 colorNodeSet1={'r','r','r'};
@@ -30,10 +37,11 @@ colorLinkSet2={'y','y','y'};
 d.plot('nodes','yes','links','yes','highlightnode',[nodeSet1 nodeSet2],'colornode',[colorNodeSet1 colorNodeSet2],...
     'highlightlink',[linkSet1 linkSet2],'colorlink',[colorLinkSet1 colorLinkSet2])
 
-figure;
+
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
-figure;
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%EPANET
 d.getControls
@@ -181,8 +189,6 @@ d.getVersion
 d.getComputedHydraulicTimeSeries % Also are included: obj.openHydraulicAnalysis;obj.initializeHydraulicAnalysis;obj.runHydraulicAnalysis;obj.nextHydraulicAnalysisStep;obj.closeHydraulicAnalysis;
 d.getComputedQualityTimeSeries% Also are included: obj.openQualityAnalysis;obj.initializeQualityAnalysis;obj.runQualityAnalysis;obj.stepQualityAnalysisTimeLeft;obj.closeQualityAnalysis;
   
-
-
 d.addPattern('NewPat1')
 d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]); 
 d.getPattern
@@ -568,32 +574,29 @@ clc;
 clear all;
 clear class;
 % Input Files
-inpname='Net1_Rossman2000';
+inpname='Net2_Rossman2000';
 d=epanet([inpname,'.inp']);
 
-% Simulate all times
+d.setQualityType('chem','mg/L');
+d.getQualityType
 d.solveCompleteHydraulics
 d.solveCompleteQuality
 
-d.setQualityType('chem','mg/L')
-d.getQualityType
-
 % Runs Quality Step-by-step
-d.solveCompleteHydraulics
 d.saveHydraulicFile([pwd,'\RESULTS\','hydraulics.hyd'])
 d.useHydraulicFile([pwd,'\RESULTS\','hydraulics.hyd'])
 d.saveHydraulicsOutputReportingFile
 d.openQualityAnalysis
 d.initializeQualityAnalysis
-tleft=1; P=[];T=[];Q=[];  
+tleft=1; P=[];T=[];Q=[];F=[];
 while (tleft>0)
     t=d.runQualityAnalysis;
     P=[P; d.getNodePressure];
+    F=[F; d.getLinkFlows];
     Q=[Q; d.getNodeActualQuality];
     T=[T; t];
-    %tstep=d.nextQualityAnalysisStep; %%% CHECK, DOES NOT SEEM TO CHANGE
-    %WITH SETTIMEQUALITYSTEP
-    tleft = d.stepQualityAnalysisTimeLeft;
+    tleft=d.nextQualityAnalysisStep;  
+% %     tleft = d.stepQualityAnalysisTimeLeft;
 end
 d.closeQualityAnalysis;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -602,7 +605,7 @@ clc;
 clear all;
 clear class;
 % Input Files
-inpname='Net1_Rossman2000';
+inpname='Net2_Rossman2000';
 d=epanet([inpname,'.inp']);
 
 % Simulate all times
