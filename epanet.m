@@ -387,8 +387,11 @@ classdef epanet <handle
         function errcode = epanetLoadLibrary(obj)
             [errcode] = ENLoadLibrary;
         end
-        function plot(obj,varargin)
-           ENplot(obj,varargin{:});
+        function [value] = plot(obj,varargin)
+           [value] = ENplot(obj,varargin{:});
+        end
+        function [value] = plotB(obj,varargin)
+           [value] = ENplotB(obj,varargin{:});
         end
         function value = getControls(obj)
             %Retrieves the parameters of all control statements
@@ -1156,8 +1159,9 @@ classdef epanet <handle
             obj.solveCompleteQuality
             obj.openQualityAnalysis
             obj.initializeQualityAnalysis
+            tleft=obj.nextQualityAnalysisStep;
             tleft=1;
-            totalsteps=obj.getTimeSimulationDuration/obj.getTimeQualityStep;
+            totalsteps=0;%obj.getTimeSimulationDuration%;/obj.getTimeQualityStep;
             initnodematrix=zeros(totalsteps, obj.getNodeCount);
             if size(varargin,2)==0
                 varargin={'time', 'quality', 'mass'};
@@ -1172,9 +1176,6 @@ classdef epanet <handle
                 value.MassFlowRate=initnodematrix;
             end
             if find(strcmpi(varargin,'demand'))
-                value.Demand=initnodematrix;
-            end
-            if find(strcmpi(varargin,'qualitySensingNodes'))
                 value.Demand=initnodematrix;
             end
             k=1;t=1;
@@ -1195,7 +1196,7 @@ classdef epanet <handle
                 if find(strcmpi(varargin,'qualitySensingNodes'))
                     value.Quality(k,:)=obj.getNodeActualQualitySensingNodes(varargin{2});
                 end
-                tleft = obj.stepQualityAnalysisTimeLeft;
+                tleft = obj.nextQualityAnalysisStep;
                 k=k+1;
                 if t==obj.getTimeSimulationDuration
                     t=obj.getTimeSimulationDuration+1;
@@ -1735,7 +1736,7 @@ classdef epanet <handle
             value={};
             if ~obj.getMsxParametersCount, value=0;return;end
             if ~length(obj.NodeTankIndex), value=0;return;end
-            for i=1:length(obj.getNodeTankCount)
+            for i=1:length(obj.NodeTankIndex)
                 for j=1:obj.MsxParametersCount
                     [obj.errcode, value{obj.NodeTankIndex(i)}(j)] = MSXgetparameter(0,obj.NodeTankIndex(i),j);
                 end
@@ -1919,8 +1920,14 @@ classdef epanet <handle
             timeSmle=obj.getTimeSimulationDuration;%bug at time
             while(tleft>0 && obj.errcode==0 && timeSmle~=t)
                 [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                for j=uu
-                    value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, ss, j);%node code0
+                if t<3600 || t==3600
+                    for j=uu
+                        value.Quality{j,i}(k,:)=obj.getMsxNodeInitqualValue{ss}(j);
+                    end
+                else
+                    for j=uu
+                        value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, ss, j);%node code0
+                    end
                 end
                 value.Time(k,:)=t;
                 k=k+1;
@@ -1950,9 +1957,16 @@ classdef epanet <handle
             k=1;tleft=1;i=1;
             while(tleft>0 && obj.errcode==0)
                 [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft();
-                for j=uu
-                    value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, ss, j); 
-                end
+                if t<3600 || t==3600
+                    for j=uu
+                        value.Quality{j,i}(k,:)=obj.getMsxLinkInitqualValue{ss}(j);
+                    end
+                else
+                    for j=uu
+                        value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, ss, j); 
+                    end
+                end                
+
                 value.Time(k,:)=t;
                 k=k+1;
             end
@@ -2148,7 +2162,11 @@ if errcode
 end
 end
 function [errcode, value] = ENgetnodevalue(index, paramcode)
-[errcode, value]=calllib('epanet2','ENgetnodevalue',index, paramcode, 0);
+value=single(0);
+%p=libpointer('singlePtr',value);
+index=int32(index);
+paramcode=int32(paramcode);
+[errcode, value]=calllib('epanet2','ENgetnodevalue',index, paramcode,value);
 if errcode==240
     value=NaN;
 end
@@ -2325,13 +2343,13 @@ if ~libisloaded('epanet2')
 end
 end
 function [errcode, tstep] = ENnextH()
-[errcode,tstep]=calllib('epanet2','ENnextH',0);
+[errcode,tstep]=calllib('epanet2','ENnextH',int32(0));
 if errcode
     ENerror(errcode);
 end
 end
 function [errcode, tstep] = ENnextQ()
-[errcode,tstep]=calllib('epanet2','ENnextQ',0);
+[errcode,tstep]=calllib('epanet2','ENnextQ',int32(0));
 if errcode
     ENerror(errcode);
 end
@@ -2339,17 +2357,17 @@ tstep = double(tstep);
 end
 function [errcode] = ENopen(inpname,repname,binname,varargin)
 errcode=calllib('epanet2','ENopen',inpname,repname,binname);
-% while errcode~=0
-%    try
+while errcode~=0
+   try
         errcode=calllib('epanet2','ENopen',inpname,repname,binname);
         if errcode==302
             unloadlibrary('epanet2');
             ENLoadLibrary;
         end
-      pause(0.5);     
-    % catch err
- %   end
-%end
+%       pause(0.5);     
+    catch err
+   end
+end
 end
 function [errcode] = ENopenH()
 [errcode]=calllib('epanet2','ENopenH');
@@ -2376,18 +2394,20 @@ if errcode
 end
 end
 function [errcode, t] = ENrunH()
-[errcode,t]=calllib('epanet2','ENrunH',0);
+[errcode,t]=calllib('epanet2','ENrunH',int32(0));
 t = double(t);
 if errcode
     ENerror(errcode);
 end
 end
 function [errcode, t] = ENrunQ()
-[errcode,t]=calllib('epanet2','ENrunQ',0);
+t=int32(0);
+%p=libpointer('int32Ptr',t);
+[errcode,t]=calllib('epanet2','ENrunQ',t);
 if errcode
     ENerror(errcode);
 end
-t = double(t);
+% t = double(t);
 end
 function [errcode] = ENsaveH()
 [errcode]=calllib('epanet2','ENsaveH');
@@ -2487,6 +2507,7 @@ tleft=int32(0);
 if errcode
     ENerror(errcode);
 end
+tleft=double(tleft);
 end
 function [errcode] = ENusehydfile(hydfname)
 [errcode]=calllib('epanet2','ENusehydfile',hydfname);
@@ -2494,9 +2515,10 @@ if errcode
     ENerror(errcode);
 end
 end
-function ENplot(obj,varargin)
+function [axesid] = ENplot(obj,varargin)
 
 % Initiality
+axesid=0;
 highlightnode=0;
 highlightlink=0;
 highlightnodeindex=[];
@@ -2532,10 +2554,17 @@ for i=1:(nargin/2)
             selectColorNode=varargin{2*i};
         case 'colorlink' % color
             selectColorLink=varargin{2*i};
+        case 'axes' % color
+            axesid=axes('Parent',varargin{2*i});
         otherwise
             warning('Invalid property found.');
             return
     end
+end
+
+if axesid==0
+   g=figure;
+   axesid=axes('Parent',g);
 end
 
 if cellfun('isempty',selectColorNode)==1
@@ -2608,10 +2637,10 @@ for i=1:value.LinkCount
         end
         h(:,5)=plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor','m',...
             'MarkerFaceColor','m',...
-            'MarkerSize',5);
+            'MarkerSize',5,'Parent',axesid);
         plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor',colornode,...
             'MarkerFaceColor',colornode,...
-            'MarkerSize',5);
+            'MarkerSize',5,'Parent',axesid);
         
         legendString{5} = char('Pumps');
     end
@@ -2623,18 +2652,18 @@ for i=1:value.LinkCount
             colornode = 'r';
         end
         h(:,6)=plot((x1+x2)/2,(y1+y2)/2,'k*','LineWidth',2,'MarkerEdgeColor',colornode,...
-            'MarkerFaceColor',colornode,'MarkerSize',7);
+            'MarkerFaceColor',colornode,'MarkerSize',7,'Parent',axesid);
         legendString{6} = char('Valves');
     end
     
     % Show Link id
     if (strcmp(lower(Link),'yes') && ~length(hh))
-        text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize);
+        text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize,'Parent',axesid);
     end
     
     if length(hh) && isempty(selectColorLink)
-        line([x1,x2],[y1,y2],'LineWidth',2,'Color','r');
-        text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize);
+        line([x1,x2],[y1,y2],'LineWidth',2,'Color','r','Parent',axesid);
+        text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize,'Parent',axesid);
     elseif length(hh) && ~isempty(selectColorLink)
         try 
             tt=length(selectColorLink{hh});
@@ -2648,14 +2677,14 @@ for i=1:value.LinkCount
                 nm=selectColorLink(hh);
             end
             if iscell(nm{1}) 
-                line([x1 NodeCoordinates{3}{i} x2],[y1 NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1}{1});
+                line([x1 NodeCoordinates{3}{i} x2],[y1 NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1}{1},'Parent',axesid);
             else
-                line([x1 NodeCoordinates{3}{i} x2],[y1 NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1});
+                line([x1 NodeCoordinates{3}{i} x2],[y1 NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1},'Parent',axesid);
             end
         else
             line([x1 NodeCoordinates{3}{i} x2],[y1 NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',char(selectColorLink(hh)));
         end
-        text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize);
+        text((x1+x2)/2,(y1+y2)/2,value.LinksAll(i),'Fontsize',fontsize,'Parent',axesid);
     end
     
     hold on
@@ -2669,7 +2698,7 @@ for i=1:value.NodeCount
     hh=strfind(highlightnodeindex,i);
     h(:,1)=plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','b',...
         'MarkerFaceColor','b',...
-        'MarkerSize',5);
+        'MarkerSize',5,'Parent',axesid);
     legendString{1}= char('Junctions');
     
     % Plot Reservoirs
@@ -2680,10 +2709,10 @@ for i=1:value.NodeCount
         end
         h(:,2)=plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','g',...
             'MarkerFaceColor','g',...
-            'MarkerSize',13);
+            'MarkerSize',13,'Parent',axesid);
         plot(x,y,'s','LineWidth',2,'MarkerEdgeColor', colornode,...
             'MarkerFaceColor', colornode,...
-            'MarkerSize',13);
+            'MarkerSize',13,'Parent',axesid);
         legendString{2} = char('Reservoirs');
     end
     % Plot Tanks
@@ -2696,25 +2725,25 @@ for i=1:value.NodeCount
         end
         h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','c',...
             'MarkerFaceColor','c',...
-            'MarkerSize',16);
+            'MarkerSize',16,'Parent',axesid);
         
         plot(x,y,'p','LineWidth',2,'MarkerEdgeColor',colornode,...
             'MarkerFaceColor',colornode,...
-            'MarkerSize',16);
+            'MarkerSize',16,'Parent',axesid);
         
         legendString{3} = char('Tanks');
     end
     
     % Show Node id
     if (strcmp(lower(Node),'yes') && ~length(hh))
-        text(x,y,value.NodesAll(i),'Fontsize',fontsize);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+        text(x,y,value.NodesAll(i),'Fontsize',fontsize,'Parent',axesid);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
     end
     
     if length(hh) && isempty(selectColorNode)
         plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','r',...
             'MarkerFaceColor','r',...
-            'MarkerSize',10)
-        text(x,y,value.NodesAll(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+            'MarkerSize',10,'Parent',axesid);
+        text(x,y,value.NodesAll(i),'Fontsize',fontsize,'Parent',axesid);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
     elseif length(hh) && ~isempty(selectColorNode)
         try 
             tt=length(selectColorNode{hh});
@@ -2728,15 +2757,15 @@ for i=1:value.NodeCount
                 nm=selectColorNode(hh);
             end
             if iscell(nm{1}) 
-                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1}{1},'MarkerFaceColor',nm{1}{1},'MarkerSize',10)
+                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1}{1},'MarkerFaceColor',nm{1}{1},'MarkerSize',10,'Parent',axesid);
             else
-                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1},'MarkerFaceColor',nm{1},'MarkerSize',10)
+                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1},'MarkerFaceColor',nm{1},'MarkerSize',10,'Parent',axesid);
             end
        else
         plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',char(selectColorNode(hh)),'MarkerFaceColor',char(selectColorNode(hh)),...
-            'MarkerSize',10)
+            'MarkerSize',10,'Parent',axesid);
        end
-        text(x,y,value.NodesAll(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+        text(x,y,value.NodesAll(i),'Fontsize',fontsize,'Parent',axesid);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
     end
     hold on
 end
@@ -5029,4 +5058,285 @@ while 1
     end
     
 end
+end
+function [axesid] = ENplotB(obj,varargin)
+% Initiality
+highlightnode=0;
+highlightlink=0;
+highlightnodeindex=[];
+highlightlinkindex=[];
+Node=char('no');
+Link=char('no');
+fontsize=10;
+selectColorNode={''};
+selectColorLink={''};
+axesid=0;
+
+for i=1:(nargin/2)
+    argument =lower(varargin{2*(i-1)+1});
+    switch argument
+        case 'nodes' % Nodes
+            if ~strcmp(lower(varargin{2*i}),'yes') && ~strcmp(lower(varargin{2*i}),'no')
+                warning('Invalid argument.');
+                return
+            end
+            Node=varargin{2*i};
+        case 'links' % Links
+            if ~strcmp(lower(varargin{2*i}),'yes') && ~strcmp(lower(varargin{2*i}),'no')
+                warning('Invalid argument.');
+                return
+            end
+            Link=varargin{2*i};
+        case 'highlightnode' % Highlight Node
+            highlightnode=varargin{2*i};
+        case 'highlightlink' % Highlight Link
+            highlightlink=varargin{2*i};
+        case 'fontsize' % font size
+            fontsize=varargin{2*i};
+        case 'colornode' % color
+            selectColorNode=varargin{2*i};
+        case 'colorlink' % color
+            selectColorLink=varargin{2*i};
+        case 'axes' % color
+            axesid=axes('Parent',varargin{2*i});
+        otherwise
+            warning('Invalid property founobj.');
+            return
+    end
+end
+
+if axesid==0
+   g=figure;
+   axesid=axes('Parent',g);
+end
+
+if cellfun('isempty',selectColorNode)==1
+    init={'r'};
+    for i=1:length(highlightnode)
+        selectColorNode=[init selectColorNode];
+    end
+end
+if cellfun('isempty',selectColorLink)==1
+    init={'r'};
+    for i=1:length(highlightlink)
+        selectColorLink=[init selectColorLink];
+    end
+end
+% Get node names and x, y coordiantes
+if isa(highlightnode,'cell')
+    for i=1:length(highlightnode)
+        n = strcmp(obj.NodeNameID,highlightnode{i});
+        if sum(n)==0
+            warning('Undefined node with id "%s" in function call therefore the index is zero.', char(highlightnode{i}));
+        else
+            highlightnodeindex(i) = strfind(n,1);
+        end
+    end
+end
+
+if isa(highlightlink,'cell')
+    for i=1:length(highlightlink)
+        n = strcmp(obj.LinkNameID,highlightlink{i});
+        if sum(n)==0
+            warning('Undefined link with id "%s" in function call therefore the index is zero.', char(highlightlink{i}));
+        else
+            highlightlinkindex(i) = strfind(n,1);
+        end
+    end
+end
+
+for i=1:obj.LinkCount
+    FromNode=strfind(strcmp(obj.NodesConnectingLinksID(i,1),obj.NodeNameID),1);
+    ToNode=strfind(strcmp(obj.NodesConnectingLinksID(i,2),obj.NodeNameID),1);
+    
+    if FromNode
+        x1 = double(obj.NodeCoordinates{1}(FromNode));
+        y1 = double(obj.NodeCoordinates{2}(FromNode));
+    end
+    if ToNode
+        x2 = double(obj.NodeCoordinates{1}(ToNode));
+        y2 = double(obj.NodeCoordinates{2}(ToNode));
+    end
+    
+    hh=strfind(highlightlinkindex,i);
+    
+    h(:,4)=line([x1 obj.NodeCoordinates{3}{i} x2],[y1 obj.NodeCoordinates{4}{i} y2],'LineWidth',1,'Parent',axesid);
+    
+    legendString{4} = char('Pipes');
+    % Plot Pumps
+    if sum(strfind(obj.LinkPumpIndex,i))
+        colornode = 'm';
+        if length(hh) && isempty(selectColorLink)
+            colornode = 'r';
+        end
+        h(:,5)=plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor','m',...
+            'MarkerFaceColor','m',...
+            'MarkerSize',5,'Parent',axesid);
+        plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor',colornode,...
+            'MarkerFaceColor',colornode,...
+            'MarkerSize',5,'Parent',axesid);
+        
+        legendString{5} = char('Pumps');
+    end
+    
+    % Plot Valves
+    if sum(strfind(obj.LinkValveIndex,i))
+        colornode = 'k';
+        if length(hh) && isempty(selectColorLink)
+            colornode = 'r';
+        end
+        h(:,6)=plot((x1+x2)/2,(y1+y2)/2,'k*','LineWidth',2,'MarkerEdgeColor',colornode,...
+            'MarkerFaceColor',colornode,'MarkerSize',7,'Parent',axesid);
+        legendString{6} = char('Valves');
+    end
+    
+    % Show Link id
+    if (strcmp(lower(Link),'yes') && ~length(hh))
+        text((x1+x2)/2,(y1+y2)/2,obj.LinkNameID(i),'Fontsize',fontsize);
+    end
+    
+    if length(hh) && isempty(selectColorLink)
+        line([x1,x2],[y1,y2],'LineWidth',2,'Color','r','Parent',axesid);
+        text((x1+x2)/2,(y1+y2)/2,obj.LinkNameID(i),'Fontsize',fontsize);
+    elseif length(hh) && ~isempty(selectColorLink)
+        try 
+            tt=length(selectColorLink{hh});
+        catch err
+            tt=2;
+        end
+       if tt>1
+            if length(selectColorLink(hh))==1
+                nm{1}=selectColorLink(hh);
+            else
+                nm=selectColorLink(hh);
+            end
+            if iscell(nm{1}) 
+                line([x1 obj.NodeCoordinates{3}{i} x2],[y1 obj.NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1}{1},'Parent',axesid);
+            else
+                line([x1 obj.NodeCoordinates{3}{i} x2],[y1 obj.NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1},'Parent',axesid);
+            end
+        else
+            line([x1 obj.NodeCoordinates{3}{i} x2],[y1 obj.NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',char(selectColorLink(hh)),'Parent',axesid);
+        end
+%         text((x1+x2)/2,(y1+y2)/2,obj.LinkNameID(i),'Fontsize',fontsize);
+    end
+    
+    hold on
+end
+
+% Coordinates for node FROM
+for i=1:obj.NodeCount
+    [x] = double(obj.NodeCoordinates{1}(i));
+    [y] = double(obj.NodeCoordinates{2}(i));
+    
+    hh=strfind(highlightnodeindex,i);
+    h(:,1)=plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','b',...
+        'MarkerFaceColor','b',...
+        'MarkerSize',5,'Parent',axesid);
+    legendString{1}= char('Junctions');
+    
+    % Plot Reservoirs
+    if sum(strfind(obj.NodeReservoirIndex,i))
+        colornode = 'g';
+        if length(hh) && isempty(selectColorNode)
+            colornode = 'r';
+        end
+        h(:,2)=plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','g',...
+            'MarkerFaceColor','g',...
+            'MarkerSize',13,'Parent',axesid);
+        plot(x,y,'s','LineWidth',2,'MarkerEdgeColor', colornode,...
+            'MarkerFaceColor', colornode,...
+            'MarkerSize',13,'Parent',axesid);
+        legendString{2} = char('Reservoirs');
+    end
+    % Plot Tanks
+    if sum(strfind(obj.NodeTankIndex,i))
+        colornode='c';
+        if length(hh) && isempty(selectColorNode)
+            colornode='r';
+        elseif length(hh) && ~isempty(selectColorNode)
+            colornode= 'c';
+        end
+        h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','c',...
+            'MarkerFaceColor','c',...
+            'MarkerSize',16,'Parent',axesid);
+        
+        plot(x,y,'p','LineWidth',2,'MarkerEdgeColor',colornode,...
+            'MarkerFaceColor',colornode,...
+            'MarkerSize',16,'Parent',axesid);
+        
+        legendString{3} = char('Tanks');
+    end
+    
+    % Show Node id
+    if (strcmp(lower(Node),'yes') && ~length(hh))
+        text(x,y,obj.NodeNameID(i),'Fontsize',fontsize);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+    end
+    
+    if length(hh) && isempty(selectColorNode)
+        plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','r',...
+            'MarkerFaceColor','r',...
+            'MarkerSize',10,'Parent',axesid);
+        text(x,y,obj.NodeNameID(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+    elseif length(hh) && ~isempty(selectColorNode)
+        try 
+            tt=length(selectColorNode{hh});
+        catch err
+            tt=2;
+        end
+       if tt>1
+            if length(selectColorNode(hh))==1
+                nm{1}=selectColorNode(hh);
+            else
+                nm=selectColorNode(hh);
+            end
+            if iscell(nm{1}) 
+                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1}{1},'MarkerFaceColor',nm{1}{1},'MarkerSize',10,'Parent',axesid);
+            else
+                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1},'MarkerFaceColor',nm{1},'MarkerSize',10,'Parent',axesid);
+            end
+       else
+        plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',char(selectColorNode(hh)),'MarkerFaceColor',char(selectColorNode(hh)),...
+            'MarkerSize',10,'Parent',axesid);
+       end
+%         text(x,y,obj.NodeNameID(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+    end
+    hold on
+end
+
+% Legend Plots
+u=1;
+for i=1:length(h)
+    if h(i)~=0
+        String{u} = legendString{i};
+        hh(:,u) = h(i);
+        u=u+1;
+    end
+end
+
+legend(hh,String);
+% Axis OFF and se Background
+[xmax,~]=max(obj.NodeCoordinates{1});
+[xmin,~]=min(obj.NodeCoordinates{1});
+[ymax,~]=max(obj.NodeCoordinates{2});
+[ymin,~]=min(obj.NodeCoordinates{2});
+
+%     xmax=yxmax(1); ymax=yxmax(2); xmin=yxmin(1); ymin=yxmin(2);
+if ~isnan(ymax)
+    if ymax==ymin
+        xlim([xmin-((xmax-xmin)*.1),xmax+((xmax-xmin)*.1)]);
+        ylim([ymin-.1,ymax+.1]);
+    elseif xmax==xmin
+        xlim([xmin-.1,xmax+.1]);
+        ylim([ymin-(ymax-ymin)*.1,ymax+(ymax-ymin)*.1]);
+    else
+        xlim([xmin-((xmax-xmin)*.1),xmax+((xmax-xmin)*.1)]);
+        ylim([ymin-(ymax-ymin)*.1,ymax+(ymax-ymin)*.1]);
+    end
+else
+    warning('Undefined coordinates.');
+end
+axis off
+whitebg('w');
+set(axesid,'position',[0 0 1 1],'units','normalized');
 end
