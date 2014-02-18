@@ -13,10 +13,6 @@ clear class;
 disp('Create EPANET Class')
 % inpname='Net1_Rossman2000'; 
 % inpname='ky11_Jolly2013';  
-inpname='Net2_Rossman2000';  
-d=epanet([inpname,'.inp']);
-% d.msx([inpname,'.msx']);
-
 inpname='Net2_Rossman2000'; 
 d=epanet([inpname,'.inp']);
 
