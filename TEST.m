@@ -17,6 +17,24 @@ inpname='Net2_Rossman2000';
 d=epanet([inpname,'.inp']);
 % d.msx([inpname,'.msx']);
 
+inpname='Net2_Rossman2000'; 
+d=epanet([inpname,'.inp']);
+
+figure;
+nodeSet1={'10','11','22'};
+nodeSet2={'21','23','31'};
+colorNodeSet1={'r','r','r'};
+colorNodeSet2={'g','g','g'};
+
+linkSet1={'1','2','3'};
+linkSet2={'6','7','8'};
+colorLinkSet1={'k','k','k'};
+colorLinkSet2={'y','y','y'};
+
+d.plot('nodes','yes','links','yes','highlightnode',[nodeSet1 nodeSet2],'colornode',[colorNodeSet1 colorNodeSet2],...
+    'highlightlink',[linkSet1 linkSet2],'colorlink',[colorLinkSet1 colorLinkSet2])
+
+
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
 figure;
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);
