@@ -496,7 +496,6 @@ classdef epanet <handle
                 value=1:obj.getLinkCount;
             elseif isa(varargin{1},'cell')
                 k=1;
-                value{length(varargin{1})}=[];
                 for j=1:length(varargin{1})
                     [obj.errcode, value(k)] = ENgetlinkindex(varargin{1}{j});
                     k=k+1;
@@ -688,7 +687,6 @@ classdef epanet <handle
                 value=1:obj.getNodeCount;
             elseif isa(varargin{1},'cell')
                 k=1;
-                value(length(varargin{1}))=[];
                 for j=1:length(varargin{1})
                     [obj.errcode, value(k)] = ENgetnodeindex(varargin{1}{j});
                     k=k+1;
@@ -1737,7 +1735,7 @@ classdef epanet <handle
             value={};
             if ~obj.getMsxParametersCount, value=0;return;end
             if ~length(obj.NodeTankIndex), value=0;return;end
-            for i=1:obj.getNodeTankCount
+            for i=1:length(obj.getNodeTankCount)
                 for j=1:obj.MsxParametersCount
                     [obj.errcode, value{obj.NodeTankIndex(i)}(j)] = MSXgetparameter(0,obj.NodeTankIndex(i),j);
                 end
@@ -2305,24 +2303,25 @@ end
 end
 function ENMatlabCleanup()
 %     if nargin == 1
-ENDLLNAME='epanet2';
+% ENDLLNAME='epanet2';
 %     end;
 % Load library
-if libisloaded(ENDLLNAME)
-    unloadlibrary(ENDLLNAME);
+if libisloaded('epanet2')
+    unloadlibrary('epanet2');
 else
-    errstring =['Library ', ENDLLNAME, '.dll was not loaded'];
+    errstring =['Library ', 'epanet2', '.dll was not loaded'];
     disp(errstring);
 end;
 end
 function [errcode] = ENLoadLibrary()
-try
-    unloadlibrary('epanet2')
-catch err
-end
+% try
+%     unloadlibrary('epanet2')
+% catch err
+% end
 errcode=0;
 if ~libisloaded('epanet2')
     loadlibrary('epanet2','epanet2.h')
+     pause(0.1);  
 end
 end
 function [errcode, tstep] = ENnextH()
@@ -2340,16 +2339,17 @@ tstep = double(tstep);
 end
 function [errcode] = ENopen(inpname,repname,binname,varargin)
 errcode=calllib('epanet2','ENopen',inpname,repname,binname);
-while errcode~=0
-    try
+% while errcode~=0
+%    try
         errcode=calllib('epanet2','ENopen',inpname,repname,binname);
         if errcode==302
             unloadlibrary('epanet2');
             ENLoadLibrary;
         end
-    catch err
-    end
-end
+      pause(0.5);     
+    % catch err
+ %   end
+%end
 end
 function [errcode] = ENopenH()
 [errcode]=calllib('epanet2','ENopenH');
@@ -2377,6 +2377,7 @@ end
 end
 function [errcode, t] = ENrunH()
 [errcode,t]=calllib('epanet2','ENrunH',0);
+t = double(t);
 if errcode
     ENerror(errcode);
 end
@@ -2461,6 +2462,8 @@ if errcode
 end
 end
 function [errcode] = ENsettimeparam(paramcode, timevalue)
+paramcode=int32(paramcode);
+timevalue=int32(timevalue);
 [errcode]=calllib('epanet2','ENsettimeparam',paramcode,timevalue);
 if errcode
     ENerror(errcode);
@@ -2689,7 +2692,7 @@ for i=1:value.NodeCount
         if length(hh) && isempty(selectColorNode)
             colornode='r';
         elseif length(hh) && ~isempty(selectColorNode)
-            colornode= 'c';
+            colornode= 'b';
         end
         h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','c',...
             'MarkerFaceColor','c',...
@@ -3112,9 +3115,11 @@ if errcode
 end
 end
 function [errcode, t, tleft] = MSXstep()
-t=0;
-tleft=0;
+t=int32(0);
+tleft=int32(0);
 [errcode,t,tleft]=calllib('epanetmsx','MSXstep',t,tleft);
+t = double(t);
+tleft = double(tleft);
 if errcode
     MSXerror(errcode);
 end
