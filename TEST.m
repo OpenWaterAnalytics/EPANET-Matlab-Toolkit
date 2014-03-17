@@ -820,7 +820,7 @@ d.getNodesInfo
 d.getControlsInfo
 d.getFlowUnitsHeadlossFormula
 
-% SET Flow Units % Valves, - problem?!
+% SET Flow Units % Valves, - EDIT (version 2)
 d.setFlowUnitsLPM('Net1_LPM.inp') % Net1.. GPM to LPM
 d=epanet(['Net1_LPM','.inp']);
 d.getFlowUnitsHeadlossFormula
@@ -846,14 +846,8 @@ d.getFlowUnitsHeadlossFormula
 % d.setHeadlossHW('Net1_HW.inp')
 
 %Delete s files 
-a='abcdefghijklmnopqrstuvwxyz';
-for i=1:length(a)
-    s=sprintf('s%s*',a(i));
-    delete(s)
-end
-for i=1:9
-    s=sprintf('s%.f*',i);
-    delete(s)
-end
+sfilesexist = dir('s*'); 
+if (~isempty(sfilesexist)), delete s*, end;
+
 rmpath(genpath(pwd));
 % close all
