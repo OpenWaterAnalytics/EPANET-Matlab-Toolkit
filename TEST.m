@@ -16,7 +16,22 @@ disp('Create EPANET Class')
 inpname='Net2_Rossman2000'; 
 d=epanet([inpname,'.inp']);
 
+%%%%%%%%%%%%%%%%%%%-9/5/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+d.plot;
+ok=0;
+if exist('Net2_AddPipe.inp')
+    delete([pwd,'\NETWORKS\','Net2_AddPipe.inp']);ok=1;
+end
+errcode=d.addPipe('Net2_AddPipe.inp','pp1','32','10'); 
+if errcode==0
+    d=epanet(['Net2_AddPipe','.inp']);
+    d.plot('links','yes','highlightlink',{'pp1'},'fontsize',8);
+    d.removeLinkID('Net2_RemovePipe.inp','pp1');
+    d.plot;
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%-18/2/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+d=epanet([inpname,'.inp']);
 tic;
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);toc
 tic;
@@ -41,7 +56,7 @@ d.plot('nodes','yes','links','yes','highlightnode',[nodeSet1 nodeSet2],'colornod
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%EPANET
 d.getControls
