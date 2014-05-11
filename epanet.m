@@ -1574,6 +1574,20 @@ classdef epanet <handle
         function setHeadlossCM(obj,newinpname)
             Options(obj,newinpname,'','C-M')  %Chezy-Manning
         end
+        %%%%%%%%%%
+        function [errcode]=addPipe(obj,newinpname,newLink,fromNode,toNode)
+            [errcode]=addLink(obj,1,newinpname,newLink,fromNode,toNode);
+        end
+        function [errcode]=removeLinkID(obj,newinpname,LinkID)
+            errcode=rmLink(obj,newinpname,LinkID);
+        end
+        function removeControlLinkID(obj,newinpname,ID)
+            rmControl(obj,newinpname,1,ID);
+        end
+        function removeControlNodeID(obj,newinpname,ID)
+            rmControl(obj,newinpname,0,ID);
+        end
+        %%%%%%%%%%
         function msx(obj,msxname)
             [obj] = MSXMatlabSetup(obj,msxname);
         end
@@ -5339,4 +5353,446 @@ end
 axis off
 whitebg('w');
 set(axesid,'position',[0 0 1 1],'units','normalized');
+end
+function errcode=addLink(obj,typecode,newinpname,newLink,fromNode,toNode,curveID,varargin)
+% Link type codes consist of the following constants: CVPIPE   0   Pipe
+% with Check Valve PIPE     1   Pipe PUMP     2   Pump PRV      3
+% Pressure Reducing Valve PSV      4   Pressure Sustaining Valve PBV
+% 5   Pressure Breaker Valve FCV      6   Flow Control Valve TCV      7
+% Throttle Control Valve GPV      8   General Purpose Valve
+
+% Initial PIPE plength ,    value for length of new pipe pdiameter,
+% value for diameter of new pipe proughness,  value for roughness of new pipe
+v=obj.getFlowUnitsHeadlossFormula;
+if v.UScustomary==1
+    plength=1000; %(ft)
+    pdiameter=12; %(in)
+    vdiameter=12; %valves
+else %SI metric
+    plength=304.8; %(m)
+    pdiameter=304.8; %(mm)
+    vdiameter=304.8; %valves
+end
+proughness=100;
+vsetting=100; %valves
+% Check if id new already exists
+Nodes = obj.getNodesInfo;
+errcode=0;
+if length(Nodes.NodesAll)==0
+    errcode=-1;
+    return
+end
+existsFrom=0;existsTo=0;
+for i=1:length(Nodes.NodesAll) 
+    existsFrom(i) = strcmp(fromNode,char(Nodes.NodesAll{i}));
+    existsTo(i) = strcmp(toNode,char(Nodes.NodesAll{i}));
+end
+if sum(existsFrom)~=1
+    s = sprintf('There is no node "%s" in the network.',fromNode);
+    warning(s);errcode=-1;
+    return
+elseif sum(existsTo)~=1
+    s = sprintf('There is no node "%s" in the network.',toNode);
+    warning(s);errcode=-1;
+    return
+end
+A = [0 1 2 3 4 5 6 7 8];
+code = strfind(A,typecode);
+if length(code)==0
+    warning('There is no such typecode(0-8)');
+    errcode=-1;
+    return
+else
+    if typecode==0 type_valv = 'CVPIPE';  end
+    if typecode==3 type_valv = 'PRV';     end
+    if typecode==4 type_valv = 'PSV';     end
+    if typecode==5 type_valv = 'PBV';     end
+    if typecode==6 type_valv = 'FCV';     end
+    if typecode==7 type_valv = 'TCV';     end
+    if typecode==8 type_valv = 'GPV';     end
+    if typecode~=1 && typecode~=2
+        typecode=3;
+    end
+end
+% Valve illegally connected to a tank or reservoir
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if typecode==3
+    i=1;ifFromReservoir=0;ifToReservoir=0;
+    while i<length(Nodes.ReservoirsID)+1
+        ifFromReservoir(i) = strcmp(fromNode,char(Nodes.ReservoirsID{i}));
+        ifToReservoir(i) = strcmp(toNode,char(Nodes.ReservoirsID{i}));
+        i=i+1;
+    end
+    i=1;ifFromTank=0;ifToTank=0;
+    while i<length(Nodes.TanksID)+1
+        ifFromTank(i) = strcmp(fromNode,char(Nodes.TanksID{i}));
+        ifToTank(i) = strcmp(toNode,char(Nodes.TanksID{i}));
+        i=i+1;
+    end
+    if sum(ifFromReservoir)==1 || sum(ifFromTank)==1 || sum(ifToReservoir)==1 || sum(ifToTank)==1
+        s = sprintf('Valve "%s" illegally connected to a tank.',newLink);
+        errcode=-1;
+        warning(s);
+        return
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+crvs = obj.getCurveInfo;
+% Check if newLink already exists
+Links = obj.getLinksInfo;
+for i=1:length(Links.LinksAll)
+    exists_link = strcmp(newLink,char(Links.LinksAll(i)));
+    if exists_link==1
+        s = sprintf('Link %s already exists.',newLink);
+        errcode=-1;
+        warning(s);
+        return
+    end
+end
+% Open and read inpname
+% Read all file and save in variable info
+info = readAllFile(obj);
+fid2 = fopen(obj.pathfile,'w');
+% Add pipe
+nn=0;sps={'                   '};
+for t = 1:length(info)
+    c = info{t};
+    a = regexp(c, '\s*','split');
+    if isempty(a)
+        % skip
+    elseif isempty(c)
+        % skip
+    else
+        u=1;
+        while u < length(a)+1
+            t =  regexp(a{u}, '[(\w*)]','split');
+            y=1;cnt=0;
+            while y<length(t)+1
+                tt = isempty(t{y});
+                if tt==0
+                    cnt=cnt+1;
+                end
+                y=y+1;
+            end
+            
+            if (cnt==2 && strcmp(a{u},'[PIPES]') && nn==0 && typecode==1)
+                if Links.sectPipes==0
+                    fprintf(fid2,'[PIPES]');
+                    fprintf(fid2,'\r\n');
+                end
+                
+                fprintf(fid2,'%s',a{u});
+                fprintf(fid2, '\n%s%s%s%s%s%s%d%s%d%s%d;',newLink,sps{:},fromNode,sps{:},...
+                    toNode,sps{:},plength,sps{:},pdiameter,sps{:},proughness);
+                
+            elseif (cnt==2 && strcmp(a{u},'[PUMPS]') && nn==0 && typecode==2)
+                if Links.sectPumps==0
+                    fprintf(fid2,'[PIPES]');
+                    fprintf(fid2,'\r\n');
+                end
+                
+                if isempty(char(crvs.CurvesID))
+                    s = sprintf('No head curve supplied for pump %s.',newLink);
+                    warning(s);
+                    warning('addCurve.. must be called after this function.');
+                    fclose(fid2);
+                    return
+                else
+                    %                     curve=input('Please enter the ID of curve:');
+                    curve=curveID;
+                end
+                fprintf(fid2,'%s',a{u});
+                fprintf(fid2, '\n%s%s%s%s%s%s%s%s%s;',newLink,sps{:},fromNode,sps{:},...
+                    toNode,sps{:},'HEAD',sps{:},curve);
+                
+            elseif typecode==3 && strcmp(a{u},'[VALVES]')
+                if Links.sectValves==0
+                    fprintf(fid2,'[VALVES]');
+                    fprintf(fid2,'\r\n');
+                end
+                fprintf(fid2,'%s',a{u});
+                fprintf(fid2, '\n%s%s%s%s%s%s%d%s%s%s%d;',newLink,sps{:},fromNode,sps{:},...
+                    toNode,sps{:},vdiameter,sps{:},type_valv,sps{:},vsetting);
+                nn=1;
+            elseif isempty(a{u}) && nn==0
+            else
+                if isempty(a{u}) && nn==1
+                else
+                    fprintf(fid2,'%s%s',a{u},sps{:});
+                end
+            end
+            u=u+1;
+        end
+    end
+    fprintf(fid2,'\n');
+end
+fclose all;
+copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
+end
+function [errcode] = rmLink(obj,newinpname,LinkID)
+errcode=0;
+% Remove link from the network.
+% Check if id new already exists
+links = obj.getLinksInfo;
+if length(links.LinksAll)==0
+    s = sprintf('There is no such object in the network.');
+    warning(s);errcode=-1;
+    return;
+end
+countLinks=length(links.LinksAll);
+i=1;
+while i<countLinks+1
+    exists(i) = strcmp(LinkID,char(links.LinksAll(i)));
+    if exists(i)==1
+        index_rmvlink=i;
+    end
+    i=i+1;
+end
+
+if (sum(exists)~=1)
+    s = sprintf('There is no such object in the network.');
+    warning(s);errcode=-1;
+    return;
+end
+
+nodes = obj.getNodesInfo;
+from_node = links.FromNode(index_rmvlink);
+r = strcmp(nodes.NodesAll,from_node);
+if sum(r)==0, from_node=''; end
+to_node = links.ToNode(index_rmvlink);
+r = strcmp(nodes.NodesAll,to_node);
+if sum(r)==0, to_node=''; end
+% Remove control, code 1(LINK)
+obj.removeControlLinkID(newinpname,LinkID);
+% Open and read inpname
+% Read all file and save in variable info
+info = readAllFile(obj);
+fid2 = fopen(obj.pathfile,'w');
+% section [JUNCTIONS]
+out=0;YY=0;sps={'                   '};
+for t = 1:length(info)
+    c = info{t};
+    a = regexp(c, '\s*','split');
+    if isempty(a)
+        % skip
+    elseif isempty(c)
+        % skip
+    else
+        u=1;x=0;xx=0;q=0;
+        while u < length(a)+1
+            if strcmp(a{u},'[PIPES]') YY=1;end
+            if YY==1
+                if isempty(a{u}) && (x==0)
+                    u=u+1; x=1;xx=1;
+                    if u==length(a)+1
+                        break
+                    end
+                end
+                
+                if strcmp(a{u},'[TAGS]') out=1; end
+                if strcmp(a{u},'[STATUS]') out=1; end
+                if strcmp(a{u},'[DEMANDS]') out=1; end
+                if strcmp(a{u},'[PATTERNS]') out=1; end
+                
+                if strcmp(a{u},LinkID) && q~=1 && out==0
+                    if xx==1 || strcmp(a{1},LinkID)
+                        u=length(a)+1;
+                    end
+                else
+                    q=1;
+                    fprintf(fid2,'%s%s',a{u},sps{:});
+                end
+            else
+                if isempty(a{u})
+                    u=u+1;
+                    if u==length(a)+1
+                        break
+                    end
+                end
+                fprintf(fid2,'%s%s',a{u},sps{:});
+            end
+            u=u+1;
+        end
+    end
+    fprintf(fid2,'\n');
+end
+fclose all;
+copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
+% Get nodes which delete with function Remove Node
+links = obj.getLinksInfo;
+i=1;
+while i<length(links.LinksAll)+1
+    t(i) = strcmp(from_node,char(links.FromNode(i)));
+    tt(i) = strcmp(to_node,char(links.ToNode(i)));
+    ttt(i) = strcmp(to_node,char(links.FromNode(i)));
+    tttt(i) = strcmp(from_node,char(links.ToNode(i)));
+    i=i+1;
+end
+
+if sum(t)+sum(tttt)==0 || sum(tt)+sum(ttt)==0
+    if isempty(char(from_node)) && isempty(char(to_node))
+        warning('Call function Removenode or Addlink.');
+    end
+end
+if sum(t)+sum(tttt)==0
+    if ~isempty(char(from_node))
+        s = sprintf('Node %s disconnected.',char(from_node));
+        warning(s);
+    end
+end
+if sum(tt)+sum(ttt)==0
+    if ~isempty(char(to_node))
+        s = sprintf('Node %s disconnected.',char(to_node));
+        warning(s);
+    end
+end
+%%%%%%%%
+if sum(t)+sum(tttt)==0 || sum(tt)+sum(ttt)==0
+    if ~isempty(char(from_node)) || ~isempty(char(to_node))
+        if ~sum(strcmp(from_node,nodes.ReservoirsID)) || ~sum(strcmp(from_node,nodes.TanksID))...
+                || ~sum(strcmp(to_node,nodes.ReservoirsID)) || ~sum(strcmp(to_node,nodes.TanksID))
+            errcode=0;
+        else
+            errcode=-1;
+        end
+    end
+end
+end
+function errcode=rmControl(obj,newinpname,type,id)
+% Remove control from the network.
+exists=0;
+exists1=0;errcode=0;
+controls = obj.getControlsInfo;
+
+if type==1
+    if length(controls.linksID)==0
+        s = sprintf('There is no such object in the network.');
+        warning(s);errcode=-1;
+        return;
+    end
+    for i=1:length(controls.linksID) 
+        if type==1
+            exists(i) = strcmp(controls.linksID{i},char(id));
+%         else
+%             warning('Type is NODE(0) or LINK(1)');
+%             errcode=-1;
+%             return;
+        end
+    end
+end
+
+if type==0
+    if length(controls.nodesID)==0
+        s = sprintf('There is no such object in the network.');
+        warning(s);
+        errcode=-1;
+        return;
+    end
+    for i=1:length(controls.nodesID)
+        if type==0
+            exists1(i) = strcmp(controls.nodesID{i},char(id));
+        else
+            warning('Type is NODE(0) or LINK(1)');
+            return;
+        end
+    end
+end
+
+if (sum(exists)==0) && (sum(exists1)==0)  
+    warning('No controls.');
+    return;
+end
+
+% Open and read inpname
+% Read all file and save in variable info
+fid = fopen(obj.pathfile,'r+');
+t=0;
+% Read all file and save in variable info
+while ~feof(fid)
+    tline=fgetl(fid);
+    t = t+1;
+    info{t}=tline;
+end
+fid2 = fopen(obj.pathfile,'w');
+
+e=0;n=0;kk=1;sps={'                 '};
+for t = 1:length(info)
+    c = info{t};
+    a = regexp(c, '\s*','split');
+    if isempty(a)
+        % skip
+    elseif isempty(c)
+        % skip
+    else
+        u=1;
+        while u < length(a)+1
+            rr = regexp(a,'\w*[\w*]\w*','split');
+            check_brackets = rr{:};
+            ch1 = strcmp(check_brackets,'[');
+            ch2 = strcmp(check_brackets,']');
+            
+            if strcmp(a{u},'[CONTROLS]')
+                fprintf(fid2,'%s',a{u});
+                n=1;
+            elseif ch1(1)==1 && ch2(2)==1 && n==1
+                if (isempty(a{u})&& n==1), break; end
+                e=1;
+            end
+            if strcmp(a{u},'[END]'),  e=1; fprintf(fid2,'%s',a{u});break;   end
+            
+            if n==1 && e==0 && kk==1
+                if strcmp(a{u},'[CONTROLS]'), break; end
+                if isempty(a{u})
+                elseif strfind(a{u},';')
+                    u = length(a)+1;break;
+                else
+                    %%%%%%%%
+                    if type==1
+                        tt = strcmp(a{u+1},id); kk=0;
+                        if tt==1
+                            u = length(a)+1;break;
+                        else
+                            fprintf(fid2,'%s%s',a{u},sps{:});
+                        end
+                    elseif type==0
+                        tt = strcmp(a{u+5},id); kk=0;
+                        if tt==1
+                            u = length(a)+1;break;
+                        else
+                            fprintf(fid2,'%s%s',a{u},sps{:});
+                        end
+                    end
+                end
+            else
+                if isempty(a{u})
+                else
+                    fprintf(fid2,'%s%s',a{u},sps{:});
+                end
+            end
+            u=u+1;
+        end
+    end
+    fprintf(fid2,'\n');kk=1;
+end
+
+if n==1
+    while ~feof(fid)
+        tline=fgetl(fid);
+        if strcmp(controls.controlsInfo{index},tline)==0
+            fprintf(fid2,'%s',tline);
+            fprintf(fid2,'\n');
+        else
+            fprintf(fid2,'\n');
+        end
+    end
+else
+    warning('There was at least one error in input file.');
+end
+while ~feof(fid)
+    tline=fgetl(fid);
+    fprintf(fid2,'%s',tline);
+    fprintf(fid2,'\n');
+end
+fclose all;
+copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
 end
