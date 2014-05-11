@@ -1,3 +1,5 @@
+***This is the alpha version, used for testing purposes***
+
 EPANET-Matlab-Class
 ===================
 The `EPANET-Matlab Class` is an open-source software which operates within the Matlab environment, for providing a programming interface for the latest version of [EPANET](https://github.com/OpenWaterAnalytics/epanet), a hydraulic and quality modeling software created by the US EPA, with Matlab, a  high-level technical computing software. The goal of the Matlab Class is to serve as a common programming framework for research and development in the growing field of smart water networks.
