@@ -18,15 +18,18 @@ d=epanet([inpname,'.inp']);
 
 %%%%%%%%%%%%%%%%%%%-9/5/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 d.plot;
-ok=0;
 if exist('Net2_AddPipe.inp')
-    delete([pwd,'\NETWORKS\','Net2_AddPipe.inp']);ok=1;
+    delete([pwd,'\NETWORKS\','Net2_AddPipe.inp']);
+end
+if exist('Net2_RemovePipe.inp')
+    delete([pwd,'\NETWORKS\','Net2_RemovePipe.inp']);
 end
 errcode=d.addPipe('Net2_AddPipe.inp','pp1','32','10'); 
 if errcode==0
     d=epanet(['Net2_AddPipe','.inp']);
     d.plot('links','yes','highlightlink',{'pp1'},'fontsize',8);
     d.removeLinkID('Net2_RemovePipe.inp','pp1');
+    d=epanet(['Net2_RemovePipe','.inp']);
     d.plot;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
