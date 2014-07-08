@@ -1578,6 +1578,33 @@ classdef epanet <handle
         function [errcode]=addPipe(obj,newinpname,newLink,fromNode,toNode)
             [errcode]=addLink(obj,1,newinpname,newLink,fromNode,toNode);
         end
+        function addCurvePump(obj,newinpname,newCurveID,CurveX,CurveY)
+            addCurve(obj,newinpname,newCurveID,CurveX,CurveY,0);  %ID Flow-OptionsHeadloss
+        end
+        function addPump(obj,newinpname,newLink,fromNode,toNode,curveID)
+            addLink(obj,2,newinpname,newLink,fromNode,toNode,curveID);
+        end
+        function addValvePRV(obj,newinpname,newLink,fromNode,toNode)
+            addLink(obj,3,newinpname,newLink,fromNode,toNode); % Pressure Reducing Valve
+        end
+        function addValvePSV(obj,newinpname,newLink,fromNode,toNode)
+            addLink(obj,4,newinpname,newLink,fromNode,toNode); % Pressure Sustaining Valve
+        end
+        function addValvePBV(obj,newinpname,newLink,fromNode,toNode)
+            addLink(obj,5,newinpname,newLink,fromNode,toNode); % Pressure Breaker Valve
+        end
+        function addValveFCV(obj,newinpname,newLink,fromNode,toNode)
+            addLink(obj,6,newinpname,newLink,fromNode,toNode); % Flow Control Valve
+        end
+        function addValveTCV(obj,newinpname,newLink,fromNode,toNode)
+            addLink(obj,7,newinpname,newLink,fromNode,toNode); % Throttle Control Valve
+        end
+        function addValveGPV(obj,newinpname,newLink,fromNode,toNode)
+            addLink(obj,8,newinpname,newLink,fromNode,toNode); % General Purpose Valve
+        end
+        function removeCurveID(obj,CurveID)
+            rmCurveID(obj,CurveID);
+        end
         function [errcode]=removeLinkID(obj,newinpname,LinkID)
             errcode=rmLink(obj,newinpname,LinkID);
         end
@@ -5374,7 +5401,7 @@ else %SI metric
     vdiameter=304.8; %valves
 end
 proughness=100;
-vsetting=100; %valves
+vsetting=0; %valves
 % Check if id new already exists
 Nodes = obj.getNodesInfo;
 errcode=0;
@@ -5628,7 +5655,6 @@ while i<length(links.LinksAll)+1
     tttt(i) = strcmp(from_node,char(links.ToNode(i)));
     i=i+1;
 end
-
 if sum(t)+sum(tttt)==0 || sum(tt)+sum(ttt)==0
     if isempty(char(from_node)) && isempty(char(to_node))
         warning('Call function Removenode or Addlink.');
@@ -5791,6 +5817,192 @@ end
 while ~feof(fid)
     tline=fgetl(fid);
     fprintf(fid2,'%s',tline);
+    fprintf(fid2,'\n');
+end
+fclose all;
+copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
+end
+function addCurve(obj,newinpname,newCurveID,CurveX,CurveY,typecode,varargin)
+% PUMP 0 EFFICIENCY 1 VOLUME 2 HEADLOSS 3
+for i=1:length(CurveX)
+    if i+1<length(CurveX)+1
+        if CurveX(i)>=CurveX(i+1)
+            if strfind([0 1 3],typecode)
+                warning('Flow values are not in ascending order.');
+                return;
+            elseif typecode==2
+                warning('Heigh values are not in ascending order.');
+                return;
+            end
+        end
+    end
+end
+% Check if new ID already exists
+[pCurveID,~,~,~,~,sectCurve]=CurveInfo(obj);
+i=1;exists=0;
+while i<length(pCurveID)+1
+    exists(i) = strcmp(newCurveID,char(pCurveID(i)));
+    i=i+1;
+end
+if sum(exists)>0
+    s = sprintf('Curve "%s" already exists.',newCurveID);
+    warning(s);
+    return
+end
+sect=0;
+% Open and read inpname
+% Read all file and save in variable info
+info = readAllFile(obj);
+% write
+fid2 = fopen(obj.pathfile,'w');
+sps={'                  '};
+nn=0;yy=0;
+for t = 1:length(info)
+    c = info{t};
+    a = regexp(c, '\s*','split');
+    if isempty(a)
+        % skip
+    elseif isempty(c)
+        % skip
+    else
+        u=1;
+        while u < length(a)+1
+            if strcmp(a{u},'[CURVES]')
+                fprintf(fid2,'[CURVES]');
+                sect=1; break;
+            end
+            rr = regexp(a,'\w*[\w*]\w*','split');
+            check_brackets = rr{:};
+            ch1 = strcmp(check_brackets,'[');
+            ch2 = strcmp(check_brackets,']');
+            if (ch1(1)==1 && ch2(2)==1 && nn==0)
+                if yy==0
+                    if sect==0
+                        fprintf(fid2,'[CURVES]\n;ID                X-Value            Y-Value\n');
+                    end
+                    if typecode==0
+                        fprintf(fid2,';PUMP: PUMP:%sX-Value%sY-Value\n',sps{:},sps{:}); yy=1;
+                    elseif typecode==1
+                        fprintf(fid2,';PUMP: EFFICIENCY:\n'); yy=1;
+                    elseif typecode==2
+                        fprintf(fid2,';PUMP: VOLUME:\n'); yy=1;
+                    elseif typecode==3
+                        fprintf(fid2,';PUMP: HEADLOSS:\n'); yy=1;
+                    end
+                end
+                for i=1:length(CurveX)
+                    fprintf(fid2, '%s%s%d%s%d', newCurveID,sps{:},CurveX(i),sps{:},CurveY(i));
+                    fprintf(fid2,'\r\n');
+                end
+                fprintf(fid2,'%s',a{u});
+                fprintf(fid2,'\r\n');
+                nn=1;
+            elseif isempty(a{u}) && nn==0
+            else
+                if isempty(a{u}) && nn==1
+                else
+                    fprintf(fid2,'%s%s',a{u},sps{:});
+                end
+            end
+            u=u+1;
+        end
+    end
+    fprintf(fid2,'\n');
+end
+fclose all;
+copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
+end
+function rmCurveID(obj,CurveID,varargin)
+% Check if id new already exists
+[pCurveID,~,~,~,~,sectCurve]=CurveInfo(obj);
+if length(pCurveID)==0
+    s = sprintf('There is no such object in the network.');
+    warning(s);
+    return
+end
+i=1;
+while i<length(pCurveID)+1
+    exists(i) = strcmp(CurveID,char(pCurveID(i)));
+    i=i+1;
+end
+if (sum(exists)==0)
+    s = sprintf('There is no such object in the network.');
+    warning(s);
+    return
+end
+value=obj.getLinksInfo;
+pp=obj.getPumpInfo;
+i=1;
+while (i<length(pp.PumpCurveID)+1)
+    p = strcmp(CurveID,pp.PumpCurveID{i});
+    
+    if p==1
+        s = sprintf('Pump %s refers to undefined curve.',value.PumpsID{i});
+        %             obj.removeLinkID(value.PumpsID{i})
+        warning(s);
+    end
+    i=i+1;
+end
+if length(pp.PumpCurveID)==0, tmp=1; else tmp=0; end
+% Open and read inpname
+% Read all file and save in variable info
+info = readAllFile(obj);
+fid2 = fopen(obj.pathfile,'w');
+e=0;n=0;sps={'                '};
+for t = 1:length(info)
+    c = info{t};
+    a = regexp(c, '\s*','split');
+    if isempty(a)
+        % skip
+    elseif isempty(c)
+        % skip
+    else
+        u=1;
+        while u < length(a)+1
+            rr = regexp(a,'\w*[\w*]\w*','split');
+            check_brackets = rr{:};
+            ch1 = strcmp(check_brackets,'[');
+            ch2 = strcmp(check_brackets,']');
+            if strcmp(a{u},'[CURVES]')
+                fprintf(fid2,'%s',a{u});
+                n=1;
+            elseif ch1(1)==1 && ch2(2)==1 && n==1
+                if (isempty(a{u})&& n==1) break; end
+                e=1;
+            end
+            if strcmp(a{u},'[END]')  e=1; fprintf(fid2,'%s',a{u});break;   end
+            
+            if n==1 && e==0
+                if strcmp(a{u},'[CURVES]') break; end
+                if isempty(a{u})
+                    u=u+1;continue;
+                elseif strfind(a{u},';')
+                    ee=regexp(tline,'\w*EFFICIENCY*\w','match');
+                    nn=regexp(tline,'\w*VOLUME*\w','match');
+                    kk=regexp(tline,'\w*HEADLOSS*\w','match');
+                    if length(strcmp(ee,'EFFICIENCY')) || length(strcmp(nn,'VOLUME')) || length(strcmp(kk,'HEADLOSS')) || length(strcmp(a{1},';PUMP:'))
+                        fprintf(fid2,'%s%s',a{u},sps{:});
+                    else
+                        u = length(a)+1; break;
+                    end
+                else
+                    tt = strcmp(a{u},CurveID);
+                    if tt==1
+                        u = length(a)+1;
+                    else
+                        fprintf(fid2,'%s%s',a{u},sps{:});
+                    end
+                end
+            else
+                if isempty(a{u})
+                else
+                    fprintf(fid2,'%s%s',a{u},sps{:});
+                end
+            end
+            u=u+1;
+            
+        end
+    end
     fprintf(fid2,'\n');
 end
 fclose all;
