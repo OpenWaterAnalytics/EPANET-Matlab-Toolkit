@@ -16,7 +16,49 @@ disp('Create EPANET Class')
 inpname='Net2_Rossman2000'; 
 d=epanet([inpname,'.inp']);
 
-%%%%%%%%%%%%%%%%%%%-9/5/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%-08/07/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Links Pipe Pump & Valves
+%PIPE
+if exist('Net2Pipe1.inp')
+    delete([pwd,'\NETWORKS\','Net2Pipe1.inp']);
+end
+d.plot;
+d.addPipe('Net2Pipe1.inp','p_1','32','10');   
+d.plot('nodes','yes','highlightlink',{'p_1'},'fontsize',8);
+%PUMP
+d.addCurvePump('Net2Pipe1.inp','C-1',1955,250)
+d.addPump('Net2Pipe1.inp','PUMP','23','32','C-1')   
+d.plot('nodes','yes','highlightlink',{'PUMP'},'fontsize',8);
+d=epanet(['Net2Pipe1','.inp']);
+d.plot;
+%VALVES
+if exist('Net2addValve.inp')
+    delete([pwd,'\NETWORKS\','Net2addValve.inp']);
+end
+d=epanet(['Net2_Rossman2000','.inp']);
+d.plot;
+%PRV OR..
+d.addValvePRV('Net2addValve.inp','V1','11','22'); 
+%PSV OR..
+d.addValvePSV('Net2addValve.inp','V2','32','10');
+d.plot('nodes','yes','highlightlink',{'V2','V1'},'fontsize',8);
+%PBV 
+d.addValvePBV('Net2addValve.inp','V3','12','23');
+d.plot('nodes','yes','highlightlink',{'V3'},'fontsize',8);
+%FCV
+d.addValveFCV('Net2addValve.inp','V4','21','9'); 
+d.plot('nodes','yes','highlightlink',{'V4'},'fontsize',8);
+%TCV
+d.addValveTCV('Net2addValve.inp','V5','22','13'); 
+d.plot('nodes','yes','highlightlink',{'V5'},'fontsize',8);
+% %GPV
+% % d.addValveGPV('Net2addValve.inp','V6','23','32') %%%%%%%%%%%%ERROR
+% % d.plot('nodes','yes','highlightlink',{'V6'},'fontsize',8);
+d=epanet(['Net2addValve','.inp']);
+d.plot;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%-09/05/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+d=epanet(['Net2_Rossman2000','.inp']);
 d.plot;
 if exist('Net2_AddPipe.inp')
     delete([pwd,'\NETWORKS\','Net2_AddPipe.inp']);
@@ -33,7 +75,7 @@ if errcode==0
     d.plot;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%-18/2/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%-18/02/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 d=epanet([inpname,'.inp']);
 tic;
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);toc
