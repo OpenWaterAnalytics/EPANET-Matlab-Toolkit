@@ -1581,6 +1581,15 @@ classdef epanet <handle
         function addCurvePump(obj,newinpname,newCurveID,CurveX,CurveY)
             addCurve(obj,newinpname,newCurveID,CurveX,CurveY,0);  %ID Flow-OptionsHeadloss
         end
+        function addCurveEfficiency(obj,newinpname,newCurveID,CurveX,CurveY)
+            addCurve(obj,newinpname,newCurveID,CurveX,CurveY,1);  %ID Flow-Efficiency
+        end
+        function addCurveVolume(obj,newinpname,newCurveID,CurveX,CurveY)
+            addCurve(obj,newinpname,newCurveID,CurveX,CurveY,2);  %ID Heigh-Volume
+        end
+        function addCurveHeadloss(obj,newinpname,newCurveID,CurveX,CurveY)
+            addCurve(obj,newinpname,newCurveID,CurveX,CurveY,3);  %ID Flow-OptionsHeadloss
+        end
         function addPump(obj,newinpname,newLink,fromNode,toNode,curveID)
             addLink(obj,2,newinpname,newLink,fromNode,toNode,curveID);
         end
@@ -1602,8 +1611,8 @@ classdef epanet <handle
         function addValveGPV(obj,newinpname,newLink,fromNode,toNode)
             addLink(obj,8,newinpname,newLink,fromNode,toNode); % General Purpose Valve
         end
-        function removeCurveID(obj,CurveID)
-            rmCurveID(obj,CurveID);
+        function removeCurveID(obj,newinpname,CurveID)
+            rmCurveID(obj,newinpname,CurveID);
         end
         function [errcode]=removeLinkID(obj,newinpname,LinkID)
             errcode=rmLink(obj,newinpname,LinkID);
@@ -5912,7 +5921,7 @@ end
 fclose all;
 copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
 end
-function rmCurveID(obj,CurveID,varargin)
+function rmCurveID(obj,newinpname,CurveID,varargin)
 % Check if id new already exists
 [pCurveID,~,~,~,~,sectCurve]=CurveInfo(obj);
 if length(pCurveID)==0
@@ -5976,10 +5985,10 @@ for t = 1:length(info)
                 if strcmp(a{u},'[CURVES]') break; end
                 if isempty(a{u})
                     u=u+1;continue;
-                elseif strfind(a{u},';')
-                    ee=regexp(tline,'\w*EFFICIENCY*\w','match');
-                    nn=regexp(tline,'\w*VOLUME*\w','match');
-                    kk=regexp(tline,'\w*HEADLOSS*\w','match');
+                elseif strfind(a{u},';') 
+                    ee=regexp(c,'\w*EFFICIENCY*\w','match');
+                    nn=regexp(c,'\w*VOLUME*\w','match');
+                    kk=regexp(c,'\w*HEADLOSS*\w','match');
                     if length(strcmp(ee,'EFFICIENCY')) || length(strcmp(nn,'VOLUME')) || length(strcmp(kk,'HEADLOSS')) || length(strcmp(a{1},';PUMP:'))
                         fprintf(fid2,'%s%s',a{u},sps{:});
                     else
