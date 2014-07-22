@@ -16,8 +16,29 @@ disp('Create EPANET Class')
 inpname='Net2_Rossman2000'; 
 d=epanet([inpname,'.inp']);
 
-%%%%%%%%%%%%%%%%%%%-08/07/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Links Pipe Pump & Valves
+%%%%%%%%%%%%%%%%%%%-22/07/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+% Add/Remove Curves  
+if exist('Net2Curves.inp')
+    delete([pwd,'\NETWORKS\','Net2Curves.inp']);
+end
+d.addCurvePump('Net2Curves.inp','C-1',[1500 1800 2000],[250 200 0]);%Flow-Head
+d.addCurveEfficiency('Net2Curves.inp','C-2',[1500 1800 2000],[250 200 0]);%Flow-Efficiency
+d.addCurveVolume('Net2Curves.inp','C33',[1500 1800 2000],[250 200 0]);%Heigh-Volume
+d.addCurveHeadloss('Net2Curves.inp','C44',[1500 1800 2000],[250 200 0]);%Flow-Headloss
+d.removeCurveID('Net2Curves.inp','C-1');
+d=epanet(['Net2Curves','.inp']);
+d.getCurveInfo
+
+% warning Flow & Heigh
+d.addCurvePump('Net2Curves.inp','C-11',[2000 1500 1800],[250 200 0])
+d.addCurveEfficiency('Net2Curves.inp','C-22',[1500 2000 1800],[250 200 0])%Flow-Efficiency
+d.addCurveVolume('Net2Curves.inp','C333',[1500 2000 1800],[250 200 0])%Heigh-Volume
+d.addCurveHeadloss('Net2Curves.inp','C244',[1500 2000 1800],[250 200 0])%Flow-Headloss
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%-08/07/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+d=epanet([inpname,'.inp']);
+
+% Links Add Pipe Pump & Valves
 %PIPE
 if exist('Net2Pipe1.inp')
     delete([pwd,'\NETWORKS\','Net2Pipe1.inp']);
