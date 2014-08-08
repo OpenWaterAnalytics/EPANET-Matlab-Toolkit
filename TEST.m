@@ -16,66 +16,147 @@ disp('Create EPANET Class')
 inpname='Net2_Rossman2000'; 
 d=epanet([inpname,'.inp']);
 
-%%%%%%%%%%%%%%%%%%%-22/07/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
-% Add/Remove Curves  
-if exist('Net2Curves.inp')
-    delete([pwd,'\NETWORKS\','Net2Curves.inp']);
+%%%%%%%%%%%%%%%%%%%-08/08/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Add node & pipe
+nfile='Net2AddNP.inp';
+if exist(nfile)
+    delete([pwd,'\NETWORKS\',nfile]);
 end
-d.addCurvePump('Net2Curves.inp','C-1',[1500 1800 2000],[250 200 0]);%Flow-Head
-d.addCurveEfficiency('Net2Curves.inp','C-2',[1500 1800 2000],[250 200 0]);%Flow-Efficiency
-d.addCurveVolume('Net2Curves.inp','C33',[1500 1800 2000],[250 200 0]);%Heigh-Volume
-d.addCurveHeadloss('Net2Curves.inp','C44',[1500 1800 2000],[250 200 0]);%Flow-Headloss
-d.removeCurveID('Net2Curves.inp','C-1');
+d.plot('nodes','yes');
+[x,y]=ginput(1);
+d.addJunction(nfile,'J1',x,y)
+d.addPipe(nfile,'P1','10','J1')
+d=epanet(nfile); 
+d.plot('nodes','yes');
+
+[x,y]=ginput(1);
+d.addReservoir(nfile,'S1',x,y)
+d.addPipe(nfile,'P2','J1','S1')
+d.plot('nodes','yes');
+
+d.plot('nodes','yes');
+[x,y]=ginput(1);
+d.addTank(nfile,'T1',x,y)
+d.addPipe(nfile,'P3','32','T1')   
+d.plot('nodes','yes');
+
+d=epanet(nfile);
+d.removeNodeID(nfile,'T1');
+d.plot('nodes','yes');
+
+d.addPipe(nfile,'pp1','12','32')
+d.plot('nodes','yes','highlightlink',{'pp1'},'fontsize',8);
+
+% Controls
+nfile='Net2AddControl.inp';
+if exist(nfile)
+    delete([pwd,'\NETWORKS\',nfile]);
+end
+% LINK x status AT TIME tv=d.getControlsInfo
+v=d.getControlsInfo
+d.addControl(nfile,'10','OPEN','10.00');
+% LINK x status AT CLOCKTIME c AM/PM
+d.addControl(nfile,'10','OPEN','12.00','AM');
+v=d.getControlsInfo
+d.removeControlLinkID(nfile,v.linksID{1});
+v=d.getControlsInfo
+% LINK x status IF NODE y ABOVE/BELOW z
+d.addControl(nfile,'12','OPEN','12','ABOVE',100)
+v=d.getControlsInfo
+d.removeControlNodeID(nfile,v.nodesID{1});
+v=d.getControlsInfo
+
+% Remove - functions
+% Nodes
+nfile='Net2rmNode.inp';
+if exist(nfile)
+    delete([pwd,'\NETWORKS\',nfile]);
+end
+d.plot('highlightnode',{'2'})
+d.removeNodeID(nfile,'2');
+d=epanet(nfile); 
+% "Warning: Node 1 disconnected. "
+d.plot('highlightnode',{'1'})
+
+% Links
+nfile='Net2rmLink.inp';
+if exist(nfile)
+    delete([pwd,'\NETWORKS\',nfile]);
+end
+d.plot('highlightlink',{'7'})
+d.removeLinkID(nfile,'7') 
+d.plot;
+d=epanet(nfile); 
+% "Warning: Node 1 disconnected. "
+
+% Nodes & Link Info
+d.getNodesInfo
+d.getLinksInfo
+d.getPumpInfo % for the specific Pump curve
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%-22/07/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+d=epanet([inpname,'.inp']);
+nfile='Net2Curves.inp';
+% Add/Remove Curves  
+if exist(nfile)
+    delete([pwd,'\NETWORKS\',nfile]);
+end
+d.addCurvePump(nfile,'C-1',[1500 1800 2000],[250 200 0]);%Flow-Head
+d.addCurveEfficiency(nfile,'C-2',[1500 1800 2000],[250 200 0]);%Flow-Efficiency
+d.addCurveVolume(nfile,'C33',[1500 1800 2000],[250 200 0]);%Heigh-Volume
+d.addCurveHeadloss(nfile,'C44',[1500 1800 2000],[250 200 0]);%Flow-Headloss
+d.removeCurveID(nfile,'C-1');
 d=epanet(['Net2Curves','.inp']);
 d.getCurveInfo
 
 % warning Flow & Heigh
-d.addCurvePump('Net2Curves.inp','C-11',[2000 1500 1800],[250 200 0])
-d.addCurveEfficiency('Net2Curves.inp','C-22',[1500 2000 1800],[250 200 0])%Flow-Efficiency
-d.addCurveVolume('Net2Curves.inp','C333',[1500 2000 1800],[250 200 0])%Heigh-Volume
-d.addCurveHeadloss('Net2Curves.inp','C244',[1500 2000 1800],[250 200 0])%Flow-Headloss
+d.addCurvePump(nfile,'C-11',[2000 1500 1800],[250 200 0])
+d.addCurveEfficiency(nfile,'C-22',[1500 2000 1800],[250 200 0])%Flow-Efficiency
+d.addCurveVolume(nfile,'C333',[1500 2000 1800],[250 200 0])%Heigh-Volume
+d.addCurveHeadloss(nfile,'C244',[1500 2000 1800],[250 200 0])%Flow-Headloss
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%-08/07/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
-d=epanet([inpname,'.inp']);
 
+%%%%%%%%%%%%%%%%%%%-08/07/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+d=epanet([inpname,'.inp']);
 % Links Add Pipe Pump & Valves
 %PIPE
-if exist('Net2Pipe1.inp')
-    delete([pwd,'\NETWORKS\','Net2Pipe1.inp']);
+nfile='Net2Pipe1.inp';
+if exist(nfile)
+    delete([pwd,'\NETWORKS\',nfile]);
 end
 d.plot;
-d.addPipe('Net2Pipe1.inp','p_1','32','10');   
+d.addPipe(nfile,'p_1','32','10');   
 d.plot('nodes','yes','highlightlink',{'p_1'},'fontsize',8);
 %PUMP
-d.addCurvePump('Net2Pipe1.inp','C-1',1955,250)
-d.addPump('Net2Pipe1.inp','PUMP','23','32','C-1')   
+d.addCurvePump(nfile,'C-1',1955,250)
+d.addPump(nfile,'PUMP','23','32','C-1')   
 d.plot('nodes','yes','highlightlink',{'PUMP'},'fontsize',8);
-d=epanet(['Net2Pipe1','.inp']);
+d=epanet(nfile);
 d.plot;
 %VALVES
-if exist('Net2addValve.inp')
-    delete([pwd,'\NETWORKS\','Net2addValve.inp']);
+nfile='Net2addValve.inp';
+if exist(nfile)
+    delete([pwd,'\NETWORKS\',nfile]);
 end
-d=epanet(['Net2_Rossman2000','.inp']);
 d.plot;
 %PRV OR..
-d.addValvePRV('Net2addValve.inp','V1','11','22'); 
+d.addValvePRV(nfile,'V1','11','22'); 
 %PSV OR..
-d.addValvePSV('Net2addValve.inp','V2','32','10');
+d.addValvePSV(nfile,'V2','32','10');
 d.plot('nodes','yes','highlightlink',{'V2','V1'},'fontsize',8);
 %PBV 
-d.addValvePBV('Net2addValve.inp','V3','12','23');
+d.addValvePBV(nfile,'V3','12','23');
 d.plot('nodes','yes','highlightlink',{'V3'},'fontsize',8);
 %FCV
-d.addValveFCV('Net2addValve.inp','V4','21','9'); 
+d.addValveFCV(nfile,'V4','21','9'); 
 d.plot('nodes','yes','highlightlink',{'V4'},'fontsize',8);
 %TCV
-d.addValveTCV('Net2addValve.inp','V5','22','13'); 
+d.addValveTCV(nfile,'V5','22','13'); 
 d.plot('nodes','yes','highlightlink',{'V5'},'fontsize',8);
 % %GPV
-% % d.addValveGPV('Net2addValve.inp','V6','23','32') %%%%%%%%%%%%ERROR
+% % d.addValveGPV(nfile,'V6','23','32') %%%%%%%%%%%%ERROR
 % % d.plot('nodes','yes','highlightlink',{'V6'},'fontsize',8);
-d=epanet(['Net2addValve','.inp']);
+d=epanet(nfile);
 d.plot;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%-09/05/2014-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
