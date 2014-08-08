@@ -34,7 +34,6 @@ d.addReservoir(nfile,'S1',x,y)
 d.addPipe(nfile,'P2','J1','S1')
 d.plot('nodes','yes');
 
-d.plot('nodes','yes');
 [x,y]=ginput(1);
 d.addTank(nfile,'T1',x,y)
 d.addPipe(nfile,'P3','32','T1')   
@@ -79,6 +78,7 @@ d=epanet(nfile);
 d.plot('highlightnode',{'1'})
 
 % Links
+d=epanet([inpname,'.inp']); 
 nfile='Net2rmLink.inp';
 if exist(nfile)
     delete([pwd,'\NETWORKS\',nfile]);
