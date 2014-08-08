@@ -206,6 +206,7 @@ classdef epanet <handle
         pathfileMsx;
         inputfile;  % Name of the input file
         version; %EPANET library version
+        info;
     end
     properties (Constant = true)
         TYPECONTROL={'LOWLEVEL','HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL','HILEVEL', 'TIMER', 'TIMEOFDAY'
@@ -224,26 +225,48 @@ classdef epanet <handle
         function obj   = epanet(pathfile,varargin)
             %   The epanet object constructor. Example call:
             %   n=epanet('Net1.inp');
-            
+            warning on;
             path(path,genpath(pwd)); % Set current folder and subfolders in PATH
             if nargin==2 % Get name of INP file
                 inpfile=varargin{1};
             elseif nargin==1
                 inpfile=pathfile;
             end
+            %Set path of temporary file
+            dir_struct = dir([pwd,'\NETWORKS\*.inp']);
+            [sorted_names,~] = sortrows({dir_struct.name}');
+            for i=3:length(sorted_names)
+                [~,name1{i-2},~]=fileparts(sorted_names{i});
+            end
+            [~,b]=fileparts(inpfile);
+            pp=strcmpi(name1,b);
+            if sum(pp)==0, warning('File does not exists'); return; end;
+            copyfile([pwd,'\NETWORKS\',inpfile],[pwd,'\RESULTS\','temp.inp']);
+            obj.pathfile=[pwd,'\RESULTS\temp.inp'];
+            nodes = obj.getNodesInfo;
+            links = obj.getLinksInfo;
+            for i=1:nodes.NodeCount
+                f1=strcmp(links.FromNode,nodes.NodesAll(i));
+                f2=strcmp(links.ToNode,nodes.NodesAll(i));
+                f=[f1 f2];
+                if sum(f)==0
+                    s = sprintf('Node %s disconnected.',char(nodes.NodesAll(i)));
+                    warning(s);
+                end
+            end          
             obj.inputfile=inpfile;
             %Load EPANET Library
             [obj.errcode]=obj.epanetLoadLibrary;
             %Open the file
-            obj.LoadInpFile([pwd,'\NETWORKS\',inpfile], '', '');
-            %Set path of temporary file
-            obj.pathfile=[pwd,'\RESULTS\temp.inp'];
+            [obj.errcode]=obj.LoadInpFile([pwd,'\NETWORKS\',inpfile], '', '');
+            if obj.errcode~=0, return, end;
             %Save the temporary input file
             obj.saveInputFile(obj.pathfile);
             %Close input file
             ENclose;
             %Load temporary file
             obj.LoadInpFile(obj.pathfile,[pwd,'\RESULTS\temp.txt'], [pwd,'\RESULTS\temp.out']);
+            obj.info=readAllFile(obj);
             % Get type of the parameters
             obj.LinkType=obj.getLinkType;
             obj.NodeType=obj.getNodeType;
@@ -1524,6 +1547,20 @@ classdef epanet <handle
                 obj.remAddCurvesID(value.CurvesID,value.Clines);
             end
         end
+%         function saveInpFileFunctions(obj,inpname)
+%             [obj.errcode] = ENsaveinpfile(inpname);
+%             % The code below is because of a bug in EPANET 2.00.12
+%             % When saving using ENsaveinpfile, it does not save the type of the curves.
+%             value=obj.getCurveInfo;
+%             if ~isempty(value.CurvesID)
+%                 obj.remAddCurvesID(value.CurvesID,value.Clines);
+%             end
+%             r=strcmpi(obj.info,'[COORDINATES]');
+%             index=find(r);
+%             if index~=0
+%                 addSectionCoordinates(obj);
+%             end
+%         end
         function writeLineInReportFile(obj, line)
             [obj.errcode] = ENwriteline (line);
         end
@@ -1578,6 +1615,24 @@ classdef epanet <handle
         function [errcode]=addPipe(obj,newinpname,newLink,fromNode,toNode)
             [errcode]=addLink(obj,1,newinpname,newLink,fromNode,toNode);
         end
+        function addJunction(obj,newinpname,newID,X,Y)
+            addNode(obj,0,newinpname,newID,X,Y)
+        end
+        function addReservoir(obj,newinpname,newID,X,Y)
+            addNode(obj,1,newinpname,newID,X,Y)
+        end
+        function addTank(obj,newinpname,newID,X,Y)
+            addNode(obj,2,newinpname,newID,X,Y)
+        end
+        function addControl(obj,newinpname,x,status,y_t_c,param,z,varargin)
+            if nargin==7
+                addNewControl(obj,newinpname,x,status,y_t_c,param,z)
+            elseif nargin==6
+                addNewControl(obj,newinpname,x,status,y_t_c,param)
+            else
+                addNewControl(obj,newinpname,x,status,y_t_c)
+            end
+        end        
         function addCurvePump(obj,newinpname,newCurveID,CurveX,CurveY)
             addCurve(obj,newinpname,newCurveID,CurveX,CurveY,0);  %ID Flow-OptionsHeadloss
         end
@@ -1622,6 +1677,9 @@ classdef epanet <handle
         end
         function removeControlNodeID(obj,newinpname,ID)
             rmControl(obj,newinpname,0,ID);
+        end
+        function [errcode]=removeNodeID(obj,newinpname,NodeID)
+            errcode=rmNode(obj,newinpname,NodeID);
         end
         %%%%%%%%%%
         function msx(obj,msxname)
@@ -2406,8 +2464,10 @@ end
 tstep = double(tstep);
 end
 function [errcode] = ENopen(inpname,repname,binname,varargin)
+warning off;cnt=0;
 errcode=calllib('epanet2','ENopen',inpname,repname,binname);
 while errcode~=0
+    cnt=cnt+1;
    try
         errcode=calllib('epanet2','ENopen',inpname,repname,binname);
         if errcode==302
@@ -2417,7 +2477,12 @@ while errcode~=0
 %       pause(0.5);     
     catch err
    end
+   if cnt==3
+       ENerror(errcode);
+       return;
+   end
 end
+warning on;
 end
 function [errcode] = ENopenH()
 [errcode]=calllib('epanet2','ENopenH');
@@ -2675,9 +2740,7 @@ for i=1:value.LinkCount
     
     hh=strfind(highlightlinkindex,i);
     
-    %         h(:,4)=line([x1,x2],[y1,y2],'LineWidth',1);
     h(:,4)=line([x1 NodeCoordinates{3}{i} x2],[y1 NodeCoordinates{4}{i} y2],'LineWidth',1);
-    
     legendString{4} = char('Pipes');
     % Plot Pumps
     if sum(strfind(value.LinkPumpIndex,i))
@@ -5656,8 +5719,7 @@ fclose all;
 copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
 % Get nodes which delete with function Remove Node
 links = obj.getLinksInfo;
-i=1;
-while i<length(links.LinksAll)+1
+for i=1:length(links.LinksAll)
     t(i) = strcmp(from_node,char(links.FromNode(i)));
     tt(i) = strcmp(to_node,char(links.ToNode(i)));
     ttt(i) = strcmp(to_node,char(links.FromNode(i)));
@@ -6017,3 +6079,517 @@ end
 fclose all;
 copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
 end
+function [errcode] = rmNode(obj,newinpname,NodeID)
+errcode=0;
+% Remove node from the network.
+checklinks='';
+checknodes='';
+
+% Check if id new already exists
+nodes = obj.getNodesInfo;
+if length(nodes.NodesAll)==0
+    return;
+end
+
+i=1;
+while i<length(nodes.NodesAll)+1
+    exists(i) = strcmp(NodeID,char(nodes.NodesAll(i)));
+    i=i+1;
+end
+
+if (sum(exists)==0)
+    s = sprintf('There is no such object in the network.');
+    warning(s);
+    errcode=-1;
+    return;
+end
+
+if sum(strcmp(NodeID,nodes.ReservoirsID)) || sum(strcmp(NodeID,nodes.TanksID))
+    if (length(char(nodes.ReservoirsID))+length(char(nodes.TanksID))-1)==0;
+        warning('One or more errors in input file.');
+        warning('This tank/reservoir has not removed.');
+        errcode=-1;
+        return;
+    end
+end
+
+% Get links which delete with function Remove Link
+links = obj.getLinksInfo;
+checklinks_index=0;
+l = unique([links.FromNode links.ToNode]); 
+a=strcmp(links.FromNode,NodeID);
+linkindex1=find(a);
+b=strcmp(links.ToNode,NodeID);
+linkindex2=find(b);
+linkindex12=[linkindex1 linkindex2];
+checklinks_index=unique(linkindex12);
+checklinks=obj.getLinkNameID(checklinks_index);
+
+% Remove control, code 0(NODE)
+obj.removeControlNodeID(newinpname,NodeID);
+
+% Open and read inpname
+% Read all file and save in variable info
+info = readAllFile(obj);
+fid2 = fopen(obj.pathfile,'w');
+
+out=0; sps={'           '};
+for t = 1:length(info)
+    c = info{t};
+    a = regexp(c,'\s*','split');
+    if isempty(a)
+        % skip
+    elseif isempty(c)
+        % skip
+    else
+        u=1;x=0;xx=0;q=0;
+        while u < length(a)+1
+            
+            if isempty(a{u}) && (x==0)
+                u=u+1; x=1;xx=1;
+                if u==length(a)+1
+                    break;
+                end
+            end
+            
+            if strcmp(a{u},'[PIPES]'), out=1; end
+            if strcmp(a{u},'[DEMANDS]'), out=0; end %out=0; delete line
+            if strcmp(a{u},'[PATTERNS]'), out=1; end 
+            if strcmp(a{u},'[QUALITY]'), out=0; end
+            if strcmp(a{u},'[SOURCES]'), out=1; end
+            if strcmp(a{u},'[MIXING]'), out=0; end
+            if strcmp(a{u},'[COORDINATES]'), out=0; end
+            
+            if strcmp(a{u},NodeID) && q~=1 && out==0
+                if xx==1 || strcmp(a{u},NodeID)
+                    u=length(a)+1;
+                end
+            else
+                q=1;
+                fprintf(fid2,'%s%s',a{u},sps{:});
+            end
+            
+            u=u+1;
+        end
+    end
+    fprintf(fid2,'\n');
+end
+
+% fclose all;
+
+% Remove links
+% tmp=0;
+% save([pwd,'\RESULTS\','tmpinp'],'tmp','-mat')
+if length(checklinks)
+    for i=1:length(checklinks)
+        warn1(i)=obj.removeLinkID(newinpname,checklinks{i});
+    end
+else
+    warn1=1;
+end
+% Find who other id must be delete
+remove_link={''};
+remove_link_index = zeros(1,length(links.FromNode));
+
+if length(checklinks)
+    for i=1:length(checklinks)
+        remove_link(i)=checklinks(i);
+        remove_link_index(i)=i;
+        s=sprintf('Removed link:%s',char(remove_link(i)));
+        warning(s);
+    end
+else
+    warn1=sum(warn1)+1;
+end
+
+% if sum(warn1)~=0 || cntrm==length(checklinks)
+%     obj = epanet('temp.inp');
+% end
+fclose all;
+% obj.saveInpFileFunctions([pwd,'\RESULTS\temp.inp']);
+% obj.LoadInpFile([pwd,'\RESULTS\temp.inp'], '', '');
+copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
+end
+function addNewControl(obj,newinpname,x,status,y_t_c,param,z,varargin)
+% Add control in the network. Syntax:
+% Addcontrol(inpname,x,status,y,param,z)
+%          LINK x status IF NODE y ABOVE/BELOW z
+%
+%          Addcontrol(inpname,x,status,t) LINK x status AT TIME t
+%
+%          Addcontrol(inpname,x,status,c,param) LINK x status AT
+%          CLOCKTIME c AM/PM
+%
+% Inputs: inpname   name of an EPANET Input file. 
+%         x         a link ID label 
+%         status    OPEN or CLOSED, a pump speed setting, or a control
+%                   valve setting 
+% y       a node ID label param     ABOVE/BELOW or AM/PM 
+% z       a pressure for a junction or a water level for a tank
+% t       a time since the start of the simulation in decimal hours
+%         or in hours:minutes notation (string) 
+% c       a 24-hour clock time(string)    
+% Examples: %1%
+% Addcontrol('Net1.inp','10','OPEN','10','ABOVE',100);
+%
+% %2% Addcontrol('Net1.inp','10','OPEN','10.00');
+% Removecontrol('Net1.inp',1,'10');
+%
+% %3% Addcontrol('Net1.inp','10','OPEN','12.00','AM');
+% syntax
+if (nargin==7)
+    syntax = sprintf('LINK     %s     %s     IF     NODE     %s     %s     %d',x,status,y_t_c,param,z);
+elseif (nargin==6)
+    syntax = sprintf('LINK     %s     %s     AT     CLOCKTIME     %s     %s',x,status,y_t_c,param);
+elseif (nargin==5)
+    syntax = sprintf('LINK     %s     %s     AT     TIME     %s',x,status,y_t_c);
+end
+if (nargin==7)
+    % Check if id new already exists
+    nodes = obj.getNodesInfo;
+    if length(char(nodes.NodesAll))==0
+        return
+    end
+    
+    i=1;
+    while i<length(char(nodes.NodesAll))+1
+        exists(i) = strcmp(y_t_c,char(nodes.NodesAll(i)));
+        i=i+1;
+    end
+    
+    if (sum(exists)~=1)
+        s = sprintf('There is no such object in the network.');
+        warning(s);
+        return
+    end
+end
+% Check if id new already exists
+links = obj.getLinksInfo;
+if length(char(links.LinksAll))==0
+    s = sprintf('There is no such object in the network.');
+    warning(s);
+    return
+end
+i=1;
+while i<length(char(links.LinksAll))+1
+    exists(i) = strcmp(x,char(links.LinksAll(i)));
+    i=i+1;
+end
+if (sum(exists)~=1)
+    s = sprintf('There is no such object in the network.');
+    warning(s);
+    return
+end
+type_n='[CONTROLS]';
+controls = obj.getControlsInfo;
+if controls.sectControls==0  type_n='[PATTERNS]'; end
+% Open and read inpname
+% Read all file and save in variable info
+info = readAllFile(obj);
+fid2 = fopen(obj.pathfile,'w');
+noo=0;s=0;yy=0;sps={'                   '};
+for t = 1:length(info)
+    c = info{t};
+    a = regexp(c, '\s*','split');
+    if isempty(a)
+        % skip
+    elseif isempty(c)
+        % skip
+    else
+        u=1;
+        while u < length(a)+1
+            if strcmp(a{u},type_n);
+                fprintf(fid2,'[CONTROLS]');
+                s=1; break;
+            end
+            rr = regexp(a,'\w*[\w*]\w*','split');
+            check_brackets = rr{:};
+            ch1 = strcmp(check_brackets,'[');
+            ch2 = strcmp(check_brackets,']');
+            
+            if (ch1(1)==1 && ch2(2)==1 && (s==1) && noo==0)
+                if yy==0
+                    if controls.sectControls==0
+                        fprintf(fid2,'[CONTROLS]\n');
+                    end
+                end
+                fprintf(fid2, '%s',syntax);
+                fprintf(fid2,'\r\n');
+                fprintf(fid2,'\r\n');
+                fprintf(fid2,'%s',a{u});
+                fprintf(fid2,'\r\n');
+                noo=1;
+                
+            elseif isempty(a{u}) && noo==0
+            else
+                if isempty(a{u}) && noo==1
+                else
+                    fprintf(fid2,'%s%s',a{u},sps{:});
+                end
+            end
+            
+            
+            u=u+1;
+        end
+    end
+    fprintf(fid2,'\n');
+end
+fclose all;
+copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
+end
+function addNode(obj,typecode,newinpname,newID,X,Y,varargin)
+% Addnode - Add node in the network. Node type codes consist of the
+% following constants: EN_JUNCTION	0  Junction node EN_RESERVOIR	1
+% Reservoir node EN_TANK       2  Tank node
+links = obj.getLinksInfo;
+nodes = obj.getNodesInfo;
+l = unique([links.FromNode links.ToNode]);
+if nodes.NodeCount~=length(l)
+    for i=1:nodes.NodeCount
+        t = strcmpi(nodes.NodesAll(i),l);
+        if sum(t)==0
+            s = sprintf('Node %s disconnected.',char(nodes.NodesAll(i)));
+            warning(s);
+            return;
+        end
+    end
+end
+v=obj.getFlowUnitsHeadlossFormula;
+if typecode==1 || typecode==0 % junction & reservoir
+    if v.UScustomary==1  %(ft)
+        elevation=500;
+    else %SI metric   %(m)
+        elevation=152.4;
+    end
+    initqual=0;
+end
+if typecode==2
+    % Initial TANK
+    if v.UScustomary==1  %(ft)
+        MaxLevel=20;
+        Diameter=50;
+        Initlevel=10;
+        elevation=500;
+    else %SI metric   %(m)
+        MaxLevel=6.0960;
+        Diameter=15.24;
+        Initlevel=3.048;
+        elevation=152.4;
+    end
+    initqual=0;
+    MinLevel=0;
+    MinVol=0;
+end
+% Check if id new already exists
+if length(nodes.NodesAll)==0
+    warning('There is no such object in the network.');
+    return
+end
+for i=1:length(nodes.NodesAll)
+    exists(i) = strcmp(newID,char(nodes.NodesAll(i)));
+end
+if (sum(exists)==1)
+    s = sprintf('Node "%s" already exists.',newID);
+    warning(s);
+    return
+end
+% Get type of node
+if typecode==0 type_new = '[JUNCTIONS]'; end
+if typecode==1 type_new = '[RESERVOIRS]'; end
+if typecode==2 type_new = '[TANKS]'; end
+A = [0 1 2];
+code=strfind(A,typecode);
+if length(code)==0
+    warning('There is no such typecode(0-2)!');
+    return
+end
+% check section in inpname, [JUNCTIONS], [RESERVOIRS], [TANKS]
+stank_check=1;
+sreservoir_check=1;
+sjunction_check=1;
+% Open and read inpname
+% Read all file and save in variable info
+info = readAllFile(obj);
+fid2 = fopen(obj.pathfile,'w');
+% Initiality
+qualch=0;
+qq=0;
+Coordch=0;
+onetime=1;
+gg=0;
+sps1={'                   '};
+for t = 1:length(info)
+    c = info{t};
+    if ~isempty(c)
+        a = regexp(c, '\s*','split');
+    end
+    if isempty(a)
+        % skip
+    elseif isempty(c)
+        % skip
+    else
+        i=i+1;
+        
+        u=1;
+        while u < length(a)+1
+            
+            % Find [brackets] cnt=2;
+            t =  regexp(a{u}, '[(\w*)]','split');
+            y=1;cnt=0;
+            while y<length(t)+1
+                tt = isempty(t{y});
+                if tt==0
+                    cnt=cnt+1;
+                end
+                y=y+1;
+            end
+            
+            %%%%%%%% Quality Section %%%%%%%%
+            if strcmp(a{u},'[QUALITY]')
+                fprintf(fid2,'[QUALITY]');
+                qualch=1;
+                break;
+            end
+            
+            if (cnt==2 && qualch==1)
+                fprintf(fid2, '%s%s%d;', newID,sps1{:},initqual);
+                fprintf(fid2,'\r\n');qq=1;
+            end
+            
+            %%%%%%%% Coordinates Section %%%%%%%%
+            if strcmp(a{u},'[COORDINATES]');
+                fprintf(fid2,'[COORDINATES]');
+                Coordch=1; break;
+            end
+            
+            if length(strfind(c,';Node'))==1 && Coordch==1 && cnt~=2
+                break;
+            elseif u==1 && Coordch==1
+                if ((gg==0)) && (typecode==0)
+                    fprintf(fid2, '%s%s%d%s%d\n', newID,sps1{:},X,sps1{:},Y);
+                end
+                gg=gg+1;
+            end
+            
+            if isempty(obj.NodeCoordinates)
+                if strcmp(a{u},'[END]')
+                    fprintf(fid2,'%s','[COORDINATES]');
+                    fprintf(fid2,'\r\n');
+
+                    for qq=1:length(X)
+                        fprintf(fid2,'%s%s%d%s%d',char(NodesID(qq)),sps1{:},X(qq),sps1{:},Y(qq));
+                        fprintf(fid2,'\r\n');
+                    end
+
+                    fprintf(fid2, '%s%s%d%s%d\n',...
+                    newID,sps1{:},X,sps1{:},Y);
+                    fprintf(fid2,'%s',a{u}); fprintf(fid2,'\r\n');
+                    fclose all; obj = epanet('temp.inp');
+                    obj.saveInputFile('temp.inp'); % OK % return
+                end
+            end
+            
+            %%%%%%%% Nodes Section %%%%%%%%
+            if (cnt==2 && (strcmp(a{u},'[TANKS]') || strcmp(a{u},'[JUNCTIONS]') || strcmp(a{u},'[RESERVOIRS]')))
+                if sjunction_check==0 && typecode==0  && strcmp(a{u},'[RESERVOIRS]')
+                    fprintf(fid2,'[JUNCTIONS]');
+                    fprintf(fid2, '\n%s%s%d%s%d%s\n',newID,sps1{:},elevation,sps1{:},0,sps1{:});
+                end
+                
+                if sreservoir_check==0 && typecode==1 && strcmp(a{u},'[TANKS]')
+                    fprintf(fid2,'[RESERVOIRS]');
+                    fprintf(fid2, '\n%s%s%d%s%d%s\n', newID,sps1{:},elevation,sps1{:},'',sps1{:});
+                end
+                
+                if stank_check==0 && typecode==2 && strcmp(a{u},'[PIPES]')
+                    fprintf(fid2,'[TANKS]');
+                    fprintf(fid2, '\n%s%s%d%s%d%s%d%s%d%s%d%s%d\n', newID,sps1{:},elevation,sps1{:},Initlevel,sps1{:},MinLevel,sps1{:},...
+                        MaxLevel,sps1{:},Diameter,sps1{:},MinVol);
+                end
+                
+                fprintf(fid2,'%s',a{u});
+                
+                %%%%%%%% Jynctions Section %%%%%%%%
+                if typecode==0 && strcmp(a{u},'[JUNCTIONS]')
+                    fprintf(fid2, '\n%s%s%d%s%d%s', newID,sps1{:},elevation,sps1{:},0,sps1{:});
+                end
+                %%%%%%%% Reservoirs Section %%%%%%%%
+                if typecode==1 && strcmp(a{u},'[RESERVOIRS]')
+                    fprintf(fid2, '\n%s%s%d%s%d%s', newID,sps1{:},elevation,sps1{:},'',sps1{:});
+                end
+                %%%%%%%% Tanks Section %%%%%%%%
+                if typecode==2 && strcmp(a{u},'[TANKS]')
+                    fprintf(fid2, '\n%s%s%d%s%d%s%d%s%d%s%d%s%d', newID,sps1{:},elevation,sps1{:},Initlevel,sps1{:},MinLevel,sps1{:},...
+                        MaxLevel,sps1{:},Diameter,sps1{:},MinVol);
+                end
+                
+            elseif isempty(a{u})
+                
+            else
+                
+                fprintf(fid2,'%s%s',a{u},sps1{:});
+            end
+            u=u+1;
+        end
+        
+        %%%%%%%% Coordinates Section %%%%%%%%
+        if gg~=0 && onetime==1
+            % Correction Index
+            if isempty(char(nodes.JunctionsID))
+                nodes.JunctionsID=[];
+            end
+            if isempty(nodes.ReservoirsID)
+                nodes.ReservoirsID=[];
+            end
+            if isempty(nodes.ReservoirsID)
+                nodes.NodesAll=[];
+            end
+            
+            if (gg==length(nodes.JunctionsID)+length(nodes.NodeReservoirIndex)-1) && (typecode==1) || (gg==length(nodes.NodesAll)-1) && (typecode==2)
+                fprintf(fid2,'\r\n');
+                fprintf(fid2, '%s%s%d%s%d', newID,sps1{:},X,sps1{:},Y);
+                gg=0; onetime=0;
+            end
+        end
+        
+        if qualch==1 && qq==1
+            qualch=0;
+        end
+        fprintf(fid2,'\n');
+    end
+end
+fclose all;
+copyfile([pwd,'\RESULTS\','temp.inp'],[pwd,'\NETWORKS\',newinpname]);
+end
+% function addSectionCoordinates(obj)
+% fid2 = fopen(obj.pathfile,'w');
+% r=strcmpi(obj.info,'[COORDINATES]');
+% index=find(r);
+% % Initiality
+% nn=0;sps={'                  '};
+% for t = 1:length(obj.info)
+%     c = obj.info{t};
+%     a = regexp(c, '\s*','split');
+%     if isempty(a)
+%         % skip
+%     elseif isempty(c)
+%         % skip
+%     else
+%         u=1;
+%         while u < length(a)+1
+%             if strcmp(a{u},'[COORDINATES]')
+%                 fprintf(fid2,'[COORDINATES]');
+%                 break;
+%             elseif isempty(a{u}) && nn==0
+%             else
+%                 if isempty(a{u}) && nn==1
+%                 else
+%                     fprintf(fid2,'%s%s',a{u},sps{:});
+%                 end
+%             end
+%             u=u+1;
+%         end
+%         fprintf(fid2,'\n');
+%     end
+% end
+% end
