@@ -1,1 +1,0 @@
-In the "Results" folder the matlab output results will be copied and saved.

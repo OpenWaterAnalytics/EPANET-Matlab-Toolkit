@@ -41,7 +41,6 @@ classdef epanet <handle
     %   implied. See the Licence for the specific language governing
     %   permissions and limitations under the Licence.
     properties
-        %EPANET-MSX (Multi-species water quality)
         MSXConstantsNameID;
         MSXConstantsValue;
         MSXConstantsCount;
@@ -78,8 +77,6 @@ classdef epanet <handle
         MSXEquationsTerms;
         %MSXComputedQualityNode;
         %MSXComputedQualityLink;
-        
-        %EPANET (Hydraulics and single-species quality)
         NodeCoordinates; % Coordinates for each node (long/lat & intermediate pipe coordinates)
         NodeJunctionsCount; %Number of junctions
         NodeCount; % Number of nodes
@@ -226,14 +223,14 @@ classdef epanet <handle
         TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
     end
     methods
-        function obj   = epanet(pathfile,varargin)
+        function obj   = epanet(varargin)
+            %Constructor of the EPANET Class
             warning on;
-            path(path,genpath(pwd)); % Add current folder and subfolders in MATLAB PATH
             if nargin==2
                 inpfile=varargin{1}; % Get name of INP file
                 obj.version=varargin{2}; % Get DLL version (e.g. epanet20012x86 for 32-bit)
             elseif nargin==1
-                inpfile=pathfile;
+                inpfile=varargin{1};
                 if strcmp(computer,'PCWIN64') % if no DLL is given, select one automatically
                     obj.version='epanet20012x64';
                 elseif strcmp(computer,'PCWIN32')
@@ -241,52 +238,15 @@ classdef epanet <handle
                 end
             end
             
-            %CHECK IF FOLDERS EXIST, ORTHERWISE CREATE
-            flag=0;
-            if ~exist('NETWORKS','dir')
-                mkdir('NETWORKS');
-                warning('Copy INP files in NETWORKS folder')
-                flag=1;
-            end
-            if ~exist('LIBRARIES','dir')
-                mkdir('LIBRARIES')
-                warning('Copy EPANET DLL and H files files in LIBRARIES folder')
-                flag=1;
-            end
-            if ~exist('RESULTS')
-                mkdir('RESULTS')
-            end
-            if flag==1 % Exit when LIBRARIES or NETWORKS folder is missing
+          
+            if ~exist(inpfile,'file')
+                warning('File ', inpfile, 'does not exist in folder');
                 return
             end
-            
-            %CHECK INP FILE
-            tmpnetinpfile=[pwd,'\NETWORKS\',inpfile];
-            if ~exist(tmpnetinpfile,'file')
-                warning('File ', inpfile, 'does not exist in NETWORKS folder');
-                return
-            end
-            
             
             obj.inputfile=inpfile;
             
-            %Load EPANET Library
-            obj.epanetLoadLibrary;
-            %Open the file
-            [obj.errcode]=obj.LoadInpFile(tmpnetinpfile, 'tmp.rpt', 'tmp.bin');
-            if obj.errcode~=0
-                warning('Could not open the file')
-                return
-            end
-            %Save the temporary input file
-            tmpresinpfile=[pwd,'\RESULTS\temp.inp'];
-            obj.pathfile=tmpresinpfile;
-            obj.saveInputFile(obj.pathfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
-            obj.closeNetwork;  %ENclose; %Close input file
-            %Load temporary file
-            obj.LoadInpFile(obj.pathfile,[pwd,'\RESULTS\tmp.rpt'], [pwd,'\RESULTS\temp.bin']);
-
-            %Read Node/Link info from INP file and save in structure
+           %Read Node/Link info from INP file and save in structure
             nodes = obj.getNodesInfo;
             links = obj.getLinksInfo;
             
@@ -296,10 +256,33 @@ classdef epanet <handle
                 f2=strcmp(links.ToNode,nodes.NodesAll(i));
                 f=[f1 f2];
                 if sum(f)==0
-                    s = sprintf('Node %s disconnected.',char(nodes.NodesAll(i)));
+                    s = sprintf('Node %s disconnected. All nodes must be connected in order to load the network',char(nodes.NodesAll(i)));
                     warning(s);
+                    return
                 end
-            end            
+            end
+            
+            %Load EPANET Library
+            ENLoadLibrary(obj.version);
+            
+            pwdinpfile=[pwd,'\',inpfile];
+            
+            %Open the file
+            [obj.errcode]=ENopen(pwdinpfile, [inpfile,'.rpt'], [inpfile,'.bin'],obj.version);
+            if obj.errcode~=0
+                warning('Could not open the file, please check INP file')
+                return
+            end
+            %Save the temporary input file
+            %tmpresinpfile=[pwd,'\RESULTS\temp.inp'];
+            pwdtmpfile=[pwd,'\',inpfile,'_TEMP.inp'];
+            obj.pathfile=pwdtmpfile;
+            obj.saveInputFile(obj.pathfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
+            obj.closeNetwork;  %ENclose; %Close input file
+            %Load temporary file
+            ENopen(obj.pathfile,[pwd,'\',inpfile,'_TEMP.rpt'], [pwd,'\',inpfile,'_TEMP.bin'],obj.version);
+
+                        
             
             obj.info=readAllFile(obj);
             % Get type of the parameters
@@ -439,18 +422,22 @@ classdef epanet <handle
             obj.NodeTankVolumeUnits=value.NodeTankVolumeUnits;
             obj.QualityWaterAgeUnits=value.QualityWaterAgeUnits;
         end % End of epanet class constructor
-        function errcode = LoadInpFile(obj,inpname,repname,binname,varargin)
-            [errcode] = ENopen(inpname,repname,binname,obj.version);
-        end
-        function epanetLoadLibrary(obj)
-            ENLoadLibrary(obj.version);
-        end
+                
         function [value] = plot(obj,varargin)
+            %Plots network in a new Matlab figure
+            %Arguments:
+            % 'nodes': yes/no
+            % 'links': yes/no
+            % 'highlightnode': array of node IDs
+            % 'highlightlink': array of link IDs
+            % 'fontsize': number (px)
+            % 'colornode': array of node IDs
+            % 'colorlink': array of link id
+            % 'axes': axes coordinates
+            %Example: d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
             [value] = ENplot(obj,varargin{:});
         end
-        function [value] = plotB(obj,varargin)
-            [value] = ENplotB(obj,varargin{:});
-        end
+
         function value = getControls(obj)
             %Retrieves the parameters of all control statements
             if obj.getControlRulesCount
@@ -469,8 +456,8 @@ classdef epanet <handle
             else
                 value=-1;
             end
-            %value=obj.ControlRules;
         end
+        
         function value = getNodeCount(obj)
             % Retrieves the number of nodes
             [obj.errcode, value] = ENgetcount(0,obj.version);
@@ -496,21 +483,27 @@ classdef epanet <handle
             [obj.errcode, value] = ENgetcount(5,obj.version);
         end
         function value = getNodeTankCount(obj)
+            % Retrieves the number of Tanks
             value = sum(strcmp(obj.getNodeType,'TANK'));
         end
         function value = getNodeReservoirCount(obj)
+            % Retrieves the number of Reservoirs
             value = sum(strcmp(obj.getNodeType,'RESERVOIR'));
         end
         function value = getNodeJunctionsCount(obj)
+            % Retrieves the number of junction nodes
             value = sum(strcmp(obj.getNodeType,'JUNCTION'));
         end
         function value = getLinkPipeCount(obj)
+            % Retrieves the number of pipes
             value = sum(strcmp(obj.getLinkType,'PIPE'))+sum(strcmp(obj.getLinkType,'CVPIPE'));
         end
         function value = getLinkPumpCount(obj)
+            % Retrieves the number of pumps
             value = sum(strcmp(obj.getLinkType,'PUMP'));
         end
         function value = getLinkValveCount(obj)
+            % Retrieves the number of valves
             value = obj.getLinkCount - (obj.getLinkPipeCount + obj.getLinkPumpCount);
         end
         function value = getError(obj,errcode)
@@ -829,21 +822,21 @@ classdef epanet <handle
             %Retrieves the value of all nodes source quality
             value=zeros(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,5);
+                [obj.errcode, value(i)] = ENgetnodevalue(i,5,obj.version);
             end
         end
         function value = getNodeSourcePatternIndex(obj)
             %Retrieves the value of all node source pattern index
             value=zeros(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,6);
+                [obj.errcode, value(i)] = ENgetnodevalue(i,6,obj.version);
             end
         end
         function value = getNodeSourceType(obj)
             %Retrieves the value of all node source type
             value=cell(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
-                [obj.errcode, temp] = ENgetnodevalue(i,7);
+                [obj.errcode, temp] = ENgetnodevalue(i,7,obj.version);
                 if ~isnan(temp)
                     value(i)=obj.TYPESOURCE(temp+1);
                 end
@@ -853,56 +846,56 @@ classdef epanet <handle
             %Retrieves the value of all tank initial water levels
             value=nan(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,8);
+                [obj.errcode, value(i)] = ENgetnodevalue(i,8,obj.version);
             end
         end
         function value = getNodeActualDemand(obj)
             %Retrieves the computed value of all actual demands
             value=zeros(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,9);
+                [obj.errcode, value(i)] = ENgetnodevalue(i,9,obj.version);
             end
         end
         function value = getNodeActualDemandSensingNodes(obj,varargin)
             %Retrieves the computed demand values at some sensing nodes
             value=zeros(1,obj.getNodeCount);
             for i=1:length(varargin{1})
-                [obj.errcode, value(varargin{1}(i))] = ENgetnodevalue(varargin{1}(i),9);
+                [obj.errcode, value(varargin{1}(i))] = ENgetnodevalue(varargin{1}(i),9,obj.version);
             end
         end
         function value = getNodeHydaulicHead(obj)
             %Retrieves the computed values of all hydraulic heads
             value=zeros(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,10);
+                [obj.errcode, value(i)] = ENgetnodevalue(i,10,obj.version);
             end
         end
         function value = getNodePressure(obj)
             %Retrieves the computed values of all node pressures
             value=zeros(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,11);
+                [obj.errcode, value(i)] = ENgetnodevalue(i,11,obj.version);
             end
         end
         function value = getNodeActualQuality(obj)
             %Retrieves the computed values of the actual quality for all nodes
             value=zeros(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,12);
+                [obj.errcode, value(i)] = ENgetnodevalue(i,12,obj.version);
             end
         end
         function value = getNodeMassFlowRate(obj)
             %Retrieves the computed mass flow rates per minute of chemical sources
             value=zeros(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,13);
+                [obj.errcode, value(i)] = ENgetnodevalue(i,13,obj.version);
             end
         end
         function value = getNodeActualQualitySensingNodes(obj,varargin)
             %Retrieves the computed quality values at some sensing nodes
             value=zeros(1,obj.getNodeCount);
             for i=1:length(varargin{1})
-                [obj.errcode, value(varargin{1}(i))] = ENgetnodevalue(varargin{1}(i),12);
+                [obj.errcode, value(varargin{1}(i))] = ENgetnodevalue(varargin{1}(i),12,obj.version);
             end
         end
         function value = getNodeTankInitialWaterVolume(obj)
@@ -910,7 +903,7 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, value(i)] = ENgetnodevalue(i,14);
+                    [obj.errcode, value(i)] = ENgetnodevalue(i,14,obj.version);
                 end
             end
         end
@@ -921,7 +914,7 @@ classdef epanet <handle
             obj.NodeTankMixingModelType={};
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, obj.NodeTankMixingModelCode(i)] = ENgetnodevalue(i, 15);
+                    [obj.errcode, obj.NodeTankMixingModelCode(i)] = ENgetnodevalue(i, 15,obj.version);
                     obj.NodeTankMixingModelType(i)=obj.TYPEMIXMODEL(obj.NodeTankMixingModelCode(i)+1);
                 end
             end
@@ -940,7 +933,7 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, value(i)] = ENgetnodevalue(i,16);
+                    [obj.errcode, value(i)] = ENgetnodevalue(i,16,obj.version);
                 end
             end
         end
@@ -949,7 +942,7 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, value(i)] = ENgetnodevalue(i, 17);
+                    [obj.errcode, value(i)] = ENgetnodevalue(i, 17,obj.version);
                 end
             end
         end
@@ -958,7 +951,7 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, value(i)] = ENgetnodevalue(i, 18);
+                    [obj.errcode, value(i)] = ENgetnodevalue(i, 18,obj.version);
                 end
             end
         end
@@ -967,7 +960,7 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, value(i)] = ENgetnodevalue(i, 19);
+                    [obj.errcode, value(i)] = ENgetnodevalue(i, 19,obj.version);
                 end
             end
         end
@@ -976,7 +969,7 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, value(i)] = ENgetnodevalue(i, 20);
+                    [obj.errcode, value(i)] = ENgetnodevalue(i, 20,obj.version);
                 end
             end
         end
@@ -985,7 +978,7 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, value(i)] = ENgetnodevalue(i, 21);
+                    [obj.errcode, value(i)] = ENgetnodevalue(i, 21,obj.version);
                 end
             end
         end
@@ -994,7 +987,7 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, value(i)] = ENgetnodevalue(i, 22);
+                    [obj.errcode, value(i)] = ENgetnodevalue(i, 22,obj.version);
                 end
             end
         end
@@ -1003,7 +996,7 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
                 for i=obj.getNodeTankIndex
-                    [obj.errcode, value(i)] = ENgetnodevalue(i, 23);
+                    [obj.errcode, value(i)] = ENgetnodevalue(i, 23,obj.version);
                 end
             end
         end
@@ -1022,36 +1015,36 @@ classdef epanet <handle
         end
         function value = getOptionsMaxTrials(obj)
             % Retrieve maximum number of analysis trials
-            [obj.errcode, value] = ENgetoption(0);
+            [obj.errcode, value] = ENgetoption(0,obj.version);
         end
         function value = getOptionsAccuracyValue(obj)
             % Retrieve the analysis convergence criterion (0.001)
-            [obj.errcode, value] = ENgetoption(1);
+            [obj.errcode, value] = ENgetoption(1,obj.version);
         end
         function value = getOptionsQualityTolerance(obj)
             % Retrieve the water quality analysis tolerance
-            [obj.errcode, value] = ENgetoption(2);
+            [obj.errcode, value] = ENgetoption(2,obj.version);
         end
         function value = getOptionsEmitterExponent(obj)
             % Retrieve power exponent for the emmitters (0.5)
-            [obj.errcode, value] = ENgetoption(3);
+            [obj.errcode, value] = ENgetoption(3,obj.version);
         end
         function value = getOptionsPatternDemandMultiplier(obj)
             % Retrieve the demand multiplier (x1)
-            [obj.errcode, value] = ENgetoption(4);
+            [obj.errcode, value] = ENgetoption(4,obj.version);
         end
         function value = getPatternID(obj,varargin)
             %Retrieves the ID label of all or some time patterns indices
             if isempty(varargin)
                 value{obj.getPatternCount}=[];
                 for i=1:obj.getPatternCount
-                    [obj.errcode, value{i}]=ENgetpatternid(i);
+                    [obj.errcode, value{i}]=ENgetpatternid(i,obj.version);
                 end
             else
                 k=1;
                 value{length(varargin{1})}=[];
                 for i=varargin{1}
-                    [obj.errcode, value{k}]=ENgetpatternid(i);
+                    [obj.errcode, value{k}]=ENgetpatternid(i,obj.version);
                     k=k+1;
                 end
             end
@@ -1064,11 +1057,11 @@ classdef epanet <handle
                 k=1;
                 value{length(varargin{1})}=[];
                 for j=1:length(varargin{1})
-                    [obj.errcode, value(k)] = ENgetpatternindex(varargin{1}{j});
+                    [obj.errcode, value(k)] = ENgetpatternindex(varargin{1}{j},obj.version);
                     k=k+1;
                 end
             elseif isa(varargin{1},'char')
-                [obj.errcode, value] = ENgetpatternindex(varargin{1});
+                [obj.errcode, value] = ENgetpatternindex(varargin{1},obj.version);
             end
         end
         function value = getPatternLengths(obj,varargin)
@@ -1076,20 +1069,20 @@ classdef epanet <handle
             if isempty(varargin)
                 tmpPatterns=1:obj.getPatternCount;
                 for i=tmpPatterns
-                    [obj.errcode, value(i)]=ENgetpatternlen(i);
+                    [obj.errcode, value(i)]=ENgetpatternlen(i,obj.version);
                 end
             elseif isa(varargin{1},'cell')
                 k=1;
                 for j=1:length(varargin{1})
-                    [obj.errcode, value(k)] = ENgetpatternlen(obj.getPatternIndex(varargin{1}{j}));
+                    [obj.errcode, value(k)] = ENgetpatternlen(obj.getPatternIndex(varargin{1}{j}),obj.version);
                     k=k+1;
                 end
             elseif isa(varargin{1},'char')
-                [obj.errcode, value] = ENgetpatternlen(obj.getPatternIndex(varargin{1}));
+                [obj.errcode, value] = ENgetpatternlen(obj.getPatternIndex(varargin{1}),obj.version);
             elseif isa(varargin{1},'numeric')
                 k=1;
                 for i=varargin{1}
-                    [obj.errcode, value(k)]=ENgetpatternlen(i);
+                    [obj.errcode, value(k)]=ENgetpatternlen(i,obj.version);
                     k=k+1;
                 end
             end
@@ -1101,7 +1094,7 @@ classdef epanet <handle
             for i=1:obj.getPatternCount
                 tmplength=obj.getPatternLengths(i);
                 for j=1:tmplength
-                    [obj.errcode, value(i,j)] = ENgetpatternvalue(i, j);
+                    [obj.errcode, value(i,j)] = ENgetpatternvalue(i, j,obj.version);
                 end
                 if tmplength<tmpmaxlen
                     for j=(tmplength+1):tmpmaxlen
@@ -1113,70 +1106,70 @@ classdef epanet <handle
         end
         function value = getPatternValue(obj,patternIndex, patternStep)
             %Retrieves the multiplier factor for a certain pattern and time
-            [obj.errcode, value] = ENgetpatternvalue(patternIndex, patternStep);
+            [obj.errcode, value] = ENgetpatternvalue(patternIndex, patternStep,obj.version);
         end
         function value = getQualityType(obj)
             %Retrieves the type of water quality analysis type
-            [obj.errcode, obj.QualityCode,obj.QualityTraceNodeIndex] = ENgetqualtype();
+            [obj.errcode, obj.QualityCode,obj.QualityTraceNodeIndex] = ENgetqualtype(obj.version);
             value=obj.TYPEQUALITY(obj.QualityCode+1);
         end
         function value = getQualityCode(obj)
             %Retrieves the code of water quality analysis type
-            [obj.errcode, value,obj.QualityTraceNodeIndex] = ENgetqualtype();
+            [obj.errcode, value,obj.QualityTraceNodeIndex] = ENgetqualtype(obj.version);
         end
         function value = getQualityTraceNodeIndex(obj)
             %Retrieves the trace node index of water quality analysis type
-            [obj.errcode, obj.QualityCode,value] = ENgetqualtype();
+            [obj.errcode, obj.QualityCode,value] = ENgetqualtype(obj.version);
         end
         function value = getTimeSimulationDuration(obj)
             %Retrieves the value of simulation duration
-            [obj.errcode, value] = ENgettimeparam(0);
+            [obj.errcode, value] = ENgettimeparam(0,obj.version);
         end
         function value = getTimeHydraulicStep(obj)
             %Retrieves the value of the hydraulic time step
-            [obj.errcode, value] = ENgettimeparam(1);
+            [obj.errcode, value] = ENgettimeparam(1,obj.version);
         end
         function value = getTimeQualityStep(obj)
             %Retrieves the value of the water quality time step
-            [obj.errcode, value] = ENgettimeparam(2);
+            [obj.errcode, value] = ENgettimeparam(2,obj.version);
         end
         function value = getTimePatternStep(obj)
             %Retrieves the value of the pattern time step
-            [obj.errcode, value] = ENgettimeparam(3);
+            [obj.errcode, value] = ENgettimeparam(3,obj.version);
         end
         function value = getTimePatternStart(obj)
             %Retrieves the value of pattern start time
-            [obj.errcode, value] = ENgettimeparam(4);
+            [obj.errcode, value] = ENgettimeparam(4,obj.version);
         end
         function value = getTimeReportingStep(obj)
             %Retrieves the value of the reporting time step
-            [obj.errcode, value] = ENgettimeparam(5);
+            [obj.errcode, value] = ENgettimeparam(5,obj.version);
         end
         function value = getTimeReportingStart(obj)
             %Retrieves the value of the reporting start time
-            [obj.errcode, value] = ENgettimeparam(6);
+            [obj.errcode, value] = ENgettimeparam(6,obj.version);
         end
         function value = getTimeRuleControlStep(obj)
             %Retrieves the time step for evaluating rule-based controls
-            [obj.errcode, value] = ENgettimeparam(7);
+            [obj.errcode, value] = ENgettimeparam(7,obj.version);
         end
         function value = getTimeStatisticsType(obj)
             %Retrieves the type of time series post-processing ('NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE')
-            [obj.errcode, obj.TimeStatisticsIndex] = ENgettimeparam(8);
+            [obj.errcode, obj.TimeStatisticsIndex] = ENgettimeparam(8,obj.version);
             value=obj.TYPESTATS(obj.TimeStatisticsIndex+1);
         end
         function value = getTimeStatisticsIndex(obj)
             %Retrieves the type of time series post-processing ('NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE')
-            [obj.errcode, value] = ENgettimeparam(8);
+            [obj.errcode, value] = ENgettimeparam(8,obj.version);
         end
         function value = getTimeReportingPeriods(obj)
             %Retrieves the number of reporting periods saved to the binary
             %output file
-            [obj.errcode, value] = ENgettimeparam(9);
+            [obj.errcode, value] = ENgettimeparam(9,obj.version);
         end
         function value = getVersion(obj)
             % Retrieve the current EPANET version
-            [obj.errcode, value] = ENgetversion();
+            [obj.errcode, value] = ENgetversion(obj.version);
         end
         function value = getComputedHydraulicTimeSeries(obj)
             % Compute hydraulic simulation and retrieve all time-series
@@ -1266,18 +1259,18 @@ classdef epanet <handle
             obj.closeQualityAnalysis;
         end
         function solveCompleteHydraulics(obj)
-            [obj.errcode] = ENsolveH();
+            [obj.errcode] = ENsolveH(obj.version);
         end
         function solveCompleteQuality(obj)
-            [obj.errcode] = ENsolveQ();
+            [obj.errcode] = ENsolveQ(obj.version);
         end
         function valueIndex = addPattern(obj,varargin)
             valueIndex=-1;
             if nargin==2
-                [obj.errcode] = ENaddpattern(varargin{1});
+                [obj.errcode] = ENaddpattern(varargin{1},obj.version);
                 valueIndex = getPatternIndex(obj,varargin{1});
             elseif nargin==3
-                [obj.errcode] = ENaddpattern(varargin{1});
+                [obj.errcode] = ENaddpattern(varargin{1},obj.version);
                 valueIndex = getPatternIndex(obj,varargin{1});
                 setPattern(obj,valueIndex,varargin{2});
             end
@@ -1286,10 +1279,10 @@ classdef epanet <handle
             % Example: d.setControl(1,1,13,1,11,150) controlRuleIndex must
             % exist
             if controlRuleIndex<=obj.getControlRulesCount
-                [obj.errcode] = ENsetcontrol(controlRuleIndex,controlTypeIndex,linkIndex,controlSettingValue,nodeIndex,controlLevel);
+                [obj.errcode] = ENsetcontrol(controlRuleIndex,controlTypeIndex,linkIndex,controlSettingValue,nodeIndex,controlLevel,obj.version);
                 obj.ControlTypes={};
                 for i=1:obj.getControlRulesCount
-                    [obj.errcode, obj.ControlTypesIndex(i),obj.ControlLinkIndex(i),obj.ControlSettings(i),obj.ControlNodeIndex(i),obj.ControlLevelValues(i)] = ENgetcontrol(i);
+                    [obj.errcode, obj.ControlTypesIndex(i),obj.ControlLinkIndex(i),obj.ControlSettings(i),obj.ControlNodeIndex(i),obj.ControlLevelValues(i)] = ENgetcontrol(i,obj.version);
                     obj.ControlTypes(i)=obj.TYPECONTROL(obj.ControlTypesIndex(i)+1);
                 end
                 obj.ControlRules={obj.ControlTypes,obj.ControlTypesIndex,obj.ControlLinkIndex,obj.ControlSettings,obj.ControlNodeIndex,obj.ControlLevelValues};
@@ -1299,208 +1292,208 @@ classdef epanet <handle
         end
         function setLinkDiameter(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 0, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 0, value(i),obj.version);
             end
         end
         function setLinkLength(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 1, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 1, value(i),obj.version);
             end
         end
         function setLinkRoughnessCoeff(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 2, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 2, value(i),obj.version);
             end
         end
         function setLinkMinorLossCoeff(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 3, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 3, value(i),obj.version);
             end
         end
         function setLinkInitialStatus(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 4, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 4, value(i),obj.version);
             end
         end
         function setLinkInitialSetting(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 5, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 5, value(i),obj.version);
             end
         end
         function setLinkBulkReactionCoeff(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 6, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 6, value(i),obj.version);
             end
         end
         function setLinkWallReactionCoeff(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 7, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 7, value(i),obj.version);
             end
         end
         function setLinkStatus(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 11, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 11, value(i),obj.version);
             end
         end
         function setLinkSettings(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 12, value(i));
+                [obj.errcode] = ENsetlinkvalue(i, 12, value(i),obj.version);
             end
         end
         function setNodeElevations(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetnodevalue(i, 0, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 0, value(i),obj.version);
             end
             %             [obj.errcode, obj.NodeElevations(index)] =
             %             ENgetnodevalue(index, 0);
         end
         function setNodeBaseDemands(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetnodevalue(i, 1, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 1, value(i),obj.version);
             end
             %[obj.errcode, obj.NodeBaseDemands(index)] =
             %ENgetnodevalue(index, 1);
         end
         function setNodeDemandPatternIndex(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetnodevalue(i, 2, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 2, value(i),obj.version);
             end
         end
         function setNodeEmitterCoeff(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetnodevalue(i, 3, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 3, value(i),obj.version);
             end
         end
         function setNodeInitialQuality(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetnodevalue(i, 4, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 4, value(i),obj.version);
             end
         end
         function setNodeTankLevelInitial(obj, value)
             for i=obj.getNodeTankIndex
-                [obj.errcode] = ENsetnodevalue(i, 8, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 8, value(i),obj.version);
             end
         end
         function setNodeTankMixingModelType(obj, value)
             for i=obj.getNodeTankIndex
                 code=strfind(strcmpi(value(i),obj.TYPEMIXMODEL),1)-1;
-                [obj.errcode] = ENsetnodevalue(i, 15, code);
+                [obj.errcode] = ENsetnodevalue(i, 15, code,obj.version);
             end
         end
         function setNodeTankDiameter(obj, value)
             for i=obj.getNodeTankIndex
-                [obj.errcode] = ENsetnodevalue(i, 17, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 17, value(i),obj.version);
             end
         end
         function setNodeTankMinimumWaterLevel(obj, value)
             for i=obj.getNodeTankIndex
-                [obj.errcode] = ENsetnodevalue(i, 20, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 20, value(i),obj.version);
             end
         end
         function setNodeTankMinimumWaterVolume(obj, value)
             for i=obj.getNodeTankIndex
-                [obj.errcode] = ENsetnodevalue(i, 18, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 18, value(i),obj.version);
             end
         end
         function setNodeTankMaximumWaterLevel(obj, value)
             for i=obj.getNodeTankIndex
-                [obj.errcode] = ENsetnodevalue(i, 21, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 21, value(i),obj.version);
             end
         end
         function setNodeTankMinimumFraction(obj, value)
             for i=obj.getNodeTankIndex
-                [obj.errcode] = ENsetnodevalue(i, 22, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 22, value(i),obj.version);
             end
         end
         function setNodeTankBulkReactionCoeff(obj, value)
             for i=obj.getNodeTankIndex
-                [obj.errcode] = ENsetnodevalue(i, 23, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 23, value(i),obj.version);
             end
         end
         function setNodeSourceQuality(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetnodevalue(i, 5, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 5, value(i),obj.version);
             end
         end
         function setNodeSourcePatternIndex(obj, value)
             for i=1:length(value)
-                [obj.errcode] = ENsetnodevalue(i, 6, value(i));
+                [obj.errcode] = ENsetnodevalue(i, 6, value(i),obj.version);
             end
         end
         function setNodeSourceType(obj, index, value)
             value=find(strcmpi(obj.TYPESOURCE,value)==1)-1;
-            [obj.errcode] = ENsetnodevalue(index, 7, value);
+            [obj.errcode] = ENsetnodevalue(index, 7, value,obj.version);
         end
         function setOptionsMaxTrials(obj,value)
-            [obj.errcode] = ENsetoption(0,value);
-            [obj.errcode, obj.OptionsMaxTrials] = ENgetoption(0);
+            [obj.errcode] = ENsetoption(0,value,obj.version);
+            [obj.errcode, obj.OptionsMaxTrials] = ENgetoption(0,obj.version);
         end
         function setOptionsAccuracyValue(obj,value)
-            [obj.errcode] = ENsetoption(1,value);
-            [obj.errcode, obj.OptionsAccuracyValue] = ENgetoption(1);
+            [obj.errcode] = ENsetoption(1,value,obj.version);
+            [obj.errcode, obj.OptionsAccuracyValue] = ENgetoption(1,obj.version);
         end
         function setOptionsQualityTolerance(obj,value)
-            [obj.errcode] = ENsetoption(2,value);
-            [obj.errcode, obj.OptionsQualityTolerance] = ENgetoption(2);
+            [obj.errcode] = ENsetoption(2,value,obj.version);
+            [obj.errcode, obj.OptionsQualityTolerance] = ENgetoption(2,obj.version);
         end
         function setOptionsEmitterExponent(obj,value)
-            [obj.errcode] = ENsetoption(3,value);
-            [obj.errcode, obj.OptionsEmitterExponent] = ENgetoption(3);
+            [obj.errcode] = ENsetoption(3,value,obj.version);
+            [obj.errcode, obj.OptionsEmitterExponent] = ENgetoption(3,obj.version);
         end
         function setOptionsPatternDemandMultiplier(obj,value)
-            [obj.errcode] = ENsetoption(4,value);
-            [obj.errcode, obj.OptionsPatternDemandMultiplier] = ENgetoption(4);
+            [obj.errcode] = ENsetoption(4,value,obj.version);
+            [obj.errcode, obj.OptionsPatternDemandMultiplier] = ENgetoption(4,obj.version);
         end
         function setTimeSimulationDuration(obj,value)
-            [obj.errcode] = ENsettimeparam(0,value);
-            [obj.errcode, obj.TimeSimulationDuration] = ENgettimeparam(0);
+            [obj.errcode] = ENsettimeparam(0,value,obj.version);
+            [obj.errcode, obj.TimeSimulationDuration] = ENgettimeparam(0,obj.version);
         end
         function setTimeHydraulicStep(obj,value)
-            [obj.errcode] = ENsettimeparam(1,value);
-            [obj.errcode, obj.TimeHydraulicStep] = ENgettimeparam(1);
+            [obj.errcode] = ENsettimeparam(1,value,obj.version);
+            [obj.errcode, obj.TimeHydraulicStep] = ENgettimeparam(1,obj.version);
         end
         function setTimeQualityStep(obj,value)
-            [obj.errcode] = ENsettimeparam(2,value);
-            [obj.errcode, obj.TimeQualityStep] = ENgettimeparam(2);
+            [obj.errcode] = ENsettimeparam(2,value,obj.version);
+            [obj.errcode, obj.TimeQualityStep] = ENgettimeparam(2,obj.version);
         end
         function setTimePatternStep(obj,value)
-            [obj.errcode] = ENsettimeparam(3,value);
-            [obj.errcode, obj.TimePatternStep] = ENgettimeparam(3);
+            [obj.errcode] = ENsettimeparam(3,value,obj.version);
+            [obj.errcode, obj.TimePatternStep] = ENgettimeparam(3,obj.version);
         end
         function setTimePatternStart(obj,value)
-            [obj.errcode] = ENsettimeparam(4,value);
-            [obj.errcode, obj.TimePatternStart] = ENgettimeparam(4);
+            [obj.errcode] = ENsettimeparam(4,value,obj.version);
+            [obj.errcode, obj.TimePatternStart] = ENgettimeparam(4,obj.version);
         end
         function setTimeReportingStep(obj,value)
-            [obj.errcode] = ENsettimeparam(5,value);
-            [obj.errcode, obj.TimeReportingStep] = ENgettimeparam(5);
+            [obj.errcode] = ENsettimeparam(5,value,obj.version);
+            [obj.errcode, obj.TimeReportingStep] = ENgettimeparam(5,obj.version);
         end
         function setTimeReportingStart(obj,value)
-            [obj.errcode] = ENsettimeparam(6,value);
-            [obj.errcode, obj.TimeReportingStart] = ENgettimeparam(6);
+            [obj.errcode] = ENsettimeparam(6,value,obj.version);
+            [obj.errcode, obj.TimeReportingStart] = ENgettimeparam(6,obj.version);
         end
         function setTimeStatisticsType(obj,value)
             %'NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE'
             tmpindex=find(strcmpi(obj.TYPESTATS,value)==1)-1;
-            [obj.errcode] = ENsettimeparam(8,tmpindex);
-            [obj.errcode, obj.TimeStatisticsIndex] = ENgettimeparam(8);
+            [obj.errcode] = ENsettimeparam(8,tmpindex,obj.version);
+            [obj.errcode, obj.TimeStatisticsIndex] = ENgettimeparam(8,obj.version);
         end
         function setTimeRuleControlStep(obj,value)
-            [obj.errcode] = ENsettimeparam(7,value);
-            [obj.errcode, obj.TimeRuleControlStep] = ENgettimeparam(7);
+            [obj.errcode] = ENsettimeparam(7,value,obj.version);
+            [obj.errcode, obj.TimeRuleControlStep] = ENgettimeparam(7,obj.version);
         end
         function setPattern(obj,index,patternVector)
             nfactors=length(patternVector);
-            [obj.errcode] = ENsetpattern(index, patternVector, nfactors);
+            [obj.errcode] = ENsetpattern(index, patternVector, nfactors,obj.version);
         end
         function setPatternMatrix(obj,patternMatrix)
             nfactors=size(patternMatrix,2);
             for i=1:size(patternMatrix,1)
-                [obj.errcode] = ENsetpattern(i, patternMatrix(i,:), nfactors);
+                [obj.errcode] = ENsetpattern(i, patternMatrix(i,:), nfactors,obj.version);
             end
         end
         function setPatternValue(obj,index, patternTimeStep, patternFactor)
-            [obj.errcode] = ENsetpatternvalue(index, patternTimeStep, patternFactor);
+            [obj.errcode] = ENsetpatternvalue(index, patternTimeStep, patternFactor,obj.version);
         end
         function setQualityType(obj,varargin)
             qualcode=0;
@@ -1508,76 +1501,76 @@ classdef epanet <handle
             chemunits='';
             tracenode='';
             if find(strcmpi(varargin,'none')==1)
-                [obj.errcode] = ENsetqualtype(qualcode,chemname,chemunits,tracenode);
+                [obj.errcode] = ENsetqualtype(qualcode,chemname,chemunits,tracenode,obj.version);
             elseif find(strcmpi(varargin,'age')==1)
                 qualcode=2;
-                [obj.errcode] = ENsetqualtype(qualcode,chemname,chemunits,tracenode);
+                [obj.errcode] = ENsetqualtype(qualcode,chemname,chemunits,tracenode,obj.version);
             elseif find(strcmpi(varargin,'chem')==1)
                 qualcode=1;
                 chemname=varargin{1};
                 chemunits=varargin{2};
-                [obj.errcode] = ENsetqualtype(qualcode,chemname,chemunits,tracenode);
+                [obj.errcode] = ENsetqualtype(qualcode,chemname,chemunits,tracenode,obj.version);
             elseif find(strcmpi(varargin,'trace')==1)
                 qualcode=3;
                 tracenode=varargin{2};
-                [obj.errcode] = ENsetqualtype(qualcode,chemname,chemunits,tracenode);
+                [obj.errcode] = ENsetqualtype(qualcode,chemname,chemunits,tracenode,obj.version);
             end
         end
         function setReportFormatReset(obj)
-            [obj.errcode]=ENresetreport();
+            [obj.errcode]=ENresetreport(obj.version);
         end
         function setReportStatus(obj,value)
             %'yes','no','full'
             statuslevel=find(strcmpi(obj.TYPEREPORT,value)==1)-1;
-            [obj.errcode] = ENsetstatusreport(statuslevel);
+            [obj.errcode] = ENsetstatusreport(statuslevel,obj.version);
         end
         function setReport(obj,value)
-            [obj.errcode] = ENsetreport(value);
+            [obj.errcode] = ENsetreport(value,obj.version);
         end
         function closeNetwork(obj)
             [obj.errcode] = ENclose(obj.version);
         end
         function closeHydraulicAnalysis(obj)
-            [obj.errcode] = ENcloseH();
+            [obj.errcode] = ENcloseH(obj.version);
         end
         function closeQualityAnalysis(obj)
-            [obj.errcode] = ENcloseQ();
+            [obj.errcode] = ENcloseQ(obj.version);
         end
         function saveHydraulicFile(obj,hydname)
-            [obj.errcode]=ENsavehydfile(hydname);
+            [obj.errcode]=ENsavehydfile(hydname,obj.version);
         end
         function useHydraulicFile(obj,hydname)
-            [obj.errcode]=ENusehydfile(hydname);
+            [obj.errcode]=ENusehydfile(hydname,obj.version);
         end
         function initializeHydraulicAnalysis(obj)
-            [obj.errcode] = ENinitH(1);
+            [obj.errcode] = ENinitH(1,obj.version);
         end
         function initializeQualityAnalysis(obj)
-            [obj.errcode] = ENinitQ(1);
+            [obj.errcode] = ENinitQ(1,obj.version);
         end
         function tstep = nextHydraulicAnalysisStep(obj)
-            [obj.errcode, tstep] = ENnextH();
+            [obj.errcode, tstep] = ENnextH(obj.version);
         end
         function tstep = nextQualityAnalysisStep(obj)
-            [obj.errcode, tstep] = ENnextQ();
+            [obj.errcode, tstep] = ENnextQ(obj.version);
         end
         function openHydraulicAnalysis(obj)
-            [obj.errcode] = ENopenH();
+            [obj.errcode] = ENopenH(obj.version);
         end
         function openQualityAnalysis(obj)
-            [obj.errcode] = ENopenQ();
+            [obj.errcode] = ENopenQ(obj.version);
         end
         function tstep = runHydraulicAnalysis(obj)
-            [obj.errcode, tstep] = ENrunH();
+            [obj.errcode, tstep] = ENrunH(obj.version);
         end
         function tstep = runQualityAnalysis(obj)
-            [obj.errcode, tstep] = ENrunQ();
+            [obj.errcode, tstep] = ENrunQ(obj.version);
         end
         function saveHydraulicsOutputReportingFile(obj)
-            [obj.errcode] = ENsaveH();
+            [obj.errcode] = ENsaveH(obj.version);
         end
         function tleft=stepQualityAnalysisTimeLeft(obj)
-            [obj.errcode, tleft] = ENstepQ();
+            [obj.errcode, tleft] = ENstepQ(obj.version);
         end
         function saveInputFile(obj,inpname)
             [obj.errcode] = ENsaveinpfile(inpname,obj.version);
@@ -1603,15 +1596,16 @@ classdef epanet <handle
         %             end
         %         end
         function writeLineInReportFile(obj, line)
-            [obj.errcode] = ENwriteline (line);
+            [obj.errcode] = ENwriteline (line,obj.version);
         end
         function writeReport(obj)
             %Writes a formatted text report on simulation results to the Report file
-            [obj.errcode]=ENreport();
+            [obj.errcode]=ENreport(obj.version);
         end
-        function unload(varargin)
-            ENclose;
-            ENMatlabCleanup;
+        function unload(obj)
+            ENclose(obj.version);
+            ENMatlabCleanup(obj.version);
+            disp('EPANET Class is unloaded')
         end
         function setFlowUnitsGPM(obj,newinpname)
             Options(obj,newinpname,'GPM') %gallons per minute
@@ -2289,25 +2283,25 @@ end
 function [errcode] = ENwriteline (line,version)
     [errcode]=calllib(version,'ENwriteline',line);
     if errcode
-        ENerror(errcode);
+        ENgeterror(errcode,version);
     end
 end
 function [errcode] = ENaddpattern(patid,version)
     errcode=calllib(version,'ENaddpattern',patid);
     if errcode
-        ENerror(errcode);
+        ENgeterror(errcode,version);
     end
 end
 function [errcode] = ENclose(version)
     [errcode]=calllib(version,'ENclose');
     if errcode
-        ENerror(errcode);
+        ENgeterror(errcode,version);
     end
 end
 function [errcode] = ENcloseH(version)
     [errcode]=calllib(version,'ENcloseH');
     if errcode
-        ENerror(errcode);
+        ENgeterror(errcode,version);
     end
 end
 function [errcode, value] = ENgetnodevalue(index, paramcode,version)
@@ -2323,149 +2317,146 @@ end
 function [errcode] = ENcloseQ(version)
     [errcode]=calllib(version,'ENcloseQ');
     if errcode
-        ENerror(errcode);
+        ENgeterror(errcode,version);
     end
 end
-function [e] = ENerror(errcode,version)
-    errstring=char(32*ones(1,80));
-    len=80;
-    [e,errstring] = calllib(version,'ENgeterror',errcode,errstring,len);
-    disp(errstring);
-end
-function [errcode, ctype,lindex,setting,nindex,level] = ENgetcontrol(cindex)
+
+function [errcode, ctype,lindex,setting,nindex,level] = ENgetcontrol(cindex,version)
     [errcode, ctype,lindex,setting,nindex,level]=calllib(version,'ENgetcontrol',cindex,0,0,0,0,0);
     if errcode
-        ENerror(errcode);
+        ENgeterror(errcode,version);
     end
 end
 function [errcode, count] = ENgetcount(countcode,version)
     [errcode,count]=calllib(version,'ENgetcount',countcode,0);
     if errcode
-        ENerror(errcode);
+        ENgeterror(errcode,version);
     end
 end
-function [e, errmsg] = ENgeterror(errcode,version)
-    errmsg = char(32*ones(1,80));
-    [e,errmsg] = calllib(version,'ENgeterror',errcode,errmsg,80);
-    if e
-        ENerror(e);
+function [e, errmsg] = ENgeterror(errcode,version);
+    if errcode
+        errmsg = char(32*ones(1,80));
+        [e,errmsg] = calllib(version,'ENgeterror',errcode,errmsg,80);
+    else
+        e=0;
+        errmsg='';
     end
 end
 function [errcode,flowunitsindex] = ENgetflowunits(version)
 [errcode, flowunitsindex]=calllib(version,'ENgetflowunits',0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode,id] = ENgetlinkid(index,version)
 id=char(32*ones(1,17));
 [errcode,id]=calllib(version,'ENgetlinkid',index,id);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode,index] = ENgetlinkindex(id,version)
 [errcode,~,index]=calllib(version,'ENgetlinkindex',id,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode,from,to] = ENgetlinknodes(index,version)
 [errcode,from,to]=calllib(version,'ENgetlinknodes',index,0,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, type] = ENgetlinktype(index,version)
 [errcode,type]=calllib(version,'ENgetlinktype',index,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, value] = ENgetlinkvalue(index, paramcode,version)
 [errcode,value]=calllib(version,'ENgetlinkvalue',index, paramcode, 0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode,id] = ENgetnodeid(index,version)
 id=char(32*ones(1,17));
 [errcode,id]=calllib(version,'ENgetnodeid',index,id);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode,index] = ENgetnodeindex(id,version)
 [errcode, ~, index]=calllib(version,'ENgetnodeindex',id,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, type] = ENgetnodetype(index,version)
 [errcode,type]=calllib(version,'ENgetnodetype',index,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, value] = ENgetoption(optioncode,version)
 [errcode,value]=calllib(version,'ENgetoption',optioncode,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, id] = ENgetpatternid(index,version)
 id=char(32*ones(1,31));
 [errcode,id]=calllib(version,'ENgetpatternid',index,id);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, index] = ENgetpatternindex(id,version)
 [errcode,~, index]=calllib(version,'ENgetpatternindex',id,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, len] = ENgetpatternlen(index,version)
 [errcode,len]=calllib(version,'ENgetpatternlen',index,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, value] = ENgetpatternvalue(index, period,version)
 [errcode,value]=calllib(version,'ENgetpatternvalue',index, period, 0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode,qualcode,tracenode] = ENgetqualtype(version)
 [errcode,qualcode,tracenode]=calllib(version,'ENgetqualtype',0,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, timevalue] = ENgettimeparam(paramcode,version)
 [errcode,timevalue]=calllib(version,'ENgettimeparam',paramcode,0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, version] = ENgetversion(version)
 [errcode,version]=calllib(version,'ENgetversion',0);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENinitH(flag,version)
 [errcode]=calllib(version,'ENinitH',flag);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENinitQ(saveflag,version)
 [errcode]=calllib(version,'ENinitQ',saveflag);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function ENMatlabCleanup(version)
@@ -2494,13 +2485,13 @@ end
 function [errcode, tstep] = ENnextH(version)
 [errcode,tstep]=calllib(version,'ENnextH',int32(0));
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, tstep] = ENnextQ(version)
 [errcode,tstep]=calllib(version,'ENnextQ',int32(0));
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 tstep = double(tstep);
 end
@@ -2512,32 +2503,32 @@ end
 function [errcode] = ENopenH(version)
 [errcode]=calllib(version,'ENopenH');
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENopenQ(version)
 [errcode]=calllib(version,'ENopenQ');
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENreport(version)
 [errcode]=calllib(version,'ENreport');
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENresetreport(version)
 [errcode]=calllib(version,'ENresetreport');
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, t] = ENrunH(version)
 [errcode,t]=calllib(version,'ENrunH',int32(0));
 t = double(t);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, t] = ENrunQ(version)
@@ -2545,80 +2536,80 @@ t=int32(0);
 %p=libpointer('int32Ptr',t);
 [errcode,t]=calllib(version,'ENrunQ',t);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 % t = double(t);
 end
 function [errcode] = ENsaveH(version)
 [errcode]=calllib(version,'ENsaveH');
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsavehydfile(fname,version)
 [errcode]=calllib(version,'ENsavehydfile',fname);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsaveinpfile(inpname,version)
 errcode=calllib(version,'ENsaveinpfile',inpname);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsetcontrol(cindex,ctype,lindex,setting,nindex,level,version)
 [errcode]=calllib(version,'ENsetcontrol',cindex,ctype,lindex,setting,nindex,level);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsetlinkvalue(index, paramcode, value,version)
 [errcode]=calllib(version,'ENsetlinkvalue',index, paramcode, value);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsetnodevalue(index, paramcode, value,version)
 [errcode]=calllib(version,'ENsetnodevalue',index, paramcode, value);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsetoption(optioncode,value,version)
 [errcode]=calllib(version,'ENsetoption',optioncode,value);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsetpattern(index, factors, nfactors,version)
 [errcode]=calllib(version,'ENsetpattern',index,factors,nfactors);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsetpatternvalue(index, period, value,version)
 [errcode]=calllib(version,'ENsetpatternvalue',index, period, value);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsetqualtype(qualcode,chemname,chemunits,tracenode,version)
 [errcode]=calllib(version,'ENsetqualtype',qualcode,chemname,chemunits,tracenode);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsetreport(command,version)
 [errcode]=calllib(version,'ENsetreport',command);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsetstatusreport(statuslevel,version)
 [errcode]=calllib(version,'ENsetstatusreport',statuslevel);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsettimeparam(paramcode, timevalue,version)
@@ -2626,33 +2617,33 @@ paramcode=int32(paramcode);
 timevalue=int32(timevalue);
 [errcode]=calllib(version,'ENsettimeparam',paramcode,timevalue);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsolveH(version)
 [errcode]=calllib(version,'ENsolveH');
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode] = ENsolveQ(version)
 [errcode]=calllib(version,'ENsolveQ');
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [errcode, tleft] = ENstepQ(version)
 tleft=int32(0);
 [errcode,tleft]=calllib(version,'ENstepQ',tleft);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 tleft=double(tleft);
 end
 function [errcode] = ENusehydfile(hydfname,version)
 [errcode]=calllib(version,'ENusehydfile',hydfname);
 if errcode
-    ENerror(errcode);
+    ENgeterror(errcode,version);
 end
 end
 function [axesid] = ENplot(obj,varargin)
@@ -3811,7 +3802,7 @@ end
 end
 function value=LinksInfo(obj)
 % Open epanet input file
-[fid,message] = fopen(obj.pathfile,'rt');
+    [fid,message] = fopen(obj.inputfile,'rt');
 if fid < 0
     disp(message)
     return
@@ -3923,7 +3914,7 @@ value.LinksAll=[value.PipesID value.PumpsID value.ValvesID];
 end
 function value=NodesInfo(obj)
     % Open epanet input file
-    [fid,message] = fopen(obj.pathfile,'rt');
+    [fid,message] = fopen(obj.inputfile,'rt');
     if fid < 0
         disp(message)
         return
@@ -5197,287 +5188,7 @@ while 1
     
 end
 end
-function [axesid] = ENplotB(obj,varargin)
-% Initiality
-highlightnode=0;
-highlightlink=0;
-highlightnodeindex=[];
-highlightlinkindex=[];
-Node=char('no');
-Link=char('no');
-fontsize=10;
-selectColorNode={''};
-selectColorLink={''};
-axesid=0;
 
-for i=1:(nargin/2)
-    argument =lower(varargin{2*(i-1)+1});
-    switch argument
-        case 'nodes' % Nodes
-            if ~strcmp(lower(varargin{2*i}),'yes') && ~strcmp(lower(varargin{2*i}),'no')
-                warning('Invalid argument.');
-                return
-            end
-            Node=varargin{2*i};
-        case 'links' % Links
-            if ~strcmp(lower(varargin{2*i}),'yes') && ~strcmp(lower(varargin{2*i}),'no')
-                warning('Invalid argument.');
-                return
-            end
-            Link=varargin{2*i};
-        case 'highlightnode' % Highlight Node
-            highlightnode=varargin{2*i};
-        case 'highlightlink' % Highlight Link
-            highlightlink=varargin{2*i};
-        case 'fontsize' % font size
-            fontsize=varargin{2*i};
-        case 'colornode' % color
-            selectColorNode=varargin{2*i};
-        case 'colorlink' % color
-            selectColorLink=varargin{2*i};
-        case 'axes' % color
-            axesid=axes('Parent',varargin{2*i});
-        otherwise
-            warning('Invalid property founobj.');
-            return
-    end
-end
-
-if axesid==0
-    g=figure;
-    axesid=axes('Parent',g);
-end
-
-if cellfun('isempty',selectColorNode)==1
-    init={'r'};
-    for i=1:length(highlightnode)
-        selectColorNode=[init selectColorNode];
-    end
-end
-if cellfun('isempty',selectColorLink)==1
-    init={'r'};
-    for i=1:length(highlightlink)
-        selectColorLink=[init selectColorLink];
-    end
-end
-% Get node names and x, y coordiantes
-if isa(highlightnode,'cell')
-    for i=1:length(highlightnode)
-        n = strcmp(obj.NodeNameID,highlightnode{i});
-        if sum(n)==0
-            warning('Undefined node with id "%s" in function call therefore the index is zero.', char(highlightnode{i}));
-        else
-            highlightnodeindex(i) = strfind(n,1);
-        end
-    end
-end
-
-if isa(highlightlink,'cell')
-    for i=1:length(highlightlink)
-        n = strcmp(obj.LinkNameID,highlightlink{i});
-        if sum(n)==0
-            warning('Undefined link with id "%s" in function call therefore the index is zero.', char(highlightlink{i}));
-        else
-            highlightlinkindex(i) = strfind(n,1);
-        end
-    end
-end
-
-for i=1:obj.LinkCount
-    FromNode=strfind(strcmp(obj.NodesConnectingLinksID(i,1),obj.NodeNameID),1);
-    ToNode=strfind(strcmp(obj.NodesConnectingLinksID(i,2),obj.NodeNameID),1);
-    
-    if FromNode
-        x1 = double(obj.NodeCoordinates{1}(FromNode));
-        y1 = double(obj.NodeCoordinates{2}(FromNode));
-    end
-    if ToNode
-        x2 = double(obj.NodeCoordinates{1}(ToNode));
-        y2 = double(obj.NodeCoordinates{2}(ToNode));
-    end
-    
-    hh=strfind(highlightlinkindex,i);
-    
-    h(:,4)=line([x1 obj.NodeCoordinates{3}{i} x2],[y1 obj.NodeCoordinates{4}{i} y2],'LineWidth',1,'Parent',axesid);
-    
-    legendString{4} = char('Pipes');
-    % Plot Pumps
-    if sum(strfind(obj.LinkPumpIndex,i))
-        colornode = 'm';
-        if length(hh) && isempty(selectColorLink)
-            colornode = 'r';
-        end
-        h(:,5)=plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor','m',...
-            'MarkerFaceColor','m',...
-            'MarkerSize',5,'Parent',axesid);
-        plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor',colornode,...
-            'MarkerFaceColor',colornode,...
-            'MarkerSize',5,'Parent',axesid);
-        
-        legendString{5} = char('Pumps');
-    end
-    
-    % Plot Valves
-    if sum(strfind(obj.LinkValveIndex,i))
-        colornode = 'k';
-        if length(hh) && isempty(selectColorLink)
-            colornode = 'r';
-        end
-        h(:,6)=plot((x1+x2)/2,(y1+y2)/2,'k*','LineWidth',2,'MarkerEdgeColor',colornode,...
-            'MarkerFaceColor',colornode,'MarkerSize',7,'Parent',axesid);
-        legendString{6} = char('Valves');
-    end
-    
-    % Show Link id
-    if (strcmp(lower(Link),'yes') && ~length(hh))
-        text((x1+x2)/2,(y1+y2)/2,obj.LinkNameID(i),'Fontsize',fontsize);
-    end
-    
-    if length(hh) && isempty(selectColorLink)
-        line([x1,x2],[y1,y2],'LineWidth',2,'Color','r','Parent',axesid);
-        text((x1+x2)/2,(y1+y2)/2,obj.LinkNameID(i),'Fontsize',fontsize);
-    elseif length(hh) && ~isempty(selectColorLink)
-        try
-            tt=length(selectColorLink{hh});
-        catch err
-            tt=2;
-        end
-        if tt>1
-            if length(selectColorLink(hh))==1
-                nm{1}=selectColorLink(hh);
-            else
-                nm=selectColorLink(hh);
-            end
-            if iscell(nm{1})
-                line([x1 obj.NodeCoordinates{3}{i} x2],[y1 obj.NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1}{1},'Parent',axesid);
-            else
-                line([x1 obj.NodeCoordinates{3}{i} x2],[y1 obj.NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',nm{1},'Parent',axesid);
-            end
-        else
-            line([x1 obj.NodeCoordinates{3}{i} x2],[y1 obj.NodeCoordinates{4}{i} y2],'LineWidth',2,'Color',char(selectColorLink(hh)),'Parent',axesid);
-        end
-        %         text((x1+x2)/2,(y1+y2)/2,obj.LinkNameID(i),'Fontsize',fontsize);
-    end
-    
-    hold on
-end
-
-% Coordinates for node FROM
-for i=1:obj.NodeCount
-    [x] = double(obj.NodeCoordinates{1}(i));
-    [y] = double(obj.NodeCoordinates{2}(i));
-    
-    hh=strfind(highlightnodeindex,i);
-    h(:,1)=plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','b',...
-        'MarkerFaceColor','b',...
-        'MarkerSize',5,'Parent',axesid);
-    legendString{1}= char('Junctions');
-    
-    % Plot Reservoirs
-    if sum(strfind(obj.NodeReservoirIndex,i))
-        colornode = 'g';
-        if length(hh) && isempty(selectColorNode)
-            colornode = 'r';
-        end
-        h(:,2)=plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','g',...
-            'MarkerFaceColor','g',...
-            'MarkerSize',13,'Parent',axesid);
-        plot(x,y,'s','LineWidth',2,'MarkerEdgeColor', colornode,...
-            'MarkerFaceColor', colornode,...
-            'MarkerSize',13,'Parent',axesid);
-        legendString{2} = char('Reservoirs');
-    end
-    % Plot Tanks
-    if sum(strfind(obj.NodeTankIndex,i))
-        colornode='c';
-        if length(hh) && isempty(selectColorNode)
-            colornode='r';
-        elseif length(hh) && ~isempty(selectColorNode)
-            colornode= 'c';
-        end
-        h(:,3)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','c',...
-            'MarkerFaceColor','c',...
-            'MarkerSize',16,'Parent',axesid);
-        
-        plot(x,y,'p','LineWidth',2,'MarkerEdgeColor',colornode,...
-            'MarkerFaceColor',colornode,...
-            'MarkerSize',16,'Parent',axesid);
-        
-        legendString{3} = char('Tanks');
-    end
-    
-    % Show Node id
-    if (strcmp(lower(Node),'yes') && ~length(hh))
-        text(x,y,obj.NodeNameID(i),'Fontsize',fontsize);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
-    end
-    
-    if length(hh) && isempty(selectColorNode)
-        plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','r',...
-            'MarkerFaceColor','r',...
-            'MarkerSize',10,'Parent',axesid);
-        text(x,y,obj.NodeNameID(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
-    elseif length(hh) && ~isempty(selectColorNode)
-        try
-            tt=length(selectColorNode{hh});
-        catch err
-            tt=2;
-        end
-        if tt>1
-            if length(selectColorNode(hh))==1
-                nm{1}=selectColorNode(hh);
-            else
-                nm=selectColorNode(hh);
-            end
-            if iscell(nm{1})
-                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1}{1},'MarkerFaceColor',nm{1}{1},'MarkerSize',10,'Parent',axesid);
-            else
-                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nm{1},'MarkerFaceColor',nm{1},'MarkerSize',10,'Parent',axesid);
-            end
-        else
-            plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',char(selectColorNode(hh)),'MarkerFaceColor',char(selectColorNode(hh)),...
-                'MarkerSize',10,'Parent',axesid);
-        end
-        %         text(x,y,obj.NodeNameID(i),'Fontsize',fontsize)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
-    end
-    hold on
-end
-
-% Legend Plots
-u=1;
-for i=1:length(h)
-    if h(i)~=0
-        String{u} = legendString{i};
-        hh(:,u) = h(i);
-        u=u+1;
-    end
-end
-
-legend(hh,String);
-% Axis OFF and se Background
-[xmax,~]=max(obj.NodeCoordinates{1});
-[xmin,~]=min(obj.NodeCoordinates{1});
-[ymax,~]=max(obj.NodeCoordinates{2});
-[ymin,~]=min(obj.NodeCoordinates{2});
-
-%     xmax=yxmax(1); ymax=yxmax(2); xmin=yxmin(1); ymin=yxmin(2);
-if ~isnan(ymax)
-    if ymax==ymin
-        xlim([xmin-((xmax-xmin)*.1),xmax+((xmax-xmin)*.1)]);
-        ylim([ymin-.1,ymax+.1]);
-    elseif xmax==xmin
-        xlim([xmin-.1,xmax+.1]);
-        ylim([ymin-(ymax-ymin)*.1,ymax+(ymax-ymin)*.1]);
-    else
-        xlim([xmin-((xmax-xmin)*.1),xmax+((xmax-xmin)*.1)]);
-        ylim([ymin-(ymax-ymin)*.1,ymax+(ymax-ymin)*.1]);
-    end
-else
-    warning('Undefined coordinates.');
-end
-axis off
-whitebg('w');
-set(axesid,'position',[0 0 1 1],'units','normalized');
-end
 function errcode=addLink(obj,typecode,newinpname,newLink,fromNode,toNode,curveID,varargin)
 % Link type codes consist of the following constants: CVPIPE   0   Pipe
 % with Check Valve PIPE     1   Pipe PUMP     2   Pump PRV      3
