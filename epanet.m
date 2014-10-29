@@ -231,9 +231,9 @@ classdef epanet <handle
                 obj.version=varargin{2}; % Get DLL version (e.g. epanet20012x86 for 32-bit)
             elseif nargin==1
                 inpfile=varargin{1};
-                if strcmp(computer,'PCWIN64') % if no DLL is given, select one automatically
+                if strcmp(computer('arch'),'win64')% if no DLL is given, select one automatically
                     obj.version='epanet20012x64';
-                elseif strcmp(computer,'PCWIN32')
+                elseif strcmp(computer('arch'),'win32')
                     obj.version='epanet20012x86';
                 end
             end
@@ -1209,8 +1209,6 @@ classdef epanet <handle
         end
         function value = getComputedQualityTimeSeries(obj,varargin)
             % Compute Quality simulation and retrieve all or some time-series
-            obj.solveCompleteHydraulics
-            obj.solveCompleteQuality
             obj.openQualityAnalysis
             obj.initializeQualityAnalysis
             tleft=obj.nextQualityAnalysisStep;
