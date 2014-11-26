@@ -2331,7 +2331,7 @@ function [errcode, count] = ENgetcount(countcode,version)
         ENgeterror(errcode,version);
     end
 end
-function [e, errmsg] = ENgeterror(errcode,version);
+function [e, errmsg] = ENgeterror(errcode,version)
     if errcode
         errmsg = char(32*ones(1,80));
         [e,errmsg] = calllib(version,'ENgeterror',errcode,errmsg,80);
@@ -3332,6 +3332,16 @@ value.sectJunctions=0;
 value.sectReservoirs=0;
 k=1;p=1;r=1;
 
+value.NodeTankElevation=0;
+value.NodeTankInitLevel=0;
+value.NodeTankMinLevel=0;
+value.NodeTankMaxLevel=0;
+value.NodeTankDiameter=0;
+value.NodeTankMinVol=0;
+
+value.NodeReservoirElevation=0;
+value.NodeJunctionElevation=0;
+
 %Links
 value.PipesID={};
 value.PumpsID={};
@@ -3347,6 +3357,16 @@ value.sectPumps=0;
 value.sectValves=0;
 sect=0; i=1;t=1;q=1;
 
+value.PipeLengths=0;
+value.PipeDiameters=0;
+value.PipeRoughness=0;
+value.PipeMinorLoss=0;
+
+value.LinkValveDiameter=0;
+value.LinkValveType={};
+value.LinkValveSetting=0;
+value.LinkValveMinorLoss=0;
+        
 %Curves
 value.typeCurve=[];
 typecode=0;
@@ -3463,6 +3483,7 @@ while 1
         end
         value.JunctionsID{k}=atline{1};
         value.NodeJunctionIndex(k)=k;
+        value.NodeJunctionElevation(k)=str2num(atline{2});
         k=k+1;
         value.NodeCount=value.NodeCount+1;
     elseif sect==2
@@ -3478,6 +3499,7 @@ while 1
         end
         value.ReservoirsID{r}=atline{1};
         value.NodeReservoirIndex(r)=k;
+        value.NodeReservoirElevation(r)=str2num(atline{2});
         k=k+1;
         r=r+1;
         value.NodeCount=value.NodeCount+1;
@@ -3494,6 +3516,12 @@ while 1
         end
         value.TanksID{p}=atline{1};
         value.NodeTankIndex(p)=k;
+        value.NodeTankElevation(p)=str2num(atline{2});
+        value.NodeTankInitLevel(p)=str2num(atline{3});
+        value.NodeTankMinLevel(p)=str2num(atline{4});
+        value.NodeTankMaxLevel(p)=str2num(atline{5});
+        value.NodeTankDiameter(p)=str2num(atline{6});
+        value.NodeTankMinVol(p)=str2num(atline{7});
         k=k+1;
         p=p+1;
         value.NodeCount=value.NodeCount+1;
@@ -3514,6 +3542,10 @@ while 1
         value.LinkPipeIndex(t)=t;
         value.FromNode{t}=atline{2};
         value.ToNode{t}=atline{3};
+        value.PipeLengths(t)=str2num(atline{4});
+        value.PipeDiameters(t)=str2num(atline{5});
+        value.PipeRoughness(t)=str2num(atline{6});
+        value.PipeMinorLoss(t)=str2num(atline{7});
         t=t+1;
         value.LinkCount= value.LinkCount+1;
     elseif sect==5
@@ -3549,6 +3581,10 @@ while 1
         value.LinkValveIndex(i)=t;
         value.FromNode{t}=atline{2};
         value.ToNode{t}=atline{3};
+        value.LinkValveDiameter(i)=str2num(atline{4});
+        value.LinkValveType{i}=atline{5};
+        value.LinkValveSetting(i)=str2num(atline{6});
+        value.LinkValveMinorLoss(i)=str2num(atline{7});
         t=t+1;
         i=i+1;
         value.LinkCount= value.LinkCount+1;
@@ -3642,7 +3678,7 @@ while 1
         % Vertices
     elseif sect==11
         A = textscan(tline,'%s %f %f');
-        [errcode,index] = ENgetlinkindex(char(A{1}));
+        [errcode,index] = ENgetlinkindex(char(A{1}),obj.version);
         if errcode ~=0
             return;
         end
