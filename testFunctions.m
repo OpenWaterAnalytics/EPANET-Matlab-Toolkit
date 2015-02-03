@@ -6,7 +6,10 @@ clear
 % Create EPANET object using the INP file
 %d=epanet('Net1_Rossman2000.inp');
 inpname='Net1_Rossman2000.inp';
-version='epanet20012x64';
+version='epanet20012x64'; % Windows, 64-bit, original EPANET 2.00.12
+%version='epanet20012x86'; % Windows, 32-bit, original EPANET 2.00.12
+%version='epanet20013x64'; % Windows, 64-bit, EPANET 2.00.12 + bugfixes from OpenWaterAnalytics
+%version='epanet20013x86'; % Windows, 32-bit, EPANET 2.00.12 + bugfixes from OpenWaterAnalytics
 d=epanet(inpname,version);
 
 
