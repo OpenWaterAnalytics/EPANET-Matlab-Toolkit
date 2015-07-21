@@ -1,24 +1,62 @@
-%% EPANET-Matlab Class Test
-% 
-clc
-clear
+%% EPANET-Matlab Class Test Part 1
+% This file is provided to ensure that all functions can be executed
+% correctly.
+% Press F10 for step-by-step execution. You may also use the breakpoints, 
+% indicated with a short dash (-) on the left of each line number.
+clc;
+clear;
+close all;
 
 % Create EPANET object using the INP file
 %d=epanet('Net1_Rossman2000.inp');
-inpname='Net1_Rossman2000.inp';
-version='epanet20012x64'; % Windows, 64-bit, original EPANET 2.00.12
-%version='epanet20012x86'; % Windows, 32-bit, original EPANET 2.00.12
-%version='epanet20013x64'; % Windows, 64-bit, EPANET 2.00.12 + bugfixes from OpenWaterAnalytics
-%version='epanet20013x86'; % Windows, 32-bit, EPANET 2.00.12 + bugfixes from OpenWaterAnalytics
+inpname='Net1_Rossman2000.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008
+if strcmp(computer('arch'),'win64') 
+    version='epanet20013patchx64'; % epanet20012x64
+elseif strcmp(computer('arch'),'win32')
+    version='epanet20013patchx86'; % epanet20012x86
+end
 d=epanet(inpname,version);
 
+%%d.getCurvesInfo % ENgetcurve bug in epanet20013
+d.TimeStartTime % EN_STARTTIME  - ENgettimeparam
+d.TimeHTime % EN_HTIME - ENgettimeparam
+d.TimeHaltFlag % EN_HALTFLAG - ENgettimeparam
+d.TimeNextEvent %find the lesser of the hydraulic time step length, or the time to next fill/empty
+d.NodeTankMaxVolume % EN_MAXVOLUME - ENgetnodevalue
+%d.CurvesInfo bug in epanet20013 energopoiisi sto prwto run
 
+d.LinkPumpHeadCurve % ENgetheadcurve
+d.getLinkPumpHeadCurve
+d.LinkPumpPatternNameID
+d.LinkPumpPatternIndex
+d.getLinkPumpPatternNameID % EN_LINKPATTERN - ENgetlinkvalue
+d.getLinkPumpPatternIndex
+d.getNodeBaseDemands 
+d.NodeBaseDemands % ENgetbasedemand
+% d.NodeNumDemandCategories % ENgetnumdemands
+% d.getNodeNumDemandCategories
+d.NodeDemandPatternNameID  % ENgetdemandpattern
+d.getNodeDemandPatternNameID
+d.NodeDemandPatternsIndex 
+d.getNodeDemandPatternsIndex
+n=d.getComputedHydraulicTimeSeries; % EN_TANKVOLUME - ENgetnodevalue
+n.TankVolume(:,d.NodeTankIndex)
 
+d.LinkPumpTypeCode % ENgetpumptype - Constants for pumps: 'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM'
+d.getLinkPumpTypeCode
+d.LinkPumpType 
+d.getLinkPumpType
+  
+d.RelativeError  % ENgetstatistic
+d.Iterations 
+d.getStatistic
+
+% inpname='Net1_Rossman2000.inp';
+d=epanet(inpname,version);
 %% Controls
 Controls=d.getControls
 disp('Press any key to continue...')
-%pause
-
+pause
 
 %% Counts
 NodeCount=d.getNodeCount
@@ -29,12 +67,12 @@ CurveCount=d.getCurveCount
 ControlRulesCount=d.getControlRulesCount
 NodeTankCount=d.getNodeTankCount
 NodeReservoirCount=d.getNodeReservoirCount
-NodeJunctionsCount=d.getNodeJunctionsCount
+NodeJunctionsCount=d.getNodeJunctionCount
 LinkPipeCount=d.getLinkPipeCount
 LinkPumpCount=d.getLinkPumpCount
 LinkValveCount=d.getLinkValveCount
 disp('Press any key to continue...')
-%pause
+pause
 
 %% Errors
 for e=[0:6,101:106,110,120,200,202:207,223:224, 240:241, 250:251, 301:309]
@@ -114,7 +152,7 @@ d.getOptionsAccuracyValue
 d.getOptionsQualityTolerance
 d.getOptionsEmitterExponent
 d.getOptionsPatternDemandMultiplier
-d.getPatternID
+d.getPatternNameID
 d.getPatternIndex
 d.getPatternLengths
 d.getPattern
@@ -137,17 +175,15 @@ d.getVersion
 %% To check
 d.getTimeRuleControlStep % bug: It always returns Zero!
 d.getTimeReportingPeriods% Check this
-d.getNodeTankMixZoneVolume% bug
-d.getNodeTankDiameter% bug: Produces a different diameter
-d.getNodeTankInitialWaterVolume% bug: When the initial volume is zero, and then save using ENsaveinpfile, it stores a number different than zero
+d.getNodeTankMixZoneVolume % ok 6/3/2015
+d.getNodeTankDiameter% bug: Produces a different diameter % fix in epanet20013 - ok 6/3/2015
+d.getNodeTankInitialWaterVolume % ok 6/3/2015
 
 
 %% Simulate all
 HTS=d.getComputedHydraulicTimeSeries % Also are included: obj.openHydraulicAnalysis;obj.initializeHydraulicAnalysis;obj.runHydraulicAnalysis;obj.nextHydraulicAnalysisStep;obj.closeHydraulicAnalysis;
 QTS=d.getComputedQualityTimeSeries% Also are included: obj.openQualityAnalysis;obj.initializeQualityAnalysis;obj.runQualityAnalysis;obj.stepQualityAnalysisTimeLeft;obj.closeQualityAnalysis;
   
-
-
 d.addPattern('NewPat1')
 d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]); 
 d.getPattern
@@ -204,7 +240,7 @@ d.setNodeElevations(values)
 d.getNodeElevations
 
 values = d.getNodeBaseDemands
-values(2)=160;
+values{2}=160; %values(2)
 d.setNodeBaseDemands(values)
 d.getNodeBaseDemands
 
@@ -225,7 +261,7 @@ d.getNodeInitialQuality
 
 values = d.getNodeTankInitialLevel
 values(end)=100; 
-d.setNodeTankLevelInitial(values)  
+d.setNodeTankInitialLevel(values)  
 d.getNodeTankInitialLevel
 
 values = d.getNodeTankMixingModelType 
@@ -587,27 +623,17 @@ d.unload
 disp('Press any key to continue...')
 pause
 
-%% Other Functions
-% OTHER FUNCTIONS
 d=epanet(inpname,version);
-
-NodeCoordinates = d.getCoordinates
-d.getInputFileInfo
-d.getCurveInfo
-d.getLinksInfo
-d.getNodesInfo
-d.getControlsInfo
-d.getFlowUnitsHeadlossFormula
-
-
-
-
 %% Test Plot
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
 disp('Press any key to continue...')
-%pause
-
-
-d.unload
-disp('Press any key to continue...')
 pause
+
+% Other functions
+d.getNodeCoordinates
+d.unload
+
+%% Delete files 
+sfilesexist = dir('s*'); 
+if (~isempty(sfilesexist)), delete('s*'), end;
+delete('TestR*','hydraulics*','*_INP*','*_temp*',[d.inputfile(1:end-4),'.txt'])

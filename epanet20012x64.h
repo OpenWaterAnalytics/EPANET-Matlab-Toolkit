@@ -1,38 +1,13 @@
 /*
-*******************************************************************
-
-TOOLKIT.H - Prototypes for EPANET Functions Exported to DLL Toolkit
-
-VERSION:    2.00
-DATE:       5/8/00
-            10/25/00
-            3/1/01
-            8/15/07    (2.00.11)
-            2/14/08    (2.00.12)
-AUTHOR:     L. Rossman
-            US EPA - NRMRL
-
-*******************************************************************
+**   EPANET2.H
+**
+** C/C++ header file for EPANET Programmers Toolkit
+**
+** Last updated on 2/14/08 (2.00.12)
 */
 
-
-#ifndef DLLEXPORT
-  #ifdef DLL
-    #ifdef __cplusplus
-    #define DLLEXPORT extern "C" __declspec(dllexport) 
-    #else
-    #define DLLEXPORT __declspec(dllexport) 
-    #endif
-  #elif defined(CYGWIN)
-    #define DLLEXPORT __stdcall
-  #else
-    #ifdef __cplusplus
-    #define DLLEXPORT
-    #else
-    #define DLLEXPORT
-    #endif
-  #endif
-#endif
+#ifndef EPANET2_H
+#define EPANET2_H
 
 // --- Define the EPANET toolkit constants
 
@@ -62,8 +37,6 @@ AUTHOR:     L. Rossman
 #define EN_MIXFRACTION  22
 #define EN_TANK_KBULK   23
 
-#define EN_TANKVOLUME   24     /* TNT */
-
 #define EN_DIAMETER     0    /* Link parameters */
 #define EN_LENGTH       1
 #define EN_ROUGHNESS    2
@@ -78,7 +51,6 @@ AUTHOR:     L. Rossman
 #define EN_STATUS       11
 #define EN_SETTING      12
 #define EN_ENERGY       13
-#define EN_LINKQUAL     14     /* TNT */
 
 #define EN_DURATION     0    /* Time parameters */
 #define EN_HYDSTEP      1
@@ -90,9 +62,8 @@ AUTHOR:     L. Rossman
 #define EN_RULESTEP     7
 #define EN_STATISTIC    8
 #define EN_PERIODS      9
-#define EN_STARTTIME    10  /* Added TNT 10/2/2009 */
 
-#define EN_NODECOUNT    0   /* Component counts */
+#define EN_NODECOUNT    0    /* Component counts */
 #define EN_TANKCOUNT    1
 #define EN_LINKCOUNT    2
 #define EN_PATCOUNT     3
@@ -103,8 +74,8 @@ AUTHOR:     L. Rossman
 #define EN_RESERVOIR    1
 #define EN_TANK         2
 
-#define EN_CVPIPE       0    /* Link types. */
-#define EN_PIPE         1    /* See LinkType in TYPES.H */
+#define EN_CVPIPE       0    /* Link types */
+#define EN_PIPE         1
 #define EN_PUMP         2
 #define EN_PRV          3
 #define EN_PSV          4
@@ -113,19 +84,19 @@ AUTHOR:     L. Rossman
 #define EN_TCV          7
 #define EN_GPV          8
 
-#define EN_NONE         0    /* Quality analysis types. */
-#define EN_CHEM         1    /* See QualType in TYPES.H */
+#define EN_NONE         0    /* Quality analysis types */
+#define EN_CHEM         1
 #define EN_AGE          2
 #define EN_TRACE        3
 
-#define EN_CONCEN       0    /* Source quality types.      */
-#define EN_MASS         1    /* See SourceType in TYPES.H. */
+#define EN_CONCEN       0    /* Source quality types */
+#define EN_MASS         1
 #define EN_SETPOINT     2
 #define EN_FLOWPACED    3
 
-#define EN_CFS          0    /* Flow units types.   */
-#define EN_GPM          1    /* See FlowUnitsType   */
-#define EN_MGD          2    /* in TYPES.H.         */
+#define EN_CFS          0    /* Flow units types */
+#define EN_GPM          1
+#define EN_MGD          2
 #define EN_IMGD         3
 #define EN_AFD          4
 #define EN_LPS          5
@@ -140,13 +111,13 @@ AUTHOR:     L. Rossman
 #define EN_EMITEXPON    3
 #define EN_DEMANDMULT   4
 
-#define EN_LOWLEVEL     0   /* Control types.  */
-#define EN_HILEVEL      1   /* See ControlType */
-#define EN_TIMER        2   /* in TYPES.H.     */
+#define EN_LOWLEVEL     0   /* Control types */
+#define EN_HILEVEL      1
+#define EN_TIMER        2
 #define EN_TIMEOFDAY    3
 
 #define EN_AVERAGE      1   /* Time statistic types.    */
-#define EN_MINIMUM      2   /* See TstatType in TYPES.H */
+#define EN_MINIMUM      2 
 #define EN_MAXIMUM      3
 #define EN_RANGE        4
 
@@ -157,84 +128,102 @@ AUTHOR:     L. Rossman
 
 #define EN_NOSAVE       0   /* Save-results-to-file flag */
 #define EN_SAVE         1
+#define EN_INITFLOW     10  /* Re-initialize flow flag   */
 
-#define EN_INITFLOW    10   /* Re-initialize flows flag  */
 
 
-// --- Declare the EPANET toolkit functions
-#if defined(__cplusplus)
-extern "C" {
+// --- define WINDOWS
+
+#undef WINDOWS
+#ifdef _WIN32
+  #define WINDOWS
 #endif
- int  DLLEXPORT ENepanet(char *, char *, char *, void (*) (char *));
+#ifdef __WIN32__
+  #define WINDOWS
+#endif
 
- int  DLLEXPORT ENopen(char *, char *, char *);
- int  DLLEXPORT ENsaveinpfile(char *);
- int  DLLEXPORT ENclose(void);
+// --- define DLLEXPORT
 
- int  DLLEXPORT ENsolveH(void);
- int  DLLEXPORT ENsaveH(void);
- int  DLLEXPORT ENopenH(void);
- int  DLLEXPORT ENinitH(int);
- int  DLLEXPORT ENrunH(long *);
- int  DLLEXPORT ENnextH(long *);
- int  DLLEXPORT ENcloseH(void);
- int  DLLEXPORT ENsavehydfile(char *);
- int  DLLEXPORT ENusehydfile(char *);
+#ifdef WINDOWS
+  #ifdef __cplusplus
+  #define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
+  #else
+  #define DLLEXPORT __declspec(dllexport) __stdcall
+  #endif
+#else
+  #ifdef __cplusplus
+  #define DLLEXPORT extern "C"
+  #else
+  #define DLLEXPORT
+  #endif
+#endif
 
- int  DLLEXPORT ENsolveQ(void);
- int  DLLEXPORT ENopenQ(void);
- int  DLLEXPORT ENinitQ(int);
- int  DLLEXPORT ENrunQ(long *);
- int  DLLEXPORT ENnextQ(long *);
- int  DLLEXPORT ENstepQ(long *);
- int  DLLEXPORT ENcloseQ(void);
 
- int  DLLEXPORT ENwriteline(char *);
- int  DLLEXPORT ENreport(void);
- int  DLLEXPORT ENresetreport(void);
- int  DLLEXPORT ENsetreport(char *);
+// --- declare the EPANET toolkit functions
 
- int  DLLEXPORT ENgetcontrol(int, int *, int *, float *,
-                int *, float *);
- int  DLLEXPORT ENgetcount(int, int *);
- int  DLLEXPORT ENgetoption(int, float *);
- int  DLLEXPORT ENgettimeparam(int, long *);
- int  DLLEXPORT ENgetflowunits(int *);
- int  DLLEXPORT ENgetpatternindex(char *, int *);
- int  DLLEXPORT ENgetpatternid(int, char *);
- int  DLLEXPORT ENgetpatternlen(int, int *);
- int  DLLEXPORT ENgetpatternvalue(int, int, float *);
- int  DLLEXPORT ENgetqualtype(int *, int *);
- int  DLLEXPORT ENgeterror(int, char *, int);
+ int   DLLEXPORT ENepanet(char *, char *, char *, void (*) (char *));
+ int   DLLEXPORT ENopen(char *, char *, char *);
+ int   DLLEXPORT ENsaveinpfile(char *);
+ int   DLLEXPORT ENclose(void);
 
- int  DLLEXPORT ENgetnodeindex(char *, int *);
- int  DLLEXPORT ENgetnodeid(int, char *);
- int  DLLEXPORT ENgetnodetype(int, int *);
- int  DLLEXPORT ENgetnodevalue(int, int, float *);
+ int   DLLEXPORT ENsolveH(void);
+ int   DLLEXPORT ENsaveH(void);
+ int   DLLEXPORT ENopenH(void);
+ int   DLLEXPORT ENinitH(int);
+ int   DLLEXPORT ENrunH(long *);
+ int   DLLEXPORT ENnextH(long *);
+ int   DLLEXPORT ENcloseH(void);
+ int   DLLEXPORT ENsavehydfile(char *);
+ int   DLLEXPORT ENusehydfile(char *);
 
- int  DLLEXPORT ENgetnumdemands(int, int *);
- int  DLLEXPORT ENgetbasedemand(int, int, float *);
- int  DLLEXPORT ENgetdemandpattern(int, int, int *);
+ int   DLLEXPORT ENsolveQ(void);
+ int   DLLEXPORT ENopenQ(void);
+ int   DLLEXPORT ENinitQ(int);
+ int   DLLEXPORT ENrunQ(long *);
+ int   DLLEXPORT ENnextQ(long *);
+ int   DLLEXPORT ENstepQ(long *);
+ int   DLLEXPORT ENcloseQ(void);
 
- int  DLLEXPORT ENgetlinkindex(char *, int *);
- int  DLLEXPORT ENgetlinkid(int, char *);
- int  DLLEXPORT ENgetlinktype(int, int *);
- int  DLLEXPORT ENgetlinknodes(int, int *, int *);
- int  DLLEXPORT ENgetlinkvalue(int, int, float *);
+ int   DLLEXPORT ENwriteline(char *);
+ int   DLLEXPORT ENreport(void);
+ int   DLLEXPORT ENresetreport(void);
+ int   DLLEXPORT ENsetreport(char *);
 
- int  DLLEXPORT ENgetversion(int *);
+ int   DLLEXPORT ENgetcontrol(int, int *, int *, float *,
+                      int *, float *);
+ int   DLLEXPORT ENgetcount(int, int *);
+ int   DLLEXPORT ENgetoption(int, float *);
+ int   DLLEXPORT ENgettimeparam(int, long *);
+ int   DLLEXPORT ENgetflowunits(int *);
+ int   DLLEXPORT ENgetpatternindex(char *, int *);
+ int   DLLEXPORT ENgetpatternid(int, char *);
+ int   DLLEXPORT ENgetpatternlen(int, int *);
+ int   DLLEXPORT ENgetpatternvalue(int, int, float *);
+ int   DLLEXPORT ENgetqualtype(int *, int *);
+ int   DLLEXPORT ENgeterror(int, char *, int);
 
- int  DLLEXPORT ENsetcontrol(int, int, int, float, int, float);
- int  DLLEXPORT ENsetnodevalue(int, int, float);
- int  DLLEXPORT ENsetlinkvalue(int, int, float);
- int  DLLEXPORT ENaddpattern(char *);
- int  DLLEXPORT ENsetpattern(int, float *, int);
- int  DLLEXPORT ENsetpatternvalue(int, int, float);
- int  DLLEXPORT ENsettimeparam(int, long);
- int  DLLEXPORT ENsetoption(int, float);
- int  DLLEXPORT ENsetstatusreport(int);
- int  DLLEXPORT ENsetqualtype(int, char *, char *, char *);
+ int   DLLEXPORT ENgetnodeindex(char *, int *);
+ int   DLLEXPORT ENgetnodeid(int, char *);
+ int   DLLEXPORT ENgetnodetype(int, int *);
+ int   DLLEXPORT ENgetnodevalue(int, int, float *);
 
-#if defined(__cplusplus)
-}
+ int   DLLEXPORT ENgetlinkindex(char *, int *);
+ int   DLLEXPORT ENgetlinkid(int, char *);
+ int   DLLEXPORT ENgetlinktype(int, int *);
+ int   DLLEXPORT ENgetlinknodes(int, int *, int *);
+ int   DLLEXPORT ENgetlinkvalue(int, int, float *);
+
+ int   DLLEXPORT ENgetversion(int *);
+
+ int   DLLEXPORT ENsetcontrol(int, int, int, float, int, float);
+ int   DLLEXPORT ENsetnodevalue(int, int, float);
+ int   DLLEXPORT ENsetlinkvalue(int, int, float);
+ int   DLLEXPORT ENaddpattern(char *);
+ int   DLLEXPORT ENsetpattern(int, float *, int);
+ int   DLLEXPORT ENsetpatternvalue(int, int, float);
+ int   DLLEXPORT ENsettimeparam(int, long);
+ int   DLLEXPORT ENsetoption(int, float);
+ int   DLLEXPORT ENsetstatusreport(int);
+ int   DLLEXPORT ENsetqualtype(int, char *, char *, char *);
+
 #endif
