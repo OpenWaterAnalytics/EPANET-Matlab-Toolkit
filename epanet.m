@@ -1129,16 +1129,16 @@ classdef epanet <handle
         end
         function value = getNodeBaseDemands(obj)
             %epanet20013
-            value={};
             numdemands = obj.getNodeNumDemandCategories;
+            val=zeros(max(numdemands),obj.getNodeCount);
             for i=obj.getNodeIndex
                 v=1;
                 for u=1:numdemands(i)
-                    [obj.errcode, value{i}(v)] = ENgetbasedemand(i,u,obj.libepanet);v=v+1;
+                    [obj.errcode, val(v,i)] = ENgetbasedemand(i,u,obj.libepanet);v=v+1;
                 end
-                if ~numdemands(i)
-                    value{i}(v)=0;
-                end
+            end
+            for i=1:size(val,1)
+                value{i} = val(i,:);
             end
         end
         function value = getNodeNumDemandCategories(obj)
@@ -1150,18 +1150,18 @@ classdef epanet <handle
         end
         function value = getNodeDemandPatternsIndex(obj)
             %epanet20013
-            value={};
             numdemands = obj.getNodeNumDemandCategories;
+            val=zeros(max(numdemands),obj.getNodeCount);
             for i=obj.getNodeIndex
                 v=1;
                 for u=1:numdemands(i)
-                    [obj.errcode, value{i}(v)] = ENgetdemandpattern(i,u,obj.libepanet);v=v+1;
-                end
-                if ~numdemands(i)
-                    value{i}(v)= 0;
-                end                
+                    [obj.errcode, val(v,i)] = ENgetdemandpattern(i,u,obj.libepanet);v=v+1;
+                end             
             end
-        end    
+            for i=1:size(val,1)
+                value{i} = val(i,:);
+            end
+        end
         function value = getNodeDemandPatternNameID(obj)
             %epanet20013
             value={};
@@ -1169,10 +1169,12 @@ classdef epanet <handle
             m = obj.getPatternNameID;
             numdemands = obj.getNodeNumDemandCategories;
             for i=obj.NodeIndex
-                if numdemands(i)
-                    value{i}= char(m(v{i}(1:numdemands(i)))); 
-                else
-                    value{i}= '';
+                for u=1:numdemands(i)
+                    if v{u}(i)~=0 
+                        value{i}= char(m(v{u}(i))); 
+                    else
+                        value{i}= '';
+                    end
                 end
             end
         end
