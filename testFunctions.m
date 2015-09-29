@@ -240,7 +240,7 @@ d.setNodeElevations(values)
 d.getNodeElevations
 
 values = d.getNodeBaseDemands
-values{2}=160; %values(2)
+values{1}(2)=160; %values(2)
 d.setNodeBaseDemands(values)
 d.getNodeBaseDemands
 
