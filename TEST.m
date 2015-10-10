@@ -608,13 +608,6 @@ clear class;
 inpname='Net2_Rossman2000';
 d=epanet([inpname,'.inp']);
 
-% Simulate all times
-d.solveCompleteHydraulics
-d.solveCompleteQuality
-
-d.setQualityType('chem','mg/L')
-d.getQualityType
-
 % Runs hydraulics Step-by-step
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis;
