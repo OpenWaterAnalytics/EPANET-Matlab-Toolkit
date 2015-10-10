@@ -235,7 +235,7 @@ classdef epanet <handle
             %Load EPANET Library
             [obj.errcode]=obj.epanetLoadLibrary;
             %Open the file
-            obj.LoadInpFile([pwd,'\NETWORKS\',inpfile], '', '');
+            obj.LoadInpFile([pwd,'\NETWORKS\',inpfile],[pwd,'\RESULTS\temp.txt'], [pwd,'\RESULTS\temp.out']);
             %Set path of temporary file
             obj.pathfile=[pwd,'\RESULTS\temp.inp'];
             %Save the temporary input file
