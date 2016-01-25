@@ -28,7 +28,7 @@ ENgetstatistic              Retrieves hydraulic simulation statistic
 ENgetnumdemands             Retrieves the number of demand categories for a node
 ENgetbasedemand             Retrieves the node's base demand for a category
 ENgetdemandpattern          Retrieves the index of a demand pattern for a specific demand category of a node
-ENgetaveragepatternvalue 	Retrieves the average value of a pattern
+ENgetaveragepatternvalue 	  Retrieves the average value of a pattern
 ENsetbasedemand             Sets the node's base demand for a category
 ENgetcurveid                Retrieves ID of a curve with specific index
 ENgetcurvelen               Retrieves number of points in a curve
