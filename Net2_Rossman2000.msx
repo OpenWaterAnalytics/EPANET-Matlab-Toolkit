@@ -6,7 +6,7 @@ NET2 Chlorine Example
 AREA_UNITS  FT2
 RATE_UNITS  DAY
 SOLVER      EUL
-TIMESTEP    300
+TIMESTEP    3600
 RTOL        0.001
 ATOL        0.001
 
