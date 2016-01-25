@@ -15,6 +15,7 @@ tic;d=epanet(inpname,'Bin');toc
 %% GET, SET FLOW UNITS
 % SET Flow Units 
 d.getBinOptionsInfo
+d.getBinNodeCoordinates
 
 errcode=d.setBinFlowUnitsLPM % Net1.. GPM to LPM
 d.getBinOptionsInfo 
@@ -975,7 +976,7 @@ d.BinQualityType% Water quality analysis code (None:0/Chemical:1/Age:2/Trace:3)
 d.BinQualityCode
 d.BinQualityTraceNodeIndex
 d.BinQualityTraceNodeID
-d.BinQualityTypeUnits
+d.BinQualityUnits
 d.BinOptionsDiffusivity
 
 d.BincountStatuslines
@@ -988,27 +989,9 @@ d.BinQualityUnits
 
 d.BinLinkFlowUnits
 d.BinOptionsHeadloss
-d.BinNodePressureUnits
 d.BinOptionsQualityTolerance
-d.BinPatternDemandsUnits
-d.BinLinkPipeDiameterUnits
-d.BinNodeTankDiameterUnits
-d.BinEnergyEfficiencyUnits
-d.BinNodeElevationUnits
-d.BinNodeEmitterCoefficientUnits
-d.BinEnergyUnits
-d.BinLinkFrictionFactorUnits
-d.BinNodeHeadUnits
-d.BinLinkLengthsUnits
-d.BinLinkMinorLossCoeffUnits
-d.BinLinkPumpPowerUnits
-d.BinQualityReactionCoeffBulkUnits
-d.BinQualityReactionCoeffWallUnits
-d.BinLinkPipeRoughnessCoeffUnits
-d.BinQualitySourceMassInjectionUnits
-d.BinLinkVelocityUnits
-d.BinNodeTankVolumeUnits
-d.BinQualityWaterAgeUnits
+
+d.BinUnits
 
 %Delete s files 
 sfilesexist = dir('s*'); 

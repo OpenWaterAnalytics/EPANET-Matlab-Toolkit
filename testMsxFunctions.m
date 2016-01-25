@@ -11,16 +11,44 @@ close all;clear class;
 inpname='example.inp'; %Net2_Rossman2000 example
 
 %% MSX Functions
-if strcmp(computer('arch'),'win64') 
-    version='epanet20013patchx64'; % epanet20012x64  epanet20013patchx64
-elseif strcmp(computer('arch'),'win32')
-    version='epanet20013patchx86'; % epanet20012x86  epanet20013patchx86
-end
-%d=epanet(inpname)
-d=epanet(inpname,version);
+d=epanet(inpname)
 d.msx([inpname(1:end-4),'.msx'])
 d
 
+% New functions - Read MSX File
+d.getMsxSolver
+d.getMsxAreaUnits
+d.getMsxRateUnits
+d.getMsxRtol
+d.getMsxAtol
+d.getMsxTimeStep
+d.getMsxCoupling
+d.getMsxCompiler
+
+d.setMsxTimeStep(3600)
+
+d.setMsxAreaUnitsFT2
+d.setMsxAreaUnitsM2
+d.setMsxAreaUnitsCM2
+
+d.setMsxRateUnitsSEC
+d.setMsxRateUnitsMIN
+d.setMsxRateUnitsHR
+d.setMsxRateUnitsDAY
+
+d.setMsxSolverEUL
+d.setMsxSolverRK5
+d.setMsxSolverROS2
+ 
+d.setMsxCouplingFULL
+d.setMsxCouplingNONE
+
+d.setMsxCompilerVC
+d.setMsxCompilerGC
+d.setMsxCompilerNONE
+
+d.setMsxAtol(0.1)
+d.setMsxRtol(0.2)
 
 %% GET PARAMETERS
 d.getMsxEquationsTerms
@@ -111,7 +139,12 @@ pause
 
 %or
 fid = fopen('ReportMsx.bat','w');
-r = sprintf('epanetmsx %s %s %s',d.inputfile,d.MsxTempFile,[d.MsxTempFile(1:end-4),'.txt']); 
+if strcmp(computer('arch'),'win32')
+    folder='32bit';
+elseif strcmp(computer('arch'),'win64')
+    folder='64bit';
+end
+r = sprintf('%s\\%s\\epanetmsx.exe %s %s %s',pwd,folder,d.inputfile,d.MsxTempFile,[d.MsxTempFile(1:end-4),'.txt']);
 fprintf(fid,'%s \n',r);fclose all;
 !ReportMsx.bat
 open([d.MsxTempFile(1:end-4),'.txt'])
@@ -205,7 +238,7 @@ d.MsxSaveQualityFile('testMsxQuality.bin')
 d.saveHydraulicsOutputReportingFile
 d.saveHydraulicFile('testMsxHydraulics.hyd')
 
-d.MsxUseHydraulicFile('testMsxHydraulics.msx')
+d.MsxUseHydraulicFile('testMsxHydraulics.hyd')
 
 % % MsxInitializeQualityAnalysis
 % % MsxStepQualityAnalysisTimeLeft

@@ -23,6 +23,7 @@ end
 %% GET, SET FLOW UNITS
 % SET Flow Units 
 d.getBinOptionsInfo
+d.getBinNodeCoordinates
 
 errcode=d.setBinFlowUnitsLPM % Net1.. GPM to LPM
 d.getFlowUnits
@@ -335,9 +336,9 @@ d.Binplot('nodes','yes','links','yes','highlightnode',[nodeSet1 nodeSet2],'color
 'highlightlink',[linkSet1 linkSet2],'colorlink',[colorLinkSet1 colorLinkSet2])
 d.Binplot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
 d.Binplot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);
+d.Binplot('links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8,'point','no');
 disp('Press any key to continue...')
 pause
-
 
 %% ADD, REMOVE NODES & LINKS
 d.Binplot('nodes','yes');
@@ -1031,7 +1032,6 @@ d.BinQualityType% Water quality analysis code (None:0/Chemical:1/Age:2/Trace:3)
 d.BinQualityCode
 d.BinQualityTraceNodeIndex
 d.BinQualityTraceNodeID
-d.BinQualityTypeUnits
 d.BinOptionsDiffusivity
 
 d.BincountStatuslines
@@ -1042,59 +1042,30 @@ d.BinSImetric
 d.BinUScustomary
 d.BinQualityUnits
 
-d.BinLinkFlowUnits
-d.BinOptionsHeadloss
-d.BinNodePressureUnits
-d.BinOptionsQualityTolerance
-d.BinPatternDemandsUnits
-d.BinLinkPipeDiameterUnits
-d.BinNodeTankDiameterUnits
-d.BinEnergyEfficiencyUnits
-d.BinNodeElevationUnits
-d.BinNodeEmitterCoefficientUnits
-d.BinEnergyUnits
-d.BinLinkFrictionFactorUnits
-d.BinNodeHeadUnits
-d.BinLinkLengthsUnits
-d.BinLinkMinorLossCoeffUnits
-d.BinLinkPumpPowerUnits
-d.BinQualityReactionCoeffBulkUnits
-d.BinQualityReactionCoeffWallUnits
-d.BinLinkPipeRoughnessCoeffUnits
-d.BinQualitySourceMassInjectionUnits
-d.BinLinkVelocityUnits
-d.BinNodeTankVolumeUnits
-d.BinQualityWaterAgeUnits
-
+d.BinUnits.BinLinkFlowUnits
+d.BinUnits.BinQualityUnits
+d.BinUnits.BinNodePressureUnits
+d.BinUnits.BinPatternDemandsUnits
+d.BinUnits.BinLinkPipeDiameterUnits
+d.BinUnits.BinNodeTankDiameterUnits
+d.BinUnits.BinEnergyEfficiencyUnits
+d.BinUnits.BinNodeElevationUnits
+d.BinUnits.BinNodeEmitterCoefficientUnits
+d.BinUnits.BinEnergyUnits
+d.BinUnits.BinLinkFrictionFactorUnits
+d.BinUnits.BinNodeHeadUnits
+d.BinUnits.BinLinkLengthsUnits
+d.BinUnits.BinLinkMinorLossCoeffUnits
+d.BinUnits.BinLinkPumpPowerUnits
+d.BinUnits.BinQualityReactionCoeffBulkUnits
+d.BinUnits.BinQualityReactionCoeffWallUnits
+d.BinUnits.BinLinkPipeRoughnessCoeffUnits
+d.BinUnits.BinQualitySourceMassInjectionUnits
+d.BinUnits.BinLinkVelocityUnits
+d.BinUnits.BinNodeTankVolumeUnits
+d.BinUnits.BinQualityWaterAgeUnits
+                
 %Delete s files 
 sfilesexist = dir('s*'); 
 if (~isempty(sfilesexist)), delete s*, end;
 delete('*_temp*',[d.BinInputFile(1:end-4),'.txt'])
-% isequal check
-% a=d.getBinComputedAllParameters;
-% isequal(a.BinElevationEachNode,d.getBinElevationEachNode)
-% isequal(a.BinLengthEachLink, d.getBinLengthEachLink)
-% isequal(a.BinDiameterEachLink, d.getBinDiameterEachLink)
-% isequal(a.BinPumpIndexListLinks, d.getBinComputedPumpIndexListLinks)
-% isequal(a.BinPumpUtilization, d.getBinComputedPumpUtilization)
-% isequal(a.BinAverageEfficiency, d.getBinComputedAverageEfficiency)
-% isequal(a.BinAverageKwattsOrMillionGallons, d.getBinComputedAverageKwattsOrMillionGallons)
-% isequal(a.BinAverageKwatts, d.getBinComputedAverageKwatts)
-% isequal(a.BinPeakKwatts, d.getBinComputedPeakKwatts)
-% isequal(a.BinAverageCostPerDay, d.getBinComputedAverageCostPerDay)
-% isequal(a.BinnodeDemand, d.getBinComputedNodeDemand)
-% isequal(a.BinnodeHead, d.getBinComputedNodeHead)
-% isequal(a.BinnodePressure, d.getBinComputedNodePressure)
-% isequal(a.BinnodeQuality, d.getBinComputedNodeQuality)
-% isequal(a.BinlinkFlow, d.getBinComputedLinkFlow)
-% isequal(a.BinlinkVelocity, d.getBinComputedLinkVelocity)
-% isequal(a.BinlinkHeadloss, d.getBinComputedLinkHeadloss)
-% isequal(a.BinlinkQuality, d.getBinComputedLinkQuality)
-% isequal(a.BinlinkStatus, d.getBinComputedLinkStatus)
-% isequal(a.BinlinkSetting, d.getBinComputedLinkSetting)
-% isequal(a.BinlinkReactionRate, d.getBinComputedLinkReactionRate)
-% isequal(a.BinlinkFrictionFactor, d.getBinComputedLinkFrictionFactor)
-% isequal(a.BinAverageBulkReactionRate, d.getBinComputedAverageBulkReactionRate)
-% isequal(a.BinAverageWallReactionRate, d.getBinComputedAverageWallReactionRate)
-% isequal(a.BinAverageTankReactionRate, d.getBinComputedAverageTankReactionRate)
-% isequal(a.BinAverageSourceInflowRate, d.getBinComputedAverageSourceInflow)

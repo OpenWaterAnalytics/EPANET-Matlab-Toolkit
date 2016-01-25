@@ -9,15 +9,112 @@ close all;
 
 % Create EPANET object using the INP file
 %d=epanet('Net1_Rossman2000.inp');
-inpname='Net1_Rossman2000.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008
-if strcmp(computer('arch'),'win64') 
-    version='epanet20013patchx64'; % epanet20012x64
-elseif strcmp(computer('arch'),'win32')
-    version='epanet20013patchx86'; % epanet20012x86
-end
-d=epanet(inpname,version);
+inpname='Net1_Rossman2000.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
+version='epanet2'; % version dev2.1
+% d=epanet(inpname,version);
+d=epanet(inpname);
 
-%%d.getCurvesInfo % ENgetcurve bug in epanet20013
+d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
+d.plot('line','no');
+d.plot('point','no','linksindex','yes');
+d.plot('linksindex','yes','fontsize',8);
+d.plot('nodesindex','yes','fontsize',14);
+
+
+%% New Functions 2.1
+% ENgetpumptype - Retrieves the type of a pump for specific link index
+% Constants for pumps: CONSTANT_HORSEPOWER, POWER_FUNCTION, CUSTOM
+d.LinkPumpTypeCode  
+d.getLinkPumpTypeCode
+d.LinkPumpType 
+d.getLinkPumpType
+  
+% ENgetheadcurve - Retrieves ID of a head curve for specific link index
+d.HeadCurveIndex 
+d.getHeadCurveIndex
+
+% ENaddcurve - Adds a new curve appended to the end of the existing curves
+% ENgetcurveid - Retrieves ID of a curve with specific index
+d.getCurveNameID
+d.addCurve('NewCur1')
+indexCurve=d.addCurve('NewCur2', [1800 200; 1500 400]); 
+d.getCurveNameID
+d.getCurveXY(indexCurve)
+
+% ENgetcurve - Retrieves curve id, number of values and (x,y) values Bug
+% ENsetcurve - Sets x,y values for a specific curve
+indexCurve=1;
+% xyCurveValue=d.getCurve(indexCurve)
+% xyCurveValue(1,1)=1000;%x
+% xyCurveValue(1,2)=300;%y
+xyCurveValue=[d.getBinCurvesInfo.BinCurveXvalue{indexCurve} d.getBinCurvesInfo.BinCurveYvalue{indexCurve}];
+d.setCurve(indexCurve,xyCurveValue)
+xyCurveValue=[d.getBinCurvesInfo.BinCurveXvalue{indexCurve} d.getBinCurvesInfo.BinCurveYvalue{indexCurve}]
+
+% ENgetcurvelen - Retrieves number of points in a curve
+len=d.getCurveLengths;
+
+% ENgetcurveindex - Retrieves index of curve with specific ID
+d.getCurveIndex
+
+% ENgetcurvevalue - Retrieves x,y point for a specific point number and curve
+% ENsetcurvevalue - Sets x,y point for a specific point and curve
+basedOnCurveLength=len(1);
+d.getCurveValue(indexCurve,basedOnCurveLength)
+xyCurve = d.getCurveValue(indexCurve,basedOnCurveLength);
+xyCurve(1) = xyCurve(1)+10;
+xyCurve(2) = xyCurve(2)+10;
+d.setCurveValue(indexCurve,basedOnCurveLength,xyCurve)
+d.getCurveValue(indexCurve,basedOnCurveLength)
+
+% ENgetbasedemand - Retrieves the node's base demand for a category
+% ENsetbasedemand - Sets the node's base demand for a category
+ndBaseDemands=d.getNodeBaseDemands;
+d.NodeBaseDemands; indexNode=1;
+disp(['Node index 1 base demand:', num2str(ndBaseDemands{1}(indexNode))])
+ndBaseDemands{1}(indexNode)=ndBaseDemands{1}(indexNode)+100;
+d.setNodeBaseDemands(ndBaseDemands)
+ndBaseDemands=d.getNodeBaseDemands;
+disp(['Node index 1 base demand after:', num2str(ndBaseDemands{1}(indexNode))])
+
+% ENgetnumdemands - Retrieves the number of demand categories for a node
+d.NodeNumDemandCategories 
+d.getNodeNumDemandCategories
+
+% ENgetdemandpattern - Retrieves the index of a demand pattern for a specific demand category of a node
+d.NodeDemandPatternNameID  
+d.getNodeDemandPatternNameID
+d.NodeDemandPatternsIndex 
+d.getNodeDemandPatternsIndex
+
+% ENgetaveragepatternvalue - Retrieves the average value of a pattern
+d.getPatternAveragePatternValue
+d.PatternAveragePatternValue
+
+% ENgetstatistic - Retrieves hydraulic simulation statistic
+d.RelativeError
+d.Iterations 
+d.getStatistic
+
+% ENgetcoord - Retrieves coordinate x, y for a node
+% ENsetcoord - Sets coordinate x, y for a node
+d.plot;
+nodeCoords=d.getNodeCoordinates;
+indexNode=1;
+nodeCoords{1}(indexNode)=nodeCoords{1}(indexNode)+10;%X
+nodeCoords{2}(indexNode)=nodeCoords{2}(indexNode)+20;%Y
+d.setNodeCoordinates(nodeCoords)
+d.plot;
+
+% ENgetqualinfo - Retrieves quality info Bug
+% d.QualityChemUnits
+% d.QualityChemName
+% % d.getQualInfo
+
+% Others new.
+n=d.getComputedHydraulicTimeSeries; % EN_TANKVOLUME - ENgetnodevalue
+n.TankVolume(:,d.NodeTankIndex)
+
 d.TimeStartTime % EN_STARTTIME  - ENgettimeparam
 d.TimeHTime % EN_HTIME - ENgettimeparam
 d.TimeHaltFlag % EN_HALTFLAG - ENgettimeparam
@@ -25,31 +122,14 @@ d.TimeNextEvent %find the lesser of the hydraulic time step length, or the time 
 d.NodeTankMaxVolume % EN_MAXVOLUME - ENgetnodevalue
 %d.CurvesInfo bug in epanet20013 energopoiisi sto prwto run
 
-d.LinkPumpHeadCurve % ENgetheadcurve
-d.getLinkPumpHeadCurve
+
 d.LinkPumpPatternNameID
 d.LinkPumpPatternIndex
 d.getLinkPumpPatternNameID % EN_LINKPATTERN - ENgetlinkvalue
 d.getLinkPumpPatternIndex
-d.getNodeBaseDemands 
-d.NodeBaseDemands % ENgetbasedemand
-% d.NodeNumDemandCategories % ENgetnumdemands
-% d.getNodeNumDemandCategories
-d.NodeDemandPatternNameID  % ENgetdemandpattern
-d.getNodeDemandPatternNameID
-d.NodeDemandPatternsIndex 
-d.getNodeDemandPatternsIndex
-n=d.getComputedHydraulicTimeSeries; % EN_TANKVOLUME - ENgetnodevalue
-n.TankVolume(:,d.NodeTankIndex)
 
-d.LinkPumpTypeCode % ENgetpumptype - Constants for pumps: 'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM'
-d.getLinkPumpTypeCode
-d.LinkPumpType 
-d.getLinkPumpType
-  
-d.RelativeError  % ENgetstatistic
-d.Iterations 
-d.getStatistic
+
+
 
 % inpname='Net1_Rossman2000.inp';
 d=epanet(inpname,version);
@@ -189,6 +269,7 @@ d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]);
 d.getPattern
 
 d.getControls
+% controlRuleIndex,controlTypeIndex,linkIndex,controlSettingValue,nodeIndex,controlLevel
 d.setControl(1,1,13,1,11,150); 
 d.getControls
 
@@ -493,7 +574,6 @@ d.setReport('F-FACTOR YES')
 
 %Write the report to file 
 d.writeReport
-%movefile('TestReport.txt',[pwd,'\RESULTS\','TestReport.txt']);
 %open('TestReport.txt');
 
 d.setReportFormatReset
@@ -505,7 +585,6 @@ d.setReport('DEMAND NO')
 d.setReport('PRESSURE NO')
 d.setReport('QUALITY NO')
 d.writeReport
-%movefile('TestReport2.txt',[pwd,'\RESULTS\','TestReport2.txt']);
 %open('TestReport2.txt');
 
 d.setReportFormatReset
@@ -513,14 +592,12 @@ d.setReport('FILE TestReport3.txt');
 d.setReport('NODES ALL')
 d.setReport('LINKS ALL')
 d.writeReport
-%movefile('TestReport3.txt',[pwd,'\RESULTS\','TestReport3.txt']);
 %open('TestReport3.txt')
 
 d.setReportFormatReset
 d.setReport('FILE TestReport4.txt'); 
 d.setReport('STATUS YES') 
 d.writeReport
-%movefile('TestReport4.txt',[pwd,'\RESULTS\','TestReport4.txt']);
 %open('TestReport4.txt')
 
 d.setReportFormatReset
@@ -533,7 +610,6 @@ d.setReport('FLOW YES')
 d.setReport('HEADLOSS NO') %bug: It shoes Headloss even though it shouldn't
 d.setReport('VELOCITY NO')
 d.writeReport
-%movefile('TestReport5.txt',[pwd,'\RESULTS\','TestReport5.txt']);
 %open('TestReport5.txt');
 
 d.setReportFormatReset
@@ -541,7 +617,6 @@ d.setReport('FILE TestReport6.txt');
 d.setTimeStatisticsType('MINIMUM')
 d.setReport('NODES ALL')
 d.writeReport
-%movefile('TestReport6.txt',[pwd,'\RESULTS\','TestReport6.txt']);
 %open('TestReport6.txt'); 
 
 d.setReportFormatReset
@@ -549,7 +624,6 @@ d.setReport('FILE TestReport7.txt');
 d.setTimeStatisticsType('NONE')
 d.setReport('LINKS ALL')
 d.writeReport
-%movefile('TestReport7.txt',[pwd,'\RESULTS\','TestReport7.txt']);
 %open('TestReport7.txt'); 
 
 d.unload

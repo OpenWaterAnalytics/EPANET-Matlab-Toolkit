@@ -18,6 +18,8 @@
 #ifndef EPANET2_H
 #define EPANET2_H
 
+// the toolkit can be compiled with support for double-precision as well.
+// just make sure that you use the correct #define in your client code.
 #ifndef EN_API_FLOAT_TYPE
   #define EN_API_FLOAT_TYPE float
 #endif
@@ -47,8 +49,11 @@
     #else
       #define DLLEXPORT
     #endif
+  #else
+    #define DLLEXPORT
   #endif
 #endif
+
 
 // --- Define the EPANET toolkit constants
 
@@ -184,6 +189,9 @@
 
 #define EN_INITFLOW    10   /* Re-initialize flows flag  */
 
+#define EN_CONST_HP     0   /* constant horsepower       */
+#define EN_POWER_FUNC   1   /* power function            */
+#define EN_CUSTOM       2   /* user-defined custom curve */
 
 // --- Declare the EPANET toolkit functions
 #if defined(__cplusplus)
@@ -237,6 +245,7 @@ extern "C" {
   int  DLLEXPORT ENgetnodetype(int index, int *code);
   int  DLLEXPORT ENgetnodevalue(int index, int code, EN_API_FLOAT_TYPE *value);
   int  DLLEXPORT ENgetcoord(int index, EN_API_FLOAT_TYPE *x, EN_API_FLOAT_TYPE *y);
+  int  DLLEXPORT ENsetcoord(int index, EN_API_FLOAT_TYPE x, EN_API_FLOAT_TYPE y);
   
   int  DLLEXPORT ENgetnumdemands(int nodeIndex, int *numDemands);
   int  DLLEXPORT ENgetbasedemand(int nodeIndex, int demandIdx, EN_API_FLOAT_TYPE *baseDemand);
@@ -249,8 +258,8 @@ extern "C" {
   int  DLLEXPORT ENgetlinkvalue(int index, int code, EN_API_FLOAT_TYPE *value);
   
   int  DLLEXPORT ENgetcurve(int curveIndex, char* id, int *nValues, EN_API_FLOAT_TYPE **xValues, EN_API_FLOAT_TYPE **yValues);
-  int  DLLEXPORT ENgetheadcurve(int, char *);
-  int  DLLEXPORT ENgetpumptype(int, int *);
+  int  DLLEXPORT ENgetheadcurveindex(int index, int *curveindex);
+  int  DLLEXPORT ENgetpumptype(int index, int *type);
   
   int  DLLEXPORT ENgetversion(int *version);
   
@@ -266,6 +275,14 @@ extern "C" {
   int  DLLEXPORT ENsetqualtype(int qualcode, char *chemname, char *chemunits, char *tracenode);
   int  DLLEXPORT ENgetqualinfo(int *qualcode, char *chemname, char *chemunits, int *tracenode);
   int  DLLEXPORT ENsetbasedemand(int nodeIndex, int demandIdx, EN_API_FLOAT_TYPE baseDemand);
+
+  int  DLLEXPORT ENgetcurveindex(char *id, int *index);
+  int  DLLEXPORT ENgetcurveid(int index, char *id);
+  int  DLLEXPORT ENgetcurvelen(int index, int *len);
+  int  DLLEXPORT ENgetcurvevalue(int index, int pnt, EN_API_FLOAT_TYPE *x, EN_API_FLOAT_TYPE *y);
+  int  DLLEXPORT ENsetcurvevalue(int index, int pnt, EN_API_FLOAT_TYPE x, EN_API_FLOAT_TYPE y);
+  int  DLLEXPORT ENsetcurve(int index, EN_API_FLOAT_TYPE *x, EN_API_FLOAT_TYPE *y, int len);
+  int  DLLEXPORT ENaddcurve(char *id);
   
 #if defined(__cplusplus)
 }
