@@ -14,7 +14,7 @@ Download the folder `Download ZIP`, set the run path in Matlab within the saved 
 
 Example:
 
-d=epanet('Net1.inp')
+d=epanet('networks/Net1_Rossman2000.inp')
 
 d.getNodeCount
 
