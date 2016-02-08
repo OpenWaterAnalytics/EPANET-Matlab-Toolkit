@@ -39,3 +39,26 @@ The `EPANET-Matlab Class` is based/inspired on the [EPANET-Matlab Toolkit](http:
 
 
 
+# List of EPANET 2.1 Functions Supported #
+
+|Function|Description|
+|--------|-----------|
+|[ENgetpumptype](ENgetpumptype)|Retrieves the type of a pump for specific link index|
+|[ENgetheadcurveindex](ENgetheadcurveindex)|Retrieves index of a head curve for specific link index|
+|[ENsetcurvevalue](ENsetcurvevalue)|Sets x,y point for a specific point and curve|
+|[ENsetcurve](ENsetcurve)|Sets x,y values for a specific curve|
+|[ENaddcurve](ENaddcurve)|Adds a new curve appended to the end of the existing curves|
+|[ENgetcurvevalue](ENgetcurvevalue)|Retrieves x,y point for a specific point number and curve|
+|[ENgetcurvelen](ENgetcurvelen)|Retrieves number of points in a curve|
+|[ENgetcurveid](ENgetcurveid)|Retrieves ID of a curve with specific index|
+|[ENgetcurveindex](ENgetcurveindex)|Retrieves index of curve with specific ID|
+|[ENsetcoord](ENsetcoord)|Sets coordinate x, y for a node|
+|[ENgetcoord](ENgetcoord)|Retrieves coordinate x, y for a node|
+|[ENgetstatistic](ENgetstatistic)|Retrieves hydraulic simulation statistic|
+|[ENgetnumdemands](ENgetnumdemands)|Retrieves the number of demand categories for a node|
+|[ENgetbasedemand](ENgetbasedemand)|Retrieves the node's base demand for a category|
+|[ENgetdemandpattern](ENgetdemandpattern)|Retrieves the index of a demand pattern for a specific demand category of a node|
+|[ENsetbasedemand](ENsetbasedemand)|Sets the node's base demand for a category|
+|[ENgetaveragepatternvalue](ENgetaveragepatternvalue)|Retrieves the average value of a pattern|
+
+
