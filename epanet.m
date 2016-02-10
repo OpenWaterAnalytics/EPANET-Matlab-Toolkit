@@ -2297,8 +2297,8 @@ classdef epanet <handle
             if exist([p,'/',f,'.txt'])==2
                 delete([p,'/',f,'.txt']);
             end
-            if exist([obj.Bintempfile(1:end-4),'.msx'])==2
-                delete([obj.Bintempfile(1:end-4),'.msx']);
+            if exist(obj.MsxTempFile)==2
+                delete(obj.MsxTempFile);
             end
             disp('EPANET Class is unloaded')
         end
