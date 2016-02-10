@@ -10,7 +10,7 @@ The `EPANET-Matlab Class` features easy to use commands/wrappers for viewing, mo
 * [EPANET](https://github.com/OpenWaterAnalytics/epanet) The OpenWaterAnalytics (OWA) EPANET version is recommended instead of the one provided by the EPA.gov website, as a number of bugs have been fixed in the OWA version. 
 
 # How to use the class #
-Download the folder `Download ZIP`, set the run path in Matlab within the saved folder, and run `TEST.m`. This will execute all the commands which have been implemented in the Class.
+Download the folder `Download ZIP`, set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
 
 Example:
 
