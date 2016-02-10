@@ -8,10 +8,10 @@ clear;
 close all;clear class;
 
 % Create EPANET object using the INP file
-inpname='example.inp'; %Net2_Rossman2000 example
+inpname='networks/example.inp'; %Net2_Rossman2000 example
 
 %% MSX Functions
-d=epanet(inpname)
+d=epanet(inpname);
 d.msx([inpname(1:end-4),'.msx'])
 d
 
@@ -25,7 +25,7 @@ d.getMsxTimeStep
 d.getMsxCoupling
 d.getMsxCompiler
 
-d.setMsxTimeStep(3600)
+d.setMsxTimeStep(3600) 
 
 d.setMsxAreaUnitsFT2
 d.setMsxAreaUnitsM2

@@ -238,7 +238,6 @@ classdef epanet <handle
         
         % Bin 
         Bin;
-        BinInputFile;
         Bintempfile;
         BinNodeJunctionNameID;
         BinNodeReservoirNameID;
@@ -422,16 +421,16 @@ classdef epanet <handle
                     warning('Folder "32bit" does not exit.');return;
                 end
             end
-            warning on;    
+            warning on;   
+            obj.inputfile=varargin{1}; % Get name of INP file
             % Bin functions
             if nargin==2
                 if strcmp(upper(varargin{2}),'BIN')
-                    obj.BinInputFile = varargin{1};
-                    obj.Bintempfile=[obj.BinInputFile(1:end-4),'_temp.inp'];
-                    copyfile(obj.BinInputFile,obj.Bintempfile);
+                    obj.Bintempfile=[obj.inputfile(1:end-4),'_temp.inp'];
+                    copyfile(obj.inputfile,obj.Bintempfile);
                     value=obj.getBinCurvesInfo;
                     if ~isempty(value.BinCurveNameID), obj.remAddBinCurvesID(obj.Bintempfile);end
-                    obj.BinInputFile=obj.Bintempfile;
+                    obj.inputfile=obj.Bintempfile;
                     obj.Bin=0;
                     obj = BinUpdateClass(obj);
                     obj.saveBinInpFile;
@@ -440,9 +439,7 @@ classdef epanet <handle
             end
             obj.Bin=1;
             if nargin==2
-                obj.inputfile=varargin{1}; % Get name of INP file
-                obj.BinInputFile = varargin{1};
-                if ~isempty(find(obj.BinInputFile==' '))
+                if ~isempty(find(obj.inputfile==' '))
                     warning(['File "', obj.inputfile, '" is not a valid']);return;
                 end
                 obj.libepanet=varargin{2}; % Get DLL libepanet (e.g. epanet20012x86 for 32-bit)
@@ -456,10 +453,8 @@ classdef epanet <handle
                 warning on;
                 
             elseif nargin==1
-                obj.inputfile=varargin{1}; % Get name of INP file
-                obj.BinInputFile = varargin{1};
                 obj.libepanet = 'epanet2';
-                if ~isempty(find(obj.BinInputFile==' '))
+                if ~isempty(find(obj.inputfile==' '))
                     warning(['File "', obj.inputfile, '" is not a valid.']);return;
                 end
             end
@@ -472,34 +467,17 @@ classdef epanet <handle
                 ENLoadLibrary(obj.libepanetpath,obj.libepanet);
                 warning on;
                 %Open the file
-                obj.errcode=ENopen(obj.BinInputFile,[obj.BinInputFile(1:end-4),'.txt'],[obj.BinInputFile(1:end-4),'.bin'],obj.libepanet);
+                obj.errcode=ENopen(obj.inputfile,[obj.inputfile(1:end-4),'.txt'],[obj.inputfile(1:end-4),'.bin'],obj.libepanet);
                 if obj.errcode~=0
                     warning('Could not open the file, please check INP file.');return;
                 end
                 %Save the temporary input file
-                obj.Bintempfile=[obj.BinInputFile(1:end-4),'_temp.inp'];
+                obj.Bintempfile=[obj.inputfile(1:end-4),'_temp.inp'];
                 obj.saveInputFile(obj.Bintempfile,1); %create a new INP file (Working Copy) using the SAVE command of EPANET
                 obj.closeNetwork;  %ENclose; %Close input file
                 %Load temporary file
-                ENopen(obj.Bintempfile,[obj.BinInputFile(1:end-4),'_temp.txt'], [obj.BinInputFile(1:end-4),'_temp.bin'],obj.libepanet);
-                [obj.pathfile,obj.BinInputFile]=fileparts(obj.BinInputFile);
-                if isempty(obj.pathfile), 
-                    obj.pathfile=[pwd,'\']; 
-                else
-                    obj.pathfile=strcat(obj.pathfile,'\'); 
-                end
-                obj.BinInputFile=[obj.BinInputFile,'_temp.inp'];
-%             else
-%                 if ~isempty(find(obj.BinInputFile==' '))
-%                     warning(['File "', obj.inputfile, '" is not a valid.']);return;
-%                 end
-%                 r = sprintf('./cfile %s %s %s',obj.BinInputFile,'tmp.txt','tmp.bin');
-%                 value=obj.getBinCurvesInfo;
-%                 obj.Bintempfile=[obj.BinInputFile(1:end-4),'_tmp.inp'];
-%                 system(r);
-%                 if ~isempty(value.BinCurveNameID), obj.remAddBinCurvesID(obj.Bintempfile,value.BinCurveAllLines);end
-%                 obj.BinInputFile=[obj.BinInputFile(1:end-4),'_tmp.inp'];
-%                 return;
+                ENopen(obj.Bintempfile,[obj.inputfile(1:end-4),'_temp.txt'], [obj.inputfile(1:end-4),'_temp.bin'],obj.libepanet);
+                obj.pathfile='';
             end
             
             obj.emcversion='dev-2.1';
@@ -1600,7 +1578,7 @@ classdef epanet <handle
             if nargin>1
                 obj.saveInputFile(obj.Bintempfile,1);
             else
-                obj.saveInputFile([obj.pathfile,obj.BinInputFile]);
+                obj.saveInputFile([obj.pathfile,obj.Bintempfile]);
             end
             value = {obj.getBinOptionsInfo.BinQualityType};
         end 
@@ -2275,8 +2253,7 @@ classdef epanet <handle
             [obj.errcode, tleft] = ENstepQ(obj.libepanet);
         end
         function errcode = saveInputFile(obj,inpname,varargin)
-%             [~,inpname]=fileparts(inpname);inpname=strcat(inpname,'.inp');
-            if strcmp(inpname,obj.Bintempfile) && nargin<3
+            if strcmp(inpname,obj.Bintempfile) && nargin<3 && ~isempty(varargin)
                 addSectionCoordinates=obj.getBinCoordinatesSection;
                 addSectionRules = obj.getBinRulesSection;
                 [obj.errcode] = ENsaveinpfile(inpname,obj.libepanet);
@@ -2284,7 +2261,7 @@ classdef epanet <handle
                 [~,info] = obj.readInpFile;
                 endSectionIndex=find(~cellfun(@isempty,regexp(info,'END','match')));
                 info(endSectionIndex)='';
-                f1=fopen([obj.pathfile,obj.BinInputFile],'w');
+                f1=fopen([obj.pathfile,obj.Bintempfile],'w');
                 fprintf(f1, '%s\n', info{:});
                 if ~isempty(addSectionRules)
                     fprintf(f1, '%s\n', addSectionRules{:});
@@ -2309,6 +2286,20 @@ classdef epanet <handle
         function unload(obj)
             ENclose(obj.libepanet);
             ENMatlabCleanup(obj.libepanet);
+            if exist([obj.Bintempfile(1:end-4),'.bin'])==2
+                delete([obj.Bintempfile(1:end-4),'.bin']);
+            end
+            delete(obj.Bintempfile);
+            if exist([obj.Bintempfile(1:end-4),'.txt'])==2
+                delete([obj.Bintempfile(1:end-4),'.txt']);
+            end
+            [p,f]=fileparts(obj.inputfile);
+            if exist([p,'/',f,'.txt'])==2
+                delete([p,'/',f,'.txt']);
+            end
+            if exist([obj.Bintempfile(1:end-4),'.msx'])==2
+                delete([obj.Bintempfile(1:end-4),'.msx']);
+            end
             disp('EPANET Class is unloaded')
         end
         function msx(obj,msxname,varargin)
@@ -2969,7 +2960,7 @@ classdef epanet <handle
             sect=0;i=1;t=1;q=1;
             typecode=0;x=1;b=1;d=1;
             if obj.Bin
-                obj.saveInputFile([obj.pathfile,obj.BinInputFile]);
+                obj.saveInputFile([obj.pathfile,obj.Bintempfile]);
             end
             [~,info] = obj.readInpFile;
             for hc=1:length(info)
@@ -3651,8 +3642,8 @@ classdef epanet <handle
             end   
            links=obj.getBinLinkNameID;
            BinLinkCount=length(links.BinLinkNameID);
-           [tlines]=regexp( fileread(obj.BinInputFile), '\n', 'split');
-           fid = fopen([obj.pathfile,obj.BinInputFile],'w');start=0;
+           [tlines]=regexp( fileread(obj.Bintempfile), '\n', 'split');
+           fid = fopen([obj.pathfile,obj.Bintempfile],'w');start=0;
            for i=1:length(tlines)
                tt=regexp(tlines{i}, '\s*', 'split');
                tok = strtok(tlines{i});m=1;
@@ -3875,6 +3866,16 @@ classdef epanet <handle
             sections={'[REACTIONS]','[MIXING]'};
             [errcode]=setBinParam(obj,1,parameter,sections);        
         end
+        function BinClose(obj)
+            if exist([obj.Bintempfile(1:end-4),'.bin'])==2
+                delete([obj.Bintempfile(1:end-4),'.bin'])
+            end
+            delete(obj.Bintempfile)
+            delete([obj.Bintempfile(1:end-4),'.txt'])
+            if exist([obj.Bintempfile(1:end-4),'.msx'])==2
+                delete([obj.Bintempfile(1:end-4),'.msx'])
+            end
+        end
         function [errcode]=setBinLinkValvesParameters(obj,varargin)
             % Initiality
             Diameter=[];
@@ -3915,8 +3916,8 @@ classdef epanet <handle
                         return;
                 end
             end            
-            [tlines]=regexp( fileread(obj.BinInputFile), '\n', 'split');
-            fid = fopen([obj.pathfile,obj.BinInputFile],'w');
+            [tlines]=regexp( fileread(obj.Bintempfile), '\n', 'split');
+            fid = fopen([obj.pathfile,obj.Bintempfile],'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[VALVES]')
@@ -4085,8 +4086,8 @@ classdef epanet <handle
             [errcode]=setBinParam(obj,11,values,sections);
         end
         function saveBinInpFile(obj)
-            [tlines]=regexp( fileread([obj.pathfile,obj.BinInputFile]), '\n', 'split');
-            f = fopen([obj.pathfile,obj.BinInputFile],'w');
+            [tlines]=regexp( fileread([obj.pathfile,obj.Bintempfile]), '\n', 'split');
+            f = fopen([obj.pathfile,obj.Bintempfile],'w');
             % /*Write [TITLE] section */
                for i=1:length(tlines)
                    tok = strtok(tlines{i});
@@ -4681,8 +4682,8 @@ classdef epanet <handle
                         return;
                 end
             end            
-            [tlines]=regexp( fileread([obj.pathfile,obj.BinInputFile]), '\n', 'split');
-            fid = fopen([obj.pathfile,obj.BinInputFile], 'w');
+            [tlines]=regexp( fileread([obj.pathfile,obj.Bintempfile]), '\n', 'split');
+            fid = fopen([obj.pathfile,obj.Bintempfile], 'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[PIPES]')
@@ -4782,8 +4783,8 @@ classdef epanet <handle
                         return;
                 end
             end            
-            [tlines]=regexp(fileread([obj.pathfile,obj.BinInputFile]), '\n', 'split');
-            fid = fopen([obj.pathfile,obj.BinInputFile], 'w');
+            [tlines]=regexp(fileread([obj.pathfile,obj.Bintempfile]), '\n', 'split');
+            fid = fopen([obj.pathfile,obj.Bintempfile], 'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[JUNCTIONS]')
@@ -4949,8 +4950,8 @@ classdef epanet <handle
                         return;
                 end
             end            
-            [tlines]=regexp( fileread([obj.pathfile,obj.BinInputFile]), '\n', 'split');
-            fid = fopen([obj.pathfile,obj.BinInputFile], 'w');
+            [tlines]=regexp( fileread([obj.pathfile,obj.Bintempfile]), '\n', 'split');
+            fid = fopen([obj.pathfile,obj.Bintempfile], 'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[TANKS]')
@@ -5108,8 +5109,8 @@ classdef epanet <handle
                         return;
                 end
             end            
-            [tlines]=regexp( fileread([obj.pathfile,obj.BinInputFile]), '\n', 'split');
-            fid = fopen([obj.pathfile,obj.BinInputFile], 'w');
+            [tlines]=regexp( fileread([obj.pathfile,obj.Bintempfile]), '\n', 'split');
+            fid = fopen([obj.pathfile,obj.Bintempfile], 'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[RESERVOIRS]')
@@ -5400,7 +5401,7 @@ classdef epanet <handle
         end
         function [info,tline,allines] = readInpFile(obj,varargin)
             if ~sum(strcmp(who,'varargin'))
-                [info,tline,allines] = readAllFile(obj.BinInputFile);
+                [info,tline,allines] = readAllFile(obj.Bintempfile);
             else
                 [info,tline,allines] = readAllFile(obj.Bintempfile);
             end
@@ -7933,7 +7934,7 @@ function [errcode]=setBinParam(obj,indexParameter,parameter,sections,varargin)
             pat=obj.getBinPatternsInfo;
         end
     end
-    [tlines]=regexp( fileread([obj.pathfile,obj.BinInputFile]), '\n', 'split');
+    [tlines]=regexp( fileread([obj.pathfile,obj.Bintempfile]), '\n', 'split');
     cntIDpat=0;start=0;stop1=0;stop11=0;itsOkQual=0;stop2=0;stop22=0;
     for i=1:length(tlines)
         tt=regexp(tlines{i}, '\s*', 'split');
@@ -7972,7 +7973,7 @@ function [errcode]=setBinParam(obj,indexParameter,parameter,sections,varargin)
     elseif strcmpi(sections{1},'[TANKS]')
         cnts=obj.BinNodeTankCount;
     end
-    fid = fopen([obj.pathfile,obj.BinInputFile], 'w');
+    fid = fopen([obj.pathfile,obj.Bintempfile], 'w');
     ll=1;clear atlines;
     for i=start:stop
        % Get first token in the line
@@ -8278,8 +8279,8 @@ function [errcode]=setBinParam2(obj,parameter,sections,zz,varargin)
         end
         patternsid=[value.BinPatternNameID varargin];
     end
-    [tlines]=regexp( fileread([obj.pathfile,obj.BinInputFile]), '\n', 'split');
-    fid = fopen([obj.pathfile,obj.BinInputFile], 'w');
+    [tlines]=regexp( fileread([obj.pathfile,obj.Bintempfile]), '\n', 'split');
+    fid = fopen([obj.pathfile,obj.Bintempfile], 'w');
     for i=1:length(tlines)
         tt=regexp(tlines{i}, '\s*', 'split');
         tok = strtok(tlines{i});m=1;
@@ -8403,7 +8404,7 @@ function [errcode]=setBinParam2(obj,parameter,sections,zz,varargin)
 end
 function value = getBinParam(obj,sections,varargin)  
     warning off;
-    [tlines]=regexp( fileread([obj.pathfile,obj.BinInputFile]), '\n', 'split');
+    [tlines]=regexp( fileread([obj.pathfile,obj.Bintempfile]), '\n', 'split');
     if strcmp(sections{1},'[SOURCES]')
         value.BinNodeSourcePatternIndex = nan(1,obj.BinNodeCount);
         value.BinNodeSourceQuality = nan(1,obj.BinNodeCount);
@@ -8541,7 +8542,7 @@ sect=0;
 % Read all file and save in variable info
 [~,info] = obj.readInpFile;
 % write
-fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
 sps=blanks(18);
 nn=0;yy=0;
 for t = 1:length(info)
@@ -8810,7 +8811,7 @@ function errcode=addNode(obj,typecode,varargin)
     % Open and read inpname
     % Read all file and save in variable info
     [~,info,~] = obj.readInpFile;
-    fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+    fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
     % Initiality
     qualch=0;qq=0;
     Coordch=0;onetime=1;gg=0;
@@ -8978,7 +8979,7 @@ crvs = obj.getBinCurvesInfo;
 % Open and read inpname
 % Read all file and save in variable info
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
 % Add pipe
 nn=0;sps=blanks(10);
 for t = 1:length(info)
@@ -9068,7 +9069,7 @@ checklinks_index=unique(linkindex12);
 checklinks=links.BinLinkNameID(checklinks_index);
 obj.removeBinControlNodeID(NodeID);% Remove control, code 0(NODE)
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
 out=0; sps=blanks(10);
 for t = 1:length(info)
     c = info{t};
@@ -9163,7 +9164,7 @@ if type==0
     end
 end
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
 e=0;n=0;kk=1;sps=blanks(15);tt=0;
 for t = 1:length(info)
     c = info{t};
@@ -9263,7 +9264,7 @@ if type==0
     end
 end
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
 e=0;n=0;kk=1;sps=blanks(15);
 for t = 1:length(info)
     c = info{t};
@@ -9359,7 +9360,7 @@ if sum(r)==0, to_node=''; end
 obj.removeBinControlLinkID(LinkID);
 
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
 
 % section [JUNCTIONS]
 out=0;YY=0;sps=blanks(15);
@@ -9493,7 +9494,7 @@ if (sum(exists)~=1)
 end
 type_n='[CONTROLS]';
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
 noo=0;s=0;sps=blanks(15);
 for t = 1:length(info)
     c = info{t};
@@ -9566,7 +9567,7 @@ end
 % Open and read inpname
 % Read all file and save in variable info
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
 e=0;n=0;sps=blanks(15);
 for t = 1:length(info)
     c = info{t};
@@ -9687,8 +9688,8 @@ controls = obj.getBinControlsInfo;
 curves = obj.getBinCurvesInfo;
 rules=obj.getBinRulesControlsInfo;
 
-[info] = readAllFile(obj.BinInputFile);
-fid2 = fopen([obj.pathfile,obj.BinInputFile],'w');
+[info] = readAllFile(obj.Bintempfile);
+fid2 = fopen([obj.pathfile,obj.Bintempfile],'w');
 sect=0;
 nn=0;pp=1;sps=blanks(15);
 for t = 1:length(info)
@@ -10201,7 +10202,7 @@ end
 end
 function errcode=closeOpenNetwork(obj)
     obj.closeNetwork;  %Close input file 
-    errcode=ENopen([obj.pathfile,obj.BinInputFile],[obj.pathfile,[obj.BinInputFile(1:end-4),'.txt']],[obj.pathfile,[obj.BinInputFile(1:end-4),'.bin']],obj.libepanet);
+    errcode=ENopen([obj.pathfile,obj.Bintempfile],[obj.pathfile,[obj.Bintempfile(1:end-4),'.txt']],[obj.pathfile,[obj.Bintempfile(1:end-4),'.bin']],obj.libepanet);
 end
 function setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
 if strcmp(previousFlowUnits,'GPM')
@@ -10437,22 +10438,22 @@ elseif strcmp(previousFlowUnits,'CMD')
 end
 end
 function [fid,binfile,msg] = makebatfile(obj)
-    binfile=[obj.BinInputFile(1:end-4),'.bin'];
+    binfile=[obj.Bintempfile(1:end-4),'.bin'];
     if exist(binfile)==2, fclose all; delete(binfile); end
     if strcmp(computer('arch'),'win64')
             folder='64bit';
-        r = sprintf('%s\\%s\\epanet2d.exe %s %s %s',pwd,folder,obj.BinInputFile,[obj.BinInputFile(1:end-4),'.txt'],binfile);
+        r = sprintf('%s\\%s\\epanet2d.exe %s %s %s',pwd,folder,obj.Bintempfile,[obj.Bintempfile(1:end-4),'.txt'],binfile);
     elseif strcmp(computer('arch'),'win32')
             folder='32bit';
-        r = sprintf('%s\\%s\\epanet2d.exe %s %s %s',pwd,folder,obj.BinInputFile,[obj.BinInputFile(1:end-4),'.txt'],binfile);
+        r = sprintf('%s\\%s\\epanet2d.exe %s %s %s',pwd,folder,obj.Bintempfile,[obj.Bintempfile(1:end-4),'.txt'],binfile);
     else
-        r = sprintf('./runcode2 %s %s %s',obj.BinInputFile,[obj.BinInputFile(1:end-4),'.txt'],binfile);
+        r = sprintf('./runcode2 %s %s %s',obj.Bintempfile,[obj.Bintempfile(1:end-4),'.txt'],binfile);
     end
     f=fopen([obj.pathfile,'Simulate.bat'],'w');
     try fprintf(f,'%s \n',r); fclose(f); catch e; end
     [~,msg]=system([obj.pathfile,'Simulate.bat']);
     delete([obj.pathfile,'Simulate.bat']);
-    binfile=[obj.pathfile,obj.BinInputFile(1:end-4),'.bin'];
+    binfile=[obj.pathfile,obj.Bintempfile(1:end-4),'.bin'];
     fid = fopen(binfile,'r');
 end
 function value = getBinComputedTimeSeries(obj,indParam,varargin)

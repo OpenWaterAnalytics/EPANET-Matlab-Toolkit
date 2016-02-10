@@ -9,16 +9,14 @@ close all;
 clear class;
 
 % Create EPANET object using the INP file
-inpname='Net1_Rossman2000.inp'; %Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
+inpname='networks/Net1_Rossman2000.inp'; %Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
 tic;d=epanet(inpname);toc
 d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]); 
 d.BinUpdateClass; % must be run if use Bin functions
 
-
 if d.errcode
     return; 
 end
-
 
 %% GET, SET FLOW UNITS
 % SET Flow Units 
@@ -323,7 +321,7 @@ end
 d = epanet(inpname);
 sim=d.getBinComputedAllParameters
 
-d.Binplot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);toc
+d.Binplot('nodes','yes','links','yes','highlightnode',{'10','11'},'colornode',{'r','k'},'highlightlink',{'10'},'fontsize',8);
 nodeSet1={'10','11','22'};
 nodeSet2={'21','23','31'};
 colorNodeSet1={'r','r','r'};
@@ -906,7 +904,7 @@ pause
 %% OTHER PROPERTIES
 d.BinUpdateClass
 
-d.BinInputFile
+d.inputfile
 d.Bintempfile
 d.BinNodeJunctionNameID
 d.BinNodeReservoirNameID
@@ -1064,8 +1062,8 @@ d.BinUnits.BinQualitySourceMassInjectionUnits
 d.BinUnits.BinLinkVelocityUnits
 d.BinUnits.BinNodeTankVolumeUnits
 d.BinUnits.BinQualityWaterAgeUnits
-                
+        
+d.BinClose
 %Delete s files 
 sfilesexist = dir('s*'); 
 if (~isempty(sfilesexist)), delete s*, end;
-delete('*_temp*',[d.BinInputFile(1:end-4),'.txt'])

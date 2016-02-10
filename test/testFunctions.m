@@ -6,7 +6,7 @@
 clc;
 clear;
 close all;
-cd ..
+
 % Create EPANET object using the INP file
 %d=epanet('Net1_Rossman2000.inp');
 inpname='networks/Net1_Rossman2000.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
@@ -705,9 +705,9 @@ pause
 
 % Other functions
 d.getNodeCoordinates
-d.unload
+d.unload % delete txt and temp files
 
 %% Delete files 
 sfilesexist = dir('s*'); 
 if (~isempty(sfilesexist)), delete('s*'), end;
-delete('TestR*','hydraulics*','*_INP*','*_temp*',[d.inputfile(1:end-4),'.txt'])
+delete('TestR*','hydraulics*','*_INP*')
