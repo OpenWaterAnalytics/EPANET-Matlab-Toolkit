@@ -131,7 +131,7 @@ d.getLinkPumpPatternIndex
 
 
 
-% inpname='Net1_Rossman2000.inp';
+% inpname='networks/Net1_Rossman2000.inp';
 d=epanet(inpname,version);
 %% Controls
 Controls=d.getControls

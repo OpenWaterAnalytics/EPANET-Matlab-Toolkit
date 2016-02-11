@@ -454,7 +454,8 @@ classdef epanet <handle
                 
             elseif nargin==1
                 obj.libepanet = 'epanet2';
-                if ~isempty(find(obj.inputfile==' '))
+                [~,inp]=fileparts(obj.inputfile);
+                if ~isempty(find(inp==' '))
                     warning(['File "', obj.inputfile, '" is not a valid.']);return;
                 end
             end
