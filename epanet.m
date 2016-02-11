@@ -1668,6 +1668,21 @@ classdef epanet <handle
 %                 [obj.errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = ENgetcurve(i,obj.libepanet);
 %             end
 %         end
+        function value = getConnectivityMatrix(obj)
+            conn = obj.getNodesConnectingLinksID;
+            nodesID = obj.getNodeNameID;
+            value = zeros(obj.getNodeCount,obj.getNodeCount);
+            for i=1:obj.getNodeCount
+                mm = strcmp(nodesID(i),conn);
+                mS = mm(:,1)+mm(:,2);       
+                chIndex = find(mS);
+                connFinal = conn(chIndex,:);
+                mmFinal = mm(chIndex,:);
+                Ok = connFinal(find(mmFinal==0));
+                nodesIndOk = obj.getNodeIndex(Ok);
+                value(i,nodesIndOk) = 1;
+            end
+        end
         function valueIndex = addCurve(obj,varargin)
             %New version dev2.1
             %Adds a new curve appended to the end of the existing curves
