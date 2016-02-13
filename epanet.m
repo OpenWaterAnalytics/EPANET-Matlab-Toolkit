@@ -2269,7 +2269,7 @@ classdef epanet <handle
             [obj.errcode, tleft] = ENstepQ(obj.libepanet);
         end
         function errcode = saveInputFile(obj,inpname,varargin)
-            if strcmp(inpname,obj.Bintempfile) && nargin<3 && ~isempty(varargin)
+            if strcmp(inpname,obj.Bintempfile) && nargin<3 %&& ~isempty(varargin)
                 addSectionCoordinates=obj.getBinCoordinatesSection;
                 addSectionRules = obj.getBinRulesSection;
                 [obj.errcode] = ENsaveinpfile(inpname,obj.libepanet);
