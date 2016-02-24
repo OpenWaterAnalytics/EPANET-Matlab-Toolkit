@@ -1574,7 +1574,7 @@ classdef epanet <handle
         end
         function value = getQualityType(obj,varargin)
             %Retrieves the type of water quality analysis type
-% %             [obj.errcode, obj.QualityCode,obj.QualityTraceNodeIndex] = ENgetqualinfo(obj.libepanet); bug
+% %             [obj.errcode, obj.QualityCode,obj.QualityTraceNodeIndex] = E_Ngetqualinfo(obj.libepanet); bug
 % %             value=obj.TYPEQUALITY(obj.QualityCode+1);
             if nargin>1
                 obj.saveInputFile(obj.Bintempfile,1);
@@ -1583,9 +1583,9 @@ classdef epanet <handle
             end
             value = {obj.getBinOptionsInfo.BinQualityType};
         end 
-        function value = getQualityInfo(obj)
-            [obj.errcode, ~,value.QualityChemName,value.QualityChemUnits,~] = ENgetqualinfo(obj.libepanet);
-        end
+%         function value = getQualityInfo(obj)
+%             [obj.errcode, ~,value.QualityChemName,value.QualityChemUnits,~] = E_Ngetqualinfo(obj.libepanet);
+%         end
         function value = getQualityCode(obj)
             %Retrieves the code of water quality analysis type
             [obj.errcode, value,obj.QualityTraceNodeIndex] = ENgetqualtype(obj.libepanet);
@@ -1665,7 +1665,7 @@ classdef epanet <handle
 %             %Returns: error code
 %             %Purpose: retrieves end nodes of a specific link
 %             for i=1:obj.getCurveCount
-%                 [obj.errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = ENgetcurve(i,obj.libepanet);
+%                 [obj.errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = E_Ngetcurve(i,obj.libepanet);
 %             end
 %         end
         function value = getConnectivityMatrix(obj)
@@ -1758,6 +1758,9 @@ classdef epanet <handle
                 end
             end
             value = unique(value)';
+        end
+        function value = getLibFunctions(obj)
+            value = libfunctions(obj.libepanet)'';
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function value = getVersion(obj)
@@ -7007,10 +7010,10 @@ if errcode
     ENgeterror(errcode,libepanet);
 end
 end
-% function [errcode, ids, nvalue, xvalue, yvalue] = ENgetcurve(value,libepanet)
+% function [errcode, ids, nvalue, xvalue, yvalue] = E_Ngetcurve(value,libepanet)
 % % New version dev2.1 bug
-% [~,~,nvalue,~,~]=calllib(libepanet,'ENgetcurve',value,'',0,0,0);
-% [errcode,ids,~, xvalue, yvalue]=calllib(libepanet,'ENgetcurve',value,char(32*ones(1,17)),0,zeros(1,nvalue),zeros(1,nvalue));
+% [~,~,nvalue,~,~]=calllib(libepanet,'E_Ngetcurve',value,'',0,0,0);
+% [errcode,ids,~, xvalue, yvalue]=calllib(libepanet,'E_Ngetcurve',value,char(32*ones(1,17)),0,zeros(1,nvalue),zeros(1,nvalue));
 % if errcode
 %     ENgeterror(errcode,libepanet);
 % end
@@ -7065,10 +7068,10 @@ if errcode
     ENgeterror(errcode,libepanet);
 end
 end
-% function [errcode,qualcode,chemname,chemunits,tracenode] = ENgetqualinfo(libepanet)
+% function [errcode,qualcode,chemname,chemunits,tracenode] = E_Ngetqualinfo(libepanet)
 % % New version dev2.1 bug
 % chm=libpointer('cstring', char(32*ones(1,16)));
-% [errcode,qualcode,chemname,chemunits,tracenode]=calllib(libepanet,'ENgetqualinfo',0,chm,chm,0);
+% [errcode,qualcode,chemname,chemunits,tracenode]=calllib(libepanet,'E_Ngetqualinfo',0,chm,chm,0);
 % if errcode
 %     ENgeterror(errcode,libepanet);
 % end

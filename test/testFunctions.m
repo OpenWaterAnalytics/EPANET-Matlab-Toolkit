@@ -21,6 +21,7 @@ d.plot('linksindex','yes','fontsize',8);
 d.plot('nodesindex','yes','fontsize',14);
 
 d.getConnectivityMatrix
+d.getLibFunctions
 
 %% New Functions 2.1
 % ENgetpumptype - Retrieves the type of a pump for specific link index
