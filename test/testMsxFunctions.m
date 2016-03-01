@@ -249,4 +249,4 @@ d.unload
 %Delete s files 
 sfilesexist = dir('s*'); 
 if (~isempty(sfilesexist)), delete s*, end;
-delete('testMsx.msx','*.hyd','*.bin','*bat*','*_temp*',[d.inputfile(1:end-4),'.txt'])
+delete('testMsx.msx','*.hyd','*.bin','*bat*','*_temp*')

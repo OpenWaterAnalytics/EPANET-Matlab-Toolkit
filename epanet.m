@@ -2627,8 +2627,8 @@ classdef epanet <handle
                 end
             end
             SnodeID=obj.getMsxSourceNodeNameID;
-            value={obj.MsxSourceType,obj.MsxSourceTypeCode,obj.MsxSourceLevel,obj.MsxSourcePatternIndex,SnodeID};
-            warning off; value.MsxSourceType=obj.MsxSourceType; warning on;
+           % value={obj.MsxSourceType,obj.MsxSourceTypeCode,obj.MsxSourceLevel,obj.MsxSourcePatternIndex,SnodeID};
+            value.MsxSourceType=obj.MsxSourceType;
             value.MsxSourceTypeCode=obj.MsxSourceTypeCode;
             value.MsxSourceLevel=obj.MsxSourceLevel;
             value.MsxSourcePatternIndex=obj.MsxSourcePatternIndex;
@@ -3886,6 +3886,7 @@ classdef epanet <handle
             [errcode]=setBinParam(obj,1,parameter,sections);        
         end
         function BinClose(obj)
+            fclose all;
             if exist([obj.Bintempfile(1:end-4),'.bin'])==2
                 delete([obj.Bintempfile(1:end-4),'.bin'])
             end
@@ -7897,7 +7898,7 @@ if (strcmp(lower(npoint),'yes'))
 end
 % Legend Plots
 u=1;
-for i=1:length(h)
+for i=find(~cellfun(@isempty,legendString))
     if h(i)~=0
         String{u} = legendString{i};
         hh(:,u) = h(i);
@@ -8431,7 +8432,7 @@ function value = getBinParam(obj,sections,varargin)
         value.BinNodeSourceType = cell(1,obj.BinNodeCount);
         value.BinNodeSourcePatternNameID = cell(1,obj.BinNodeCount);
     else 
-        value=0;
+        value=[];
     end
     v{1}=''; 
     for i=1:length(tlines)
