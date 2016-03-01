@@ -14,7 +14,7 @@ Download the folder `Download ZIP`, set the run path in Matlab within the saved 
 
 Example:
 
-d=epanet(networks/Net1_Rossman2000.inp)
+d=epanet('networks/Net1_Rossman2000.inp')
 
 d.getNodeCount
 
@@ -39,18 +39,14 @@ The `EPANET-Matlab Class` is based/inspired on the [EPANET-Matlab Toolkit](http:
 
 # List of Matlab Class Functions #
 |Function|Description|
-|--------|-----------|
+|---------|---------|
+|Struct epanet(String)| Load Input file and open the EPANET Toolkit system|
+|unload()|Unload library and close the EPANET Toolkit system|
+|Integer LoadFile(String)| Open the EPANET Toolkit system|
 |String getError(Integer)| Returns the description of an error code| 
-|LoadFile
-|addCurve
-|addPattern
-|addlistener
-|closeHydraulicAnalysis
-|closeNetwork
-|closeQualityAnalysis
-|getComputedHydraulicTimeSeries
-|getComputedQualityTimeSeries
-|getConnectivityMatrix
+|Struct getComputedHydraulicTimeSeries()|Computed Hydraulic Time Series|
+|Struct getComputedQualityTimeSeries()|Computed Quality Time Series|
+|Array getConnectivityMatrix|Return connectivity matrix of the network|
 |getControlRulesCount
 |getControls
 |getCurveCount
@@ -60,7 +56,6 @@ The `EPANET-Matlab Class` is based/inspired on the [EPANET-Matlab Toolkit](http:
 |getCurveValue
 |getCurveXY
 |getENfunctionsImpemented
-|getError
 |getFlowUnits
 |getHeadCurveIndex
 |getLibFunctions
@@ -143,7 +138,7 @@ The `EPANET-Matlab Class` is based/inspired on the [EPANET-Matlab Toolkit](http:
 |getNodeTankMixiningModel
 |getNodeTankNameID
 |getNodeTankReservoirCount
-|getNodeTankVolume
+|getNodeTankVolumer
 |getNodeTankVolumeCurveIndex
 |getNodeType
 |getNodeTypeIndex
@@ -181,19 +176,24 @@ The `EPANET-Matlab Class` is based/inspired on the [EPANET-Matlab Toolkit](http:
 |getTimeStatisticsIndex
 |getTimeStatisticsType
 |getVersion
-initializeHydraulicAnalysis
-initializeQualityAnalysis
-nextHydraulicAnalysisStep
-nextQualityAnalysisStep
-openHydraulicAnalysis
-openQualityAnalysis
-runHydraulicAnalysis
-runQualityAnalysis
-saveHydraulicFile
-saveHydraulicsOutputReportingFile
-saveInputFile
-plot
-readInpFile
+|addCurve
+|addPattern
+|closeHydraulicAnalysis
+|closeNetwork
+|closeQualityAnalysis
+|initializeHydraulicAnalysis
+|initializeQualityAnalysis
+|nextHydraulicAnalysisStep
+|nextQualityAnalysisStep
+|openHydraulicAnalysis
+|openQualityAnalysis
+|runHydraulicAnalysis
+|runQualityAnalysis
+|saveHydraulicFile
+|saveHydraulicsOutputReportingFile
+|saveInputFile
+|plot
+|readInpFile
 |setControl
 |setCurve
 |setCurveValue
@@ -247,27 +247,26 @@ readInpFile
 |setTimeRuleControlStep
 |setTimeSimulationDuration
 |setTimeStatisticsType
-solveCompleteHydraulics
-solveCompleteQuality
-stepQualityAnalysisTimeLeft
-unload
-useHydraulicFile
-writeLineInReportFile
-writeReport
-
-msx
-MsxAddPattern
-MsxInitializeQualityAnalysis
-MsxPlotConcentrationSpeciesOfLinks
-MsxPlotConcentrationSpeciesOfNodes
-MsxSaveFile
-MsxSaveQualityFile
-MsxSolveCompleteHydraulics
-MsxSolveCompleteQuality
-MsxStepQualityAnalysisTimeLeft
-MsxUnload
-MsxUseHydraulicFile
-MsxWriteReport
+|solveCompleteHydraulics
+|solveCompleteQuality
+|stepQualityAnalysisTimeLeft
+|useHydraulicFile
+|writeLineInReportFile
+|writeReport
+|<b> MSX Functions </b>
+|msx
+|MsxAddPattern
+|MsxInitializeQualityAnalysis
+|MsxPlotConcentrationSpeciesOfLinks
+|MsxPlotConcentrationSpeciesOfNodes
+|MsxSaveFile
+|MsxSaveQualityFile
+|MsxSolveCompleteHydraulics
+|MsxSolveCompleteQuality
+|MsxStepQualityAnalysisTimeLeft
+|MsxUnload
+|MsxUseHydraulicFile
+|MsxWriteReport
 |getMsxAreaUnits
 |getMsxAtol
 |getMsxCompiler
@@ -339,44 +338,44 @@ MsxWriteReport
 |setMsxSolverROS2
 |setMsxSources
 |setMsxTimeStep
-
-BinClose
-BinUpdateClass
-Binplot
-addBinControl
-addBinCurveEfficiency
-addBinCurveHeadloss
-addBinCurvePump
-addBinCurveVolume
-addBinJunction
-addBinPattern
-addBinPipe
-addBinPump
-addBinReservoir
-addBinTank
-addBinValveFCV
-addBinValveGPV
-addBinValvePBV
-addBinValvePRV
-addBinValvePSV
-addBinValveTCV
-remAddBinCurvesID
-removeBinControlLinkID
-removeBinControlNodeID
-removeBinCurveID
-removeBinLinkID
-removeBinNodeID
-removeBinRulesControlLinkID
-removeBinRulesControlNodeID
-saveBinInpFile
+|<b>Bin Functions</b>
+|BinClose
+|BinUpdateClass
+|Binplot
+|addBinControl
+|addBinCurveEfficiency
+|addBinCurveHeadloss
+|addBinCurvePump
+|addBinCurveVolume
+|addBinJunction
+|addBinPattern
+|addBinPipe
+|addBinPump
+|addBinReservoir
+|addBinTank
+|addBinValveFCV
+|addBinValveGPV
+|addBinValvePBV
+|addBinValvePRV
+|addBinValvePSV
+|addBinValveTCV
+|remAddBinCurvesID
+|removeBinControlLinkID
+|removeBinControlNodeID
+|removeBinCurveID
+|removeBinLinkID
+|removeBinNodeID
+|removeBinRulesControlLinkID
+|removeBinRulesControlNodeID
+|saveBinInpFile
 |getBinComputedAllParameters
 |getBinComputedAverageBulkReactionRate
 |getBinComputedAverageCostPerDay
 |getBinComputedAverageEfficiency
 |getBinComputedAverageKwatts
 |getBinComputedAverageKwattsOrMillionGallons
-|getBinComputedAverageSourceInflow
-|getBinComputedAvera|getankReactionRate
+|getBinComputedAverageSourceInflow                                                                                             
+|getBinComputedAverageTankReactionRate
 |getBinComputedAverageWallReactionRate
 |getBinComputedLinkFlow
 |getBinComputedLinkFrictionFactor

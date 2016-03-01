@@ -344,7 +344,7 @@ d.Binplot('nodes','yes');
 % arguments: newNodeID,X,Y,ToNodeID,newElevation,newBaseDemand,newDemandPattern,newPipeID,
 % newLength,newDiameter,newRoughness,Code
 % Code - Constants for valves: 'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'
-
+fprintf('Add nodes and links. Select on plot.\n')
 % PIPE
 % Add Junction + pipe
 newID='J1';
