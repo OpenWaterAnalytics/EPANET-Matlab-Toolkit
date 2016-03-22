@@ -47,91 +47,91 @@ The `EPANET-Matlab Class` is based/inspired on the [EPANET-Matlab Toolkit](http:
 |Struct getComputedHydraulicTimeSeries()|Computed Hydraulic Time Series|
 |Struct getComputedQualityTimeSeries()|Computed Quality Time Series|
 |Array getConnectivityMatrix|Return connectivity matrix of the network|
-|getControlRulesCount
-|getControls
-|getCurveCount
-|getCurveIndex
-|getCurveLengths
-|getCurveNameID
-|getCurveValue
-|getCurveXY
-|getENfunctionsImpemented
-|getFlowUnits
-|getHeadCurveIndex
-|getLibFunctions
-|getLinkBulkReactionCoeff
-|getLinkCount
-|getLinkDiameter
-|getLinkFlows
-|getLinkHeadloss
-|getLinkIndex
-|getLinkInitialSetting
-|getLinkInitialStatus
-|getLinkLength
-|getLinkMinorLossCoeff
-|getLinkNameID
-|getLinkNodesIndex
-|getLinkPipeCount
-|getLinkPipeIndex
-|getLinkPipeNameID
-|getLinkPumpCount
-|getLinkPumpEnergy
-|getLinkPumpIndex
-|getLinkPumpNameID
-|getLinkPumpPatternIndex
-|getLinkPumpPatternNameID
-|getLinkPumpType
-|getLinkPumpTypeCode
-|getLinkQuality
-|getLinkRoughnessCoeff
-|getLinkSettings
-|getLinkStatus
-|getLinkType
-|getLinkTypeIndex
-|getLinkValveCount
-|getLinkValveIndex
-|getLinkValveNameID
-|getLinkVelocity
-|getLinkWallReactionCoeff
-|getNodeActualDemand
-|getNodeActualDemandSensingNodes
-|getNodeActualQuality
-|getNodeActualQualitySensingNodes
-|getNodeBaseDemands
-|getNodeCoordinates
-|getNodeCount
-|getNodeDemandPatternIndex
-|getNodeDemandPatternNameID
-|getNodeDemandPatternsIndex
-|getNodeElevations
-|getNodeEmitterCoeff
-|getNodeHydaulicHead
-|getNodeIndex
-|getNodeInitialQuality
-|getNodeJunctionCount
-|getNodeJunctionIndex
-|getNodeJunctionNameID
-|getNodeMassFlowRate
-|getNodeNameID
-|getNodeNumDemandCategories
-|getNodePressure
-|getNodeReservoirCount
-|getNodeReservoirIndex
-|getNodeReservoirNameID
-|getNodeSourcePatternIndex
-|getNodeSourceQuality
-|getNodeSourceType
-|getNodeTankBulkReactionCoeff
-|getNodeTankCount
-|getNodeTankDiameter
-|getNodeTankIndex
-|getNodeTankInitialLevel
-|getNodeTankInitialWaterVolume
-|getNodeTankMaxVolume
-|getNodeTankMaximumWaterLevel
-|getNodeTankMinimumFraction
-|getNodeTankMinimumWaterLevel
-|getNodeTankMinimumWaterVolume
+|getControlRulesCount|Retrieves the number of control rules|
+|getControls|Retrieves the controls|
+|getCurveCount|Retrieves the number of curves|
+|getCurveIndex|Retrieves index of curve with specific ID|
+|getCurveLengths|Retrieves number of points in a curve|
+|getCurveNameID|Retrieves curve id|
+|getCurveValue|Retrieves (x,y) values of specific curve index|
+|getCurveXY|Retrieves (x,y) values of all curves|
+|getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
+|getFlowUnits|Retrieves the units used to express all flow rates|
+|getHeadCurveIndex|Retrieves index of a head curve for specific link index|
+|getLibFunctions|Retrieves the functions of DLL|
+|getLinkBulkReactionCoeff|Retrieves the value of all link bulk reaction coefficients|
+|getLinkCount|Retrieves the number of links|
+|getLinkDiameter|Retrieves the value of all link diameters|
+|getLinkFlows|Retrieves the value of all computed link flow rates|
+|getLinkHeadloss|Retrieves the value of all computed link headloss|
+|getLinkIndex|Retrieves the indices of all links, or the indices of an ID set of links|
+|getLinkInitialSetting|Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves|
+|getLinkInitialStatus|Retrieves the value of all link initial status|
+|getLinkLength|Retrieves the value of all link lengths|
+|getLinkMinorLossCoeff|Retrieves the value of all link minor loss coefficients|
+|getLinkNameID|Retrieves the ID label(s) of all links, or the IDs of an index set of links|
+|getLinkNodesIndex|Retrieves the indexes of the from/to nodes of all links|
+|getLinkPipeCount|Retrieves the number of pipes|
+|getLinkPipeIndex|Retrieves the indices of pipes|
+|getLinkPipeNameID|Retrieves the pipe IDs|
+|getLinkPumpCount|Retrieves the number of pumps|
+|getLinkPumpEnergy|Retrieves the value of all computed energy in kwatts|
+|getLinkPumpIndex|Retrieves the indices of pumps|
+|getLinkPumpNameID|Retrieves the pump IDs|
+|getLinkPumpPatternIndex|Retrieves the pump pattern indices|
+|getLinkPumpPatternNameID|Retrieves the pump pattern IDs|
+|getLinkPumpType|Retrieves the type of a pump for specific link index|
+|getLinkPumpTypeCode|Retrieves the type code of a pump for specific link index|
+|getLinkQuality|Retrieves the quality of links|
+|getLinkRoughnessCoeff|Retrieves the value of all link roughness|
+|getLinkSettings|Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves|
+|getLinkStatus|Retrieves the value of all computed link status (0 = closed, 1 = open)|
+|getLinkType|Retrieves the link-type for all links|
+|getLinkTypeIndex|Retrieves the link-type code for all links.|
+|getLinkValveCount|Retrieves the number of valves|
+|getLinkValveIndex|Retrieves the indices of valves|
+|getLinkValveNameID|Retrieves the valve IDs|
+|getLinkVelocity|Retrieves the value of all computed link velocities|
+|getLinkWallReactionCoeff|Retrieves the value of all link wall reaction coefficients|
+|getNodeActualDemand|Retrieves the computed value of all actual demands|
+|getNodeActualDemandSensingNodes|Retrieves the computed demand values at some sensing nodes|
+|getNodeActualQuality|Retrieves the computed values of the actual quality for all nodes|
+|getNodeActualQualitySensingNodes|Retrieves the computed quality values at some sensing nodes|
+|getNodeBaseDemands|Retrieves the value of all node base demands|
+|getNodeCoordinates|Retrieves coordinate x, y, and x, y vertices for a node|
+|getNodeCount|Retrieves the number of nodes|
+|getNodeDemandPatternIndex|Retrieves the value of all node demand pattern indices|
+|getNodeDemandPatternNameID|Retrieves the value of all node demand pattern IDs|
+|getNodeDemandPatternsIndex|Retrieves the value of all node demand pattern indices dev-2.1|
+|getNodeElevations|Retrieves the value of all node elevations|
+|getNodeEmitterCoeff|Retrieves the value of all node emmitter coefficients|
+|getNodeHydaulicHead|Retrieves the computed values of all hydraulic heads|
+|getNodeIndex|Retrieves the indices of all nodes or some nodes with a specified ID|
+|getNodeInitialQuality|Retrieves the value of all node initial quality|
+|getNodeJunctionCount|Retrieves the number of junctions|
+|getNodeJunctionIndex|Retrieves the junctions indices|
+|getNodeJunctionNameID|Retrieves the junctions IDs|
+|getNodeMassFlowRate|Retrieves the computed mass flow rates per minute of chemical sources|
+|getNodeNameID|Retrieves the ID label of all nodes or some nodes with a specified index|
+|getNodeNumDemandCategories|Retrieves the number of demand categories for a node|
+|getNodePressure|Retrieves the computed values of all node pressures|
+|getNodeReservoirCount|Retrieves the number of reservoirs|
+|getNodeReservoirIndex|Retrieves the indices of reservoirs|
+|getNodeReservoirNameID|Retrieves the reservoirs IDs|
+|getNodeSourcePatternIndex|Retrieves the value of all node source pattern index|
+|getNodeSourceQuality|Retrieves the value of all nodes source quality|
+|getNodeSourceType|Retrieves the value of all node source type|
+|getNodeTankBulkReactionCoeff|Retrieves the tank bulk rate coefficient|
+|getNodeTankCount|Retrieves the number of tanks|
+|getNodeTankDiameter|Retrieves the tank diameters|
+|getNodeTankIndex|Retrieves the indices of tanks|
+|getNodeTankInitialLevel|Retrieves the value of all tank initial water levels|
+|getNodeTankInitialWaterVolume|Retrieves the tank initial volume|
+|getNodeTankMaxVolume|Retrieves maximum water volume|
+|getNodeTankMaximumWaterLevel|Retrieves the tank maximum water level|
+|getNodeTankMinimumFraction|Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank|
+|getNodeTankMinimumWaterLevel|Retrieves the tank minimum water level|
+|getNodeTankMinimumWaterVolume|Retrieves the tank minimum volume|
 |getNodeTankMixZoneVolume
 |getNodeTankMixingModelCode
 |getNodeTankMixingModelType

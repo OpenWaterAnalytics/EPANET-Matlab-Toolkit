@@ -844,19 +844,19 @@ classdef epanet <handle
             end
         end
         function value = getLinkPipeIndex(obj)
-            %Retrieves the pipe index
+            %Retrieves the pipe indices
             tmpLinkTypes=obj.getLinkType;
             value = find(strcmp(tmpLinkTypes,'PIPE'));
 %             if isempty(value), value=-1; end
         end
         function value = getLinkPumpIndex(obj)
-            %Retrieves the pipe index
+            %Retrieves the pump indices
             tmpLinkTypes=obj.getLinkType;
             value = find(strcmp(tmpLinkTypes,'PUMP'));
 %             if isempty(value), value=-1; end
         end
         function value = getLinkValveIndex(obj)
-            %Retrieves the pipe index
+            %Retrieves the valve indices
             value = obj.getLinkPipeCount+obj.getLinkPumpCount+1:obj.getLinkCount;
 %             if isempty(value), value=-1; end
         end
@@ -1050,7 +1050,7 @@ classdef epanet <handle
             end
         end
         function value = getNodeReservoirIndex(obj)
-            %Retrieves the reservoir index
+            %Retrieves the indices of reservoirs
             if obj.getNodeReservoirCount
                 tmpNodeTypes=obj.getNodeType;
                 value = find(strcmp(tmpNodeTypes,'RESERVOIR'));
@@ -1059,7 +1059,7 @@ classdef epanet <handle
             end
         end
         function value = getNodeJunctionIndex(obj)
-            %Retrieves the junction index
+            %Retrieves the indices of junctions
             if obj.getNodeJunctionCount
                 tmpNodeTypes=obj.getNodeType;
                 value = find(strcmp(tmpNodeTypes,'JUNCTION'));
@@ -2970,6 +2970,263 @@ classdef epanet <handle
         end
         function MsxSaveFile(obj,msxname)
             [obj.errcode] = MSXsavemsxfile(msxname,obj.Msxlibepanet);
+        end
+        function msx = writeMsxFile(obj,msx)
+            % Input Arguments
+            % msx={};
+            % msx.msxFile = 'networks/MsxFileName.msx';
+            % % section Title
+            % msx.titleDescription{1} = 'Example: MsxFile.';
+            % % section Options
+            % msx.options{1}='FT2'; %AREA_UNITS FT2/M2/CM2
+            % msx.options{2}='DAY'; %TIME_UNITS SEC/MIN/HR/DAY
+            % msx.options{3}='EUL'; %SOLVER EUL/RK5/ROS2
+            % msx.options{4}='NONE'; %COUPLING FULL/NONE
+            % msx.options{5}='NONE'; %COMPILER NONE/VC/GC
+            % msx.options{6}=3600; %TIMESTEP in seconds
+            % msx.options{7}=0.01;  %ATOL value
+            % msx.options{8}=0.001;  %RTOL value
+            % % section Species
+            % % <type> <specieID> <units> (<atol> <rtol>)
+            % msx.species{1}={'BULK'}; %type BULK/WALL
+            % msx.species{2}={'CL2'}; %specieID
+            % msx.species{3}={'MG'}; %units UG/MG
+            % msx.species{4}={0.01}; %atol
+            % msx.species{5}={0.001}; %rtol
+            % 
+            % % section Coefficients 
+            % % CONSTANT name value % PARAMETER name value
+            % msx.coefficients{1}={'PARAMETER','PARAMETER'}; 
+            % msx.coefficients{2}={'Kb','Kw'}; 
+            % msx.coefficients{3}={0.3,1}; 
+            % 
+            % % section Terms
+            % % <termID> <expression>
+            % msx.terms{1}={'Kf'}; % termID
+            % msx.terms{2}={'1.5826e-4 * RE^0.88 / D'}; % expression
+            % 
+            % % section Pipes
+            % % EQUIL <specieID> <expression>
+            % % RATE <specieID> <expression>
+            % % FORMULA <specieID> <expression>
+            % msx.pipes{1} ={'RATE'}; %type
+            % msx.pipes{2} ={'CL2'}; %specieID
+            % msx.pipes{3} ={'-Kb*CL2 - (4/D)*Kw*Kf/(Kw+Kf)*CL2'}; %expression
+            % 
+            % % section Tanks
+            % % EQUIL <specieID> <expression>
+            % % RATE <specieID> <expression>
+            % % FORMULA <specieID> <expression>
+            % msx.tanks{1} ={'RATE'}; %type
+            % msx.tanks{2} ={'CL2'}; %specieID
+            % msx.tanks{3} ={'-Kb*CL2'}; %expression
+
+            % % section Sources
+            % % <type> <nodeID> <specieID> <strength> (<patternID>)
+            % msx.sources{1}={''}; %CONC/MASS/FLOW/SETPOINT
+            % msx.sources{2}={''}; %nodeID
+            % msx.sources{3}={''}; %specieID
+            % msx.sources{4}={''}; %strength
+            % msx.sources{5}={''}; %patternID
+            % 
+            % % section Quality Global
+            % % GLOBAL <specieID> <value>
+            % msx.global{1} = {''};
+            % msx.global{2} = {''};%specieID
+            % msx.global{3} = {''};%value
+            % % others
+            % % NODE <nodeID> <bulkSpecieID> <value>
+            % % LINK <linkID> <wallSpecieID> <value>
+            % msx.quality{1} = {''}; %NODE/LINK
+            % msx.quality{2} = {''}; %ID
+            % msx.quality{3} = {''}; %bulkSpecieID/wallSpecieID
+            % msx.quality{4} = {''}; %value
+            % 
+            % % section Parameters
+            % % PIPE <pipeID> <paramID> <value>
+            % % TANK <tankID> <paramID> <value>
+            % msx.parameters{1} = {''};
+            % msx.parameters{2} = {''};
+            % msx.parameters{3} = {''};
+            % msx.parameters{4} = {''};
+            % 
+            % % section Patterns
+            % % <patternID> <multiplier> <multiplier> 
+            % msx.patterns{1} = {''}; %patternID
+            % msx.patterns{2} = {''}; %multiplier
+            space=5;
+            f = fopen(msx.msxFile,'w');
+            fprintf(f,'[TITLE]\n');
+            if isfield(msx,'titleDescription')
+                for i=1:length(msx.titleDescription)
+                    fprintf(f,msx.titleDescription{i});
+                end
+            end
+
+            fprintf(f,'\n\n[OPTIONS]\n');
+            options = {'AREA_UNITS', 'RATE_UNITS', 'SOLVER', 'COUPLING', 'COMPILER',...
+                'TIMESTEP', 'ATOL', 'RTOL'};
+            spaces=blanks(space);
+            if isfield(msx,'options')
+                for i=1:length(msx.options)
+                    fprintf(f,num2str(options{i}));
+                    fprintf(f,spaces);
+                    fprintf(f,num2str(msx.options{i}));
+                    fprintf(f,'\n');
+                end
+            end
+
+            fprintf(f,'\n[SPECIES]\n');
+            if isfield(msx,'species')
+                for u=1:length(msx.species{1})
+                    for i=1:length(msx.species)
+                        if isnumeric(msx.species{i}{u})
+                            fprintf(f,num2str(msx.species{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.species{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+            fprintf(f,'\n[COEFFICIENTS]\n');
+            if isfield(msx,'coefficients')
+                for u=1:length(msx.coefficients{1})
+                    for i=1:length(msx.coefficients)
+                        if isnumeric(msx.coefficients{i}{u})
+                            fprintf(f,num2str(msx.coefficients{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.coefficients{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+
+            fprintf(f,'\n[TERMS]\n');
+            if isfield(msx,'terms')
+                for u=1:length(msx.terms{1})
+                    for i=1:length(msx.terms)
+                        if isnumeric(msx.terms{i}{u})
+                            fprintf(f,num2str(msx.terms{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.terms{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+
+            fprintf(f,'\n[PIPES]\n');
+            if isfield(msx,'pipes')
+                for u=1:length(msx.pipes{1})
+                    for i=1:length(msx.pipes)
+                        if isnumeric(msx.pipes{i}{u})
+                            fprintf(f,num2str(msx.pipes{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.pipes{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+
+            fprintf(f,'\n[TANKS]\n');
+            if isfield(msx,'tanks')
+                for u=1:length(msx.tanks{1})
+                    for i=1:length(msx.tanks)
+                        if isnumeric(msx.tanks{i}{u})
+                            fprintf(f,num2str(msx.tanks{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.tanks{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+
+            fprintf(f,'\n[SOURCES]\n');
+            if isfield(msx,'sources')
+                for u=1:length(msx.sources{1})
+                    for i=1:length(msx.sources)
+                        if isnumeric(msx.sources{i}{u})
+                            fprintf(f,num2str(msx.sources{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.sources{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+
+            fprintf(f,'\n[QUALITY]\n');
+            if isfield(msx,'global')
+                for u=1:length(msx.global{1})
+                    for i=1:length(msx.global)
+                        if isnumeric(msx.global{i}{u})
+                            fprintf(f,num2str(msx.global{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.global{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+            if isfield(msx,'quality')
+                for u=1:length(msx.quality{1})
+                    for i=1:length(msx.quality)
+                        if isnumeric(msx.quality{i}{u})
+                            fprintf(f,num2str(msx.quality{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.quality{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+
+            fprintf(f,'[PARAMETERS]\n');
+            if isfield(msx,'parameters')
+                for u=1:length(msx.parameters{1})
+                    for i=1:length(msx.parameters)
+                        if isnumeric(msx.parameters{i}{u})
+                            fprintf(f,num2str(msx.parameters{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.parameters{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+
+            fprintf(f,'[PATTERNS]\n');
+            if isfield(msx,'patterns')
+                for u=1:length(msx.patterns{1})
+                    for i=1:length(msx.patterns)
+                        if isnumeric(msx.patterns{i}{u})
+                            fprintf(f,num2str(msx.patterns{i}{u}));
+                        else
+                            fprintf(f,num2str(char(msx.patterns{i}{u})));
+                        end
+                        fprintf(f,spaces);
+                    end
+                    fprintf(f,'\n');
+                end
+            end
+
+            fprintf(f,'[REPORT]\n');
+            fprintf(f,'NODES ALL\n');
+            fprintf(f,'LINKS ALL\n');
+            fclose(f)
         end
         function MsxUnload(obj)
             MSXclose(obj);
@@ -7457,6 +7714,7 @@ while 1
     end
     %
 end
+fclose(fid);
 end
 function value=getMsxOptions(msxname)
 
@@ -7537,6 +7795,7 @@ while 1
         end
     end
 end
+fclose(fid);
 end
 function [axesid] = ENplot(obj,varargin)
 % Initiality
