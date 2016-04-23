@@ -2093,13 +2093,13 @@ classdef epanet <handle
             end
         end
         function setNodeSourceQuality(obj, value)
-            value(find(isnan(value)))='';
+            %value(find(isnan(value)))='';
             for i=1:length(value)
                 [obj.errcode] = ENsetnodevalue(i, 5, value(i),obj.libepanet);
             end
         end
         function setNodeSourcePatternIndex(obj, value)
-            value(find(isnan(value)))='';
+            %value(find(isnan(value)))='';
             for i=1:length(value)
                 [obj.errcode] = ENsetnodevalue(i, 6, value(i),obj.libepanet);
             end
