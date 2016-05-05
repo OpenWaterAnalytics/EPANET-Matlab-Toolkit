@@ -176,6 +176,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getTimeStatisticsIndex
 |getTimeStatisticsType
 |getVersion
+|getNodesInfo
+|getLinksInfo
+|writeMsxFile
 |addCurve
 |addPattern
 |closeHydraulicAnalysis

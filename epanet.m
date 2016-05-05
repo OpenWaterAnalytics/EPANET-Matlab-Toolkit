@@ -152,7 +152,6 @@ classdef epanet <handle
         LinkFlowUnits; %Units of flow
         LinkValveIndex; % Index of valves
         LinkValveNameID; % ID name of valves
-        LinkStatus;
         LinkVelocityUnits; % Units for velocity
         ControlLevelValues; %The control level values
         ControlLinkIndex; % Set of control types in links
@@ -482,9 +481,13 @@ classdef epanet <handle
             end
             
             obj.emcversion='dev-2.1';
-            % Get type of the parameters
-            obj.LinkType=obj.getLinkType;
-            obj.NodeType=obj.getNodeType;
+            % Get some link data
+            [obj.LinkDiameter,obj.LinkLength,obj.LinkRoughnessCoeff,obj.LinkMinorLossCoeff,obj.LinkInitialStatus,...
+            obj.LinkInitialSetting,obj.LinkBulkReactionCoeff,obj.LinkWallReactionCoeff,obj.NodesConnectingLinksIndex,...
+            obj.LinkTypeIndex] = obj.getLinksInfo;
+            % Get some node data
+            [obj.NodeElevations,obj.NodeDemandPatternIndex,obj.NodeEmitterCoeff,obj.NodeInitialQuality,...
+            obj.NodeSourceQuality,obj.NodeSourcePatternIndex,obj.NodeSourceTypeIndex,obj.NodeTypeIndex] = obj.getNodesInfo; 
             %Get all the countable network parameters
             obj.NodeCount = obj.getNodeCount;
             obj.NodeTankReservoirCount = obj.getNodeTankReservoirCount;
@@ -492,51 +495,38 @@ classdef epanet <handle
             obj.PatternCount = obj.getPatternCount;
             obj.CurveCount = obj.getCurveCount;
             obj.ControlRulesCount = obj.getControlRulesCount;
-            obj.NodeReservoirCount = obj.getNodeReservoirCount;
-            obj.NodeTankCount = obj.getNodeTankCount;
-            obj.NodeJunctionCount = obj.getNodeJunctionCount;
-            obj.LinkPipeCount = obj.getLinkPipeCount;
-            obj.LinkPumpCount = obj.getLinkPumpCount;
-            obj.LinkValveCount = obj.getLinkValveCount;
+            obj.NodeJunctionCount = obj.NodeCount-obj.NodeTankReservoirCount; %obj.getNodeJunctionCount;
+            % Get type of the parameters
+            obj.LinkType=obj.TYPELINK(obj.LinkTypeIndex+1); 
+            obj.NodeType=obj.TYPENODE(obj.NodeTypeIndex+1);
+            %Get all the countable network parameters
+            obj.LinkPipeCount = sum(strcmp(obj.LinkType,'PIPE'))+sum(strcmp(obj.LinkType,'CVPIPE')); %obj.getLinkPipeCount;
+            obj.LinkPumpCount = sum(strcmp(obj.LinkType,'PUMP')); %obj.getLinkPumpCount;
+            obj.NodeReservoirCount = sum(strcmp(obj.NodeType,'RESERVOIR')); %obj.getNodeReservoirCount;
+            obj.NodeTankCount = obj.NodeCount-obj.NodeJunctionCount-obj.NodeReservoirCount; %obj.getNodeTankCount;
+            obj.LinkValveCount = obj.LinkCount-obj.LinkPipeCount-obj.LinkPumpCount;%obj.getLinkValveCount;
             %Get all the controls
             obj.Controls = obj.getControls;
             %Get the flow units
             obj.LinkFlowUnits = obj.getFlowUnits;
             %Get all the link data
             obj.LinkNameID = obj.getLinkNameID;
-            obj.LinkIndex = obj.getLinkIndex;
-            obj.LinkTypeIndex = obj.getLinkTypeIndex;
-            obj.LinkPipeIndex = find(strcmp(obj.LinkType,'PIPE'));
-            obj.LinkPumpIndex = find(strcmp(obj.LinkType,'PUMP'));
+            obj.LinkIndex = 1:obj.LinkCount;   %obj.getLinkIndex;
+            obj.LinkPipeIndex = 1:obj.LinkPipeCount; %find(strcmp(obj.LinkType,'PIPE'));
+            obj.LinkPumpIndex = obj.LinkPipeCount+1:obj.LinkPipeCount+obj.LinkPumpCount; %find(strcmp(obj.LinkType,'PUMP'));
             obj.LinkValveIndex = find(obj.LinkTypeIndex>2);
-            obj.LinkDiameter = obj.getLinkDiameter;
-            obj.LinkLength = obj.getLinkLength;
-            obj.LinkRoughnessCoeff = obj.getLinkRoughnessCoeff;
-            obj.LinkMinorLossCoeff = obj.getLinkMinorLossCoeff;
-            obj.LinkInitialStatus  = obj.getLinkInitialStatus;
-            obj.LinkInitialSetting = obj.getLinkInitialSetting;
-            obj.LinkBulkReactionCoeff = obj.getLinkBulkReactionCoeff;
-            obj.LinkWallReactionCoeff = obj.getLinkWallReactionCoeff;
             obj.LinkPipeNameID = obj.LinkNameID(obj.LinkPipeIndex);
             obj.LinkPumpNameID = obj.LinkNameID(obj.LinkPumpIndex);
             obj.LinkValveNameID = obj.LinkNameID(obj.LinkValveIndex);
-            obj.LinkStatus = obj.getLinkStatus;
             %Get all the node data
-            obj.NodesConnectingLinksIndex = obj.getLinkNodesIndex;
-            obj.NodesConnectingLinksID = obj.getNodesConnectingLinksID;
             obj.NodeNameID = obj.getNodeNameID;
-            obj.NodeIndex = obj.getNodeIndex;
-            obj.NodeTypeIndex = obj.getNodeTypeIndex;
-            obj.NodeElevations = obj.getNodeElevations;
-            obj.NodeDemandPatternIndex = obj.getNodeDemandPatternIndex;
-            obj.NodeEmitterCoeff = obj.getNodeEmitterCoeff;
-            obj.NodeInitialQuality = obj.getNodeInitialQuality;
-            obj.NodeSourceQuality = obj.getNodeSourceQuality;
-            obj.NodeSourcePatternIndex = obj.getNodeSourcePatternIndex;
-            obj.NodeSourceTypeIndex = obj.NodeSourceTypeIndex;
-            obj.NodeReservoirIndex = find(strcmp(obj.NodeType,'RESERVOIR'));
-            obj.NodeTankIndex = find(strcmp(obj.NodeType,'TANK'));
-            obj.NodeJunctionIndex = find(strcmp(obj.NodeType,'JUNCTION'));
+            tmp(:,1)=obj.NodeNameID(obj.NodesConnectingLinksIndex(:,1)');
+            tmp(:,2) = obj.NodeNameID(obj.NodesConnectingLinksIndex(:,2)');
+            obj.NodesConnectingLinksID=tmp;
+            obj.NodeIndex = 1:obj.NodeCount; %obj.getNodeIndex;
+            obj.NodeReservoirIndex = find(obj.NodeTypeIndex==1); %find(strcmp(obj.NodeType,'RESERVOIR'));
+            obj.NodeTankIndex = find(obj.NodeTypeIndex==2); %find(strcmp(obj.NodeType,'TANK'));
+            obj.NodeJunctionIndex = 1:obj.NodeJunctionCount; %find(strcmp(obj.NodeType,'JUNCTION'));
             obj.NodeReservoirNameID=obj.NodeNameID(obj.NodeReservoirIndex);
             obj.NodeTankNameID=obj.NodeNameID(obj.NodeTankIndex);
             obj.NodeJunctionNameID=obj.NodeNameID(obj.NodeJunctionIndex);
@@ -561,7 +551,7 @@ classdef epanet <handle
             obj.OptionsPatternDemandMultiplier = obj.getOptionsPatternDemandMultiplier;
             %Get pattern data
             obj.PatternNameID = obj.getPatternNameID;
-            obj.PatternIndex = obj.getPatternIndex;
+            obj.PatternIndex = 1:obj.PatternCount; %obj.getPatternIndex;
             obj.PatternLengths = obj.getPatternLengths;
             obj.Pattern = obj.getPattern;
             %Get quality types
@@ -626,27 +616,10 @@ classdef epanet <handle
             end
             
             %     US Customary - SI metric
-            switch char(obj.LinkFlowUnits)
-                case 'CFS'
-                    obj.UScustomary=1;
-                case 'GPM'
-                    obj.UScustomary=1;
-                case 'MGD'
-                    obj.UScustomary=1;
-                case 'IMGD'
-                    obj.UScustomary=1;
-                case 'AFD'
-                    obj.UScustomary=1;
-                case 'LPS'
-                    obj.SImetric=1;
-                case 'LPM'
-                    obj.SImetric=1;
-                case 'MLD'
-                    obj.SImetric=1;
-                case 'CMH'
-                    obj.SImetric=1;
-                case 'CMD'
-                    obj.SImetric=1;
+            if find(strcmp(obj.LinkFlowUnits, obj.TYPEUNITS))<6
+                obj.UScustomary=1;
+            else
+                obj.SImetric=1;
             end
 
             if obj.UScustomary==1;
@@ -794,8 +767,7 @@ classdef epanet <handle
         function value = getFlowUnits(obj)
             %Retrieves flow units used to express all flow rates.
             [obj.errcode, flowunitsindex] = ENgetflowunits(obj.libepanet);
-            obj.LinkFlowUnits=obj.TYPEUNITS(flowunitsindex+1);
-            value=obj.LinkFlowUnits;
+            value=obj.TYPEUNITS(flowunitsindex+1);
         end
         function value = getLinkNameID(obj,varargin)
             % Retrieves the ID label(s) of all links, or the IDs of an index set of links
@@ -872,20 +844,15 @@ classdef epanet <handle
             %Retrieves the id of the from/to nodes of all links.
             obj.NodesConnectingLinksIndex=obj.getLinkNodesIndex;
             if obj.getLinkCount
-                for i=1:obj.getLinkCount
-                    value(i,1)=obj.getNodeNameID(obj.NodesConnectingLinksIndex(i,1));
-                    value(i,2) = obj.getNodeNameID(obj.NodesConnectingLinksIndex(i,2));
-                end
+                value(:,1)=obj.getNodeNameID(obj.NodesConnectingLinksIndex(:,1)');
+                value(:,2) = obj.getNodeNameID(obj.NodesConnectingLinksIndex(:,2)');
             else
                 value=-1;
             end
         end
         function value = getLinkType(obj)
             %Retrieves the link-type code for all links.
-            index=obj.getLinkTypeIndex;
-            for i=1:obj.getLinkCount
-                value(i)=obj.TYPELINK(index(i)+1);
-            end
+            value=obj.TYPELINK(obj.getLinkTypeIndex+1);
         end
         function value = getLinkTypeIndex(obj)
             %Retrieves the link-type code for all links.
@@ -893,107 +860,123 @@ classdef epanet <handle
                 [obj.errcode,value(i)] = ENgetlinktype(i,obj.libepanet);
             end
         end
+        function [LinkDiameter,LinkLength,LinkRoughnessCoeff,LinkMinorLossCoeff,LinkInitialStatus,...
+                LinkInitialSetting,LinkBulkReactionCoeff,LinkWallReactionCoeff,NodesConnectingLinksIndex,...
+                LinkTypeIndex] = getLinksInfo(obj)
+            for i=1:obj.getLinkCount
+                [~, LinkDiameter(i)] = ENgetlinkvalue(i,0,obj.libepanet);
+                [~, LinkLength(i)] = ENgetlinkvalue(i,1,obj.libepanet);
+                [~, LinkRoughnessCoeff(i)] = ENgetlinkvalue(i,2,obj.libepanet);
+                [~, LinkMinorLossCoeff(i)] = ENgetlinkvalue(i,3,obj.libepanet);
+                [~, LinkInitialStatus(i)] = ENgetlinkvalue(i,4,obj.libepanet);
+                [~, LinkInitialSetting(i)] = ENgetlinkvalue(i,5,obj.libepanet);
+                [~, LinkBulkReactionCoeff(i)] = ENgetlinkvalue(i,6,obj.libepanet);
+                [~, LinkWallReactionCoeff(i)] = ENgetlinkvalue(i,7,obj.libepanet);
+                [~,NodesConnectingLinksIndex(i,1),NodesConnectingLinksIndex(i,2)] = ENgetlinknodes(i,obj.libepanet);
+                [~,LinkTypeIndex(i)] = ENgetlinktype(i,obj.libepanet);
+            end
+        end
         function value = getLinkDiameter(obj)
             %Retrieves the value of all link diameters
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,0,obj.libepanet);
             end
         end
         function value = getLinkLength(obj)
             %Retrieves the value of all link lengths
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,1,obj.libepanet);
             end
         end
         function value = getLinkRoughnessCoeff(obj)
             %Retrieves the value of all link roughness
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,2,obj.libepanet);
             end
         end
         function value = getLinkMinorLossCoeff(obj)
             %Retrieves the value of all link minor loss coefficients
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,3,obj.libepanet);
             end
         end
         function value = getLinkInitialStatus(obj)
             %Retrieves the value of all link initial status
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,4,obj.libepanet);
             end
         end
         function value = getLinkInitialSetting(obj)
             %Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,5,obj.libepanet);
             end
         end
         function value = getLinkBulkReactionCoeff(obj)
             %Retrieves the value of all link bulk reaction coefficients
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,6,obj.libepanet);
             end
         end
         function value = getLinkWallReactionCoeff(obj)
             %Retrieves the value of all link wall reaction coefficients
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,7,obj.libepanet);
             end
         end
         function value = getLinkFlows(obj)
             %Retrieves the value of all computed link flow rates
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,8,obj.libepanet);
             end
         end
         function value = getLinkVelocity(obj)
             %Retrieves the value of all computed link velocities
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,9,obj.libepanet);
             end
         end
         function value = getLinkHeadloss(obj)
             %Retrieves the value of all computed link headloss
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,10,obj.libepanet);
             end
         end
         function value = getLinkStatus(obj)
             %Retrieves the value of all computed link status (0 = closed, 1 = open)
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,11,obj.libepanet);
             end
         end
         function value = getLinkSettings(obj)
             %Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,12,obj.libepanet);
             end
         end
         function value = getLinkPumpEnergy(obj)
             %Retrieves the value of all computed energy in kwatts
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,13,obj.libepanet);
             end
         end
         function value = getLinkQuality(obj)
             %New version dev2.1
-            value=zeros(1,obj.getLinkCount);
+            value=[];
             for i=1:obj.getLinkCount
                 [obj.errcode, value(i)] = ENgetlinkvalue(i,14,obj.libepanet);
             end
@@ -1069,15 +1052,25 @@ classdef epanet <handle
         end
         function value = getNodeType(obj)
             %Retrieves the node-type code for all nodes
-            for i=1:obj.getNodeCount
-                [obj.errcode,obj.NodeTypeIndex(i)] = ENgetnodetype(i,obj.libepanet);
-                value(i)=obj.TYPENODE(obj.NodeTypeIndex(i)+1);
-            end
+            value=obj.TYPENODE(obj.getNodeTypeIndex+1);
         end
         function value = getNodeTypeIndex(obj)
             %Retrieves the node-type code for all nodes
             for i=1:obj.getNodeCount
                 [obj.errcode,value(i)] = ENgetnodetype(i,obj.libepanet);
+            end
+        end
+        function [NodeElevations,NodeDemandPatternIndex,NodeEmitterCoeff,NodeInitialQuality,...
+                NodeSourceQuality,NodeSourcePatternIndex,NodeSourceTypeIndex,NodeTypeIndex] = getNodesInfo(obj)
+            for i=1:obj.getNodeCount
+                [~, NodeElevations(i)] = ENgetnodevalue(i,0,obj.libepanet);
+                [~, NodeDemandPatternIndex(i)] = ENgetnodevalue(i,2,obj.libepanet);
+                [~, NodeEmitterCoeff(i)] = ENgetnodevalue(i,3,obj.libepanet);
+                [~, NodeInitialQuality(i)] = ENgetnodevalue(i,4,obj.libepanet);
+                [~, NodeSourceQuality(i)] = ENgetnodevalue(i,5,obj.libepanet);
+                [~, NodeSourcePatternIndex(i)] = ENgetnodevalue(i,6,obj.libepanet);
+                [~, NodeSourceTypeIndex(i)] = ENgetnodevalue(i,7,obj.libepanet);
+                [~, NodeTypeIndex(i)] = ENgetnodetype(i,obj.libepanet);
             end
         end
         function value = getNodeElevations(obj)
@@ -1193,6 +1186,12 @@ classdef epanet <handle
             value=zeros(1,obj.getNodeCount);
             for i=1:obj.getNodeCount
                 [obj.errcode, value(i)] = ENgetnodevalue(i,6,obj.libepanet);
+            end
+        end
+        function value = getNodeSourceTypeIndex(obj)
+            %Retrieves the value of all node source index
+            for i=1:obj.getNodeCount
+                [obj.errcode, value(i)] = ENgetnodevalue(i,7,obj.libepanet);
             end
         end
         function value = getNodeSourceType(obj)
@@ -1581,7 +1580,8 @@ classdef epanet <handle
             else
                 obj.saveInputFile([obj.pathfile,obj.Bintempfile]);
             end
-            value = {obj.getBinOptionsInfo.BinQualityType};
+            value = obj.getBinQualType;
+%             value = {obj.getBinOptionsInfo.BinQualityType};
         end 
 %         function value = getQualityInfo(obj)
 %             [obj.errcode, ~,value.QualityChemName,value.QualityChemUnits,~] = E_Ngetqualinfo(obj.libepanet);
@@ -2273,8 +2273,7 @@ classdef epanet <handle
         end
         function errcode = saveInputFile(obj,inpname,varargin)
             if strcmp(inpname,obj.Bintempfile) && nargin<3 %&& ~isempty(varargin)
-                addSectionCoordinates=obj.getBinCoordinatesSection;
-                addSectionRules = obj.getBinRulesSection;
+                [addSectionCoordinates,addSectionRules] = obj.getBinCoordRuleSections;
                 [obj.errcode] = ENsaveinpfile(inpname,obj.libepanet);
                 % Open epanet input file
                 [~,info] = obj.readInpFile;
@@ -5899,10 +5898,41 @@ classdef epanet <handle
             value.BinNodeBaseDemands = single([value.BinNodeJunctionsBaseDemands zeros(1,value.BinNodeReservoirCount) zeros(1,value.BinNodeTankCount)]);
             value.BinNodeIndex=obj.getBinNodeIndex;
         end
-        function value = getBinCoordinatesSection(obj)
+        function [valueQualityType] = getBinQualType(obj)
             % Open epanet input file
-            [info]=regexp( fileread(obj.Bintempfile), '\n', 'split');%[~,info] = obj.readInpFile;
-            sect=0;d=1;value={};
+            [info]=regexp( fileread(obj.Bintempfile), '\n', 'split'); 
+            sect=0;valueQualityType={};
+            for h=1:length(info)
+                tline = info{h};
+                if ~ischar(tline),   break,   end
+                % Get first token in the line
+                tok = strtok(tline);
+                % Skip blank Clines and comments
+                if isempty(tok), continue, end
+                if (tok(1) == ';'), continue, end
+                if (tok(1) == '[')
+                        % [OPTIONS] section
+                    if strcmpi(tok(1:5),'[OPTI')
+                        sect=3;
+                    end
+                end
+                if sect==0
+                    continue;
+                elseif sect==3
+                    if strcmp(regexp(tline,'\w*QUALITY*\w','match'),'QUALITY')
+                        tl=regexp(tline,'\s*','split');mm=2;
+                        if isempty(tl{1})
+                            mm=3;
+                        end
+                        valueQualityType=tl(mm);
+                    end
+                end
+            end
+        end
+        function [valueCoord,valueRule] = getBinCoordRuleSections(obj)
+            % Open epanet input file
+            [info]=regexp( fileread(obj.Bintempfile), '\n', 'split'); 
+            sect=0;d=1;valueCoord={};valueRule={};dRule=1;
             for h=1:length(info)
                 tline = info{h};
                 if ~ischar(tline),   break,   end
@@ -5914,44 +5944,24 @@ classdef epanet <handle
                 if (tok(1) == '[')
                         % [COORDINATES] section
                     if strcmpi(tok(1:5),'[COOR')
-                        sect=17;
-                        value{d}=tline;
+                        sect=1;
+                        valueCoord{d}=tline;
                         continue;
-                    end
-                end
-                if sect==0
-                    continue;
-                elseif sect==17
-                    d=d+1;
-                    value{d}=tline;
-                end
-            end
-        end
-        function value = getBinRulesSection(obj)
-            % Open epanet input file
-            [~,info] = obj.readInpFile;
-            sect=0;d=1;value={};
-            for h=1:length(info)
-                tline = info{h};
-                if ~ischar(tline),   break,   end
-                % Get first token in the line
-                tok = strtok(tline);
-                % Skip blank Clines and comments
-                if isempty(tok), continue, end
-                if (tok(1) == ';'), continue, end
-                if (tok(1) == '[')
                         % [RULES] section
-                    if strcmpi(tok(1:5),'[RULE')
-                        sect=17;
-                        value{d}=tline;
+                    elseif strcmpi(tok(1:5),'[RULE')
+                        sect=2;
+                        valueRule{dRule}=tline;
                         continue;
                     end
                 end
                 if sect==0
                     continue;
-                elseif sect==17
+                elseif sect==1
                     d=d+1;
-                    value{d}=tline;
+                    valueCoord{d}=tline;
+                elseif sect==2
+                    dRule=dRule+1;
+                    valueRule{dRule}=tline;
                 end
             end
         end
@@ -6652,27 +6662,10 @@ classdef epanet <handle
                 end
             end
         %     US Customary - SI metric
-            switch char(value.BinLinkFlowUnits)
-                case 'CFS'
-                    value.BinUScustomary=1;
-                case 'GPM'
-                    value.BinUScustomary=1;
-                case 'MGD'
-                    value.BinUScustomary=1;
-                case 'IMGD'
-                    value.BinUScustomary=1;
-                case 'AFD'
-                    value.BinUScustomary=1;
-                case 'LPS'
-                    value.BinSImetric=1;
-                case 'LPM'
-                    value.BinSImetric=1;
-                case 'MLD'
-                    value.BinSImetric=1;
-                case 'CMH'
-                    value.BinSImetric=1;
-                case 'CMD'
-                    value.BinSImetric=1;
+            if find(strcmp(value.BinLinkFlowUnits, obj.TYPEUNITS))<6
+                value.BinUScustomary=1;
+            else
+                value.BinSImetric=1;
             end
         end
         function value = getBinUnits(obj)
