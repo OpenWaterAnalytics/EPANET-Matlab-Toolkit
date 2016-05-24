@@ -175,10 +175,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getTimeStatisticsType|Retrieves the type of time series post-processing ('NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE')|
 |getTimeStatisticsIndex|Retrieves the type of time series post-processing|
 |getVersion|Retrieve the current EPANET version of DLL|
-|getNodesInfo|Retrieves nodes info e.g. elevations, demand pattern indices, emitter coeff. , initial quality,...
-                source quality, source pattern indices, source type code, type indices|
-|getLinksInfo|Retrieves links info e.g. diameters, lengths, roughness coeff. , minor loss coeff. , initial status,...
-                initial settings, bulk reaction coeff. , wall reaction coeff. , nodes connecting link indices, type indices|
+|getNodesInfo|Retrieves nodes info e.g. elevations, demand pattern indices, emitter coeff. , initial quality, source quality, source pattern indices, source type code, type indices|
+|getLinksInfo|Retrieves links info e.g. diameters, lengths, roughness coeff. , minor loss coeff. , initial status, initial settings, bulk reaction coeff. , wall reaction coeff. , nodes connecting link indices, type indices|
 |addCurve|Adds a new curve appended to the end of the existing curves|
 |addPattern|Adds a new time pattern to the network|
 |closeHydraulicAnalysis|Closes the hydraulic analysis system, freeing all allocated memory|
@@ -208,7 +206,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkRoughnessCoeff|Sets the values of roughness coeff.|
 |setLinkSettings|Sets the values of settings|
 |setLinkStatus|Sets the values of status|
-|setLinkWallReactionCoeffSets the values of wall reactions|
+|setLinkWallReactionCoeff|Sets the values of wall reactions|
 |setNodeBaseDemands|Sets the values of demands|
 |setNodeCoordinates|Sets node coordinates|
 |setNodeDemandPatternIndex|Sets the values of demand pattern indices|
@@ -370,7 +368,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |removeBinRulesControlLinkID|Removes a specific rule based on link ID|
 |removeBinRulesControlNodeID|Removes a specific rule based on node ID|
 |saveBinInpFile|Writes all current network input data to a file using the format of an EPANET input file|
-|getBinComputedAllParameters||Computes hydraulic and quality time series||
+|getBinComputedAllParameters|Computes hydraulic and quality time series|
 |getBinComputedAverageBulkReactionRate|Computes the average bulk reaction rate|
 |getBinComputedAverageCostPerDay|Computes the average cost per day|
 |getBinComputedAverageEfficiency|Computes the average efficiency|
