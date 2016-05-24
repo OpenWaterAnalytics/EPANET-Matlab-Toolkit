@@ -10710,24 +10710,21 @@ elseif strcmp(previousFlowUnits,'CMD')
 end
 end
 function [fid,binfile,msg] = makebatfile(obj)
-    pp=[pwd,'/'];
+    [~,mm]=system(['cmd /c for %A in ("',pwd,'") do @echo %~sA']);
+    mmPwd=regexp(mm,'\s','split');
+    pp=[mmPwd{1},'/'];
     inpfile=[pp,obj.Bintempfile];
     rptfile=[inpfile(1:length(inpfile)-4),'.txt'];
     binfile=[inpfile(1:length(inpfile)-4),'.bin'];
     if exist(binfile)==2, fclose all; delete(binfile); end
     if strcmp(computer('arch'),'win64')
             folder='64bit';
-        r = sprintf('%s\\%s\\epanet2d.exe %s %s %s',pwd,folder,inpfile,rptfile,binfile);
+        r = sprintf('%s\\%s\\epanet2d.exe %s %s %s',mmPwd{1},folder,inpfile,rptfile,binfile);
     elseif strcmp(computer('arch'),'win32')
             folder='32bit';
-        r = sprintf('%s\\%s\\epanet2d.exe %s %s %s',pwd,folder,inpfile,rptfile,binfile);
-%     else
-%         r = sprintf('./runcode2 %s %s %s',obj.Bintempfile,[obj.Bintempfile(1:end-4),'.txt'],binfile);
+        r = sprintf('%s\\%s\\epanet2d.exe %s %s %s',mmPwd{1},folder,inpfile,rptfile,binfile);
     end
-    f=fopen('Simulate.bat','w');
-    try fprintf(f,'%s \n',r); fclose(f); catch e; end
-    [~,msg]=system('Simulate.bat');
-    delete('Simulate.bat');
+    [~,msg]=system(r);
     fid = fopen(binfile,'r');
 end
 function value = getBinComputedTimeSeries(obj,indParam,varargin)
