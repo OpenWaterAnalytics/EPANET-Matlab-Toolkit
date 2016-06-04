@@ -138,15 +138,13 @@ disp('Press any key to continue...')
 pause
 
 %or
-fid = fopen('ReportMsx.bat','w');
 if strcmp(computer('arch'),'win32')
     folder='32bit';
 elseif strcmp(computer('arch'),'win64')
     folder='64bit';
 end
 r = sprintf('%s\\%s\\epanetmsx.exe %s %s %s',pwd,folder,d.inputfile,d.MsxTempFile,[d.MsxTempFile(1:end-4),'.txt']);
-fprintf(fid,'%s \n',r);fclose all;
-!ReportMsx.bat
+system(r);
 open([d.MsxTempFile(1:end-4),'.txt'])
 disp('Press any key to continue...')
 pause
