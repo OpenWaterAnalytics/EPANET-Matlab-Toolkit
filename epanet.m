@@ -480,7 +480,7 @@ classdef epanet <handle
                 obj.pathfile='';
             end
             
-            obj.emcversion='dev-2.1';
+            obj.emcversion='dev-2.2';
             % Get some link data
             [obj.LinkDiameter,obj.LinkLength,obj.LinkRoughnessCoeff,obj.LinkMinorLossCoeff,obj.LinkInitialStatus,...
             obj.LinkInitialSetting,obj.LinkBulkReactionCoeff,obj.LinkWallReactionCoeff,obj.NodesConnectingLinksIndex,...
@@ -850,14 +850,18 @@ classdef epanet <handle
                 value=-1;
             end
         end
-        function value = getLinkType(obj)
+        function value = getLinkType(obj, varargin)
             %Retrieves the link-type code for all links.
-            value=obj.TYPELINK(obj.getLinkTypeIndex+1);
+            indices = getLinkIndices(obj,varargin);
+            value=obj.TYPELINK(obj.getLinkTypeIndex(indices)+1);
         end
-        function value = getLinkTypeIndex(obj)
+        function value = getLinkTypeIndex(obj, varargin)
             %Retrieves the link-type code for all links.
-            for i=1:obj.getLinkCount
-                [obj.errcode,value(i)] = ENgetlinktype(i,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode,value(j)] = ENgetlinktype(i,obj.libepanet);  
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end  
+                j=j+1;
             end
         end
         function [LinkDiameter,LinkLength,LinkRoughnessCoeff,LinkMinorLossCoeff,LinkInitialStatus,...
@@ -876,109 +880,142 @@ classdef epanet <handle
                 [~,LinkTypeIndex(i)] = ENgetlinktype(i,obj.libepanet);
             end
         end
-        function value = getLinkDiameter(obj)
+        function value = getLinkDiameter(obj, varargin)
+            indices = getLinkIndices(obj,varargin);j=1;
             %Retrieves the value of all link diameters
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,0,obj.libepanet);
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,0,obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkLength(obj)
+        function value = getLinkLength(obj, varargin)
             %Retrieves the value of all link lengths
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,1,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,1,obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end 
+                j=j+1;
             end
         end
-        function value = getLinkRoughnessCoeff(obj)
+        function value = getLinkRoughnessCoeff(obj, varargin)
             %Retrieves the value of all link roughness
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,2,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,2,obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkMinorLossCoeff(obj)
+        function value = getLinkMinorLossCoeff(obj, varargin)
             %Retrieves the value of all link minor loss coefficients
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,3,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,3,obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkInitialStatus(obj)
+        function value = getLinkInitialStatus(obj, varargin)
             %Retrieves the value of all link initial status
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,4,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,4,obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkInitialSetting(obj)
+        function value = getLinkInitialSetting(obj, varargin)
             %Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,5,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,5,obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkBulkReactionCoeff(obj)
+        function value = getLinkBulkReactionCoeff(obj, varargin)
             %Retrieves the value of all link bulk reaction coefficients
             value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,6,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,6,obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkWallReactionCoeff(obj)
+        function value = getLinkWallReactionCoeff(obj, varargin)
             %Retrieves the value of all link wall reaction coefficients
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,7,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,7,obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkFlows(obj)
+        function value = getLinkFlows(obj, varargin)
             %Retrieves the value of all computed link flow rates
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,8,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,8,obj.libepanet);  
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkVelocity(obj)
+        function value = getLinkVelocity(obj, varargin)
             %Retrieves the value of all computed link velocities
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,9,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,9,obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkHeadloss(obj)
+        function value = getLinkHeadloss(obj, varargin)
             %Retrieves the value of all computed link headloss
             value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,10,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,10,obj.libepanet);  
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkStatus(obj)
+        function value = getLinkStatus(obj, varargin)
             %Retrieves the value of all computed link status (0 = closed, 1 = open)
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,11,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,11,obj.libepanet);  
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkSettings(obj)
+        function value = getLinkSettings(obj, varargin)
             %Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,12,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,12,obj.libepanet);  
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkPumpEnergy(obj)
+        function value = getLinkPumpEnergy(obj, varargin)
             %Retrieves the value of all computed energy in kwatts
             value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,13,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,13,obj.libepanet);  
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
-        function value = getLinkQuality(obj)
+        function value = getLinkQuality(obj, varargin)
             %New version dev2.1
-            value=[];
-            for i=1:obj.getLinkCount
-                [obj.errcode, value(i)] = ENgetlinkvalue(i,14,obj.libepanet);
+            indices = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetlinkvalue(i,14,obj.libepanet);  
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+                j=j+1;
             end
         end
         function value = getLinkPumpPatternIndex(obj)
@@ -1050,14 +1087,16 @@ classdef epanet <handle
                 value=0;
             end
         end
-        function value = getNodeType(obj)
+        function value = getNodeType(obj, varargin)
             %Retrieves the node-type code for all nodes
-            value=obj.TYPENODE(obj.getNodeTypeIndex+1);
+            indices = getNodeIndices(obj,varargin);
+            value=obj.TYPENODE(obj.getNodeTypeIndex(indices)+1);
         end
-        function value = getNodeTypeIndex(obj)
+        function value = getNodeTypeIndex(obj, varargin)
             %Retrieves the node-type code for all nodes
-            for i=1:obj.getNodeCount
-                [obj.errcode,value(i)] = ENgetnodetype(i,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode,value(j)] = ENgetnodetype(i,obj.libepanet); j=j+1;
             end
         end
         function [NodeElevations,NodeDemandPatternIndex,NodeEmitterCoeff,NodeInitialQuality,...
@@ -1073,12 +1112,11 @@ classdef epanet <handle
                 [~, NodeTypeIndex(i)] = ENgetnodetype(i,obj.libepanet);
             end
         end
-        function value = getNodeElevations(obj)
+        function value = getNodeElevations(obj, varargin)
             %Retrieves the value of all node elevations
-            ndcount = obj.getNodeCount;
-            value=zeros(1,ndcount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,0,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,0,obj.libepanet); j=j+1;
             end
         end
         function value = getNodeBaseDemands(obj)
@@ -1098,17 +1136,17 @@ classdef epanet <handle
                 end
             else%version epanet20012
                 %Retrieves the value of all node base demands
-                value=zeros(1,obj.getNodeCount);
-                for i=1:obj.getNodeCount
-                    [obj.errcode, value(i)] = ENgetnodevalue(i,1,obj.libepanet);
+                indices = getNodeIndices(obj,varargin);j=1;
+                for i=indices
+                    [obj.errcode, value(j)] = ENgetnodevalue(i,1,obj.libepanet); j=j+1;
                 end
             end
         end
-        function value = getNodeNumDemandCategories(obj)
+        function value = getNodeNumDemandCategories(obj, varargin)
             %New version dev2.1
-            value=zeros(1,obj.getNodeCount);
-            for i=obj.getNodeIndex
-                [obj.errcode, value(i)] = ENgetnumdemands(i,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnumdemands(i,obj.libepanet); j=j+1;
             end
         end
         function value = getNodeDemandPatternsIndex(obj)
@@ -1125,22 +1163,24 @@ classdef epanet <handle
                 value{i} = val(i,:);
             end
         end
-        function value = getNodeDemandPatternNameID(obj)
+        function value = getNodeDemandPatternNameID(obj, varargin)
             %New version dev2.1
             value={};
             v = obj.getNodeDemandPatternsIndex;
             m = obj.getPatternNameID;
             numdemands = obj.getNodeNumDemandCategories;
-            for i=1:obj.getNodeCount
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
                 for u=1:numdemands(i)
                     if v{u}(i)~=0 
                         value{u,i}= char(m(v{u}(i))); 
                     else
                         value{u,i}= '';
                     end
+                    j=j+1;
                 end
                 if numdemands(i)==0
-                    value{1,i}= [];
+                    value{1,i}= []; j=j+1;
                 end
             end
         end
@@ -1153,104 +1193,116 @@ classdef epanet <handle
             [obj.errcode, value.Iterations] = ENgetstatistic(0,obj.libepanet);
             [obj.errcode, value.RelativeError] = ENgetstatistic(1,obj.libepanet);
         end    
-        function value = getNodeDemandPatternIndex(obj)
+        function value = getNodeDemandPatternIndex(obj, varargin)
             %Retrieves the value of all node demand pattern indices
-            value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,2,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,2,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeEmitterCoeff(obj)
+        function value = getNodeEmitterCoeff(obj, varargin)
             %Retrieves the value of all node emmitter coefficients
             value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,3,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,3,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeInitialQuality(obj)
+        function value = getNodeInitialQuality(obj, varargin)
             %Retrieves the value of all node initial quality
             value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,4,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,4,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeSourceQuality(obj)
+        function value = getNodeSourceQuality(obj, varargin)
             %Retrieves the value of all nodes source quality
             value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,5,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,5,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeSourcePatternIndex(obj)
+        function value = getNodeSourcePatternIndex(obj, varargin)
             %Retrieves the value of all node source pattern index
             value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,6,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,6,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeSourceTypeIndex(obj)
+        function value = getNodeSourceTypeIndex(obj, varargin)
             %Retrieves the value of all node source index
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,7,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,7,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeSourceType(obj)
+        function value = getNodeSourceType(obj, varargin)
             %Retrieves the value of all node source type
             value=cell(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
                 [obj.errcode, temp] = ENgetnodevalue(i,7,obj.libepanet);
                 if ~isnan(temp)
-                    value(i)=obj.TYPESOURCE(temp+1);
+                    value(j)=obj.TYPESOURCE(temp+1); j=j+1;
                 end
             end
         end
-        function value = getNodeTankInitialLevel(obj)
+        function value = getNodeTankInitialLevel(obj, varargin)
             %Retrieves the value of all tank initial water levels
             value=nan(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,8,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,8,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeActualDemand(obj)
+        function value = getNodeActualDemand(obj, varargin)
             %Retrieves the computed value of all actual demands
             value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,9,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,9,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeActualDemandSensingNodes(obj,varargin)
+        function value = getNodeActualDemandSensingNodes(obj, varargin)
             %Retrieves the computed demand values at some sensing nodes
             value=zeros(1,length(varargin{1}));v=1;
             for i=varargin{1}
                 [obj.errcode, value(v)] = ENgetnodevalue(i,9,obj.libepanet);v=v+1;
             end
         end
-        function value = getNodeHydaulicHead(obj)
+        function value = getNodeHydaulicHead(obj, varargin)
             %Retrieves the computed values of all hydraulic heads
             value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,10,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,10,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodePressure(obj)
+        function value = getNodePressure(obj, varargin)
             %Retrieves the computed values of all node pressures
             value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,11,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,11,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeActualQuality(obj)
+        function value = getNodeActualQuality(obj, varargin)
             %Retrieves the computed values of the actual quality for all nodes
             value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,12,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,12,obj.libepanet); j=j+1;
             end
         end
-        function value = getNodeMassFlowRate(obj)
+        function value = getNodeMassFlowRate(obj, varargin)
             %Retrieves the computed mass flow rates per minute of chemical sources
             value=zeros(1,obj.getNodeCount);
-            for i=1:obj.getNodeCount
-                [obj.errcode, value(i)] = ENgetnodevalue(i,13,obj.libepanet);
+            indices = getNodeIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.errcode, value(j)] = ENgetnodevalue(i,13,obj.libepanet); j=j+1;
             end
         end
         function value = getNodeActualQualitySensingNodes(obj,varargin)
@@ -1260,7 +1312,7 @@ classdef epanet <handle
                 [obj.errcode, value(v)] = ENgetnodevalue(i,12,obj.libepanet);v=v+1;
             end
         end
-        function value = getNodeTankInitialWaterVolume(obj)
+        function value = getNodeTankInitialWaterVolume(obj, varargin)
             %Retrieves the tank initial volume
             value=zeros(1,obj.getNodeCount);
             if obj.getNodeTankCount
@@ -1956,58 +2008,74 @@ classdef epanet <handle
                 disp('New rules cannot be added in this libepanet')
             end
         end
-        function setLinkDiameter(obj, value)
-            for i=1:length(value)
-                [obj.errcode] = ENsetlinkvalue(i, 0, value(i),obj.libepanet);
-            end
+        function setLinkDiameter(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices
+                [obj.errcode] = ENsetlinkvalue(i,0, value(i),obj.libepanet); 
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
+            end            
         end
-        function setLinkLength(obj, value)
-            for i=1:length(value)
+        function setLinkLength(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices
                 [obj.errcode] = ENsetlinkvalue(i, 1, value(i),obj.libepanet);
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
             end
         end
-        function setLinkRoughnessCoeff(obj, value)
-            for i=1:length(value)
+        function setLinkRoughnessCoeff(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices
                 [obj.errcode] = ENsetlinkvalue(i, 2, value(i),obj.libepanet);
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
             end
         end
-        function setLinkMinorLossCoeff(obj, value)
-            for i=1:length(value)
+        function setLinkMinorLossCoeff(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices
                 [obj.errcode] = ENsetlinkvalue(i, 3, value(i),obj.libepanet);
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
             end
         end
-        function setLinkInitialStatus(obj, value)
-            for i=1:length(value)
+        function setLinkInitialStatus(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices% Cannot set status for a check valve
                 [obj.errcode] = ENsetlinkvalue(i, 4, value(i),obj.libepanet);
-                e=obj.getError(obj.errcode); % Cannot set status for a check valve
-                if ~isempty(e)
-                   disp(e);
-                end
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
             end
         end
-        function setLinkInitialSetting(obj, value)
-            for i=1:length(value)
+        function setLinkInitialSetting(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices
                 [obj.errcode] = ENsetlinkvalue(i, 5, value(i),obj.libepanet);
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
             end
         end
-        function setLinkBulkReactionCoeff(obj, value)
-            for i=1:length(value)
+        function setLinkBulkReactionCoeff(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices
                 [obj.errcode] = ENsetlinkvalue(i, 6, value(i),obj.libepanet);
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
             end
         end
-        function setLinkWallReactionCoeff(obj, value)
-            for i=1:length(value)
+        function setLinkWallReactionCoeff(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices
                 [obj.errcode] = ENsetlinkvalue(i, 7, value(i),obj.libepanet);
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
             end
         end
-        function setLinkStatus(obj, value)
-            for i=1:length(value)
+        function setLinkStatus(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices
                 [obj.errcode] = ENsetlinkvalue(i, 11, value(i),obj.libepanet);
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
             end
         end
-        function setLinkSettings(obj, value)
-            for i=1:length(value)
+        function setLinkSettings(obj, value, varargin)
+            if nargin==3, indices = value; value=varargin{1};  else  indices = getLinkIndices(obj,varargin); end
+            for i=indices
                 [obj.errcode] = ENsetlinkvalue(i, 12, value(i),obj.libepanet);
+                if obj.errcode, error(obj.getError(obj.errcode)), return; end   
             end
         end
         function setNodeElevations(obj, value)
@@ -11028,4 +11096,17 @@ for t = 1:length(info)
 end
 obj.MsxUnload;
 obj.msx(obj.MsxTempFile,1);
+end
+function indices = getLinkIndices(obj, varargin)
+    indices = getIndices(obj.getLinkCount, varargin{1});
+end
+function indices = getNodeIndices(obj, varargin)
+    indices = getIndices(obj.getNodeCount, varargin{1});
+end
+function indices = getIndices(cnt, varargin)
+    if isempty(varargin{1})
+        indices=1:cnt;
+    else
+        indices=varargin{1}{1};
+    end 
 end
