@@ -192,7 +192,7 @@ patterns=d.BinNodeDemandPatternNameID;
 errcode=d.addBinPattern('new',1:0.1:2);
 patterns{end}='new';
 errcode=d.setBinNodeDemandPatternNameID(patterns);
-d.getPatternNameID(d.getNodeDemandPatternIndex)
+d.getPatternNameID(d.getNodePatternIndex)
 case1node=toc
 disp('Press any key to continue...')
 pause
@@ -209,7 +209,7 @@ patterns{end}='new1';
 d.setBinNodeJunctionsParameters('elevation',elevations,'basedemand',basedemands,'demandpattern',patterns);
 d.getNodeElevations
 d.getNodeBaseDemands
-d.getPatternNameID(d.getNodeDemandPatternIndex)
+d.getPatternNameID(d.getNodePatternIndex)
 case2node=toc
 disp('Press any key to continue...')
 pause
@@ -226,7 +226,7 @@ if d.NodeReservoirCount
     patres=d.BinNodeResDemandPatternNameID;
     patres{end}='new';
     errcode=d.setBinNodeResDemandPatternNameID(patres);
-    d.getPatternNameID(d.getNodeDemandPatternIndex)
+    d.getPatternNameID(d.getNodePatternIndex)
     caseres1=toc
     disp('Press any key to continue...')
     pause
@@ -239,7 +239,7 @@ if d.NodeReservoirCount
     patres{end}='pat2';
     errcode=d.setBinNodeReservoirParameters('elevation',elevationsReservoirs,'pattern',patres);
     d.getNodeElevations
-    d.getPatternNameID(d.getNodeDemandPatternIndex)
+    d.getPatternNameID(d.getNodePatternIndex)
     caseres2=toc
     disp('Press any key to continue...')
     pause

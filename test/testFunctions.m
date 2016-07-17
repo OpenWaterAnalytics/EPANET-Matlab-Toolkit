@@ -86,8 +86,8 @@ d.getNodeNumDemandCategories
 % ENgetdemandpattern - Retrieves the index of a demand pattern for a specific demand category of a node
 d.NodeDemandPatternNameID  
 d.getNodeDemandPatternNameID
-d.NodeDemandPatternsIndex 
-d.getNodeDemandPatternsIndex
+d.NodeDemandPatternIndex 
+d.getNodePatternIndex
 
 % ENgetaveragepatternvalue - Retrieves the average value of a pattern
 d.getPatternAveragePatternValue
@@ -201,7 +201,7 @@ d.getNodeType
 d.getNodeTypeIndex
 d.getNodeElevations
 d.getNodeBaseDemands
-d.getNodeDemandPatternIndex
+d.getNodePatternIndex
 d.getNodeEmitterCoeff
 d.getNodeInitialQuality
 d.getNodeSourceQuality
@@ -255,7 +255,6 @@ d.getTimeStatisticsIndex
 d.getVersion
 
 %% To check
-d.getTimeRuleControlStep % bug: It always returns Zero!
 d.getTimeReportingPeriods% Check this
 d.getNodeTankMixZoneVolume % ok 6/3/2015
 d.getNodeTankDiameter% bug: Produces a different diameter % fix in epanet20013 - ok 6/3/2015
@@ -327,10 +326,10 @@ values{1}(2)=160; %values(2)
 d.setNodeBaseDemands(values)
 d.getNodeBaseDemands
 
-values = d.getNodeDemandPatternIndex
+values = d.getNodePatternIndex
 values(2)=0;
 d.setNodeDemandPatternIndex(values)
-d.getNodeDemandPatternIndex
+d.getNodePatternIndex
 
 values = d.getNodeEmitterCoeff
 values(2)=0.5;
@@ -481,7 +480,7 @@ d.getTimeStatisticsType
 d.getTimeStatisticsIndex
 
 d.getTimeRuleControlStep 
-d.setTimeRuleControlStep(100) % bug: Does not change Time Rule Control Step
+d.setTimeRuleControlStep(100) 
 d.getTimeRuleControlStep
 
 d.getPattern 

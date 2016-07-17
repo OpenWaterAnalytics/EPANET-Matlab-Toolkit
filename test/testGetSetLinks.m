@@ -1,4 +1,4 @@
-%% EPANET-Matlab Class Test Part 5   **01/07/2016**
+%% EPANET-Matlab Class Test Net1  **01/07/2016**
 % This file is provided to ensure that all functions can be executed
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints, 
@@ -8,10 +8,7 @@ clear;
 close all;
 
 % Create EPANET object using the INP file
-%d=epanet('Net1_Rossman2000.inp');
-inpname='networks/Net1_Rossman2000.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
-version='epanet2'; % version dev2.1
-% d=epanet(inpname,version);
+inpname='networks/Net1_Rossman2000.inp'; % Net1_Rossman2000
 d=epanet(inpname);
 
 %% *Get Links Data (EXAMPLES)*
@@ -85,37 +82,37 @@ d.getLinkSettings(2)
 d.getLinkDiameter
 d.setLinkDiameter(2*d.getLinkDiameter);
 d.getLinkDiameter
-d.getLinkDiameter(1)
-d.setLinkDiameter(1,200); %index, value
-d.getLinkDiameter(1)
+d.getLinkDiameter(2)
+d.setLinkDiameter(2,200); %index, value
+d.getLinkDiameter(2)
 
 d.getLinkLength
 d.setLinkLength(2*d.getLinkLength)
 d.getLinkLength
-d.getLinkLength(1)
-d.setLinkLength(1,500)%index, value
-d.getLinkLength(1)
+d.getLinkLength(2)
+d.setLinkLength(2,500)%index, value
+d.getLinkLength(2)
 
 d.getLinkRoughnessCoeff
 d.setLinkRoughnessCoeff(2*d.getLinkRoughnessCoeff)
 d.getLinkRoughnessCoeff
-d.getLinkRoughnessCoeff(1)
-d.setLinkRoughnessCoeff(1,150)%index, value
-d.getLinkRoughnessCoeff(1)
+d.getLinkRoughnessCoeff(2)
+d.setLinkRoughnessCoeff(2,150)%index, value
+d.getLinkRoughnessCoeff(2)
 
 d.getLinkMinorLossCoeff
 d.setLinkMinorLossCoeff(d.getLinkMinorLossCoeff+1.1)
 d.getLinkMinorLossCoeff
-d.getLinkMinorLossCoeff(1)
-d.setLinkMinorLossCoeff(1,1.01)%index, value
-d.getLinkMinorLossCoeff(1)
+d.getLinkMinorLossCoeff(2)
+d.setLinkMinorLossCoeff(2,1.01)%index, value
+d.getLinkMinorLossCoeff(2)
 
 d.getLinkInitialStatus
 d.setLinkInitialStatus(0*d.getLinkInitialStatus)
 d.getLinkInitialStatus
-d.getLinkInitialStatus(1)
-d.setLinkInitialStatus(1,1)
-d.getLinkInitialStatus(1)
+d.getLinkInitialStatus(2)
+d.setLinkInitialStatus(2,1)
+d.getLinkInitialStatus(2)
 
 d.getLinkBulkReactionCoeff
 d.setLinkBulkReactionCoeff(d.getLinkBulkReactionCoeff-0.055)
@@ -127,31 +124,30 @@ d.getLinkBulkReactionCoeff(1)
 d.getLinkWallReactionCoeff
 d.setLinkWallReactionCoeff(-1.1*d.getLinkWallReactionCoeff)
 d.getLinkWallReactionCoeff
-d.getLinkWallReactionCoeff(1)
-d.setLinkWallReactionCoeff(1,-2)
-d.getLinkWallReactionCoeff(1)
+d.getLinkWallReactionCoeff(2)
+d.setLinkWallReactionCoeff(2,-2)
+d.getLinkWallReactionCoeff(2)
 
 d.getLinkInitialSetting
 d.setLinkInitialSetting(d.getLinkInitialSetting*10)
 d.getLinkInitialSetting
-d.getLinkInitialSetting(1)
-d.setLinkInitialSetting(1,10)
-d.getLinkInitialSetting(1)
+d.getLinkInitialSetting(2)
+d.setLinkInitialSetting(2,10)
+d.getLinkInitialSetting(2)
 
 d.getLinkStatus %dynamic
 d.setLinkStatus(0*d.getLinkStatus)
 d.getLinkStatus 
-d.getLinkStatus(1)
-d.setLinkStatus(1,1)
-d.getLinkStatus(1) 
+d.getLinkStatus(2)
+d.setLinkStatus(2,1)
+d.getLinkStatus(2) 
 
 d.getLinkSettings %dynamic
 d.setLinkSettings(d.getLinkSettings+10)
 d.getLinkSettings
-d.getLinkSettings(1)
-d.setLinkSettings(1,121)
-d.getLinkSettings(1)
+d.getLinkSettings(2)
+d.setLinkSettings(2,121)
+d.getLinkSettings(2)
 
-
-
+d.unload
 
