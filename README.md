@@ -102,7 +102,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodePatternIndex|Retrieves the value of all node pattern indices|
 |getNodeDemandPatternIndex|Retrieves the value of all node demand pattern indices|
 |getNodeDemandPatternNameID|Retrieves the value of all node demand pattern IDs|
-|getNodeDemandPatternsIndex|Retrieves the value of all node demand pattern indices dev-2.1|
 |getNodeElevations|Retrieves the value of all node elevations|
 |getNodeEmitterCoeff|Retrieves the value of all node emmitter coefficients|
 |getNodeHydaulicHead|Retrieves the computed values of all hydraulic heads|
