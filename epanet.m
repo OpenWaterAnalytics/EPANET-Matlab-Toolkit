@@ -1569,12 +1569,6 @@ classdef epanet <handle
             nfactors=size(curveVector,1);%x = number of points in curve
             [obj.Errcode] = ENsetcurve(index, curveVector(:,1), curveVector(:,2), nfactors,obj.LibEPANET);
         end
-        function value = getCurveValue(obj,curveIndex, curvePnt)
-            %Retrieves x,y point for a specific point number and curve
-            %New version dev2.1
-            [obj.Errcode, x, y] = ENgetcurvevalue(curveIndex, curvePnt,obj.LibEPANET);
-            value = [x y];
-        end
         function setCurveValue(obj,index, curvePnt, value)
             %Retrieves x,y point for a specific point number and curve
             %New version dev2.1
@@ -1765,13 +1759,19 @@ classdef epanet <handle
                 setCurve(obj,valueIndex,varargin{2});
             end
         end
-        function value = getCurveXY(obj,index)
+        function value = getCurveValue(obj,index,varargin)
             %New version dev2.1
             %Retrieves x,y point for a specific point number and curve
-            tmplen=obj.getCurveLengths;
-            value=zeros(tmplen(index),2);
-            for i=1:tmplen(index)
-                [obj.Errcode, value(i,1), value(i,2)] = ENgetcurvevalue(index, i,obj.LibEPANET);
+            if nargin<3
+                tmplen=obj.getCurveLengths;
+                value=zeros(tmplen(index),2);
+                for i=1:tmplen(index)
+                    [obj.Errcode, value(i,1), value(i,2)] = ENgetcurvevalue(index, i,obj.LibEPANET);
+                end
+            else
+                [obj.Errcode, x, y] = ENgetcurvevalue(index, varargin{1},obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+                value = [x y];
             end
         end
         function value = getHeadCurveIndex(obj)
