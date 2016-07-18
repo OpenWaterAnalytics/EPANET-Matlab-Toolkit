@@ -255,7 +255,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |writeReport|Writes a formatted text report on simulation results to the Report file|
 |<b> MSX Functions </b>
 |loadMSXFile|Opens the EPANET-MSX toolkit system|
-|writeMSXFile|Write a new MSX file|
 |addMSXPattern|Adds a new, empty MSX source time pattern to the project|
 |initializeMSXQualityAnalysis|Initializes the MSX system before solving for water quality results in step-wise fashion|
 |saveMSXFile|Saves the data associated with the current MSX project into a new MSX input file|
@@ -263,11 +262,13 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |solveMSXCompleteHydraulics|Solves for system hydraulics over the entire simulation period saving results to an internal scratch file|
 |solveMSXCompleteQuality|Solves for water quality over the entire simulation period and saves the results to an internal scratch file|
 |stepMSXQualityAnalysisTimeLeft|Advances the water quality solution through a single water quality time step when performing a step-wise simulation|
-|unloadMSX|Closes the EPANET-MSX toolkit system|
-|useMSXHydraulicFile|Uses a previously saved EPANET hydraulics file as the source of hydraulic information|
+|writeMSXFile|Write a new MSX file|
 |writeMSXReport|Writes water quality simulations results as instructed by the MSX input file to a text file|
+|useMSXHydraulicFile|Uses a previously saved EPANET hydraulics file as the source of hydraulic information|
 |plotMSXConcentrationSpeciesOfLinks|Plots the concentration species of links|
 |plotMSXConcentrationSpeciesOfNodes|Plots the concentration species of nodes|
+|runMSXexe|Writes water quality simulations results as instructed by the MSX input file to a text file using the epanetmsx.exe|
+|unloadMSX|Closes the EPANET-MSX toolkit system|
 |getMSXAtol|Retrieves the absolute concentration tolerance|
 |getMSXRtol|Retrieves the relative concentration tolerance|
 |getMSXComputedQualityLink|Retrieves the concentration of a chemical species at a specific link of the network at the current simulation time step|
