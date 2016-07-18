@@ -1,7 +1,13 @@
 classdef epanet <handle
-    %epanet EPANET-Matlab Class: A Matlab Class for EPANET and EPANET-MSX
+    %EPANET-Matlab Toolkit v2.1: A Matlab Class for EPANET and EPANET-MSX
+    %libraries
     %
-    %   How to run: d=epanet('Net1_Rossman2000.inp');
+    %
+    %   How to run: 
+    %   d=epanet('networks/Net1_Rossman2000.inp');
+    %   
+    %   To select a different DLL version:  
+    %   d=epanet('networks/Net1_Rossman2000.inp','epanet2');
     %
     %   EPANET is software that models water distribution piping systems
     %   developed by the US EPA and provided under a public domain licence.
@@ -14,20 +20,20 @@ classdef epanet <handle
     %   National Risk Management Research Laboratory. EPANET is under the
     %   Public Domain and EPANET-MSX under GNU LGPL.
     %
-    %   The latest EPANET files can downloaded by the *unofficial* channel
-    %   https://github.com/OpenWaterAnalytics/epanet which is the most
-    %   updated libepanet of the software
+    %   The latest EPANET files can downloaded at:
+    %   https://github.com/OpenWaterAnalytics/epanet
     %
-    %   Some part of the EPANET-Matlab Class are based on the epanet-matlab
-    %   wrappers prepared by Jim Uber
-    %   (https://github.com/OpenWaterAnalytics/epanet-matlab)
+    %   Inspired by:
+    %   EPANET-Matlab Wrappers (Jim Uber)
+    %   EPANET-Matlab Toolkit (Demetrios Eliades)
+    %   getwdsdata (Philip Jonkergouw)   
     %
     %   EPANET-Matlab Class Licence:
     %
-    %   Copyright 2013 KIOS Research Center for Intelligent Systems and
+    %   Copyright 2016 KIOS Research Center for Intelligent Systems and
     %   Networks, University of Cyprus (www.kios.org.cy)
     %
-    %   Licensed under the EUPL, libepanet 1.1 or - as soon they will be
+    %   Licensed under the EUPL, Version 1.1 or - as soon they will be
     %   approved by the European Commission - subsequent libepanets of the
     %   EUPL (the "Licence"); You may not use this work except in
     %   compliance with the Licence. You may obtain a copy of the Licence
