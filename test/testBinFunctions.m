@@ -14,7 +14,7 @@ tic;d=epanet(inpname);toc
 d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]); 
 d.BinUpdateClass; % must be run if use Bin functions
 
-if d.errcode
+if d.Errcode
     return; 
 end
 
@@ -904,8 +904,8 @@ pause
 %% OTHER PROPERTIES
 d.BinUpdateClass
 
-d.inputfile
-d.Bintempfile
+d.InputFile
+d.BinTempfile
 d.BinNodeJunctionNameID
 d.BinNodeReservoirNameID
 d.BinNodeTankNameID
@@ -1032,12 +1032,12 @@ d.BinQualityTraceNodeIndex
 d.BinQualityTraceNodeID
 d.BinOptionsDiffusivity
 
-d.BincountStatuslines
-d.BincountInitialQualitylines
-d.BincountReactionlines
-d.BincountPatternlines
-d.BinSImetric
-d.BinUScustomary
+d.BinCountStatuslines
+d.BinCountInitialQualitylines
+d.BinCountReactionlines
+d.BinCountPatternlines
+d.BinUnits_SI_Metric
+d.BinUnits_US_Customary
 d.BinQualityUnits
 
 d.BinUnits.BinLinkFlowUnits
