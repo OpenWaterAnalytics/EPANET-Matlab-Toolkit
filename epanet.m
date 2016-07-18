@@ -9439,7 +9439,7 @@ elseif typecode==2
         curveID=varargin{1};
     else
         power=varargin{1};
-        curveID={};
+        curveID='';
     end
 elseif typecode>2
     if typecode==0, type_valv = 'CVPIPE';  end
