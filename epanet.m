@@ -2518,6 +2518,20 @@ classdef epanet <handle
                 MSXMatlabSetup(obj,msxname,varargin);
             end
         end
+        function runMSXexe(obj)
+            [~,mm]=system(['cmd /c for %A in ("',pwd,'") do @echo %~sA']);
+            mmPwd=regexp(mm,'\s','split');
+            inpfile=obj.Bintempfile;
+            rptfile=[inpfile(1:length(inpfile)-4),'.txt'];
+            if strcmp(computer('arch'),'win64')
+                    folder='64bit';
+                r = sprintf('%s\\%s\\epanetmsx.exe %s %s %s',mmPwd{1},folder,inpfile,obj.MSXTempFile,rptfile);
+            elseif strcmp(computer('arch'),'win32')
+                    folder='32bit';
+                r = sprintf('%s\\%s\\epanetmsx.exe %s %s %s',mmPwd{1},folder,inpfile,obj.MSXTempFile,rptfile);
+            end
+            system(r);
+        end
         function value = getMSXEquationsTerms(obj)
             [value,~,~] = getEquations(obj.MSXFile);
         end
@@ -4952,6 +4966,7 @@ classdef epanet <handle
             [errcode]=addLink(obj,1,newLink,fromNode,toNode,newLength,newDiameter,newRoughness);
         end
         function [errcode]=addBinPump(obj,newPumpID,fromNode,toNode,varargin)
+            errcode=-1;
             if length(varargin)==4
                 newCurveIDofPump=varargin{1};
                 newCurveXvalue=varargin{2};
@@ -9480,7 +9495,7 @@ for t = 1:length(info)
                         return;
                     end
                     fprintf(fid2,'%s',a{u});
-                    fprintf(fid2, '\n%s%s%s%s%s%s%s%s%s',newLink,sps,fromNode,sps,...
+                    fprintf(fid2,'\n%s%s%s%s%s%s%s%s%s',newLink,sps,fromNode,sps,...
                         toNode,sps,'HEAD',sps,curveID);
                 else
                     fprintf(fid2,'%s',a{u});
@@ -10930,21 +10945,6 @@ function [fid,binfile] = runEPANETexe(obj)
     end
     system(r);
     fid = fopen(binfile,'r');
-end
-function [fid] = runMSXexe(obj)
-    [~,mm]=system(['cmd /c for %A in ("',pwd,'") do @echo %~sA']);
-    mmPwd=regexp(mm,'\s','split');
-    pp=[mmPwd{1},'/'];
-    inpfile=[pp,obj.Bintempfile];
-    rptfile=[inpfile(1:length(inpfile)-4),'.txt'];
-    if strcmp(computer('arch'),'win64')
-            folder='64bit';
-        r = sprintf('%s\\%s\\epanetmsx.exe %s %s %s',mmPwd{1},folder,inpfile,obj.MSXTempFile,rptfile);
-    elseif strcmp(computer('arch'),'win32')
-            folder='32bit';
-        r = sprintf('%s\\%s\\epanetmsx.exe %s %s %s',mmPwd{1},folder,inpfile,obj.MSXTempFile,rptfile);
-    end
-    system(r);
 end
 function value = getBinComputedTimeSeries(obj,indParam,varargin)
     [fid,binfile] = runEPANETexe(obj);

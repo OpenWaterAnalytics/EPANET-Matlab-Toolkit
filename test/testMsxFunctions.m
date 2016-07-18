@@ -145,8 +145,8 @@ disp('Press any key to continue...')
 pause
 
 % Different way to write the report (the "bug" above does not appear)
-
-% TODO using the runMSXexe function
+d.runMSXexe
+open([d.MSXTempFile(1:end-4),'.txt']);
 
 disp('Press any key to continue...')
 pause
