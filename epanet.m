@@ -47,7 +47,7 @@ classdef epanet <handle
     %   implied. See the Licence for the specific language governing
     %   permissions and limitations under the Licence.
     properties
-        MSXlibepanet;
+        MSXlibepanet;           
         MSXlibepanetPath;
         MSXConstantsNameID;
         MSXConstantsValue;
@@ -83,23 +83,23 @@ classdef epanet <handle
         MSXSpeciesType;
         MSXSpeciesUnits;
         MSXEquationsTanks;
-        MSXEquationsTerms;
-        NodeCoordinates; % Coordinates for each node (long/lat & intermediate pipe coordinates)
-        NodeJunctionCount; %Number of junctions
-        NodeCount; % Number of nodes
-        NodeReservoirCount; %Number of reservoirs
-        NodeTankCount;% Number of tanks
-        NodeTankReservoirCount;   %Number of tanks and reservoirs
-        NodeTankDiameterUnits; % Units for tank diameters
-        NodeElevationUnits; % Units for elevation
-        NodeEmitterCoefficientUnits; %Units for emitter coefficient
-        NodeBaseDemands; % Base demands of nodes
-        NodeDemandPatternIndex; % Index of demand patterns
-        NodeElevations;% Elevation of nodes
-        NodeEmitterCoeff; %Emmitter Coefficient of nodes
-        NodeIndex; %Index of nodes
-        NodeInitialQuality; %Initial quality of nodes
-        NodeJunctionIndex; %Index of node junctions
+        MSXEquationsTerms;          % ... to complete the above...
+        NodeCoordinates;            % Coordinates for each node (long/lat & intermediate pipe coordinates)
+        NodeJunctionCount;          % Number of junctions
+        NodeCount;                  % Number of nodes
+        NodeReservoirCount;         % Number of reservoirs
+        NodeTankCount;              % Number of tanks
+        NodeTankReservoirCount;     % Number of tanks and reservoirs
+        NodeTankDiameterUnits;      % Units for tank diameters
+        NodeElevationUnits;         % Units for elevation
+        NodeEmitterCoefficientUnits;% Units for emitter coefficient
+        NodeBaseDemands;            % Base demands of nodes
+        NodeDemandPatternIndex;     % Index of demand patterns
+        NodeElevations;             % Elevation of nodes
+        NodeEmitterCoeff;           % Emmitter Coefficient of nodes
+        NodeIndex;                  % Index of nodes
+        NodeInitialQuality;         %Initial quality of nodes
+        NodeJunctionIndex; % Index of node junctions
         NodeJunctionNameID; %Name ID of node junctions
         NodeNameID; %Name ID of all nodes
         NodeReservoirIndex; %Index of reservoirs
