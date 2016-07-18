@@ -32,8 +32,8 @@ Keep in mind that some bugs may exist in the `EPANET` libraries, in case you are
 * `EPANET-Matlab Toolkit`: EUPL 
 
 # Acknowledgements #
-* Marios Kyriakou
-* Demetrios Eliades
+* Marios Kyriakou, KIOS Research Center, University of Cyprus
+* Demetrios Eliades, KIOS Research Center, University of Cyprus
 
 The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](http://www.mathworks.com/matlabcentral/fileexchange/25100-epanet-matlab-toolkit) as well as the OpenWaterAnalytics [EPANET-Matlab Wrappers](https://github.com/OpenWaterAnalytics/epanet-matlab)
 # List of Matlab Class Functions #
@@ -41,7 +41,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |---------|---------|
 |epanet| Load Input file and open the EPANET Toolkit system|
 |unload|Unload library and close the EPANET Toolkit system|
-|LoadFile| Open the EPANET Toolkit system|
+|loadEPANETFile| Open the EPANET Toolkit system|
 |getError| Returns the description of an error code| 
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
@@ -254,91 +254,91 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |writeLineInReportFile|Writes a line of text to the EPANET report file|
 |writeReport|Writes a formatted text report on simulation results to the Report file|
 |<b> MSX Functions </b>
-|msx|Opens the EPANET-MSX toolkit system|
-|writeMsxFile|Write a new MSX file|
-|MsxAddPattern|Adds a new, empty MSX source time pattern to the project|
-|MsxInitializeQualityAnalysis|Initializes the MSX system before solving for water quality results in step-wise fashion|
-|MsxSaveFile|Saves the data associated with the current MSX project into a new MSX input file|
-|MsxSaveQualityFile|Saves water quality results computed for each node, link and reporting time period to a named binary file|
-|MsxSolveCompleteHydraulics|Solves for system hydraulics over the entire simulation period saving results to an internal scratch file|
-|MsxSolveCompleteQuality|Solves for water quality over the entire simulation period and saves the results to an internal scratch file|
-|MsxStepQualityAnalysisTimeLeft|Advances the water quality solution through a single water quality time step when performing a step-wise simulation|
-|MsxUnload|Closes the EPANET-MSX toolkit system|
-|MsxUseHydraulicFile|Uses a previously saved EPANET hydraulics file as the source of hydraulic information|
-|MsxWriteReport|Writes water quality simulations results as instructed by the MSX input file to a text file|
-|MsxPlotConcentrationSpeciesOfLinks|Plots the concentration species of links|
-|MsxPlotConcentrationSpeciesOfNodes|Plots the concentration species of nodes|
-|getMsxAtol|Retrieves the absolute concentration tolerance|
-|getMsxRtol|Retrieves the relative concentration tolerance|
-|getMsxComputedQualityLink|Retrieves the concentration of a chemical species at a specific link of the network at the current simulation time step|
-|getMsxComputedQualityNode|Retrieves the concentration of a chemical species at a specific node of the network at the current simulation time step.|
-|getMsxConstantsCount|Retrieves the number of constants|
-|getMsxConstantsIndex|Retrieves the internal index number of constants (given its ID name)|
-|getMsxConstantsNameID|Retrieves the ID name of constants (given its internal index number)|
-|getMsxConstantsValue|Retrieves the value of a particular reaction constant|
-|getMsxError|Returns the text for an error message given its error code|
-|getMsxLinkInitqualValue|Retrieves the initial concentration of chemical species assigned to links of the pipe network|
-|getMsxNodeInitqualValue|Retrieves the initial concentration of chemical species assigned to nodes|
-|getMsxParametersCount|Retrieves the number of parameters|
-|getMsxParametersIndex|Retrieves the indices of parameters|
-|getMsxParametersNameID|Retrieves the ID name of parameters|
-|getMsxParametersPipesValue|Retrieves the value of reaction parameters for pipes|
-|getMsxParametersTanksValue|Retrieves the value of reaction parameters for tanks|
-|getMsxPattern|Retrieves the multiplier factor for all patterns and all times|
-|getMsxPatternValue|Retrieves the multiplier at a specific time period for a given source time pattern|
-|getMsxPatternsCount|Retrieves the number of patterns|
-|getMsxPatternsIndex|Retrieves the indices of patterns|
-|getMsxPatternsLengths|Retrieves the number of time periods in all or some patterns|
-|getMsxPatternsNameID|Retrieves the patterns IDs|
-|getMsxSourceLevel|Retrieves the value of all nodes source level|
-|getMsxSourceNodeNameID|Retrieves the indices of parameters|
-|getMsxSourcePatternIndex|Retrieves the value of all node source pattern index|
-|getMsxSourceType|Retrieves the value of all node source type|
-|getMsxSources|Retrieves the source info|
-|getMsxSpeciesATOL|Retrieves the atol|
-|getMsxSpeciesRTOL|Retrieves the rtol|
-|getMsxSpeciesConcentration|Retrieves the concentration of chemical species for nodes and links|
-|getMsxSpeciesCount|Retrieves the number of species|
-|getMsxSpeciesIndex|Retrieves the indices of species|
-|getMsxSpeciesNameID|Retrieves the species IDs|
-|getMsxSpeciesType|Retrieves the value of all species|
-|getMsxSpeciesUnits|Retrieves the species units|
-|getMsxTimeStep|Retrieves the time step|
-|getMsxRateUnits|Retrieves the rate/time units (SEC/MIN/HR/DAY)|
-|getMsxAreaUnits|Retrieves the area units (FT2/M2/CM2)|
-|getMsxCompiler|Retrieves the compiler (NONE/VC/GC)|
-|getMsxCoupling|Retrieves the coupling (FULL/NONE)|
-|getMsxEquationsPipes|Retrieves the species dynamics in pipes|
-|getMsxEquationsTanks|Retrieves the species dynamics in tanks|
-|getMsxEquationsTerms|Retrieves the species dynamics in terms|
-|getMsxSolver|Retrieves the solver (EUL/RK5/ROS2)|
-|setMsxAreaUnitsCM2|Sets area units to CM2|
-|setMsxAreaUnitsFT2|Sets area units to FT2|
-|setMsxAreaUnitsM2|Sets area units to M2|
-|setMsxAtol|Sets the value of Atol|
-|setMsxRtol|Sets the value of Rtol|
-|setMsxCompilerGC|Sets compilet to GC|
-|setMsxCompilerNONE|Sets compiler to None|
-|setMsxCompilerVC|Sets compiler to VC|
-|setMsxConstantsValue|Assigns a new value to a specific reaction constant|
-|setMsxCouplingFULL|Sets coupling option to FULL|
-|setMsxCouplingNONE|Sets coupling option to NONE|
-|setMsxLinkInitqualValue|Assigns an initial concentration of chemical species to links|
-|setMsxNodeInitqualValue|Assigns an initial concentration of chemical species to nodes|
-|setMsxParametersPipesValue|Assigns a value to a particular reaction parameter for given pipes|
-|setMsxParametersTanksValue|Assigns a value to a particular reaction parameter for given tanks|
-|setMsxPattern|Sets all of the multiplier factors for a specific time pattern|
-|setMsxPatternMatrix|Sets all of the multiplier factors for all patterns|
-|setMsxPatternValue|Assigns a new value to the multiplier for a specific time period in a given MSX source time pattern|
-|setMsxRateUnitsDAY|Sets rate units to DAY|
-|setMsxRateUnitsHR|Sets rate units to HR|
-|setMsxRateUnitsMIN|Sets rate units to MIN|
-|setMsxRateUnitsSEC|Sets rate units to SEC|
-|setMsxSolverEUL|Sets solver to EUL (standard Euler integrator)|
-|setMsxSolverRK5|Sets solver to RK5 (Runge-Kutta 5th order integrator)|
-|setMsxSolverROS2|Sets solver to ROS2 (2nd order Rosenbrock integrator)|
-|setMsxSources|Sets the attributes of an external source of a particular chemical species to a specific node of the pipe network|
-|setMsxTimeStep|Sets time step|
+|loadMSXFile|Opens the EPANET-MSX toolkit system|
+|writeMSXFile|Write a new MSX file|
+|addMSXPattern|Adds a new, empty MSX source time pattern to the project|
+|initializeMSXQualityAnalysis|Initializes the MSX system before solving for water quality results in step-wise fashion|
+|saveMSXFile|Saves the data associated with the current MSX project into a new MSX input file|
+|saveMSXQualityFile|Saves water quality results computed for each node, link and reporting time period to a named binary file|
+|solveMSXCompleteHydraulics|Solves for system hydraulics over the entire simulation period saving results to an internal scratch file|
+|solveMSXCompleteQuality|Solves for water quality over the entire simulation period and saves the results to an internal scratch file|
+|stepMSXQualityAnalysisTimeLeft|Advances the water quality solution through a single water quality time step when performing a step-wise simulation|
+|unloadMSX|Closes the EPANET-MSX toolkit system|
+|useMSXHydraulicFile|Uses a previously saved EPANET hydraulics file as the source of hydraulic information|
+|writeMSXReport|Writes water quality simulations results as instructed by the MSX input file to a text file|
+|plotMSXConcentrationSpeciesOfLinks|Plots the concentration species of links|
+|plotMSXConcentrationSpeciesOfNodes|Plots the concentration species of nodes|
+|getMSXAtol|Retrieves the absolute concentration tolerance|
+|getMSXRtol|Retrieves the relative concentration tolerance|
+|getMSXComputedQualityLink|Retrieves the concentration of a chemical species at a specific link of the network at the current simulation time step|
+|getMSXComputedQualityNode|Retrieves the concentration of a chemical species at a specific node of the network at the current simulation time step.|
+|getMSXConstantsCount|Retrieves the number of constants|
+|getMSXConstantsIndex|Retrieves the internal index number of constants (given its ID name)|
+|getMSXConstantsNameID|Retrieves the ID name of constants (given its internal index number)|
+|getMSXConstantsValue|Retrieves the value of a particular reaction constant|
+|getMSXError|Returns the text for an error message given its error code|
+|getMSXLinkInitqualValue|Retrieves the initial concentration of chemical species assigned to links of the pipe network|
+|getMSXNodeInitqualValue|Retrieves the initial concentration of chemical species assigned to nodes|
+|getMSXParametersCount|Retrieves the number of parameters|
+|getMSXParametersIndex|Retrieves the indices of parameters|
+|getMSXParametersNameID|Retrieves the ID name of parameters|
+|getMSXParametersPipesValue|Retrieves the value of reaction parameters for pipes|
+|getMSXParametersTanksValue|Retrieves the value of reaction parameters for tanks|
+|getMSXPattern|Retrieves the multiplier factor for all patterns and all times|
+|getMSXPatternValue|Retrieves the multiplier at a specific time period for a given source time pattern|
+|getMSXPatternsCount|Retrieves the number of patterns|
+|getMSXPatternsIndex|Retrieves the indices of patterns|
+|getMSXPatternsLengths|Retrieves the number of time periods in all or some patterns|
+|getMSXPatternsNameID|Retrieves the patterns IDs|
+|getMSXSourceLevel|Retrieves the value of all nodes source level|
+|getMSXSourceNodeNameID|Retrieves the indices of parameters|
+|getMSXSourcePatternIndex|Retrieves the value of all node source pattern index|
+|getMSXSourceType|Retrieves the value of all node source type|
+|getMSXSources|Retrieves the source info|
+|getMSXSpeciesATOL|Retrieves the atol|
+|getMSXSpeciesRTOL|Retrieves the rtol|
+|getMSXSpeciesConcentration|Retrieves the concentration of chemical species for nodes and links|
+|getMSXSpeciesCount|Retrieves the number of species|
+|getMSXSpeciesIndex|Retrieves the indices of species|
+|getMSXSpeciesNameID|Retrieves the species IDs|
+|getMSXSpeciesType|Retrieves the value of all species|
+|getMSXSpeciesUnits|Retrieves the species units|
+|getMSXTimeStep|Retrieves the time step|
+|getMSXRateUnits|Retrieves the rate/time units (SEC/MIN/HR/DAY)|
+|getMSXAreaUnits|Retrieves the area units (FT2/M2/CM2)|
+|getMSXCompiler|Retrieves the compiler (NONE/VC/GC)|
+|getMSXCoupling|Retrieves the coupling (FULL/NONE)|
+|getMSXEquationsPipes|Retrieves the species dynamics in pipes|
+|getMSXEquationsTanks|Retrieves the species dynamics in tanks|
+|getMSXEquationsTerms|Retrieves the species dynamics in terms|
+|getMSXSolver|Retrieves the solver (EUL/RK5/ROS2)|
+|setMSXAreaUnitsCM2|Sets area units to CM2|
+|setMSXAreaUnitsFT2|Sets area units to FT2|
+|setMSXAreaUnitsM2|Sets area units to M2|
+|setMSXAtol|Sets the value of Atol|
+|setMSXRtol|Sets the value of Rtol|
+|setMSXCompilerGC|Sets compilet to GC|
+|setMSXCompilerNONE|Sets compiler to None|
+|setMSXCompilerVC|Sets compiler to VC|
+|setMSXConstantsValue|Assigns a new value to a specific reaction constant|
+|setMSXCouplingFULL|Sets coupling option to FULL|
+|setMSXCouplingNONE|Sets coupling option to NONE|
+|setMSXLinkInitqualValue|Assigns an initial concentration of chemical species to links|
+|setMSXNodeInitqualValue|Assigns an initial concentration of chemical species to nodes|
+|setMSXParametersPipesValue|Assigns a value to a particular reaction parameter for given pipes|
+|setMSXParametersTanksValue|Assigns a value to a particular reaction parameter for given tanks|
+|setMSXPattern|Sets all of the multiplier factors for a specific time pattern|
+|setMSXPatternMatrix|Sets all of the multiplier factors for all patterns|
+|setMSXPatternValue|Assigns a new value to the multiplier for a specific time period in a given MSX source time pattern|
+|setMSXRateUnitsDAY|Sets rate units to DAY|
+|setMSXRateUnitsHR|Sets rate units to HR|
+|setMSXRateUnitsMIN|Sets rate units to MIN|
+|setMSXRateUnitsSEC|Sets rate units to SEC|
+|setMSXSolverEUL|Sets solver to EUL (standard Euler integrator)|
+|setMSXSolverRK5|Sets solver to RK5 (Runge-Kutta 5th order integrator)|
+|setMSXSolverROS2|Sets solver to ROS2 (2nd order Rosenbrock integrator)|
+|setMSXSources|Sets the attributes of an external source of a particular chemical species to a specific node of the pipe network|
+|setMSXTimeStep|Sets time step|
 |<b>Bin Functions</b>
 |BinClose|Close binary files and delete|
 |BinUpdateClass|Run all bin functions and update the results|

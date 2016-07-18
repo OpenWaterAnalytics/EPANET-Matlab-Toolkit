@@ -6,7 +6,7 @@ addpath(genpath(pwd))
 testFunctions
 
 % Msx Functions
-testMsxFunctions
+testMSXFunctions
 
 % Bin Functions
 testBinFunctions

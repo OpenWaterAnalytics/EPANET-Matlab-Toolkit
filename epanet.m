@@ -47,43 +47,43 @@ classdef epanet <handle
     %   implied. See the Licence for the specific language governing
     %   permissions and limitations under the Licence.
     properties
-        Msxlibepanet;
-        MsxlibepanetPath;
-        MsxConstantsNameID;
-        MsxConstantsValue;
-        MsxConstantsCount;
-        MsxConstantsIndex;
-        MsxParametersCount;
-        MsxPatternsCount;
-        MsxSpeciesCount;
-        MsxLinkInitqualValue;
-        MsxNodeInitqualValue;
-        MsxFile;
-        MsxTempFile;
-        MsxParametersNameID;
-        MsxParametersIndex;
-        MsxParametersPipesValue;
-        MsxParametersTanksValue;
-        MsxPatternsNameID;
-        MsxPatternsIndex;
-        MsxPatternsLengths;
-        MsxPattern;
-        MsxEquationsPipes;
-        MsxSources;
-        MsxSourceLevel;
-        MsxSourceNodeNameID;
-        MsxSourcePatternNameID;
-        MsxSourcePatternIndex;
-        MsxSourceType;
-        MsxSourceTypeCode;
-        MsxSpeciesATOL;
-        MsxSpeciesIndex;
-        MsxSpeciesNameID;
-        MsxSpeciesRTOL;
-        MsxSpeciesType;
-        MsxSpeciesUnits;
-        MsxEquationsTanks;
-        MsxEquationsTerms;
+        MSXlibepanet;
+        MSXlibepanetPath;
+        MSXConstantsNameID;
+        MSXConstantsValue;
+        MSXConstantsCount;
+        MSXConstantsIndex;
+        MSXParametersCount;
+        MSXPatternsCount;
+        MSXSpeciesCount;
+        MSXLinkInitqualValue;
+        MSXNodeInitqualValue;
+        MSXFile;
+        MSXTempFile;
+        MSXParametersNameID;
+        MSXParametersIndex;
+        MSXParametersPipesValue;
+        MSXParametersTanksValue;
+        MSXPatternsNameID;
+        MSXPatternsIndex;
+        MSXPatternsLengths;
+        MSXPattern;
+        MSXEquationsPipes;
+        MSXSources;
+        MSXSourceLevel;
+        MSXSourceNodeNameID;
+        MSXSourcePatternNameID;
+        MSXSourcePatternIndex;
+        MSXSourceType;
+        MSXSourceTypeCode;
+        MSXSpeciesATOL;
+        MSXSpeciesIndex;
+        MSXSpeciesNameID;
+        MSXSpeciesRTOL;
+        MSXSpeciesType;
+        MSXSpeciesUnits;
+        MSXEquationsTanks;
+        MSXEquationsTerms;
         NodeCoordinates; % Coordinates for each node (long/lat & intermediate pipe coordinates)
         NodeJunctionCount; %Number of junctions
         NodeCount; % Number of nodes
@@ -383,11 +383,10 @@ classdef epanet <handle
         BinOptionsHeadloss;
         BinOptionsQualityTolerance;
         BinNodePressureUnits;
-        
-        % EMC Version
-        classversion;
     end
     properties (Constant = true)
+        classversion='2.1a';
+        
         TYPECONTROL={'LOWLEVEL','HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL','HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'PUMP','EFFICIENCY','VOLUME','HEADLOSS'}; % Constants for pump curves: 'PUMP','EFFICIENCY','VOLUME','HEADLOSS'
         TYPELINK={'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'}; % Constants for links: 'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'VALVE'
@@ -401,11 +400,11 @@ classdef epanet <handle
         TYPESTATS={'NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE'}; % Constants for statistics: 'NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE'
         TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
         
-        MsxTYPEAREAUNITS={'FT2','M2','CM2'}; % sets the units used to express pipe wall surface area
-        MsxTYPERATEUNITS={'SEC','MIN','HR','DAY'}; % is the units in which all reaction rate terms are expressed
-        MsxTYPESOLVER={'EUL','RK5','ROS2'}; % is the choice of numerical integration method used to solve the reaction system
-        MsxTYPECOUPLING={'FULL','NONE'}; % is the choice of numerical integration method used to solve the reaction system
-        MsxTYPECOMPILER={'NONE','VC','GC'}; % is the choice of numerical integration method used to solve the reaction system
+        MSXTYPEAREAUNITS={'FT2','M2','CM2'}; % sets the units used to express pipe wall surface area
+        MSXTYPERATEUNITS={'SEC','MIN','HR','DAY'}; % is the units in which all reaction rate terms are expressed
+        MSXTYPESOLVER={'EUL','RK5','ROS2'}; % is the choice of numerical integration method used to solve the reaction system
+        MSXTYPECOUPLING={'FULL','NONE'}; % is the choice of numerical integration method used to solve the reaction system
+        MSXTYPECOMPILER={'NONE','VC','GC'}; % is the choice of numerical integration method used to solve the reaction system
     end
     methods
         function obj = epanet(varargin)
@@ -486,7 +485,6 @@ classdef epanet <handle
                 obj.pathfile='';
             end
             
-            obj.classversion='dev-2.2';
             % Get some link data
             [obj.LinkDiameter,obj.LinkLength,obj.LinkRoughnessCoeff,obj.LinkMinorLossCoeff,obj.LinkInitialStatus,...
             obj.LinkInitialSetting,obj.LinkBulkReactionCoeff,obj.LinkWallReactionCoeff,obj.NodesConnectingLinksIndex,...
@@ -668,7 +666,7 @@ classdef epanet <handle
             end
             
         end % End of epanet class constructor
-        function errcode = LoadFile(obj,varargin)
+        function errcode = loadEPANETFile(obj,varargin)
            [errcode] = ENopen(varargin{1},[varargin{1}(1:end-4),'.rpt'],[varargin{1}(1:end-4),'.bin'],obj.libepanet); 
         end
         function [value] = plot(obj,varargin)
@@ -2497,278 +2495,278 @@ classdef epanet <handle
         function unload(obj)
             ENclose(obj.libepanet);
             ENMatlabCleanup(obj.libepanet);
-            if exist([obj.Bintempfile(1:end-4),'.bin'])==2
-                delete([obj.Bintempfile(1:end-4),'.bin']);
-            end
-            delete(obj.Bintempfile);
-            if exist([obj.Bintempfile(1:end-4),'.txt'])==2
-                delete([obj.Bintempfile(1:end-4),'.txt']);
-            end
-            [p,f]=fileparts(obj.inputfile);
-            if exist([p,'/',f,'.txt'])==2
-                delete([p,'/',f,'.txt']);
-            end
-            if exist(obj.MsxTempFile)==2
-                delete(obj.MsxTempFile);
-            end
+%             if exist([obj.Bintempfile(1:end-4),'.bin'])==2
+%                 delete([obj.Bintempfile(1:end-4),'.bin']);
+%             end
+%             delete(obj.Bintempfile);
+%             if exist([obj.Bintempfile(1:end-4),'.txt'])==2
+%                 delete([obj.Bintempfile(1:end-4),'.txt']);
+%             end
+%             [p,f]=fileparts(obj.inputfile);
+%             if exist([p,'/',f,'.txt'])==2
+%                 delete([p,'/',f,'.txt']);
+%             end
+%             if exist(obj.MSXTempFile)==2
+%                 delete(obj.MSXTempFile);
+%             end
             disp('EPANET Class is unloaded')
         end
-        function msx(obj,msxname,varargin)
+        function loadMSXFile(obj,msxname,varargin)
             if isempty(varargin)
                 MSXMatlabSetup(obj,msxname);
             else
                 MSXMatlabSetup(obj,msxname,varargin);
             end
         end
-        function value = getMsxEquationsTerms(obj)
-            [value,~,~] = getEquations(obj.MsxFile);
+        function value = getMSXEquationsTerms(obj)
+            [value,~,~] = getEquations(obj.MSXFile);
         end
-        function value = getMsxEquationsPipes(obj)
-            [~,value,~] = getEquations(obj.MsxFile);
+        function value = getMSXEquationsPipes(obj)
+            [~,value,~] = getEquations(obj.MSXFile);
         end
-        function value = getMsxEquationsTanks(obj)
-            [~,~,value] = getEquations(obj.MsxFile);
+        function value = getMSXEquationsTanks(obj)
+            [~,~,value] = getEquations(obj.MSXFile);
         end
-        function value = getMsxTimeStep(obj)
-            [value] = getMsxOptions(obj.MsxFile);
+        function value = getMSXTimeStep(obj)
+            [value] = getMSXOptions(obj.MSXFile);
             value = value.timestep;
         end
-        function value = getMsxSolver(obj)
-            [value] = getMsxOptions(obj.MsxFile);
+        function value = getMSXSolver(obj)
+            [value] = getMSXOptions(obj.MSXFile);
             value = value.solver;
         end
-        function value = getMsxAreaUnits(obj)
-            [value] = getMsxOptions(obj.MsxFile);
+        function value = getMSXAreaUnits(obj)
+            [value] = getMSXOptions(obj.MSXFile);
             value = value.areaunits;
         end        
-        function value = getMsxRateUnits(obj)
-            [value] = getMsxOptions(obj.MsxFile);
+        function value = getMSXRateUnits(obj)
+            [value] = getMSXOptions(obj.MSXFile);
             value = value.rateunits;
         end 
-        function value = getMsxRtol(obj)
-            [value] = getMsxOptions(obj.MsxFile);
+        function value = getMSXRtol(obj)
+            [value] = getMSXOptions(obj.MSXFile);
             value = value.rtol;
         end 
-        function value = getMsxAtol(obj)
-            [value] = getMsxOptions(obj.MsxFile);
+        function value = getMSXAtol(obj)
+            [value] = getMSXOptions(obj.MSXFile);
             value = value.atol;
         end
-        function value = getMsxCoupling(obj)
-            [value] = getMsxOptions(obj.MsxFile);
+        function value = getMSXCoupling(obj)
+            [value] = getMSXOptions(obj.MSXFile);
             value = value.coupling;
         end
-        function value = getMsxCompiler(obj)
-            [value] = getMsxOptions(obj.MsxFile);
+        function value = getMSXCompiler(obj)
+            [value] = getMSXOptions(obj.MSXFile);
             value = value.compiler;
         end
-        function value = getMsxSpeciesCount(obj)
+        function value = getMSXSpeciesCount(obj)
             % Species, Constants, Parameters, Patterns
-            [obj.errcode, value] = MSXgetcount(3,obj.Msxlibepanet);
+            [obj.errcode, value] = MSXgetcount(3,obj.MSXlibepanet);
         end
-        function value = getMsxConstantsCount(obj)
-            [obj.errcode, value] = MSXgetcount(6,obj.Msxlibepanet);
+        function value = getMSXConstantsCount(obj)
+            [obj.errcode, value] = MSXgetcount(6,obj.MSXlibepanet);
         end
-        function value = getMsxParametersCount(obj)
-            [obj.errcode, value] = MSXgetcount(5,obj.Msxlibepanet);
+        function value = getMSXParametersCount(obj)
+            [obj.errcode, value] = MSXgetcount(5,obj.MSXlibepanet);
         end
-        function value = getMsxPatternsCount(obj)
-            [obj.errcode, value] = MSXgetcount(7,obj.Msxlibepanet);
+        function value = getMSXPatternsCount(obj)
+            [obj.errcode, value] = MSXgetcount(7,obj.MSXlibepanet);
         end
-        function value = getMsxSpeciesNameID(obj,varargin)
+        function value = getMSXSpeciesNameID(obj,varargin)
             if isempty(varargin)
-                for i=1:obj.getMsxSpeciesCount
-                    [obj.errcode, len] = MSXgetIDlen(3,i,obj.Msxlibepanet);
-                    [obj.errcode, value{i}]=MSXgetID(3,i,len,obj.Msxlibepanet);
+                for i=1:obj.getMSXSpeciesCount
+                    [obj.errcode, len] = MSXgetIDlen(3,i,obj.MSXlibepanet);
+                    [obj.errcode, value{i}]=MSXgetID(3,i,len,obj.MSXlibepanet);
                 end
             else
                 k=1;
                 for i=varargin{1}
-                    [obj.errcode, len] = MSXgetIDlen(3,i,obj.Msxlibepanet);
-                    [obj.errcode, value{k}]=MSXgetID(3,i,len,obj.Msxlibepanet);
+                    [obj.errcode, len] = MSXgetIDlen(3,i,obj.MSXlibepanet);
+                    [obj.errcode, value{k}]=MSXgetID(3,i,len,obj.MSXlibepanet);
                     k=k+1;
                 end
             end
         end
-        function value = getMsxSpeciesType(obj)
-            if obj.getMsxSpeciesCount
-                for i=1:obj.getMsxSpeciesCount
-                    [obj.errcode,value{i},~,~,~] = MSXgetspecies(i,obj.Msxlibepanet);
+        function value = getMSXSpeciesType(obj)
+            if obj.getMSXSpeciesCount
+                for i=1:obj.getMSXSpeciesCount
+                    [obj.errcode,value{i},~,~,~] = MSXgetspecies(i,obj.MSXlibepanet);
                 end
             else
                 value=-1;
             end
         end
-        function value = getMsxSpeciesUnits(obj)
-            if obj.getMsxSpeciesCount
-                for i=1:obj.getMsxSpeciesCount
-                    [obj.errcode,~,value{i},~,~] = MSXgetspecies(i,obj.Msxlibepanet);
+        function value = getMSXSpeciesUnits(obj)
+            if obj.getMSXSpeciesCount
+                for i=1:obj.getMSXSpeciesCount
+                    [obj.errcode,~,value{i},~,~] = MSXgetspecies(i,obj.MSXlibepanet);
                 end
             else
                 value=-1;
             end
         end
-        function value = getMsxSpeciesATOL(obj)
-            if obj.getMsxSpeciesCount
-                for i=1:obj.getMsxSpeciesCount
-                    [obj.errcode,~,~,value,~] = MSXgetspecies(i,obj.Msxlibepanet);
+        function value = getMSXSpeciesATOL(obj)
+            if obj.getMSXSpeciesCount
+                for i=1:obj.getMSXSpeciesCount
+                    [obj.errcode,~,~,value,~] = MSXgetspecies(i,obj.MSXlibepanet);
                 end
             else
                 value=-1;
             end
         end
-        function value = getMsxSpeciesRTOL(obj)
-            if obj.getMsxSpeciesCount
-                for i=1:obj.getMsxSpeciesCount
-                    [obj.errcode,~,~,~,value] = MSXgetspecies(i,obj.Msxlibepanet);
+        function value = getMSXSpeciesRTOL(obj)
+            if obj.getMSXSpeciesCount
+                for i=1:obj.getMSXSpeciesCount
+                    [obj.errcode,~,~,~,value] = MSXgetspecies(i,obj.MSXlibepanet);
                 end
             else
                 value=-1;
             end
         end
-        function value = getMsxSpeciesIndex(obj,varargin)
+        function value = getMSXSpeciesIndex(obj,varargin)
             if isempty(varargin)
-                value=1:obj.getMsxSpeciesCount;
+                value=1:obj.getMSXSpeciesCount;
             elseif isa(varargin{1},'cell')
                 k=1;
                 for j=1:length(varargin{1})
-                    [obj.errcode, value(k)] = MSXgetindex(3,varargin{1}{j},obj.Msxlibepanet);
+                    [obj.errcode, value(k)] = MSXgetindex(3,varargin{1}{j},obj.MSXlibepanet);
                     k=k+1;
                 end
             elseif isa(varargin{1},'char')
-                [obj.errcode, value] = MSXgetindex(obj.Msxlibepanet,3,varargin{1});
+                [obj.errcode, value] = MSXgetindex(obj.MSXlibepanet,3,varargin{1});
             end
         end
-        function value = getMsxConstantsNameID(obj)
-            if obj.getMsxConstantsCount
-                for i=1:obj.getMsxConstantsCount
-                    [obj.errcode, len] = MSXgetIDlen(6,i,obj.Msxlibepanet);
-                    [obj.errcode, value{i}] = MSXgetID(6,i,len,obj.Msxlibepanet);
+        function value = getMSXConstantsNameID(obj)
+            if obj.getMSXConstantsCount
+                for i=1:obj.getMSXConstantsCount
+                    [obj.errcode, len] = MSXgetIDlen(6,i,obj.MSXlibepanet);
+                    [obj.errcode, value{i}] = MSXgetID(6,i,len,obj.MSXlibepanet);
                 end
             else
                 value=-1;
             end
         end
-        function value = getMsxConstantsValue(obj)
-            if obj.getMsxConstantsCount
-                for i=1:obj.getMsxConstantsCount
-                    [obj.errcode, value(i)] = MSXgetconstant(i,obj.Msxlibepanet);
+        function value = getMSXConstantsValue(obj)
+            if obj.getMSXConstantsCount
+                for i=1:obj.getMSXConstantsCount
+                    [obj.errcode, value(i)] = MSXgetconstant(i,obj.MSXlibepanet);
                 end
             else
                 value=-1;
             end
         end
-        function value = getMsxConstantsIndex(obj,varargin)
+        function value = getMSXConstantsIndex(obj,varargin)
             if isempty(varargin)
-                value=1:obj.getMsxConstantsCount;
+                value=1:obj.getMSXConstantsCount;
             elseif isa(varargin{1},'cell')
                 k=1;
                 for j=1:length(varargin{1})
-                    [obj.errcode, value(k)] = MSXgetindex(6,varargin{1}{j},obj.Msxlibepanet);
+                    [obj.errcode, value(k)] = MSXgetindex(6,varargin{1}{j},obj.MSXlibepanet);
                     k=k+1;
                 end
             elseif isa(varargin{1},'char')
-                [obj.errcode, value] = MSXgetindex(obj.Msxlibepanet,6,varargin{1});
+                [obj.errcode, value] = MSXgetindex(obj.MSXlibepanet,6,varargin{1});
             end
         end
-        function value = getMsxParametersNameID(obj,varargin)
+        function value = getMSXParametersNameID(obj,varargin)
             if isempty(varargin)
-                for i=1:obj.getMsxParametersCount
-                    [obj.errcode, len] = MSXgetIDlen(5,i,obj.Msxlibepanet);
-                    [obj.errcode, value{i}]=MSXgetID(5,i,len,obj.Msxlibepanet);
+                for i=1:obj.getMSXParametersCount
+                    [obj.errcode, len] = MSXgetIDlen(5,i,obj.MSXlibepanet);
+                    [obj.errcode, value{i}]=MSXgetID(5,i,len,obj.MSXlibepanet);
                 end
-                if ~obj.getMsxParametersCount
+                if ~obj.getMSXParametersCount
                     value=0;
                 end
             else
                 k=1;
                 for i=varargin{1}
-                    [obj.errcode, len] = MSXgetIDlen(5,i,obj.Msxlibepanet);
-                    [obj.errcode, value{k}]=MSXgetID(5,i,len,obj.Msxlibepanet);
+                    [obj.errcode, len] = MSXgetIDlen(5,i,obj.MSXlibepanet);
+                    [obj.errcode, value{k}]=MSXgetID(5,i,len,obj.MSXlibepanet);
                     k=k+1;
                 end
             end
         end
-        function value = getMsxParametersIndex(obj,varargin)
+        function value = getMSXParametersIndex(obj,varargin)
             if isempty(varargin)
-                value=1:obj.getMsxParametersCount;
+                value=1:obj.getMSXParametersCount;
                 if ~length(value)
                     value=0;
                 end
             elseif isa(varargin{1},'cell')
                 k=1;
                 for j=1:length(varargin{1})
-                    [obj.errcode, value(k)] = MSXgetindex(5,varargin{1}{j},obj.Msxlibepanet);
+                    [obj.errcode, value(k)] = MSXgetindex(5,varargin{1}{j},obj.MSXlibepanet);
                     k=k+1;
                 end
             elseif isa(varargin{1},'char')
-                [obj.errcode, value] = MSXgetindex(5,varargin{1},obj.Msxlibepanet);
+                [obj.errcode, value] = MSXgetindex(5,varargin{1},obj.MSXlibepanet);
             end
         end
-        function value = getMsxParametersTanksValue(obj)
+        function value = getMSXParametersTanksValue(obj)
             value={};
-            if ~obj.getMsxParametersCount, value=0;return;end
+            if ~obj.getMSXParametersCount, value=0;return;end
             if ~length(obj.NodeTankIndex), value=0;return;end
             for i=1:length(obj.NodeTankIndex)
-                for j=1:obj.MsxParametersCount%
-                    [obj.errcode, value{obj.NodeTankIndex(i)}(j)] = MSXgetparameter(0,obj.NodeTankIndex(i),j,obj.Msxlibepanet);
+                for j=1:obj.MSXParametersCount%
+                    [obj.errcode, value{obj.NodeTankIndex(i)}(j)] = MSXgetparameter(0,obj.NodeTankIndex(i),j,obj.MSXlibepanet);
                 end
             end
         end
-        function value = getMsxParametersPipesValue(obj)
-            if ~obj.getMsxParametersCount
+        function value = getMSXParametersPipesValue(obj)
+            if ~obj.getMSXParametersCount
                 value=0;return;
             end
             for i=1:obj.getLinkPipeCount
-                for j=1:obj.getMsxParametersCount
-                    [obj.errcode, value{i}(j)] = MSXgetparameter(1,i,j,obj.Msxlibepanet);
+                for j=1:obj.getMSXParametersCount
+                    [obj.errcode, value{i}(j)] = MSXgetparameter(1,i,j,obj.MSXlibepanet);
                 end
             end
         end
-        function value = getMsxPatternsNameID(obj,varargin)
+        function value = getMSXPatternsNameID(obj,varargin)
             if isempty(varargin)
-                for i=1:obj.getMsxPatternsCount
-                    [obj.errcode, len] = MSXgetIDlen(7,i,obj.Msxlibepanet);
-                    [obj.errcode, value{i}]=MSXgetID(7,i,len,obj.Msxlibepanet);
+                for i=1:obj.getMSXPatternsCount
+                    [obj.errcode, len] = MSXgetIDlen(7,i,obj.MSXlibepanet);
+                    [obj.errcode, value{i}]=MSXgetID(7,i,len,obj.MSXlibepanet);
                 end
-                if ~obj.getMsxPatternsCount
+                if ~obj.getMSXPatternsCount
                     value=0;
                 end
             else
                 k=1;
                 for i=varargin{1}
-                    [obj.errcode, len] = MSXgetIDlen(7,i,obj.Msxlibepanet);
-                    [obj.errcode, value{k}]=MSXgetID(7,i,len,obj.Msxlibepanet);
+                    [obj.errcode, len] = MSXgetIDlen(7,i,obj.MSXlibepanet);
+                    [obj.errcode, value{k}]=MSXgetID(7,i,len,obj.MSXlibepanet);
                     k=k+1;
                 end
             end
         end
-        function value = getMsxPatternsIndex(obj,varargin)
+        function value = getMSXPatternsIndex(obj,varargin)
             if isempty(varargin)
-                value=1:obj.getMsxPatternsCount;
+                value=1:obj.getMSXPatternsCount;
                 if ~length(value)
                     value=0;
                 end
             elseif isa(varargin{1},'cell')
                 k=1;
                 for j=1:length(varargin{1})
-                    [obj.errcode, value] = MSXgetindex(obj.Msxlibepanet,7,varargin{1});
+                    [obj.errcode, value] = MSXgetindex(obj.MSXlibepanet,7,varargin{1});
                     if obj.errcode
                         value{k}=0;
                     end
                     k=k+1;
                 end
             elseif isa(varargin{1},'char')
-                [obj.errcode, value] = MSXgetindex(obj.Msxlibepanet,7,varargin{1});
+                [obj.errcode, value] = MSXgetindex(obj.MSXlibepanet,7,varargin{1});
                 if obj.errcode
                     value=0;
                 end
             end
         end
-        function value = getMsxPatternsLengths(obj,varargin)
+        function value = getMSXPatternsLengths(obj,varargin)
             if isempty(varargin)
-                if obj.getMsxPatternsCount
-                    for i=obj.getMsxPatternsIndex
-                        [obj.errcode, value(i)]=MSXgetpatternlen(i,obj.Msxlibepanet);
+                if obj.getMSXPatternsCount
+                    for i=obj.getMSXPatternsIndex
+                        [obj.errcode, value(i)]=MSXgetpatternlen(i,obj.MSXlibepanet);
                     end
                 else
                     value=-1;
@@ -2776,87 +2774,87 @@ classdef epanet <handle
             elseif isa(varargin{1},'cell')
                 k=1;
                 for j=1:length(varargin{1})
-                    [obj.errcode, value(k)] = MSXgetpatternlen(obj.getMsxPatternsIndex(varargin{1}{j}),obj.Msxlibepanet);
+                    [obj.errcode, value(k)] = MSXgetpatternlen(obj.getMSXPatternsIndex(varargin{1}{j}),obj.MSXlibepanet);
                     k=k+1;
                 end
             elseif isa(varargin{1},'char')
-                [obj.errcode, value] = MSXgetpatternlen(obj.getMsxPatternsIndex(varargin{1}),obj.Msxlibepanet);
+                [obj.errcode, value] = MSXgetpatternlen(obj.getMSXPatternsIndex(varargin{1}),obj.MSXlibepanet);
             elseif isa(varargin{1},'numeric')
                 k=1;
                 for i=varargin{1}
-                    [obj.errcode, value(k)]=MSXgetpatternlen(i,obj.Msxlibepanet);
+                    [obj.errcode, value(k)]=MSXgetpatternlen(i,obj.MSXlibepanet);
                     k=k+1;
                 end
             end
         end
-        function value = getMsxNodeInitqualValue(obj)
-            if obj.getMsxSpeciesCount==0
+        function value = getMSXNodeInitqualValue(obj)
+            if obj.getMSXSpeciesCount==0
                 value{1}(1)=0;
                 return;
             end
             for i=1:obj.getNodeCount
-                for j=1:obj.getMsxSpeciesCount
-                    [obj.errcode, value{i}(j)] = MSXgetinitqual(0,i,j,obj.Msxlibepanet);
+                for j=1:obj.getMSXSpeciesCount
+                    [obj.errcode, value{i}(j)] = MSXgetinitqual(0,i,j,obj.MSXlibepanet);
                 end
             end
         end
-        function value = getMsxLinkInitqualValue(obj)
-            if obj.getMsxSpeciesCount==0
+        function value = getMSXLinkInitqualValue(obj)
+            if obj.getMSXSpeciesCount==0
                 value{1}(1)=0;
                 return;
             end
             for i=1:obj.getLinkCount
-                for j=1:obj.getMsxSpeciesCount
-                    [obj.errcode, value{i}(j)] = MSXgetinitqual(1,i,j,obj.Msxlibepanet);
+                for j=1:obj.getMSXSpeciesCount
+                    [obj.errcode, value{i}(j)] = MSXgetinitqual(1,i,j,obj.MSXlibepanet);
                 end
             end
         end
-        function value = getMsxSources(obj)
+        function value = getMSXSources(obj)
             for i=1:obj.getNodeCount
-                for j=1:obj.getMsxSpeciesCount
-                    [obj.errcode, obj.MsxSourceType{i}{j},obj.MsxSourceLevel{i}(j),obj.MsxSourcePatternIndex{i}(j)] = MSXgetsource(i,j,obj.Msxlibepanet);
-                    obj.MsxSourceTypeCode{i}(j)=find(strcmp(obj.TYPESOURCEMSX,obj.MsxSourceType{i}{j}))-2;
+                for j=1:obj.getMSXSpeciesCount
+                    [obj.errcode, obj.MSXSourceType{i}{j},obj.MSXSourceLevel{i}(j),obj.MSXSourcePatternIndex{i}(j)] = MSXgetsource(i,j,obj.MSXlibepanet);
+                    obj.MSXSourceTypeCode{i}(j)=find(strcmp(obj.TYPESOURCEMSX,obj.MSXSourceType{i}{j}))-2;
                 end
             end
-            SnodeID=obj.getMsxSourceNodeNameID;
-           % value={obj.MsxSourceType,obj.MsxSourceTypeCode,obj.MsxSourceLevel,obj.MsxSourcePatternIndex,SnodeID};
-            value.MsxSourceType=obj.MsxSourceType;
-            value.MsxSourceTypeCode=obj.MsxSourceTypeCode;
-            value.MsxSourceLevel=obj.MsxSourceLevel;
-            value.MsxSourcePatternIndex=obj.MsxSourcePatternIndex;
-            value.MsxSourceNodeNameID=SnodeID;
+            SnodeID=obj.getMSXSourceNodeNameID;
+           % value={obj.MSXSourceType,obj.MSXSourceTypeCode,obj.MSXSourceLevel,obj.MSXSourcePatternIndex,SnodeID};
+            value.MSXSourceType=obj.MSXSourceType;
+            value.MSXSourceTypeCode=obj.MSXSourceTypeCode;
+            value.MSXSourceLevel=obj.MSXSourceLevel;
+            value.MSXSourcePatternIndex=obj.MSXSourcePatternIndex;
+            value.MSXSourceNodeNameID=SnodeID;
         end
-        function value = getMsxSourceNodeNameID(obj)
+        function value = getMSXSourceNodeNameID(obj)
             value = obj.getNodeNameID;
         end
-        function value = getMsxSourceType(obj)
+        function value = getMSXSourceType(obj)
             for i=1:obj.getNodeCount
-                for j=1:obj.getMsxSpeciesCount
-                    [obj.errcode, value{i}{j},~,~] = MSXgetsource(i,j,obj.Msxlibepanet);
+                for j=1:obj.getMSXSpeciesCount
+                    [obj.errcode, value{i}{j},~,~] = MSXgetsource(i,j,obj.MSXlibepanet);
                 end
             end
         end
-        function value = getMsxSourceLevel(obj)
+        function value = getMSXSourceLevel(obj)
             for i=1:obj.getNodeCount
-                for j=1:obj.getMsxSpeciesCount
-                    [obj.errcode,~,value{i}(j),~] = MSXgetsource(i,j,obj.Msxlibepanet);
+                for j=1:obj.getMSXSpeciesCount
+                    [obj.errcode,~,value{i}(j),~] = MSXgetsource(i,j,obj.MSXlibepanet);
                 end
             end
         end
-        function value = getMsxSourcePatternIndex(obj)
+        function value = getMSXSourcePatternIndex(obj)
             for i=1:obj.getNodeCount
-                for j=1:obj.getMsxSpeciesCount
-                    [obj.errcode,~,~,value{i}(j)] = MSXgetsource(i,j,obj.Msxlibepanet);
+                for j=1:obj.getMSXSpeciesCount
+                    [obj.errcode,~,~,value{i}(j)] = MSXgetsource(i,j,obj.MSXlibepanet);
                 end
             end
         end
-        function value = getMsxPattern(obj) %Mass flow rate per minute of a chemical source
-            tmpmaxlen=max(obj.getMsxPatternsLengths);
-            value=nan(obj.getMsxPatternsCount,tmpmaxlen);
-            for i=1:obj.getMsxPatternsCount
-                tmplength=obj.getMsxPatternsLengths(i);
+        function value = getMSXPattern(obj) %Mass flow rate per minute of a chemical source
+            tmpmaxlen=max(obj.getMSXPatternsLengths);
+            value=nan(obj.getMSXPatternsCount,tmpmaxlen);
+            for i=1:obj.getMSXPatternsCount
+                tmplength=obj.getMSXPatternsLengths(i);
                 for j=1:tmplength
-                    [obj.errcode, value(i,j)] = MSXgetpatternvalue(i,j,obj.Msxlibepanet);
+                    [obj.errcode, value(i,j)] = MSXgetpatternvalue(i,j,obj.MSXlibepanet);
                 end
                 if tmplength<tmpmaxlen
                     for j=(tmplength+1):tmpmaxlen
@@ -2866,61 +2864,61 @@ classdef epanet <handle
                 
             end
         end
-        function value = getMsxPatternValue(obj,patternIndex, patternStep) %Mass flow rate per minute of a chemical source
-            [obj.errcode, value] = MSXgetpatternvalue(patternIndex, patternStep, obj.Msxlibepanet);
+        function value = getMSXPatternValue(obj,patternIndex, patternStep) %Mass flow rate per minute of a chemical source
+            [obj.errcode, value] = MSXgetpatternvalue(patternIndex, patternStep, obj.MSXlibepanet);
         end
-        function value = getMsxSpeciesConcentration(obj, type, index, species)
-            [obj.errcode, value] = MSXgetqual(type, index, species, obj.Msxlibepanet);
+        function value = getMSXSpeciesConcentration(obj, type, index, species)
+            [obj.errcode, value] = MSXgetqual(type, index, species, obj.MSXlibepanet);
         end
-        function value = getMsxComputedQualityNode(obj,varargin)
-            if obj.getMsxSpeciesCount==0
+        function value = getMSXComputedQualityNode(obj,varargin)
+            if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
             end
             if ~isempty(varargin)
                 if length(varargin)==1
                     ss=varargin{1};%index node
-                    uu=1:obj.getMsxSpeciesCount;
+                    uu=1:obj.getMSXSpeciesCount;
                 elseif length(varargin)==2
                     ss=varargin{1};%index node
                     uu=varargin{2};%index species
                 end
             else
                 ss=1:obj.getNodeCount;%index node
-                uu=1:obj.getMsxSpeciesCount;
+                uu=1:obj.getMSXSpeciesCount;
             end
             % Obtain a hydraulic solution
-            obj.MsxSolveCompleteHydraulics(obj.Msxlibepanet);
+            obj.solveMSXCompleteHydraulics(obj.MSXlibepanet);
             % Run a step-wise water quality analysis without saving
             % RESULTS to file
-            obj.MsxInitializeQualityAnalysis(0);
+            obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
             k=2; tleft=1;t=0;i=1;nl=1;
             value.Time(k,:)=0;
             timeSmle=obj.getTimeSimulationDuration;%bug at time
             while(tleft>0 && obj.errcode==0 && timeSmle~=t)
-                [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft;
+                [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
                 if ~isempty(varargin)
                     if t<3600 || t==3600
                         for j=uu
-                            value.Quality{j,i}(k,:)=obj.getMsxNodeInitqualValue{ss}(j);
+                            value.Quality{j,i}(k,:)=obj.getMSXNodeInitqualValue{ss}(j);
                         end
                     else
                         for j=uu
-                            value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(0, ss, j);%node code0
+                            value.Quality{j,i}(k,:)=obj.getMSXSpeciesConcentration(0, ss, j);%node code0
                         end
                     end
                 else
                     if t<3600 || t==3600
                         for nl=ss
                             for j=uu
-                                value.Quality{nl}{j}(k)=obj.getMsxNodeInitqualValue{(nl)}(j);
+                                value.Quality{nl}{j}(k)=obj.getMSXNodeInitqualValue{(nl)}(j);
                             end
                         end
                     else
                         for nl=ss
                             for j=uu
-                                value.Quality{nl}{j}(k)=obj.getMsxSpeciesConcentration(0, (nl), j);%node code0
+                                value.Quality{nl}{j}(k)=obj.getMSXSpeciesConcentration(0, (nl), j);%node code0
                             end
                         end
                     end
@@ -2930,55 +2928,55 @@ classdef epanet <handle
                 k=k+1;
             end
         end
-        function value = getMsxComputedQualityLink(obj,varargin)
-            if obj.getMsxSpeciesCount==0
+        function value = getMSXComputedQualityLink(obj,varargin)
+            if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
             end
             if ~isempty(varargin)
                 if length(varargin)==1
                     ss=varargin{1};%index link
-                    uu=1:obj.getMsxSpeciesCount;
+                    uu=1:obj.getMSXSpeciesCount;
                 elseif length(varargin)==2
                     ss=varargin{1};%index link
                     uu=varargin{2};%index species
                 end
             else
                 ss=1:obj.getLinkCount;%index link
-                uu=1:obj.getMsxSpeciesCount;
+                uu=1:obj.getMSXSpeciesCount;
             end
             % Obtain a hydraulic solution
-            obj.MsxSolveCompleteHydraulics(obj.Msxlibepanet);
+            obj.solveMSXCompleteHydraulics(obj.MSXlibepanet);
             % Run a step-wise water quality analysis without saving
             % RESULTS to file
-            obj.MsxInitializeQualityAnalysis(0);
+            obj.initializeMSXQualityAnalysis(0);
             
             % Retrieve species concentration at node
             k=2;tleft=1;i=1;
             value.Time(k,:)=0;
             while(tleft>0 && obj.errcode==0)
-                [t, tleft]=obj.MsxStepQualityAnalysisTimeLeft;
+                [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
                 if ~isempty(varargin)
                     if t<3600 || t==3600
                         for j=uu
-                            value.Quality{j,i}(k,:)=obj.getMsxLinkInitqualValue{ss}(j);
+                            value.Quality{j,i}(k,:)=obj.getMSXLinkInitqualValue{ss}(j);
                         end
                     else
                         for j=uu
-                            value.Quality{j,i}(k,:)=obj.getMsxSpeciesConcentration(1, ss, j);
+                            value.Quality{j,i}(k,:)=obj.getMSXSpeciesConcentration(1, ss, j);
                         end
                     end
                 else
                     if t<3600 || t==3600
                         for nl=ss
                             for j=uu
-                                value.Quality{nl}{j}(k)=obj.getMsxLinkInitqualValue{(nl)}(j);
+                                value.Quality{nl}{j}(k)=obj.getMSXLinkInitqualValue{(nl)}(j);
                             end
                         end
                     else
                         for nl=ss
                             for j=uu
-                                value.Quality{nl}{j}(k)=obj.getMsxSpeciesConcentration(1, (nl), j);%link code1
+                                value.Quality{nl}{j}(k)=obj.getMSXSpeciesConcentration(1, (nl), j);%link code1
                             end
                         end
                     end
@@ -2988,10 +2986,10 @@ classdef epanet <handle
                 k=k+1;
             end
         end
-        function MsxPlotConcentrationSpeciesOfNodes(obj,varargin)
-            s=obj.getMsxComputedQualityNode(varargin{1},varargin{2});
+        function plotMSXSpeciesNodeConcentration(obj,varargin)
+            s=obj.getMSXComputedQualityNode(varargin{1},varargin{2});
             nodesID=obj.getNodeNameID;
-            SpeciesNameID=obj.getMsxSpeciesNameID;
+            SpeciesNameID=obj.getMSXSpeciesNameID;
             for l=varargin{1}
                 nodeID=nodesID(l);
                 figure('Name',['NODE ',char(nodeID)]);
@@ -3006,10 +3004,10 @@ classdef epanet <handle
                 legend(SpeciesNameID(varargin{2}));
             end
         end
-        function MsxPlotConcentrationSpeciesOfLinks(obj,varargin)
-            s=obj.getMsxComputedQualityLink(varargin{1},varargin{2});
+        function plotMSXSpeciesLinkConcentration(obj,varargin)
+            s=obj.getMSXComputedQualityLink(varargin{1},varargin{2});
             linksID=obj.getLinkNameID;
-            SpeciesNameID=obj.getMsxSpeciesNameID;
+            SpeciesNameID=obj.getMSXSpeciesNameID;
             for l=varargin{1}
                 linkID=linksID(l);
                 figure('Name',['LINK ',char(linkID)]);
@@ -3024,151 +3022,151 @@ classdef epanet <handle
                 legend(SpeciesNameID(varargin{2}));
             end
         end
-        function value = getMsxError(obj,errcode)
-            [obj.errcode, value] = MSXgeterror(errcode,obj.Msxlibepanet);
+        function value = getMSXError(obj,errcode)
+            [obj.errcode, value] = MSXgeterror(errcode,obj.MSXlibepanet);
         end
-        function MsxSolveCompleteHydraulics(obj,varargin)
-            [obj.errcode] = MSXsolveH(obj.Msxlibepanet);
+        function solveMSXCompleteHydraulics(obj,varargin)
+            [obj.errcode] = MSXsolveH(obj.MSXlibepanet);
         end
-        function MsxSolveCompleteQuality(obj,varargin)
-            [obj.errcode] = MSXsolveQ(obj.Msxlibepanet);
+        function solveMSXCompleteQuality(obj,varargin)
+            [obj.errcode] = MSXsolveQ(obj.MSXlibepanet);
         end
-        function MsxWriteReport(obj,varargin)
-            [obj.errcode]=MSXreport(obj.Msxlibepanet);
+        function writeMSXReport(obj,varargin)
+            [obj.errcode]=MSXreport(obj.MSXlibepanet);
         end
-        function index = MsxAddPattern(obj,varargin)
+        function index = addMSXPattern(obj,varargin)
             index=-1;
             if nargin==2
-                [obj.errcode] = MSXaddpattern(varargin{1},obj.Msxlibepanet);
-                [obj.errcode, index] = MSXgetindex(obj.Msxlibepanet,7,varargin{1});
+                [obj.errcode] = MSXaddpattern(varargin{1},obj.MSXlibepanet);
+                [obj.errcode, index] = MSXgetindex(obj.MSXlibepanet,7,varargin{1});
             elseif nargin==3
-                [obj.errcode] = MSXaddpattern(varargin{1},obj.Msxlibepanet);
-                [obj.errcode, index] = MSXgetindex(obj.Msxlibepanet,7,varargin{1});
-                setMsxPattern(obj,index,varargin{2});
+                [obj.errcode] = MSXaddpattern(varargin{1},obj.MSXlibepanet);
+                [obj.errcode, index] = MSXgetindex(obj.MSXlibepanet,7,varargin{1});
+                setMSXPattern(obj,index,varargin{2});
             end
         end
-        function setMsxSources(obj, node, species, type, level, pat)
-            MSXsetsource(node, species, type, level, pat, obj.Msxlibepanet);
+        function setMSXSources(obj, node, species, type, level, pat)
+            MSXsetsource(node, species, type, level, pat, obj.MSXlibepanet);
         end
-        function setMsxConstantsValue(obj, value)
+        function setMSXConstantsValue(obj, value)
             for i=1:length(value)
-                [obj.errcode] = MSXsetconstant(i, value(i), obj.Msxlibepanet);
+                [obj.errcode] = MSXsetconstant(i, value(i), obj.MSXlibepanet);
             end
         end
-        function setMsxParametersTanksValue(obj, NodeTankIndex, paramindex, value)
+        function setMSXParametersTanksValue(obj, NodeTankIndex, paramindex, value)
             if ~sum(NodeTankIndex==obj.NodeTankIndex)
                 fprintf('>> Invalid Tank Index <<\n');obj.NodeTankIndex
                 return;
             end
-            [obj.errcode] = MSXsetparameter(0, NodeTankIndex, paramindex, value, obj.Msxlibepanet);
+            [obj.errcode] = MSXsetparameter(0, NodeTankIndex, paramindex, value, obj.MSXlibepanet);
         end
-        function setMsxParametersPipesValue(obj, pipeIndex, value)
+        function setMSXParametersPipesValue(obj, pipeIndex, value)
             for i=1:length(value)
-                [obj.errcode] = MSXsetparameter(1, pipeIndex, i, value(i), obj.Msxlibepanet);
+                [obj.errcode] = MSXsetparameter(1, pipeIndex, i, value(i), obj.MSXlibepanet);
             end
         end
-        function setMsxNodeInitqualValue(obj, value)
+        function setMSXNodeInitqualValue(obj, value)
             for i=1:length(value)
                 for j=1:size(value{1},2)
-                    [obj.errcode] = MSXsetinitqual(0, i, j, value{i}(j), obj.Msxlibepanet);
+                    [obj.errcode] = MSXsetinitqual(0, i, j, value{i}(j), obj.MSXlibepanet);
                 end
             end
         end
-        function setMsxLinkInitqualValue(obj, value)
+        function setMSXLinkInitqualValue(obj, value)
             for i=1:length(value)
                 for j=1:size(value{1},2)
-                    [obj.errcode] = MSXsetinitqual(1, i, j, value{i}(j), obj.Msxlibepanet);
+                    [obj.errcode] = MSXsetinitqual(1, i, j, value{i}(j), obj.MSXlibepanet);
                 end
             end
         end
-        function setMsxPattern(obj,index,patternVector)
+        function setMSXPattern(obj,index,patternVector)
             nfactors=length(patternVector);
-            [obj.errcode] = MSXsetpattern(index, patternVector, nfactors, obj.Msxlibepanet);
+            [obj.errcode] = MSXsetpattern(index, patternVector, nfactors, obj.MSXlibepanet);
         end
-        function setMsxPatternMatrix(obj,patternMatrix)
+        function setMSXPatternMatrix(obj,patternMatrix)
             nfactors=size(patternMatrix,2);
             for i=1:size(patternMatrix,1)
-                [obj.errcode] = MSXsetpattern(i, patternMatrix(i,:), nfactors, obj.Msxlibepanet);
+                [obj.errcode] = MSXsetpattern(i, patternMatrix(i,:), nfactors, obj.MSXlibepanet);
             end
         end
-        function setMsxPatternValue(obj,index, patternTimeStep, patternFactor)
-            [obj.errcode] = MSXsetpatternvalue(index, patternTimeStep, patternFactor, obj.Msxlibepanet);
+        function setMSXPatternValue(obj,index, patternTimeStep, patternFactor)
+            [obj.errcode] = MSXsetpatternvalue(index, patternTimeStep, patternFactor, obj.MSXlibepanet);
         end
-        function setMsxTimeStep(obj,timestep)
-            setMsxOptions(obj,'timestep',timestep);
+        function setMSXTimeStep(obj,timestep)
+            setMSXOptions(obj,'timestep',timestep);
         end
-        function setMsxAreaUnitsFT2(obj)
-            setMsxOptions(obj,'areaunits','FT2');
+        function setMSXAreaUnitsFT2(obj)
+            setMSXOptions(obj,'areaunits','FT2');
         end
-        function setMsxAreaUnitsM2(obj)
-            setMsxOptions(obj,'areaunits','M2');
+        function setMSXAreaUnitsM2(obj)
+            setMSXOptions(obj,'areaunits','M2');
         end
-        function setMsxAreaUnitsCM2(obj)
-            setMsxOptions(obj,'areaunits','CM2');
+        function setMSXAreaUnitsCM2(obj)
+            setMSXOptions(obj,'areaunits','CM2');
         end
-        function setMsxRateUnitsSEC(obj)
-            setMsxOptions(obj,'rateunits','SEC');
+        function setMSXRateUnitsSEC(obj)
+            setMSXOptions(obj,'rateunits','SEC');
         end
-        function setMsxRateUnitsMIN(obj)
-            setMsxOptions(obj,'rateunits','MIN');
+        function setMSXRateUnitsMIN(obj)
+            setMSXOptions(obj,'rateunits','MIN');
         end
-        function setMsxRateUnitsHR(obj)
-            setMsxOptions(obj,'rateunits','HR');
+        function setMSXRateUnitsHR(obj)
+            setMSXOptions(obj,'rateunits','HR');
         end        
-        function setMsxRateUnitsDAY(obj)
-            setMsxOptions(obj,'rateunits','DAY');
+        function setMSXRateUnitsDAY(obj)
+            setMSXOptions(obj,'rateunits','DAY');
         end
-        function setMsxSolverEUL(obj)
-            setMsxOptions(obj,'solver','EUL');
+        function setMSXSolverEUL(obj)
+            setMSXOptions(obj,'solver','EUL');
         end
-        function setMsxSolverRK5(obj)
-            setMsxOptions(obj,'solver','RK5');
+        function setMSXSolverRK5(obj)
+            setMSXOptions(obj,'solver','RK5');
         end        
-        function setMsxSolverROS2(obj)
-            setMsxOptions(obj,'solver','ROS2');
+        function setMSXSolverROS2(obj)
+            setMSXOptions(obj,'solver','ROS2');
         end
-        function setMsxCouplingFULL(obj)
-            setMsxOptions(obj,'coupling','FULL');
+        function setMSXCouplingFULL(obj)
+            setMSXOptions(obj,'coupling','FULL');
         end
-        function setMsxCouplingNONE(obj)
-            setMsxOptions(obj,'coupling','NONE');
+        function setMSXCouplingNONE(obj)
+            setMSXOptions(obj,'coupling','NONE');
         end
-        function setMsxCompilerNONE(obj)
-            setMsxOptions(obj,'compiler','NONE');
+        function setMSXCompilerNONE(obj)
+            setMSXOptions(obj,'compiler','NONE');
         end
-        function setMsxCompilerVC(obj)
-            setMsxOptions(obj,'compiler','VC');
+        function setMSXCompilerVC(obj)
+            setMSXOptions(obj,'compiler','VC');
         end
-        function setMsxCompilerGC(obj)
-            setMsxOptions(obj,'compiler','GC');
+        function setMSXCompilerGC(obj)
+            setMSXOptions(obj,'compiler','GC');
         end
-        function setMsxAtol(obj,atol)
-            setMsxOptions(obj,'atol',atol);
+        function setMSXAtol(obj,atol)
+            setMSXOptions(obj,'atol',atol);
         end
-        function setMsxRtol(obj,rtol)
-            setMsxOptions(obj,'rtol',rtol);
+        function setMSXRtol(obj,rtol)
+            setMSXOptions(obj,'rtol',rtol);
         end        
-        function MsxSaveQualityFile(obj,outfname)
-            [obj.errcode]=MSXsaveoutfile(outfname,obj.Msxlibepanet);
+        function saveMSXQualityFile(obj,outfname)
+            [obj.errcode]=MSXsaveoutfile(outfname,obj.MSXlibepanet);
         end
-        function MsxUseHydraulicFile(obj,hydname)
-            [obj.errcode]=MSXusehydfile(hydname,obj.Msxlibepanet);
+        function useMSXHydraulicFile(obj,hydname)
+            [obj.errcode]=MSXusehydfile(hydname,obj.MSXlibepanet);
         end
-        function MsxInitializeQualityAnalysis(obj,flag)
-            [obj.errcode] = MSXinit(flag,obj.Msxlibepanet);
+        function initializeMSXQualityAnalysis(obj,flag)
+            [obj.errcode] = MSXinit(flag,obj.MSXlibepanet);
         end
-        function [t, tleft]=MsxStepQualityAnalysisTimeLeft(obj)
-            [obj.errcode, t, tleft] = MSXstep(obj.Msxlibepanet);
+        function [t, tleft]= stepMSXQualityAnalysisTimeLeft(obj)
+            [obj.errcode, t, tleft] = MSXstep(obj.MSXlibepanet);
         end
-        function MsxSaveFile(obj,msxname)
-            [obj.errcode] = MSXsavemsxfile(msxname,obj.Msxlibepanet);
+        function saveMSXFile(obj,msxname)
+            [obj.errcode] = MSXsavemsxfile(msxname,obj.MSXlibepanet);
         end
-        function msx = writeMsxFile(obj,msx)
+        function msx = writeMSXFile(obj,msx)
             % Input Arguments
             % msx={};
-            % msx.msxFile = 'networks/MsxFileName.msx';
+            % msx.msxFile = 'networks/MSXFileName.msx';
             % % section Title
-            % msx.titleDescription{1} = 'Example: MsxFile.';
+            % msx.titleDescription{1} = 'Example: MSXFile.';
             % % section Options
             % msx.options{1}='FT2'; %AREA_UNITS FT2/M2/CM2
             % msx.options{2}='DAY'; %TIME_UNITS SEC/MIN/HR/DAY
@@ -3420,7 +3418,7 @@ classdef epanet <handle
             fprintf(f,'LINKS ALL\n');
             fclose(f)
         end
-        function MsxUnload(obj)
+        function unloadMSX(obj)
             MSXclose(obj);
             MSXMatlabCleanup(obj);
         end
@@ -5779,7 +5777,7 @@ classdef epanet <handle
         end
         function value = getBinComputedAllParameters(obj)
             value=[];
-            [fid,binfile] = makebatfile(obj);
+            [fid,binfile] = runEPANETexe(obj);
             if fid~=-1
                 data = fread(fid,'int32');
                 fclose(fid);
@@ -7537,134 +7535,134 @@ function [obj] = MSXMatlabSetup(obj,msxname,varargin)
 if ~isempty(varargin)
     if varargin{1}{1}~=1
         if nargin==3 
-            obj.MsxlibepanetPath=char(varargin{1});
-            obj.MsxlibepanetPath=[fileparts(obj.MsxlibepanetPath),'\'];
+            obj.MSXlibepanetPath=char(varargin{1});
+            obj.MSXlibepanetPath=[fileparts(obj.MSXlibepanetPath),'\'];
             if isempty(varargin{1})
-                obj.MsxlibepanetPath='';
+                obj.MSXlibepanetPath='';
             end
         end
     end
 else
-    obj.MsxlibepanetPath=obj.libepanetpath;
+    obj.MSXlibepanetPath=obj.libepanetpath;
 end
-obj.Msxlibepanet='epanetmsx'; % Get DLL libepanet (e.g. epanet20012x86 for 32-bit)
-if ~libisloaded(obj.Msxlibepanet)
-    loadlibrary([obj.MsxlibepanetPath,obj.Msxlibepanet],[obj.MsxlibepanetPath,[obj.Msxlibepanet,'.h']]);
+obj.MSXlibepanet='epanetmsx'; % Get DLL libepanet (e.g. epanet20012x86 for 32-bit)
+if ~libisloaded(obj.MSXlibepanet)
+    loadlibrary([obj.MSXlibepanetPath,obj.MSXlibepanet],[obj.MSXlibepanetPath,[obj.MSXlibepanet,'.h']]);
 end
 
-obj.MsxFile = char(msxname);
+obj.MSXFile = char(msxname);
 %Save the temporary msx file
 if ~isempty(varargin)
     if varargin{1}{1}==1
         if ~iscell(varargin)
-            obj.MsxTempFile=obj.MsxFile;
+            obj.MSXTempFile=obj.MSXFile;
         end
     end
 else
-    obj.MsxTempFile=[obj.MsxFile(1:end-4),'_temp.msx'];
-    copyfile(obj.MsxFile,obj.MsxTempFile);
+    obj.MSXTempFile=[obj.MSXFile(1:end-4),'_temp.msx'];
+    copyfile(obj.MSXFile,obj.MSXTempFile);
 end
 %Open the file
 [obj.errcode] = MSXopen(obj);
-obj.MsxEquationsTerms = obj.getMsxEquationsTerms;
-obj.MsxEquationsPipes = obj.getMsxEquationsPipes;
-obj.MsxEquationsTanks = obj.getMsxEquationsTanks;
-obj.MsxSpeciesCount = obj.getMsxSpeciesCount;
-obj.MsxConstantsCount = obj.getMsxConstantsCount;
-obj.MsxParametersCount = obj.getMsxParametersCount;
-obj.MsxPatternsCount = obj.getMsxPatternsCount;
-obj.MsxSpeciesIndex = obj.getMsxSpeciesIndex;
-obj.MsxSpeciesNameID = obj.getMsxSpeciesNameID;
-obj.MsxSpeciesType = obj.getMsxSpeciesType;
-obj.MsxSpeciesUnits = obj.getMsxSpeciesUnits;
-obj.MsxSpeciesATOL = obj.getMsxSpeciesATOL;
-obj.MsxSpeciesRTOL = obj.getMsxSpeciesRTOL;
-obj.MsxConstantsNameID = obj.getMsxConstantsNameID;
-obj.MsxConstantsValue  = obj.getMsxConstantsValue;
-obj.MsxConstantsIndex = obj.getMsxConstantsIndex;
-obj.MsxParametersNameID = obj.getMsxParametersNameID;
-obj.MsxParametersIndex = obj.getMsxParametersIndex;
-obj.MsxParametersTanksValue = obj.getMsxParametersTanksValue;
-obj.MsxParametersPipesValue = obj.getMsxParametersPipesValue;
-obj.MsxPatternsNameID = obj.getMsxPatternsNameID;
-obj.MsxPatternsIndex = obj.getMsxPatternsIndex;
-obj.MsxPatternsLengths = obj.getMsxPatternsLengths;
-obj.MsxNodeInitqualValue = obj.getMsxNodeInitqualValue;
-obj.MsxLinkInitqualValue = obj.getMsxLinkInitqualValue;
-obj.MsxSources = obj.getMsxSources;
-obj.MsxSourceType = obj.getMsxSourceType;
-obj.MsxSourceLevel = obj.getMsxSourceLevel;
-obj.MsxSourcePatternIndex = obj.getMsxSourcePatternIndex;
-obj.MsxSourceNodeNameID = obj.getMsxSourceNodeNameID;
-obj.MsxPattern = obj.getMsxPattern;
+obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
+obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
+obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
+obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
+obj.MSXConstantsCount = obj.getMSXConstantsCount;
+obj.MSXParametersCount = obj.getMSXParametersCount;
+obj.MSXPatternsCount = obj.getMSXPatternsCount;
+obj.MSXSpeciesIndex = obj.getMSXSpeciesIndex;
+obj.MSXSpeciesNameID = obj.getMSXSpeciesNameID;
+obj.MSXSpeciesType = obj.getMSXSpeciesType;
+obj.MSXSpeciesUnits = obj.getMSXSpeciesUnits;
+obj.MSXSpeciesATOL = obj.getMSXSpeciesATOL;
+obj.MSXSpeciesRTOL = obj.getMSXSpeciesRTOL;
+obj.MSXConstantsNameID = obj.getMSXConstantsNameID;
+obj.MSXConstantsValue  = obj.getMSXConstantsValue;
+obj.MSXConstantsIndex = obj.getMSXConstantsIndex;
+obj.MSXParametersNameID = obj.getMSXParametersNameID;
+obj.MSXParametersIndex = obj.getMSXParametersIndex;
+obj.MSXParametersTanksValue = obj.getMSXParametersTanksValue;
+obj.MSXParametersPipesValue = obj.getMSXParametersPipesValue;
+obj.MSXPatternsNameID = obj.getMSXPatternsNameID;
+obj.MSXPatternsIndex = obj.getMSXPatternsIndex;
+obj.MSXPatternsLengths = obj.getMSXPatternsLengths;
+obj.MSXNodeInitqualValue = obj.getMSXNodeInitqualValue;
+obj.MSXLinkInitqualValue = obj.getMSXLinkInitqualValue;
+obj.MSXSources = obj.getMSXSources;
+obj.MSXSourceType = obj.getMSXSourceType;
+obj.MSXSourceLevel = obj.getMSXSourceLevel;
+obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
+obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
+obj.MSXPattern = obj.getMSXPattern;
 end
 function [errcode] = MSXopen(obj,varargin)
-[errcode] = calllib(obj.Msxlibepanet,'MSXopen',obj.MsxTempFile);
+[errcode] = calllib(obj.MSXlibepanet,'MSXopen',obj.MSXTempFile);
 if errcode
-    MSXerror(errcode,obj.Msxlibepanet);
+    MSXerror(errcode,obj.MSXlibepanet);
 end
 if (errcode == 520)
     disp('current MSX project will be closed and the new project will be opened');
     [errcode] = MSXclose(obj);
     if errcode
-        MSXerror(errcode,obj.Msxlibepanet);
+        MSXerror(errcode,obj.MSXlibepanet);
     else
-        [errcode] = calllib(obj.Msxlibepanet,'MSXopen',obj.MsxTempFile);
+        [errcode] = calllib(obj.MSXlibepanet,'MSXopen',obj.MSXTempFile);
         if errcode
-            MSXerror(errcode,obj.Msxlibepanet);
+            MSXerror(errcode,obj.MSXlibepanet);
         end
     end
 end
 end
 function [errcode] = MSXclose(obj)
-[errcode] = calllib(obj.Msxlibepanet,'MSXclose');
+[errcode] = calllib(obj.MSXlibepanet,'MSXclose');
 if errcode
-    MSXerror(errcode,obj.Msxlibepanet);
+    MSXerror(errcode,obj.MSXlibepanet);
 end
 end
-function [e] = MSXerror(errcode,Msxlibepanet)
+function [e] = MSXerror(errcode,MSXlibepanet)
 len=80;
 errstring=char(32*ones(1,len+1));
-[e,errstring] = calllib(Msxlibepanet,'MSXgeterror',errcode,errstring,len);
+[e,errstring] = calllib(MSXlibepanet,'MSXgeterror',errcode,errstring,len);
 disp(errstring);
 end
-function [errcode, count] = MSXgetcount(code,Msxlibepanet)
+function [errcode, count] = MSXgetcount(code,MSXlibepanet)
 count=0;
-[errcode,count] = calllib(Msxlibepanet,'MSXgetcount',code,count);
+[errcode,count] = calllib(MSXlibepanet,'MSXgetcount',code,count);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, index] = MSXgetindex(Msxlibepanet,varargin)
+function [errcode, index] = MSXgetindex(MSXlibepanet,varargin)
 index =0;
 if ~isnumeric(varargin{1})
     varargin{1}=varargin{2};
     varargin{2}=varargin{3};
 end
-[errcode,~,index]=calllib(Msxlibepanet,'MSXgetindex',varargin{1},varargin{2},index);
+[errcode,~,index]=calllib(MSXlibepanet,'MSXgetindex',varargin{1},varargin{2},index);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, id] = MSXgetID(type,index,len,Msxlibepanet)
+function [errcode, id] = MSXgetID(type,index,len,MSXlibepanet)
 id=char(32*ones(1,len+1));
-[errcode,id]=calllib(Msxlibepanet,'MSXgetID',type,index,id,len);
+[errcode,id]=calllib(MSXlibepanet,'MSXgetID',type,index,id,len);
 id=id(1:len);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, len] = MSXgetIDlen(type,index,Msxlibepanet)
+function [errcode, len] = MSXgetIDlen(type,index,MSXlibepanet)
 len=0;
-[errcode,len]=calllib(Msxlibepanet,'MSXgetIDlen',type,index,len);
+[errcode,len]=calllib(MSXlibepanet,'MSXgetIDlen',type,index,len);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, type, units, atol, rtol] = MSXgetspecies(index,Msxlibepanet)
+function [errcode, type, units, atol, rtol] = MSXgetspecies(index,MSXlibepanet)
 type=0; rtol=0; atol=0;
 units=char(32*ones(1,16));
-[errcode,type,units,atol,rtol]=calllib(Msxlibepanet,'MSXgetspecies',index,type,units,atol,rtol);
+[errcode,type,units,atol,rtol]=calllib(MSXlibepanet,'MSXgetspecies',index,type,units,atol,rtol);
 switch type
     case 0
         type='BULK';   % for a bulk water species
@@ -7672,49 +7670,49 @@ switch type
         type='WALL';   % for a pipe wall surface species
 end
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, value] = MSXgetconstant(index,Msxlibepanet)
+function [errcode, value] = MSXgetconstant(index,MSXlibepanet)
 value=0;
-[errcode,value]=calllib(Msxlibepanet,'MSXgetconstant',index,value);
+[errcode,value]=calllib(MSXlibepanet,'MSXgetconstant',index,value);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, value] = MSXgetparameter(type,index,param,Msxlibepanet)
+function [errcode, value] = MSXgetparameter(type,index,param,MSXlibepanet)
 value=0;
-[errcode,value]=calllib(Msxlibepanet,'MSXgetparameter',type,index,param,value);
+[errcode,value]=calllib(MSXlibepanet,'MSXgetparameter',type,index,param,value);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, patlen] = MSXgetpatternlen(patindex,Msxlibepanet)
+function [errcode, patlen] = MSXgetpatternlen(patindex,MSXlibepanet)
 patlen=0;
-[errcode,patlen]=calllib(Msxlibepanet,'MSXgetpatternlen',patindex,patlen);
+[errcode,patlen]=calllib(MSXlibepanet,'MSXgetpatternlen',patindex,patlen);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, value] = MSXgetpatternvalue(patindex,period,Msxlibepanet)
+function [errcode, value] = MSXgetpatternvalue(patindex,period,MSXlibepanet)
 value=0;
-[errcode,value]=calllib(Msxlibepanet,'MSXgetpatternvalue',patindex,period,value);
+[errcode,value]=calllib(MSXlibepanet,'MSXgetpatternvalue',patindex,period,value);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, value] = MSXgetinitqual(obj,index,species,Msxlibepanet)
+function [errcode, value] = MSXgetinitqual(obj,index,species,MSXlibepanet)
 value=0;
-[errcode,value]=calllib(Msxlibepanet,'MSXgetinitqual',obj,index,species,value);
+[errcode,value]=calllib(MSXlibepanet,'MSXgetinitqual',obj,index,species,value);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, type, level, pat] = MSXgetsource(node,species,Msxlibepanet)
+function [errcode, type, level, pat] = MSXgetsource(node,species,MSXlibepanet)
 type=0;
 level=0;
 pat=0;
-[errcode,type,level,pat]=calllib(Msxlibepanet,'MSXgetsource',node,species,type,level,pat);
+[errcode,type,level,pat]=calllib(MSXlibepanet,'MSXgetsource',node,species,type,level,pat);
 switch type     % type codes
     case -1
         type='NOSOURCE';  % for no source
@@ -7728,124 +7726,124 @@ switch type     % type codes
         type='FLOWPACED'; % for a flow paced source
 end
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
 function MSXMatlabCleanup(obj)
 % Unload library
-if libisloaded(obj.Msxlibepanet)
-    unloadlibrary(obj.Msxlibepanet);
+if libisloaded(obj.MSXlibepanet)
+    unloadlibrary(obj.MSXlibepanet);
 else
-    errstring =['Library ', obj.Msxlibepanet, '.dll was not loaded'];
+    errstring =['Library ', obj.MSXlibepanet, '.dll was not loaded'];
     disp(errstring);
 end
 end
-function [errcode] = MSXsaveoutfile(outfname,Msxlibepanet)
-[errcode] = calllib(Msxlibepanet,'MSXsaveoutfile',outfname);
+function [errcode] = MSXsaveoutfile(outfname,MSXlibepanet)
+[errcode] = calllib(MSXlibepanet,'MSXsaveoutfile',outfname);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXsavemsxfile(msxname,Msxlibepanet)
-[errcode] = calllib(Msxlibepanet,'MSXsavemsxfile',msxname);
+function [errcode] = MSXsavemsxfile(msxname,MSXlibepanet)
+[errcode] = calllib(MSXlibepanet,'MSXsavemsxfile',msxname);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXsetconstant(index, value, Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXsetconstant',index,value);
+function [errcode] = MSXsetconstant(index, value, MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXsetconstant',index,value);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXsetparameter(type, index, param, value, Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXsetparameter',type,index,param,value);
+function [errcode] = MSXsetparameter(type, index, param, value, MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXsetparameter',type,index,param,value);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXsetinitqual(type,index,species,value,Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXsetinitqual',type,index,species,value);
+function [errcode] = MSXsetinitqual(type,index,species,value,MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXsetinitqual',type,index,species,value);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXsetpattern(index, factors, nfactors, Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXsetpattern',index,factors,nfactors);
+function [errcode] = MSXsetpattern(index, factors, nfactors, MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXsetpattern',index,factors,nfactors);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXsetpatternvalue(pat, period, value,Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXsetpatternvalue',pat,period,value);
+function [errcode] = MSXsetpatternvalue(pat, period, value,MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXsetpatternvalue',pat,period,value);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXsolveQ(Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXsolveQ');
+function [errcode] = MSXsolveQ(MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXsolveQ');
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXsolveH(Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXsolveH');
+function [errcode] = MSXsolveH(MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXsolveH');
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXaddpattern(patid,Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXaddpattern',patid);
+function [errcode] = MSXaddpattern(patid,MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXaddpattern',patid);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXusehydfile(hydfname,Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXusehydfile',hydfname);
+function [errcode] = MSXusehydfile(hydfname,MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXusehydfile',hydfname);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode, t, tleft] = MSXstep(Msxlibepanet)
+function [errcode, t, tleft] = MSXstep(MSXlibepanet)
 t=int32(0);
 tleft=int32(0);
-[errcode,t,tleft]=calllib(Msxlibepanet,'MSXstep',t,tleft);
+[errcode,t,tleft]=calllib(MSXlibepanet,'MSXstep',t,tleft);
 t = double(t);
 tleft = double(tleft);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXinit(flag,Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXinit',flag);
+function [errcode] = MSXinit(flag,MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXinit',flag);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXreport(Msxlibepanet)
-[errcode] = calllib(Msxlibepanet,'MSXreport');
+function [errcode] = MSXreport(MSXlibepanet)
+[errcode] = calllib(MSXlibepanet,'MSXreport');
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [e, errmsg] = MSXgeterror(errcode,Msxlibepanet)
+function [e, errmsg] = MSXgeterror(errcode,MSXlibepanet)
 errmsg = char(32*ones(1,80));
-[e,errmsg] = calllib(Msxlibepanet,'MSXgeterror',errcode,errmsg,80);
+[e,errmsg] = calllib(MSXlibepanet,'MSXgeterror',errcode,errmsg,80);
 if e
     MSXerror(e);
 end
 end
-function [errcode, value] = MSXgetqual(type, index, species,Msxlibepanet)
+function [errcode, value] = MSXgetqual(type, index, species,MSXlibepanet)
 value=0;
-[errcode,value]=calllib(Msxlibepanet,'MSXgetqual',type,index,species,value);
+[errcode,value]=calllib(MSXlibepanet,'MSXgetqual',type,index,species,value);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
-function [errcode] = MSXsetsource(node,species,type,level,pat,Msxlibepanet)
-[errcode]=calllib(Msxlibepanet,'MSXsetsource',node,species,type,level,pat);
+function [errcode] = MSXsetsource(node,species,type,level,pat,MSXlibepanet)
+[errcode]=calllib(MSXlibepanet,'MSXsetsource',node,species,type,level,pat);
 if errcode
-    MSXerror(errcode,Msxlibepanet);
+    MSXerror(errcode,MSXlibepanet);
 end
 end
 function [Terms,Pipes,Tanks] = getEquations(msxname)
@@ -7915,10 +7913,10 @@ while 1
 end
 fclose(fid);
 end
-function value=getMsxOptions(msxname)
+function value=getMSXOptions(msxname)
 
 if isempty(msxname)
-    warning('Please load Msx File.');
+    warning('Please load MSX File.');
     return;
 end
 % Open epanet input file
@@ -10915,7 +10913,7 @@ elseif strcmp(previousFlowUnits,'CMD')
     end
 end
 end
-function [fid,binfile] = makebatfile(obj)
+function [fid,binfile] = runEPANETexe(obj)
     [~,mm]=system(['cmd /c for %A in ("',pwd,'") do @echo %~sA']);
     mmPwd=regexp(mm,'\s','split');
     pp=[mmPwd{1},'/'];
@@ -10930,13 +10928,26 @@ function [fid,binfile] = makebatfile(obj)
             folder='32bit';
         r = sprintf('%s\\%s\\epanet2d.exe %s %s %s',mmPwd{1},folder,inpfile,rptfile,binfile);
     end
-%     [~,msg]=system(r);
     system(r);
-    clear status result
     fid = fopen(binfile,'r');
 end
+function [fid] = runMSXexe(obj)
+    [~,mm]=system(['cmd /c for %A in ("',pwd,'") do @echo %~sA']);
+    mmPwd=regexp(mm,'\s','split');
+    pp=[mmPwd{1},'/'];
+    inpfile=[pp,obj.Bintempfile];
+    rptfile=[inpfile(1:length(inpfile)-4),'.txt'];
+    if strcmp(computer('arch'),'win64')
+            folder='64bit';
+        r = sprintf('%s\\%s\\epanetmsx.exe %s %s %s',mmPwd{1},folder,inpfile,obj.MSXTempFile,rptfile);
+    elseif strcmp(computer('arch'),'win32')
+            folder='32bit';
+        r = sprintf('%s\\%s\\epanetmsx.exe %s %s %s',mmPwd{1},folder,inpfile,obj.MSXTempFile,rptfile);
+    end
+    system(r);
+end
 function value = getBinComputedTimeSeries(obj,indParam,varargin)
-    [fid,binfile] = makebatfile(obj);
+    [fid,binfile] = runEPANETexe(obj);
     value=[];
     if fid~=-1
         data = fread(fid,'int32');
@@ -11155,15 +11166,15 @@ function cnt=bracketsCheck(v)
         y=y+1;
     end
 end
-function setMsxOptions(obj,varargin)
-solver=obj.getMsxSolver;
-areaunits=obj.getMsxAreaUnits;
-rateunits=obj.getMsxRateUnits;
-rtol=obj.getMsxRtol;
-atol=obj.getMsxAtol;
-timestep=obj.getMsxTimeStep;
-coupling=obj.getMsxCoupling;
-compiler=obj.getMsxCompiler;
+function setMSXOptions(obj,varargin)
+solver=obj.getMSXSolver;
+areaunits=obj.getMSXAreaUnits;
+rateunits=obj.getMSXRateUnits;
+rtol=obj.getMSXRtol;
+atol=obj.getMSXAtol;
+timestep=obj.getMSXTimeStep;
+coupling=obj.getMSXCoupling;
+compiler=obj.getMSXCompiler;
 
 for i=1:(nargin/2)
     argument =lower(varargin{2*(i-1)+1});
@@ -11190,8 +11201,8 @@ for i=1:(nargin/2)
     end
 end
                 
-[info,tline] = readAllFile(obj.MsxFile);
-fid2 = fopen([obj.pathfile,obj.MsxTempFile],'w');
+[info,tline] = readAllFile(obj.MSXFile);
+fid2 = fopen([obj.pathfile,obj.MSXTempFile],'w');
 sect=0;
 for t = 1:length(info)
     a = info{t};
@@ -11235,8 +11246,8 @@ for t = 1:length(info)
         fprintf(fid2,'\n');
     end
 end
-obj.MsxUnload;
-obj.msx(obj.MsxTempFile,1);
+obj.unloadMSX;
+obj.loadMSXFile(obj.MSXTempFile,1);
 end
 function indices = getLinkIndices(obj, varargin)
     indices = getIndices(obj.getLinkCount, varargin{1});
