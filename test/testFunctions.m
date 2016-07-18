@@ -24,40 +24,29 @@ d.getConnectivityMatrix
 d.getLibFunctions
 
 %% New Functions 2.1
-% ENgetpumptype - Retrieves the type of a pump for specific link index
-% Constants for pumps: CONSTANT_HORSEPOWER, POWER_FUNCTION, CUSTOM
-d.LinkPumpTypeCode  
-d.getLinkPumpTypeCode
-d.LinkPumpType 
-d.getLinkPumpType
-  
-% ENgetheadcurve - Retrieves ID of a head curve for specific link index
-d.HeadCurveIndex 
-d.getHeadCurveIndex
-
-% ENaddcurve - Adds a new curve appended to the end of the existing curves
-% ENgetcurveid - Retrieves ID of a curve with specific index
+d.getLinkPumpTypeCode   % returns type index of all pumps
+d.getLinkPumpType       % returns type name of all pumps: CONSTANT_HORSEPOWER, POWER_FUNCTION, CUSTOM
+d.getHeadCurveIndex     % returns index of all pump head curve
+d.getCurveNameID        % returns all curve IDs
+d.getCurveNameID(1)     % returns specific curve ID
+d.addCurve('NewCur1')   % add new curve with ID
+indexCurve=d.addCurve('NewCur2', [1800 200; 1500 400]); % add new curve with points
 d.getCurveNameID
-d.addCurve('NewCur1')
-indexCurve=d.addCurve('NewCur2', [1800 200; 1500 400]); 
-d.getCurveNameID
-d.getCurveXY(indexCurve)
+d.getCurveValue(indexCurve)     % returns all points for specific curve index
+d.getCurveValue(indexCurve,2)   % returns specific point for specific curve index
 
-% ENgetcurve - Retrieves curve id, number of values and (x,y) values Bug
-% ENsetcurve - Sets x,y values for a specific curve
-indexCurve=1;
-% xyCurveValue=d.getCurve(indexCurve)
-% xyCurveValue(1,1)=1000;%x
-% xyCurveValue(1,2)=300;%y
-xyCurveValue=[d.getBinCurvesInfo.BinCurveXvalue{indexCurve} d.getBinCurvesInfo.BinCurveYvalue{indexCurve}];
-d.setCurve(indexCurve,xyCurveValue)
-xyCurveValue=[d.getBinCurvesInfo.BinCurveXvalue{indexCurve} d.getBinCurvesInfo.BinCurveYvalue{indexCurve}]
+d.setCurve(3,[1900 300; 1400 200]) % Change an existing curve 
+d.getCurveValue(indexCurve) 
 
-% ENgetcurvelen - Retrieves number of points in a curve
-len=d.getCurveLengths;
+% d.getCurve  % Currently there is a segmentation fault in Matlab
+
+len=d.getCurveLengths
+d.getCurveLengths(3)
+d.getCurveLengths('NewCur2')
 
 % ENgetcurveindex - Retrieves index of curve with specific ID
 d.getCurveIndex
+d.getCurveIndex('NewCur1')
 
 % ENgetcurvevalue - Retrieves x,y point for a specific point number and curve
 % ENsetcurvevalue - Sets x,y point for a specific point and curve
