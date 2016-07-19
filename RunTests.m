@@ -12,4 +12,4 @@ testMSXFunctions
 testBinFunctions
 
 % Run epanet without DLL
-testBinWithoutLib
+testBinWithoutDLL
