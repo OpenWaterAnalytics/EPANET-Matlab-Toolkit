@@ -117,7 +117,7 @@ classdef epanet <handle
         NodeJunctionIndex; % Index of node junctions
         NodeJunctionNameID; %Name ID of node junctions
         NodeNameID; %Name ID of all nodes
-        NodeNumDemandCategories;
+        NodeDemandCategoriesNumber;
         NodePatternIndex;
         NodePressureUnits; % PUnits for Pressure
         NodeReservoirCount;         % Number of reservoirs
@@ -163,7 +163,7 @@ classdef epanet <handle
         OptionsViscosity; %*** Not implemented ***
         Pathfile;   % The path of the input file
         Pattern; % get all patterns
-        PatternAveragePatternValue;
+        PatternAverageValue;
         PatternCount;  % Number of patterns
         PatternDemandsUnits; %Units for demands
         PatternIndex; %Indices of the patterns
@@ -581,8 +581,8 @@ classdef epanet <handle
                 obj.TimeNextEvent = obj.getTimeNextEvent;
                 obj.NodeTankMaxVolume = obj.getNodeTankMaxVolume;
                 obj.NodeBaseDemands = obj.getNodeBaseDemands;
-                obj.NodeNumDemandCategories = obj.getNodeNumDemandCategories;
-                obj.PatternAveragePatternValue = obj.getPatternAveragePatternValue;
+                obj.NodeDemandCategoriesNumber = obj.getNodeDemandCategoriesNumber;
+                obj.PatternAverageValue = obj.getPatternAverageValue;
                 n = obj.getStatistic;
                 obj.RelativeError = n.RelativeError;
                 obj.Iterations = n.Iterations;
@@ -1118,7 +1118,7 @@ classdef epanet <handle
             %New version dev2.1
             chckfunctions=libfunctions(obj.LibEPANET);
             if sum(strcmp(chckfunctions,'ENgetbasedemand'))
-                numdemands = obj.getNodeNumDemandCategories;
+                numdemands = obj.getNodeDemandCategoriesNumber;
                 val=zeros(max(numdemands),obj.getNodeCount);
                 for i=obj.getNodeIndex
                     v=1;
@@ -1139,7 +1139,7 @@ classdef epanet <handle
                 end   
             end
         end
-        function value = getNodeNumDemandCategories(obj, varargin)
+        function value = getNodeDemandCategoriesNumber(obj, varargin)
             %New version dev2.1
             indices = getNodeIndices(obj,varargin);j=1;
             for i=indices
@@ -1150,7 +1150,7 @@ classdef epanet <handle
         end
         function value = getNodeDemandPatternIndex(obj)
             %New version dev2.1
-            numdemands = obj.getNodeNumDemandCategories;
+            numdemands = obj.getNodeDemandCategoriesNumber;
             val=zeros(max(numdemands),obj.getNodeCount);
             for i=obj.getNodeIndex
                 v=1;
@@ -1168,9 +1168,9 @@ classdef epanet <handle
             v = obj.getNodeDemandPatternIndex;
             m = obj.getPatternNameID;
             if ~isempty(varargin)
-                numdemands = obj.getNodeNumDemandCategories(varargin{1});
+                numdemands = obj.getNodeDemandCategoriesNumber(varargin{1});
             else
-                numdemands = obj.getNodeNumDemandCategories;
+                numdemands = obj.getNodeDemandCategoriesNumber;
             end
             indices = getNodeIndices(obj,varargin);j=1;
             for i=indices
@@ -1805,7 +1805,7 @@ classdef epanet <handle
             v = obj.getLinkPumpTypeCode;
             value = obj.TYPEPUMP(v+1);
         end
-        function value = getPatternAveragePatternValue(obj)
+        function value = getPatternAverageValue(obj)
             %New version dev2.1
             for i=obj.getPatternIndex
                 [obj.Errcode, value(i)] = ENgetaveragepatternvalue(i,obj.LibEPANET);
@@ -2126,7 +2126,7 @@ classdef epanet <handle
             %New version dev2.1
             chckfunctions=libfunctions(obj.LibEPANET);
             if sum(strcmp(chckfunctions,'ENsetbasedemand'))
-                NodeNumDemandC=obj.getNodeNumDemandCategories;
+                NodeNumDemandC=obj.getNodeDemandCategoriesNumber;
                 for i=1:obj.getNodeJunctionCount
                     for u=1:NodeNumDemandC(i)
                         [obj.Errcode] = ENsetbasedemand(i, NodeNumDemandC(u), value{NodeNumDemandC(u)}(i),obj.LibEPANET);
