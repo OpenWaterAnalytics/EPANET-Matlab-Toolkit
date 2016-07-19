@@ -437,6 +437,7 @@ classdef epanet <handle
                     warning(['File "', obj.InputFile, '" is not a valid']);return;
                 end
                 obj.LibEPANET=varargin{2}; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+                obj.LibEPANETpath = [pwd,'\'];
                 warning off;
                 try  loadlibrary([obj.LibEPANETpath,obj.LibEPANET],[obj.LibEPANETpath,obj.LibEPANET,'.h']); 
                 catch e
@@ -1113,7 +1114,7 @@ classdef epanet <handle
                 j=j+1;
             end
         end
-        function value = getNodeBaseDemands(obj)
+        function value = getNodeBaseDemands(obj, varargin)
             %New version dev2.1
             chckfunctions=libfunctions(obj.LibEPANET);
             if sum(strcmp(chckfunctions,'ENgetbasedemand'))
