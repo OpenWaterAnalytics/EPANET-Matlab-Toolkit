@@ -10,6 +10,8 @@ close all;
 % Create EPANET object using the INP file
 %d=epanet('Net1_Rossman2000.inp');
 inpname='networks/Net1_Rossman2000.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
+inpname='networks/Net1b.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
+
 version='epanet2'; % version dev2.1
 % d=epanet(inpname,version);
 d=epanet(inpname);
@@ -78,15 +80,19 @@ d.getPatternAverageValue
 % ENgetstatistic - Retrieves hydraulic simulation statistic
 d.getStatistic
 
-% ENgetcoord - Retrieves coordinate x, y for a node
-% ENsetcoord - Sets coordinate x, y for a node
+%[int32, singlePtr, singlePtr] ENgetcoord(int32, singlePtr, singlePtr)
+
 d.plot;
-nodeCoords=d.getNodeCoordinates;
+nodeCoords=d.getNodeCoordinates; 
 indexNode=1;
 nodeCoords{1}(indexNode)=nodeCoords{1}(indexNode)+10;%X
 nodeCoords{2}(indexNode)=nodeCoords{2}(indexNode)+20;%Y
 d.setNodeCoordinates(nodeCoords)
 d.plot;
+
+
+%[int32, int32Ptr, cstring, cstring, int32Ptr] ENgetqualinfo(int32Ptr, cstring, cstring, int32Ptr)
+%[r1 r2 r3 r4 r5]=calllib('epanet2','ENgetqualinfo', 0, [''], [''], 0)
 
 % ENgetqualinfo - Retrieves quality info Bug
 % d.QualityChemUnits
