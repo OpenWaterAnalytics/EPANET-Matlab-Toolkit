@@ -57,30 +57,25 @@ d.getCurveValue(indexCurve,pointindex)
 
 
 bd1=d.getNodeBaseDemands % get an array of the base demands (some nodes may have multiple base demands for different patterns)
+bd1{1}
 node_index=5
-bd2{1}(node_index)=bd2{1}(node_index)+100
-d.setNodeBaseDemands(bd2)
-bd3=d.getNodeBaseDemands
-bd1{1} %otiginal
-bd3{1} % new
+bd1{1}(node_index)= bd1{1}(node_index)+100
+d.setNodeBaseDemands(bd1)
+bd2=d.getNodeBaseDemands
+bd2{1}
 
-% ENgetnumdemands - Retrieves the number of demand categories for a node
-d.NodeNumDemandCategories 
-d.getNodeNumDemandCategories
+d.getNodeDemandCategoriesNumber
+d.getNodeDemandCategoriesNumber(11)
+d.getNodeDemandCategoriesNumber(5:11)
 
 % ENgetdemandpattern - Retrieves the index of a demand pattern for a specific demand category of a node
-d.NodeDemandPatternNameID  
 d.getNodeDemandPatternNameID
-d.NodeDemandPatternIndex 
-d.getNodePatternIndex
+d.getNodeDemandPatternIndex
 
 % ENgetaveragepatternvalue - Retrieves the average value of a pattern
-d.getPatternAveragePatternValue
-d.PatternAveragePatternValue
+d.getPatternAverageValue
 
 % ENgetstatistic - Retrieves hydraulic simulation statistic
-d.RelativeError
-d.Iterations 
 d.getStatistic
 
 % ENgetcoord - Retrieves coordinate x, y for a node
