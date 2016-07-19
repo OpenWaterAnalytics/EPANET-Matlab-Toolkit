@@ -38,35 +38,31 @@ d.getCurveValue(indexCurve,2)   % returns specific point for specific curve inde
 d.setCurve(3,[1900 300; 1400 200]) % Change an existing curve 
 d.getCurveValue(indexCurve) 
 
-% d.getCurve  % Currently there is a segmentation fault in Matlab
+% d.getCurve
+% [int32, cstring, int32Ptr, singlePtrPtr, singlePtrPtr] ENgetcurve(int32, cstring, int32Ptr, singlePtrPtr, singlePtrPtr)
+% Currently there is a segmentation fault in Matlab
 
 len=d.getCurveLengths
 d.getCurveLengths(3)
 d.getCurveLengths('NewCur2')
 
-% ENgetcurveindex - Retrieves index of curve with specific ID
 d.getCurveIndex
 d.getCurveIndex('NewCur1')
 
-% ENgetcurvevalue - Retrieves x,y point for a specific point number and curve
-% ENsetcurvevalue - Sets x,y point for a specific point and curve
-basedOnCurveLength=len(1);
-d.getCurveValue(indexCurve,basedOnCurveLength)
-xyCurve = d.getCurveValue(indexCurve,basedOnCurveLength);
-xyCurve(1) = xyCurve(1)+10;
-xyCurve(2) = xyCurve(2)+10;
-d.setCurveValue(indexCurve,basedOnCurveLength,xyCurve)
-d.getCurveValue(indexCurve,basedOnCurveLength)
+indexCurve=3
+pointindex=2
+tmppoints=d.getCurveValue(indexCurve,pointindex)
+d.setCurveValue(indexCurve,pointindex,tmppoints+100)
+d.getCurveValue(indexCurve,pointindex)
 
-% ENgetbasedemand - Retrieves the node's base demand for a category
-% ENsetbasedemand - Sets the node's base demand for a category
-ndBaseDemands=d.getNodeBaseDemands;
-d.NodeBaseDemands; indexNode=1;
-disp(['Node index 1 base demand:', num2str(ndBaseDemands{1}(indexNode))])
-ndBaseDemands{1}(indexNode)=ndBaseDemands{1}(indexNode)+100;
-d.setNodeBaseDemands(ndBaseDemands)
-ndBaseDemands=d.getNodeBaseDemands;
-disp(['Node index 1 base demand after:', num2str(ndBaseDemands{1}(indexNode))])
+
+bd1=d.getNodeBaseDemands % get an array of the base demands (some nodes may have multiple base demands for different patterns)
+node_index=5
+bd2{1}(node_index)=bd2{1}(node_index)+100
+d.setNodeBaseDemands(bd2)
+bd3=d.getNodeBaseDemands
+bd1{1} %otiginal
+bd3{1} % new
 
 % ENgetnumdemands - Retrieves the number of demand categories for a node
 d.NodeNumDemandCategories 
