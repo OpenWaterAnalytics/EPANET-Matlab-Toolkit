@@ -9,6 +9,7 @@ close all;
 
 % Create EPANET object using the INP file
 inpname='networks/Net1_Rossman2000.inp'; % Net1_Rossman2000
+% Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
 d=epanet(inpname);
 
 %% *Get Nodes Data (EXAMPLES)*
@@ -25,8 +26,8 @@ elevationsSp = d.getNodeElevations([1 5 10]);
 disp(elevationsSp);
 
 
-d.getNodeNumDemandCategories
-d.getNodeNumDemandCategories(2)
+d.getNodeDemandCategoriesNumber
+d.getNodeDemandCategoriesNumber(2)
 
 numCategories=1;nodeindex=2;
 d.getNodeDemandPatternIndex{numCategories}
@@ -178,48 +179,48 @@ d.setNodeSourceQuality(3,20);
 d.getNodeSourceQuality
 
 %% Set tanks info
-d.getNodeTankIndex
+indTank = d.getNodeTankIndex
 
 d.getNodeTankInitialLevel
 d.setNodeTankInitialLevel(d.getNodeTankInitialLevel+20);
-d.getNodeTankInitialLevel
-d.setNodeTankInitialLevel(11,100);
+v=d.getNodeTankInitialLevel
+d.setNodeTankInitialLevel(indTank(1),v(indTank(1))+10);
 d.getNodeTankInitialLevel
 
 d.getNodeTankDiameter
 d.setNodeTankDiameter(d.getNodeTankDiameter+20);
 d.getNodeTankDiameter
-d.setNodeTankDiameter(11,100);
+d.setNodeTankDiameter(indTank(1),100);
 d.getNodeTankDiameter
 
 d.getNodeTankBulkReactionCoeff
 d.setNodeTankBulkReactionCoeff(d.getNodeTankBulkReactionCoeff+1);
 d.getNodeTankBulkReactionCoeff
-d.setNodeTankBulkReactionCoeff(11,-1);
+d.setNodeTankBulkReactionCoeff(indTank(1),-1);
 d.getNodeTankBulkReactionCoeff
 
 d.getNodeTankMaximumWaterLevel
 d.setNodeTankMaximumWaterLevel(d.getNodeTankMaximumWaterLevel+21);
 d.getNodeTankMaximumWaterLevel
-d.setNodeTankMaximumWaterLevel(11,200);
+d.setNodeTankMaximumWaterLevel(indTank(1),200);
 d.getNodeTankMaximumWaterLevel
 
 d.getNodeTankMinimumWaterLevel
 d.setNodeTankMinimumWaterLevel(d.getNodeTankMinimumWaterLevel-21);
-d.getNodeTankMinimumWaterLevel
-d.setNodeTankMinimumWaterLevel(11,95);
+n=d.getNodeTankMinimumWaterLevel
+d.setNodeTankMinimumWaterLevel(indTank(1),n(indTank(1))+20);
 d.getNodeTankMinimumWaterLevel
 
 d.getNodeTankMinimumFraction
 d.setNodeTankMinimumFraction(d.getNodeTankMinimumFraction+0.1);
 d.getNodeTankMinimumFraction
-d.setNodeTankMinimumFraction(11,0.2);
+d.setNodeTankMinimumFraction(indTank(1),0.2);
 d.getNodeTankMinimumFraction
 
 d.getNodeTankMinimumWaterVolume
 d.setNodeTankMinimumWaterVolume(d.getNodeTankMinimumWaterVolume+10000);
 d.getNodeTankMinimumWaterVolume
-d.setNodeTankMinimumWaterVolume(11,20000);
+d.setNodeTankMinimumWaterVolume(indTank(1),20000);
 d.getNodeTankMinimumWaterVolume
 
 values = d.getNodeTankMixingModelType 
@@ -228,7 +229,7 @@ values{end}='MIX2';
 d.setNodeTankMixingModelType(values);
 d.getNodeTankMixingModelType 
 d.getNodeTankMixingModelCode
-d.setNodeTankMixingModelType(11,'FIFO');
+d.setNodeTankMixingModelType(indTank(1),'FIFO');
 d.getNodeTankMixingModelType 
 d.getNodeTankMixingModelCode
 

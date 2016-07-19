@@ -161,7 +161,6 @@ classdef epanet <handle
         OptionsUnbalanced; %*** Not implemented ***
         OptionsUnbalancedContinueN; % *** Not implemented ***
         OptionsViscosity; %*** Not implemented ***
-        Pathfile;   % The path of the input file
         Pattern; % get all patterns
         PatternAverageValue;
         PatternCount;  % Number of patterns
@@ -472,8 +471,10 @@ classdef epanet <handle
                 obj.saveInputFile(obj.BinTempfile,1); %create a new INP file (Working Copy) using the SAVE command of EPANET
                 obj.closeNetwork;  %ENclose; %Close input file
                 %Load temporary file
-                ENopen(obj.BinTempfile,[obj.InputFile(1:end-4),'_temp.txt'], [obj.InputFile(1:end-4),'_temp.bin'],obj.LibEPANET);
-                obj.Pathfile='';
+                obj.Errcode=ENopen(obj.BinTempfile,[obj.InputFile(1:end-4),'_temp.txt'], [obj.InputFile(1:end-4),'_temp.bin'],obj.LibEPANET);
+                if obj.Errcode~=0
+                    warning('Could not open the file, please check INP file.');return;
+                end
             end
             
             % Get some link data
@@ -1033,7 +1034,7 @@ classdef epanet <handle
                 value{length(varargin{1})}=[];
                 for i=varargin{1}
                     [obj.Errcode, value{k}]=ENgetnodeid(i,obj.LibEPANET);
-                    if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end   
+                    if obj.Errcode==203, value=NaN; return; end   
                     k=k+1;
                 end
             end
@@ -1493,34 +1494,39 @@ classdef epanet <handle
         end
         function value = getPatternNameID(obj,varargin)
             %Retrieves the ID label of all or some time patterns indices
-            if isempty(varargin)
-                value{obj.getPatternCount}=[];
-                for i=1:obj.getPatternCount
-                    [obj.Errcode, value{i}]=ENgetpatternid(i,obj.LibEPANET);
-                end
-            else
-                k=1;
-                for i=varargin{1}
-                    [obj.Errcode, value{k}]=ENgetpatternid(i,obj.LibEPANET);
-%                     if obj.Errcode==205, error(obj.getError(obj.Errcode)), return; end   
-                    k=k+1;
+            value={};
+            if obj.getPatternCount
+                if isempty(varargin) 
+                    value{obj.getPatternCount}=[];
+                    for i=1:obj.getPatternCount
+                        [obj.Errcode, value{i}]=ENgetpatternid(i,obj.LibEPANET);
+                    end
+                else
+                    k=1;
+                    for i=varargin{1}
+                        [obj.Errcode, value{k}]=ENgetpatternid(i,obj.LibEPANET);
+    %                     if obj.Errcode==205, error(obj.getError(obj.Errcode)), return; end   
+                        k=k+1;
+                    end
                 end
             end
         end
         function value = getCurveNameID(obj,varargin)
             %Retrieves ID of a curve with specific index
             %New version dev2.1
-            if isempty(varargin)
-                value{obj.getCurveCount}=[];
-                for i=1:obj.getCurveCount
-                    [obj.Errcode, value{i}]=ENgetcurveid(i,obj.LibEPANET);
-                end
-            else
-                k=1;
-                for i=varargin{1}
-                    [obj.Errcode, value{k}]=ENgetcurveid(i,obj.LibEPANET);
-                    if obj.Errcode==206, error('Input Error 205: function call  refers to undefined curve.'), return; end   
-                    k=k+1;
+            if obj.getCurveCount
+                if isempty(varargin) 
+                    value{obj.getCurveCount}=[];
+                    for i=1:obj.getCurveCount
+                        [obj.Errcode, value{i}]=ENgetcurveid(i,obj.LibEPANET);
+                    end
+                else
+                    k=1;
+                    for i=varargin{1}
+                        [obj.Errcode, value{k}]=ENgetcurveid(i,obj.LibEPANET);
+                        if obj.Errcode==206, error('Input Error 205: function call  refers to undefined curve.'), return; end   
+                        k=k+1;
+                    end
                 end
             end
         end
@@ -1642,7 +1648,7 @@ classdef epanet <handle
             if nargin>1
                 obj.saveInputFile(obj.BinTempfile,1);
             else
-                obj.saveInputFile([obj.Pathfile,obj.BinTempfile]);
+                obj.saveInputFile(obj.BinTempfile);
             end
             value = obj.getBinQualType;
 %             value = {obj.getBinOptionsInfo.BinQualityType};
@@ -1771,7 +1777,7 @@ classdef epanet <handle
                 end
             else
                 [obj.Errcode, x, y] = ENgetcurvevalue(index, varargin{1},obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+                %if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
                 value = [x y];
             end
         end
@@ -2460,14 +2466,22 @@ classdef epanet <handle
                 % Open epanet input file
                 [~,info] = obj.readInpFile;
                 endSectionIndex=find(~cellfun(@isempty,regexp(info,'END','match')));
+                coordSectionIndex=find(~cellfun(@isempty,regexp(info,'COORDINATES','match')));
+%                 verticesSectionIndex=find(~cellfun(@isempty,regexp(info,'VERTICES','match')));
                 info(endSectionIndex)='';
-                f1=fopen([obj.Pathfile,obj.BinTempfile],'w');
-                fprintf(f1, '%s\n', info{:});
+                f1=fopen([obj.BinTempfile],'w');
+                if ~isempty(coordSectionIndex)
+                    fprintf(f1, '%s\n', info{1:coordSectionIndex-1});
+                else
+                    fprintf(f1, '%s\n', info{:});
+                end
                 if ~isempty(addSectionRules)
                     fprintf(f1, '%s\n', addSectionRules{:});
                 end
-                if ~isempty(addSectionCoordinates)
+                if ~isempty(addSectionCoordinates) % && isempty(coordSectionIndex)
                     fprintf(f1, '%s\n', addSectionCoordinates{:});
+                else
+                    fprintf(f1, '[END]\n');
                 end
                 fclose(f1);return;
             end
@@ -3431,7 +3445,7 @@ classdef epanet <handle
             sect=0;i=1;t=1;q=1;
             typecode=0;x=1;b=1;d=1;
             if obj.Bin
-                obj.saveInputFile([obj.Pathfile,obj.BinTempfile]);
+                obj.saveInputFile([obj.BinTempfile]);
             end
             [~,info] = obj.readInpFile;
             for hc=1:length(info)
@@ -4114,7 +4128,7 @@ classdef epanet <handle
            links=obj.getBinLinkNameID;
            BinLinkCount=length(links.BinLinkNameID);
            [tlines]=regexp( fileread(obj.BinTempfile), '\n', 'split');
-           fid = fopen([obj.Pathfile,obj.BinTempfile],'w');start=0;
+           fid = fopen([obj.BinTempfile],'w');start=0;
            for i=1:length(tlines)
                tt=regexp(tlines{i}, '\s*', 'split');
                tok = strtok(tlines{i});m=1;
@@ -4389,7 +4403,7 @@ classdef epanet <handle
                 end
             end            
             [tlines]=regexp( fileread(obj.BinTempfile), '\n', 'split');
-            fid = fopen([obj.Pathfile,obj.BinTempfile],'w');
+            fid = fopen([obj.BinTempfile],'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[VALVES]')
@@ -4558,8 +4572,8 @@ classdef epanet <handle
             [Errcode]=setBinParam(obj,11,values,sections);
         end
         function saveBinInpFile(obj)
-            [tlines]=regexp( fileread([obj.Pathfile,obj.BinTempfile]), '\n', 'split');
-            f = fopen([obj.Pathfile,obj.BinTempfile],'w');
+            [tlines]=regexp( fileread([obj.BinTempfile]), '\n', 'split');
+            f = fopen([obj.BinTempfile],'w');
             % /*Write [TITLE] section */
                for i=1:length(tlines)
                    tok = strtok(tlines{i});
@@ -5155,8 +5169,8 @@ classdef epanet <handle
                         return;
                 end
             end            
-            [tlines]=regexp( fileread([obj.Pathfile,obj.BinTempfile]), '\n', 'split');
-            fid = fopen([obj.Pathfile,obj.BinTempfile], 'w');
+            [tlines]=regexp( fileread([obj.BinTempfile]), '\n', 'split');
+            fid = fopen([obj.BinTempfile], 'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[PIPES]')
@@ -5256,8 +5270,8 @@ classdef epanet <handle
                         return;
                 end
             end            
-            [tlines]=regexp(fileread([obj.Pathfile,obj.BinTempfile]), '\n', 'split');
-            fid = fopen([obj.Pathfile,obj.BinTempfile], 'w');
+            [tlines]=regexp(fileread([obj.BinTempfile]), '\n', 'split');
+            fid = fopen([obj.BinTempfile], 'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[JUNCTIONS]')
@@ -5423,8 +5437,8 @@ classdef epanet <handle
                         return;
                 end
             end            
-            [tlines]=regexp( fileread([obj.Pathfile,obj.BinTempfile]), '\n', 'split');
-            fid = fopen([obj.Pathfile,obj.BinTempfile], 'w');
+            [tlines]=regexp( fileread([obj.BinTempfile]), '\n', 'split');
+            fid = fopen([obj.BinTempfile], 'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[TANKS]')
@@ -5582,8 +5596,8 @@ classdef epanet <handle
                         return;
                 end
             end            
-            [tlines]=regexp( fileread([obj.Pathfile,obj.BinTempfile]), '\n', 'split');
-            fid = fopen([obj.Pathfile,obj.BinTempfile], 'w');
+            [tlines]=regexp( fileread([obj.BinTempfile]), '\n', 'split');
+            fid = fopen([obj.BinTempfile], 'w');
             for i=1:length(tlines)
                 tt=regexp(tlines{i}, '\s*', 'split');
                 if strcmp(tt{1},'[RESERVOIRS]')
@@ -6128,7 +6142,7 @@ classdef epanet <handle
         end
         function [valueCoord,valueRule] = getBinCoordRuleSections(obj)
             % Open epanet input file
-            [info]=regexp( fileread(obj.BinTempfile), '\n', 'split'); 
+            [info]=regexp( fileread(obj.InputFile), '\n', 'split'); 
             sect=0;d=1;valueCoord={};valueRule={};dRule=1;
             for h=1:length(info)
                 tline = info{h};
@@ -6148,6 +6162,9 @@ classdef epanet <handle
                     elseif strcmpi(tok(1:5),'[RULE')
                         sect=2;
                         valueRule{dRule}=tline;
+                        continue;
+                    elseif strcmpi(tok(1:5),'[ENER')
+                        sect=0;
                         continue;
                     end
                 end
@@ -8416,7 +8433,7 @@ function [Errcode]=setBinParam(obj,indexParameter,parameter,sections,varargin)
             pat=obj.getBinPatternsInfo;
         end
     end
-    [tlines]=regexp( fileread([obj.Pathfile,obj.BinTempfile]), '\n', 'split');
+    [tlines]=regexp( fileread([obj.BinTempfile]), '\n', 'split');
     cntIDpat=0;start=0;stop1=0;stop11=0;itsOkQual=0;stop2=0;stop22=0;
     for i=1:length(tlines)
         tt=regexp(tlines{i}, '\s*', 'split');
@@ -8455,7 +8472,7 @@ function [Errcode]=setBinParam(obj,indexParameter,parameter,sections,varargin)
     elseif strcmpi(sections{1},'[TANKS]')
         cnts=obj.BinNodeTankCount;
     end
-    fid = fopen([obj.Pathfile,obj.BinTempfile], 'w');
+    fid = fopen([obj.BinTempfile], 'w');
     ll=1;clear atlines;
     for i=start:stop
        % Get first token in the line
@@ -8761,8 +8778,8 @@ function [Errcode]=setBinParam2(obj,parameter,sections,zz,varargin)
         end
         patternsid=[value.BinPatternNameID varargin];
     end
-    [tlines]=regexp( fileread([obj.Pathfile,obj.BinTempfile]), '\n', 'split');
-    fid = fopen([obj.Pathfile,obj.BinTempfile], 'w');
+    [tlines]=regexp( fileread([obj.BinTempfile]), '\n', 'split');
+    fid = fopen([obj.BinTempfile], 'w');
     for i=1:length(tlines)
         tt=regexp(tlines{i}, '\s*', 'split');
         tok = strtok(tlines{i});m=1;
@@ -8886,7 +8903,7 @@ function [Errcode]=setBinParam2(obj,parameter,sections,zz,varargin)
 end
 function value = getBinParam(obj,sections,varargin)  
     warning off;
-    [tlines]=regexp( fileread([obj.Pathfile,obj.BinTempfile]), '\n', 'split');
+    [tlines]=regexp( fileread([obj.BinTempfile]), '\n', 'split');
     if strcmp(sections{1},'[SOURCES]')
         value.BinNodeSourcePatternIndex = nan(1,obj.BinNodeCount);
         value.BinNodeSourceQuality = nan(1,obj.BinNodeCount);
@@ -9024,7 +9041,7 @@ sect=0;
 % Read all file and save in variable info
 [~,info] = obj.readInpFile;
 % write
-fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+fid2 = fopen([obj.BinTempfile],'w');
 sps=blanks(18);
 nn=0;yy=0;
 for t = 1:length(info)
@@ -9293,7 +9310,7 @@ function Errcode=addNode(obj,typecode,varargin)
     % Open and read inpname
     % Read all file and save in variable info
     [~,info,~] = obj.readInpFile;
-    fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+    fid2 = fopen([obj.BinTempfile],'w');
     % Initiality
     qualch=0;qq=0;
     Coordch=0;onetime=1;gg=0;
@@ -9461,7 +9478,7 @@ crvs = obj.getBinCurvesInfo;
 % Open and read inpname
 % Read all file and save in variable info
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+fid2 = fopen([obj.BinTempfile],'w');
 % Add pipe
 nn=0;sps=blanks(10);
 for t = 1:length(info)
@@ -9551,7 +9568,7 @@ checklinks_index=unique(linkindex12);
 checklinks=links.BinLinkNameID(checklinks_index);
 obj.removeBinControlNodeID(NodeID);% Remove control, code 0(NODE)
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+fid2 = fopen([obj.BinTempfile],'w');
 out=0; sps=blanks(10);
 for t = 1:length(info)
     c = info{t};
@@ -9646,7 +9663,7 @@ if type==0
     end
 end
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+fid2 = fopen([obj.BinTempfile],'w');
 e=0;n=0;kk=1;sps=blanks(15);tt=0;
 for t = 1:length(info)
     c = info{t};
@@ -9746,7 +9763,7 @@ if type==0
     end
 end
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+fid2 = fopen([obj.BinTempfile],'w');
 e=0;n=0;kk=1;sps=blanks(15);
 for t = 1:length(info)
     c = info{t};
@@ -9842,7 +9859,7 @@ if sum(r)==0, to_node=''; end
 obj.removeBinControlLinkID(LinkID);
 
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+fid2 = fopen([obj.BinTempfile],'w');
 
 % section [JUNCTIONS]
 out=0;YY=0;sps=blanks(15);
@@ -9976,7 +9993,7 @@ if (sum(exists)~=1)
 end
 type_n='[CONTROLS]';
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+fid2 = fopen([obj.BinTempfile],'w');
 noo=0;s=0;sps=blanks(15);
 for t = 1:length(info)
     c = info{t};
@@ -10049,7 +10066,7 @@ end
 % Open and read inpname
 % Read all file and save in variable info
 [~,info] = obj.readInpFile;
-fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+fid2 = fopen([obj.BinTempfile],'w');
 e=0;n=0;sps=blanks(15);
 for t = 1:length(info)
     c = info{t};
@@ -10171,7 +10188,7 @@ curves = obj.getBinCurvesInfo;
 rules=obj.getBinRulesControlsInfo;
 
 [info] = readAllFile(obj.BinTempfile);
-fid2 = fopen([obj.Pathfile,obj.BinTempfile],'w');
+fid2 = fopen([obj.BinTempfile],'w');
 sect=0;
 nn=0;pp=1;sps=blanks(15);
 for t = 1:length(info)
@@ -10684,7 +10701,7 @@ end
 end
 function Errcode=closeOpenNetwork(obj)
     obj.closeNetwork;  %Close input file 
-    Errcode=ENopen([obj.Pathfile,obj.BinTempfile],[obj.Pathfile,[obj.BinTempfile(1:end-4),'.txt']],[obj.Pathfile,[obj.BinTempfile(1:end-4),'.bin']],obj.LibEPANET);
+    Errcode=ENopen([obj.BinTempfile],[obj.BinTempfile(1:end-4),'.txt'],[obj.BinTempfile(1:end-4),'.bin'],obj.LibEPANET);
 end
 function setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
 if strcmp(previousFlowUnits,'GPM')
@@ -11193,7 +11210,7 @@ for i=1:(nargin/2)
 end
                 
 [info,tline] = readAllFile(obj.MSXFile);
-fid2 = fopen([obj.Pathfile,obj.MSXTempFile],'w');
+fid2 = fopen([obj.MSXTempFile],'w');
 sect=0;
 for t = 1:length(info)
     a = info{t};

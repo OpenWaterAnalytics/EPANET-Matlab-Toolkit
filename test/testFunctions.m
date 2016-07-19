@@ -9,10 +9,10 @@ close all;
 
 % Create EPANET object using the INP file
 %d=epanet('Net1_Rossman2000.inp');
-inpname='networks/Net1_Rossman2000.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
-inpname='networks/Net1b.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
+inpname='networks/Net1_Rossman2000.inp'; 
+% Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
 
-version='epanet2'; % version dev2.1
+% version='epanet2'; % version dev2.1
 % d=epanet(inpname,version);
 d=epanet(inpname);
 
@@ -51,7 +51,7 @@ d.getCurveLengths('NewCur2')
 d.getCurveIndex
 d.getCurveIndex('NewCur1')
 
-indexCurve=3
+indexCurve=2
 pointindex=2
 tmppoints=d.getCurveValue(indexCurve,pointindex)
 d.setCurveValue(indexCurve,pointindex,tmppoints+100)
@@ -120,7 +120,7 @@ d.getLinkPumpPatternIndex
 
 
 % inpname='networks/Net1_Rossman2000.inp';
-d=epanet(inpname,version);
+d=epanet(inpname);
 %% Controls
 Controls=d.getControls
 disp('Press any key to continue...')
@@ -280,9 +280,12 @@ d.getLinkInitialStatus
 d.setLinkInitialStatus(0*d.getLinkInitialStatus)
 d.getLinkInitialStatus
 
-linkstatus=d.getLinkInitialSetting
-linkstatus(end)=108;
-d.setLinkInitialSetting(linkstatus)
+linkset=d.getLinkInitialSetting
+linkset(end)=108;
+if d.LinkValveCount
+    linkset(d.LinkValveIndex)=0;
+end
+d.setLinkInitialSetting(linkset)
 d.getLinkInitialSetting
 
 d.getLinkBulkReactionCoeff
@@ -509,7 +512,7 @@ pause
 
 
 %% Report Preparation
-d=epanet(inpname,version);
+d=epanet(inpname);
 
 % Compute ranges (max - min) 
 d.setTimeStatisticsType('RANGE')
@@ -620,7 +623,7 @@ pause
 
 %% Create Hydraulics file
 
-d=epanet(inpname,version);
+d=epanet(inpname);
 
 d.solveCompleteHydraulics % Only call this ONLY once (see ENsolveH for more details)
 d.saveHydraulicFile([pwd,'\hydraulics.hyd'])
@@ -632,7 +635,7 @@ disp('Press any key to continue...')
 pause
 
 %% Simulation Quality
-d=epanet(inpname,version);
+d=epanet(inpname);
 d.setQualityType('chem','mg/L')
 
 % Solve Hydraulics (outside the loop)
@@ -661,7 +664,7 @@ pause
 %WITH SETTIMEQUALITYSTEP
 
 %% Simulation Hydraulics
-d=epanet(inpname,version);
+d=epanet(inpname);
 d.setQualityType('chem','mg/L')
 
 
@@ -684,7 +687,7 @@ d.unload
 disp('Press any key to continue...')
 pause
 
-d=epanet(inpname,version);
+d=epanet(inpname);
 %% Test Plot
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
 disp('Press any key to continue...')

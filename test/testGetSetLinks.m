@@ -9,6 +9,7 @@ close all;
 
 % Create EPANET object using the INP file
 inpname='networks/Net1_Rossman2000.inp'; % Net1_Rossman2000
+% Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
 d=epanet(inpname);
 
 %% *Get Links Data (EXAMPLES)*
@@ -128,8 +129,11 @@ d.getLinkWallReactionCoeff(2)
 d.setLinkWallReactionCoeff(2,-2)
 d.getLinkWallReactionCoeff(2)
 
-d.getLinkInitialSetting
-d.setLinkInitialSetting(d.getLinkInitialSetting*10)
+linkset=d.getLinkInitialSetting
+if d.LinkValveCount
+    linkset(d.LinkValveIndex)=0;
+end
+d.setLinkInitialSetting(linkset*10)
 d.getLinkInitialSetting
 d.getLinkInitialSetting(2)
 d.setLinkInitialSetting(2,10)

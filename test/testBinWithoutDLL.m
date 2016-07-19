@@ -9,7 +9,8 @@ close all;
 clear class;
 
 % Create EPANET object using the INP file
-inpname='networks/Net1_Rossman2000.inp'; %Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
+inpname='networks/Net1_Rossman2000.inp'; 
+%Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
 tic;d=epanet(inpname,'Bin');toc  
 
 %% GET, SET FLOW UNITS

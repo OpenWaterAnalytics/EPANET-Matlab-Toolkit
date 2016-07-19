@@ -9,7 +9,8 @@ close all;
 clear class;
 
 % Create EPANET object using the INP file
-inpname='networks/Net1_Rossman2000.inp'; %Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
+inpname='networks/Net1_Rossman2000.inp';
+%Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
 tic;d=epanet(inpname);toc
 d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]); 
 d.BinUpdateClass; % must be run if use Bin functions
