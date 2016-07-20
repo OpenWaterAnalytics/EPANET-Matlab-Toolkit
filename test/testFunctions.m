@@ -91,15 +91,11 @@ d.setNodeCoordinates(nodeCoords)
 d.plot;
 
 
-%[int32, int32Ptr, cstring, cstring, int32Ptr] ENgetqualinfo(int32Ptr, cstring, cstring, int32Ptr)
-%[r1 r2 r3 r4 r5]=calllib('epanet2','ENgetqualinfo', 0, [''], [''], 0)
+%[a b c] = calllib('epanet2','ENgetcurve',1,'',0,[0 0 0],[0 0 0])
 
-% ENgetqualinfo - Retrieves quality info Bug
-% d.QualityChemUnits
-% d.QualityChemName
-% % d.getQualInfo
+% [a b c e f] = calllib('epanet2','ENgetqualinfo',0,'','',0)
 
-% Others new.
+% Others
 n=d.getComputedHydraulicTimeSeries; % EN_TANKVOLUME - ENgetnodevalue
 n.TankVolume(:,d.NodeTankIndex)
 
