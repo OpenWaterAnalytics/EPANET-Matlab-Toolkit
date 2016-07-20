@@ -1643,8 +1643,8 @@ classdef epanet <handle
         end
         function value = getQualityType(obj,varargin)
             %Retrieves the type of water quality analysis type
-% %             [obj.Errcode, obj.QualityCode,obj.QualityTraceNodeIndex] = E_Ngetqualinfo(obj.LibEPANET); bug
-% %             value=obj.TYPEQUALITY(obj.QualityCode+1);
+%             [obj.Errcode, obj.QualityCode,obj.QualityTraceNodeIndex] = ENgetqualinfo(obj.LibEPANET); % bug
+%             value=obj.TYPEQUALITY(obj.QualityCode+1);
             if nargin>1
                 obj.saveInputFile(obj.BinTempfile,1);
             else
@@ -1653,9 +1653,9 @@ classdef epanet <handle
             value = obj.getBinQualType;
 %             value = {obj.getBinOptionsInfo.BinQualityType};
         end 
-%         function value = getQualityInfo(obj)
-%             [obj.Errcode, ~,value.QualityChemName,value.QualityChemUnits,~] = E_Ngetqualinfo(obj.LibEPANET);
-%         end
+        function value = getQualityInfo(obj)
+            [obj.Errcode, ~,value.QualityChemName,value.QualityChemUnits,~] = ENgetqualinfo(obj.LibEPANET);
+        end
         function value = getQualityCode(obj)
             %Retrieves the code of water quality analysis type
             [obj.Errcode, value,obj.QualityTraceNodeIndex] = ENgetqualtype(obj.LibEPANET);
@@ -1726,18 +1726,18 @@ classdef epanet <handle
             %Retrieves the number of next event 
             [obj.Errcode, value] = ENgettimeparam(13,obj.LibEPANET);
         end
-%         function value = getCurvesInfo(obj)
-%             %New version dev2.1
-%             %Input:   curveIndex = curve index
-%             %Output:  *nValues = number of points on curve
-%             %         *xValues = values for x
-%             %         *yValues = values for y
-%             %Returns: error code
-%             %Purpose: retrieves end nodes of a specific link
-%             for i=1:obj.getCurveCount
-%                 [obj.Errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = E_Ngetcurve(i,obj.LibEPANET);
-%             end
-%         end
+        function value = getCurvesInfo(obj)
+            %New version dev2.1
+            %Input:   curveIndex = curve index
+            %Output:  *nValues = number of points on curve
+            %         *xValues = values for x
+            %         *yValues = values for y
+            %Returns: error code
+            %Purpose: retrieves end nodes of a specific link
+            for i=1:obj.getCurveCount
+                [obj.Errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = ENgetcurve(i,obj.LibEPANET);
+            end
+        end
         function value = getConnectivityMatrix(obj, varargin)
             conn = obj.getNodesConnectingLinksID;
             nodesID = obj.getNodeNameID;
@@ -7488,14 +7488,13 @@ if Errcode
     ENgeterror(Errcode,LibEPANET);
 end
 end
-% function [Errcode, ids, nvalue, xvalue, yvalue] = E_Ngetcurve(value,LibEPANET)
-% % New version dev2.1 bug
-% [~,~,nvalue,~,~]=calllib(LibEPANET,'E_Ngetcurve',value,'',0,0,0);
-% [Errcode,ids,~, xvalue, yvalue]=calllib(LibEPANET,'E_Ngetcurve',value,char(32*ones(1,17)),0,zeros(1,nvalue),zeros(1,nvalue));
-% if Errcode
-%     ENgeterror(Errcode,LibEPANET);
-% end
-% end
+function [Errcode, ids, nvalue, xvalue, yvalue] = ENgetcurve(value,LibEPANET)
+[~,~,nvalue,~,~]=calllib(LibEPANET,'ENgetcurve',value,'',0,0,0);
+[Errcode,ids,~, xvalue, yvalue]=calllib(LibEPANET,'ENgetcurve',value,char(32*ones(1,17)),0,zeros(1,nvalue),zeros(1,nvalue));
+if Errcode
+    ENgeterror(Errcode,LibEPANET);
+end
+end
 function [Errcode, len] = ENgetcurvelen(index,LibEPANET)
 % New version dev2.1
 [Errcode,len]=calllib(LibEPANET,'ENgetcurvelen',index,0);
@@ -7546,14 +7545,13 @@ if Errcode
     ENgeterror(Errcode,LibEPANET);
 end
 end
-% function [Errcode,qualcode,chemname,chemunits,tracenode] = E_Ngetqualinfo(LibEPANET)
-% % New version dev2.1 bug
-% chm=libpointer('cstring', char(32*ones(1,16)));
-% [Errcode,qualcode,chemname,chemunits,tracenode]=calllib(LibEPANET,'E_Ngetqualinfo',0,chm,chm,0);
-% if Errcode
-%     ENgeterror(Errcode,LibEPANET);
-% end
-% end
+function [Errcode,qualcode,chemname,chemunits,tracenode] = ENgetqualinfo(LibEPANET)
+chm=libpointer('cstring', char(32*ones(1,16)));
+[Errcode,qualcode,chemname,chemunits,tracenode]=calllib(LibEPANET,'ENgetqualinfo',0,chm,chm,0);
+if Errcode
+    ENgeterror(Errcode,LibEPANET);
+end
+end
 function [obj] = MSXMatlabSetup(obj,msxname,varargin)
 if ~isempty(varargin)
     if varargin{1}{1}~=1
