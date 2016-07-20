@@ -9,8 +9,10 @@ close all;
 
 % Create EPANET object using the INP file
 %d=epanet('Net1_Rossman2000.inp');
-inpname='networks/Net1_Rossman2000.inp'; % Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
-version='epanet2'; % version dev2.1
+inpname='networks/Net1_Rossman2000.inp'; 
+% Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
+
+% version='epanet2'; % version dev2.1
 % d=epanet(inpname,version);
 d=epanet(inpname);
 
@@ -24,100 +26,80 @@ d.getConnectivityMatrix
 d.getLibFunctions
 
 %% New Functions 2.1
-% ENgetpumptype - Retrieves the type of a pump for specific link index
-% Constants for pumps: CONSTANT_HORSEPOWER, POWER_FUNCTION, CUSTOM
-d.LinkPumpTypeCode  
-d.getLinkPumpTypeCode
-d.LinkPumpType 
-d.getLinkPumpType
-  
-% ENgetheadcurve - Retrieves ID of a head curve for specific link index
-d.HeadCurveIndex 
-d.getHeadCurveIndex
-
-% ENaddcurve - Adds a new curve appended to the end of the existing curves
-% ENgetcurveid - Retrieves ID of a curve with specific index
+d.getLinkPumpTypeCode   % returns type index of all pumps
+d.getLinkPumpType       % returns type name of all pumps: CONSTANT_HORSEPOWER, POWER_FUNCTION, CUSTOM
+d.getHeadCurveIndex     % returns index of all pump head curve
+d.getCurveNameID        % returns all curve IDs
+d.getCurveNameID(1)     % returns specific curve ID
+d.addCurve('NewCur1')   % add new curve with ID
+indexCurve=d.addCurve('NewCur2', [1800 200; 1500 400]); % add new curve with points
 d.getCurveNameID
-d.addCurve('NewCur1')
-indexCurve=d.addCurve('NewCur2', [1800 200; 1500 400]); 
-d.getCurveNameID
-d.getCurveXY(indexCurve)
+d.getCurveValue(indexCurve)     % returns all points for specific curve index
+d.getCurveValue(indexCurve,2)   % returns specific point for specific curve index
 
-% ENgetcurve - Retrieves curve id, number of values and (x,y) values Bug
-% ENsetcurve - Sets x,y values for a specific curve
-indexCurve=1;
-% xyCurveValue=d.getCurve(indexCurve)
-% xyCurveValue(1,1)=1000;%x
-% xyCurveValue(1,2)=300;%y
-xyCurveValue=[d.getBinCurvesInfo.BinCurveXvalue{indexCurve} d.getBinCurvesInfo.BinCurveYvalue{indexCurve}];
-d.setCurve(indexCurve,xyCurveValue)
-xyCurveValue=[d.getBinCurvesInfo.BinCurveXvalue{indexCurve} d.getBinCurvesInfo.BinCurveYvalue{indexCurve}]
+d.setCurve(3,[1900 300; 1400 200]) % Change an existing curve 
+d.getCurveValue(indexCurve) 
 
-% ENgetcurvelen - Retrieves number of points in a curve
-len=d.getCurveLengths;
+% d.getCurve
+% [int32, cstring, int32Ptr, singlePtrPtr, singlePtrPtr] ENgetcurve(int32, cstring, int32Ptr, singlePtrPtr, singlePtrPtr)
+% Currently there is a segmentation fault in Matlab
 
-% ENgetcurveindex - Retrieves index of curve with specific ID
+len=d.getCurveLengths
+d.getCurveLengths(3)
+d.getCurveLengths('NewCur2')
+
 d.getCurveIndex
+d.getCurveIndex('NewCur1')
 
-% ENgetcurvevalue - Retrieves x,y point for a specific point number and curve
-% ENsetcurvevalue - Sets x,y point for a specific point and curve
-basedOnCurveLength=len(1);
-d.getCurveValue(indexCurve,basedOnCurveLength)
-xyCurve = d.getCurveValue(indexCurve,basedOnCurveLength);
-xyCurve(1) = xyCurve(1)+10;
-xyCurve(2) = xyCurve(2)+10;
-d.setCurveValue(indexCurve,basedOnCurveLength,xyCurve)
-d.getCurveValue(indexCurve,basedOnCurveLength)
+indexCurve=2
+pointindex=2
+tmppoints=d.getCurveValue(indexCurve,pointindex)
+d.setCurveValue(indexCurve,pointindex,tmppoints+100)
+d.getCurveValue(indexCurve,pointindex)
 
-% ENgetbasedemand - Retrieves the node's base demand for a category
-% ENsetbasedemand - Sets the node's base demand for a category
-ndBaseDemands=d.getNodeBaseDemands;
-d.NodeBaseDemands; indexNode=1;
-disp(['Node index 1 base demand:', num2str(ndBaseDemands{1}(indexNode))])
-ndBaseDemands{1}(indexNode)=ndBaseDemands{1}(indexNode)+100;
-d.setNodeBaseDemands(ndBaseDemands)
-ndBaseDemands=d.getNodeBaseDemands;
-disp(['Node index 1 base demand after:', num2str(ndBaseDemands{1}(indexNode))])
 
-% ENgetnumdemands - Retrieves the number of demand categories for a node
-d.NodeNumDemandCategories 
-d.getNodeNumDemandCategories
+bd1=d.getNodeBaseDemands % get an array of the base demands (some nodes may have multiple base demands for different patterns)
+bd1{1}
+node_index=5
+bd1{1}(node_index)= bd1{1}(node_index)+100
+d.setNodeBaseDemands(bd1)
+bd2=d.getNodeBaseDemands
+bd2{1}
+
+d.getNodeDemandCategoriesNumber
+d.getNodeDemandCategoriesNumber(11)
+d.getNodeDemandCategoriesNumber(5:11)
 
 % ENgetdemandpattern - Retrieves the index of a demand pattern for a specific demand category of a node
-d.NodeDemandPatternNameID  
 d.getNodeDemandPatternNameID
-d.NodeDemandPatternsIndex 
-d.getNodeDemandPatternsIndex
+d.getNodeDemandPatternIndex
 
 % ENgetaveragepatternvalue - Retrieves the average value of a pattern
-d.getPatternAveragePatternValue
-d.PatternAveragePatternValue
+d.getPatternAverageValue
 
 % ENgetstatistic - Retrieves hydraulic simulation statistic
-d.RelativeError
-d.Iterations 
 d.getStatistic
 
-% ENgetcoord - Retrieves coordinate x, y for a node
-% ENsetcoord - Sets coordinate x, y for a node
+%[int32, singlePtr, singlePtr] ENgetcoord(int32, singlePtr, singlePtr)
+
 d.plot;
-nodeCoords=d.getNodeCoordinates;
+nodeCoords=d.getNodeCoordinates; 
 indexNode=1;
 nodeCoords{1}(indexNode)=nodeCoords{1}(indexNode)+10;%X
 nodeCoords{2}(indexNode)=nodeCoords{2}(indexNode)+20;%Y
 d.setNodeCoordinates(nodeCoords)
 d.plot;
 
-% ENgetqualinfo - Retrieves quality info Bug
-% d.QualityChemUnits
-% d.QualityChemName
-% % d.getQualInfo
 
-% Others new.
+%[a b c] = calllib('epanet2','ENgetcurve',1,'',0,[0 0 0],[0 0 0])
+
+% [a b c e f] = calllib('epanet2','ENgetqualinfo',0,'','',0)
+
+% Others
 n=d.getComputedHydraulicTimeSeries; % EN_TANKVOLUME - ENgetnodevalue
 n.TankVolume(:,d.NodeTankIndex)
 
-d.TimeStartTime % EN_STARTTIME  - ENgettimeparam
+d.TimeStarting_Time % EN_STARTTIME  - ENgettimeparam
 d.TimeHTime % EN_HTIME - ENgettimeparam
 d.TimeHaltFlag % EN_HALTFLAG - ENgettimeparam
 d.TimeNextEvent %find the lesser of the hydraulic time step length, or the time to next fill/empty
@@ -134,7 +116,7 @@ d.getLinkPumpPatternIndex
 
 
 % inpname='networks/Net1_Rossman2000.inp';
-d=epanet(inpname,version);
+d=epanet(inpname);
 %% Controls
 Controls=d.getControls
 disp('Press any key to continue...')
@@ -201,7 +183,7 @@ d.getNodeType
 d.getNodeTypeIndex
 d.getNodeElevations
 d.getNodeBaseDemands
-d.getNodeDemandPatternIndex
+d.getNodePatternIndex
 d.getNodeEmitterCoeff
 d.getNodeInitialQuality
 d.getNodeSourceQuality
@@ -255,7 +237,6 @@ d.getTimeStatisticsIndex
 d.getVersion
 
 %% To check
-d.getTimeRuleControlStep % bug: It always returns Zero!
 d.getTimeReportingPeriods% Check this
 d.getNodeTankMixZoneVolume % ok 6/3/2015
 d.getNodeTankDiameter% bug: Produces a different diameter % fix in epanet20013 - ok 6/3/2015
@@ -295,9 +276,12 @@ d.getLinkInitialStatus
 d.setLinkInitialStatus(0*d.getLinkInitialStatus)
 d.getLinkInitialStatus
 
-linkstatus=d.getLinkInitialSetting
-linkstatus(end)=108;
-d.setLinkInitialSetting(linkstatus)
+linkset=d.getLinkInitialSetting
+linkset(end)=108;
+if d.LinkValveCount
+    linkset(d.LinkValveIndex)=0;
+end
+d.setLinkInitialSetting(linkset)
 d.getLinkInitialSetting
 
 d.getLinkBulkReactionCoeff
@@ -327,10 +311,10 @@ values{1}(2)=160; %values(2)
 d.setNodeBaseDemands(values)
 d.getNodeBaseDemands
 
-values = d.getNodeDemandPatternIndex
+values = d.getNodePatternIndex
 values(2)=0;
 d.setNodeDemandPatternIndex(values)
-d.getNodeDemandPatternIndex
+d.getNodePatternIndex
 
 values = d.getNodeEmitterCoeff
 values(2)=0.5;
@@ -481,7 +465,7 @@ d.getTimeStatisticsType
 d.getTimeStatisticsIndex
 
 d.getTimeRuleControlStep 
-d.setTimeRuleControlStep(100) % bug: Does not change Time Rule Control Step
+d.setTimeRuleControlStep(100) 
 d.getTimeRuleControlStep
 
 d.getPattern 
@@ -524,7 +508,7 @@ pause
 
 
 %% Report Preparation
-d=epanet(inpname,version);
+d=epanet(inpname);
 
 % Compute ranges (max - min) 
 d.setTimeStatisticsType('RANGE')
@@ -635,7 +619,7 @@ pause
 
 %% Create Hydraulics file
 
-d=epanet(inpname,version);
+d=epanet(inpname);
 
 d.solveCompleteHydraulics % Only call this ONLY once (see ENsolveH for more details)
 d.saveHydraulicFile([pwd,'\hydraulics.hyd'])
@@ -647,7 +631,7 @@ disp('Press any key to continue...')
 pause
 
 %% Simulation Quality
-d=epanet(inpname,version);
+d=epanet(inpname);
 d.setQualityType('chem','mg/L')
 
 % Solve Hydraulics (outside the loop)
@@ -676,7 +660,7 @@ pause
 %WITH SETTIMEQUALITYSTEP
 
 %% Simulation Hydraulics
-d=epanet(inpname,version);
+d=epanet(inpname);
 d.setQualityType('chem','mg/L')
 
 
@@ -699,7 +683,7 @@ d.unload
 disp('Press any key to continue...')
 pause
 
-d=epanet(inpname,version);
+d=epanet(inpname);
 %% Test Plot
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
 disp('Press any key to continue...')

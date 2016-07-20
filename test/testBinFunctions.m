@@ -9,12 +9,13 @@ close all;
 clear class;
 
 % Create EPANET object using the INP file
-inpname='networks/Net1_Rossman2000.inp'; %Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
+inpname='networks/Net1_Rossman2000.inp';
+%Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
 tic;d=epanet(inpname);toc
 d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]); 
 d.BinUpdateClass; % must be run if use Bin functions
 
-if d.errcode
+if d.Errcode
     return; 
 end
 
@@ -192,7 +193,7 @@ patterns=d.BinNodeDemandPatternNameID;
 errcode=d.addBinPattern('new',1:0.1:2);
 patterns{end}='new';
 errcode=d.setBinNodeDemandPatternNameID(patterns);
-d.getPatternNameID(d.getNodeDemandPatternIndex)
+d.getPatternNameID(d.getNodePatternIndex)
 case1node=toc
 disp('Press any key to continue...')
 pause
@@ -209,7 +210,7 @@ patterns{end}='new1';
 d.setBinNodeJunctionsParameters('elevation',elevations,'basedemand',basedemands,'demandpattern',patterns);
 d.getNodeElevations
 d.getNodeBaseDemands
-d.getPatternNameID(d.getNodeDemandPatternIndex)
+d.getPatternNameID(d.getNodePatternIndex)
 case2node=toc
 disp('Press any key to continue...')
 pause
@@ -226,7 +227,7 @@ if d.NodeReservoirCount
     patres=d.BinNodeResDemandPatternNameID;
     patres{end}='new';
     errcode=d.setBinNodeResDemandPatternNameID(patres);
-    d.getPatternNameID(d.getNodeDemandPatternIndex)
+    d.getPatternNameID(d.getNodePatternIndex)
     caseres1=toc
     disp('Press any key to continue...')
     pause
@@ -239,7 +240,7 @@ if d.NodeReservoirCount
     patres{end}='pat2';
     errcode=d.setBinNodeReservoirParameters('elevation',elevationsReservoirs,'pattern',patres);
     d.getNodeElevations
-    d.getPatternNameID(d.getNodeDemandPatternIndex)
+    d.getPatternNameID(d.getNodePatternIndex)
     caseres2=toc
     disp('Press any key to continue...')
     pause
@@ -904,8 +905,8 @@ pause
 %% OTHER PROPERTIES
 d.BinUpdateClass
 
-d.inputfile
-d.Bintempfile
+d.InputFile
+d.BinTempfile
 d.BinNodeJunctionNameID
 d.BinNodeReservoirNameID
 d.BinNodeTankNameID
@@ -1032,12 +1033,12 @@ d.BinQualityTraceNodeIndex
 d.BinQualityTraceNodeID
 d.BinOptionsDiffusivity
 
-d.BincountStatuslines
-d.BincountInitialQualitylines
-d.BincountReactionlines
-d.BincountPatternlines
-d.BinSImetric
-d.BinUScustomary
+d.BinCountStatuslines
+d.BinCountInitialQualitylines
+d.BinCountReactionlines
+d.BinCountPatternlines
+d.BinUnits_SI_Metric
+d.BinUnits_US_Customary
 d.BinQualityUnits
 
 d.BinUnits.BinLinkFlowUnits

@@ -49,6 +49,9 @@ Arsenic Oxidation/Adsorption Example
   NODE    Source AS3   10.0
   NODE    Source NH2CL 2.5
 
+[PATTERNS]
+1   1.1 0.8
+
 [REPORT]
   NODES   C   D                ;Report results for nodes C and D
   LINKS   5                    ;Report results for pipe 5

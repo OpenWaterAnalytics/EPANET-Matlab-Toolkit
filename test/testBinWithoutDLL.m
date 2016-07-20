@@ -9,7 +9,8 @@ close all;
 clear class;
 
 % Create EPANET object using the INP file
-inpname='networks/Net1_Rossman2000.inp'; %Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
+inpname='networks/Net1_Rossman2000.inp'; 
+%Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
 tic;d=epanet(inpname,'Bin');toc  
 
 %% GET, SET FLOW UNITS
@@ -850,8 +851,8 @@ pause
 %% OTHER PROPERTIES
 d.BinUpdateClass
 
-d.inputfile
-d.Bintempfile
+d.InputFile
+d.BinTempfile
 d.BinNodeJunctionNameID
 d.BinNodeReservoirNameID
 d.BinNodeTankNameID
@@ -979,12 +980,12 @@ d.BinQualityTraceNodeID
 d.BinQualityUnits
 d.BinOptionsDiffusivity
 
-d.BincountStatuslines
-d.BincountInitialQualitylines
-d.BincountReactionlines
-d.BincountPatternlines
-d.BinSImetric
-d.BinUScustomary
+d.BinCountStatuslines
+d.BinCountInitialQualitylines
+d.BinCountReactionlines
+d.BinCountPatternlines
+d.BinUnits_SI_Metric
+d.BinUnits_US_Customary
 d.BinQualityUnits
 
 d.BinLinkFlowUnits
