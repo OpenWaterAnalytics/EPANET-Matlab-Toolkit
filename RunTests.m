@@ -1,4 +1,4 @@
-% Run Tests Files of EpaClass 2.1
+% Run Tests Files
 
 addpath(genpath(pwd))
 

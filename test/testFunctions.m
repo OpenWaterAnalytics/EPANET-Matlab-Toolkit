@@ -40,9 +40,7 @@ d.getCurveValue(indexCurve,2)   % returns specific point for specific curve inde
 d.setCurve(3,[1900 300; 1400 200]) % Change an existing curve 
 d.getCurveValue(indexCurve) 
 
-% d.getCurve
-% [int32, cstring, int32Ptr, singlePtrPtr, singlePtrPtr] ENgetcurve(int32, cstring, int32Ptr, singlePtrPtr, singlePtrPtr)
-% Currently there is a segmentation fault in Matlab
+d.getCurvesInfo
 
 len=d.getCurveLengths
 d.getCurveLengths(3)
@@ -90,10 +88,7 @@ nodeCoords{2}(indexNode)=nodeCoords{2}(indexNode)+20;%Y
 d.setNodeCoordinates(nodeCoords)
 d.plot;
 
-
-%[a b c] = calllib('epanet2','ENgetcurve',1,'',0,[0 0 0],[0 0 0])
-
-% [a b c e f] = calllib('epanet2','ENgetqualinfo',0,'','',0)
+d.getQualityInfo
 
 % Others
 n=d.getComputedHydraulicTimeSeries; % EN_TANKVOLUME - ENgetnodevalue
@@ -697,3 +692,5 @@ d.unload % delete txt and temp files
 sfilesexist = dir('s*'); 
 if (~isempty(sfilesexist)), delete('s*'), end;
 delete('TestR*','hydraulics*','*_INP*')
+
+fprintf('Test finished.\n')

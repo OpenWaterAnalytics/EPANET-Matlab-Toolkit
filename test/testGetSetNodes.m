@@ -234,3 +234,5 @@ d.getNodeTankMixingModelType
 d.getNodeTankMixingModelCode
 
 d.unload
+
+fprintf('Test finished.\n')

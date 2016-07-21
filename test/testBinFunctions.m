@@ -1068,3 +1068,5 @@ d.BinClose
 %Delete s files 
 sfilesexist = dir('s*'); 
 if (~isempty(sfilesexist)), delete s*, end;
+
+fprintf('Test finished.\n')

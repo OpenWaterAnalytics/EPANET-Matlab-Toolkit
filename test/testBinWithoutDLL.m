@@ -998,3 +998,5 @@ d.BinUnits
 sfilesexist = dir('s*'); 
 if (~isempty(sfilesexist)), delete s*, end;
 d.BinClose
+
+fprintf('Test finished.\n')

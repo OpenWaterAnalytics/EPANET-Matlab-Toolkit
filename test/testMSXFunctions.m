@@ -251,3 +251,5 @@ d.unload
 sfilesexist = dir('s*'); 
 if (~isempty(sfilesexist)), delete s*, end;
 delete('testMSX.msx','*.hyd','*.bin','*bat*','*_temp*')
+
+fprintf('Test finished.\n')
