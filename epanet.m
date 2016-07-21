@@ -7131,8 +7131,8 @@ function [Errcode, count] = ENgetcount(countcode,LibEPANET)
 end
 function [errmsg, e] = ENgeterror(Errcode,LibEPANET)
     if Errcode
-        errmsg = char(32*ones(1,80));
-        [e,errmsg] = calllib(LibEPANET,'ENgeterror',Errcode,errmsg,80);
+        errmsg = char(32*ones(1,79));
+        [e,errmsg] = calllib(LibEPANET,'ENgeterror',Errcode,errmsg,79);
     else
         e=0;
         errmsg='';
@@ -7145,7 +7145,7 @@ if Errcode
 end
 end
 function [Errcode,id] = ENgetlinkid(index,LibEPANET)
-id=char(32*ones(1,17));
+id=char(32*ones(1,31));
 [Errcode,id]=calllib(LibEPANET,'ENgetlinkid',index,id);
 if Errcode
     ENgeterror(Errcode,LibEPANET);
@@ -7176,7 +7176,7 @@ if Errcode
 end
 end
 function [Errcode,id] = ENgetnodeid(index,LibEPANET)
-id=char(32*ones(1,17));
+id=char(32*ones(1,31));
 [Errcode,id]=calllib(LibEPANET,'ENgetnodeid',index,id);
 if Errcode
     ENgeterror(Errcode,LibEPANET);
@@ -7299,7 +7299,7 @@ end
 function [Errcode] = ENopen(inpname,repname,binname,LibEPANET) %DE
     Errcode=calllib(LibEPANET,'ENopen',inpname,repname,binname);
     if Errcode
-       [~,errmsg] = calllib(LibEPANET,'ENgeterror',Errcode,char(32*ones(1,80)),80);
+       [~,errmsg] = calllib(LibEPANET,'ENgeterror',Errcode,char(32*ones(1,79)),79);
        warning(errmsg);
     end
 end
