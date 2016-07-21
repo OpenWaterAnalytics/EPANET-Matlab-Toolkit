@@ -555,11 +555,10 @@ classdef epanet <handle
             %Get quality types
             obj.QualityCode = obj.getQualityCode;
             obj.QualityTraceNodeIndex = obj.getQualityTraceNodeIndex;
-            %Bug
-            obj.QualityType = obj.getQualityType;
-%             n = obj.getQualityInfo;
-%             obj.QualityChemUnits = n.QualityChemUnits;
-%             obj.QualityChemName= n.QualityChemUnits;
+%             obj.QualityType = obj.getQualityType;
+            n = obj.getQualityInfo;
+            obj.QualityChemUnits = n.QualityChemUnits;
+            obj.QualityChemName= n.QualityChemUnits;
             
             %Get time parameters
             obj.TimeSimulationDuration = obj.getTimeSimulationDuration;
@@ -594,7 +593,7 @@ classdef epanet <handle
                 obj.LinkPumpPatternIndex = obj.getLinkPumpPatternIndex;
                 obj.LinkPumpTypeCode = obj.getLinkPumpTypeCode;
                 obj.LinkPumpType = obj.getLinkPumpType;
-%                 obj.CurvesInfo = obj.getCurvesInfo; % New version dev2.1
+                obj.CurvesInfo = obj.getCurvesInfo; % New version dev2.1
             catch e
             end
             %Get data from raw file (for information which cannot be
