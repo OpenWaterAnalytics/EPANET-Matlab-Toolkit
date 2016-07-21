@@ -7489,8 +7489,8 @@ if Errcode
 end
 end
 function [Errcode, ids, nvalue, xvalue, yvalue] = ENgetcurve(value,LibEPANET)
-[~,~,nvalue,~,~]=calllib(LibEPANET,'ENgetcurve',value,'',0,0,0);
-[Errcode,ids,~, xvalue, yvalue]=calllib(LibEPANET,'ENgetcurve',value,char(32*ones(1,17)),0,zeros(1,nvalue),zeros(1,nvalue));
+[~,~,nvalue,~,~]=calllib(LibEPANET,'ENgetcurve',value,char(32*ones(1,31)),0,0,0);
+[Errcode,ids,~, xvalue, yvalue]=calllib(LibEPANET,'ENgetcurve',value,char(32*ones(1,31)),0,zeros(1,nvalue),zeros(1,nvalue));
 if Errcode
     ENgeterror(Errcode,LibEPANET);
 end
@@ -7546,7 +7546,7 @@ if Errcode
 end
 end
 function [Errcode,qualcode,chemname,chemunits,tracenode] = ENgetqualinfo(LibEPANET)
-chm=libpointer('cstring', char(32*ones(1,16)));
+chm=char(32*ones(1,31));
 [Errcode,qualcode,chemname,chemunits,tracenode]=calllib(LibEPANET,'ENgetqualinfo',0,chm,chm,0);
 if Errcode
     ENgeterror(Errcode,LibEPANET);
