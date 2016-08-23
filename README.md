@@ -1,7 +1,7 @@
-EPANET-Matlab-Toolkit
+EPANET-MATLAB-Toolkit
 ==================================
 
-The `EPANET-Matlab Toolkit` is an open-source software which operates within the Matlab environment, for providing a programming interface for the latest version of [EPANET](https://github.com/OpenWaterAnalytics/epanet), a hydraulic and quality modeling software created by the US EPA, with Matlab, a  high-level technical computing software. The goal of the Matlab Class is to serve as a common programming framework for research and development in the growing field of smart water networks.
+The `EPANET-Matlab Toolkit` is an open-source software, originally developed by the [KIOS Research Center for Intelligent Systems and Networks of the University of Cyprus](http://www.kios.ucy.ac.cy/) which operates within the Matlab environment, for providing a programming interface for the latest version of [EPANET](https://github.com/OpenWaterAnalytics/epanet), a hydraulic and quality modeling software created by the US EPA, with Matlab, a  high-level technical computing software. The goal of the EPANET Matlab Toolkit is to serve as a common programming framework for research and development in the growing field of smart water networks.
 
 The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, modifying, simulating and plotting results produced by the EPANET libraries.  
 
@@ -9,7 +9,7 @@ The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, 
 * [Matlab](http://www.mathworks.com/)
 * [EPANET](https://github.com/OpenWaterAnalytics/epanet) The OpenWaterAnalytics (OWA) EPANET version is recommended instead of the one provided by the EPA.gov website, as a number of bugs have been fixed in the OWA version. 
 
-# How to use the class #
+# How to use the Toolkit #
 Download the folder `Download ZIP`, set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
 
 Example:
@@ -31,9 +31,9 @@ Keep in mind that some bugs may exist in the `EPANET` libraries, in case you are
 * `EPANET-MSX`: GNU Lesser General Public License
 * `EPANET-Matlab Toolkit`: EUPL 
 
-# Acknowledgements #
-* Marios Kyriakou, KIOS Research Center, University of Cyprus
-* Demetrios Eliades, KIOS Research Center, University of Cyprus
+# Contributors #
+* Marios Kyriakou, [KIOS Research Center for Intelligent Systems and Networks, University of Cyprus](http://www.kios.ucy.ac.cy/)
+* Demetrios Eliades, [KIOS Research Center for Intelligent Systems and Networks, University of Cyprus](http://www.kios.ucy.ac.cy/c)
 
 The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](http://www.mathworks.com/matlabcentral/fileexchange/25100-epanet-matlab-toolkit) as well as the OpenWaterAnalytics [EPANET-Matlab Wrappers](https://github.com/OpenWaterAnalytics/epanet-matlab)
 # List of Matlab Class Functions #
