@@ -9,7 +9,7 @@ For support, please use the OWA community forum : http://community.wateranalytic
 
 # Requirements #
 * [Matlab](http://www.mathworks.com/)
-* [EPANET](https://github.com/OpenWaterAnalytics/epanet) The OpenWaterAnalytics (OWA) EPANET version is recommended instead of the one provided by the EPA.gov website, as a number of bugs have been fixed in the OWA version. 
+* [EPANET 2.1](https://github.com/OpenWaterAnalytics/epanet) 
 
 # How to use the Toolkit #
 Download the folder `Download ZIP`, set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
