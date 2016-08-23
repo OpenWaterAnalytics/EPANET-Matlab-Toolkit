@@ -5,6 +5,8 @@ The `EPANET-Matlab Toolkit` is an open-source software, originally developed by 
 
 The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, modifying, simulating and plotting results produced by the EPANET libraries.  
 
+For support, please use the OWA community forum : http://community.wateranalytics.org/
+
 # Requirements #
 * [Matlab](http://www.mathworks.com/)
 * [EPANET](https://github.com/OpenWaterAnalytics/epanet) The OpenWaterAnalytics (OWA) EPANET version is recommended instead of the one provided by the EPA.gov website, as a number of bugs have been fixed in the OWA version. 
