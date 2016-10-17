@@ -114,7 +114,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeJunctionNameID|Retrieves the junctions IDs|
 |getNodeMassFlowRate|Retrieves the computed mass flow rates per minute of chemical sources|
 |getNodeNameID|Retrieves the ID label of all nodes or some nodes with a specified index|
-|getNodeNumDemandCategories|Retrieves the number of demand categories for a node|
+|getNodeDemandCategoriesNumber|Retrieves the number of demand categories for a node|
 |getNodePressure|Retrieves the computed values of all node pressures|
 |getNodeReservoirCount|Retrieves the number of reservoirs|
 |getNodeReservoirIndex|Retrieves the indices of reservoirs|
