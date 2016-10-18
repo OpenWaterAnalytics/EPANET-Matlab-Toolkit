@@ -2134,7 +2134,7 @@ classdef epanet <handle
                 NodeNumDemandC=obj.getNodeDemandCategoriesNumber;
                 for i=1:obj.getNodeJunctionCount
                     for u=1:NodeNumDemandC(i)
-                        [obj.Errcode] = ENsetbasedemand(i, NodeNumDemandC(u), value{NodeNumDemandC(u)}(i),obj.LibEPANET);
+                        [obj.Errcode] = ENsetbasedemand(i, u, value{u}(i),obj.LibEPANET);
                     end
                 end
             else %version epanet20012
