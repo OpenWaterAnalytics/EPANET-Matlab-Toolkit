@@ -1,4 +1,4 @@
-%% EPANET-Matlab Class Test Net1 **01/07/2016**
+%% EPANET-Matlab Toolkit Test Part 2
 % This file is provided to ensure that all functions can be executed
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints, 
@@ -8,8 +8,8 @@ clear;
 close all;
 
 % Create EPANET object using the INP file
-inpname='networks/Net1_Rossman2000.inp'; % Net1_Rossman2000
-% Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
+inpname='Net1.inp';  
+% Net1 Net2 Net3 BWSN_Network_1 
 d=epanet(inpname);
 
 %% *Get Nodes Data (EXAMPLES)*
@@ -60,53 +60,55 @@ d.getNodeSourceType
 d.getNodeSourceType(3)
 
 %% Tanks
+tankInd = d.NodeTankIndex(1);
+
 d.getNodeTankInitialLevel
-d.getNodeTankInitialLevel(11)
+d.getNodeTankInitialLevel(tankInd)
 
 d.getNodeTankInitialWaterVolume
-d.getNodeTankInitialWaterVolume(11)
+d.getNodeTankInitialWaterVolume(tankInd)
 
 d.getNodeTankMixZoneVolume
-d.getNodeTankMixZoneVolume(11)
+d.getNodeTankMixZoneVolume(tankInd)
 
 d.getNodeTankDiameter
-d.getNodeTankDiameter(11)
+d.getNodeTankDiameter(tankInd)
 
 d.getNodeTankMinimumWaterVolume
-d.getNodeTankMinimumWaterVolume(11)
+d.getNodeTankMinimumWaterVolume(tankInd)
 
 d.getNodeTankVolumeCurveIndex
-d.getNodeTankVolumeCurveIndex(11)
+d.getNodeTankVolumeCurveIndex(tankInd)
 
 d.getNodeTankMinimumWaterLevel
-d.getNodeTankMinimumWaterLevel(11)
+d.getNodeTankMinimumWaterLevel(tankInd)
 
 d.getNodeTankMaximumWaterLevel
-d.getNodeTankMaximumWaterLevel(11)
+d.getNodeTankMaximumWaterLevel(tankInd)
 
 d.getNodeTankMinimumFraction
-d.getNodeTankMinimumFraction(11)
+d.getNodeTankMinimumFraction(tankInd)
 
 d.getNodeTankBulkReactionCoeff
-d.getNodeTankBulkReactionCoeff(11)
+d.getNodeTankBulkReactionCoeff(tankInd)
 
 d.getNodeTankVolume
-d.getNodeTankVolume(11)
+d.getNodeTankVolume(tankInd)
 
-d.getNodeTankMaxVolume
-d.getNodeTankMaxVolume(11)
+d.getNodeTankMaximumWaterVolume
+d.getNodeTankMaximumWaterVolume(tankInd)
 
 d.getNodeType
-d.getNodeType(11)
+d.getNodeType(tankInd)
 
 d.getNodeNameID
-d.getNodeNameID(11)
+d.getNodeNameID(tankInd)
 
 d.getNodeCoordinates
 d.getNodeCoordinates{1}
 d.getNodeCoordinates{2}
 d.getNodeCoordinates(2)
-d.getNodeCoordinates(1:d.NodeCount)
+% d.getNodeCoordinates(1:d.NodeCount)
 % Runs hydraulics Step-by-step
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis;
@@ -179,48 +181,46 @@ d.setNodeSourceQuality(3,20);
 d.getNodeSourceQuality
 
 %% Set tanks info
-indTank = d.getNodeTankIndex
-
 d.getNodeTankInitialLevel
 d.setNodeTankInitialLevel(d.getNodeTankInitialLevel+20);
 v=d.getNodeTankInitialLevel
-d.setNodeTankInitialLevel(indTank(1),v(indTank(1))+10);
+d.setNodeTankInitialLevel(tankInd,v(tankInd)+10);
 d.getNodeTankInitialLevel
 
 d.getNodeTankDiameter
 d.setNodeTankDiameter(d.getNodeTankDiameter+20);
 d.getNodeTankDiameter
-d.setNodeTankDiameter(indTank(1),100);
+d.setNodeTankDiameter(tankInd,100);
 d.getNodeTankDiameter
 
 d.getNodeTankBulkReactionCoeff
 d.setNodeTankBulkReactionCoeff(d.getNodeTankBulkReactionCoeff+1);
 d.getNodeTankBulkReactionCoeff
-d.setNodeTankBulkReactionCoeff(indTank(1),-1);
+d.setNodeTankBulkReactionCoeff(tankInd,-1);
 d.getNodeTankBulkReactionCoeff
 
 d.getNodeTankMaximumWaterLevel
 d.setNodeTankMaximumWaterLevel(d.getNodeTankMaximumWaterLevel+21);
 d.getNodeTankMaximumWaterLevel
-d.setNodeTankMaximumWaterLevel(indTank(1),200);
+d.setNodeTankMaximumWaterLevel(tankInd,200);
 d.getNodeTankMaximumWaterLevel
 
 d.getNodeTankMinimumWaterLevel
 d.setNodeTankMinimumWaterLevel(d.getNodeTankMinimumWaterLevel-21);
 n=d.getNodeTankMinimumWaterLevel
-d.setNodeTankMinimumWaterLevel(indTank(1),n(indTank(1))+20);
+d.setNodeTankMinimumWaterLevel(tankInd,n(tankInd)+20);
 d.getNodeTankMinimumWaterLevel
 
 d.getNodeTankMinimumFraction
 d.setNodeTankMinimumFraction(d.getNodeTankMinimumFraction+0.1);
 d.getNodeTankMinimumFraction
-d.setNodeTankMinimumFraction(indTank(1),0.2);
+d.setNodeTankMinimumFraction(tankInd,0.2);
 d.getNodeTankMinimumFraction
 
 d.getNodeTankMinimumWaterVolume
 d.setNodeTankMinimumWaterVolume(d.getNodeTankMinimumWaterVolume+10000);
 d.getNodeTankMinimumWaterVolume
-d.setNodeTankMinimumWaterVolume(indTank(1),20000);
+d.setNodeTankMinimumWaterVolume(tankInd,20000);
 d.getNodeTankMinimumWaterVolume
 
 values = d.getNodeTankMixingModelType 
@@ -229,10 +229,9 @@ values{end}='MIX2';
 d.setNodeTankMixingModelType(values);
 d.getNodeTankMixingModelType 
 d.getNodeTankMixingModelCode
-d.setNodeTankMixingModelType(indTank(1),'FIFO');
+d.setNodeTankMixingModelType(tankInd,'FIFO');
 d.getNodeTankMixingModelType 
 d.getNodeTankMixingModelCode
 
 d.unload
-
 fprintf('Test finished.\n')

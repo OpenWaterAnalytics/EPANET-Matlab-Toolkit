@@ -1,4 +1,4 @@
-%% EPANET-Matlab Class Test Part 3
+%% EPANET-Matlab Toolkit Test Part 5
 % This file is provided to ensure that all functions can be executed
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints, 
@@ -9,8 +9,8 @@ close all;
 clear class;
 
 % Create EPANET object using the INP file
-inpname='networks/Net1_Rossman2000.inp';
-%Net1_Rossman2000 Net3_Rossman2000 Net2_Rossman2000 BWSN1_Ostfeld2008
+inpname='Net1.inp';
+%Net1 Net2 Net3 net2-cl2 BWSN_Network_1
 tic;d=epanet(inpname);toc
 d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]); 
 d.BinUpdateClass; % must be run if use Bin functions
@@ -186,13 +186,13 @@ d.getNodeElevations
 basedemands=d.BinNodeJunctionsBaseDemands;
 basedemands(end)=323;
 errcode=d.setBinNodeJunctionsBaseDemands(basedemands);
-d.getNodeBaseDemands
+d.getNodeBaseDemands{1}
 
-patterns=d.BinNodeDemandPatternNameID;
+patterns=d.BinNodeJunDemandPatternNameID;
 % patternsid=d.BinPatternNameID;
 errcode=d.addBinPattern('new',1:0.1:2);
-patterns{end}='new';
-errcode=d.setBinNodeDemandPatternNameID(patterns);
+patterns{1}='new';
+errcode=d.setBinNodeJunDemandPatternNameID(patterns); %No for Reservoirs (use setBinNodeResDemandPatternNameID)
 d.getPatternNameID(d.getNodePatternIndex)
 case1node=toc
 disp('Press any key to continue...')
@@ -204,12 +204,12 @@ elevations=d.BinNodeJunctionElevation;
 elevations(end)=2002;
 basedemands=d.BinNodeJunctionsBaseDemands;
 basedemands(end)=325;
-patterns=d.BinNodeDemandPatternNameID;
+patterns=d.getPatternNameID(d.getNodePatternIndex);
 errcode=d.addBinPattern('new1',1:0.1:2);
-patterns{end}='new1';
+patterns{2}='new1';
 d.setBinNodeJunctionsParameters('elevation',elevations,'basedemand',basedemands,'demandpattern',patterns);
 d.getNodeElevations
-d.getNodeBaseDemands
+d.getNodeBaseDemands{1}
 d.getPatternNameID(d.getNodePatternIndex)
 case2node=toc
 disp('Press any key to continue...')
@@ -232,6 +232,7 @@ if d.NodeReservoirCount
     disp('Press any key to continue...')
     pause
 
+    d.BinUpdateClass
     tic
     elevationsReservoirs=d.BinNodeReservoirElevation;
     elevationsReservoirs(end)=190;
@@ -247,7 +248,7 @@ if d.NodeReservoirCount
 end
 
 %% GET, SET TANKS PARAMETERS
-if strcmp(inpname,'networks/Net1_Rossman2000.inp')
+if strcmp(inpname,'Net1.inp')
 if d.BinNodeTankCount
     tic
     tankElevation=d.BinNodeTankElevation;
@@ -255,20 +256,20 @@ if d.BinNodeTankCount
     errcode=d.setBinNodeTankElevation(tankElevation);
     d.getNodeElevations
     
-    tankInitlevel=d.BinNodeTankInitLevel;
+    tankInitlevel=d.BinNodeTankInitialLevel;
     tankInitlevel(end)=110;
-    errcode=d.setBinNodeTankInitLevel(tankInitlevel);
+    errcode=d.setBinNodeTankInitialLevel(tankInitlevel);
     d.getNodeTankInitialLevel
     
     d=epanet(inpname);d.BinUpdateClass
-    tankMinlevel=d.BinNodeTankMinLevel;
+    tankMinlevel=d.BinNodeTankMinimumWaterLevel;
     tankMinlevel(end)=tankMinlevel(end)+5;%5
-    errcode=d.setBinNodeTankMinLevel(tankMinlevel);
-    d.getNodeTankMinimumWaterLevel
+    errcode=d.setBinNodeTankMinimumWaterLevel(tankMinlevel);
+    d.getNodeTankMinimumWaterLevel	
     
-    tankMaxlevel=d.BinNodeTankMaxLevel;
+    tankMaxlevel=d.BinNodeTankMaximumWaterLevel;
     tankMaxlevel(end)=300;
-    errcode=d.setBinNodeTankMaxLevel(tankMaxlevel);    
+    errcode=d.setBinNodeTankMaximumWaterLevel(tankMaxlevel);    
     d.getNodeTankMaximumWaterLevel
 
     tankDiameter=d.BinNodeTankDiameter;
@@ -276,24 +277,24 @@ if d.BinNodeTankCount
     errcode=d.setBinNodeTankDiameter(tankDiameter); %bug
     d.getNodeTankDiameter
     
-    tankMinvol=d.BinNodeTankMinVol;
+    tankMinvol=d.BinNodeTankMinimumWaterVolume;
     tankMinvol(end)=10;
-    errcode=d.setBinNodeTankMinVol(tankMinvol);
+    errcode=d.setBinNodeTankMinimumWaterVolume(tankMinvol);
     d.getNodeTankMinimumWaterVolume
     case1tank=toc
     
     tic
     tankElevation=d.BinNodeTankElevation;
     tankElevation(end)=100;
-    tankInitlevel=d.BinNodeTankInitLevel;
+    tankInitlevel=d.BinNodeTankInitialLevel;
     tankInitlevel(end)=550;
-    tankMinlevel=d.BinNodeTankMinLevel;
+    tankMinlevel=d.BinNodeTankMinimumWaterLevel;
     tankMinlevel(end)=250;    
-    tankMaxlevel=d.BinNodeTankMaxLevel;
+    tankMaxlevel=d.BinNodeTankMaximumWaterLevel;
     tankMaxlevel(end)=3000;
     tankDiameter=d.BinNodeTankDiameter;
     tankDiameter(end)=1000;
-    tankMinvol=d.BinNodeTankMinVol;
+    tankMinvol=d.BinNodeTankMinimumWaterVolume;
     tankMinvol(end)=100;
 errcode=d.setBinNodeTankParameters('elevation',tankElevation,'initlevel',tankInitlevel,'minlevel',tankMinlevel,'maxlevel',tankMaxlevel,'diameter',tankDiameter,'minvol',tankMinvol);
     d.getNodeElevations
@@ -436,7 +437,7 @@ newElevation=500; %ft
 ToNodeID='11'; 
 newPumpID='PU2';
 Code='PUMP';
-newCurveIDofPump='C-1'; 
+newCurveIDofPump='C-1n'; 
 newCurveXvalue=1500;
 newCurveYvalue=250;
 [errcode]=d.addBinReservoir(newID,x,y,newElevation,newPumpID,...
@@ -460,7 +461,7 @@ MinVol=0;
 newPumpID='PU3';
 ToNodeID='32'; 
 Code='PUMP';
-newCurveIDofPump='C-1'; 
+newCurveIDofPump='C-1n2'; 
 newCurveXvalue=[1500 1800 2000];
 newCurveYvalue=[250 200 0];
 errcode=d.addBinTank(newID,x,y,MaxLevel,Diameter,Initlevel,newElevation,initqual,MinLevel,MinVol,newPumpID,...
@@ -502,7 +503,7 @@ Code='PSV';
 newValveSetting=15; 
 [errcode]=d.addBinReservoir(newID,x,y,newElevation,newValveID,...
 ToNodeID,newValveDiameter,newValveSetting,Code);
-d.Binplot('nodes','yes','highlightlink',{'PU2'},'fontsize',10);
+d.Binplot('nodes','yes','highlightlink',{'V2psv'},'fontsize',10);
 if errcode
     [errcode]=d.removeBinNodeID('S3');
 end
@@ -565,7 +566,7 @@ d.plot('nodes','yes','highlightlink',{'V4'},'fontsize',8);
 %TCV
 errcode=d.addBinValveTCV('V5','32','13',newValveDiameter,newValveSetting);
 d.plot('nodes','yes','highlightlink',{'V5'},'fontsize',8);
-d.getBinComputedAllParameters  %"Run was successful."
+d.getBinComputedAllParameters  %"Run was unsuccessful."
 d.getComputedHydraulicTimeSeries
 % %GPV
 errcode=d.addBinValveGPV('V6','11','22',newValveDiameter,newValveSetting); %%%%%%%%%%%%ERROR
@@ -583,7 +584,7 @@ end
 
 %% GET, REMOVE RULES CONTROLS
 % section [RULES]
-if strcmp(inpname,'networks/BWSN1_Ostfeld2008.inp')
+if strcmp(inpname,'BWSN_Network_1.inp')
     p=d.getBinRulesControlsInfo
     errcode=d.removeBinRulesControlLinkID(p.BinRulesControlLinksID{4}{3}); % PUMP-170
     errcode=d.removeBinRulesControlNodeID(p.BinRulesControlNodesID{4}{2}); % TANK-131
@@ -617,11 +618,11 @@ end
 pp=LinksInfo.BinLinkWallReactionCoeff;
 pp2=LinksInfo.BinLinkBulkReactionCoeff;
 errcode=d.setBinLinkReactionCoeff('wall',pp,'bulk',pp2);
+d.getLinkBulkReactionCoeff
+d.getLinkWallReactionCoeff
 
 errcode=d.setBinLinkGlobalWallReactionCoeff(1.99)
 errcode=d.setBinLinkGlobalBulkReactionCoeff(2)
-isequal(d.getLinkBulkReactionCoeff,LinksInfo.BinLinkBulkReactionCoeff)
-isequal(d.getLinkWallReactionCoeff,LinksInfo.BinLinkWallReactionCoeff)
 disp('Press any key to continue...')
 pause
 
@@ -654,6 +655,13 @@ n=d.BinNodeNameID;
 errcode=d.setBinQualityTrace(n{2})
 d.getQualityType
 d.getQualityTraceNodeIndex
+
+species = 'Chlorine'; 
+units = 'mg/L';
+errcode = d.setBinQualType(species,units)
+d.getQualityInfo.QualityChemName
+d.getQualityInfo.QualityChemUnits
+
 disp('Press any key to continue...')
 pause
 
@@ -703,8 +711,8 @@ pause
 %% ADD, GET, REMOVE CURVES
 d.getBinCurvesInfo.BinCurveCount
 d.getCurveCount
-errcode=d.addBinCurvePump('C-1',[1500 1800 2000],[250 200 0])%Flow-Head
-errcode=d.addBinCurveEfficiency('C-2',[1500 1800 2000],[250 200 0])%Flow-Efficiency
+errcode=d.addBinCurvePump('C-1n3',[1500 1800 2000],[250 200 0])%Flow-Head
+errcode=d.addBinCurveEfficiency('C-2n',[1500 1800 2000],[250 200 0])%Flow-Efficiency
 errcode=d.addBinCurveVolume('C33',[1500 1800 2000],[250 200 0])%Heigh-Volume
 errcode=d.addBinCurveHeadloss('C44',[1500 1800 2000],[250 200 0])%Flow-Headloss
 d.getBinCurvesInfo
@@ -727,7 +735,6 @@ pause
 d.BinNodeSourcePatternIndex
 d.BinNodeSourceQuality
 d.BinNodeSourceTypeIndex
-d.BinNodeSourceTypeCode
 d.BinNodeSourceType
 d.BinNodeSourcePatternNameID
 
@@ -761,7 +768,7 @@ pause
 
 
 %% GET, SET VALVES
-if strcmp(inpname,'networks/BWSN1_Ostfeld2008.inp')
+if strcmp(inpname,'BWSN_Network_1.inp')
     if d.BinLinkValveCount
         index=1;
         m=d.BinLinkValveMinorLoss; 
@@ -771,15 +778,17 @@ if strcmp(inpname,'networks/BWSN1_Ostfeld2008.inp')
         t=d.BinLinkValveType;
         t{index}='TCV';
         s=d.BinLinkValveSetting;
-        s(index)=0.1;
+        s(index)=10;
         statuss=d.BinLinkValveStatus;
         statuss{index}='closed';
         errcode=d.setBinLinkValvesParameters('minorloss',m,'diameter',dv,'type',t,'setting',s,'status',statuss);
         LinkValveIndex=d.getLinkValveIndex;
         LinkType=d.getLinkType;
         LinkType(LinkValveIndex(index))
-        d.getLinkInitialStatus
-        d.getLinkInitialSetting
+        d.getLinkMinorLossCoeff(LinkValveIndex)
+        d.getLinkDiameter(LinkValveIndex)
+        d.getLinkInitialSetting(LinkValveIndex)  %if write in [STATUS] section the values of setting in valves is diff! Check!
+        d.getLinkInitialStatus(LinkValveIndex)
         disp('Press any key to continue...')
         pause
     end
@@ -817,7 +826,6 @@ d.getBinNodeSourceInfo
 d.getBinCurvesInfo
 d.getBinOptionsInfo
 d.getBinTimesInfo
-d.getBinComputedAllParameters
 d.getBinPatternsInfo
 d.getBinLinksInfo
 d.BinUpdateClass
@@ -825,7 +833,7 @@ d.BinUpdateClass
 disp('Press any key to continue...')
 pause
 
-if strcmp(inpname,'networks/Net1_Rossman2000.inp')
+if strcmp(inpname,'Net1.inp')
 %% GET, ADD, REMOVE CONTROLS
     v=d.getBinControlsInfo;
     errcode=d.removeBinControlLinkID(v.BinControlLinksID{1});
@@ -892,7 +900,6 @@ disp('Press any key to continue...')
 pause
 
 
-
 %% Run epanet2d.exe 
 % Computes quality and hydraulics
 d.getBinComputedAllParameters
@@ -901,146 +908,168 @@ disp('Press any key to continue...')
 pause
 
 
-
 %% OTHER PROPERTIES
 d.BinUpdateClass
 
 d.InputFile
-d.BinTempfile
-d.BinNodeJunctionNameID
-d.BinNodeReservoirNameID
-d.BinNodeTankNameID
-d.BinNodeNameID
-d.BinNodeType
-d.BinNodeReservoirIndex
-d.BinNodeTankIndex
-d.BinNodeJunctionIndex
-d.BinNodeElevations
-d.BinNodeTankElevation
-d.BinNodeTankInitLevel
-d.BinNodeTankMinLevel
-d.BinNodeTankMaxLevel
-d.BinNodeTankDiameter
-d.BinNodeTankMinVol
-d.BinNodeTankMixID
-d.BinNodeTankMixModel
-d.BinNodeTankMinimumFraction
-d.BinNodeReservoirElevation
-d.BinNodeJunctionElevation
-d.BinNodeResDemandPatternNameID
-d.BinNodeCount  
-d.BinNodeJunctionCount 
-d.BinNodeReservoirCount 
-d.BinNodeTankCount
-d.BinNodeTankReservoirCount   
-d.BinNodeSourceTypeCode
-d.BinNodeSourceType
-d.BinNodeSourcePatternIndex
-d.BinNodeSourcePatternNameID
-d.BinNodeSourceQuality
-d.BinNodeSourceTypeIndex
-d.BinNodeJunctionsBaseDemands
-d.BinNodeDemandPatternNameID
-d.BinNodeInitialQuality
-d.BinNodeCoordinates
-d.BinNodeBaseDemands
+d.BinTempfile                
 
-d.BinPatternNameID
-d.BinPatternLengths
-d.BinPatternValue 
-d.BinPatternMatrix
-d.BinPatternCount
-
-d.BinLinkNameID
-d.BinLinkType
-d.BinLinkPipeNameID
-d.BinLinkPumpNameID
-d.BinLinkValveNameID
-d.BinLinkInitialStatusNameID
-d.BinLinkInitialStatus
-d.BinLinkPumpPatterns
-d.BinLinkPumpCurveNameID
-d.BinLinkPipeIndex
-d.BinLinkPumpIndex
-d.BinLinkValveIndex
-d.BinLinkFromNode
-d.BinLinkToNode
-d.BinLinkCount
-d.BinLinkPipeCount
-d.BinLinkPumpCount
-d.BinLinkValveCount
-d.BinLinkPipeLengths
-d.BinLinkPipeDiameters
-d.BinLinkPipeRoughness
-d.BinLinkPipeMinorLoss
-d.BinLinkValveDiameters
-d.BinLinkValveType
-d.BinLinkValveSetting
-d.BinLinkValveMinorLoss
-d.BinLinkValveStatus
-d.BinLinkValveStatusNameID
-d.BinLinkPipeStatus
-d.BinLinkPumpStatusNameID   
-d.BinLinkPumpStatus  
-d.BinLinkPumpPower
-d.BinLinkPumpNameIDPower
-d.BinLinkSettings
-d.BinLinkDiameters
-d.BinLinkLengths
-d.BinLinkRoughnessCoeff
-d.BinLinkGlobalWallReactionCoeff
-d.BinLinkGlobalBulkReactionCoeff
-d.BinLinkWallReactionCoeff
-d.BinLinkBulkReactionCoeff
-d.BinCurveNameID %ID name of curves
-d.BinCurveXvalue %X-value of curves
-d.BinCurveYvalue %Y-value of curves
-d.BinCurveAllLines
-d.BinCurveTypes % Type of curves 
-d.BinCurveCount % Number of curves
-
-d.BinControlsInfo
 d.BinControlLinksID
 d.BinControlNodesID
 d.BinControlRulesCount
+d.BinControlsInfo
 
-d.BinRulesControlsInfo
-d.BinRulesControlLinksID
-d.BinRulesControlNodesID
-d.BinRulesCount
-
-d.BinTimeSimulationDuration
-d.BinTimeHydraulicStep
-d.BinTimeQualityStep
-d.BinTimePatternStep
-d.BinTimePatternStart
-d.BinTimeReportingStep
-d.BinTimeReportingStart
-d.BinTimeStatisticsIndex
-d.BinTimeStatistics
-
-d.BinOptionsSpecificGravity
-d.BinOptionsViscosity
-d.BinOptionsMaxTrials
-d.BinOptionsAccuracyValue
-d.BinOptionsUnbalanced
-d.BinOptionsPattern
-d.BinOptionsPatternDemandMultiplier
-d.BinOptionsEmitterExponent
-d.BinQualityType% Water quality analysis code (None:0/Chemical:1/Age:2/Trace:3)
-d.BinQualityCode
-d.BinQualityTraceNodeIndex
-d.BinQualityTraceNodeID
-d.BinOptionsDiffusivity
-
-d.BinCountStatuslines
 d.BinCountInitialQualitylines
-d.BinCountReactionlines
 d.BinCountPatternlines
-d.BinUnits_SI_Metric
-d.BinUnits_US_Customary
-d.BinQualityUnits
+d.BinCountReactionlines
+d.BinCountStatuslines
 
+d.BinCurveAllLines
+d.BinCurveCount
+d.BinCurveNameID
+d.BinCurveTypes
+d.BinCurveXvalue
+d.BinCurveYvalue
+
+
+d.BinLinkCount
+d.BinLinkFlowUnits
+d.BinLinkNameID
+
+d.BinLinkDiameters
+d.BinLinkInitialStatus
+d.BinLinkInitialStatusNameID
+d.BinLinkLengths
+d.BinLinkRoughnessCoeff       
+d.BinLinkSettings             
+d.BinLinkType  
+
+d.BinLinkToNode  
+d.BinLinkFromNode
+
+d.BinLinkBulkReactionCoeff
+d.BinLinkWallReactionCoeff   
+d.BinLinkGlobalBulkReactionCoeff
+d.BinLinkGlobalWallReactionCoeff
+
+d.BinLinkPipeCount   
+d.BinLinkPipeIndex            
+d.BinLinkPipeNameID           
+
+d.BinLinkPipeDiameters        
+d.BinLinkPipeLengths          
+d.BinLinkPipeMinorLoss        
+d.BinLinkPipeRoughness        
+d.BinLinkPipeStatus   
+
+d.BinLinkPumpCount           
+d.BinLinkPumpCurveNameID      
+d.BinLinkPumpIndex          
+d.BinLinkPumpNameID          
+d.BinLinkPumpNameIDPower   
+
+d.BinLinkPumpPatterns         
+d.BinLinkPumpPower            
+d.BinLinkPumpStatus           
+d.BinLinkPumpStatusNameID  
+
+d.BinLinkValveCount  
+d.BinLinkValveIndex          
+d.BinLinkValveNameID         
+
+d.BinLinkValveDiameters     
+d.BinLinkValveMinorLoss     
+d.BinLinkValveSetting      
+d.BinLinkValveStatus          
+d.BinLinkValveStatusNameID    
+d.BinLinkValveType  
+
+d.BinNodeCount               
+d.BinNodeNameID           
+d.BinNodeBaseDemands         
+d.BinNodeCoordinates          
+d.BinNodeJunDemandPatternNameID  
+d.BinNodeElevations           
+d.BinNodeInitialQuality   
+d.BinNodeType               
+
+d.BinNodeJunctionCount 
+d.BinNodeJunctionIndex        
+d.BinNodeJunctionNameID 
+d.BinNodeJunctionElevation    
+d.BinNodeJunctionsBaseDemands
+d.BinNodeJunctionsBaseDemandsID
+d.BinNodePressureUnits    
+
+d.BinNodeResDemandPatternNameID
+d.BinNodeReservoirCount       
+d.BinNodeReservoirElevation   
+d.BinNodeReservoirIndex       
+d.BinNodeReservoirNameID 
+
+d.BinNodeSourcePatternIndex   
+d.BinNodeSourcePatternNameID
+d.BinNodeSourceQuality        
+d.BinNodeSourceType        
+d.BinNodeSourceTypeIndex   
+
+d.BinNodeTankCount         
+d.BinNodeTankDiameter         
+d.BinNodeTankElevation        
+d.BinNodeTankIndex           
+d.BinNodeTankInitialLevel     
+d.BinNodeTankMaximumWaterLevel
+d.BinNodeTankMinimumFraction  
+d.BinNodeTankMinimumWaterLevel
+d.BinNodeTankMinimumWaterVolume
+d.BinNodeTankMixID           
+d.BinNodeTankMixModel        
+d.BinNodeTankNameID           
+d.BinNodeTankReservoirCount   
+
+d.BinOptionsAccuracyValue     
+d.BinOptionsDiffusivity       
+d.BinOptionsEmitterExponent   
+d.BinOptionsHeadloss         
+d.BinOptionsMaxTrials         
+d.BinOptionsPattern           
+d.BinOptionsPatternDemandMultiplier
+d.BinOptionsQualityTolerance  
+d.BinOptionsSpecificGravity   
+d.BinOptionsUnbalanced        
+d.BinOptionsViscosity    
+
+d.BinPatternCount            
+d.BinPatternLengths           
+d.BinPatternMatrix            
+d.BinPatternNameID            
+d.BinPatternValue     
+
+d.BinQualityCode              
+d.BinQualityTraceNodeID    
+d.BinQualityTraceNodeIndex   
+d.BinQualityType            
+d.BinQualityUnits      
+
+d.BinRulesControlLinksID      
+d.BinRulesControlNodesID    
+d.BinRulesControlsInfo      
+d.BinRulesCount  
+
+d.BinTimeHydraulicStep       
+d.BinTimePatternStart         
+d.BinTimePatternStep          
+d.BinTimeQualityStep         
+d.BinTimeReportingStart       
+d.BinTimeReportingStep       
+d.BinTimeSimulationDuration   
+d.BinTimeStatistics          
+d.BinTimeStatisticsIndex    
+
+d.BinUnits_US_Customary     
+d.BinUnits_SI_Metric   
+
+d.BinUnits                    
 d.BinUnits.BinLinkFlowUnits
 d.BinUnits.BinQualityUnits
 d.BinUnits.BinNodePressureUnits
@@ -1049,6 +1078,7 @@ d.BinUnits.BinLinkPipeDiameterUnits
 d.BinUnits.BinNodeTankDiameterUnits
 d.BinUnits.BinEnergyEfficiencyUnits
 d.BinUnits.BinNodeElevationUnits
+d.BinUnits.BinNodeDemandUnits
 d.BinUnits.BinNodeEmitterCoefficientUnits
 d.BinUnits.BinEnergyUnits
 d.BinUnits.BinLinkFrictionFactorUnits
@@ -1065,8 +1095,5 @@ d.BinUnits.BinNodeTankVolumeUnits
 d.BinUnits.BinQualityWaterAgeUnits
         
 d.BinClose
-%Delete s files 
-sfilesexist = dir('s*'); 
-if (~isempty(sfilesexist)), delete s*, end;
-
+d.unload
 fprintf('Test finished.\n')
