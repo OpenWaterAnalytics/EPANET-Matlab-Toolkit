@@ -128,7 +128,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeTankIndex|Retrieves the indices of tanks|
 |getNodeTankInitialLevel|Retrieves the value of all tank initial water levels|
 |getNodeTankInitialWaterVolume|Retrieves the tank initial volume|
-|getNodeTankMaxVolume|Retrieves maximum water volume|
+|getNodeTankMaximumWaterVolume|Retrieves maximum water volume|
 |getNodeTankMaximumWaterLevel|Retrieves the tank maximum water level|
 |getNodeTankMinimumFraction|Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank|
 |getNodeTankMinimumWaterLevel|Retrieves the tank minimum water level|
@@ -454,10 +454,10 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setBinNodeSourceQuality|Sets the values of source qualities|
 |setBinNodeTankDiameter|Sets the values of tanks diameter|
 |setBinNodeTankElevation|Sets the values of tanks elevation|
-|setBinNodeTankInitLevel|Sets the values of tanks initial level|
-|setBinNodeTankMaxLevel|Sets the values of tanks maximum water level|
-|setBinNodeTankMinLevel|Sets the values of tanks minimum water level|
-|setBinNodeTankMinVol|Sets the values of tanks minimum water volume|
+|setBinNodeTankInitialLevel|Sets the values of tanks initial level|
+|setBinNodeTankMaximumWaterLevel|Sets the values of tanks maximum water level|
+|setBinNodeTankMinimumWaterLevel|Sets the values of tanks minimum water level|
+|setBinNodeTankMinimumWaterVolume|Sets the values of tanks minimum water volume|
 |setBinNodeTankParameters|Sets the values of reservoir parameters (elevations, initialLevels, minLevels, maxLevels, diameters, minVolume, mixfraction)|
 |setBinPattern|Sets all of the multiplier factors for a specific time pattern|
 |setBinQualityAge|Sets the type of water quality analysis to Age|
