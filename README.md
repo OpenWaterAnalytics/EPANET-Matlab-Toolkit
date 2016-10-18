@@ -16,7 +16,7 @@ Download the folder `Download ZIP`, set the run path in Matlab within the saved 
 
 Example:
 
-d=epanet('networks/Net1_Rossman2000.inp')
+d=epanet('Net1_Rossman2000.inp')
 
 d.getNodeCount
 
@@ -266,6 +266,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |stepMSXQualityAnalysisTimeLeft|Advances the water quality solution through a single water quality time step when performing a step-wise simulation|
 |writeMSXFile|Write a new MSX file|
 |writeMSXReport|Writes water quality simulations results as instructed by the MSX input file to a text file|
+|writeMSXReportExe|Writes water quality simulations results as instructed by the MSX input file to a specific name text file|
 |useMSXHydraulicFile|Uses a previously saved EPANET hydraulics file as the source of hydraulic information|
 |plotMSXConcentrationSpeciesOfLinks|Plots the concentration species of links|
 |plotMSXConcentrationSpeciesOfNodes|Plots the concentration species of nodes|
@@ -294,7 +295,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getMSXPatternsLengths|Retrieves the number of time periods in all or some patterns|
 |getMSXPatternsNameID|Retrieves the patterns IDs|
 |getMSXSourceLevel|Retrieves the value of all nodes source level|
-|getMSXSourceNodeNameID|Retrieves the indices of parameters|
+|getMSXSourceNodeNameID|Retrieves the ID label of all nodes|
 |getMSXSourcePatternIndex|Retrieves the value of all node source pattern index|
 |getMSXSourceType|Retrieves the value of all node source type|
 |getMSXSources|Retrieves the source info|
@@ -304,8 +305,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getMSXSpeciesCount|Retrieves the number of species|
 |getMSXSpeciesIndex|Retrieves the indices of species|
 |getMSXSpeciesNameID|Retrieves the species IDs|
-|getMSXSpeciesType|Retrieves the value of all species|
-|getMSXSpeciesUnits|Retrieves the species units|
+|getMSXSpeciesType|Retrieves the type of all species (BULK/WALL)|
+|getMSXSpeciesUnits|Retrieves the species mass units|
 |getMSXTimeStep|Retrieves the time step|
 |getMSXRateUnits|Retrieves the rate/time units (SEC/MIN/HR/DAY)|
 |getMSXAreaUnits|Retrieves the area units (FT2/M2/CM2)|
@@ -407,6 +408,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getBinControlsInfo|Retrieves the controls info|
 |getBinCurvesInfo|Retrieves the curves info|
 |getBinLinksInfo|Retrieves the links info|
+|getBinLimitingPotential|Retrieves limiting potential|
 |getBinNodesInfo|Retrieves the nodes info|
 |getBinNodeSourceInfo|Retrieves the sources info|
 |getBinOptionsInfo|Retrieves the options info|
@@ -431,6 +433,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setBinHeadlossHW|Sets headloss to H-W|
 |setBinLinkGlobalBulkReactionCoeff|Sets the global bulk reaction rate coeff.|
 |setBinLinkGlobalWallReactionCoeff|Sets the global wall reaction rate coeff.|
+|setBinLimitingPotential|Sets limiting potential|
 |setBinLinkPipeDiameters|Sets the values of pipe diameters|
 |setBinLinkPipeLengths|Sets the values of pipe lengths|
 |setBinLinkPipeMinorLoss|Sets the values of pipe minor losses|
@@ -440,7 +443,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setBinLinkPumpStatus|Sets the values of pump status|
 |setBinLinkReactionCoeff|Sets the values of bulk and wall reaction coeff.|
 |setBinLinkValvesParameters|Sets the values of valve parameters (diameters, types, settings, minor losses)|
-|setBinNodeDemandPatternNameID|Sets the names of demand pattern IDs|
+|setBinNodeJunDemandPatternNameID|Sets the names of demand pattern IDs for junctions|
 |setBinNodeInitialQuality|Sets the values of initial qualities|
 |setBinNodeJunctionElevation|Sets the values of elevations for junctions|
 |setBinNodeJunctionsBaseDemands|Sets the values of base demands|
@@ -461,6 +464,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setBinQualityChem|Sets the type of water quality analysis to Chem|
 |setBinQualityNone|Sets the type of water quality analysis to None|
 |setBinQualityTrace|Sets the type of water quality analysis to Trace|
+|setBinQualType|Sets the type of water quality analysis to any chem e.g. chlorine|
 |setBinTimeHydraulicStep|Sets the hydraulic step|
 |setBinTimePatternStart|Sets the pattern start|
 |setBinTimePatternStep|Sets the pattern step|
