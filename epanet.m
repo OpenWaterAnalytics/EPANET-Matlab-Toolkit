@@ -230,7 +230,7 @@ classdef epanet <handle
         MSXSpeciesATOL;              % Absolute tolerance used to determine when two concentration levels of a species are the same
         MSXSpeciesIndex;             % Index name of species
         MSXSpeciesNameID;            % ID name of species
-        MSXSpeciesRTOL;              % Relative accuracy level on a species’ concentration used to adjust time steps in the RK5 and ROS2 integration methods
+        MSXSpeciesRTOL;              % Relative accuracy level on a speciesÂ’ concentration used to adjust time steps in the RK5 and ROS2 integration methods
         MSXSpeciesType;              % Type of all species, bulk or wall
         MSXSpeciesUnits;             % Species mass units
         MSXEquationsTanks;           % Species dynamics in tanks
@@ -1164,18 +1164,17 @@ classdef epanet <handle
             else
                 numdemands = obj.getNodeDemandCategoriesNumber;
             end
-            indices = getNodeIndices(obj,varargin);j=1;
+            indices = getNodeIndices(obj,varargin);
             for i=indices
                 for u=1:numdemands(i)
                     if v{u}(i)~=0 
-                        val{u,j}= char(m(v{u}(i))); 
+                        val{u,i}= char(m(v{u}(i))); 
                     else
-                        val{u,j}= '';
+                        val{u,i}= '';
                     end
-                    j=j+1;
                 end
                 if numdemands(i)==0
-                    val{1,j}= []; j=j+1;
+                    val{1,i}= [];
                 end
             end
             for i=1:size(val,1)
