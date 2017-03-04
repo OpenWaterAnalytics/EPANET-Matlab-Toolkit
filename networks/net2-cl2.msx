@@ -6,7 +6,7 @@ NET2 Chlorine Example
 AREA_UNITS  FT2
 RATE_UNITS  DAY
 SOLVER      EUL
-TIMESTEP    3600
+TIMESTEP    300
 RTOL        0.001
 ATOL        0.001
 
@@ -29,6 +29,7 @@ RATE        CL2    -Kb*CL2 - (4/D)*Kw*Kf/(Kw+Kf)*CL2
 
 [TANK]
 RATE        CL2    -Kb*CL2
+
 
 [SOURCES]
 ;CONC/MASS/FLOW/SETPOINT   <nodeID>      <specieID>     <strength>     (<tseriesID>)
