@@ -405,14 +405,15 @@ classdef epanet <handle
             try unloadlibrary('epanetmsx');catch e; end
             % DLLs
             arch = computer('arch');
-            pwdepanet = fileparts(which('epanet.m'));
+            pwdepanet = fileparts(which(mfilename));
             if strcmpi(arch,'win64')% if no DLL is given, select one automatically
                 obj.LibEPANETpath = [pwdepanet,'/64bit/'];
             elseif strcmpi(arch,'win32')
                 obj.LibEPANETpath = [pwdepanet,'/32bit/'];
             end
             if strcmpi(arch(1:4),'glnx')
-                obj.LibEPANETpath = [pwdepanet,'/32bit/'];
+                obj.LibEPANETpath = [pwdepanet,'/glnx/'];
+                obj.LibEPANET = 'libepanet';
             end
             if ~isdeployed
                 obj.InputFile=which(varargin{1}); % Get name of INP file
@@ -448,7 +449,7 @@ classdef epanet <handle
                    obj.Errcode=-1;
                    warning(['File "', obj.LibEPANET, '" is not a valid win application.']);return;
                 end
-            else%if nargin==1
+            elseif ~strcmpi(arch(1:4),'glnx')
                 obj.LibEPANET = 'epanet2';
             end
             if ~isdeployed
@@ -7167,8 +7168,13 @@ end
 function ENLoadLibrary(LibEPANETpath,LibEPANET,varargin)
 if ~libisloaded(LibEPANET)
     warning('off', 'MATLAB:loadlibrary:TypeNotFound');
+    arch=computer('arch');
     if ~isdeployed
-        loadlibrary([LibEPANETpath,LibEPANET],[LibEPANETpath,LibEPANET,'.h']);
+        if strcmpi(arch(1:4),'glnx')
+            loadlibrary(LibEPANET,[LibEPANETpath,LibEPANET,'.h']);
+        else
+            loadlibrary([LibEPANETpath,LibEPANET],[LibEPANETpath,LibEPANET,'.h']);
+        end
     else
         loadlibrary('epanet2',@mxepanet); %loadlibrary('epanet2','epanet2.h','mfilename','mxepanet.m');
     end
@@ -7485,11 +7491,15 @@ end
 % % disp(obj.getError(Errcode));
 % % end
 function [obj] = MSXMatlabSetup(obj,msxname,varargin)
-pwdepanet=fileparts(which('epanet.m'));
-if strcmp(computer('arch'),'win64')
+arch = computer('arch');
+pwdepanet = fileparts(which(mfilename));
+if strcmp(arch,'win64')
     obj.MSXLibEPANETPath = [pwdepanet,'\64bit\'];
-elseif strcmp(computer('arch'),'win32')
+elseif strcmp(arch,'win32')
     obj.MSXLibEPANETPath = [pwdepanet,'\32bit\'];
+end
+if strcmpi(arch(1:4),'glnx')
+    obj.MSXLibEPANETPath = [pwdepanet,'/glnx/'];
 end
             
 if ~isempty(varargin)
@@ -11539,7 +11549,8 @@ function [value, cont, sect, i,t,q,d] = getLV(tok,value,sect,tline,i,t,q,d)
 end
 function [status,result] = runMSXexe(obj, rptfile, varargin)
     inpfile=obj.BinTempfile;
-    if strcmp(computer('arch'),'win64') || strcmp(computer('arch'),'win32')
+    arch=computer('arch');
+    if strcmp(arch,'win64') || strcmp(arch,'win32')
         [~,lpwd]=system(['cmd /c for %A in ("',obj.MSXLibEPANETPath,'") do @echo %~sA']);
         libPwd=regexp(lpwd,'\s','split');
         if nargin<3
@@ -11547,6 +11558,14 @@ function [status,result] = runMSXexe(obj, rptfile, varargin)
         else
             binfile=varargin{1};
             r = sprintf('%s\\epanetmsx.exe %s %s %s %s',libPwd{1},inpfile,obj.MSXTempFile,rptfile,binfile);
+        end
+    end
+    if strcmpi(arch(1:4),'glnx')
+        if nargin<3
+            r = sprintf('%sepanetmsx %s %s %s',obj.MSXLibEPANETPath,inpfile,obj.MSXTempFile,rptfile);
+        else
+            binfile=varargin{1};
+            r = sprintf('%sepanetmsx %s %s %s %s',obj.MSXLibEPANETPath,inpfile,obj.MSXTempFile,rptfile,binfile);
         end
     end
     [status,result] = system(r);
