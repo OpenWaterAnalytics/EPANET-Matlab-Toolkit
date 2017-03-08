@@ -3593,10 +3593,13 @@ classdef epanet <handle
             while ischar(tline)
                if ~isempty(regexp(tline,'typedef enum','match'))
                    tline = fgetl(fid);
-                   while isempty(regexp(tline,'}','match'))
+                   while isempty(regexp(tline,'}','match')) || isempty(tline)
+                       while isempty(tline)
+                           tline = fgetl(fid);
+                       end
                        n = regexp(tline, {'\w*EN_\w*','\d*'}, 'match');
                        constants(i) = n{1};
-                       codes(i) = str2num(n{2}{1}); 
+                       codes(i) = str2num(n{2}{end}); 
                        ToolkitConstants.(constants{i}) = codes(i);
                        i=i+1;
                        tline = fgetl(fid);
