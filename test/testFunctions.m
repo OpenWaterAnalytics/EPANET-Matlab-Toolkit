@@ -186,7 +186,7 @@ d.getLinkVelocity
 d.getLinkHeadloss
 d.getLinkStatus
 d.getLinkSettings
-d.getLinkPumpEnergy 
+d.getLinkEnergy 
 
 d.getNodeNameID
 d.getNodeReservoirNameID

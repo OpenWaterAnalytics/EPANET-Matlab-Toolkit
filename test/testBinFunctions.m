@@ -588,7 +588,7 @@ end
 if strcmp(inpname,'BWSN_Network_1.inp')
     p=d.getBinRulesControlsInfo
     errcode=d.removeBinRulesControlLinkID(p.BinRulesControlLinksID{4}{3}); % PUMP-170
-    errcode=d.removeBinRulesControlNodeID(p.BinRulesControlNodesID{4}{2}); % TANK-131
+    errcode=d.removeBinRulesControlNodeID(p.BinRulesControlNodesID{1}{2}); % TANK-130
     v=d.getBinRulesControlsInfo
     disp('Press any key to continue...')
     pause

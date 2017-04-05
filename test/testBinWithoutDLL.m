@@ -566,7 +566,7 @@ end
 if strcmp(inpname,'BWSN_Network_1.inp')
     p=d.getBinRulesControlsInfo
     d.removeBinRulesControlLinkID(p.BinRulesControlLinksID{4}{3}); % PUMP-170
-    d.removeBinRulesControlNodeID(p.BinRulesControlNodesID{4}{2}); % TANK-131
+    d.removeBinRulesControlNodeID(p.BinRulesControlNodesID{1}{2}); % TANK-130
     v=d.getBinRulesControlsInfo
     disp('Press any key to continue...')
     pause
@@ -784,7 +784,10 @@ d.getBinNodeSourceInfo
 d.getBinCurvesInfo
 d.getBinOptionsInfo
 d.getBinTimesInfo
-d.getBinComputedAllParameters
+d.getCMDCODE % code 1
+% Hide messages e.g. : Computing water quality at hour 17:00:00 
+% Computing water quality at hour 18:00:00.. EPANET completed. 
+d.getBinComputedAllParameters % For show messages, d.setCMDCODE(0)
 d.getBinPatternsInfo
 d.getBinLinksInfo
 d.BinUpdateClass
