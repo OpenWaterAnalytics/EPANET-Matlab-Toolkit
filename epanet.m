@@ -1862,6 +1862,9 @@ classdef epanet <handle
             initlinkmatrix=zeros(totalsteps, obj.getLinkCount);
             if size(varargin,2)==0
                 varargin={'time','pressure','demand','head','tankvolume','flow','velocity','headloss','status','setting','energy','efficiency'};
+                if ~sum(strcmpi(fields(obj.ToolkitConstants),'EN_EFFICIENCY'))
+                    varargin{end}={''};
+                end
             else
                 for i=1:length(varargin)
                     if isnumeric(varargin{i})
