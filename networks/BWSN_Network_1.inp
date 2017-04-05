@@ -652,10 +652,6 @@ Priority 1.000000
  DIMENSIONS     	-1295.01        	-677.25         	27195.15        	14222.23        
  UNITS          	None
  FILE           	
- OFFSET         	0.00            	0.00            
-
-[END]
-  	
- OFFSET         	0.00            	0.00            
+ OFFSET         	0.00            	0.00                    
 
 [END]
