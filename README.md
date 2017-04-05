@@ -185,6 +185,20 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinksInfo|Retrieves links info e.g. diameters, lengths, roughness coeff. , minor loss coeff. , initial status, initial settings, bulk reaction coeff. , wall reaction coeff. , nodes connecting link indices, type indices|
 |addCurve|Adds a new curve appended to the end of the existing curves|
 |addPattern|Adds a new time pattern to the network|
+|addNodeJunction|Adds a new junction|
+|addNodeReservoir|Adds a new reservoir|
+|addNodeTank|Adds a new tank|
+|addLinkPipeCV|Adds a new CV pipe|
+|addLinkPipe|Adds a new pipe|
+|addLinkPump|Adds a new pump|
+|addLinkValvePRV|Adds a new PRV valve|
+|addLinkValvePSV|Adds a new PSV valve|
+|addLinkValvePBV|Adds a new PBV valve|
+|addLinkValveFCV|Adds a new FCV valve|
+|addLinkValveTCV|Adds a new TCV valve|
+|addLinkValveGPV|Adds a new GPV valve|
+|deleteNode|Deletes a node|
+|deleteLink|Deletes a link|
 |closeHydraulicAnalysis|Closes the hydraulic analysis system, freeing all allocated memory|
 |closeNetwork|Closes down the Toolkit system|
 |closeQualityAnalysis|Closes the water quality analysis system, freeing all allocated memory|
