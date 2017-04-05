@@ -63,6 +63,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkBulkReactionCoeff|Retrieves the value of all link bulk reaction coefficients|
 |getLinkCount|Retrieves the number of links|
 |getLinkDiameter|Retrieves the value of all link diameters|
+|getLinkEnergy|Retrieves the value of all computed energy in kwatts|
+|getLinkEfficiency|Retrieves the value of all computed efficiency|
 |getLinkFlows|Retrieves the value of all computed link flow rates|
 |getLinkHeadloss|Retrieves the value of all computed link headloss|
 |getLinkIndex|Retrieves the indices of all links, or the indices of an ID set of links|
@@ -76,7 +78,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkPipeIndex|Retrieves the indices of pipes|
 |getLinkPipeNameID|Retrieves the pipe IDs|
 |getLinkPumpCount|Retrieves the number of pumps|
-|getLinkPumpEnergy|Retrieves the value of all computed energy in kwatts|
 |getLinkPumpHeadCurveIndex|Retrieves index of a head curve for specific link index|
 |getLinkPumpIndex|Retrieves the indices of pumps|
 |getLinkPumpNameID|Retrieves the pump IDs|
@@ -505,3 +506,15 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENgetdemandpattern|Retrieves the index of a demand pattern for a specific demand category of a node|
 |ENsetbasedemand|Sets the nodes base demand for a category|
 |ENgetaveragepatternvalue|Retrieves the average value of a pattern|
+
+
+# List of other new EPANET Functions Supported #
+
+|Function|Description|
+|--------|-----------|
+|ENaddnode|Adds a new node| 
+|ENaddlink|Adds a new link| 
+|ENdeletenode|Deletes a node| 
+|ENdeletelink|Deletes a link| 
+|ENsetheadcurveindex|Sets the curve index for a specified pump index|
+|ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index.|
