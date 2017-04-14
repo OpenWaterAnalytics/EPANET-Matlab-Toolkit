@@ -14,14 +14,14 @@ nodeindex=6;
 %For step by step Hydraulic Analysis
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis;
-tstep=1; P=[];T=[]; D=[]; H=[];F=[];
+tstep=1;P=[];T_H=[];D=[];H=[];F=[];
 while (tstep>0)
     t=d.runHydraulicAnalysis;
     P=[P; d.getNodePressure];
     D=[D; d.getNodeActualDemand];
     H=[H; d.getNodeHydaulicHead];
     F=[F; d.getLinkFlows];
-    T=[T; t];
+    T_H=[T_H; t];
     tstep=d.nextHydraulicAnalysisStep;
 end
 d.closeHydraulicAnalysis
@@ -29,13 +29,12 @@ d.closeHydraulicAnalysis
 %For step by step Quality Analysis
 d.openQualityAnalysis
 d.initializeQualityAnalysis
-tleft=1; P=[];T=[];Q=[];  
+tleft=1; P=[];T_Q=[];Q=[];  
 while (tleft>0)
     %Add code which changes something related to quality
     t=d.runQualityAnalysis;
-    P=[P; d.getNodePressure];
     Q=[Q; d.getNodeActualQuality];
-    T=[T; t];
+    T_Q=[T_Q; t];
     tleft = d.stepQualityAnalysisTimeLeft;
 end
 d.closeQualityAnalysis;
@@ -47,36 +46,42 @@ disp(['Run Time of function d.getComputedHydraulicTimeSeries: ', num2str(tocHydr
 disp(['Run Time of function d.getComputedQualityTimeSeries: ', num2str(tocQuality), '(sec)'])
 
 figure;
-plot(Results.Flow(:,pipeindex));
+plot(Results.Time, Results.Flow(:,pipeindex));
 title('d.getComputedTimeSeries (Ignore events)');
-xlabel('Time(hours)'); ylabel(['Flow (',d.LinkFlowUnits{1},') - Link ID "',d.LinkNameID{pipeindex},'"'])
+xlabel('Time (sec)'); ylabel(['Flow (',d.LinkFlowUnits{1},') - Link ID "',d.LinkNameID{pipeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
 
 figure;
-plot(Hydraulics.Flow(:,pipeindex));
+plot(Hydraulics.Time, Hydraulics.Flow(:,pipeindex));
 title('d.getComputedHydraulicTimeSeries');
-xlabel('Time(hours)'); ylabel(['Flow (',d.LinkFlowUnits{1},') - Link ID "',d.LinkNameID{pipeindex},'"'])
+xlabel('Time (sec)'); ylabel(['Flow (',d.LinkFlowUnits{1},') - Link ID "',d.LinkNameID{pipeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
 
 h=figure;
 plot(0);axis off
 whitebg('w');
 
 figure;
-plot(F(:,pipeindex));
+plot(T_H, F(:,pipeindex));
 title('step by step Hydraulic Analysis');
-xlabel('Time(hours)'); ylabel(['Flow (',d.LinkFlowUnits{1},') - Link ID "',d.LinkNameID{pipeindex},'"'])
+xlabel('Time (sec)'); ylabel(['Flow (',d.LinkFlowUnits{1},') - Link ID "',d.LinkNameID{pipeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
 
 figure;
-plot(Results.NodeQuality(:,nodeindex));
+plot(Results.Time, Results.NodeQuality(:,nodeindex));
 title('d.getComputedTimeSeries (Ignore events)');
-xlabel('Time(hours)'); ylabel(['Node Quality (',d.QualityChemUnits,') - Node ID "',d.NodeNameID{nodeindex},'"'])
+xlabel('Time (sec)'); ylabel(['Node Quality (',d.QualityChemUnits,') - Node ID "',d.NodeNameID{nodeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
 
 figure;
-plot(Quality.NodeQuality(:,nodeindex));
+plot(Quality.Time, Quality.NodeQuality(:,nodeindex));
 title('d.getComputedQualityTimeSeries');
-xlabel('Time(hours)'); ylabel(['Node Quality (',d.QualityChemUnits,') - Link ID "',d.NodeNameID{nodeindex},'"'])
+xlabel('Time (sec)'); ylabel(['Node Quality (',d.QualityChemUnits,') - Link ID "',d.NodeNameID{nodeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
 
 figure;
-plot(Q(:,nodeindex));
+plot(T_Q, Q(:,nodeindex));
 title('step by step Quality Analysis');
-xlabel('Time(hours)'); ylabel(['Node Quality (',d.QualityChemUnits,') - Link ID "',d.NodeNameID{nodeindex},'"'])
+xlabel('Time (sec)'); ylabel(['Node Quality (',d.QualityChemUnits,') - Link ID "',d.NodeNameID{nodeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
 
