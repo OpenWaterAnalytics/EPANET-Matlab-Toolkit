@@ -1,0 +1,300 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>simepa</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-06-07"><meta name="DC.source" content="simepa.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput">d=epanet(<span class="string">'Net1.inp'</span>);tic;
+
+hours = 100;
+
+d.setTimeSimulationDuration(hours*3600);
+Results = d.getComputedTimeSeries <span class="comment">%Using ENepanet, create and read binary file</span>
+tocResults = toc;tic;
+Hydraulics = d.getComputedHydraulicTimeSeries <span class="comment">% Using the functions(ENopenH, ENinit, ENrunH, ENgetnodevalue/&amp;ENgetlinkvalue, ENnextH, ENcloseH)</span>
+tocHydraulics = toc;tic;
+Quality = d.getComputedQualityTimeSeries <span class="comment">% ENopenQ, ENinitQ, ENrunQ, ENgetnodevalue/&amp;ENgetlinkvalue, ENstepQ, ENcloseQ</span>
+tocQuality = toc;tic;
+
+pipeindex=4;
+nodeindex=6;
+
+<span class="comment">%For step by step Hydraulic Analysis</span>
+d.openHydraulicAnalysis;
+d.initializeHydraulicAnalysis;
+tstep=1;P=[];T_H=[];D=[];H=[];F=[];
+<span class="keyword">while</span> (tstep&gt;0)
+    t=d.runHydraulicAnalysis;
+    P=[P; d.getNodePressure];
+    D=[D; d.getNodeActualDemand];
+    H=[H; d.getNodeHydaulicHead];
+    F=[F; d.getLinkFlows];
+    T_H=[T_H; t];
+    tstep=d.nextHydraulicAnalysisStep;
+<span class="keyword">end</span>
+d.closeHydraulicAnalysis
+
+<span class="comment">%For step by step Quality Analysis</span>
+d.openQualityAnalysis
+d.initializeQualityAnalysis
+tleft=1; P=[];T_Q=[];Q=[];
+<span class="keyword">while</span> (tleft&gt;0)
+    <span class="comment">%Add code which changes something related to quality</span>
+    t=d.runQualityAnalysis;
+    Q=[Q; d.getNodeActualQuality];
+    T_Q=[T_Q; t];
+    tleft = d.stepQualityAnalysisTimeLeft;
+<span class="keyword">end</span>
+d.closeQualityAnalysis;
+d.unload
+
+<span class="comment">%Run time d.getComputedTimeSeries</span>
+fprintf(<span class="string">'\nSimulation duration: %d hours\n'</span>, hours);
+disp([<span class="string">'Run Time of function d.getComputedTimeSeries: '</span>, num2str(tocResults), <span class="string">'(sec)'</span>])
+disp([<span class="string">'Run Time of function d.getComputedHydraulicTimeSeries: '</span>, num2str(tocHydraulics), <span class="string">'(sec)'</span>])
+disp([<span class="string">'Run Time of function d.getComputedQualityTimeSeries: '</span>, num2str(tocQuality), <span class="string">'(sec)'</span>])
+
+figure;
+plot(Results.Time, Results.Flow(:,pipeindex));
+title(<span class="string">'d.getComputedTimeSeries (Ignore events)'</span>);
+xlabel(<span class="string">'Time (sec)'</span>); ylabel([<span class="string">'Flow ('</span>,d.LinkFlowUnits{1},<span class="string">') - Link ID "'</span>,d.LinkNameID{pipeindex},<span class="string">'"'</span>])
+set(gca,<span class="string">'XTickLabel'</span>,num2str(get(gca,<span class="string">'XTick'</span>).'));
+
+figure;
+plot(Hydraulics.Time, Hydraulics.Flow(:,pipeindex));
+title(<span class="string">'d.getComputedHydraulicTimeSeries'</span>);
+xlabel(<span class="string">'Time (sec)'</span>); ylabel([<span class="string">'Flow ('</span>,d.LinkFlowUnits{1},<span class="string">') - Link ID "'</span>,d.LinkNameID{pipeindex},<span class="string">'"'</span>])
+set(gca,<span class="string">'XTickLabel'</span>,num2str(get(gca,<span class="string">'XTick'</span>).'));
+
+h=figure;
+plot(0);axis <span class="string">off</span>
+whitebg(<span class="string">'w'</span>);
+
+figure;
+plot(T_H, F(:,pipeindex));
+title(<span class="string">'step by step Hydraulic Analysis'</span>);
+xlabel(<span class="string">'Time (sec)'</span>); ylabel([<span class="string">'Flow ('</span>,d.LinkFlowUnits{1},<span class="string">') - Link ID "'</span>,d.LinkNameID{pipeindex},<span class="string">'"'</span>])
+set(gca,<span class="string">'XTickLabel'</span>,num2str(get(gca,<span class="string">'XTick'</span>).'));
+
+figure;
+plot(Results.Time, Results.NodeQuality(:,nodeindex));
+title(<span class="string">'d.getComputedTimeSeries (Ignore events)'</span>);
+xlabel(<span class="string">'Time (sec)'</span>); ylabel([<span class="string">'Node Quality ('</span>,d.QualityChemUnits,<span class="string">') - Node ID "'</span>,d.NodeNameID{nodeindex},<span class="string">'"'</span>])
+set(gca,<span class="string">'XTickLabel'</span>,num2str(get(gca,<span class="string">'XTick'</span>).'));
+
+figure;
+plot(Quality.Time, Quality.NodeQuality(:,nodeindex));
+title(<span class="string">'d.getComputedQualityTimeSeries'</span>);
+xlabel(<span class="string">'Time (sec)'</span>); ylabel([<span class="string">'Node Quality ('</span>,d.QualityChemUnits,<span class="string">') - Link ID "'</span>,d.NodeNameID{nodeindex},<span class="string">'"'</span>])
+set(gca,<span class="string">'XTickLabel'</span>,num2str(get(gca,<span class="string">'XTick'</span>).'));
+
+figure;
+plot(T_Q, Q(:,nodeindex));
+title(<span class="string">'step by step Quality Analysis'</span>);
+xlabel(<span class="string">'Time (sec)'</span>); ylabel([<span class="string">'Node Quality ('</span>,d.QualityChemUnits,<span class="string">') - Link ID "'</span>,d.NodeNameID{nodeindex},<span class="string">'"'</span>])
+set(gca,<span class="string">'XTickLabel'</span>,num2str(get(gca,<span class="string">'XTick'</span>).'));
+</pre><pre class="codeoutput">EPANET loaded sucessfuly.
+
+Results = 
+
+              Time: [101x1 double]
+          Pressure: [101x11 double]
+            Demand: [101x11 double]
+              Head: [101x11 double]
+       NodeQuality: [101x11 double]
+              Flow: [101x13 double]
+          Velocity: [101x13 double]
+          HeadLoss: [101x13 double]
+            Status: [101x13 double]
+           Setting: [101x13 double]
+      ReactionRate: [101x13 double]
+    FrictionFactor: [101x13 double]
+       LinkQuality: [101x13 double]
+
+
+Hydraulics = 
+
+          Time: [109x1 double]
+      Pressure: [109x11 double]
+        Demand: [109x11 double]
+          Head: [109x11 double]
+    TankVolume: [109x11 double]
+          Flow: [109x13 double]
+      Velocity: [109x13 double]
+      HeadLoss: [109x13 double]
+        Status: [109x13 double]
+       Setting: [109x13 double]
+        Energy: [109x13 double]
+    Efficiency: [109x13 double]
+
+
+Quality = 
+
+            Time: [109x1 double]
+     NodeQuality: [109x11 double]
+     LinkQuality: [109x13 double]
+    MassFlowRate: [109x11 double]
+
+EPANET Class is unloaded
+
+Simulation duration: 100 hours
+Run Time of function d.getComputedTimeSeries: 0.10333(sec)
+Run Time of function d.getComputedHydraulicTimeSeries: 0.25558(sec)
+Run Time of function d.getComputedQualityTimeSeries: 0.081972(sec)
+</pre><img vspace="5" hspace="5" src="simepa_01.png" alt=""> <img vspace="5" hspace="5" src="simepa_02.png" alt=""> <img vspace="5" hspace="5" src="simepa_03.png" alt=""> <img vspace="5" hspace="5" src="simepa_04.png" alt=""> <img vspace="5" hspace="5" src="simepa_05.png" alt=""> <img vspace="5" hspace="5" src="simepa_06.png" alt=""> <img vspace="5" hspace="5" src="simepa_07.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+d=epanet('Net1.inp');tic;
+
+hours = 100;
+
+d.setTimeSimulationDuration(hours*3600);
+Results = d.getComputedTimeSeries %Using ENepanet, create and read binary file
+tocResults = toc;tic;
+Hydraulics = d.getComputedHydraulicTimeSeries % Using the functions(ENopenH, ENinit, ENrunH, ENgetnodevalue/&ENgetlinkvalue, ENnextH, ENcloseH)
+tocHydraulics = toc;tic;
+Quality = d.getComputedQualityTimeSeries % ENopenQ, ENinitQ, ENrunQ, ENgetnodevalue/&ENgetlinkvalue, ENstepQ, ENcloseQ
+tocQuality = toc;tic;
+
+pipeindex=4;
+nodeindex=6;
+
+%For step by step Hydraulic Analysis
+d.openHydraulicAnalysis;
+d.initializeHydraulicAnalysis;
+tstep=1;P=[];T_H=[];D=[];H=[];F=[];
+while (tstep>0)
+    t=d.runHydraulicAnalysis;
+    P=[P; d.getNodePressure];
+    D=[D; d.getNodeActualDemand];
+    H=[H; d.getNodeHydaulicHead];
+    F=[F; d.getLinkFlows];
+    T_H=[T_H; t];
+    tstep=d.nextHydraulicAnalysisStep;
+end
+d.closeHydraulicAnalysis
+
+%For step by step Quality Analysis
+d.openQualityAnalysis
+d.initializeQualityAnalysis
+tleft=1; P=[];T_Q=[];Q=[];  
+while (tleft>0)
+    %Add code which changes something related to quality
+    t=d.runQualityAnalysis;
+    Q=[Q; d.getNodeActualQuality];
+    T_Q=[T_Q; t];
+    tleft = d.stepQualityAnalysisTimeLeft;
+end
+d.closeQualityAnalysis;
+d.unload
+
+%Run time d.getComputedTimeSeries
+fprintf('\nSimulation duration: %d hours\n', hours);
+disp(['Run Time of function d.getComputedTimeSeries: ', num2str(tocResults), '(sec)'])
+disp(['Run Time of function d.getComputedHydraulicTimeSeries: ', num2str(tocHydraulics), '(sec)'])
+disp(['Run Time of function d.getComputedQualityTimeSeries: ', num2str(tocQuality), '(sec)'])
+
+figure;
+plot(Results.Time, Results.Flow(:,pipeindex));
+title('d.getComputedTimeSeries (Ignore events)');
+xlabel('Time (sec)'); ylabel(['Flow (',d.LinkFlowUnits{1},') - Link ID "',d.LinkNameID{pipeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
+
+figure;
+plot(Hydraulics.Time, Hydraulics.Flow(:,pipeindex));
+title('d.getComputedHydraulicTimeSeries');
+xlabel('Time (sec)'); ylabel(['Flow (',d.LinkFlowUnits{1},') - Link ID "',d.LinkNameID{pipeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
+
+h=figure;
+plot(0);axis off
+whitebg('w');
+
+figure;
+plot(T_H, F(:,pipeindex));
+title('step by step Hydraulic Analysis');
+xlabel('Time (sec)'); ylabel(['Flow (',d.LinkFlowUnits{1},') - Link ID "',d.LinkNameID{pipeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
+
+figure;
+plot(Results.Time, Results.NodeQuality(:,nodeindex));
+title('d.getComputedTimeSeries (Ignore events)');
+xlabel('Time (sec)'); ylabel(['Node Quality (',d.QualityChemUnits,') - Node ID "',d.NodeNameID{nodeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
+
+figure;
+plot(Quality.Time, Quality.NodeQuality(:,nodeindex));
+title('d.getComputedQualityTimeSeries');
+xlabel('Time (sec)'); ylabel(['Node Quality (',d.QualityChemUnits,') - Link ID "',d.NodeNameID{nodeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
+
+figure;
+plot(T_Q, Q(:,nodeindex));
+title('step by step Quality Analysis');
+xlabel('Time (sec)'); ylabel(['Node Quality (',d.QualityChemUnits,') - Link ID "',d.NodeNameID{nodeindex},'"'])
+set(gca,'XTickLabel',num2str(get(gca,'XTick').'));
+
+
+##### SOURCE END #####
+--></body></html>
