@@ -1,4 +1,4 @@
-%% EPANET-Matlab Class Test Part 1
+%% EPANET-Matlab Toolkit Test Part 1
 % This file is provided to ensure that all functions can be executed
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints, 
@@ -8,13 +8,13 @@ clear;
 close all;
 
 % Create EPANET object using the INP file
-%d=epanet('Net1_Rossman2000.inp');
-inpname='networks/Net1_Rossman2000.inp'; 
-% Net1_Rossman2000 Net2_Rossman2000 Net3_Rossman2000 BWSN1_Ostfeld2008 
+inpname='Net1.inp'; 
+% Net1 Net2 Net3 BWSN_Network_1 example
 
 % version='epanet2'; % version dev2.1
 % d=epanet(inpname,version);
 d=epanet(inpname);
+% d=epanet(inpname, 'epanet2');
 
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
 d.plot('line','no');
@@ -25,94 +25,114 @@ d.plot('nodesindex','yes','fontsize',14);
 d.getConnectivityMatrix
 d.getLibFunctions
 
+newFunctionsDev2_1 = {'ENgetpumptype' , 'ENgetheadcurveindex', 'ENsetcurvevalue',...
+            'ENsetcurve', 'ENaddcurve', 'ENgetcurvevalue', 'ENgetcurve',...
+            'ENgetcurvelen', 'ENgetcurveid', 'ENgetcurveindex', 'ENsetcoord',...
+            'ENgetcoord', 'ENgetstatistic', 'ENgetnumdemands', 'ENgetbasedemand',...	
+            'ENgetdemandpattern', 'ENsetbasedemand', 'ENgetaveragepatternvalue'};
+        
 %% New Functions 2.1
-d.getLinkPumpTypeCode   % returns type index of all pumps
-d.getLinkPumpType       % returns type name of all pumps: CONSTANT_HORSEPOWER, POWER_FUNCTION, CUSTOM
-d.getHeadCurveIndex     % returns index of all pump head curve
-d.getCurveNameID        % returns all curve IDs
-d.getCurveNameID(1)     % returns specific curve ID
-d.addCurve('NewCur1')   % add new curve with ID
-indexCurve=d.addCurve('NewCur2', [1800 200; 1500 400]); % add new curve with points
-d.getCurveNameID
-d.getCurveValue(indexCurve)     % returns all points for specific curve index
-d.getCurveValue(indexCurve,2)   % returns specific point for specific curve index
+nF=0; % old dll
+for i=1:length(newFunctionsDev2_1)
+    if sum(strcmp(d.libFunctions,newFunctionsDev2_1(i)))
+        nF=1; % new dll
+        break;
+    end
+end
+if nF==1
+    d.getLinkPumpTypeCode   % returns type index of all pumps
+    d.getLinkPumpType       % returns type name of all pumps: CONSTANT_HORSEPOWER, POWER_FUNCTION, CUSTOM
+    d.getLinkPumpHeadCurveIndex % returns index of all pump head curve
+    d.getCurveNameID        % returns all curve IDs
+    d.getCurveNameID(1)     % returns specific curve ID
+    d.addCurve('NewCur1')   % add new curve with ID
+    indexCurve=d.addCurve('NewCur2', [1800 200; 1500 400]); % add new curve with points
+    d.getCurveNameID
+    d.getCurveValue(indexCurve)     % returns all points for specific curve index
+    d.getCurveValue(indexCurve,2)   % returns specific point for specific curve index
 
-d.setCurve(3,[1900 300; 1400 200]) % Change an existing curve 
-d.getCurveValue(indexCurve) 
+    d.setCurve(3,[1900 300; 1400 200]) % Change an existing curve 
+    d.getCurveValue(indexCurve) 
 
-d.getCurvesInfo
+    d.getCurvesInfo
 
-len=d.getCurveLengths
-d.getCurveLengths(3)
-d.getCurveLengths('NewCur2')
+    len=d.getCurveLengths
+    d.getCurveLengths(3)
+    d.getCurveLengths('NewCur2')
 
-d.getCurveIndex
-d.getCurveIndex('NewCur1')
+    d.getCurveIndex
+    d.getCurveIndex('NewCur1')
 
-indexCurve=2
-pointindex=2
-tmppoints=d.getCurveValue(indexCurve,pointindex)
-d.setCurveValue(indexCurve,pointindex,tmppoints+100)
-d.getCurveValue(indexCurve,pointindex)
-
-
-bd1=d.getNodeBaseDemands % get an array of the base demands (some nodes may have multiple base demands for different patterns)
-bd1{1}
-node_index=5
-bd1{1}(node_index)= bd1{1}(node_index)+100
-d.setNodeBaseDemands(bd1)
-bd2=d.getNodeBaseDemands
-bd2{1}
-
-d.getNodeDemandCategoriesNumber
-d.getNodeDemandCategoriesNumber(11)
-d.getNodeDemandCategoriesNumber(5:11)
-
-% ENgetdemandpattern - Retrieves the index of a demand pattern for a specific demand category of a node
-d.getNodeDemandPatternNameID
-d.getNodeDemandPatternIndex
-
-% ENgetaveragepatternvalue - Retrieves the average value of a pattern
-d.getPatternAverageValue
-
-% ENgetstatistic - Retrieves hydraulic simulation statistic
-d.getStatistic
-
-%[int32, singlePtr, singlePtr] ENgetcoord(int32, singlePtr, singlePtr)
-
-d.plot;
-nodeCoords=d.getNodeCoordinates; 
-indexNode=1;
-nodeCoords{1}(indexNode)=nodeCoords{1}(indexNode)+10;%X
-nodeCoords{2}(indexNode)=nodeCoords{2}(indexNode)+20;%Y
-d.setNodeCoordinates(nodeCoords)
-d.plot;
-
-d.getQualityInfo
-
-% Others
-n=d.getComputedHydraulicTimeSeries; % EN_TANKVOLUME - ENgetnodevalue
-n.TankVolume(:,d.NodeTankIndex)
-
-d.TimeStarting_Time % EN_STARTTIME  - ENgettimeparam
-d.TimeHTime % EN_HTIME - ENgettimeparam
-d.TimeHaltFlag % EN_HALTFLAG - ENgettimeparam
-d.TimeNextEvent %find the lesser of the hydraulic time step length, or the time to next fill/empty
-d.NodeTankMaxVolume % EN_MAXVOLUME - ENgetnodevalue
-%d.CurvesInfo bug in epanet20013 energopoiisi sto prwto run
+    pointindex=2
+    tmppoints=d.getCurveValue(indexCurve,pointindex)
+    d.setCurveValue(indexCurve,pointindex,tmppoints+100)
+    d.getCurveValue(indexCurve,pointindex)
 
 
-d.LinkPumpPatternNameID
-d.LinkPumpPatternIndex
-d.getLinkPumpPatternNameID % EN_LINKPATTERN - ENgetlinkvalue
-d.getLinkPumpPatternIndex
+    bd1=d.getNodeBaseDemands % get an array of the base demands (some nodes may have multiple base demands for different patterns)
+    bd1{1}
+    node_index=5
+    bd1{1}(node_index)= bd1{1}(node_index)+100
+    d.setNodeBaseDemands(bd1)
+    bd2=d.getNodeBaseDemands
+    bd2{1}
 
+    d.getNodeDemandCategoriesNumber
+    d.getNodeDemandCategoriesNumber(end)
+    d.getNodeDemandCategoriesNumber(5:end)
 
+    % ENgetdemandpattern - Retrieves the index of a demand pattern for a specific demand category of a node
+    d.getNodeDemandPatternNameID{1}
+    d.getNodeDemandPatternIndex{1}
 
+    % ENgetaveragepatternvalue - Retrieves the average value of a pattern
+    d.getPatternAverageValue
 
-% inpname='networks/Net1_Rossman2000.inp';
-d=epanet(inpname);
+    % ENgetstatistic - Retrieves hydraulic simulation statistic
+    d.getStatistic
+
+    %[int32, singlePtr, singlePtr] ENgetcoord(int32, singlePtr, singlePtr)
+
+    d.plot;
+    nodeCoords=d.getNodeCoordinates; 
+    indexNode=1;
+    nodeCoords{1}(indexNode)=nodeCoords{1}(indexNode)+10;%X
+    nodeCoords{2}(indexNode)=nodeCoords{2}(indexNode)+20;%Y
+    d.setNodeCoordinates(nodeCoords)
+    d.plot;
+
+    % Quality Info
+    d.getQualityInfo
+
+    % Others
+    n=d.getComputedHydraulicTimeSeries; % EN_TANKVOLUME - ENgetnodevalue
+    n.TankVolume(:,d.NodeTankIndex)
+
+    % EN_STARTTIME  - ENgettimeparam
+    d.getTimeStartTime
+
+    % EN_HTIME - ENgettimeparam
+    d.getTimeHTime 
+
+    % EN_HALTFLAG - ENgettimeparam
+    d.getTimeHaltFlag
+
+    %find the lesser of the hydraulic time step length, or the time to next fill/empty
+    d.getTimeNextEvent
+
+    % EN_MAXVOLUME - ENgetnodevalue
+    d.getNodeTankMaximumWaterVolume 
+
+    % Curves Info
+    d.getCurvesInfo
+
+    % Pump pattern
+    d.getLinkPumpPatternNameID % EN_LINKPATTERN - ENgetlinkvalue
+    d.getLinkPumpPatternIndex
+end
+
 %% Controls
+d.loadEPANETFile(d.BinTempfile);
 Controls=d.getControls
 disp('Press any key to continue...')
 pause
@@ -139,7 +159,7 @@ for e=[0:6,101:106,110,120,200,202:207,223:224, 240:241, 250:251, 301:309]
 end
 
 
-%%
+%% Get Functions
 d.getFlowUnits
 d.getLinkNameID
 d.getLinkPipeNameID
@@ -166,7 +186,7 @@ d.getLinkVelocity
 d.getLinkHeadloss
 d.getLinkStatus
 d.getLinkSettings
-d.getLinkPumpEnergy 
+d.getLinkEnergy 
 
 d.getNodeNameID
 d.getNodeReservoirNameID
@@ -233,9 +253,9 @@ d.getVersion
 
 %% To check
 d.getTimeReportingPeriods% Check this
-d.getNodeTankMixZoneVolume % ok 6/3/2015
-d.getNodeTankDiameter% bug: Produces a different diameter % fix in epanet20013 - ok 6/3/2015
-d.getNodeTankInitialWaterVolume % ok 6/3/2015
+d.getNodeTankMixZoneVolume % OK
+d.getNodeTankDiameter% bug: Produces a different diameter % fix in dev.2.1 OK now
+d.getNodeTankInitialWaterVolume % OK
 
 
 %% Simulate all
@@ -301,10 +321,22 @@ values(end)=720;
 d.setNodeElevations(values)
 d.getNodeElevations
 
-values = d.getNodeBaseDemands
-values{1}(2)=160; %values(2)
-d.setNodeBaseDemands(values)
-d.getNodeBaseDemands
+if nF==1
+    values = d.getNodeBaseDemands
+    values{1}(2)=160; 
+    d.setNodeBaseDemands(values)
+    d.getNodeBaseDemands{1}
+    
+    values = d.getNodeDemandPatternIndex
+    values{1}(1)=2;
+    d.setNodeDemandPatternIndex(values)
+    d.getNodePatternIndex
+else
+    values = d.getNodeBaseDemands
+    values(2)=160; 
+    d.setNodeBaseDemands(values)
+    d.getNodeBaseDemands
+end
 
 values = d.getNodePatternIndex
 values(2)=0;
@@ -321,57 +353,59 @@ values(2)=0.6;
 d.setNodeInitialQuality(values)
 d.getNodeInitialQuality
 
-values = d.getNodeTankInitialLevel
-values(end)=100; 
-d.setNodeTankInitialLevel(values)  
-d.getNodeTankInitialLevel
+if d.getNodeTankCount
+    values = d.getNodeTankInitialLevel
+    values(end)=100; 
+    d.setNodeTankInitialLevel(values)  
+    d.getNodeTankInitialLevel
 
-values = d.getNodeTankMixingModelType 
-d.getNodeTankMixingModelCode
-values{end}='MIX2';
-d.setNodeTankMixingModelType(values);
-d.getNodeTankMixingModelType 
-d.getNodeTankMixingModelCode
-values = d.getNodeTankMixingModelType 
-values{end}='FIFO';
-d.setNodeTankMixingModelType(values);
-d.getNodeTankMixingModelType 
-d.getNodeTankMixingModelCode
-values = d.getNodeTankMixingModelType 
-values{end}='LIFO';
-d.setNodeTankMixingModelType(values);
-d.getNodeTankMixingModelType 
-d.getNodeTankMixingModelCode
+    values = d.getNodeTankMixingModelType 
+    d.getNodeTankMixingModelCode
+    values{end}='MIX2';
+    d.setNodeTankMixingModelType(values);
+    d.getNodeTankMixingModelType 
+    d.getNodeTankMixingModelCode
+    values = d.getNodeTankMixingModelType 
+    values{end}='FIFO';
+    d.setNodeTankMixingModelType(values);
+    d.getNodeTankMixingModelType 
+    d.getNodeTankMixingModelCode
+    values = d.getNodeTankMixingModelType 
+    values{end}='LIFO';
+    d.setNodeTankMixingModelType(values);
+    d.getNodeTankMixingModelType 
+    d.getNodeTankMixingModelCode
 
-values = d.getNodeTankDiameter 
-values(end)= 60;
-d.setNodeTankDiameter(values) 
-d.getNodeTankDiameter 
+    values = d.getNodeTankDiameter 
+    values(end)= 60;
+    d.setNodeTankDiameter(values) 
+    d.getNodeTankDiameter 
 
-values = d.getNodeTankMinimumWaterLevel
-values(end)= 10;
-d.setNodeTankMinimumWaterLevel(values)  
-d.getNodeTankMinimumWaterLevel
+    values = d.getNodeTankMinimumWaterLevel
+    values(end)= 10;
+    d.setNodeTankMinimumWaterLevel(values)  
+    d.getNodeTankMinimumWaterLevel
 
-values = d.getNodeTankMinimumWaterVolume
-values(end)= 10;
-d.setNodeTankMinimumWaterVolume(values) 
-d.getNodeTankMinimumWaterVolume
+    values = d.getNodeTankMinimumWaterVolume
+    values(end)= 10;
+    d.setNodeTankMinimumWaterVolume(values) 
+    d.getNodeTankMinimumWaterVolume
 
-values = d.getNodeTankMaximumWaterLevel
-values(end)= 210;
-d.setNodeTankMaximumWaterLevel(values) 
-d.getNodeTankMaximumWaterLevel
+    values = d.getNodeTankMaximumWaterLevel
+    values(end)= 210;
+    d.setNodeTankMaximumWaterLevel(values) 
+    d.getNodeTankMaximumWaterLevel
 
-values = d.getNodeTankMinimumFraction
-values(end)= 0.5; %takes values 0-1
-d.setNodeTankMinimumFraction(values) 
-d.getNodeTankMinimumFraction
+    values = d.getNodeTankMinimumFraction
+    values(end)= 0.5; %takes values 0-1
+    d.setNodeTankMinimumFraction(values) 
+    d.getNodeTankMinimumFraction
 
-values = d.getNodeTankBulkReactionCoeff
-values(end)= 1; 
-d.setNodeTankBulkReactionCoeff(values) 
-d.getNodeTankBulkReactionCoeff
+    values = d.getNodeTankBulkReactionCoeff
+    values(end)= 1; 
+    d.setNodeTankBulkReactionCoeff(values) 
+    d.getNodeTankBulkReactionCoeff
+end
 
 d.getNodeSourceType
 d.setNodeSourceType(2,'MASS')
@@ -487,30 +521,38 @@ d.getQualityCode
 d.setQualityType('chem','mg/L')
 d.getQualityType
 d.getQualityCode
-tankid=d.getNodeTankNameID 
-d.setQualityType('trace',tankid{1})
+d.setQualityType('trace',d.NodeNameID{2})
 d.getQualityType
 d.getQualityCode
-d.saveInputFile([pwd,'\TEST_INP_TEMP.inp']);
+d.saveInputFile([pwd,'/TEST_INP_TEMP.inp']);
 
+d.loadEPANETFile(d.BinTempfile);
+% write line in report file
+% Solve hydraulics 
+d.solveCompleteHydraulics % solves internally the hydraulics (does not return something)
+% Solve quality
+d.solveCompleteQuality
+d.writeLineInReportFile('Line-writting testing!!') % Check this! at the second time is work
+d.writeReport
+% open([d.BinTempfile(1:end-4),'.txt'])
 
-d.writeLineInReportFile('Line-writting testing')
-%open('temp.txt'); % bug, write in status report > tmprpt.txt
-
-d.unload
 disp('Press any key to continue...')
 pause
 
 
 %% Report Preparation
-d=epanet(inpname);
+d.loadEPANETFile(d.BinTempfile);
 
 % Compute ranges (max - min) 
 d.setTimeStatisticsType('RANGE')
+d.getTimeStatisticsType
 d.setTimeStatisticsType('MINIMUM')
+d.getTimeStatisticsType
 % StatisticsType('AVERAGE')
 d.setTimeStatisticsType('NONE')
+d.getTimeStatisticsType
 d.setTimeStatisticsType('MAXIMUM')
+d.getTimeStatisticsType
 
 
 % Solve hydraulics 
@@ -577,7 +619,7 @@ d.writeReport
 
 d.setReportFormatReset
 d.setReport('FILE TestReport4.txt'); 
-d.setReport('STATUS YES') 
+d.setReport('STATUS YES')   % is not appear - check
 d.writeReport
 %open('TestReport4.txt')
 
@@ -607,33 +649,30 @@ d.setReport('LINKS ALL')
 d.writeReport
 %open('TestReport7.txt'); 
 
-d.unload
 disp('Press any key to continue...')
 pause
 
 
 %% Create Hydraulics file
-
-d=epanet(inpname);
+d.loadEPANETFile(d.BinTempfile);
 
 d.solveCompleteHydraulics % Only call this ONLY once (see ENsolveH for more details)
-d.saveHydraulicFile([pwd,'\hydraulics.hyd'])
-d.useHydraulicFile([pwd,'\hydraulics.hyd'])
+d.saveHydraulicFile([pwd,'/hydraulics.hyd'])
+d.useHydraulicFile([pwd,'/hydraulics.hyd'])
 d.saveHydraulicsOutputReportingFile
 
-d.unload
 disp('Press any key to continue...')
 pause
 
 %% Simulation Quality
-d=epanet(inpname);
+d.loadEPANETFile(d.BinTempfile);
 d.setQualityType('chem','mg/L')
 
 % Solve Hydraulics (outside the loop)
 %d.solveCompleteHydraulics
 
 % or open hydraulics files
-d.useHydraulicFile([pwd,'\hydraulics.hyd'])
+d.useHydraulicFile([pwd,'/hydraulics.hyd'])
 
 % Runs Quality Step-by-step
 d.openQualityAnalysis
@@ -648,14 +687,13 @@ while (tleft>0)
     tleft = d.stepQualityAnalysisTimeLeft;
 end
 d.closeQualityAnalysis;
-d.unload
 disp('Press any key to continue...')
 pause
 %tstep=d.nextQualityAnalysisStep; %%% CHECK, DOES NOT SEEM TO CHANGE
 %WITH SETTIMEQUALITYSTEP
 
 %% Simulation Hydraulics
-d=epanet(inpname);
+d.loadEPANETFile(d.BinTempfile);
 d.setQualityType('chem','mg/L')
 
 
@@ -673,12 +711,10 @@ while (tstep>0)
     tstep=d.nextHydraulicAnalysisStep;
 end
 d.closeHydraulicAnalysis
-
-d.unload
 disp('Press any key to continue...')
 pause
 
-d=epanet(inpname);
+d.loadEPANETFile(d.BinTempfile);
 %% Test Plot
 d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
 disp('Press any key to continue...')
@@ -688,9 +724,5 @@ pause
 d.getNodeCoordinates
 d.unload % delete txt and temp files
 
-%% Delete files 
-sfilesexist = dir('s*'); 
-if (~isempty(sfilesexist)), delete('s*'), end;
 delete('TestR*','hydraulics*','*_INP*')
-
 fprintf('Test finished.\n')

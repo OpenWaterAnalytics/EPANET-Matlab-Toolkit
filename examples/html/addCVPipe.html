@@ -1,0 +1,152 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>addCVPipe</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-06-07"><meta name="DC.source" content="addCVPipe.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Example 1: Add CV PIPE</a></li><li><a href="#2">Example 2: Add CV PIPE with Bin Functions</a></li><li><a href="#3">Example 3: Add CV PIPE with Bin Functions addBinJunction</a></li></ul></div><h2>Example 1: Add CV PIPE<a name="1"></a></h2><pre class="codeinput">d=epanet(<span class="string">'Net1.inp'</span>);
+disp(<span class="string">'Add a CV pipe'</span>)
+d.plot;
+fromNode = d.getNodeNameID{2};
+toNode = d.getNodeNameID{6};
+index=d.addLinkPipeCV(<span class="string">'CVPipe'</span>,fromNode,toNode);
+d.plot(<span class="string">'links'</span>,<span class="string">'yes'</span>);
+d.unload;
+</pre><pre class="codeoutput">EPANET loaded sucessfuly.
+Add a CV pipe
+EPANET Class is unloaded
+</pre><img vspace="5" hspace="5" src="addCVPipe_01.png" alt=""> <img vspace="5" hspace="5" src="addCVPipe_02.png" alt=""> <h2>Example 2: Add CV PIPE with Bin Functions<a name="2"></a></h2><pre class="codeinput">d=epanet(<span class="string">'Net1.inp'</span>);
+d.Binplot();
+[errcode]=d.addBinCVPipe(<span class="string">'CV-P1'</span>,fromNode,toNode,1000,10,100);
+d.plot(<span class="string">'links'</span>,<span class="string">'yes'</span>);
+d.unload;
+</pre><pre class="codeoutput">EPANET loaded sucessfuly.
+EPANET Class is unloaded
+</pre><img vspace="5" hspace="5" src="addCVPipe_03.png" alt=""> <img vspace="5" hspace="5" src="addCVPipe_04.png" alt=""> <h2>Example 3: Add CV PIPE with Bin Functions addBinJunction<a name="3"></a></h2><pre class="codeinput">d=epanet(<span class="string">'Net1.inp'</span>);
+d.Binplot(<span class="string">'nodes'</span>,<span class="string">'yes'</span>);
+<span class="comment">% addBinJunction</span>
+<span class="comment">% arguments: newNodeID,X,Y,ToNodeID,newElevation,newBaseDemand,newDemandPattern,newPipeID,</span>
+<span class="comment">% newLength,newDiameter,newRoughness,Code</span>
+<span class="comment">% Add Junction + CV pipe</span>
+newID=<span class="string">'J1'</span>;
+[x,y]=ginput(1);
+ToNodeID=<span class="string">'10'</span>;
+newElevation=500; <span class="comment">%ft</span>
+newBaseDemand=0;
+newDemandPattern=<span class="string">'1'</span>;
+newPipeID=<span class="string">'CV-P2'</span>;
+newLength=1000; <span class="comment">%ft</span>
+newDiameter=10; <span class="comment">%in</span>
+newRoughness=100;
+Code=<span class="string">'CVPIPE'</span>;<span class="comment">%'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'</span>
+errcode=d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,<span class="keyword">...</span>
+ToNodeID,newLength,newDiameter,newRoughness,Code);
+d.plot(<span class="string">'links'</span>,<span class="string">'yes'</span>);
+d.unload;
+</pre><pre class="codeoutput">EPANET loaded sucessfuly.
+EPANET Class is unloaded
+</pre><img vspace="5" hspace="5" src="addCVPipe_05.png" alt=""> <img vspace="5" hspace="5" src="addCVPipe_06.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Example 1: Add CV PIPE 
+d=epanet('Net1.inp');
+disp('Add a CV pipe')
+d.plot;
+fromNode = d.getNodeNameID{2};
+toNode = d.getNodeNameID{6};
+index=d.addLinkPipeCV('CVPipe',fromNode,toNode);
+d.plot('links','yes');
+d.unload;
+
+%% Example 2: Add CV PIPE with Bin Functions
+d=epanet('Net1.inp');
+d.Binplot();
+[errcode]=d.addBinCVPipe('CV-P1',fromNode,toNode,1000,10,100);
+d.plot('links','yes');
+d.unload;
+
+%% Example 3: Add CV PIPE with Bin Functions addBinJunction
+d=epanet('Net1.inp');
+d.Binplot('nodes','yes');
+% addBinJunction
+% arguments: newNodeID,X,Y,ToNodeID,newElevation,newBaseDemand,newDemandPattern,newPipeID,
+% newLength,newDiameter,newRoughness,Code
+% Add Junction + CV pipe
+newID='J1';
+[x,y]=ginput(1);
+ToNodeID='10'; 
+newElevation=500; %ft
+newBaseDemand=0;
+newDemandPattern='1';
+newPipeID='CV-P2';
+newLength=1000; %ft
+newDiameter=10; %in
+newRoughness=100;
+Code='CVPIPE';%'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'
+errcode=d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,...
+ToNodeID,newLength,newDiameter,newRoughness,Code);
+d.plot('links','yes');
+d.unload;
+##### SOURCE END #####
+--></body></html>

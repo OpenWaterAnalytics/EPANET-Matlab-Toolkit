@@ -1,0 +1,180 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Defining pattern time for valves setting via Bin functions</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-06-07"><meta name="DC.source" content="defPatternTimeValves.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Defining pattern time for valves setting via Bin functions</h1><pre class="codeinput"><span class="comment">%Add paths and load inp file</span>
+d=epanet(<span class="string">'BWSN_Network_1.inp'</span>,<span class="string">'Bin'</span>);
+
+<span class="comment">% Get times</span>
+t = d.getBinTimesInfo;
+hydstep = t.BinTimeHydraulicStep;
+duration = t.BinTimeSimulationDuration;
+
+<span class="comment">% Create random settings</span>
+a = 60; b = 90;
+settings = (b-a).*rand((duration/hydstep)+1,1) + a;
+
+<span class="comment">% Settings for valve 'VALVE-173'</span>
+valveID = <span class="string">'VALVE-173'</span>;
+valveIndex = d.getBinLinkIndex(valveID);
+
+<span class="comment">% Check pressures at node after valve</span>
+nodeIndex = d.getBinNodeIndex(<span class="string">'JUNCTION-112'</span>);
+settings = num2str(settings,<span class="string">'%04.4f'</span>);
+
+hrs = duration/3600;
+hours = 0:hrs;
+step = 0:hydstep/60:55; <span class="comment">%step 30min</span>
+i=1; Time = cell(hrs,1);
+<span class="keyword">for</span> u=1:hrs
+    <span class="keyword">for</span> j=1:length(step)
+        Time{i} = sprintf(<span class="string">'%03d:%02d:00'</span>,hours(u),step(j));
+        Controls(i,: ) = [<span class="string">'LINK '</span>,valveID,<span class="string">' '</span>,settings(i,:),<span class="string">' AT TIME '</span>,Time{i}];
+        i=i+1;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+d.addBinControl(Controls);
+
+<span class="comment">% Run simulation with executable</span>
+d.setCMDCODE(1) <span class="comment">% hide cmd messages..</span>
+Sim = d.getBinComputedAllParameters;
+
+<span class="comment">% d.saveBinInpFile('NetwithControls.inp');</span>
+d.BinClose;
+
+disp(<span class="string">'Create random settings'</span>)
+disp(<span class="string">'----------------------'</span>)
+disp(<span class="string">'a = 60; b = 90;'</span>)
+disp(<span class="string">'settings = (b-a).*rand((duration/hydstep)+1,1) + a;'</span>)
+
+figure;
+plot(Sim.BinnodePressure(:,nodeIndex));
+title(<span class="string">'Valve Setting Pattern'</span>);
+xlabel(<span class="string">'Time (hours)'</span>);
+ylabel(valveID);
+</pre><pre class="codeoutput">Create random settings
+----------------------
+a = 60; b = 90;
+settings = (b-a).*rand((duration/hydstep)+1,1) + a;
+</pre><img vspace="5" hspace="5" src="defPatternTimeValves_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Defining pattern time for valves setting via Bin functions
+
+%Add paths and load inp file
+d=epanet('BWSN_Network_1.inp','Bin');
+
+% Get times
+t = d.getBinTimesInfo;
+hydstep = t.BinTimeHydraulicStep;
+duration = t.BinTimeSimulationDuration;
+
+% Create random settings
+a = 60; b = 90;
+settings = (b-a).*rand((duration/hydstep)+1,1) + a;
+
+% Settings for valve 'VALVE-173'
+valveID = 'VALVE-173';
+valveIndex = d.getBinLinkIndex(valveID);
+
+% Check pressures at node after valve
+nodeIndex = d.getBinNodeIndex('JUNCTION-112');
+settings = num2str(settings,'%04.4f');
+
+hrs = duration/3600;
+hours = 0:hrs;
+step = 0:hydstep/60:55; %step 30min
+i=1; Time = cell(hrs,1);
+for u=1:hrs
+    for j=1:length(step)
+        Time{i} = sprintf('%03d:%02d:00',hours(u),step(j));
+        Controls(i,: ) = ['LINK ',valveID,' ',settings(i,:),' AT TIME ',Time{i}];
+        i=i+1;
+    end
+end
+
+d.addBinControl(Controls);
+
+% Run simulation with executable
+d.setCMDCODE(1) % hide cmd messages..
+Sim = d.getBinComputedAllParameters;
+
+% d.saveBinInpFile('NetwithControls.inp');
+d.BinClose;
+
+disp('Create random settings')
+disp('REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH')
+disp('a = 60; b = 90;')
+disp('settings = (b-a).*rand((duration/hydstep)+1,1) + a;')
+
+figure;
+plot(Sim.BinnodePressure(:,nodeIndex));
+title('Valve Setting Pattern');
+xlabel('Time (hours)');
+ylabel(valveID);
+##### SOURCE END #####
+--></body></html>

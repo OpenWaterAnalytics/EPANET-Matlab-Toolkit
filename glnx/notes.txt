@@ -1,0 +1,5 @@
+1. Unzip libepanet
+2. run terminal
+3. sudo cp libepanet.so /lib64/libepanet.so
+4. use msx files
+5. sudo rm libepanet.so
