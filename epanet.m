@@ -379,7 +379,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='2.1.5'; % comment function for net-builder branch
+        classversion='2.1.6'; % 13/12/2017
         
         TYPECONTROL={'LOWLEVEL','HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL','HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'PUMP','EFFICIENCY','VOLUME','HEADLOSS'}; % Constants for pump curves: 'PUMP','EFFICIENCY','VOLUME','HEADLOSS'
@@ -9119,8 +9119,8 @@ for t = 1:length(info)
                 end
             elseif typecode==3 && strcmp(a{u},'[VALVES]')
                 fprintf(fid2,'%s',a{u});
-                fprintf(fid2, '\n%s%s%s%s%s%s%d%s%s%s%d',newLink,sps,fromNode,sps,...
-                    toNode,sps,vdiameter,sps,type_valv,sps,vsetting);
+                fprintf(fid2, '\n%s%s%s%s%s%s%d%s%s%s%s',newLink,sps,fromNode,sps,...
+                    toNode,sps,vdiameter,sps,type_valv,sps,num2str(vsetting));
                 nn=1;
             elseif isempty(a{u}) && nn==0
             else
