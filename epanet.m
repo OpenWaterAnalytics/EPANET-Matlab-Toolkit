@@ -2475,7 +2475,7 @@ classdef epanet <handle
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_REPORTSTEP,value,obj.LibEPANET);
         end
         function setTimeReportingStart(obj,value)
-            [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_PATTERNSTART,value,obj.LibEPANET);
+            [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_REPORTSTART,value,obj.LibEPANET);
         end
         function setTimeRuleControlStep(obj,value)
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_RULESTEP,value,obj.LibEPANET);
