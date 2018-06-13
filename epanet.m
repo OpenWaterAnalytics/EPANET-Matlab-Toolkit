@@ -379,7 +379,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='2.1.6'; % 13/12/2017
+        classversion='2.1.6'; % comment function for net-builder branch
         
         TYPECONTROL={'LOWLEVEL','HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL','HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'PUMP','EFFICIENCY','VOLUME','HEADLOSS'}; % Constants for pump curves: 'PUMP','EFFICIENCY','VOLUME','HEADLOSS'
@@ -392,6 +392,7 @@ classdef epanet <handle
         TYPESOURCE={'CONCEN','MASS', 'SETPOINT', 'FLOWPACED'}; % Constants for sources: 'CONCEN','MASS', 'SETPOINT', 'FLOWPACED'
         TYPESTATS={'NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE'}; % Constants for statistics: 'NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE'
         TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
+        TYPESTATUS = {'CLOSED','OPEN'};
         
         MSXTYPEAREAUNITS={'FT2','M2','CM2'}; % sets the units used to express pipe wall surface area
         MSXTYPERATEUNITS={'SEC','MIN','HR','DAY'}; % is the units in which all reaction rate terms are expressed
@@ -415,10 +416,14 @@ classdef epanet <handle
             elseif strcmpi(arch,'win32')
                 obj.LibEPANETpath = [pwdepanet,'/32bit/'];
             end
-            if strcmpi(arch(1:4),'glnx')
+            if isunix
                 obj.LibEPANETpath = [pwdepanet,'/glnx/'];
                 obj.LibEPANET = 'libepanet';
             end
+%             if ismac
+%                 obj.LibEPANETpath = [pwdepanet,'/mac/'];
+%                 obj.LibEPANET = 'libepanet';
+%             end
             if ~isdeployed
                 obj.InputFile=which(varargin{1}); % Get name of INP file
             else
@@ -451,7 +456,7 @@ classdef epanet <handle
                    obj.Errcode=-1;
                    warning(['File "', obj.LibEPANET, '" is not a valid win application.']);return;
                 end
-            elseif ~strcmpi(arch(1:4),'glnx')
+            elseif ~isunix
                 obj.LibEPANET = 'epanet2';
             end
             if ~isdeployed
@@ -687,29 +692,57 @@ classdef epanet <handle
             % 'linksindex': yes
             % 'nodesindex': yes
             % Example:
-            % d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},'highlightlink',{'10'},'fontsize',8);
+            % d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},
+%             'highlightlink',{'10'},'fontsize',8);
             % d.plot('line','no');
             % d.plot('point','no','linksindex','yes');
             % d.plot('linksindex','yes','fontsize',8);
             % d.plot('nodesindex','yes','fontsize',14);
             [value] = ENplot(obj,'bin',0,varargin{:});
         end
-        function value = getControls(obj)
+        function value = getControls(obj, varargin)
             %Retrieves the parameters of all control statements
+            indices = getControlIndices(obj,varargin);j=1;            
             value={};
-            cnt=obj.getControlRulesCount;
-            if cnt
-                obj.ControlTypes{cnt}=[];
-                obj.ControlTypesIndex(cnt)=NaN;
-                obj.ControlLinkIndex(cnt)=NaN;
-                obj.ControlSettings(cnt)=NaN;
-                obj.ControlNodeIndex(cnt)=NaN;
-                obj.ControlLevelValues(cnt)=NaN;
-                for i=1:cnt
-                    [obj.Errcode, obj.ControlTypesIndex(i),obj.ControlLinkIndex(i),obj.ControlSettings(i),obj.ControlNodeIndex(i),obj.ControlLevelValues(i)] = ENgetcontrol(i,obj.LibEPANET);
-                    obj.ControlTypes(i)={obj.TYPECONTROL(obj.ControlTypesIndex(i)+1)};
-                    value{i}={obj.ControlTypes{i},obj.ControlTypesIndex(i),obj.ControlLinkIndex(i),obj.ControlSettings(i),obj.ControlNodeIndex(i),obj.ControlLevelValues(i)};
+            obj.ControlTypes={};
+            for i=indices
+                [obj.Errcode, obj.ControlTypesIndex(j),...
+                    obj.ControlLinkIndex(j), obj.ControlSettings(j),...
+                    obj.ControlNodeIndex(j),obj.ControlLevelValues(j)]...
+                    = ENgetcontrol(i,obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                obj.ControlTypes(j)=obj.TYPECONTROL(obj.ControlTypesIndex(j)+1);
+                value(j).Type = obj.ControlTypes{j};
+                %value{i}.TypeIndex = obj.ControlTypesIndex(i);
+                value(j).LinkID = obj.getLinkNameID{obj.ControlLinkIndex(j)};
+                if all(obj.ControlSettings(j) ~= [0, 1])
+                    value(j).Setting = obj.ControlSettings(j);
+                else
+                    value(j).Setting = obj.TYPESTATUS{obj.ControlSettings(j)+1};
                 end
+                if obj.ControlNodeIndex(j)
+                    value(j).NodeID = obj.getNodeNameID{obj.ControlNodeIndex(j)};
+                else
+                    value(j).NodeID = NaN;
+                end
+                value(j).Value = obj.ControlLevelValues(j);   
+                switch obj.ControlTypes{j}
+                    case 'LOWLEVEL'
+                        value(j).Control = ['LINK ',value(j).LinkID,' ',...
+                            value(j).Setting,' IF NODE ',value(j).NodeID,...
+                            ' BELOW ',num2str(value(j).Value)];
+                    case 'HIGHLEVEL'
+                        value(j).Control = ['LINK ',value(j).LinkID,' ',...
+                            value(j).Setting,' IF NODE ',value(j).NodeID,...
+                            ' ABOVE ',num2str(value(j).Value)];
+                    case 'TIMER'
+                        value(j).Control = ['LINK ',value(j).LinkID,' ',...
+                            num2str(value(j).Setting),' AT TIME ',num2str(value(j).Value)];
+                    case 'TIMEOFDAY'
+                        value(j).Control = ['LINK ',value(j).LinkID,' ',...
+                            num2str(value(j).Setting),' AT CLOCKTIME ',num2str(value(j).Value), ' SEC'];
+                end
+                j=j+1;
             end
         end
 %         function value = getRules(obj)
@@ -2151,7 +2184,7 @@ classdef epanet <handle
             if controlRuleIndex<=obj.getControlRulesCount
                 [obj.Errcode] = ENsetcontrol(controlRuleIndex,controlTypeIndex,linkIndex,controlSettingValue,nodeIndex,controlLevel,obj.LibEPANET);
             else
-                disp('New rules cannot be added in this LibEPANET')
+                disp('New controls cannot be added in this DLL');
             end
         end
         function setLinkDiameter(obj, value, varargin)
@@ -2499,8 +2532,9 @@ classdef epanet <handle
         end
 %         function value = setTimeReportingPeriods(obj)
 %             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_PERIODS,obj.LibEPANET);
-%         function value = setTimeStartTime(obj)
-%             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_STARTTIME,obj.LibEPANET);
+        function setTimeStartTime(obj, value)
+            [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_STARTTIME,value,obj.LibEPANET);
+        end
 %         function value = setTimeNextEvent(obj)
 %             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENT,obj.LibEPANET);
 %         end
@@ -2615,29 +2649,29 @@ classdef epanet <handle
             [obj.Errcode, tleft] = ENstepQ(obj.LibEPANET);
         end
         function Errcode = saveInputFile(obj,inpname)
-            [addSectionCoordinates,addSectionRules] = obj.getBinCoordRuleSections(obj.InputFile);
+%             [addSectionCoordinates,addSectionRules] = obj.getBinCoordRuleSections(obj.InputFile);
             [Errcode] = ENsaveinpfile(inpname,obj.LibEPANET);
-            [~,info] = obj.readInpFile;
-            endSectionIndex=find(~cellfun(@isempty,regexp(info,'END','match')));
-            endInpIndex=find(~cellfun(@isempty,regexp(addSectionCoordinates,'END','match')));
-            info(endSectionIndex)='';
-            f1 = writenewTemp(obj.BinTempfile);
-            coordSectionIndex=find(~cellfun(@isempty,regexp(info,'COORDINATES','match')));
-            if ~isempty(coordSectionIndex)
-                fprintf(f1, '%s\n', info{1:coordSectionIndex-1});
-            else
-                fprintf(f1, '%s\n', info{:});
-            end
-            if ~isempty(addSectionRules)
-                fprintf(f1, '%s\n', addSectionRules{:});
-            end
-            if ~isempty(addSectionCoordinates) % && isempty(coordSectionIndex)
-                fprintf(f1, '%s\n', addSectionCoordinates{:});
-            end
-            if isempty(endInpIndex)
-                fprintf(f1, '[END]\n');
-            end
-            fclose(f1);
+%             [~,info] = obj.readInpFile;
+%             endSectionIndex=find(~cellfun(@isempty,regexp(info,'END','match')));
+%             endInpIndex=find(~cellfun(@isempty,regexp(addSectionCoordinates,'END','match')));
+%             info(endSectionIndex)='';
+%             f1 = writenewTemp(obj.BinTempfile);
+%             coordSectionIndex=find(~cellfun(@isempty,regexp(info,'COORDINATES','match')));
+%             if ~isempty(coordSectionIndex)
+%                 fprintf(f1, '%s\n', info{1:coordSectionIndex-1});
+%             else
+%                 fprintf(f1, '%s\n', info{:});
+%             end
+%             if ~isempty(addSectionRules)
+%                 fprintf(f1, '%s\n', addSectionRules{:});
+%             end
+%             if ~isempty(addSectionCoordinates) % && isempty(coordSectionIndex)
+%                 fprintf(f1, '%s\n', addSectionCoordinates{:});
+%             end
+%             if isempty(endInpIndex)
+%                 fprintf(f1, '[END]\n');
+%             end
+%             fclose(f1);
         end
         function writeLineInReportFile(obj, line)
             [obj.Errcode] = ENwriteline (line,obj.LibEPANET);
@@ -6478,7 +6512,7 @@ classdef epanet <handle
                 if (tok(1) == '[')                
                         % [RULES] section
                     if strcmpi(tok(1:5),'[RULE')
-                        sect=1;d=1;dd=0;
+                        sect=1;d=1;
                         value.BinRulesControlsInfo={};
                         value.BinRulesControlLinksID={};
                         value.BinRulesControlNodesID={};
@@ -6909,9 +6943,8 @@ end
 function ENLoadLibrary(LibEPANETpath,LibEPANET,varargin)
 if ~libisloaded(LibEPANET)
     warning('off', 'MATLAB:loadlibrary:TypeNotFound');
-    arch=computer('arch');
     if ~isdeployed
-        if strcmpi(arch(1:4),'glnx')
+        if isunix
             loadlibrary(LibEPANET,[LibEPANETpath,LibEPANET,'.h']);
         else
             loadlibrary([LibEPANETpath,LibEPANET],[LibEPANETpath,LibEPANET,'.h']);
@@ -7245,7 +7278,7 @@ if strcmp(arch,'win64')
 elseif strcmp(arch,'win32')
     obj.MSXLibEPANETPath = [pwdepanet,'\32bit\'];
 end
-if strcmpi(arch(1:4),'glnx')
+if isunix
     obj.MSXLibEPANETPath = [pwdepanet,'/glnx/'];
 end
             
@@ -10408,8 +10441,10 @@ function [fid,binfile,rptfile] = runEPANETexe(obj)
         libPwd=regexp(lpwd,'\s','split');
         r = sprintf('%s//epanet2d.exe %s %s %s',libPwd{1},inpfile,rptfile,binfile);
     end
-    if strcmpi(arch(1:4),'glnx')
+    if isunix
         r = sprintf('%sepanet2d %s %s %s',obj.LibEPANETpath,obj.BinTempfile,rptfile,binfile);
+    elseif ismac
+        r = sprintf('%runepanet %s %s %s',obj.LibEPANETpath,obj.BinTempfile,rptfile,binfile);
     end
     if obj.getCMDCODE, [~,~]=system(r); else system(r); end
     fid = fopen(binfile,'r');
@@ -10685,6 +10720,9 @@ end
 function indices = getNodeIndices(obj, varargin)
     indices = getIndices(obj.getNodeCount, varargin{1});
 end
+function indices = getControlIndices(obj, varargin)
+    indices = getIndices(obj.getControlRulesCount, varargin{1});
+end
 function indices = getIndices(cnt, varargin)
     if isempty(varargin{1})
         indices=1:cnt;
@@ -10946,7 +10984,7 @@ function [status,result] = runMSXexe(obj, rptfile, varargin)
             r = sprintf('%s\\epanetmsx.exe %s %s %s %s',libPwd{1},inpfile,obj.MSXTempFile,rptfile,binfile);
         end
     end
-    if strcmpi(arch(1:4),'glnx')
+    if isunix
         if nargin<3
             r = sprintf('%sepanetmsx %s %s %s',obj.MSXLibEPANETPath,inpfile,obj.MSXTempFile,rptfile);
         else
