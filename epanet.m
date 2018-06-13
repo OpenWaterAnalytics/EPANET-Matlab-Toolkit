@@ -11292,13 +11292,17 @@ function setControlFunction(obj, index, value)
     controlRuleIndex = index;
     controlSettingValue = find(strcmpi(obj.TYPESTATUS,splitControl(3)))-1;
     if isempty(controlSettingValue)
-        controlSettingValue = splitControl(3);
+        if strcmpi(splitControl(3), 'CLOSE')
+            controlSettingValue = 0;
+        else
+            controlSettingValue = splitControl(3);
+        end
     end
     linkIndex = obj.getLinkIndex(splitControl(2));
     if linkIndex==0
         warning('Wrong link ID. Please change your control.')
     end
-    switch splitControl{4}
+    switch upper(splitControl{4})
         case 'IF'
             %LINK linkID status IF NODE nodeID ABOVE/BELOW value
             nodeIndex = obj.getNodeIndex(splitControl(6));
