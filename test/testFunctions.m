@@ -266,10 +266,9 @@ d.addPattern('NewPat1')
 d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]); 
 d.getPattern
 
-d.getControls
-% controlRuleIndex,controlTypeIndex,linkIndex,controlSettingValue,nodeIndex,controlLevel
-d.setControl(1,1,13,1,11,150); 
-d.getControls
+d.getControls(1)
+d.setControls(1, 'Link 12 OPEN AT TIME 2'); 
+d.getControls(1)
 
 d.getLinkDiameter
 d.setLinkDiameter(2*d.getLinkDiameter);

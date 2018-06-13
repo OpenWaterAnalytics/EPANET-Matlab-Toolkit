@@ -740,7 +740,7 @@ classdef epanet <handle
                             num2str(value(j).Setting),' AT TIME ',num2str(value(j).Value)];
                     case 'TIMEOFDAY'
                         value(j).Control = ['LINK ',value(j).LinkID,' ',...
-                            num2str(value(j).Setting),' AT CLOCKTIME ',num2str(value(j).Value), ' SEC'];
+                            num2str(value(j).Setting),' AT CLOCKTIME ',num2str(value(j).Value)];
                 end
                 j=j+1;
             end
@@ -2179,12 +2179,16 @@ classdef epanet <handle
         function Errcode = deleteLink(obj,indexLink)
             [Errcode] = ENdeletelink(obj,indexLink);
         end
-        function setControl(obj,controlRuleIndex,controlTypeIndex,linkIndex,controlSettingValue,nodeIndex,controlLevel)
-            % Example: d.setControl(1,1,13,1,11,150)
-            if controlRuleIndex<=obj.getControlRulesCount
-                [obj.Errcode] = ENsetcontrol(controlRuleIndex,controlTypeIndex,linkIndex,controlSettingValue,nodeIndex,controlLevel,obj.LibEPANET);
+        function setControls(obj, index, control)
+            if nargin<3
+                if ~isstruct(index), warning('e.g. setControls(1, "LINK 9 CLOSED IF NODE 2 ABOVE 140")'); return; end
+            end
+            if isstruct(index)
+                for c=1:length(index)
+                    setControlFunction(obj, c, index(c).Control)
+                end
             else
-                disp('New controls cannot be added in this DLL');
+                setControlFunction(obj, index, control)
             end
         end
         function setLinkDiameter(obj, value, varargin)
@@ -11282,4 +11286,43 @@ function atline = checktlines(tline)
             atline{uu}=a{tt}; uu=uu+1;
         end
     end
+end
+function setControlFunction(obj, index, value)
+    splitControl = strsplit(value);
+    controlRuleIndex = index;
+    controlSettingValue = find(strcmpi(obj.TYPESTATUS,splitControl(3)))-1;
+    if isempty(controlSettingValue)
+        controlSettingValue = splitControl(3);
+    end
+    linkIndex = obj.getLinkIndex(splitControl(2));
+    if linkIndex==0
+        warning('Wrong link ID. Please change your control.')
+    end
+    switch splitControl{4}
+        case 'IF'
+            %LINK linkID status IF NODE nodeID ABOVE/BELOW value
+            nodeIndex = obj.getNodeIndex(splitControl(6));
+            controlTypeIndex = 0; % LOWLEVEL
+            if strcmpi(splitControl(7), 'ABOVE')
+                controlTypeIndex = 1; % HIGHLEVEL
+            end
+            controlLevel = str2num(splitControl{8});
+        case 'AT'
+            if strcmpi(splitControl{5}, 'CLOCKTIME')
+                %LINK linkID status AT CLOCKTIME clocktime AM/PM 
+                nodeIndex = 0;
+                controlTypeIndex = 3; 
+                controlLevel = str2num(splitControl{6}); 
+            else
+                %LINK linkID status AT TIME time
+                nodeIndex = 0;
+                controlTypeIndex = 2; 
+                controlLevel = str2num(splitControl{6}); 
+            end
+        otherwise
+    end
+
+    [obj.Errcode] = ENsetcontrol(controlRuleIndex,...
+        controlTypeIndex,linkIndex,controlSettingValue,nodeIndex,controlLevel,obj.LibEPANET);
+    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
 end
