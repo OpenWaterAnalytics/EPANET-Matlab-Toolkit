@@ -2180,15 +2180,28 @@ classdef epanet <handle
             [Errcode] = ENdeletelink(obj,indexLink);
         end
         function setControls(obj, index, control)
-            if nargin<3
-                if ~isstruct(index), warning('e.g. setControls(1, "LINK 9 CLOSED IF NODE 2 ABOVE 140")'); return; end
-            end
+            
             if isstruct(index)
                 for c=1:length(index)
                     setControlFunction(obj, c, index(c).Control)
                 end
             else
-                setControlFunction(obj, index, control)
+                if length(index)> 1
+                    tmpC = index;
+                    index = 1:length(index);
+                elseif length(index)== 1
+                    if isnumeric(index) 
+                        tmpC{1} = control;
+                    else
+                        tmpC{1} = index{1};
+                        index = 1;
+                    end
+                end
+                j=1;
+                for i=index
+                    setControlFunction(obj, i, tmpC{j}); 
+                    j=j+1;
+                end
             end
         end
         function setLinkDiameter(obj, value, varargin)
@@ -10721,11 +10734,11 @@ end
 function indices = getLinkIndices(obj, varargin)
     indices = getIndices(obj.getLinkCount, varargin{1});
 end
-function indices = getNodeIndices(obj, varargin)
-    indices = getIndices(obj.getNodeCount, varargin{1});
-end
 function indices = getControlIndices(obj, varargin)
     indices = getIndices(obj.getControlRulesCount, varargin{1});
+end
+function indices = getNodeIndices(obj, varargin)
+    indices = getIndices(obj.getNodeCount, varargin{1});
 end
 function indices = getIndices(cnt, varargin)
     if isempty(varargin{1})
