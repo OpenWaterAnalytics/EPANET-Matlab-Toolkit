@@ -11312,9 +11312,8 @@ function setControlFunction(obj, index, value)
             controlSettingValue = str2num(splitControl{3});
         end
     end
-    linkIndexArray = obj.getLinkIndex;
-    linkIndex = linkIndexArray(str2num(splitControl{2}));
-    if linkIndex==0
+    linkIndex = obj.getLinkIndex(splitControl(2));
+    if ~linkIndex
         warning('Wrong link ID. Please change your control.')
     end
     switch upper(splitControl{4})
