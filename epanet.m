@@ -11308,11 +11308,12 @@ function setControlFunction(obj, index, value)
         if strcmpi(splitControl(3), 'CLOSE')
             controlSettingValue = 0;
         else
-            controlSettingValue = splitControl(3);
+            % control setting Value (type should be int) for pump or valve
+            controlSettingValue = str2num(splitControl{3});
         end
     end
     linkIndex = obj.getLinkIndex(splitControl(2));
-    if linkIndex==0
+    if ~linkIndex
         warning('Wrong link ID. Please change your control.')
     end
     switch upper(splitControl{4})
