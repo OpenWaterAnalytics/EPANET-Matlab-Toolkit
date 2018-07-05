@@ -446,7 +446,7 @@ classdef epanet <handle
             obj.Bin=1;
             [~,inp]=fileparts(obj.InputFile);
             if isempty(inp)
-                warning(['File "', varargin{1}, '" is not a valid.']);return;
+                error(['File "', varargin{1}, '" is not a valid.']);
             end
             if nargin==2 && ~strcmpi(varargin{2},'loadfile')% e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL,obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
@@ -457,14 +457,14 @@ classdef epanet <handle
                 try ENLoadLibrary(obj.LibEPANETpath,obj.LibEPANET,0);
                 catch
                    obj.Errcode=-1;
-                   warning(['File "', obj.LibEPANET, '" is not a valid win application.']);return;
+                   error(['File "', obj.LibEPANET, '" is not a valid win application.']); 
                 end
             elseif ~isunix
                 obj.LibEPANET = 'epanet2';
             end
             if ~isdeployed
                 if ~exist(obj.InputFile,'file')
-                    warning(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);return;
+                    error(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);
                 end
             end
             %Load EPANET Library
@@ -474,7 +474,7 @@ classdef epanet <handle
             %Open the file
             obj.Errcode=ENopen(obj.InputFile,[obj.InputFile(1:end-4),'.txt'],'',obj.LibEPANET);
             if obj.Errcode
-                warning('Could not open the file, please check INP file.');return;
+                error('Could not open the file, please check INP file.');
             end
             %Save the temporary input file
             obj.BinTempfile=[obj.InputFile(1:end-4),'_temp.inp'];
@@ -483,7 +483,9 @@ classdef epanet <handle
             %Load temporary file
             obj.Errcode=ENopen(obj.BinTempfile,[obj.InputFile(1:end-4),'_temp.txt'], [obj.InputFile(1:end-4),'_temp.bin'],obj.LibEPANET);
             if obj.Errcode
-                warning('Could not open the file, please check INP file.');return;
+                error('Could not open the file, please check INP file.');
+            else
+                disp(['Input File "', varargin{1}, '" loaded sucessfuly.'])
             end
             % Hide messages at command window from bin computed
             obj.CMDCODE=1;
