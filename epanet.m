@@ -437,7 +437,7 @@ classdef epanet <handle
                     copyfile(obj.InputFile,obj.BinTempfile);
                     obj.InputFile=obj.BinTempfile;
                     obj.Bin=0;
-                    if nargin==3, if strcmpi(varargin{3},'LOADFILE'); return; end;end;
+                    if nargin==3, if strcmpi(varargin{3},'LOADFILE'); return; end; end
                     obj = BinUpdateClass(obj);
                     obj.saveBinInpFile;
                     return;
@@ -450,7 +450,10 @@ classdef epanet <handle
             end
             if nargin==2 && ~strcmpi(varargin{2},'loadfile')% e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL,obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-                obj.LibEPANETpath = [pwdDLL,'/'];
+                if isempty(pwdDLL)
+                    pwdDLL = pwd;
+                end
+                obj.LibEPANETpath = [pwdDLL,'\'];
                 try ENLoadLibrary(obj.LibEPANETpath,obj.LibEPANET,0);
                 catch
                    obj.Errcode=-1;
@@ -486,7 +489,7 @@ classdef epanet <handle
             obj.CMDCODE=1;
             % Load file only, return
             if nargin==2
-                if strcmpi(varargin{2},'LOADFILE'); 
+                if strcmpi(varargin{2},'LOADFILE') 
                     return;
                 end
             end
@@ -625,14 +628,14 @@ classdef epanet <handle
             obj.NodeCoordinates{3} = value{3};
             obj.NodeCoordinates{4} = value{4};
             
-            %     US Customary - SI metric
+            % US Customary - SI metric
             if find(strcmp(obj.LinkFlowUnits, obj.TYPEUNITS))<6
                 obj.Units_US_Customary=1;
             else
                 obj.Units_SI_Metric=1;
             end
 
-            if obj.Units_US_Customary==1;
+            if obj.Units_US_Customary
                 obj.NodePressureUnits='pounds per square inch';
                 obj.PatternDemandsUnits=obj.LinkFlowUnits;
                 obj.LinkPipeDiameterUnits='inches';
@@ -2236,7 +2239,7 @@ classdef epanet <handle
             end
         end
         function setLinkDiameter(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_DIAMETER, value(j),obj.LibEPANET); j=j+1;
@@ -2244,7 +2247,7 @@ classdef epanet <handle
             end            
         end
         function setLinkLength(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_LENGTH, value(j),obj.LibEPANET); j=j+1;
@@ -2252,7 +2255,7 @@ classdef epanet <handle
             end
         end
         function setLinkRoughnessCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_ROUGHNESS, value(j),obj.LibEPANET); j=j+1;
@@ -2260,7 +2263,7 @@ classdef epanet <handle
             end
         end
         function setLinkMinorLossCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_MINORLOSS, value(j),obj.LibEPANET); j=j+1;
@@ -2268,7 +2271,7 @@ classdef epanet <handle
             end
         end
         function setLinkInitialStatus(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices% Cannot set status for a check valve
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_INITSTATUS, value(j),obj.LibEPANET); j=j+1;
@@ -2276,7 +2279,7 @@ classdef epanet <handle
             end
         end
         function setLinkInitialSetting(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_INITSETTING, value(j),obj.LibEPANET); j=j+1;
@@ -2284,7 +2287,7 @@ classdef epanet <handle
             end
         end
         function setLinkBulkReactionCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_KBULK, value(j),obj.LibEPANET); j=j+1;
@@ -2292,7 +2295,7 @@ classdef epanet <handle
             end
         end
         function setLinkWallReactionCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_KWALL, value(j),obj.LibEPANET); j=j+1;
@@ -2300,7 +2303,7 @@ classdef epanet <handle
             end
         end
         function setLinkStatus(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_STATUS, value(j),obj.LibEPANET); j=j+1;
@@ -2308,7 +2311,7 @@ classdef epanet <handle
             end
         end
         function setLinkSettings(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getLinkIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_SETTING, value(j),obj.LibEPANET); j=j+1;
@@ -2316,7 +2319,7 @@ classdef epanet <handle
             end
         end
         function setNodeElevations(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getNodeIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getNodeIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i,obj.ToolkitConstants.EN_ELEVATION, value(j),obj.LibEPANET); j=j+1;
@@ -2324,7 +2327,7 @@ classdef epanet <handle
             end
         end
         function setNodeBaseDemands(obj, value, varargin)
-            if nargin==3, 
+            if nargin==3 
                 indices = value; value=varargin{1};j=1;
                 for i=indices
                     [obj.Errcode] = ENsetnodevalue(i,obj.ToolkitConstants.EN_BASEDEMAND, value(j),obj.LibEPANET); j=j+1;
@@ -2342,7 +2345,7 @@ classdef epanet <handle
                     end
                 end
             else %version epanet20012
-                if nargin==3, indices = value; value=varargin{1}; else  indices = getNodeIndices(obj,varargin); end
+                if nargin==3, indices = value; value=varargin{1}; else,  indices = getNodeIndices(obj,varargin); end
                 j=1;
                 for i=indices
                     [obj.Errcode] = ENsetnodevalue(i,obj.ToolkitConstants.EN_BASEDEMAND, value(j),obj.LibEPANET); j=j+1;
@@ -2351,7 +2354,7 @@ classdef epanet <handle
             end
         end
         function setNodeCoordinates(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getNodeIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getNodeIndices(obj,varargin); end
             if ~isempty(varargin)
                 for i=indices
                     [obj.Errcode] = ENsetcoord(i,value(1),value(2),obj.LibEPANET);
@@ -2366,7 +2369,7 @@ classdef epanet <handle
             end
         end
         function setNodeDemandPatternIndex(obj, value, varargin)
-            if nargin==3, 
+            if nargin==3
                 indices = value; value=varargin{1};j=1;
                 for i=indices
                     [obj.Errcode] = ENsetnodevalue(i,obj.ToolkitConstants.EN_PATTERN, value(j),obj.LibEPANET); j=j+1;
@@ -2394,7 +2397,7 @@ classdef epanet <handle
             end
         end
         function setNodeEmitterCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getNodeIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getNodeIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, value(j),obj.LibEPANET); j=j+1;
@@ -2402,7 +2405,7 @@ classdef epanet <handle
             end
         end
         function setNodeInitialQuality(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getNodeIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getNodeIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, value(j),obj.LibEPANET); j=j+1;
@@ -2492,7 +2495,7 @@ classdef epanet <handle
             end
         end
         function setNodeSourceQuality(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getNodeIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getNodeIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, value(j),obj.LibEPANET); j=j+1;
@@ -2500,7 +2503,7 @@ classdef epanet <handle
             end
         end
         function setNodeSourcePatternIndex(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getNodeIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getNodeIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, value(j),obj.LibEPANET); j=j+1;
@@ -2508,7 +2511,7 @@ classdef epanet <handle
             end
         end
         function value = setLinkPumpHeadCurveIndex(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getNodeIndices(obj,varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else,  indices = getNodeIndices(obj,varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetheadcurveindex(obj,i,value(j)); j=j+1;
@@ -7743,7 +7746,7 @@ for i=1:(nargin/2)
         case 'axes' % color
             try
                 axesid=axes('Parent',varargin{2*i});
-            catch e
+            catch
                 axesid=varargin{2*i};
             end
         case 'bin' % color
@@ -9713,9 +9716,9 @@ for t = 1:length(info)
                         pp=pp+1;
                         fprintf(fid2,'%s%s',char(a{mm}),sps);
                         if changes==1
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.3048),sps);
                         elseif changes==2
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.281),sps);
                         end
                         if length(a)>2
                             mm=2;
@@ -9734,9 +9737,9 @@ for t = 1:length(info)
                         pp=pp+1;
                         fprintf(fid2,'%s%s',char(a{mm}),sps);
                         if changes==1
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.3048),sps);
                         elseif changes==2
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.281),sps);
                         end
                     end
                 else
@@ -9751,19 +9754,19 @@ for t = 1:length(info)
                         pp=pp+1;
                         fprintf(fid2,'%s%s',char(a{mm}),sps);
                         if changes==1
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+3})*0.3048),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+4})*0.3048),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+5})*0.3048),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+6})*0.02831685),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.3048),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+2})*0.3048),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+3})*0.3048),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+4})*0.3048),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+5})*0.3048),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+6})*0.02831685),sps);
                         elseif changes==2
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*3.281),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+3})*3.281),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+4})*3.281),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+5})*3.281),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+6})*35.3147),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.281),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+2})*3.281),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+3})*3.281),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+4})*3.281),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+5})*3.281),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+6})*35.3147),sps);
                         end
                     end
                 else
@@ -9781,19 +9784,19 @@ for t = 1:length(info)
                             fprintf(fid2,'%s%s',char(a{mm}),sps);
                         end
                         if changes==1
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*25.4),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.3048),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+2})*25.4),sps);
                             if nheadl
                                 if strcmp('D-W',value.BinOptionsHeadloss)
-                                    fprintf(fid2,'%s%s',num2str(str2num(a{mm+3})*0.3048),sps);
+                                    fprintf(fid2,'%s%s',num2str(str2double(a{mm+3})*0.3048),sps);
                                     mm=7;
                                 else
                                     mm=6;
                                 end
                             end
                         elseif changes==2
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps);
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.03937007874),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.281),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+2})*0.03937007874),sps);
                             if nheadl
                                 if strcmp('D-W',value.BinOptionsHeadloss)
                                     mm=7;
@@ -9824,9 +9827,9 @@ for t = 1:length(info)
                         if strcmpi(power,'POWER')
                             mm=mm-1;
                             if changes==1 
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.745699882507324),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.745699882507324),sps);
                             elseif changes==2
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})/0.745699882507324),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})/0.745699882507324),sps);
                             end
                         end
                     end
@@ -9850,18 +9853,18 @@ for t = 1:length(info)
                         fcv=regexp(c,'FCV','match');if isempty(fcv), fcv=0; end
 %                         tcv=regexp(c,'TCV','match');if isempty(tcv), tcv=0; end
                         if changes==1
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*25.4),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*25.4),sps);
                             fprintf(fid2,'%s%s',char(a{mm+2}),sps);
                             if strcmpi(prv,'PRV') || strcmpi(psv,'PSV') || strcmpi(pbv,'PBV') %|| strcmpi(tcv,'TCV')
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+3})*0.3048),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+3})*0.3048),sps);
                             elseif strcmpi(fcv,'FCV')
                                 setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
                             end
                         elseif changes==2
-                            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.03937007874),sps);
+                            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.03937007874),sps);
                             fprintf(fid2,'%s%s',char(a{mm+2}),sps);
                             if strcmpi(prv,'PRV') || strcmpi(psv,'PSV') || strcmpi(pbv,'PBV') %|| strcmpi(tcv,'TCV')
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+3})/0.3048),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+3})/0.3048),sps);
                             elseif strcmpi(fcv,'FCV')
                                 setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
                             end
@@ -9942,9 +9945,9 @@ for t = 1:length(info)
                             fprintf(fid2,'%s%s',char(a{mm}),sps);
                             setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm);
                             if changes==1
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+2})*0.3048),sps);
                             elseif changes==2
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*3.281),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+2})*3.281),sps);
                             else
                                 fprintf(fid2,'%s%s',char(a{mm+2}),sps);
                             end
@@ -9966,11 +9969,11 @@ for t = 1:length(info)
                             pp=pp+1;
                             fprintf(fid2,'%s%s',char(a{mm}),sps);
                             if changes==1
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*2.831685e-02),sps);
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})*0.3048),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*2.831685e-02),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+2})*0.3048),sps);
                             else
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+2})),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+2})),sps);
                             end
                         elseif curves.BintypeCurve(ww)==3 % HEADLOSS
                             kk=regexp(c,'\w*HEADLOSS*\w','match');
@@ -9980,9 +9983,9 @@ for t = 1:length(info)
                             pp=pp+1;
                             fprintf(fid2,'%s%s',char(a{mm}),sps);
                             if changes==1
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3048),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.3048),sps);
                             elseif changes==2
-                                fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.281),sps);
+                                fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.281),sps);
                             else
                                 fprintf(fid2,'%s%s',char(a{mm+1}),sps);
                             end
@@ -10140,232 +10143,232 @@ function setflow(previousFlowUnits,newFlowUnits,fid2,a,sps,mm)
 if strcmp(previousFlowUnits,'GPM')
     switch newFlowUnits %(GPM)
         case 'CFS' 
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00222816399286988),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.00222816399286988),sps);
         case 'MGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00144),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.00144),sps);
         case 'IMGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00119905),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.00119905),sps);
         case 'AFD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.004419191),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.004419191),sps);
         case 'LPS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0630902),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.0630902),sps);
         case 'LPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.785412),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.785412),sps);
         case 'MLD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.005450993),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.005450993),sps);
         case 'CMH'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.2271247),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.2271247),sps);
         case 'CMD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*5.450993),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*5.450993),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 elseif strcmp(previousFlowUnits,'CFS')
     switch newFlowUnits
         case 'GPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*448.8312),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*448.8312),sps);
         case 'MGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.6463169),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.6463169),sps);
         case 'IMGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.5381711),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.5381711),sps);
         case 'AFD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.983471),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*1.983471),sps);
         case 'LPS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*28.31685),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*28.31685),sps);
         case 'LPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1899.011),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*1899.011),sps);
         case 'MLD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*2.446576),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*2.446576),sps);
         case 'CMH'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*101.9406),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*101.9406),sps);
         case 'CMD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*2446.576),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*2446.576),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 elseif strcmp(previousFlowUnits,'MGD')
     switch newFlowUnits
         case 'CFS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.547229),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*1.547229),sps);
         case 'GPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*694.4445),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*694.4445),sps);
         case 'IMGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.8326738),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.8326738),sps);
         case 'AFD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.068883),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.068883),sps);
         case 'LPS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*43.81264),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*43.81264),sps);
         case 'LPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*2628.758),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*2628.758),sps);
         case 'MLD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.785412),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.785412),sps);
         case 'CMH'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*157.7255),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*157.7255),sps);
         case 'CMD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3785.412),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3785.412),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 elseif strcmp(previousFlowUnits,'IMGD')
     switch newFlowUnits
         case 'CFS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.858145),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*1.858145),sps);
         case 'GPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*833.9936),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*833.9936),sps);
         case 'MGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.200951),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*1.200951),sps);
         case 'AFD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.685577),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.685577),sps);
         case 'LPS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*52.61681),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*52.61681),sps);
         case 'LPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3157.008),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3157.008),sps);
         case 'MLD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*4.546092),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*4.546092),sps);
         case 'CMH'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*189.4205),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*189.4205),sps);
         case 'CMD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*4546.092),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*4546.092),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 elseif strcmp(previousFlowUnits,'AFD')
     switch newFlowUnits
         case 'CFS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.5041667),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.5041667),sps);
         case 'GPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*226.2857),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*226.2857),sps);
         case 'MGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.3258514),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.3258514),sps);
         case 'IMGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.271328),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.271328),sps);
         case 'LPS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*14.27641),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*14.27641),sps);
         case 'LPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*856.5846),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*856.5846),sps);
         case 'MLD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.233482),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*1.233482),sps);
         case 'CMH'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*51.39508),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*51.39508),sps);
         case 'CMD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1233.482),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*1233.482),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 elseif strcmp(previousFlowUnits,'LPS')
     switch newFlowUnits
         case 'CFS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.03531466),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.03531466),sps);
         case 'GPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*15.85032),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*15.85032),sps);
         case 'MGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.02282446),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.02282446),sps);
         case 'IMGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.01900533),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.01900533),sps);
         case 'AFD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.07004562),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.07004562),sps);
         case 'LPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*60),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*60),sps);
         case 'MLD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0864),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.0864),sps);
         case 'CMH'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*3.6),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*3.6),sps);
         case 'CMD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*86.4),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*86.4),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 elseif strcmp(previousFlowUnits,'LPM')
     switch newFlowUnits
         case 'CFS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0005885777),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.0005885777),sps);
         case 'GPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.264172),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.264172),sps);
         case 'MGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0003804078),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.0003804078),sps);
         case 'IMGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0003167556),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.0003167556),sps);
         case 'AFD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0011674272),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.0011674272),sps);
         case 'LPS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.01666667),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.01666667),sps);
         case 'MLD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00144),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.00144),sps);
         case 'CMH'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.06),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.06),sps);
         case 'CMD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1.44),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*1.44),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 elseif strcmp(previousFlowUnits,'MLD')
     switch newFlowUnits
         case 'CFS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.4087345),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.4087345),sps);
         case 'GPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*183.4528),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*183.4528),sps);
         case 'MGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.264172),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.264172),sps);
         case 'IMGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.2199692),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.2199692),sps);
         case 'AFD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.8107132),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.8107132),sps);
         case 'LPS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*11.57407),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*11.57407),sps);
         case 'LPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*694.4445),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*694.4445),sps);
         case 'CMH'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*41.66667),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*41.66667),sps);
         case 'CMD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*1000),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*1000),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 elseif strcmp(previousFlowUnits,'CMH')
     switch newFlowUnits
         case 'CFS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.009809635),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.009809635),sps);
         case 'GPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*4.402868),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*4.402868),sps);
         case 'MGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.006340129),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.006340129),sps);
         case 'IMGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.00527926),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.00527926),sps);
         case 'AFD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.01945712),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.01945712),sps);
         case 'LPS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.2777778),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.2777778),sps);
         case 'LPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*16.66667),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*16.66667),sps);
         case 'MLD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.024),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.024),sps);
         case 'CMD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*24),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*24),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 elseif strcmp(previousFlowUnits,'CMD')
     switch newFlowUnits
         case 'CFS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0004087345),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.0004087345),sps);
         case 'GPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.1834528),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.1834528),sps);
         case 'MGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.000264172),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.000264172),sps);
         case 'IMGD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0002199692),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.0002199692),sps);
         case 'AFD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.0008107132),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.0008107132),sps);
         case 'LPS'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.01157407),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.01157407),sps);
         case 'LPM'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.6944444),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.6944444),sps);
         case 'MLD'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.001),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.001),sps);
         case 'CMH'
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})*0.04166667),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})*0.04166667),sps);
         otherwise
-            fprintf(fid2,'%s%s',num2str(str2num(a{mm+1})),sps);
+            fprintf(fid2,'%s%s',num2str(str2double(a{mm+1})),sps);
     end
 end
 end
@@ -10535,7 +10538,7 @@ if ~ismember(toNode,Nodes.BinNodeNameID)
     warning('There is no node "%s" in the network.',toNode);
     Errcode=-1; return;
 end
-if isempty(strfind(0:8,typecode))
+if ~ismember(0:8,typecode)
     warning('Wrong constant type.');
     Errcode=-1; return;
 else
