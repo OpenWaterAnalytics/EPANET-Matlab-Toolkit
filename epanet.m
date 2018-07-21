@@ -747,7 +747,7 @@ classdef epanet <handle
             %   linkSet2={'110','12','113'};
             %   colorLinkSet1={'k','k','k'};
             %   colorLinkSet2={'y','y','y'};
-            %   d.Binplot('nodes','yes','links','yes','highlightnode',[nodeSet1 nodeSet2],'colornode',[colorNodeSet1 colorNodeSet2],...
+            %   d.plot('nodes','yes','links','yes','highlightnode',[nodeSet1 nodeSet2],'colornode',[colorNodeSet1 colorNodeSet2],...
             %   'highlightlink',[linkSet1 linkSet2],'colorlink',[colorLinkSet1 colorLinkSet2])
             [value] = ENplot(obj,'bin',0,varargin{:});
         end
