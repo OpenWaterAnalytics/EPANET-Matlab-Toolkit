@@ -7696,6 +7696,9 @@ selectColorLink={''};
 axesid=0;
 lline='yes';
 npoint='yes';
+extend='no';
+legendposition = 'northeast';
+slegend = 'show';
 for i=1:(nargin/2)
     argument =lower(varargin{2*(i-1)+1});
     switch argument
@@ -7739,23 +7742,28 @@ for i=1:(nargin/2)
                 return
             end
             npoint=varargin{2*i};
-        case 'line' % color
+        case 'line' % remove line
             if ~strcmpi(varargin{2*i},'yes') && ~strcmpi(varargin{2*i},'no')
                 warning('Invalid argument.');
                 return
             end
             lline=varargin{2*i};
-        case 'axes' % color
+        case 'axes' % axes id
             try
                 axesid=axes('Parent',varargin{2*i});
-            catch
+            catch 
                 axesid=varargin{2*i};
             end
-        case 'bin' % color
+        case 'bin' 
             bin=varargin{2*i};
+        case 'extend' % extend option
+            extend=varargin{2*i};
+        case 'legendposition' % extend option
+            legendposition=varargin{2*i};
+        case 'legend'
+            slegend=varargin{2*i};
         otherwise
-            warning('Invalid property founobj.');
-            return
+            error('Invalid property founobj.');
     end
 end
 drawnow;
@@ -8031,12 +8039,19 @@ if (strcmpi(npoint,'yes'))
 end
     
 % Legend Plots
-if isempty(highlightnodeindex) || isempty(highlightnodeindex)
-    legendString={'Pipes','Pumps','Valves',...
-        'Junctions','Reservoirs','Tanks'}; 
-    legendIndices=sort(legendIndices,'descend');
-    legend(h(legendIndices),legendString(legendIndices));
+if strcmpi(slegend,'show')
+    if isempty(highlightnodeindex) || isempty(highlightnodeindex)
+        legendString={'Pipes','Pumps','Valves',...
+            'Junctions','Reservoirs','Tanks'}; 
+        legendIndices=sort(legendIndices,'descend');
+        legend(h(legendIndices),legendString(legendIndices), 'Location', legendposition);
+    end
+elseif strcmpi(slegend,'hide')
+    %skip
+else
+    error('Invalid property founobj(legend: "hide", "show")')
 end
+    
 % Axis OFF and se Background
 [xmax,~]=max(v.nodecoords{1});
 [xmin,~]=min(v.nodecoords{1});
@@ -8059,7 +8074,9 @@ else
 end
 axis off
 whitebg('w');
-set(axesid,'position',[0 0 1 1],'units','normalized');
+if strcmpi(extend,'yes')
+    set(axesid,'position',[0 0 1 1],'units','normalized');
+end
 end
 function [info,tline,allines] = readAllFile(inpname)
     fid = fopen(inpname, 'rt');%or msxname
