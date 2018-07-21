@@ -706,13 +706,49 @@ classdef epanet <handle
             % 'axes': axes coordinates
             % 'linksindex': yes
             % 'nodesindex': yes
+            % 'legend': show/hide
+            % 'extend': yes/no
+            % 'legendposition':
+                %       'North'              inside plot box near top
+                %       'South'              inside bottom
+                %       'East'               inside right
+                %       'West'               inside left
+                %       'NorthEast'          inside top right (default for 2-D plots)
+                %       'NorthWest'          inside top left
+                %       'SouthEast'          inside bottom right
+                %       'SouthWest'          inside bottom left
+                %       'NorthOutside'       outside plot box near top
+                %       'SouthOutside'       outside bottom
+                %       'EastOutside'        outside right
+                %       'WestOutside'        outside left
+                %       'NorthEastOutside'   outside top right (default for 3-D plots)
+                %       'NorthWestOutside'   outside top left
+                %       'SouthEastOutside'   outside bottom right
+                %       'SouthWestOutside'   outside bottom left
+                %       'Best'               least conflict with data in plot
+                %       'BestOutside'        least unused space outside plot
             % Example:
-            % d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},
+            %   d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},
 %             'highlightlink',{'10'},'fontsize',8);
-            % d.plot('line','no');
-            % d.plot('point','no','linksindex','yes');
-            % d.plot('linksindex','yes','fontsize',8);
-            % d.plot('nodesindex','yes','fontsize',14);
+            %   d.plot('line','no');
+            %   d.plot('point','no','linksindex','yes');
+            %   d.plot('linksindex','yes','fontsize',8);
+            %   d.plot('nodesindex','yes','fontsize',14);
+            %   f=figure()
+            %   d.plot('axes', h) % d.plot('axes', handles.axes) #gui
+            %   d.plot('legend','hide')
+            %   d.plot('legendposition','northwest')
+            %   d = epanet('Net1.inp');
+            %   nodeSet1={'10','11','22'};
+            %   nodeSet2={'21','23','31'};
+            %   colorNodeSet1={'r','r','r'};
+            %   colorNodeSet2={'g','g','g'};
+            %   linkSet1={'111','122','121'};
+            %   linkSet2={'110','12','113'};
+            %   colorLinkSet1={'k','k','k'};
+            %   colorLinkSet2={'y','y','y'};
+            %   d.Binplot('nodes','yes','links','yes','highlightnode',[nodeSet1 nodeSet2],'colornode',[colorNodeSet1 colorNodeSet2],...
+            %   'highlightlink',[linkSet1 linkSet2],'colorlink',[colorLinkSet1 colorLinkSet2])
             [value] = ENplot(obj,'bin',0,varargin{:});
         end
         function value = getControls(obj, varargin)
