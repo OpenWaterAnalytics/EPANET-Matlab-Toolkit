@@ -503,32 +503,83 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 
 |Function|Description|
 |--------|-----------|
-|ENgetpumptype|Retrieves the type of a pump for specific link index|
-|ENgetheadcurveindex|Retrieves index of a head curve for specific link index|
-|ENsetcurvevalue|Sets x,y point for a specific point and curve|
-|ENsetcurve|Sets x,y values for a specific curve|
 |ENaddcurve|Adds a new curve appended to the end of the existing curves|
-|ENgetcurvevalue|Retrieves x,y point for a specific point number and curve|
-|ENgetcurvelen|Retrieves number of points in a curve|
+|ENaddlink|Adds a new link| 
+|ENaddnode|Adds a new node| 
+|ENaddpattern|Adds a new time pattern to the network|
+|ENclose|Closes down the Toolkit system (including all files being processed)|
+|ENcloseH|Closes the hydraulic analysis system, freeing all allocated memory|
+|ENcloseQ|Closes the water quality analysis system, freeing all allocated memory|
+|ENdeletelink|Deletes a link| 
+|ENdeletenode|Deletes a node| 
+|ENepanet|Runs a complete EPANET simulation|
+|ENgetaveragepatternvalue|Retrieves the average value of a pattern|
+|ENgetbasedemand|Retrieves the nodes base demand for a category|
+|ENgetcontrol|Retrieves the parameters of a simple control statement|
+|ENgetcoord|Retrieves coordinate x, y for a node|
+|ENgetcount|Retrieves the number of network components of a specified type|
+|ENgetcurve|Retrieves a curve's properties|
 |ENgetcurveid|Retrieves ID of a curve with specific index|
 |ENgetcurveindex|Retrieves index of curve with specific ID|
-|ENsetcoord|Sets coordinate x, y for a node|
-|ENgetcoord|Retrieves coordinate x, y for a node|
-|ENgetstatistic|Retrieves hydraulic simulation statistic|
-|ENgetnumdemands|Retrieves the number of demand categories for a node|
-|ENgetbasedemand|Retrieves the nodes base demand for a category|
+|ENgetcurvelen|Retrieves number of points in a curve|
+|ENgetcurvevalue|Retrieves x,y point for a specific point number and curve|
 |ENgetdemandpattern|Retrieves the index of a demand pattern for a specific demand category of a node|
+|ENgeterror|Retrieves the text of the message associated with a particular error or warning code|
+|ENgetflowunits|Retrieves a code number indicating the units used to express all flow rates|
+|ENgetheadcurveindex|Retrieves index of a head curve for specific link index|
+|ENgetlinkid|Retrieves the ID label of a link with a specified index|
+|ENgetlinkindex|Retrieves the index of a link with a specified ID|
+|ENgetlinknodes|Retrieves the indexes of the end nodes of a specified link|
+|ENgetlinktype|Retrieves the link-type code for a specific link|
+|ENgetlinkvalue|Retrieves the value of a specific link parameter|
+|ENgetnodeid|Retrieves the ID label of a node with a specified index|
+|ENgetnodeindex|Retrieves the index of a node with a specified ID|
+|ENgetnodetype|Retrieves the node-type code for a specific node|
+|ENgetnodevalue|Retrieves the value of a specific link parameter|
+|ENgetnumdemands|Retrieves the number of demand categories for a node|
+|ENgetoption|Retrieves the value of a particular analysis option|
+|ENgetpatternid|Retrieves the ID label of a particular time pattern|
+|ENgetpatternindex|Retrieves the index of a particular time pattern|
+|ENgetpatternlen|Retrieves the number of time periods in a specific time pattern|
+|ENgetpatternvalue|Retrieves the multiplier factor for a specific time period in a time pattern|
+|ENgetpumptype|Retrieves the type of a pump for specific link index|
+|ENgetqualinfo|Retrieves quality analysis information (type, chemical name, units, trace node ID)|
+|ENgetqualtype|Retrieves the type of water quality analysis called for|
+|ENgetstatistic|Retrieves hydraulic simulation statistic|
+|ENgettimeparam|Retrieves the value of a specific analysis time parameter|
+|ENgetversion|Retrieves the version number|
+|ENinitH|Initializes hydraulic analysis|
+|ENinitQ|Initializes water quality analysis|
+|ENnextH|Determine time (in seconds) until next hydraulic event|
+|ENnextQ|Advances WQ simulation to next hydraulic event|
+|ENopen|Opens EPANET input file & reads in network data|
+|ENopenH|Sets up data structures for hydraulic analysis|
+|ENopenQ|Sets up data structures for WQ analysis|
+|ENreport|Writes simulation report to the report file|
+|ENresetreport|Resets report options to default values|
+|ENrunH|Run a hydraulic solution period|
+|ENrunQ|Retrieves hydraulic & WQ results at time t|
+|ENsaveH|Saves hydraulic results to binary file|
+|ENsavehydfile|Copies binary hydraulics file to disk|
+|ENsaveinpfile|Saves current data to "INP" formatted text file|
 |ENsetbasedemand|Sets the nodes base demand for a category|
-|ENgetaveragepatternvalue|Retrieves the average value of a pattern|
-
-
-# List of other new EPANET Functions Supported #
-
-|Function|Description|
-|--------|-----------|
-|ENaddnode|Adds a new node| 
-|ENaddlink|Adds a new link| 
-|ENdeletenode|Deletes a node| 
-|ENdeletelink|Deletes a link| 
+|ENsetcontrol|Specify parameters to define a simple control|
+|ENsetcoord|Sets coordinate x, y for a node|
+|ENsetcurve|Sets x,y values for a specific curve|
+|ENsetcurvevalue|Sets x,y point for a specific point and curve|
+|ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
-|ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index.|
+|ENsetlinkvalue|Set a proprty value for a link|
+|ENsetnodevalue|Set a property value for a node|
+|ENsetoption|Set a value for an anlysis option|
+|ENsetpattern|Set multipliers for a specific pattern|
+|ENsetpatternvalue|Set the multiplier for a specific pattern at a specific period|
+|ENsetqualtype|Sets the type of water quality analysis called|
+|ENsetreport|Processes a reporting format command|
+|ENsetstatusreport|Sets the level of hydraulic status reporting|
+|ENsettimeparam|Set the value for a time parameter|
+|ENsolveH|Solves the network hydraulics for all time periods|
+|ENsolveQ|Solves for network water quality in all time periods|
+|ENstepQ|Advances WQ simulation by a single WQ time step|
+|ENusehydfile|Opens previously saved binary hydraulics file|
+|ENwriteline|Writes line of text to the report file|
