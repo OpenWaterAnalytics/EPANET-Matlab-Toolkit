@@ -30,34 +30,38 @@
   #define EN_API_FLOAT_TYPE float
 #endif
 
-// --- define WINDOWS
-#undef WINDOWS
-#ifdef _WIN32
-  #define WINDOWS
-#endif
-#ifdef __WIN32__
-  #define WINDOWS
-#endif
+#ifdef NO_GENX
+  // --- define WINDOWS
+  #undef WINDOWS
+  #ifdef _WIN32
+    #define WINDOWS
+  #endif
+  #ifdef __WIN32__
+    #define WINDOWS
+  #endif
 
-// --- define DLLEXPORT
-#ifndef DLLEXPORT
-  #ifdef WINDOWS
-    #ifdef __cplusplus
-      #define DLLEXPORT extern "C" __declspec(dllexport)
-    #else
-      #define DLLEXPORT __declspec(dllexport) __stdcall
-    #endif // __cplusplus
-  #elif defined(CYGWIN)
-    #define DLLEXPORT __stdcall
-  #elif defined(__APPLE__)
-    #ifdef __cplusplus
-      #define DLLEXPORT
+  // --- define DLLEXPORT
+  #ifndef DLLEXPORT
+    #ifdef WINDOWS
+      #ifdef __cplusplus
+        #define DLLEXPORT __declspec(dllexport)
+      #else
+        #define DLLEXPORT __declspec(dllexport) __stdcall
+      #endif // __cplusplus
+    #elif defined(CYGWIN)
+      #define DLLEXPORT __stdcall
+    #elif defined(__APPLE__)
+      #ifdef __cplusplus
+        #define DLLEXPORT
+      #else
+        #define DLLEXPORT
+      #endif
     #else
       #define DLLEXPORT
     #endif
-  #else
-    #define DLLEXPORT
   #endif
+#else 
+  #include "epanet_export.h"
 #endif
 
 
@@ -111,7 +115,13 @@ typedef enum {
   EN_ENERGY       = 13,
   EN_LINKQUAL     = 14,
   EN_LINKPATTERN  = 15,
-  EN_EFFICIENCY   = 16
+  EN_EFFICIENCY   = 16,
+  EN_HEADCURVE    = 17,
+  EN_EFFICIENCYCURVE = 18,
+  EN_PRICEPATTERN = 19,
+  EN_STATE        = 20,
+  EN_CONST_POWER  = 21,
+  EN_SPEED        = 22
 } EN_LinkProperty;
 
 /// Time parameter codes
@@ -130,13 +140,15 @@ typedef enum {
   EN_HTIME        = 11,
   EN_QTIME        = 12,
   EN_HALTFLAG     = 13,
-  EN_NEXTEVENT    = 14
+  EN_NEXTEVENT    = 14,
+  EN_NEXTEVENTIDX = 15
 } EN_TimeProperty;
-
 
 typedef enum {
   EN_ITERATIONS    = 0,
-  EN_RELATIVEERROR = 1
+  EN_RELATIVEERROR = 1,
+  EN_MAXHEADERROR  = 2,
+  EN_MAXFLOWCHANGE = 3
 } EN_AnalysisStatistic;
 
 typedef enum {
@@ -145,7 +157,8 @@ typedef enum {
   EN_LINKCOUNT    = 2,   /**< Number of Links (Pipes + Pumps + Valves) */
   EN_PATCOUNT     = 3,   /**< Number of Time Patterns */
   EN_CURVECOUNT   = 4,   /**< Number of Curves */
-  EN_CONTROLCOUNT = 5    /**< Number of Control Statements */
+  EN_CONTROLCOUNT = 5,   /**< Number of Control Statements */
+  EN_RULECOUNT	  = 6    /**< Number of Rule-based Control Statements */
 } EN_CountType;
 
 typedef enum {
@@ -180,6 +193,12 @@ typedef enum {
   EN_FLOWPACED   = 3
 } EN_SourceType;
 
+typedef enum {          /* Head loss formula:                  */
+  EN_HW          = 0,    /*   Hazen-Williams                    */
+  EN_DW          = 1,    /*   Darcy-Weisbach                    */
+  EN_CM          = 2     /*   Chezy-Manning                     */
+} EN_FormType;           /* See FormType in TYPES.H             */
+
 typedef enum {
   EN_CFS         = 0,    /* Flow units types.   */
   EN_GPM         = 1,    /* See FlowUnitsType   */
@@ -193,6 +212,10 @@ typedef enum {
   EN_CMD         = 9
 } EN_FlowUnits;
 
+typedef enum {           /* Demand model types. */
+  EN_DDA         = 0,   /**< Demand driven analysis */
+  EN_PDA         = 1    /**< Pressure driven analysis */
+} EN_DemandModel;
 
 /// Simulation Option codes
 typedef enum {
@@ -200,7 +223,9 @@ typedef enum {
   EN_ACCURACY     = 1,
   EN_TOLERANCE    = 2,
   EN_EMITEXPON    = 3,
-  EN_DEMANDMULT   = 4
+  EN_DEMANDMULT   = 4,
+  EN_HEADERROR    = 5,
+  EN_FLOWCHANGE   = 6
 } EN_Option;
 
 typedef enum {
@@ -210,16 +235,12 @@ typedef enum {
   EN_TIMEOFDAY   = 3
 } EN_ControlType;
 
-
-
 typedef enum {
   EN_AVERAGE     = 1,   /* Time statistic types.    */
   EN_MINIMUM     = 2,   /* See TstatType in TYPES.H */
   EN_MAXIMUM     = 3,
   EN_RANGE       = 4
 } EN_StatisticType;
-
-
 
 typedef enum {
   EN_MIX1        = 0,   /* Tank mixing models */
@@ -228,8 +249,6 @@ typedef enum {
   EN_LIFO        = 3
 } EN_MixingModel;
 
-
-
 typedef enum {
   EN_NOSAVE        = 0,
   EN_SAVE          = 1,
@@ -237,20 +256,34 @@ typedef enum {
   EN_SAVE_AND_INIT = 11
 } EN_SaveOption;
 
-
-
 typedef enum {
   EN_CONST_HP    = 0,   /* constant horsepower       */
   EN_POWER_FUNC  = 1,   /* power function            */
-  EN_CUSTOM      = 2    /* user-defined custom curve */
+  EN_CUSTOM      = 2,   /* user-defined custom curve */
+  EN_NOCURVE     = 3    /* no curve                  */
+} EN_PumpType;
+
+typedef enum {
+  EN_V_CURVE     = 0,   /*    volume curve                      */
+  EN_P_CURVE     = 1,   /*    pump curve                        */
+  EN_E_CURVE     = 2,   /*    efficiency curve                  */
+  EN_H_CURVE     = 3,   /*    head loss curve                   */
+  EN_G_CURVE     = 4    /*    General\default curve             */
 } EN_CurveType;
-
-
 
 // --- Declare the EPANET toolkit functions
 #if defined(__cplusplus)
 extern "C" {
 #endif
+  
+  /**
+   @brief The EPANET Project wrapper object
+   */
+  typedef void *EN_ProjectHandle;
+
+  typedef struct EN_Pattern EN_Pattern;
+  typedef struct EN_Curve EN_Curve;
+  
   /**
    @brief runs a complete EPANET simulation
    @param inpFile pointer to name of input file (must exist)
@@ -264,7 +297,18 @@ extern "C" {
    as it carries out its computations. If this feature is not
    needed then the argument should be NULL.
    */
-  int  DLLEXPORT ENepanet(char *inpFile, char *rptFile, char *binOutFile, void (*callback) (char *));
+  int  DLLEXPORT ENepanet(const char *inpFile, const char *rptFile, 
+    const char *binOutFile, void (*callback) (char *));
+  
+  /**
+   @brief Initializes an EPANET session
+   @param rptFile pointer to name of report file (to be created)
+   @param binOutFile pointer to name of binary output file (to be created)
+   @param UnitsType flow units flag
+   @param HeadlossFormula headloss formula flag
+   @return error code
+   */
+  int  DLLEXPORT ENinit(char *rptFile, char *binOutFile, int UnitsType, int HeadlossFormula);
   
   /**
    @brief Opens EPANET input file & reads in network data
@@ -273,7 +317,6 @@ extern "C" {
    @param binOutFile pointer to name of binary output file (to be created)
    @return error code
    */
-
   int  DLLEXPORT ENopen(char *inpFile, char *rptFile, char *binOutFile);
   
   /**
@@ -486,6 +529,35 @@ extern "C" {
   int  DLLEXPORT ENgetflowunits(int *code);
   
   /**
+   @brief Sets the flow units
+   @param code Code of flow units to use
+   @return Error code
+   */
+  int  DLLEXPORT ENsetflowunits(int code);
+
+  /**
+   @brief Retrieves the type of demand model in use and its parameters
+   @param[out] type  Type of demand model (EN_DDA or EN_PDA)
+   @param[out] pmin  Pressure below which there is no demand
+   @param[out] preq  Pressure required to deliver full demand
+   @param[out] pexp  Pressure exponent in demand function
+   @return Error code
+  */
+  int DLLEXPORT ENgetdemandmodel(int *type, EN_API_FLOAT_TYPE *pmin,
+      EN_API_FLOAT_TYPE *preq, EN_API_FLOAT_TYPE *pexp);
+
+  /**
+  @brief Sets the type of demand model to use and its parameters
+  @param type  Type of demand model (EN_DDA or EN_PDA)
+  @param pmin  Pressure below which there is no demand
+  @param preq  Pressure required to deliver full demand
+  @param pexp  Pressure exponent in demand function
+  @return Error code
+  */
+  int DLLEXPORT ENsetdemandmodel(int type, EN_API_FLOAT_TYPE pmin,
+      EN_API_FLOAT_TYPE preq, EN_API_FLOAT_TYPE pexp);
+
+  /**
    @brief Retrieves the index of the time pattern with specified ID
    @param id String ID of the time pattern
    @param[out] index Index of the specified time pattern
@@ -661,6 +733,15 @@ extern "C" {
    @see EN_LinkType
    */
   int  DLLEXPORT ENgetlinktype(int index, EN_LinkType *code);
+
+  /**
+   @brief Set the link type code for a specified link
+   @param id The id of a link
+   @param type The type code of the link.
+   @return Error code
+   @see EN_LinkType
+   */
+  int  DLLEXPORT ENsetlinktype(char *id, EN_LinkType type);
   
   /**
    @brief Get the indexes of a link's start- and end-nodes.
@@ -683,8 +764,7 @@ extern "C" {
   int  DLLEXPORT ENgetlinkvalue(int index, int code, EN_API_FLOAT_TYPE *value);
   
   /**
-   @brief Get curve x/y data.
-   @details PLEASE NOTE: x/y data returned will be in EPANET's native units, not the units specified by the project. This is a known issue related to the library not keeping track of the curve type (head, efficiency, volume, ...)
+   @brief Get a curve's properties.
    @param curveIndex The index of a curve (first curve is index 1).
    @param[out] id The curve's string ID. Client code must preallocate at least MAXID characters.
    @param[out] nValues The number of values in the curve's (x,y) list.
@@ -715,10 +795,19 @@ extern "C" {
    @param linkIndex The index of the pump element
    @param[out] outType The integer-typed pump curve type signifier (output parameter)
    @return Error code
-   @see EN_CurveType
+   @see EN_PumpType
    */
   int  DLLEXPORT ENgetpumptype(int linkIndex, int *outType);
-  
+
+  /**
+   @brief Get the type of a curve
+   @param curveIndex The index of the curve element
+   @param[out] outType The integer-typed curve curve type signifier (output parameter)
+   @return Error code
+   @see EN_CurveType
+   */
+  int  DLLEXPORT ENgetcurvetype(int curveIndex, int *outType);
+    
   /**
    @brief Get the version number. This number is to be interpreted with implied decimals, i.e., "20100" == "2(.)01(.)00"
    @param[out] version The version of EPANET
@@ -747,10 +836,9 @@ extern "C" {
    @see EN_NodeProperty
    */
   int  DLLEXPORT ENsetnodevalue(int index, int code, EN_API_FLOAT_TYPE v);
-
   
   /**
-   @brief Set a proprty value for a link.
+   @brief Set a property value for a link.
    @param index The index of a link. First link is index 1.
    @param code The code for the property to set.
    @param v The value to set for this link and property.
@@ -844,15 +932,15 @@ extern "C" {
    @see ENgetbasedemand
    */
   int  DLLEXPORT ENsetbasedemand(int nodeIndex, int demandIdx, EN_API_FLOAT_TYPE baseDemand);
-  
-   /**
+   
+  /**
    @brief Sets the index of the demand pattern assigned to a node for a category index.
    @param nodeIndex The index of a node (first node is index 1).
    @param demandIndex The index of a category (first category is index 1).
    @param pattIndex The index of the pattern for this node and category.
    @return Error code
    */
-  int  DLLEXPORT ENsetdemandpattern(int nodeIndex, int demandIdx, int pattIndex);
+  int  DLLEXPORT ENsetdemandpattern(int nodeIndex, int demandIdx, int patIndex);
   
   /**
    @brief Retrieves index of curve with specific ID.
@@ -922,6 +1010,135 @@ extern "C" {
    */
   int  DLLEXPORT ENaddcurve(char *id);
   
+
+  /**
+   @brief Gets the number of premises, true actions, and false actions and the priority of an existing rule-based control.
+   @param index The index of a rule-based control.
+   @param nPremises The number of conditions in a rule-based control.
+   @param nTrueActions The number of actions that are executed when the conditions in the rule-based control are met.
+   @param nFalseActions The number of actions that are executed when the conditions in the rule-based control are not met.
+   @param priority The priority of a rule-based control.
+   @return Error code.
+   */
+  int  DLLEXPORT ENgetrule(int index, int *nPremises, int *nTrueActions, int *nFalseActions, EN_API_FLOAT_TYPE *priority);
+
+  /**
+   @brief Sets the priority of the existing rule-based control.
+   @param index The index of a rule-based control.
+   @param priority The priority to be set in the rule-based control.
+   @return Error code.
+   */
+  int  DLLEXPORT ENsetrulepriority(int index, EN_API_FLOAT_TYPE priority);
+
+  /**
+   @brief Gets the components of a premise/condition in an existing rule-based control.
+   @param indexRule The index of a rule-based control.
+   @param indexPremise The index of the premise.
+   @param logop The logiv operator (IF/AND/OR) in the premise
+   @param object The object (e.g. TANK) the premise is looking at.
+   @param indexObj The index of the object (e.g. the index of the tank).
+   @param variable The variable to be checked (e.g. level).
+   @param relop The relashionship operator (e.g. LARGER THAN) in the premise.
+   @param status The status of the object to be checked (e.g. CLOSED)
+   @param value The value of the variable to be checked (e.g. 5.5) 
+   @return Error code.
+   */
+  int  DLLEXPORT ENgetpremise(int indexRule, int indexPremise, int *logop, int *object, int *indexObj, int *variable, int *relop, int *status, EN_API_FLOAT_TYPE *value);
+
+  /**
+   @brief Sets the components of a premise/condition in an existing rule-based control.
+   @param indexRule The index of a rule-based control.
+   @param indexPremise The index of the premise.
+   @param logop The logiv operator (IF/AND/OR) in the premise
+   @param object The object (e.g. TANK) the premise is looking at.
+   @param indexObj The index of the object (e.g. the index of the tank).
+   @param variable The variable to be checked (e.g. level).
+   @param relop The relashionship operator (e.g. LARGER THAN) in the premise.
+   @param status The status of the object to be checked (e.g. CLOSED)
+   @param value The value of the variable to be checked (e.g. 5.5) 
+   @return Error code.
+   */
+  int  DLLEXPORT ENsetpremise(int indexRule, int indexPremise, int logop, int object, int indexObj, int variable, int relop, int status, EN_API_FLOAT_TYPE value);
+
+  /**
+   @brief Sets the index of an object in a premise of an existing rule-based control.
+   @param indexRule The index of a rule-based control.
+   @param indexPremise The index of the premise.
+   @param indexObj The index of the object (e.g. the index of the tank).
+   @return Error code.
+   */
+  int  DLLEXPORT ENsetpremiseindex(int indexRule, int indexPremise, int indexObj);
+
+  /**
+   @brief Sets the status in a premise of an existing rule-based control.
+   @param indexRule The index of a rule-based control.
+   @param indexPremise The index of the premise.
+   @param status The status of the object to be checked (e.g. CLOSED)
+   @return Error code.
+   */
+  int  DLLEXPORT ENsetpremisestatus(int indexRule, int indexPremise, int status);
+
+  /**
+   @brief Sets the value in a premise of an existing rule-based control.
+   @param indexRule The index of a rule-based control.
+   @param indexPremise The index of the premise.
+   @param value The value of the variable to be checked (e.g. 5.5) 
+   @return Error code.
+   */
+  int  DLLEXPORT ENsetpremisevalue(int indexRule, int indexPremise, EN_API_FLOAT_TYPE value);
+  
+  /**
+   @brief Gets the components of a true-action in an existing rule-based control.
+   @param indexRule The index of a rule-based control.
+   @param indexAction The index of the action when the conditions in the rule are met.
+   @param indexLink The index of the link in the action (e.g. index of Pump 1)
+   @param status The status of the link (e.g. CLOSED)
+   @param setting The value of the link (e.g. pump speed 0.9)
+   @return Error code.
+   */
+  int  DLLEXPORT ENgettrueaction(int indexRule, int indexAction, int *indexLink, int *status, EN_API_FLOAT_TYPE *setting);
+
+  /**
+   @brief Sets the components of a true-action in an existing rule-based control.
+   @param indexRule The index of a rule-based control.
+   @param indexAction The index of the action when the conditions in the rule are met.
+   @param indexLink The index of the link in the action (e.g. index of Pump 1)
+   @param status The status of the link (e.g. CLOSED)
+   @param setting The value of the link (e.g. pump speed 0.9)
+   @return Error code.
+   */
+  int  DLLEXPORT ENsettrueaction(int indexRule, int indexAction, int indexLink, int status, EN_API_FLOAT_TYPE setting);
+  
+  /**
+   @brief Gets the components of a false-action in an existing rule-based control.
+   @param indexRule The index of a rule-based control.
+   @param indexAction The index of the action when the conditions in the rule are not met.
+   @param indexLink The index of the link in the action (e.g. index of Pump 1)
+   @param status The status of the link (e.g. CLOSED)
+   @param setting The value of the link (e.g. pump speed 0.9)
+   @return Error code.
+   */
+  int  DLLEXPORT ENgetfalseaction(int indexRule, int indexAction, int *indexLink, int *status, EN_API_FLOAT_TYPE *setting);
+
+  /**
+   @brief Sets the components of a false-action in an existing rule-based control.
+   @param indexRule The index of a rule-based control.
+   @param indexAction The index of the action when the conditions in the rule are not met.
+   @param indexLink The index of the link in the action (e.g. index of Pump 1)
+   @param status The status of the link (e.g. CLOSED)
+   @param setting The value of the link (e.g. pump speed 0.9)
+   @return Error code.
+   */
+  int  DLLEXPORT ENsetfalseaction(int indexRule, int indexAction, int indexLink, int status, EN_API_FLOAT_TYPE setting);
+
+  /**
+   @brief Returns the ID of a rule.
+   @param indexRule The index of a rule-based control.
+   @param id The ID of the rule
+   @return Error code.
+   */
+  int  DLLEXPORT ENgetruleID(int indexRule, char* id);
+
   /**
    @brief Adds a new node
    @param id The name of the node to be added.
@@ -929,7 +1146,7 @@ extern "C" {
    @return Error code.
    */
   int DLLEXPORT ENaddnode(char *id, EN_NodeType nodeType);
-
+  
   /**
    @brief Adds a new link
    @param id The name of the link to be added.
@@ -953,6 +1170,135 @@ extern "C" {
    @return Error code.
    */
   int DLLEXPORT ENdeletelink(int linkIndex);
+  
+  
+  /***************************************************
+   
+   Threadsafe versions of all epanet functions
+   
+   ***************************************************/
+  int DLLEXPORT EN_createproject(EN_ProjectHandle *ph);
+  int DLLEXPORT EN_deleteproject(EN_ProjectHandle *ph);
+
+  void DLLEXPORT EN_clearError(EN_ProjectHandle ph);
+  int DLLEXPORT EN_checkError(EN_ProjectHandle ph, char** msg_buffer);
+
+  int DLLEXPORT EN_runproject(EN_ProjectHandle ph, const char *f1, const char *f2,
+	  const char *f3, void(*pviewprog)(char *));
+
+  int DLLEXPORT EN_init(EN_ProjectHandle ph, char *rptFile, char *binOutFile,
+          EN_FlowUnits UnitsType, EN_FormType HeadlossFormula);
+
+  int DLLEXPORT EN_open(EN_ProjectHandle ph, const char *inpFile,
+          const char *rptFile, const char *binOutFile);
+
+  int DLLEXPORT EN_saveinpfile(EN_ProjectHandle ph, char *filename);
+
+  int DLLEXPORT EN_close(EN_ProjectHandle ph);
+  int DLLEXPORT EN_solveH(EN_ProjectHandle ph);
+
+  int DLLEXPORT EN_saveH(EN_ProjectHandle ph);
+  int DLLEXPORT EN_openH(EN_ProjectHandle ph);
+  int DLLEXPORT EN_initH(EN_ProjectHandle ph, int EN_SaveOption);
+  int DLLEXPORT EN_runH(EN_ProjectHandle ph, long *currentTime);
+  int DLLEXPORT EN_nextH(EN_ProjectHandle ph, long *tStep);
+  int DLLEXPORT EN_closeH(EN_ProjectHandle ph);
+  int DLLEXPORT EN_savehydfile(EN_ProjectHandle ph, char *filename);
+  int DLLEXPORT EN_usehydfile(EN_ProjectHandle ph, char *filename);
+
+  int DLLEXPORT EN_solveQ(EN_ProjectHandle ph);
+  int DLLEXPORT EN_openQ(EN_ProjectHandle ph);
+  int DLLEXPORT EN_initQ(EN_ProjectHandle ph, int saveFlag);
+  int DLLEXPORT EN_runQ(EN_ProjectHandle ph, long *currentTime);
+  int DLLEXPORT EN_nextQ(EN_ProjectHandle ph, long *tStep);
+  int DLLEXPORT EN_stepQ(EN_ProjectHandle ph, long *timeLeft);
+  int DLLEXPORT EN_closeQ(EN_ProjectHandle ph);
+  int DLLEXPORT EN_writeline(EN_ProjectHandle ph, char *line);
+
+  int DLLEXPORT EN_report(EN_ProjectHandle ph);
+  int DLLEXPORT EN_resetreport(EN_ProjectHandle ph);
+  int DLLEXPORT EN_setreport(EN_ProjectHandle ph, char *reportFormat);
+
+  int DLLEXPORT EN_getcontrol(EN_ProjectHandle ph, int controlIndex, int *controlType, int *linkIndex, EN_API_FLOAT_TYPE *setting, int *nodeIndex, EN_API_FLOAT_TYPE *level);
+  int DLLEXPORT EN_getcount(EN_ProjectHandle ph, EN_CountType code, int *count);
+  int DLLEXPORT EN_getoption(EN_ProjectHandle ph, EN_Option opt, EN_API_FLOAT_TYPE *value);
+  int DLLEXPORT EN_gettimeparam(EN_ProjectHandle ph, int code, long *value);
+  int DLLEXPORT EN_getflowunits(EN_ProjectHandle ph, int *code);
+  int DLLEXPORT EN_setflowunits(EN_ProjectHandle ph, int code);
+  int DLLEXPORT EN_getpatternindex(EN_ProjectHandle ph, char *id, int *index);
+  int DLLEXPORT EN_getpatternid(EN_ProjectHandle ph, int index, char *id);
+  int DLLEXPORT EN_getpatternlen(EN_ProjectHandle ph, int index, int *len);
+  int DLLEXPORT EN_getpatternvalue(EN_ProjectHandle ph, int index, int period, EN_API_FLOAT_TYPE *value);
+  int DLLEXPORT EN_getaveragepatternvalue(EN_ProjectHandle ph, int index, EN_API_FLOAT_TYPE *value);
+  int DLLEXPORT EN_getqualtype(EN_ProjectHandle ph, int *qualcode, int *tracenode);
+  int DLLEXPORT EN_geterror(int errcode, char *errmsg, int maxLen);
+
+  int DLLEXPORT EN_getstatistic(EN_ProjectHandle ph, int code, EN_API_FLOAT_TYPE* value);
+  int DLLEXPORT EN_getnodeindex(EN_ProjectHandle ph, char *id, int *index);
+  int DLLEXPORT EN_getnodeid(EN_ProjectHandle ph, int index, char *id);
+  int DLLEXPORT EN_getnodetype(EN_ProjectHandle ph, int index, int *code);
+  int DLLEXPORT EN_getnodevalue(EN_ProjectHandle ph, int index, int code, EN_API_FLOAT_TYPE *value);
+  int DLLEXPORT EN_getcoord(EN_ProjectHandle ph, int index, EN_API_FLOAT_TYPE *x, EN_API_FLOAT_TYPE *y);
+  int DLLEXPORT EN_setcoord(EN_ProjectHandle ph, int index, EN_API_FLOAT_TYPE x, EN_API_FLOAT_TYPE y);
+  int DLLEXPORT EN_getnumdemands(EN_ProjectHandle ph, int nodeIndex, int *numDemands);
+  int DLLEXPORT EN_getbasedemand(EN_ProjectHandle ph, int nodeIndex, int demandIndex, EN_API_FLOAT_TYPE *baseDemand);
+  int DLLEXPORT EN_getdemandpattern(EN_ProjectHandle ph, int nodeIndex, int demandIndex, int *pattIndex);
+  int DLLEXPORT EN_getlinkindex(EN_ProjectHandle ph, char *id, int *index);
+  int DLLEXPORT EN_getlinkid(EN_ProjectHandle ph, int index, char *id);
+  int DLLEXPORT EN_getlinktype(EN_ProjectHandle ph, int index, EN_LinkType *code);
+  int DLLEXPORT EN_setlinktype(EN_ProjectHandle ph, char *id, EN_LinkType type);
+  int DLLEXPORT EN_getlinknodes(EN_ProjectHandle ph, int index, int *node1, int *node2);
+  int DLLEXPORT EN_getlinkvalue(EN_ProjectHandle ph, int index, EN_LinkProperty code, EN_API_FLOAT_TYPE *value);
+  int DLLEXPORT EN_getcurve(EN_ProjectHandle ph, int curveIndex, char* id, int *nValues, EN_API_FLOAT_TYPE **xValues, EN_API_FLOAT_TYPE **yValues);
+  int DLLEXPORT EN_getheadcurveindex(EN_ProjectHandle ph, int pumpIndex, int *curveIndex);
+  int DLLEXPORT EN_setheadcurveindex(EN_ProjectHandle ph, int pumpIndex, int curveIndex);
+  int DLLEXPORT EN_getpumptype(EN_ProjectHandle ph, int linkIndex, int *outType);
+  int DLLEXPORT EN_getcurvetype(EN_ProjectHandle ph, int curveIndex, int *outType);
+
+  int DLLEXPORT EN_getversion(int *version);
+
+  int DLLEXPORT EN_setcontrol(EN_ProjectHandle ph, int cindex, int ctype, int lindex, EN_API_FLOAT_TYPE setting, int nindex, EN_API_FLOAT_TYPE level);
+  int DLLEXPORT EN_setnodevalue(EN_ProjectHandle ph, int index, int code, EN_API_FLOAT_TYPE v);
+  int DLLEXPORT EN_setlinkvalue(EN_ProjectHandle ph, int index, int code, EN_API_FLOAT_TYPE v);
+  int DLLEXPORT EN_addpattern(EN_ProjectHandle ph, char *id);
+  int DLLEXPORT EN_setpattern(EN_ProjectHandle ph, int index, EN_API_FLOAT_TYPE *f, int len);
+  int DLLEXPORT EN_setpatternvalue(EN_ProjectHandle ph, int index, int period, EN_API_FLOAT_TYPE value);
+  int DLLEXPORT EN_settimeparam(EN_ProjectHandle ph, int code, long value);
+  int DLLEXPORT EN_setoption(EN_ProjectHandle ph, int code, EN_API_FLOAT_TYPE v);
+  int DLLEXPORT EN_setstatusreport(EN_ProjectHandle ph, int code);
+  int DLLEXPORT EN_setqualtype(EN_ProjectHandle ph, int qualcode, char *chemname, char *chemunits, char *tracenode);
+
+  int DLLEXPORT EN_getdemandmodel(EN_ProjectHandle ph, int *type, EN_API_FLOAT_TYPE *pmin,
+              EN_API_FLOAT_TYPE *preq, EN_API_FLOAT_TYPE *pexp);
+   int DLLEXPORT EN_setdemandmodel(EN_ProjectHandle ph, int type, EN_API_FLOAT_TYPE pmin,
+              EN_API_FLOAT_TYPE preq, EN_API_FLOAT_TYPE pexp);
+
+  int DLLEXPORT EN_getqualinfo(EN_ProjectHandle ph, int *qualcode, char *chemname, char *chemunits, int *tracenode);
+  int DLLEXPORT EN_setbasedemand(EN_ProjectHandle ph, int nodeIndex, int demandIdx, EN_API_FLOAT_TYPE baseDemand);
+  int DLLEXPORT EN_setdemandpattern(EN_ProjectHandle ph, int nodeIndex, int demandIdx, int patIndex);
+  int DLLEXPORT EN_getcurveindex(EN_ProjectHandle ph, char *id, int *index);
+  int DLLEXPORT EN_getcurveid(EN_ProjectHandle ph, int index, char *id);
+  int DLLEXPORT EN_getcurvelen(EN_ProjectHandle ph, int index, int *len);
+  int DLLEXPORT EN_getcurvevalue(EN_ProjectHandle ph, int curveIndex, int pointIndex, EN_API_FLOAT_TYPE *x, EN_API_FLOAT_TYPE *y);
+  int DLLEXPORT EN_setcurvevalue(EN_ProjectHandle ph, int curveIndex, int pointIndex, EN_API_FLOAT_TYPE x, EN_API_FLOAT_TYPE y);
+  int DLLEXPORT EN_setcurve(EN_ProjectHandle ph, int index, EN_API_FLOAT_TYPE *x, EN_API_FLOAT_TYPE *y, int len);
+  int DLLEXPORT EN_addcurve(EN_ProjectHandle ph, char *id);
+  int DLLEXPORT EN_getrule(EN_ProjectHandle ph, int index, int *nPremises, int *nTrueActions, int *nFalseActions, EN_API_FLOAT_TYPE *priority);
+  int DLLEXPORT EN_setrulepriority(EN_ProjectHandle ph, int index, EN_API_FLOAT_TYPE priority);
+  int DLLEXPORT EN_getpremise(EN_ProjectHandle ph, int indexRule, int indexPremise, int *logop, int *object, int *indexObj, int *variable, int *relop, int *status, EN_API_FLOAT_TYPE *value);
+  int DLLEXPORT EN_setpremise(EN_ProjectHandle ph, int indexRule, int indexPremise, int logop, int object, int indexObj, int variable, int relop, int status, EN_API_FLOAT_TYPE value);
+  int DLLEXPORT EN_setpremiseindex(EN_ProjectHandle ph, int indexRule, int indexPremise, int indexObj);
+  int DLLEXPORT EN_setpremisestatus(EN_ProjectHandle ph, int indexRule, int indexPremise, int status);
+  int DLLEXPORT EN_setpremisevalue(EN_ProjectHandle ph, int indexRule, int indexPremise, EN_API_FLOAT_TYPE value);
+  int DLLEXPORT EN_gettrueaction(EN_ProjectHandle ph, int indexRule, int indexAction, int *indexLink, int *status, EN_API_FLOAT_TYPE *setting);
+  int DLLEXPORT EN_settrueaction(EN_ProjectHandle ph, int indexRule, int indexAction, int indexLink, int status, EN_API_FLOAT_TYPE setting);
+  int DLLEXPORT EN_getfalseaction(EN_ProjectHandle ph, int indexRule, int indexAction, int *indexLink, int *status, EN_API_FLOAT_TYPE *setting);
+  int DLLEXPORT EN_setfalseaction(EN_ProjectHandle ph, int indexRule, int indexAction, int indexLink, int status, EN_API_FLOAT_TYPE setting);
+  int DLLEXPORT EN_getruleID(EN_ProjectHandle ph, int indexRule, char* id);
+  int DLLEXPORT EN_addnode(EN_ProjectHandle ph, char *id, EN_NodeType nodeType);
+  int DLLEXPORT EN_addlink(EN_ProjectHandle ph, char *id, EN_LinkType linkType, char *fromNode, char *toNode);
+  int DLLEXPORT EN_deletenode(EN_ProjectHandle ph, int nodeIndex);
+  int DLLEXPORT EN_deletelink(EN_ProjectHandle ph, int linkIndex);
   
 #if defined(__cplusplus)
 }
