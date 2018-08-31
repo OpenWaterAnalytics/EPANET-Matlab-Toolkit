@@ -1101,7 +1101,15 @@ classdef epanet <handle
         end
         function value = getLinkState(obj, varargin)
             %EPANET Version 2.2
-            %Retrieves the value of all computed link status (0 = closed, 1 = open)
+            % Status Code for Each Link
+            % 0 = closed (max. head exceeded)
+            % 1 = temporarily closed
+            % 2 = closed
+            % 3 = open
+            % 4 = active (partially open)
+            % 5 = open (max. flow exceeded)
+            % 6 = open (flow setting not met)
+            % 7 = open (pressure setting not met)
             [indices, value] = getLinkIndices(obj,varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetlinkvalue(i,obj.ToolkitConstants.EN_STATE,obj.LibEPANET);  

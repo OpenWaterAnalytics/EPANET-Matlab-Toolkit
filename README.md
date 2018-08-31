@@ -89,6 +89,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkQuality|Retrieves the quality of links|
 |getLinkRoughnessCoeff|Retrieves the value of all link roughness|
 |getLinkSettings|Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves|
+|getLinkState|Retrieves the value of all computed link states|
 |getLinkStatus|Retrieves the value of all computed link status (0 = closed, 1 = open)|
 |getLinkType|Retrieves the link-type for all links|
 |getLinkTypeIndex|Retrieves the link-type code for all links.|
