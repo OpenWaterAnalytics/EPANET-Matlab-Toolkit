@@ -1099,6 +1099,16 @@ classdef epanet <handle
                 j=j+1;
             end
         end
+        function value = getLinkState(obj, varargin)
+            %EPANET Version 2.2
+            %Retrieves the value of all computed link status (0 = closed, 1 = open)
+            [indices, value] = getLinkIndices(obj,varargin);j=1;
+            for i=indices
+                [obj.Errcode, value(j)] = ENgetlinkvalue(i,obj.ToolkitConstants.EN_STATE,obj.LibEPANET);  
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                j=j+1;
+            end
+        end
         function value = getLinkSettings(obj, varargin)
             %Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves
             [indices, value] = getLinkIndices(obj,varargin);j=1;
@@ -2009,7 +2019,7 @@ classdef epanet <handle
             initnodematrix=zeros(totalsteps, obj.getNodeCount);
             initlinkmatrix=zeros(totalsteps, obj.getLinkCount);
             if size(varargin,2)==0
-                varargin={'time','pressure','demand','head','tankvolume','flow','velocity','headloss','status','setting','energy','efficiency'};
+                varargin={'time','pressure','demand','head','tankvolume','flow','velocity','headloss','status','setting','energy','efficiency', 'state'};
                 if ~sum(strcmpi(fields(obj.ToolkitConstants),'EN_EFFICIENCY'))
                     varargin{end}={''};
                 end
@@ -2060,6 +2070,9 @@ classdef epanet <handle
             if find(strcmpi(varargin,'efficiency'))
                 value.Efficiency=initlinkmatrix;
             end
+            if find(strcmpi(varargin,'state'))
+                value.State=initlinkmatrix;
+            end
             clear initlinkmatrix initnodematrix;
             k=1;tstep=1;
             while (tstep>0)
@@ -2102,6 +2115,9 @@ classdef epanet <handle
                 end
                 if find(strcmpi(varargin,'efficiency'))
                     value.Efficiency(k,:)=obj.getLinkEfficiency;
+                end
+                if find(strcmpi(varargin,'state'))
+                    value.State(k,:)=obj.getLinkState;
                 end
                 tstep = obj.nextHydraulicAnalysisStep;
                 k=k+1;
