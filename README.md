@@ -501,6 +501,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 
 # List of EPANET 2.012 Functions Supported #
 
+|Function|Description|
 |--------|-----------|
 |ENaddpattern|Adds a new time pattern to the network|
 |ENclose|Closes down the Toolkit system (including all files being processed)|
