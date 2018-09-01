@@ -55,6 +55,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getCurveIndex|Retrieves index of curve with specific ID|
 |getCurveLengths|Retrieves number of points in a curve|
 |getCurveNameID|Retrieves curve id|
+|getCurveType|Retrieves the curve-type (VOLUME, PUMP, EFFICIENCY, HEADLOSS, GENERAL)|
+|getCurveTypeIndex|Retrieves the curve-type index for all curves|
 |getCurveValue|Retrieves (x,y) values of specific curve index|
 |getCurveXY|Retrieves (x,y) values of all curves|
 |getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
@@ -218,6 +220,16 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setControls|Sets the parameters of a simple control statement|
 |setCurve|Sets x,y values for a specific curve|
 |setCurveValue|Retrieves x,y point for a specific point number and curve|
+|setFlowUnitsAFD|Sets flow units to AFD|
+|setFlowUnitsCFS|Sets flow units to CFS|
+|setFlowUnitsCMD|Sets flow units to CMD|
+|setFlowUnitsCMH|Sets flow units to CMH|
+|setFlowUnitsGPM|Sets flow units to GPM|
+|setFlowUnitsIMGD|Sets flow units to IMGD|
+|setFlowUnitsLPM|Sets flow units to LPM|
+|setFlowUnitsLPS|Sets flow units to LPS|
+|setFlowUnitsMGD|Sets flow units to MGD|
+|setFlowUnitsMLD|Sets flow units to MLD|
 |setLinkBulkReactionCoeff|Sets the values of bulk reactions|
 |setLinkDiameter|Sets the values of diameters|
 |setLinkPumpHeadCurveIndex|Sets the curves index for pumps index|
