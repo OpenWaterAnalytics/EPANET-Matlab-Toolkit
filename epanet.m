@@ -11005,21 +11005,16 @@ function [status,result] = runMSXexe(obj, rptfile, varargin)
     arch=computer('arch');
     if strcmp(arch,'win64') || strcmp(arch,'win32')
         [~,lpwd]=system(['cmd /c for %A in ("',obj.MSXLibEPANETPath,'") do @echo %~sA']);
-        libPwd=regexp(lpwd,'\s','split');
-        if nargin<3
-            r = sprintf('%s\\epanetmsx.exe "%s" "%s" "%s"',libPwd{1},inpfile,obj.MSXTempFile,rptfile);
-        else
-            binfile=varargin{1};
-            r = sprintf('%s\\epanetmsx.exe %s %s %s %s',libPwd{1},inpfile,obj.MSXTempFile,rptfile,binfile);
-        end
+        libtmp=regexp(lpwd,'\s','split');
+        libPwd=libtmp{1};
+    elseif isunix
+        libPwd=obj.MSXLibEPANETPath;
     end
-    if isunix
-        if nargin<3
-            r = sprintf('%sepanetmsx "%s" "%s" "%s"',obj.MSXLibEPANETPath,inpfile,obj.MSXTempFile,rptfile);
-        else
-           binfile=varargin{1};
-            r = sprintf('%sepanetmsx %s %s %s %s',obj.MSXLibEPANETPath,inpfile,obj.MSXTempFile,rptfile,binfile);
-        end
+    if nargin<3
+        r = sprintf('%s\\epanetmsx.exe "%s" "%s" "%s"',libPwd,inpfile,obj.MSXTempFile,rptfile);
+    else
+        binfile=varargin{1};
+        r = sprintf('%s\\epanetmsx.exe "%s" "%s" "%s" "%s"',libPwd,inpfile,obj.MSXTempFile,rptfile,binfile);
     end
     [status,result] = system(r);
 end
