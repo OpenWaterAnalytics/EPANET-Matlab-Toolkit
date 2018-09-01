@@ -3642,9 +3642,6 @@ classdef epanet <handle
             MSXclose(obj);
             MSXMatlabCleanup(obj);
             fclose('all');
-            if exist(obj.MSXTempFile, 'file')==2
-                delete(obj.MSXTempFile);
-            end
             disp('MSX unloaded');
         end
         function ToolkitConstants = getToolkitConstants(obj)
