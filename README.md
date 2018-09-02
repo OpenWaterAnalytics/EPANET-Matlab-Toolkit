@@ -521,6 +521,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENcloseQ|Closes the water quality analysis system, freeing all allocated memory|
 |ENepanet|Runs a complete EPANET simulation|
 |ENgetcount|Retrieves the number of network components of a specified type|
+|ENgetcontrol|Retrieves the parameters of a simple control statement|
 |ENgeterror|Retrieves the text of the message associated with a particular error or warning code|
 |ENgetflowunits|Retrieves a code number indicating the units used to express all flow rates|
 |ENgetlinkid|Retrieves the ID label of a link with a specified index|
@@ -537,6 +538,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENgetpatternindex|Retrieves the index of a particular time pattern|
 |ENgetpatternlen|Retrieves the number of time periods in a specific time pattern|
 |ENgetpatternvalue|Retrieves the multiplier factor for a specific time period in a time pattern|
+|ENgetqualtype|Retrieves the type of water quality analysis called for|
 |ENgettimeparam|Retrieves the value of a specific analysis time parameter|
 |ENgetversion|Retrieves the version number|
 |ENinitH|Initializes hydraulic analysis|
@@ -601,8 +603,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENaddnode|Adds a new node|
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
-|ENgetcontrol|Retrieves the parameters of a simple control statement|
-|ENgetqualtype|Retrieves the type of water quality analysis called for|
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENgetcurvetype|Retrieves the type of a curve|
