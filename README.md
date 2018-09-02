@@ -55,8 +55,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getCurveIndex|Retrieves index of curve with specific ID|
 |getCurveLengths|Retrieves number of points in a curve|
 |getCurveNameID|Retrieves curve id|
-|getCurveType|Retrieves the curve-type (VOLUME, PUMP, EFFICIENCY, HEADLOSS, GENERAL)|
-|getCurveTypeIndex|Retrieves the curve-type index for all curves|
 |getCurveValue|Retrieves (x,y) values of specific curve index|
 |getCurveXY|Retrieves (x,y) values of all curves|
 |getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
@@ -91,7 +89,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkQuality|Retrieves the quality of links|
 |getLinkRoughnessCoeff|Retrieves the value of all link roughness|
 |getLinkSettings|Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves|
-|getLinkState|Retrieves the value of all computed link states|
 |getLinkStatus|Retrieves the value of all computed link status (0 = closed, 1 = open)|
 |getLinkType|Retrieves the link-type for all links|
 |getLinkTypeIndex|Retrieves the link-type code for all links.|
@@ -220,16 +217,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setControls|Sets the parameters of a simple control statement|
 |setCurve|Sets x,y values for a specific curve|
 |setCurveValue|Retrieves x,y point for a specific point number and curve|
-|setFlowUnitsAFD|Sets flow units to AFD|
-|setFlowUnitsCFS|Sets flow units to CFS|
-|setFlowUnitsCMD|Sets flow units to CMD|
-|setFlowUnitsCMH|Sets flow units to CMH|
-|setFlowUnitsGPM|Sets flow units to GPM|
-|setFlowUnitsIMGD|Sets flow units to IMGD|
-|setFlowUnitsLPM|Sets flow units to LPM|
-|setFlowUnitsLPS|Sets flow units to LPS|
-|setFlowUnitsMGD|Sets flow units to MGD|
-|setFlowUnitsMLD|Sets flow units to MLD|
 |setLinkBulkReactionCoeff|Sets the values of bulk reactions|
 |setLinkDiameter|Sets the values of diameters|
 |setLinkPumpHeadCurveIndex|Sets the curves index for pumps index|
@@ -511,18 +498,35 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setBinTimeStatisticsNone|Sets the statistic type to None|
 |setBinTimeStatisticsRange|Sets the statistic type to Range|
 
-# List of EPANET 2.012 Functions Supported #
+
+# List of EPANET 2.1 Functions Supported #
 
 |Function|Description|
 |--------|-----------|
+|ENaddcurve|Adds a new curve appended to the end of the existing curves|
+|ENaddlink|Adds a new link| 
+|ENaddnode|Adds a new node| 
 |ENaddpattern|Adds a new time pattern to the network|
 |ENclose|Closes down the Toolkit system (including all files being processed)|
 |ENcloseH|Closes the hydraulic analysis system, freeing all allocated memory|
 |ENcloseQ|Closes the water quality analysis system, freeing all allocated memory|
+|ENdeletelink|Deletes a link| 
+|ENdeletenode|Deletes a node| 
 |ENepanet|Runs a complete EPANET simulation|
+|ENgetaveragepatternvalue|Retrieves the average value of a pattern|
+|ENgetbasedemand|Retrieves the nodes base demand for a category|
+|ENgetcontrol|Retrieves the parameters of a simple control statement|
+|ENgetcoord|Retrieves coordinate x, y for a node|
 |ENgetcount|Retrieves the number of network components of a specified type|
+|ENgetcurve|Retrieves a curve's properties|
+|ENgetcurveid|Retrieves ID of a curve with specific index|
+|ENgetcurveindex|Retrieves index of curve with specific ID|
+|ENgetcurvelen|Retrieves number of points in a curve|
+|ENgetcurvevalue|Retrieves x,y point for a specific point number and curve|
+|ENgetdemandpattern|Retrieves the index of a demand pattern for a specific demand category of a node|
 |ENgeterror|Retrieves the text of the message associated with a particular error or warning code|
 |ENgetflowunits|Retrieves a code number indicating the units used to express all flow rates|
+|ENgetheadcurveindex|Retrieves index of a head curve for specific link index|
 |ENgetlinkid|Retrieves the ID label of a link with a specified index|
 |ENgetlinkindex|Retrieves the index of a link with a specified ID|
 |ENgetlinknodes|Retrieves the indexes of the end nodes of a specified link|
@@ -532,11 +536,16 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENgetnodeindex|Retrieves the index of a node with a specified ID|
 |ENgetnodetype|Retrieves the node-type code for a specific node|
 |ENgetnodevalue|Retrieves the value of a specific link parameter|
+|ENgetnumdemands|Retrieves the number of demand categories for a node|
 |ENgetoption|Retrieves the value of a particular analysis option|
 |ENgetpatternid|Retrieves the ID label of a particular time pattern|
 |ENgetpatternindex|Retrieves the index of a particular time pattern|
 |ENgetpatternlen|Retrieves the number of time periods in a specific time pattern|
 |ENgetpatternvalue|Retrieves the multiplier factor for a specific time period in a time pattern|
+|ENgetpumptype|Retrieves the type of a pump for specific link index|
+|ENgetqualinfo|Retrieves quality analysis information (type, chemical name, units, trace node ID)|
+|ENgetqualtype|Retrieves the type of water quality analysis called for|
+|ENgetstatistic|Retrieves hydraulic simulation statistic|
 |ENgettimeparam|Retrieves the value of a specific analysis time parameter|
 |ENgetversion|Retrieves the version number|
 |ENinitH|Initializes hydraulic analysis|
@@ -553,7 +562,13 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsaveH|Saves hydraulic results to binary file|
 |ENsavehydfile|Copies binary hydraulics file to disk|
 |ENsaveinpfile|Saves current data to "INP" formatted text file|
+|ENsetbasedemand|Sets the nodes base demand for a category|
 |ENsetcontrol|Specify parameters to define a simple control|
+|ENsetcoord|Sets coordinate x, y for a node|
+|ENsetcurve|Sets x,y values for a specific curve|
+|ENsetcurvevalue|Sets x,y point for a specific point and curve|
+|ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
+|ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENsetlinkvalue|Set a proprty value for a link|
 |ENsetnodevalue|Set a property value for a node|
 |ENsetoption|Set a value for an anlysis option|
@@ -568,40 +583,3 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENstepQ|Advances WQ simulation by a single WQ time step|
 |ENusehydfile|Opens previously saved binary hydraulics file|
 |ENwriteline|Writes line of text to the report file|
-
-# List of EPANET 2.1 Functions Supported #
-
-|Function|Description|
-|--------|-----------|
-|ENaddcurve|Adds a new curve appended to the end of the existing curves|
-|ENgetaveragepatternvalue|Retrieves the average value of a pattern|
-|ENgetbasedemand|Retrieves the nodes base demand for a category|
-|ENgetcoord|Retrieves coordinate x, y for a node|
-|ENgetcurve|Retrieves a curve's properties|
-|ENgetcurveid|Retrieves ID of a curve with specific index|
-|ENgetcurveindex|Retrieves index of curve with specific ID|
-|ENgetcurvelen|Retrieves number of points in a curve|
-|ENgetcurvevalue|Retrieves x,y point for a specific point number and curve|
-|ENgetdemandpattern|Retrieves the index of a demand pattern for a specific demand category of a node|
-|ENgetheadcurveindex|Retrieves index of a head curve for specific link index|
-|ENgetnumdemands|Retrieves the number of demand categories for a node|
-|ENgetpumptype|Retrieves the type of a pump for specific link index|
-|ENgetqualinfo|Retrieves quality analysis information (type, chemical name, units, trace node ID)|
-|ENgetstatistic|Retrieves hydraulic simulation statistic|
-|ENsetbasedemand|Sets the nodes base demand for a category|
-|ENsetcoord|Sets coordinate x, y for a node|
-|ENsetcurve|Sets x,y values for a specific curve|
-|ENsetcurvevalue|Sets x,y point for a specific point and curve|
-
-# List of EPANET 2.2 Functions Supported #
-
-|Function|Description|
-|--------|-----------|
-|ENaddlink|Adds a new link|
-|ENaddnode|Adds a new node|
-|ENdeletelink|Deletes a link|
-|ENdeletenode|Deletes a node|
-|ENgetcontrol|Retrieves the parameters of a simple control statement|
-|ENgetqualtype|Retrieves the type of water quality analysis called for|
-|ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
-|ENsetheadcurveindex|Sets the curve index for a specified pump index|
