@@ -605,3 +605,5 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENgetqualtype|Retrieves the type of water quality analysis called for|
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
+|ENgetcurvetype|Retrieves the type of a curve|
+|ENsetflowunits|Sets the flow units|
