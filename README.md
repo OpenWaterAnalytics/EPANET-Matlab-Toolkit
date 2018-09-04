@@ -152,6 +152,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodesConnectingLinksID|Retrieves the id of the from/to nodes of all links|
 |getOptionsAccuracyValue|Retrieve the analysis convergence criterion (0.001)|
 |getOptionsEmitterExponent|Retrieve power exponent for the emmitters (0.5)|
+|getOptionsFlowChange|Retrieve flow change|
+|getOptionsHeadError|Retrieve the head error|
+|getOptionsHeadLossFormula|Retrieve headloss formula code (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)|
 |getOptionsMaxTrials|Retrieve maximum number of analysis trials|
 |getOptionsPatternDemandMultiplier|Retrieve the demand multiplier (x1)|
 |getOptionsQualityTolerance|Retrieve the water quality analysis tolerance|

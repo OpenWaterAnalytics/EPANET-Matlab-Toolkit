@@ -153,7 +153,7 @@ classdef epanet <handle
         NodeTypeIndex;               % Index of nodetype
         OptionsAccuracyValue;        % Convergence value (0.001 is default)
         OptionsEmitterExponent;      % Exponent of pressure at an emmiter node (0.5 is default)
-        OptionsHeadloss;             % Headloss formula (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)*** Not implemented *** BinOptionsHeadloss
+        OptionsHeadlossFormula;      % Headloss formula (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)
         OptionsHydraulics;           % Save or Use hydraulic soltion. *** Not implemented ***
         OptionsMaxTrials;            % Maximum number of trials (40 is default)
         OptionsPattern;              % *** Not implemented *** % but get with BinOptionsPattern
@@ -162,6 +162,8 @@ classdef epanet <handle
         OptionsSpecificGravity;      % *** Not implemented *** % but get with BinOptionsSpecificGravity
         OptionsUnbalanced;           % *** Not implemented *** % but get with BinOptionsUnbalanced
         OptionsViscosity;            % *** Not implemented *** % but get with BinOptionsViscosity
+        OptionsHeadError;
+        OptionsFlowChange;
         Pattern;                     % Get all patterns - matrix
         PatternAverageValue;         % Average value of patterns
         PatternCount;                % Number of patterns
@@ -573,6 +575,9 @@ classdef epanet <handle
             obj.OptionsQualityTolerance = obj.getOptionsQualityTolerance;
             obj.OptionsEmitterExponent = obj.getOptionsEmitterExponent;
             obj.OptionsPatternDemandMultiplier = obj.getOptionsPatternDemandMultiplier;
+            obj.OptionsHeadError = obj.getOptionsHeadError;
+            obj.OptionsFlowChange = obj.getOptionsFlowChange;
+            obj.OptionsHeadLossFormula = obj.getOptionsHeadLossFormula;
             %Get pattern data
             obj.PatternNameID = obj.getPatternNameID;
             obj.PatternIndex = 1:obj.PatternCount; %obj.getPatternIndex;
@@ -1635,22 +1640,42 @@ classdef epanet <handle
         function value = getOptionsMaxTrials(obj)
             % Retrieve maximum number of analysis trials
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_TRIALS, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsAccuracyValue(obj)
             % Retrieve the analysis convergence criterion (0.001)
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_ACCURACY, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsQualityTolerance(obj)
             % Retrieve the water quality analysis tolerance
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_TOLERANCE, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsEmitterExponent(obj)
             % Retrieve power exponent for the emmitters (0.5)
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_EMITEXPON, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsPatternDemandMultiplier(obj)
             % Retrieve the demand multiplier (x1)
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_DEMANDMULT, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsHeadError(obj)
+            % Retrieve the head error EPANET Version 2.2
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_HEADERROR, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsFlowChange(obj)
+            % Retrieve flow change EPANET Version 2.2
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_FLOWCHANGE, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsHeadLossFormula(obj)
+            % Retrieve headloss formula EPANET Version 2.2
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getPatternNameID(obj, varargin)
             %Retrieves the ID label of all or some time patterns indices
@@ -2629,21 +2654,31 @@ classdef epanet <handle
         end
         function setOptionsMaxTrials(obj, value)
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_TRIALS, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsAccuracyValue(obj, value)
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_ACCURACY, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsQualityTolerance(obj, value)
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_TOLERANCE, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsEmitterExponent(obj, value)
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_EMITEXPON, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsPatternDemandMultiplier(obj, value)
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_DEMANDMULT, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function setOptionsHeadLossFormula(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setTimeSimulationDuration(obj, value)
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_DURATION, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setTimeHydraulicStep(obj, value)
             % Hstep = min(Pstep, Hstep)
