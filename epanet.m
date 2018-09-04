@@ -153,7 +153,7 @@ classdef epanet <handle
         NodeTypeIndex;               % Index of nodetype
         OptionsAccuracyValue;        % Convergence value (0.001 is default)
         OptionsEmitterExponent;      % Exponent of pressure at an emmiter node (0.5 is default)
-        OptionsHeadlossFormula;      % Headloss formula (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)
+        OptionsHeadLossFormula;      % Headloss formula (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)
         OptionsHydraulics;           % Save or Use hydraulic soltion. *** Not implemented ***
         OptionsMaxTrials;            % Maximum number of trials (40 is default)
         OptionsPattern;              % *** Not implemented *** % but get with BinOptionsPattern
@@ -382,7 +382,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='2.1.6'; % comment function for net-builder branch
+        classversion='2.2.test'; % comment function for DEV branch
         
         TYPECONTROL={'LOWLEVEL', 'HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL', 'HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'VOLUME', 'PUMP', 'EFFICIENCY', 'HEADLOSS', 'GENERAL'}; % Constants for pump curves: 'PUMP', 'EFFICIENCY', 'VOLUME', 'HEADLOSS' % EPANET Version 2.2
@@ -2345,7 +2345,6 @@ classdef epanet <handle
             [Errcode] = ENdeletelink(obj, indexLink);
         end
         function setControls(obj, index, control)
-            
             if isstruct(index)
                 for c=1:length(index)
                     setControlFunction(obj, c, index(c).Control)
@@ -2368,6 +2367,9 @@ classdef epanet <handle
                     j=j+1;
                 end
             end
+        end
+        function addControls(obj, control)
+            addControlFunction(obj, control); 
         end
         function setLinkDiameter(obj, value, varargin)
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
@@ -7378,6 +7380,12 @@ function [Errcode] = ENsetheadcurveindex(obj, pumpindex, curveindex)
 [Errcode]=calllib(obj.LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
 disp(obj.getError(Errcode));
 end
+function [Errcode, cindex] = ENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
+[Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', 0, ctype, lindex, setting, nindex, level);
+if Errcode
+    ENgeterror(Errcode, LibEPANET);
+end
+end
 % function [Errcode, nPremises, nTrueActions, nFalseActions, priority] = EN_getrule(cindex, LibEPANET)
 %     [Errcode, nPremises, nTrueActions, nFalseActions, priority]=calllib(LibEPANET, 'ENgetrule', cindex, 0, 0, 0, 0);
 %     if Errcode
@@ -11421,8 +11429,23 @@ function atline = checktlines(tline)
     end
 end
 function setControlFunction(obj, index, value)
-    splitControl = strsplit(value);
     controlRuleIndex = index;
+    [controlTypeIndex, linkIndex,controlSettingValue,...
+    nodeIndex, controlLevel] = controlSettings(obj, value);
+    [obj.Errcode] = ENsetcontrol(controlRuleIndex, ...
+        controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
+    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+end
+function controlRuleIndex = addControlFunction(obj, value)
+    [controlTypeIndex, linkIndex,controlSettingValue,...
+    nodeIndex, controlLevel] = controlSettings(obj, value);
+    [obj.Errcode, controlRuleIndex] = ENaddcontrol(controlTypeIndex, linkIndex,...
+        controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
+    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+end
+function [controlTypeIndex, linkIndex,controlSettingValue,...
+    nodeIndex, controlLevel] = controlSettings(obj, value)
+    splitControl = strsplit(value);
     controlSettingValue = find(strcmpi(obj.TYPESTATUS, splitControl(3)))-1;
     if isempty(controlSettingValue)
         if strcmpi(splitControl(3), 'CLOSE')
@@ -11459,8 +11482,4 @@ function setControlFunction(obj, index, value)
             end
         otherwise
     end
-
-    [obj.Errcode] = ENsetcontrol(controlRuleIndex, ...
-        controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
-    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-end
+    end

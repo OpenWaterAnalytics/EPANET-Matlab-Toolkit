@@ -267,8 +267,12 @@ d.addPattern('NewPat2', [0.8, 1.1, 1.4, 1.1, 0.8, 0.7]);
 d.getPattern
 
 d.getControls(1)
-d.setControls(1, 'Link 12 OPEN AT TIME 2'); 
+d.addControls('Link 122 OPEN AT TIME 2')
+d.getControls(end)
+d.setControls(1,'LINK 9 CLOSED IF NODE 2 ABOVE 180')
 d.getControls(1)
+d.addControls('LINK 12 CLOSED AT CLOCKTIME 10 AM')
+d.getControls(end)
 
 d.getLinkDiameter
 d.setLinkDiameter(2*d.getLinkDiameter);
