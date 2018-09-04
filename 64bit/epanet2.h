@@ -30,7 +30,9 @@
   #define EN_API_FLOAT_TYPE float
 #endif
 
-#ifdef NO_GENX
+#ifdef WITH_GENX
+   #include "epanet_export.h"
+#else 
   // --- define WINDOWS
   #undef WINDOWS
   #ifdef _WIN32
@@ -60,8 +62,6 @@
       #define DLLEXPORT
     #endif
   #endif
-#else 
-  #include "epanet_export.h"
 #endif
 
 
@@ -814,19 +814,7 @@ extern "C" {
    @return Error code.
    */
   int  DLLEXPORT ENgetversion(int *version);
-
-  /**
-   @brief Specify parameters to add a new simple control
-   @param[out] cindex The index of the new control. First control is index 1.
-   @param ctype The type code to set for this control.
-   @param lindex The index of a link to control.
-   @param setting The control setting applied to the link.
-   @param nindex The index of a node used to control the link, or 0 for TIMER / TIMEOFDAY control.
-   @param level control point (tank level, junction pressure, or time in seconds).
-   @return Error code.
-   */
-  int  DLLEXPORT ENaddcontrol(int *cindex, int ctype, int lindex, EN_API_FLOAT_TYPE setting, int nindex, EN_API_FLOAT_TYPE level);
-
+  
   /**
    @brief Specify parameters to define a simple control
    @param cindex The index of the control to edit. First control is index 1.
@@ -944,14 +932,14 @@ extern "C" {
    @see ENgetbasedemand
    */
   int  DLLEXPORT ENsetbasedemand(int nodeIndex, int demandIdx, EN_API_FLOAT_TYPE baseDemand);
-   
-  /**
-   @brief Sets the index of the demand pattern assigned to a node for a category index.
-   @param nodeIndex The index of a node (first node is index 1).
-   @param demandIndex The index of a category (first category is index 1).
-   @param pattIndex The index of the pattern for this node and category.
-   @return Error code
-   */
+  
+   /**  
+   @brief Sets the index of the demand pattern assigned to a node for a category index. 
+   @param nodeIndex The index of a node (first node is index 1).  
+   @param demandIndex The index of a category (first category is index 1).  
+   @param pattIndex The index of the pattern for this node and category.  
+   @return Error code 
+   */ 
   int  DLLEXPORT ENsetdemandpattern(int nodeIndex, int demandIdx, int patIndex);
   
   /**
@@ -1192,6 +1180,9 @@ extern "C" {
   int DLLEXPORT EN_createproject(EN_ProjectHandle *ph);
   int DLLEXPORT EN_deleteproject(EN_ProjectHandle *ph);
 
+  int DLLEXPORT EN_runproject(EN_ProjectHandle ph, const char *f1, 
+    const char *f2, const char *f3, void (*pviewprog)(char *));
+
   void DLLEXPORT EN_clearError(EN_ProjectHandle ph);
   int DLLEXPORT EN_checkError(EN_ProjectHandle ph, char** msg_buffer);
 
@@ -1268,7 +1259,6 @@ extern "C" {
 
   int DLLEXPORT EN_getversion(int *version);
 
-  int DLLEXPORT EN_addcontrol(EN_ProjectHandle ph, int *cindex, int ctype, int lindex, EN_API_FLOAT_TYPE setting, int nindex, EN_API_FLOAT_TYPE level);
   int DLLEXPORT EN_setcontrol(EN_ProjectHandle ph, int cindex, int ctype, int lindex, EN_API_FLOAT_TYPE setting, int nindex, EN_API_FLOAT_TYPE level);
   int DLLEXPORT EN_setnodevalue(EN_ProjectHandle ph, int index, int code, EN_API_FLOAT_TYPE v);
   int DLLEXPORT EN_setlinkvalue(EN_ProjectHandle ph, int index, int code, EN_API_FLOAT_TYPE v);
@@ -1287,7 +1277,7 @@ extern "C" {
 
   int DLLEXPORT EN_getqualinfo(EN_ProjectHandle ph, int *qualcode, char *chemname, char *chemunits, int *tracenode);
   int DLLEXPORT EN_setbasedemand(EN_ProjectHandle ph, int nodeIndex, int demandIdx, EN_API_FLOAT_TYPE baseDemand);
-  int DLLEXPORT EN_setdemandpattern(EN_ProjectHandle ph, int nodeIndex, int demandIdx, int patIndex);
+  int  DLLEXPORT EN_setdemandpattern(EN_ProjectHandle ph, int nodeIndex, int demandIdx, int patIndex);
   int DLLEXPORT EN_getcurveindex(EN_ProjectHandle ph, char *id, int *index);
   int DLLEXPORT EN_getcurveid(EN_ProjectHandle ph, int index, char *id);
   int DLLEXPORT EN_getcurvelen(EN_ProjectHandle ph, int index, int *len);
