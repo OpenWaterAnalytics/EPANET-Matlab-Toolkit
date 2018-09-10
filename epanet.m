@@ -917,8 +917,11 @@ classdef epanet <handle
         end
         function value = getLinkIndex(obj, varargin)
             %Retrieves the indices of all links, or the indices of an ID set of links
+            value = [];
             if isempty(varargin)
                 value=1:obj.getLinkCount;
+            elseif isempty(varargin{1})
+                   return;
             elseif isa(varargin{1}, 'cell')
                 k=1;
                 value = zeros(1, length(varargin{1}));
@@ -929,7 +932,7 @@ classdef epanet <handle
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = ENgetlinkindex(varargin{1}, obj.LibEPANET);
             else
-                disp('Run function: getLinkIndex({''linkID''})) or getLinkIndex(''linkID''))');
+                warning('e.g. getLinkIndex({''linkID''})) or getLinkIndex(''linkID''))');
             end
         end
         function value = getLinkPipeIndex(obj)
@@ -1214,8 +1217,11 @@ classdef epanet <handle
         end
         function value = getNodeIndex(obj, varargin)
             %Retrieves the indices of all nodes or some nodes with a specified ID
+            value = [];
             if isempty(varargin)
                 value=1:obj.getNodeCount;
+            elseif isempty(varargin{1})
+                    return;
             elseif isa(varargin{1}, 'cell')
                 k=1;
                 value = zeros(1, length(varargin{1}));
@@ -1226,7 +1232,7 @@ classdef epanet <handle
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = ENgetnodeindex(varargin{1}, obj.LibEPANET);
             else
-                disp('Run function: getNodeIndex({''nodeID''})) or getNodeIndex(''nodeID''))');
+                warning('e.g. getNodeIndex({''nodeID''})) or getNodeIndex(''nodeID''))');
             end
         end
         function value = getNodeReservoirIndex(obj)
@@ -2178,6 +2184,7 @@ classdef epanet <handle
         end
         function value = getComputedQualityTimeSeries(obj, varargin)
             % Compute Quality simulation and retrieve all or some time-series
+            
             obj.openQualityAnalysis
             obj.initializeQualityAnalysis
             %tleft=obj.nextQualityAnalysisStep;
