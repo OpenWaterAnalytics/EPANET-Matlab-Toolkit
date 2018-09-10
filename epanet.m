@@ -1118,11 +1118,17 @@ classdef epanet <handle
             % 5 = open (max. flow exceeded)
             % 6 = open (flow setting not met)
             % 7 = open (pressure setting not met)
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_STATE, obj.LibEPANET);  
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
+			[indices, value] = getLinkIndices(obj, varargin);
+            if obj.getVersion > 20101
+                j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_STATE, obj.LibEPANET);  
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                    j=j+1;
+                end
+            else
+                value = value*NaN;
+                warning('Function getLinkState need: EPANET Version > 20012');
             end
         end
         function value = getLinkSettings(obj, varargin)
