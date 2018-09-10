@@ -2190,9 +2190,9 @@ classdef epanet <handle
         end
         function value = getComputedQualityTimeSeries(obj, varargin)
             % Compute Quality simulation and retrieve all or some time-series
-            
-            obj.openQualityAnalysis
-            obj.initializeQualityAnalysis
+            obj.solveCompleteHydraulics % Only call this ONLY once (see ENsolveH for more details)
+            obj.openQualityAnalysis;
+            obj.initializeQualityAnalysis;
             %tleft=obj.nextQualityAnalysisStep;
             totalsteps=obj.getTimeSimulationDuration/obj.getTimeHydraulicStep;
             initnodematrix=zeros(totalsteps, obj.getNodeCount);
