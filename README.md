@@ -59,6 +59,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getCurveTypeIndex|Retrieves the curve-type index for all curves|
 |getCurveValue|Retrieves (x,y) values of specific curve index|
 |getCurveXY|Retrieves (x,y) values of all curves|
+|getDemandModel|Retrieves the type of demand model in use and its parameters|
 |getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
 |getFlowUnits|Retrieves the units used to express all flow rates|
 |getLibFunctions|Retrieves the functions of DLL|
@@ -224,6 +225,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setControls|Sets the parameters of a simple control statement|
 |setCurve|Sets x,y values for a specific curve|
 |setCurveValue|Retrieves x,y point for a specific point number and curve|
+|setDemandModel|Sets the type of demand model to use and its parameters|
 |setFlowUnitsAFD|Sets flow units to AFD|
 |setFlowUnitsCFS|Sets flow units to CFS|
 |setFlowUnitsCMD|Sets flow units to CMD|
@@ -612,3 +614,5 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENgetcurvetype|Retrieves the type of a curve|
 |ENsetflowunits|Sets the flow units|
+|ENgetdemandmodel|Retrieves the type of demand model in use and its parameters|
+|ENsetdemandmodel|Sets the type of demand model to use and its parameters|

@@ -219,13 +219,15 @@ typedef enum {           /* Demand model types. */
 
 /// Simulation Option codes
 typedef enum {
-  EN_TRIALS       = 0,
-  EN_ACCURACY     = 1,
-  EN_TOLERANCE    = 2,
-  EN_EMITEXPON    = 3,
-  EN_DEMANDMULT   = 4,
-  EN_HEADERROR    = 5,
-  EN_FLOWCHANGE   = 6
+  EN_TRIALS         = 0,
+  EN_ACCURACY       = 1,
+  EN_TOLERANCE      = 2,
+  EN_EMITEXPON      = 3,
+  EN_DEMANDMULT     = 4,
+  EN_HEADERROR      = 5,
+  EN_FLOWCHANGE     = 6,
+  EN_DEMANDDEFPAT   = 7,
+  EN_HEADLOSSFORM 	= 8
 } EN_Option;
 
 typedef enum {
@@ -308,7 +310,8 @@ extern "C" {
    @param HeadlossFormula headloss formula flag
    @return error code
    */
-  int  DLLEXPORT ENinit(char *rptFile, char *binOutFile, int UnitsType, int HeadlossFormula);
+  int  DLLEXPORT ENinit(const char *rptFile, const char *binOutFile, 
+    int UnitsType, int HeadlossFormula);
   
   /**
    @brief Opens EPANET input file & reads in network data
@@ -317,14 +320,14 @@ extern "C" {
    @param binOutFile pointer to name of binary output file (to be created)
    @return error code
    */
-  int  DLLEXPORT ENopen(char *inpFile, char *rptFile, char *binOutFile);
+  int  DLLEXPORT ENopen(const char *inpFile, const char *rptFile, const char *binOutFile);
   
   /**
    @brief Saves current data to "INP" formatted text file.
    @param filename The file path to create
    @return Error code
    */
-  int  DLLEXPORT ENsaveinpfile(char *filename);
+  int  DLLEXPORT ENsaveinpfile(const char *filename);
   
   /**
    @brief Frees all memory and files used by EPANET
@@ -814,7 +817,19 @@ extern "C" {
    @return Error code.
    */
   int  DLLEXPORT ENgetversion(int *version);
-  
+
+  /**
+   @brief Specify parameters to add a new simple control
+   @param[out] cindex The index of the new control. First control is index 1.
+   @param ctype The type code to set for this control.
+   @param lindex The index of a link to control.
+   @param setting The control setting applied to the link.
+   @param nindex The index of a node used to control the link, or 0 for TIMER / TIMEOFDAY control.
+   @param level control point (tank level, junction pressure, or time in seconds).
+   @return Error code.
+   */
+  int  DLLEXPORT ENaddcontrol(int *cindex, int ctype, int lindex, EN_API_FLOAT_TYPE setting, int nindex, EN_API_FLOAT_TYPE level);
+
   /**
    @brief Specify parameters to define a simple control
    @param cindex The index of the control to edit. First control is index 1.
@@ -922,6 +937,26 @@ extern "C" {
    @see EN_QualityType
    */
   int  DLLEXPORT ENgetqualinfo(int *qualcode, char *chemname, char *chemunits, int *tracenode);
+
+  /**
+   @brief Sets the node's demand name for a category.
+   @param nodeIndex The index of a node.
+   @param demandIdx The index of a demand category.
+   @param demandName The demand name for the selected category.
+   @return Error code.
+   @see ENgetdemandname
+   */
+  int DLLEXPORT ENsetdemandname(int nodeIndex, int demandIdx, char *demandName);
+
+  /**
+   @brief Retrieves the node's demand name for a category.
+   @param nodeIndex The index of a node.
+   @param demandIdx The index of a demand category.
+   @param demandName The demand name for the selected category.
+   @return Error code.
+   @see ENsetdemandname
+   */
+  int DLLEXPORT ENgetdemandname(int nodeIndex, int demandIdx, char *demandName);
   
   /**
    @brief Sets the node's base demand for a category.
@@ -1188,13 +1223,13 @@ extern "C" {
 
   //int DLLEXPORT EN_epanet(EN_ProjectHandle ph, const char *f1, const char *f2,
 	//  const char *f3, void(*pviewprog)(char *));
-  int DLLEXPORT EN_init(EN_ProjectHandle ph, char *rptFile, char *binOutFile,
+  int DLLEXPORT EN_init(EN_ProjectHandle ph, const char *rptFile, const char *binOutFile,
           EN_FlowUnits UnitsType, EN_FormType HeadlossFormula);
 
   int DLLEXPORT EN_open(EN_ProjectHandle ph, const char *inpFile,
           const char *rptFile, const char *binOutFile);
 
-  int DLLEXPORT EN_saveinpfile(EN_ProjectHandle ph, char *filename);
+  int DLLEXPORT EN_saveinpfile(EN_ProjectHandle ph, const char *filename);
 
   int DLLEXPORT EN_close(EN_ProjectHandle ph);
   int DLLEXPORT EN_solveH(EN_ProjectHandle ph);
@@ -1259,6 +1294,7 @@ extern "C" {
 
   int DLLEXPORT EN_getversion(int *version);
 
+  int DLLEXPORT EN_addcontrol(EN_ProjectHandle ph, int *cindex, int ctype, int lindex, EN_API_FLOAT_TYPE setting, int nindex, EN_API_FLOAT_TYPE level);
   int DLLEXPORT EN_setcontrol(EN_ProjectHandle ph, int cindex, int ctype, int lindex, EN_API_FLOAT_TYPE setting, int nindex, EN_API_FLOAT_TYPE level);
   int DLLEXPORT EN_setnodevalue(EN_ProjectHandle ph, int index, int code, EN_API_FLOAT_TYPE v);
   int DLLEXPORT EN_setlinkvalue(EN_ProjectHandle ph, int index, int code, EN_API_FLOAT_TYPE v);
@@ -1272,12 +1308,14 @@ extern "C" {
 
   int DLLEXPORT EN_getdemandmodel(EN_ProjectHandle ph, int *type, EN_API_FLOAT_TYPE *pmin,
               EN_API_FLOAT_TYPE *preq, EN_API_FLOAT_TYPE *pexp);
-   int DLLEXPORT EN_setdemandmodel(EN_ProjectHandle ph, int type, EN_API_FLOAT_TYPE pmin,
+  int DLLEXPORT EN_setdemandmodel(EN_ProjectHandle ph, int type, EN_API_FLOAT_TYPE pmin,
               EN_API_FLOAT_TYPE preq, EN_API_FLOAT_TYPE pexp);
 
+  int DLLEXPORT EN_setdemandname(EN_ProjectHandle ph, int nodeIndex, int demandIdx, char *demandName);
+  int DLLEXPORT EN_getdemandname(EN_ProjectHandle ph, int nodeIndex, int demandIdx, char *demandName);
   int DLLEXPORT EN_getqualinfo(EN_ProjectHandle ph, int *qualcode, char *chemname, char *chemunits, int *tracenode);
   int DLLEXPORT EN_setbasedemand(EN_ProjectHandle ph, int nodeIndex, int demandIdx, EN_API_FLOAT_TYPE baseDemand);
-  int  DLLEXPORT EN_setdemandpattern(EN_ProjectHandle ph, int nodeIndex, int demandIdx, int patIndex);
+  int DLLEXPORT EN_setdemandpattern(EN_ProjectHandle ph, int nodeIndex, int demandIdx, int patIndex);
   int DLLEXPORT EN_getcurveindex(EN_ProjectHandle ph, char *id, int *index);
   int DLLEXPORT EN_getcurveid(EN_ProjectHandle ph, int index, char *id);
   int DLLEXPORT EN_getcurvelen(EN_ProjectHandle ph, int index, int *len);

@@ -58,6 +58,11 @@ classdef epanet <handle
         ControlTypesIndex;           % Index of the control types
         CurveCount;                  % Number of curves
         CurvesInfo;                  % Curves info
+        DemandModelCode;             % Demand model code DDA - 0, PDA - 1
+        DemandModelPmin;             % Demand model Pmin - Pressure below which there is no demand
+        DemandModelPreq;             % Demand model Preq - Pressure required to deliver full demand
+        DemandModelPexp;             % Demand model Pexp - Pressure exponent in demand function
+        DemandModelType;             % Demand model type DDA, PDA
         EnergyEfficiencyUnits;       % Units for efficiency
         EnergyUnits;                 % Units for energy
         Errcode;                     % Code for the EPANET error message
@@ -396,7 +401,7 @@ classdef epanet <handle
         TYPESTATS={'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'}; % Constants for statistics: 'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'
         TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
         TYPESTATUS = {'CLOSED', 'OPEN'}; % Link status
-        
+        DEMANDMODEL = {'DDA', 'PDA'}; % Demand model types. DDA #0 Demand driven analysis, PDA #1 Pressure driven analysis.
         MSXTYPEAREAUNITS={'FT2', 'M2', 'CM2'}; % sets the units used to express pipe wall surface area
         MSXTYPERATEUNITS={'SEC', 'MIN', 'HR', 'DAY'}; % is the units in which all reaction rate terms are expressed
         MSXTYPESOLVER={'EUL', 'RK5', 'ROS2'}; % is the choice of numerical integration method used to solve the reaction system
@@ -511,6 +516,12 @@ classdef epanet <handle
             getFields_node_info = fields(ndInfo);
             for i=1:length(getFields_node_info)
                 obj.(getFields_node_info{i}) = eval(['ndInfo.', getFields_node_info{i}]);
+            end
+            % Get demand model type and parameters
+            demModelInfo = obj.getDemandModel;
+            getFields_demModelInfo = fields(demModelInfo);
+            for i=1:length(getFields_demModelInfo)
+                obj.(getFields_demModelInfo{i}) = eval(['demModelInfo.', getFields_demModelInfo{i}]);
             end
             %Get all the countable network parameters
             obj.NodeCount = obj.getNodeCount;
@@ -1287,6 +1298,21 @@ classdef epanet <handle
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET); 
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
                 j=j+1;
+            end
+        end
+        function value = getDemandModel(obj, varargin)
+            %Retrieves the type of demand model in use and its parameters
+            %EPANET Version 2.2
+            if obj.getVersion > 20101
+                [obj.Errcode, value.DemandModelCode, value.DemandModelPmin, value.DemandModelPreq, value.DemandModelPexp] = ENgetdemandmodel(obj.LibEPANET); 
+                value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
+            else
+                value.DemandModelCode = NaN;
+                value.DemandModelPmin = NaN;
+                value.DemandModelPreq = NaN;
+                value.DemandModelPexp = NaN;
+                value.DemandModelType = NaN;
+                warning('Function getDemandModel need: EPANET Version > 20101');
             end
         end
         function value = getNodeBaseDemands(obj, varargin)
@@ -2666,6 +2692,16 @@ classdef epanet <handle
         function setNodeSourceType(obj, index, value)
             value=find(strcmpi(obj.TYPESOURCE, value)==1)-1;
             [obj.Errcode] = ENsetnodevalue(index, obj.ToolkitConstants.EN_SOURCETYPE, value, obj.LibEPANET);
+        end
+        function setDemandModel(obj, code, pmin, preq, pexp)
+            % Sets the type of demand model to use and its parameters
+            % Example: d.setDemandModel('PDA', 0, 0, 0.5);
+            %          d.getDemandModel
+            model_type=find(strcmpi(obj.DEMANDMODEL, code)==1)-1;
+            if isempty(model_type)
+                error('Please give Demand model type: DDA or PDA');
+            end
+            [obj.Errcode] = ENsetdemandmodel(model_type, pmin, preq, pexp, obj.LibEPANET);
         end
         function setOptionsMaxTrials(obj, value)
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_TRIALS, value, obj.LibEPANET);
@@ -7395,6 +7431,20 @@ disp(obj.getError(Errcode));
 end
 function [Errcode, cindex] = ENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', 0, ctype, lindex, setting, nindex, level);
+if Errcode
+    ENgeterror(Errcode, LibEPANET);
+end
+end
+function [Errcode, type, pmin, preq, pexp] = ENgetdemandmodel(LibEPANET)
+% EPANET Version 2.2
+[Errcode, type, pmin, preq, pexp]=calllib(LibEPANET, 'ENgetdemandmodel', 0, 0, 0, 0);
+if Errcode
+    ENgeterror(Errcode, LibEPANET);
+end
+end
+function [Errcode] = ENsetdemandmodel(type, pmin, preq, pexp, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsetdemandmodel', type, pmin, preq, pexp);
 if Errcode
     ENgeterror(Errcode, LibEPANET);
 end
