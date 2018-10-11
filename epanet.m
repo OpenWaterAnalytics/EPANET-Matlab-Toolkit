@@ -8004,6 +8004,8 @@ for i=1:(nargin/2)
             catch 
                 axesid=varargin{2*i};
             end
+        case 'figure' % figure
+            fig=varargin{2*i};
         case 'bin' 
             bin=varargin{2*i};
         case 'extend' % extend option
@@ -8019,8 +8021,8 @@ end
 drawnow;
 
 if axesid==0
-   g=figure;
-   axesid=axes('Parent', g);
+   fig=figure;
+   axesid=axes('Parent', fig);
 end
 
 if cellfun('isempty', selectColorNode)==1
@@ -8103,7 +8105,7 @@ if isa(highlightlink, 'cell')
 end
 
 if (strcmpi(lline, 'yes'))
-    hold on;
+    hold(axesid, 'on')
     for i=1:v.linkcount
         FromNode=strfind(strcmp(v.nodesconnlinks(i, 1), v.nodenameid), 1);
         ToNode=strfind(strcmp(v.nodesconnlinks(i, 2), v.nodenameid), 1);
@@ -8186,7 +8188,7 @@ end
 
 if (strcmpi(npoint, 'yes'))
     % Coordinates for node FROM
-    hold on;
+    hold(axesid, 'on')
     for i=1:v.nodecount
         [x] = double(v.nodecoords{1}(i));
         [y] = double(v.nodecoords{2}(i));
@@ -8279,7 +8281,7 @@ if (strcmpi(npoint, 'yes'))
         end
         % Show Node id
         if (strcmpi(Node, 'yes')) %&& ~length(hh))
-            text(x, y, v.nodenameid(i), 'Fontsize', fontsize);%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
+            text(x, y, v.nodenameid(i), 'Fontsize', fontsize, 'Parent', axesid);%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
         end
         % Show Node index
         if (strcmpi(NodeInd, 'yes')) %&& ~length(hh))
@@ -8310,20 +8312,23 @@ end
 
 if ~isnan(ymax)
     if ymax==ymin
-        xlim([xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
-        ylim([ymin-.1, ymax+.1]);
+        xlim(axesid, [xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
+        ylim(axesid, [ymin-.1, ymax+.1]);
     elseif xmax==xmin
-        xlim([xmin-.1, xmax+.1]);
-        ylim([ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
+        xlim(axesid, [xmin-.1, xmax+.1]);
+        ylim(axesid, [ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
     else
-        xlim([xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
-        ylim([ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
+        xlim(axesid, [xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
+        ylim(axesid, [ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
     end
 else
     warning('Undefined coordinates.');
 end
-axis off
-whitebg('w');
+axis(axesid, 'off');
+try
+    whitebg(fig, 'w');
+catch
+end
 if strcmpi(extend, 'yes')
     set(axesid, 'position', [0 0 1 1], 'units', 'normalized');
 end
