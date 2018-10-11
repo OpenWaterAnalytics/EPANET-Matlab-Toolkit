@@ -7743,14 +7743,14 @@ while 1
 end
 fclose(fid);
 end
-function [axesid] = plotnet(obj,varargin)
+function [axesid] = plotnet(obj, varargin)
 % Initiality
 highlightnode=0;
 highlightlink=0;
 highlightnodeindex=[];
 highlightlinkindex=[];
 legendIndices=[];
-l=zeros(1,6);
+l=zeros(1, 6);
 Node=char('no');
 Link=char('no');
 NodeInd=0;
@@ -7768,25 +7768,25 @@ for i=1:(nargin/2)
     argument =lower(varargin{2*(i-1)+1});
     switch argument
         case 'nodes' % Nodes
-            if ~strcmpi(varargin{2*i},'yes') && ~strcmpi(varargin{2*i},'no')
+            if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
                 warning('Invalid argument.');
                 return
             end
             Node=varargin{2*i};
         case 'links' % Nodes
-            if ~strcmpi(varargin{2*i},'yes') && ~strcmpi(varargin{2*i},'no')
+            if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
                 warning('Invalid argument.');
                 return
             end
             Link=varargin{2*i};
         case 'nodesindex' % Nodes
-            if ~strcmpi(varargin{2*i},'yes') 
+            if ~strcmpi(varargin{2*i}, 'yes') 
                 warning('Invalid argument.');
                 return
             end
             NodeInd=varargin{2*i};
         case 'linksindex' % Links
-            if ~strcmpi(varargin{2*i},'yes')
+            if ~strcmpi(varargin{2*i}, 'yes')
                 warning('Invalid argument.');
                 return
             end
@@ -7802,23 +7802,25 @@ for i=1:(nargin/2)
         case 'colorlink' % color
             selectColorLink=varargin{2*i};        
         case 'point' % color
-            if ~strcmpi(varargin{2*i},'yes') && ~strcmpi(varargin{2*i},'no')
+            if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
                 warning('Invalid argument.');
                 return
             end
             npoint=varargin{2*i};
         case 'line' % remove line
-            if ~strcmpi(varargin{2*i},'yes') && ~strcmpi(varargin{2*i},'no')
+            if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
                 warning('Invalid argument.');
                 return
             end
             lline=varargin{2*i};
         case 'axes' % axes id
             try
-                axesid=axes('Parent',varargin{2*i});
+                axesid=axes('Parent', varargin{2*i});
             catch 
                 axesid=varargin{2*i};
             end
+        case 'uifigure' % figure
+            fig=varargin{2*i};
         case 'bin' 
             bin=varargin{2*i};
         case 'extend' % extend option
@@ -7834,17 +7836,17 @@ end
 drawnow;
 
 if axesid==0
-   g=figure;
-   axesid=axes('Parent',g);
+   fig=figure;
+   axesid=axes('Parent', fig);
 end
 
-if cellfun('isempty',selectColorNode)==1
+if cellfun('isempty', selectColorNode)==1
     init={'r'};
     for i=1:length(highlightnode)
         selectColorNode=[init selectColorNode];
     end
 end
-if cellfun('isempty',selectColorLink)==1
+if cellfun('isempty', selectColorLink)==1
     init={'r'};
     for i=1:length(highlightlink)
         selectColorLink=[init selectColorLink];
@@ -7875,7 +7877,7 @@ elseif bin==0
     v.linknameid=obj.getLinkNameID;
     v.nodesconnlinks=obj.getNodesConnectingLinksID;
     chckfunctions=libfunctions(obj.LibEPANET);
-    if sum(strcmp(chckfunctions,'ENgetcoord'))
+    if sum(strcmp(chckfunctions, 'ENgetcoord'))
         v.nodecoords=obj.getNodeCoordinates;
     else
         v.nodecoords=obj.getBinNodeCoordinates;
@@ -7895,33 +7897,33 @@ if isnan(v.nodecoords{1}(2))
    return
 end
 % Get node names and x, y coordiantes
-if isa(highlightnode,'cell')
+if isa(highlightnode, 'cell')
     for i=1:length(highlightnode)
-        n = strcmp(v.nodenameid,highlightnode{i});
+        n = strcmp(v.nodenameid, highlightnode{i});
         if sum(n)==0
             warning('Undefined node with id "%s" in function call therefore the index is zero.', char(highlightnode{i}));
         else
-            highlightnodeindex(i) = strfind(n,1);
+            highlightnodeindex(i) = strfind(n, 1);
         end
     end
 end
 
-if isa(highlightlink,'cell')
+if isa(highlightlink, 'cell')
     for i=1:length(highlightlink)
-        n = strcmp(v.linknameid,highlightlink{i});
+        n = strcmp(v.linknameid, highlightlink{i});
         if sum(n)==0
             warning('Undefined link with id "%s" in function call therefore the index is zero.', char(highlightlink{i}));
         else
-            highlightlinkindex(i) = strfind(n,1);
+            highlightlinkindex(i) = strfind(n, 1);
         end
     end
 end
 
-if (strcmpi(lline,'yes'))
-    hold on;
+if (strcmpi(lline, 'yes'))
+    hold(axesid, 'on')
     for i=1:v.linkcount
-        FromNode=strfind(strcmp(v.nodesconnlinks(i,1),v.nodenameid),1);
-        ToNode=strfind(strcmp(v.nodesconnlinks(i,2),v.nodenameid),1);
+        FromNode=strfind(strcmp(v.nodesconnlinks(i, 1), v.nodenameid), 1);
+        ToNode=strfind(strcmp(v.nodesconnlinks(i, 2), v.nodenameid), 1);
 
         if FromNode
             x1 = double(v.nodecoords{1}(FromNode));
@@ -7932,45 +7934,45 @@ if (strcmpi(lline,'yes'))
             y2 = double(v.nodecoords{2}(ToNode));
         end
 
-        hh=strfind(highlightlinkindex,i);
+        hh=strfind(highlightlinkindex, i);
 
         if length(hh) && ~isempty(selectColorLink)
-            line([x1 v.nodecoords{3}{i} x2],[y1 v.nodecoords{4}{i} y2],'LineWidth',1,'Color',[.5 .5 .5],'Parent',axesid);
+            line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', [.5 .5 .5], 'Parent', axesid);
         end
         if ~length(hh)
-            h(:,1)=line([x1 v.nodecoords{3}{i} x2],[y1 v.nodecoords{4}{i} y2],'LineWidth',1,'Parent',axesid);
+            h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Parent', axesid);
             if ~l(1), legendIndices = [legendIndices 1]; l(1)=1; end
         end
             
         % Plot Pumps
-        if sum(strfind(v.pumpindex,i))
+        if sum(strfind(v.pumpindex, i))
             colornode = 'm';
             if length(hh) && isempty(selectColorLink)
                 colornode = 'r';
             end
-            h(:,2)=plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor','m',...
-                'MarkerFaceColor','m',...
-                'MarkerSize',5,'Parent',axesid);
+            h(:, 2)=plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 2, 'MarkerEdgeColor', 'm', ...
+                'MarkerFaceColor', 'm', ...
+                'MarkerSize', 5, 'Parent', axesid);
             if ~l(2), legendIndices = [legendIndices 2]; l(2)=1; end
-            plot((x1+x2)/2,(y1+y2)/2,'mv','LineWidth',2,'MarkerEdgeColor',colornode,...
-                'MarkerFaceColor',colornode,...
-                'MarkerSize',5,'Parent',axesid);
+            plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                'MarkerFaceColor', colornode, ...
+                'MarkerSize', 5, 'Parent', axesid);
         end
 
         % Plot Valves
-        if sum(strfind(v.valveindex,i))
+        if sum(strfind(v.valveindex, i))
             colornode = 'k';
             if length(hh) && isempty(selectColorLink)
                 colornode = 'r';
             end
-            h(:,3)=plot((x1+x2)/2,(y1+y2)/2,'k*','LineWidth',2,'MarkerEdgeColor',colornode,...
-                'MarkerFaceColor',colornode,'MarkerSize',7,'Parent',axesid);         
+            h(:, 3)=plot((x1+x2)/2, (y1+y2)/2, 'k*', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                'MarkerFaceColor', colornode, 'MarkerSize', 7, 'Parent', axesid);         
             if ~l(3), legendIndices = [legendIndices 3]; l(3)=1; end
         end
 
         if length(hh) && isempty(selectColorLink)
-            line([x1,x2],[y1,y2],'LineWidth',1,'Color','r','Parent',axesid);
-            text((x1+x2)/2,(y1+y2)/2,v.linknameid(i),'Fontsize',fontsize,'Parent',axesid);
+            line([x1, x2], [y1, y2], 'LineWidth', 1, 'Color', 'r', 'Parent', axesid);
+            text((x1+x2)/2, (y1+y2)/2, v.linknameid(i), 'Fontsize', fontsize, 'Parent', axesid);
         elseif length(hh) && ~isempty(selectColorLink)
             try tt=length(selectColorLink{hh}); catch; tt=2; end
            if tt>1
@@ -7980,77 +7982,77 @@ if (strcmpi(lline,'yes'))
                     nm=selectColorLink(hh);
                 end
                 if iscell(nm{1}) 
-                    line([x1 v.nodecoords{3}{i} x2],[y1 v.nodecoords{4}{i} y2],'LineWidth',1,'Color',nm{1}{1},'Parent',axesid);
+                    line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', nm{1}{1}, 'Parent', axesid);
                 else
-                    line([x1 v.nodecoords{3}{i} x2],[y1 v.nodecoords{4}{i} y2],'LineWidth',1,'Color',nm{1},'Parent',axesid);
+                    line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', nm{1}, 'Parent', axesid);
                 end
             else
-                line([x1 v.nodecoords{3}{i} x2],[y1 v.nodecoords{4}{i} y2],'LineWidth',1,'Color',char(selectColorLink(hh)),'Parent',axesid);
+                line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', char(selectColorLink(hh)), 'Parent', axesid);
             end
         end
         % Show Link id
-        if (strcmpi(Link,'yes')) %&& ~length(hh))
-            text((x1+x2)/2,(y1+y2)/2,v.linknameid(i),'Fontsize',fontsize,'Parent',axesid);
+        if (strcmpi(Link, 'yes')) %&& ~length(hh))
+            text((x1+x2)/2, (y1+y2)/2, v.linknameid(i), 'Fontsize', fontsize, 'Parent', axesid);
         end
         % Show Link Index
-        if (strcmpi(LinkInd,'yes')) %&& ~length(hh))
-            text((x1+x2)/2,(y1+y2)/2,num2str(v.linkindex(i)),'Fontsize',fontsize,'Parent',axesid);
+        if (strcmpi(LinkInd, 'yes')) %&& ~length(hh))
+            text((x1+x2)/2, (y1+y2)/2, num2str(v.linkindex(i)), 'Fontsize', fontsize, 'Parent', axesid);
         end
     end
 end
 
-if (strcmpi(npoint,'yes'))
+if (strcmpi(npoint, 'yes'))
     % Coordinates for node FROM
-    hold on;
+    hold(axesid, 'on')
     for i=1:v.nodecount
         [x] = double(v.nodecoords{1}(i));
         [y] = double(v.nodecoords{2}(i));
 
-        hh=strfind(highlightnodeindex,i);
+        hh=strfind(highlightnodeindex, i);
         if ~length(hh)
-            h(:,4)=plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','b',...
-            'MarkerFaceColor','b',...
-            'MarkerSize',5,'Parent',axesid);
+            h(:, 4)=plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', 'b', ...
+            'MarkerFaceColor', 'b', ...
+            'MarkerSize', 5, 'Parent', axesid);
             if ~l(4), legendIndices = [legendIndices 4]; l(4)=1; end
         end
 
         % Plot Reservoirs
-        if sum(strfind(v.resindex,i))
+        if sum(strfind(v.resindex, i))
             colornode = 'g';
             if length(hh) && isempty(selectColorNode)
                 colornode = 'r';
             end
-            h(:,5)=plot(x,y,'s','LineWidth',2,'MarkerEdgeColor','g',...
-                'MarkerFaceColor','g',...
-                'MarkerSize',13,'Parent',axesid);
+            h(:, 5)=plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', 'g', ...
+                'MarkerFaceColor', 'g', ...
+                'MarkerSize', 13, 'Parent', axesid);
             if ~l(5), legendIndices = [legendIndices 5]; l(5)=1; end
-            plot(x,y,'s','LineWidth',2,'MarkerEdgeColor', colornode,...
-                'MarkerFaceColor', colornode,...
-                'MarkerSize',13,'Parent',axesid);
+            plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                'MarkerFaceColor', colornode, ...
+                'MarkerSize', 13, 'Parent', axesid);
         end
         % Plot Tanks
-        if sum(strfind(v.tankindex,i))
+        if sum(strfind(v.tankindex, i))
             colornode='c';
             if length(hh) && isempty(selectColorNode)
                 colornode='r';
             elseif length(hh) && ~isempty(selectColorNode)
                 colornode= 'c';
             end
-            h(:,6)=plot(x,y,'p','LineWidth',2,'MarkerEdgeColor','c',...
-                'MarkerFaceColor','c',...
-                'MarkerSize',16,'Parent',axesid);
+            h(:, 6)=plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', 'c', ...
+                'MarkerFaceColor', 'c', ...
+                'MarkerSize', 16, 'Parent', axesid);
             if ~l(6), legendIndices = [legendIndices 6]; l(6)=1; end
 
-            plot(x,y,'p','LineWidth',2,'MarkerEdgeColor',colornode,...
-                'MarkerFaceColor',colornode,...
-                'MarkerSize',16,'Parent',axesid);
+            plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                'MarkerFaceColor', colornode, ...
+                'MarkerSize', 16, 'Parent', axesid);
         end
 
         if length(hh) && isempty(selectColorNode)
-            plot(x, y,'o','LineWidth',2,'MarkerEdgeColor','r',...
-                'MarkerFaceColor','r',...
-                'MarkerSize',5,'Parent',axesid);
-            text(x,y,v.nodenameid(i),'Fontsize',fontsize,'Parent',axesid)%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+            plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', 'r', ...
+                'MarkerFaceColor', 'r', ...
+                'MarkerSize', 5, 'Parent', axesid);
+            text(x, y, v.nodenameid(i), 'Fontsize', fontsize, 'Parent', axesid)%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
         elseif length(hh) && ~isempty(selectColorNode)
             try tt=length(selectColorNode{hh}); catch, tt=2; end
            if tt>1
@@ -8062,85 +8064,88 @@ if (strcmpi(npoint,'yes'))
                     nmplot=nm{1};
                 end
                 if iscell(nm{1}) 
-                    plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nmplot,'MarkerFaceColor',nmplot,'MarkerSize',5,'Parent',axesid);
+                    plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, 'MarkerSize', 5, 'Parent', axesid);
                 else
-                    plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nmplot,'MarkerFaceColor',nmplot,'MarkerSize',5,'Parent',axesid);
+                    plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, 'MarkerSize', 5, 'Parent', axesid);
                 end
                 if sum(find(i==v.resindex))
-                   plot(x,y,'s','LineWidth',2,'MarkerEdgeColor', nmplot,...
-                   'MarkerFaceColor', nmplot,...
-                   'MarkerSize',13,'Parent',axesid);
+                   plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
+                   'MarkerFaceColor', nmplot, ...
+                   'MarkerSize', 13, 'Parent', axesid);
                 end
                 if sum(find(i==v.tankindex))
-                   plot(x,y,'p','LineWidth',2,'MarkerEdgeColor',nmplot,...
-                   'MarkerFaceColor',nmplot,...
-                   'MarkerSize',16,'Parent',axesid);
+                   plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
+                   'MarkerFaceColor', nmplot, ...
+                   'MarkerSize', 16, 'Parent', axesid);
                 end
            else
                 nmplot=char(selectColorNode(hh));
-                plot(x, y,'o','LineWidth',2,'MarkerEdgeColor',nmplot,'MarkerFaceColor',nmplot,...
-                    'MarkerSize',5,'Parent',axesid);
+                plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, ...
+                    'MarkerSize', 5, 'Parent', axesid);
                 if sum(find(i==v.resindex))
-                   plot(x,y,'s','LineWidth',2,'MarkerEdgeColor', nmplot,...
-                   'MarkerFaceColor', nmplot,...
-                   'MarkerSize',13,'Parent',axesid);
+                   plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
+                   'MarkerFaceColor', nmplot, ...
+                   'MarkerSize', 13, 'Parent', axesid);
                 end
                 if sum(find(i==v.tankindex))
-                   plot(x,y,'p','LineWidth',2,'MarkerEdgeColor',nmplot,...
-                   'MarkerFaceColor',nmplot,...
-                   'MarkerSize',16,'Parent',axesid);
+                   plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
+                   'MarkerFaceColor', nmplot, ...
+                   'MarkerSize', 16, 'Parent', axesid);
                 end
            end
         end
         % Show Node id
-        if (strcmpi(Node,'yes')) %&& ~length(hh))
-            text(x,y,v.nodenameid(i),'Fontsize',fontsize);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+        if (strcmpi(Node, 'yes')) %&& ~length(hh))
+            text(x, y, v.nodenameid(i), 'Fontsize', fontsize, 'Parent', axesid);%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
         end
         % Show Node index
-        if (strcmpi(NodeInd,'yes')) %&& ~length(hh))
-            text(x,y,num2str(v.nodeindex(i)),'Fontsize',fontsize,'Parent',axesid);%'BackgroundColor',[.7 .9 .7],'Margin',margin/4);
+        if (strcmpi(NodeInd, 'yes')) %&& ~length(hh))
+            text(x, y, num2str(v.nodeindex(i)), 'Fontsize', fontsize, 'Parent', axesid);%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
         end
     end
 end
     
 % Legend Plots
-if strcmpi(slegend,'show')
+if strcmpi(slegend, 'show')
     if isempty(highlightnodeindex) || isempty(highlightnodeindex)
-        legendString={'Pipes','Pumps','Valves',...
-            'Junctions','Reservoirs','Tanks'}; 
-        legendIndices=sort(legendIndices,'descend');
-        legend(h(legendIndices),legendString(legendIndices), 'Location', legendposition);
+        legendString={'Pipes', 'Pumps', 'Valves', ...
+            'Junctions', 'Reservoirs', 'Tanks'}; 
+        legendIndices=sort(legendIndices, 'descend');
+        legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
     end
-elseif strcmpi(slegend,'hide')
+elseif strcmpi(slegend, 'hide')
     %skip
 else
     error('Invalid property founobj(legend: "hide", "show")')
 end
     
 % Axis OFF and se Background
-[xmax,~]=max(v.nodecoords{1});
-[xmin,~]=min(v.nodecoords{1});
-[ymax,~]=max(v.nodecoords{2});
-[ymin,~]=min(v.nodecoords{2});
+[xmax, ~]=max(v.nodecoords{1});
+[xmin, ~]=min(v.nodecoords{1});
+[ymax, ~]=max(v.nodecoords{2});
+[ymin, ~]=min(v.nodecoords{2});
 
 if ~isnan(ymax)
     if ymax==ymin
-        xlim([xmin-((xmax-xmin)*.1),xmax+((xmax-xmin)*.1)]);
-        ylim([ymin-.1,ymax+.1]);
+        xlim(axesid, [xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
+        ylim(axesid, [ymin-.1, ymax+.1]);
     elseif xmax==xmin
-        xlim([xmin-.1,xmax+.1]);
-        ylim([ymin-(ymax-ymin)*.1,ymax+(ymax-ymin)*.1]);
+        xlim(axesid, [xmin-.1, xmax+.1]);
+        ylim(axesid, [ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
     else
-        xlim([xmin-((xmax-xmin)*.1),xmax+((xmax-xmin)*.1)]);
-        ylim([ymin-(ymax-ymin)*.1,ymax+(ymax-ymin)*.1]);
+        xlim(axesid, [xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
+        ylim(axesid, [ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
     end
 else
     warning('Undefined coordinates.');
 end
-axis off
-whitebg('w');
-if strcmpi(extend,'yes')
-    set(axesid,'position',[0 0 1 1],'units','normalized');
+axis(axesid, 'off');
+try
+    whitebg(fig, 'w');
+catch
+end
+if strcmpi(extend, 'yes')
+    set(axesid, 'position', [0 0 1 1], 'units', 'normalized');
 end
 end
 function [info,tline,allines] = readAllFile(inpname)
