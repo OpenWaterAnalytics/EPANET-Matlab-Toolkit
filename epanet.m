@@ -749,6 +749,7 @@ classdef epanet <handle
                 %       'SouthWestOutside'   outside bottom left
                 %       'Best'               least conflict with data in plot
                 %       'BestOutside'        least unused space outside plot
+            % 'uifigure': app.UIFigure
             % Example:
             %   d.plot('nodes', 'yes', 'links', 'yes', 'highlightnode', {'10', '11'}, 
 %             'highlightlink', {'10'}, 'fontsize', 8);
@@ -8004,7 +8005,7 @@ for i=1:(nargin/2)
             catch 
                 axesid=varargin{2*i};
             end
-        case 'figure' % figure
+        case 'uifigure' % figure
             fig=varargin{2*i};
         case 'bin' 
             bin=varargin{2*i};
