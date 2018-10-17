@@ -619,3 +619,5 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetflowunits|Sets the flow units|
 |ENgetdemandmodel|Retrieves the type of demand model in use and its parameters|
 |ENsetdemandmodel|Sets the type of demand model to use and its parameters|
+|ENsetnodeid|Change the ID name for a node|
+|ENsetlinkid|Change the ID name for a link|
