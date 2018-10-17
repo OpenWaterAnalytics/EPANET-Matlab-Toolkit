@@ -2422,7 +2422,7 @@ classdef epanet <handle
             addControlFunction(obj, control); 
         end
         function setLinkDiameter(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, value(j), obj.LibEPANET); j=j+1;
@@ -2430,15 +2430,32 @@ classdef epanet <handle
             end            
         end
         function setLinkLength(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_LENGTH, value(j), obj.LibEPANET); j=j+1;
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
             end
         end
+        function value = setLinkNameID(obj, value, varargin)
+            % Sets the ID name for links
+            % Example: 
+            %       d.setLinkNameID(1, 'newID');
+            %       d.setLinkNameID(cellarrayofnewIDs);
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
+            j=1;
+            if length(indices) == 1
+                [obj.Errcode] = ENsetlinkid(indices, value, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+            else
+                for i=indices
+                    [obj.Errcode] = ENsetlinkid(i, value{j}, obj.LibEPANET); j=j+1;
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                end   
+            end
+        end
         function setLinkRoughnessCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_ROUGHNESS, value(j), obj.LibEPANET); j=j+1;
@@ -2446,7 +2463,7 @@ classdef epanet <handle
             end
         end
         function setLinkMinorLossCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_MINORLOSS, value(j), obj.LibEPANET); j=j+1;
@@ -2454,7 +2471,7 @@ classdef epanet <handle
             end
         end
         function setLinkInitialStatus(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices% Cannot set status for a check valve
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_INITSTATUS, value(j), obj.LibEPANET); j=j+1;
@@ -2462,7 +2479,7 @@ classdef epanet <handle
             end
         end
         function setLinkInitialSetting(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_INITSETTING, value(j), obj.LibEPANET); j=j+1;
@@ -2470,7 +2487,7 @@ classdef epanet <handle
             end
         end
         function setLinkBulkReactionCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_KBULK, value(j), obj.LibEPANET); j=j+1;
@@ -2478,7 +2495,7 @@ classdef epanet <handle
             end
         end
         function setLinkWallReactionCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else  indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_KWALL, value(j), obj.LibEPANET); j=j+1;
@@ -2486,7 +2503,7 @@ classdef epanet <handle
             end
         end
         function setLinkStatus(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_STATUS, value(j), obj.LibEPANET); j=j+1;
@@ -2494,7 +2511,7 @@ classdef epanet <handle
             end
         end
         function setLinkSettings(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_SETTING, value(j), obj.LibEPANET); j=j+1;
@@ -2502,7 +2519,7 @@ classdef epanet <handle
             end
         end
         function setNodeElevations(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, value(j), obj.LibEPANET); j=j+1;
@@ -2528,7 +2545,7 @@ classdef epanet <handle
                     end
                 end
             else %version epanet20012
-                if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+                if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
                 j=1;
                 for i=indices
                     [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_BASEDEMAND, value(j), obj.LibEPANET); j=j+1;
@@ -2537,7 +2554,7 @@ classdef epanet <handle
             end
         end
         function setNodeCoordinates(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             if ~isempty(varargin)
                 for i=indices
                     [obj.Errcode] = ENsetcoord(i, value(1), value(2), obj.LibEPANET);
@@ -2580,7 +2597,7 @@ classdef epanet <handle
             end
         end
         function setNodeEmitterCoeff(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, value(j), obj.LibEPANET); j=j+1;
@@ -2588,11 +2605,28 @@ classdef epanet <handle
             end
         end
         function setNodeInitialQuality(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, value(j), obj.LibEPANET); j=j+1;
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+            end
+        end
+        function value = setNodeNameID(obj, value, varargin)
+            % Sets the ID name for nodes
+            % Example: 
+            %       d.setNodeNameID(1, 'newID');
+            %       d.setNodeNameID(cellarrayofnewIDs);
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
+            j=1;
+            if length(indices) == 1
+                [obj.Errcode] = ENsetnodeid(indices, value, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+            else
+                for i=indices
+                    [obj.Errcode] = ENsetnodeid(i, value{j}, obj.LibEPANET); j=j+1;
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                end   
             end
         end
         function setNodeTankInitialLevel(obj, value, varargin)
@@ -2678,7 +2712,7 @@ classdef epanet <handle
             end
         end
         function setNodeSourceQuality(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, value(j), obj.LibEPANET); j=j+1;
@@ -2686,7 +2720,7 @@ classdef epanet <handle
             end
         end
         function setNodeSourcePatternIndex(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, value(j), obj.LibEPANET); j=j+1;
@@ -2694,7 +2728,7 @@ classdef epanet <handle
             end
         end
         function value = setLinkPumpHeadCurveIndex(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetheadcurveindex(obj, i, value(j)); j=j+1;
@@ -6986,6 +7020,13 @@ if Errcode
     ENgeterror(Errcode, LibEPANET);
 end
 end
+function [Errcode] = ENsetlinkid(index, newid, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsetlinkid', index, newid);
+if Errcode
+    ENgeterror(Errcode, LibEPANET);
+end
+end
 function [Errcode, index] = ENgetlinkindex(id, LibEPANET)
 [Errcode, ~, index]=calllib(LibEPANET, 'ENgetlinkindex', id, 0);
 if Errcode
@@ -7015,6 +7056,13 @@ end
 function [Errcode, id] = ENgetnodeid(index, LibEPANET)
 id=char(32*ones(1, 31));
 [Errcode, id]=calllib(LibEPANET, 'ENgetnodeid', index, id);
+if Errcode
+    ENgeterror(Errcode, LibEPANET);
+end
+end
+function [Errcode] = ENsetnodeid(index, newid, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsetnodeid', index, newid);
 if Errcode
     ENgeterror(Errcode, LibEPANET);
 end

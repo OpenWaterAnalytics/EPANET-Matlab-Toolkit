@@ -244,6 +244,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkInitialStatus|Sets the values of initial status|
 |setLinkLength|Sets the values of lengths|
 |setLinkMinorLossCoeff|Sets the values of minor loss coeff.|
+|setLinkNameID|Sets the ID name for links|
 |setLinkRoughnessCoeff|Sets the values of roughness coeff.|
 |setLinkSettings|Sets the values of settings|
 |setLinkStatus|Sets the values of status|
@@ -254,6 +255,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeElevations|Sets the values of elevations|
 |setNodeEmitterCoeff|Sets the values of emitter coeff.|
 |setNodeInitialQuality|Sets the values of initial qualities|
+|setNodeNameID|Sets the ID name for nodes|
 |setNodeSourcePatternIndex|Sets the values of source pattern indices|
 |setNodeSourceQuality|Sets the values of source qualities|
 |setNodeSourceType|Sets the values of source types|
