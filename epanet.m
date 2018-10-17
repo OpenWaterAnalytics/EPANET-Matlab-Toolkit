@@ -650,58 +650,11 @@ classdef epanet <handle
             obj.NodeCoordinates{4} = value{4};
             
             % US Customary - SI metric
-            if find(strcmp(obj.LinkFlowUnits, obj.TYPEUNITS))<6
-                obj.Units_US_Customary=1;
-            else
-                obj.Units_SI_Metric=1;
+            infoUnits = obj.getUnits;
+            getFields_infoUnits = fields(infoUnits);
+            for i=1:length(getFields_demModelInfo)
+                obj.(getFields_demModelInfo{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
             end
-
-            if obj.Units_US_Customary
-                obj.NodePressureUnits='pounds per square inch';
-                obj.PatternDemandsUnits=obj.LinkFlowUnits;
-                obj.LinkPipeDiameterUnits='inches';
-                obj.NodeTankDiameterUnits='feet';
-                obj.EnergyEfficiencyUnits='percent';
-                obj.NodeElevationUnits='feet';
-                obj.NodeDemandUnits=obj.LinkFlowUnits;
-                obj.NodeEmitterCoefficientUnits='flow units @ 1 psi drop';
-                obj.EnergyUnits='kwatt-hours';
-                obj.LinkFrictionFactorUnits='unitless';
-                obj.NodeHeadUnits='feet';
-                obj.LinkLengthsUnits='feet';
-                obj.LinkMinorLossCoeffUnits='unitless';
-                obj.LinkPumpPowerUnits='horsepower';
-                obj.QualityReactionCoeffBulkUnits='1/day (1st-order)';
-                obj.QualityReactionCoeffWallUnits='mass/sq-ft/day (0-order), ft/day (1st-order)';
-                obj.LinkPipeRoughnessCoeffUnits='millifeet(Darcy-Weisbach), unitless otherwise';
-                obj.QualitySourceMassInjectionUnits='mass/minute';
-                obj.LinkVelocityUnits='ft/sec';
-                obj.NodeTankVolumeUnits='cubic feet';
-                obj.QualityWaterAgeUnits='hours';
-            else % SI Metric
-                obj.NodePressureUnits='meters';
-                obj.PatternDemandsUnits=obj.LinkFlowUnits;
-                obj.LinkPipeDiameterUnits='millimeters';
-                obj.NodeTankDiameterUnits='meters';
-                obj.EnergyEfficiencyUnits='percent';
-                obj.NodeElevationUnits='meters';
-                obj.NodeDemandUnits=obj.LinkFlowUnits;
-                obj.NodeEmitterCoefficientUnits='flow units @ 1 meter drop';
-                obj.EnergyUnits='kwatt-hours';
-                obj.LinkFrictionFactorUnits='unitless';
-                obj.NodeHeadUnits='meters';
-                obj.LinkLengthsUnits='meters';
-                obj.LinkMinorLossCoeffUnits='unitless';
-                obj.LinkPumpPowerUnits='kwatts';
-                obj.QualityReactionCoeffBulkUnits='1/day (1st-order)';
-                obj.QualityReactionCoeffWallUnits='mass/sq-m/day(0-order), meters/day (1st-order)';
-                obj.LinkPipeRoughnessCoeffUnits='mm(Darcy-Weisbach), unitless otherwise';
-                obj.QualitySourceMassInjectionUnits='mass/minute';
-                obj.LinkVelocityUnits='meters/sec';
-                obj.NodeTankVolumeUnits='cubic meters';
-                obj.QualityWaterAgeUnits='hours';
-            end
-            
         end % End of epanet class constructor
         function Errcode = loadEPANETFile(obj, varargin)
             %Load epanet file when use bin functions
@@ -895,7 +848,7 @@ classdef epanet <handle
         function value = getFlowUnits(obj)
             %Retrieves flow units used to express all flow rates.
             [obj.Errcode, flowunitsindex] = ENgetflowunits(obj.LibEPANET);
-            value=obj.TYPEUNITS(flowunitsindex+1);
+            value=obj.TYPEUNITS{flowunitsindex+1};
         end
         function value = getLinkNameID(obj, varargin)
             %Retrieves the ID label(s) of all links, or the IDs of an index set of links
@@ -2324,6 +2277,63 @@ classdef epanet <handle
             fid = fopen(binfile, 'r');            
             value = readEpanetBin(fid, binfile, rptfile, 0);
             obj.loadEPANETFile(obj.BinTempfile);
+        end
+        function value = getUnits(obj)
+            % Retrieves the Units of Measurement
+            % More info: https://github.com/OpenWaterAnalytics/EPANET/wiki/Units-of-Measurement
+            if find(strcmp(obj.getFlowUnits, obj.TYPEUNITS))<6
+                value.Units_US_Customary=1;
+                value.Units_SI_Metric=0;
+            else
+                value.Units_SI_Metric=1;
+                value.Units_US_Customary=0;
+            end
+
+            if value.Units_US_Customary
+                value.NodePressureUnits='pounds per square inch';
+                value.PatternDemandsUnits=obj.getFlowUnits;
+                value.LinkPipeDiameterUnits='inches';
+                value.NodeTankDiameterUnits='feet';
+                value.EnergyEfficiencyUnits='percent';
+                value.NodeElevationUnits='feet';
+                value.NodeDemandUnits=obj.getFlowUnits;
+                value.NodeEmitterCoefficientUnits='flow units @ 1 psi drop';
+                value.EnergyUnits='kwatt-hours';
+                value.LinkFrictionFactorUnits='unitless';
+                value.NodeHeadUnits='feet';
+                value.LinkLengthsUnits='feet';
+                value.LinkMinorLossCoeffUnits='unitless';
+                value.LinkPumpPowerUnits='horsepower';
+                value.QualityReactionCoeffBulkUnits='1/day (1st-order)';
+                value.QualityReactionCoeffWallUnits='mass/sq-ft/day (0-order), ft/day (1st-order)';
+                value.LinkPipeRoughnessCoeffUnits='millifeet(Darcy-Weisbach), unitless otherwise';
+                value.QualitySourceMassInjectionUnits='mass/minute';
+                value.LinkVelocityUnits='ft/sec';
+                value.NodeTankVolumeUnits='cubic feet';
+                value.QualityWaterAgeUnits='hours';
+            else % SI Metric
+                value.NodePressureUnits='meters';
+                value.PatternDemandsUnits=obj.getFlowUnits;
+                value.LinkPipeDiameterUnits='millimeters';
+                value.NodeTankDiameterUnits='meters';
+                value.EnergyEfficiencyUnits='percent';
+                value.NodeElevationUnits='meters';
+                value.NodeDemandUnits=obj.getFlowUnits;
+                value.NodeEmitterCoefficientUnits='flow units @ 1 meter drop';
+                value.EnergyUnits='kwatt-hours';
+                value.LinkFrictionFactorUnits='unitless';
+                value.NodeHeadUnits='meters';
+                value.LinkLengthsUnits='meters';
+                value.LinkMinorLossCoeffUnits='unitless';
+                value.LinkPumpPowerUnits='kwatts';
+                value.QualityReactionCoeffBulkUnits='1/day (1st-order)';
+                value.QualityReactionCoeffWallUnits='mass/sq-m/day(0-order), meters/day (1st-order)';
+                value.LinkPipeRoughnessCoeffUnits='mm(Darcy-Weisbach), unitless otherwise';
+                value.QualitySourceMassInjectionUnits='mass/minute';
+                value.LinkVelocityUnits='meters/sec';
+                value.NodeTankVolumeUnits='cubic meters';
+                value.QualityWaterAgeUnits='hours';
+            end 
         end
         function solveCompleteHydraulics(obj)
             [obj.Errcode] = ENsolveH(obj.LibEPANET);
