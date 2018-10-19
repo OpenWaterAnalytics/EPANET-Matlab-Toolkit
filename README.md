@@ -227,6 +227,15 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkRoughnessCoeff|Sets the values of roughness coeff.|
 |setLinkSettings|Sets the values of settings|
 |setLinkStatus|Sets the values of status|
+|setLinkTypePipe|Set the link type pipe for a specified link|
+|setLinkTypePipeCV|Set the link type cvpipe for a specified link|
+|setLinkTypePump|Set the link type pump for a specified link|
+|setLinkTypeValveFCV|Set the link type valve FCV for a specified link|
+|setLinkTypeValveGPV|Set the link type valve PCV for a specified link|
+|setLinkTypeValvePBV|Set the link type valve PBV for a specified link|
+|setLinkTypeValvePRV|Set the link type valve PRV for a specified link|
+|setLinkTypeValvePSV|Set the link type valve PSV for a specified link|
+|setLinkTypeValveTCV|Set the link type valve TCV for a specified link|
 |setLinkWallReactionCoeff|Sets the values of wall reactions|
 |setNodeBaseDemands|Sets the values of demands|
 |setNodeCoordinates|Sets node coordinates|

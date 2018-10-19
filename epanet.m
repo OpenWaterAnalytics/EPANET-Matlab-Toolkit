@@ -380,7 +380,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='2.1.6'; % comment function for net-builder branch
+        classversion='2.1.7'; % comment function for net-builder branch
         
         TYPECONTROL={'LOWLEVEL','HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL','HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'VOLUME','PUMP','EFFICIENCY','HEADLOSS','GENERAL'}; % Constants for pump curves: 'PUMP','EFFICIENCY','VOLUME','HEADLOSS' % EPANET Version 2.2
@@ -2308,6 +2308,53 @@ classdef epanet <handle
                 [obj.Errcode] = ENsetlinkvalue(i,obj.ToolkitConstants.EN_DIAMETER, value(j),obj.LibEPANET); j=j+1;
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
             end            
+        end
+        function index = setLinkTypePipe(obj, id)
+            % Set the link type pipe for a specified link
+            nodesID = setLinkType(obj, id);
+            index = obj.addLinkPipe(id, nodesID{1}, nodesID{2});
+            %[Errcode] = ENsetlinktype(id, obj.ToolkitConstants.EN_PIPE, obj.LibEPANET);
+%             if Errcode, error(obj.getError(Errcode)), return; end   
+        end
+        function index = setLinkTypePipeCV(obj, id)
+            % Set the link type cvpipe for a specified link
+            nodesID = setLinkType(obj, id);
+            index = obj.addLinkPipeCV(id, nodesID{1}, nodesID{2});
+        end
+        function index = setLinkTypePump(obj, id)
+            % Set the link type pump for a specified link
+            nodesID = setLinkType(obj, id);
+            index = obj.addLinkPump(id, nodesID{1}, nodesID{2});
+        end
+        function index = setLinkTypeValveFCV(obj, id)
+            % Set the link type valve FCV for a specified link
+            nodesID = setLinkType(obj, id);
+            index = obj.addLinkValveFCV(id, nodesID{1}, nodesID{2});
+        end
+        function index = setLinkTypeValveGPV(obj, id)
+            % Set the link type valve GPV for a specified link
+            nodesID = setLinkType(obj, id);
+            index = obj.addLinkValveGPV(id, nodesID{1}, nodesID{2});
+        end
+        function index = setLinkTypeValvePBV(obj, id)
+            % Set the link type valve PBV for a specified link
+            nodesID = setLinkType(obj, id);
+            index = obj.addLinkValvePBV(id, nodesID{1}, nodesID{2});
+        end
+        function index = setLinkTypeValvePRV(obj, id)
+            % Set the link type valve PRV for a specified link
+            nodesID = setLinkType(obj, id);
+            index = obj.addLinkValvePRV(id, nodesID{1}, nodesID{2});
+        end
+        function index = setLinkTypeValvePSV(obj, id)
+            % Set the link type valve PSV for a specified link
+            nodesID = setLinkType(obj, id);
+            index = obj.addLinkValvePSV(id, nodesID{1}, nodesID{2});
+        end
+        function index = setLinkTypeValveTCV(obj, id)
+            % Set the link type valve TCV for a specified link
+            nodesID = setLinkType(obj, id);
+            index = obj.addLinkValveTCV(id, nodesID{1}, nodesID{2});
         end
         function setLinkLength(obj, value, varargin)
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj,varargin); end
@@ -11361,4 +11408,11 @@ function setControlFunction(obj, index, value)
     [obj.Errcode] = ENsetcontrol(controlRuleIndex,...
         controlTypeIndex,linkIndex,controlSettingValue,nodeIndex,controlLevel,obj.LibEPANET);
     if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+end
+function nodesID = setLinkType(obj, id)
+    index = obj.getLinkIndex(id);
+    nodeLinkIndex = obj.getLinkNodesIndex();
+    nodesIndex = nodeLinkIndex(index, :);
+    nodesID = obj.getNodeNameID(nodesIndex);
+    obj.deleteLink(index);
 end
