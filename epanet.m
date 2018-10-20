@@ -4057,7 +4057,7 @@ classdef epanet <handle
                         for i=1:obj.BinPatternCount
                             tmplength=obj.BinPatternLengths(i);
                             for j=1:tmplength
-                                obj.BinPatternMatrix(i, j)=single(obj.BinPatternValue{i}(j));
+                                obj.BinPatternMatrix(i,j)=double(obj.BinPatternValue{i}(j));
                             end
                             if tmplength<tmpmaxlen
                                 for j=(tmplength+1):tmpmaxlen
@@ -4330,10 +4330,10 @@ classdef epanet <handle
                     d=length(obj.BinPatternNameID);
                     if dd>1 && dd~=d
                         obj.BinPatternLengths(d)=length(atline(2:end))+obj.BinPatternLengths(d);
-                        obj.BinPatternValue{d}=single([obj.BinPatternValue{d} str2double(char(atline(2:end)))']);
+                        obj.BinPatternValue{d}=single([obj.BinPatternValue{d} str2num(char(atline(2:end)))']);
                     else
                         obj.BinPatternLengths(d)=length(atline(2:end));
-                        obj.BinPatternValue{d}=single(str2double(char(atline(2:end)))');
+                        obj.BinPatternValue{d}=single(str2num(char(atline(2:end)))');
                     end
                     obj.BinCountPatternlines=h;
                     d=d+1;h=h+1;                
@@ -9015,9 +9015,9 @@ function value = getBinParam(obj, sections, varargin)
                     w=unique(w); 
                     d=length(w);
                     if dd>1 && dd~=d
-                        v{d}=[v{d} str2double(char(atline(2:end)))'];
+                        v{d}=[v{d} str2num(char(atline(2:end)))'];
                     else
-                        v{d}=str2double(char(atline(2:end)))';
+                        v{d}=str2num(char(atline(2:end)))';
                     end
                     value.BinPatternValue=v; % single
                     d=d+1;
