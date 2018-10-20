@@ -8764,9 +8764,9 @@ function value = getBinParam(obj,sections,varargin)
                     w=unique(w); 
                     d=length(w);
                     if dd>1 && dd~=d
-                        v{d}=[v{d} str2double(char(atline(2:end)))'];
+                        v{d}=[v{d} str2num(char(atline(2:end)))'];
                     else
-                        v{d}=str2double(char(atline(2:end)))';
+                        v{d}=str2num(char(atline(2:end)))';
                     end
                     value.BinPatternValue=v; % single
                     d=d+1;
