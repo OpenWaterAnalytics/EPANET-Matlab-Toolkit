@@ -1,3 +1,7 @@
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493)
+
+
 EPANET-MATLAB-Toolkit
 ==================================
 
@@ -7,14 +11,31 @@ The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, 
 
 For support, please use the OWA community forum : http://community.wateranalytics.org/
 
+# How to cite #
+D.G. Eliades, M. Kyriakou, S. Vrachimis and M.M. Polycarpou, "EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB", in *Proc. 14th International Conference on Computing and Control for the Water Industry (CCWI)*, The Netherlands, Nov 2016, p.8. (doi:10.5281/zenodo.831493)
+
+```
+@INPROCEEDINGS{Eliades2016, 
+author={Eliades, Demetrios G. and Kyriakou, Marios and Vrachimis, Stelios and Polycarpou, Marios M.}, 
+title={EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB}, 
+booktitle={Proc. 14th International Conference on Computing and Control for the Water Industry (CCWI)}, 
+year={2016},
+pages={8},
+address = {The Netherlands},
+month={Nov},
+DOI={10.5281/zenodo.831493}}
+```
+
 # Requirements #
 * [Matlab](http://www.mathworks.com/)
 * [EPANET 2.1](https://github.com/OpenWaterAnalytics/epanet) 
 
 # How to use the Toolkit #
-Download the folder `Download ZIP`, set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
+Detailed examples on how to use the toolkit can be found in the [publication](https://zenodo.org/record/831493#.W9B69PZRXIV) of the Toolkit , together with the [code](https://zenodo.org/record/437778). A presentation of its use is also provided [here](https://github.com/KIOS-Research/CCWI2016/blob/master/CCWI2016/Presentation/Eliades_CCWI2016.ppt).
 
-Example:
+To start, you need to download the folder from GitHub (e.g., `Download ZIP`), set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
+
+Minimum Example:
 
 d=epanet('Net1.inp')
 
