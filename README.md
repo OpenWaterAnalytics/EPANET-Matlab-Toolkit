@@ -31,9 +31,11 @@ DOI={10.5281/zenodo.831493}}
 * [EPANET 2.1](https://github.com/OpenWaterAnalytics/epanet) 
 
 # How to use the Toolkit #
-Download the folder `Download ZIP`, set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
+Detailed examples on how to use the toolkit can be found in the [publication](https://zenodo.org/record/831493#.W9B69PZRXIV) of the Toolkit , together with the [code](https://zenodo.org/record/437778). A presentation of its use is also provided [here](https://github.com/KIOS-Research/CCWI2016/blob/master/CCWI2016/Presentation/Eliades_CCWI2016.ppt).
 
-Example:
+To start, you need to download the folder from GitHub (e.g., `Download ZIP`), set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
+
+Minimum Example:
 
 d=epanet('Net1.inp')
 
