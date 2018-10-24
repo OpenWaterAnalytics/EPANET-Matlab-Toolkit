@@ -7,6 +7,19 @@ The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, 
 
 For support, please use the OWA community forum : http://community.wateranalytics.org/
 
+# How to cite #
+D.G. Eliades, M. Kyriakou, S. Vrachimis and M.M. Polycarpou, "EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB", in Proc. 2016 Computing & Control for the Water Industry (CCWI), The Netherlands, Nov 2016, p.8. (doi:10.5281/zenodo.831493)
+
+@INPROCEEDINGS{Eliades2016, 
+author={Eliades, Demetrios G. and Kyriakou, Marios and Vrachimis, Stelios and Polycarpou, Marios M.}, 
+title={EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB}, 
+booktitle={Proc. of Computing & Control for the Water Industry (CCWI)}, 
+year={2016},
+pages={8},
+address = {The Netherlands},
+month={Nov},
+DOI={10.5281/zenodo.831493}}
+
 # Requirements #
 * [Matlab](http://www.mathworks.com/)
 * [EPANET 2.1](https://github.com/OpenWaterAnalytics/epanet) 
