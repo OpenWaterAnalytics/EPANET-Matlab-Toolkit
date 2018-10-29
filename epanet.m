@@ -2418,8 +2418,8 @@ classdef epanet <handle
                 end
             end
         end
-        function addControls(obj, control)
-            addControlFunction(obj, control); 
+        function index = addControls(obj, control)
+            index = addControlFunction(obj, control); 
         end
         function setLinkDiameter(obj, value, varargin)
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
@@ -9845,7 +9845,7 @@ for t = Index:length(info)
             end
             if (s==1) && (noo==0)
                 if (nargin==2)
-                    for i=1:length(controls)
+                    for i=1:size(controls, 1)
                         fprintf(fid2, controls(i, :));
                         fprintf(fid2, '\r\n');
                     end
@@ -11659,7 +11659,8 @@ function [controlTypeIndex, linkIndex,controlSettingValue,...
                 %LINK linkID status AT TIME time
                 nodeIndex = 0;
                 controlTypeIndex = 2; 
-                controlLevel = str2double(splitControl{6}); 
+                [~, ~, ~, H, MN, S] = datevec(splitControl{6});
+                controlLevel = H*3600+MN*60+S;
             end
         otherwise
     end
