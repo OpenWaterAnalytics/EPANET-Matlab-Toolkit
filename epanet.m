@@ -1385,12 +1385,13 @@ classdef epanet <handle
         end
         function value = getNodeSourceType(obj, varargin)
             %Retrieves the value of all node source type
-            [indices, value] = getNodeIndices(obj,varargin);j=1;
+            [indices, ~] = getNodeIndices(obj,varargin);j=1;
+            value = cell(1, length(indices));
             for i=indices
                 [obj.Errcode, temp] = ENgetnodevalue(i,obj.ToolkitConstants.EN_SOURCETYPE,obj.LibEPANET);
                 if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end   
                 if ~isnan(temp)
-                    value(j)=obj.TYPESOURCE(temp+1);
+                    value{j}=obj.TYPESOURCE(temp+1);
                 else
                     value{j}=[];
                 end
