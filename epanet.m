@@ -3393,6 +3393,75 @@ classdef epanet <handle
         function value = getMSXSpeciesConcentration(obj, type, index, species)
             [obj.Errcode, value] = MSXgetqual(type, index, species, obj.MSXLibEPANET);
         end
+        function value = getMSXComputedQualitySpecie(obj, specie)
+            % Return the quality nodes for specific specie
+            % Example: 
+            %       MSX_comp = d.getMSXComputedQualitySpecie('CL2')
+            %            MSX_comp.NodeQuality % row: time, col: node index
+            %            MSX_comp.LinkQuality % row: time, col: link index
+            %            MSX_comp.Time
+           
+            if obj.getMSXSpeciesCount==0
+                value=0;
+                return;
+            end
+            link_indices = 1:obj.getLinkCount;%for all link index
+            node_indices = 1:obj.getNodeCount;%for all node index
+            specie_name = obj.getMSXSpeciesIndex(specie);
+            
+            value.NodeQuality = nan(1, length(node_indices));
+            value.LinkQuality = nan(1, length(node_indices));
+            % Obtain a hydraulic solution
+            obj.solveMSXCompleteHydraulics(obj.MSXLibEPANET);
+            % Run a step-wise water quality analysis without saving
+            % RESULTS to file
+            obj.initializeMSXQualityAnalysis(0);
+            % Retrieve species concentration at node
+            k=1; tleft=1;t=0;
+            value.Time(k, :)=0;
+            time_step = obj.getMSXTimeStep;
+            timeSmle=obj.getTimeSimulationDuration;%bug at time
+            while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
+                [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
+                if t<time_step || t==time_step
+                    if node_indices(end) < link_indices(end)
+                        for lnk=link_indices
+                            value.LinkQuality(k, lnk)=obj.getMSXLinkInitqualValue{lnk}(specie_name);
+                            if lnk < node_indices(end) + 1
+                                value.NodeQuality(k, lnk)=obj.getMSXNodeInitqualValue{lnk}(specie_name);
+                            end
+                        end
+                    else
+                        for lnk=node_indices
+                            value.NodeQuality(k, lnk)=obj.getMSXNodeInitqualValue{lnk}(specie_name);
+                            if lnk < link_indices(end) + 1
+                                value.LinkQuality(k, lnk)=obj.getMSXLinkInitqualValue{lnk}(specie_name);
+                            end
+                        end
+                    end
+                else
+                    if node_indices(end) < link_indices(end)
+                        for lnk=link_indices
+                            value.LinkQuality(k, lnk)=obj.getMSXSpeciesConcentration(1, lnk, specie_name);%link code 1
+                            if lnk < node_indices(end) + 1
+                                value.NodeQuality(k, lnk)=obj.getMSXSpeciesConcentration(0, lnk, specie_name);%node code0
+                            end
+                        end
+                    else
+                        for lnk=node_indices
+                            value.NodeQuality(k, lnk)=obj.getMSXSpeciesConcentration(0, lnk, specie_name);%link code 1
+                            if lnk < link_indices(end) + 1
+                                value.LinkQuality(k, lnk)=obj.getMSXSpeciesConcentration(1, lnk, specie_name);%node code0
+                            end
+                        end
+                    end
+                end
+                if k>1
+                    value.Time(k, :)=t;
+                end
+                k=k+1;
+            end
+        end
         function value = getMSXComputedQualityNode(obj, varargin)
             if obj.getMSXSpeciesCount==0
                 value=0;
@@ -3417,13 +3486,14 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k=2; tleft=1;t=0;
+            k=1; tleft=1;t=0;
             value.Time(k, :)=0;
+            time_step = obj.getMSXTimeStep;
             timeSmle=obj.getTimeSimulationDuration;%bug at time
             while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
                 [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
                 if ~isempty(varargin)
-                    if t<3600 || t==3600
+                    if t<time_step || t==time_step
                         i=1;
                         for nl=ss
                             g=1;
@@ -3445,7 +3515,7 @@ classdef epanet <handle
                         end
                     end
                 else
-                    if t<3600 || t==3600
+                    if t<time_step || t==time_step
                         i=1;
                         for nl=ss
                             g=1;
@@ -3467,7 +3537,9 @@ classdef epanet <handle
                         end
                     end
                 end
-                value.Time(k, :)=t;
+                if k>1
+                    value.Time(k, :)=t;
+                end
                 k=k+1;
             end
         end
@@ -3495,12 +3567,13 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k=2;tleft=1;
+            k=1;tleft=1;
+            time_step = obj.getMSXTimeStep;
             value.Time(k, :)=0;
             while(tleft>0 && obj.Errcode==0)
                 [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
                 if ~isempty(varargin)
-                    if t<3600 || t==3600
+                    if t<time_step || t==time_step
                         i=1;
                         for nl=ss
                             g=1;
@@ -3522,7 +3595,7 @@ classdef epanet <handle
                         end
                     end
                 else
-                    if t<3600 || t==3600
+                    if t<time_step || t==time_step
                         i=1;
                         for nl=ss
                             g=1;
@@ -3544,7 +3617,9 @@ classdef epanet <handle
                         end
                     end
                 end
-                value.Time(k, :)=t;
+                if k>1
+                    value.Time(k, :)=t;
+                end
                 k=k+1;
             end
         end
