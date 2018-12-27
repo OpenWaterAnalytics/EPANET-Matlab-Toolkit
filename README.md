@@ -323,6 +323,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |unloadMSX|Closes the EPANET-MSX toolkit system|
 |getMSXAtol|Retrieves the absolute concentration tolerance|
 |getMSXRtol|Retrieves the relative concentration tolerance|
+|getMSXComputedQualitySpecie|Retrieves the quality values for specific specie (e.g getMSXComputedQualitySpecie('CL2'))|
 |getMSXComputedQualityLink|Retrieves the concentration of a chemical species at a specific link of the network at the current simulation time step|
 |getMSXComputedQualityNode|Retrieves the concentration of a chemical species at a specific node of the network at the current simulation time step.|
 |getMSXConstantsCount|Retrieves the number of constants|
