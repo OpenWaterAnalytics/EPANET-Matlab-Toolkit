@@ -652,8 +652,8 @@ classdef epanet <handle
             % US Customary - SI metric
             infoUnits = obj.getUnits;
             getFields_infoUnits = fields(infoUnits);
-            for i=1:length(getFields_demModelInfo)
-                obj.(getFields_demModelInfo{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
+            for i=1:length(getFields_infoUnits)
+                obj.(getFields_infoUnits{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
             end
         end % End of epanet class constructor
         function Errcode = loadEPANETFile(obj, varargin)
