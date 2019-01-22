@@ -33,8 +33,14 @@ DOI={10.5281/zenodo.831493}}
 
 # How to install necessary compilers # 
 
+In order to use the EPANET-MATLAB-Toolkit the <b> MinGW-w64 compiler </b> must be install: <p>
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=R_RABL3_6EY
 " target="_blank"><img src="http://img.youtube.com/vi/R_RABL3_6EY/0.jpg" 
+alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="5" /></a>
+
+In case you have a version of matlab older than 2015b install the <b> Windows SDK compiler </b>: <p>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=hc3OkDypd24
+" target="_blank"><img src="http://img.youtube.com/vi/hc3OkDypd24/0.jpg" 
 alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="5" /></a>
 
 # How to use the Toolkit #
