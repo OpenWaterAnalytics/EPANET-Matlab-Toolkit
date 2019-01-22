@@ -1,3 +1,4 @@
+<a href="http://www.kios.ucy.ac.cy"><img src="http://www.kios.ucy.ac.cy/templates/favourite/images/kios_logo_hover.png"/><a>
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493)
 
@@ -29,6 +30,18 @@ DOI={10.5281/zenodo.831493}}
 # Requirements #
 * [Matlab](http://www.mathworks.com/)
 * [EPANET 2.1](https://github.com/OpenWaterAnalytics/epanet) 
+
+# How to install necessary compilers # 
+
+In order to use the EPANET-MATLAB-Toolkit the <b> MinGW-w64 compiler </b> must be install: <p>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=R_RABL3_6EY
+" target="_blank"><img src="http://img.youtube.com/vi/R_RABL3_6EY/0.jpg" 
+alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="5" /></a>
+
+In case you have a version of matlab older than 2015b install the <b> Windows SDK compiler </b>: <p>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=hc3OkDypd24
+" target="_blank"><img src="http://img.youtube.com/vi/hc3OkDypd24/0.jpg" 
+alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="5" /></a>
 
 # How to use the Toolkit #
 Detailed examples on how to use the toolkit can be found in the [publication](https://zenodo.org/record/831493#.W9B69PZRXIV) of the Toolkit , together with the [code](https://zenodo.org/record/437778). A presentation of its use is also provided [here](https://github.com/KIOS-Research/CCWI2016/blob/master/CCWI2016/Presentation/Eliades_CCWI2016.ppt).
