@@ -755,6 +755,14 @@ classdef epanet <handle
             %   colorLinkSet2={'y','y','y'};
             %   d.plot('nodes','yes','links','yes','highlightnode',[nodeSet1 nodeSet2],'colornode',[colorNodeSet1 colorNodeSet2],...
             %   'highlightlink',[linkSet1 linkSet2],'colorlink',[colorLinkSet1 colorLinkSet2])
+            %   
+            %   % Highlight multiple links with different colors #nodes
+            %   linkSet1=d.getLinkNameID(1:4);
+            %   colorLinkSet1=repmat({'r'},1,length(linkSet1));
+            %   linkSet2=d.getLinkNameID([5,6,7,8]);
+            %   colorLinkSet2=repmat({'g'},1,length(linkSet2));
+            %   d.plot('highlightlink',[linkSet1 linkSet2],'colorlink',[colorLinkSet1 colorLinkSet2])
+            
             [value] = plotnet(obj,'bin',0,varargin{:});
         end
         function value = getControls(obj, varargin)
