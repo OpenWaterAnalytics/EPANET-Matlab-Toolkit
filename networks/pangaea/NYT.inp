@@ -1,0 +1,238 @@
+[TITLE]
+
+
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern         
+ 2               	0           	2093.1813   	1               	;
+ 3               	0           	2093.1813   	1               	;
+ 4               	0           	1998.0368   	1               	;
+ 5               	0           	1998.036695 	1               	;
+ 6               	0           	1998.036695 	1               	;
+ 7               	0           	1998.036695 	1               	;
+ 8               	0           	1998.036695 	1               	;
+ 9               	0           	3851.091137 	1               	;
+ 10              	0           	22.65347727 	1               	;
+ 11              	0           	3851.091137 	1               	;
+ 12              	0           	2652.722189 	1               	;
+ 13              	0           	2652.722189 	1               	;
+ 14              	0           	2093.1813   	1               	;
+ 15              	0           	2093.1813   	1               	;
+ 16              	0           	3851.091137 	1               	;
+ 17              	0           	1302.574943 	1               	;
+ 18              	0           	2652.722189 	1               	;
+ 19              	0           	2652.722189 	1               	;
+ 20              	0           	3851.091137 	1               	;
+
+[RESERVOIRS]
+;ID              	Head        	Pattern         
+ 1               	91.44       	                	;
+
+[TANKS]
+;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
+
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ 1               	1               	2               	3535.68     	4572        	120         	0           	Closed	;
+ 2               	2               	3               	6035.04     	4572        	120         	0           	Closed	;
+ 3               	3               	4               	2225.04     	4572        	120         	0           	Closed	;
+ 4               	4               	5               	2529.84     	4572        	120         	0           	Closed	;
+ 5               	5               	6               	2621.28     	4572        	120         	0           	Closed	;
+ 6               	6               	7               	5821.68     	4572        	120         	0           	Closed	;
+ 7               	7               	8               	2926.08     	3657.6      	120         	0           	Closed	;
+ 8               	8               	9               	3810        	3352.8      	120         	0           	Closed	;
+ 9               	9               	10              	2926.08     	4572        	120         	0           	Closed	;
+ 10              	11              	9               	3413.76     	5181.6      	120         	0           	Closed	;
+ 11              	12              	11              	4419.6      	5181.6      	120         	0           	Closed	;
+ 12              	13              	12              	3718.56     	5181.6      	120         	0           	Closed	;
+ 13              	14              	13              	7345.68     	5181.6      	120         	0           	Closed	;
+ 14              	15              	14              	6431.28     	5181.6      	120         	0           	Open  	;
+ 15              	1               	15              	4724.4      	5181.6      	120         	0           	Open  	;
+ 16              	10              	17              	8046.72     	2438.4      	120         	0           	Closed	;
+ 17              	12              	18              	9509.76     	2438.4      	120         	0           	Open  	;
+ 18              	18              	19              	7315.2      	2133.6      	120         	0           	Open  	;
+ 19              	11              	20              	4389.12     	1828.8      	120         	0           	Open  	;
+ 20              	20              	16              	11704.32    	1524        	120         	0           	Open  	;
+ 21              	9               	16              	8046.72     	1828.8      	120         	0           	Open  	;
+ 22              	1               	2               	3535.68     	4572        	120         	0           	Open  	;
+ 23              	2               	3               	6035.04     	4572        	120         	0           	Open  	;
+ 24              	3               	4               	2225.04     	4572        	120         	0           	Open  	;
+ 25              	4               	5               	2529.84     	4572        	120         	0           	Open  	;
+ 26              	5               	6               	2621.28     	4572        	120         	0           	Open  	;
+ 27              	6               	7               	5821.68     	4572        	120         	0           	Open  	;
+ 28              	7               	8               	2926.08     	3352.8      	120         	0           	Open  	;
+ 29              	8               	9               	3810        	3352.8      	120         	0           	Open  	;
+ 30              	9               	10              	2926.08     	4572        	120         	0           	Open  	;
+ 31              	11              	9               	3413.76     	5181.6      	120         	0           	Open  	;
+ 32              	12              	11              	4419.6      	5181.6      	120         	0           	Open  	;
+ 33              	13              	12              	3718.56     	5181.6      	120         	0           	Open  	;
+ 34              	14              	13              	7345.68     	5181.6      	120         	0           	Open  	;
+ 35              	15              	14              	6431.28     	5181.6      	120         	0           	Open  	;
+ 36              	1               	15              	4724.4      	5181.6      	120         	0           	Open  	;
+ 37              	10              	17              	8046.72     	1828.8      	120         	0           	Open  	;
+ 38              	12              	18              	9509.76     	1828.8      	120         	0           	Open  	;
+ 39              	18              	19              	7315.2      	1524        	120         	0           	Open  	;
+ 40              	11              	20              	4389.12     	1524        	120         	0           	Open  	;
+ 41              	20              	16              	11704.32    	1524        	120         	0           	Open  	;
+ 42              	9               	16              	8046.72     	1828.8      	120         	0           	Open  	;
+
+[PUMPS]
+;ID              	Node1           	Node2           	Parameters
+
+[VALVES]
+;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss   
+
+[TAGS]
+
+[DEMANDS]
+;Junction        	Demand      	Pattern         	Category
+
+[STATUS]
+;ID              	Status/Setting
+
+[PATTERNS]
+;ID              	Multipliers
+;Diurnal Curve
+ 1               	1.0         	0.9231      	0.8462      	0.7692      	0.6923      	0.5385      
+ 1               	0.4615      	0.9231      
+;
+ Source1         	1           
+
+[CURVES]
+;ID              	X-Value     	Y-Value
+
+[CONTROLS]
+
+
+
+
+
+
+
+
+[RULES]
+
+
+
+
+
+
+
+
+[ENERGY]
+ Global Efficiency  	75
+ Global Price       	0
+ Demand Charge      	0
+
+[EMITTERS]
+;Junction        	Coefficient
+
+[QUALITY]
+;Node            	InitQual
+ 2               	.7
+ 3               	.7
+ 4               	.7
+ 5               	.7
+ 6               	.7
+ 7               	.7
+ 8               	.7
+ 9               	.7
+ 10              	.7
+ 11              	.7
+ 12              	.7
+ 13              	.7
+ 14              	.7
+ 15              	.7
+ 16              	.7
+ 17              	.7
+ 18              	.7
+ 19              	.7
+ 20              	.7
+ 1               	0.7
+
+[SOURCES]
+;Node            	Type        	Quality     	Pattern
+ 1               	CONCEN      	1           	Source1
+
+[REACTIONS]
+;Type     	Pipe/Tank       	Coefficient
+
+
+[REACTIONS]
+ Order Bulk            	1
+ Order Tank            	1
+ Order Wall            	1
+ Global Bulk	-0.292245
+ Global Wall           	0
+ Limiting Potential    	0
+ Roughness Correlation 	0
+
+[MIXING]
+;Tank            	Model
+
+[TIMES]
+ Duration           	168:00 
+ Hydraulic Timestep 	3:00 
+ Quality Timestep   	0:05 
+ Pattern Timestep   	3:00 
+ Pattern Start      	0:00 
+ Report Timestep    	3:00 
+ Report Start       	0:00 
+ Start ClockTime    	9 am
+ Statistic          	NONE
+
+[REPORT]
+ Status             	No
+ Summary            	No
+ Page               	0
+
+[OPTIONS]
+ Units              	LPS
+ Headloss           	H-W
+ Specific Gravity   	1
+ Viscosity          	1
+ Trials             	40
+ Accuracy           	0.001
+ Unbalanced         	Continue 10
+ Pattern            	1
+ Demand Multiplier  	1.0
+ Emitter Exponent   	0.5
+ Quality            	Chemical mg/L
+ Diffusivity        	1
+ Tolerance          	0.01
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ 2               	1407.77         	8608.41         
+ 3               	873.79          	7702.27         
+ 4               	809.06          	6893.20         
+ 5               	792.88          	6019.42         
+ 6               	987.05          	5210.36         
+ 7               	1197.41         	4207.12         
+ 8               	1747.57         	3559.87         
+ 9               	2702.27         	2718.45         
+ 10              	2038.83         	1779.94         
+ 11              	3673.14         	3721.68         
+ 12              	3996.76         	5000.00         
+ 13              	4110.03         	6569.58         
+ 14              	3867.31         	7847.90         
+ 15              	3042.07         	8883.50         
+ 16              	4255.66         	1731.39         
+ 17              	1132.69         	663.43          
+ 18              	5906.15         	5048.54         
+ 19              	7944.98         	5113.27         
+ 20              	5339.81         	3220.06         
+ 1               	1957.93         	9449.84         
+
+[VERTICES]
+;Link            	X-Coord         	Y-Coord
+
+[LABELS]
+;X-Coord           Y-Coord          Label & Anchor Node
+
+[BACKDROP]
+ DIMENSIONS     	0.00            	0.00            	10000.00        	10000.00        
+ UNITS          	None
+ FILE           	
+ OFFSET         	0.00            	0.00            
+
+[END]

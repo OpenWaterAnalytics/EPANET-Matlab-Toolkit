@@ -33,28 +33,35 @@ DOI={10.5281/zenodo.831493}}
 
 # How to install necessary compilers # 
 
-In order to use the EPANET-MATLAB-Toolkit the <b> MinGW-w64 compiler </b> must be install: <p>
+In order to use the EPANET-MATLAB-Toolkit the <b> MinGW-w64 compiler </b> must be installed: <p>
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=R_RABL3_6EY
 " target="_blank"><img src="http://img.youtube.com/vi/R_RABL3_6EY/0.jpg" 
 alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="5" /></a>
 
-In case you have a version of matlab older than 2015b install the <b> Windows SDK compiler </b>: <p>
+In case you have a version of matlab older than 2015b install the <b> Windows SDK compiler</b>: <p>
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=hc3OkDypd24
 " target="_blank"><img src="http://img.youtube.com/vi/hc3OkDypd24/0.jpg" 
-alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="5" /></a>
+alt="How to install Windows SDK compiler compiler #Matlab" width="240" height="180" border="5" /></a>
 
 # How to use the Toolkit #
 Detailed examples on how to use the toolkit can be found in the [publication](https://zenodo.org/record/831493#.W9B69PZRXIV) of the Toolkit , together with the [code](https://zenodo.org/record/437778). A presentation of its use is also provided [here](https://github.com/KIOS-Research/CCWI2016/blob/master/CCWI2016/Presentation/Eliades_CCWI2016.ppt).
 
-To start, you need to download the folder from GitHub (e.g., `Download ZIP`), set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
+To start, you need to download the folder from GitHub (e.g., `Download ZIP`), and set the run path in Matlab within the saved folder by running the function `start_toolkit`.
+You can then execute all the toolkit functions from the folder `test_all_functions` or  try a use case example from the folder `use_cases`.
 
 Minimum Example:
+
+start_toolkit;
 
 d=epanet('Net1.inp')
 
 d.getNodeCount
 
 d.getNodeElevations
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=7fQTeZ0mH8Q
+" target="_blank"><img src="http://img.youtube.com/vi/7fQTeZ0mH8Q/0.jpg" 
+alt="How to use EPANET-MATLAB-Toolkit" width="240" height="180" border="5" /></a>
 
 # How to fix/report bugs #
 To fix a bug `Fork` the `EPANET-Matlab Toolkit`, `Edit` the code and make the appropriate change, and then `Pull` it so that we evaluate it. 

@@ -1,0 +1,7 @@
+New York Tunnels
+No. of Pipes: 21
+No. of Nodes: 19
+No. of Reservoirs: 1
+No. of Tanks: 0
+Total system demand (average daily demand summed over all nodes): 4.94E+6 m3
+

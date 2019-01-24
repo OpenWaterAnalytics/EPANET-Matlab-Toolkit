@@ -1,0 +1,396 @@
+;FAIRFIELD, CA ZONE III
+;WATER SYSTEM MODEL
+;UPDATED 7-21-93 JWC
+;        5-04-94 JJV
+;Pipe length has been increased by 5% to account for valve and fitting losses
+;Max Day Demand Reservoirs Full
+									
+[TITLE]
+CITY OF FAIRFIELD - Zone III Water System Model
+AWWARF Study July 8+9, 1993
+Chlorine Simulation - 1st Order Bulk Reaction Only
+Starting Time 6pm 7/7/93
+
+[JUNCTIONS]
+; Node  Elev   Demand
+; ID    [ft]   [Frac]     Comments
+; ----  ----   ------     --------
+  106   168   0.00000  1  ; TAKEOUT for Zone 2 - PRV                 0.00000
+  107   193   0.00448  1  ; Cotswold Hill Dr (3)                     0.00313
+  108   195   0.00448  1  ; Bellevue Ct (3)                          0.00313
+  109   206   0.00448  1  ; Cotswold Hill Dr & Troon (3)             0.00313
+  111   207   0.00594  1  ; Troon Ct (4)                             0.00415
+  112   200   0.00000  1  ; St Andrews Dr & Cotswold Hill Dr         0.00000
+  113   126   0.00000  1  ; Pump Station Outlet                      0.00000
+  1131  191   0.00000  1  ; Interp Elev                              0.00000
+  115   126   0.00000  1  ; Pump Station Inlet                       0.00000
+  123   194   0.01233  1  ; TAKEOUT for Zone 2 - PRV (8)             0.00861
+  124   205   0.00448  1  ; Pasatiempo Ct (3)                        0.00313
+  125   207   0.01233  1  ; Del Monte Ct & Del Monte (8)             0.00861
+  126   191   0.01233  1  ; Del Monte Ct & Del Monte (8)             0.00861
+  127   209   0.00000  1  ; St Andrews Dr & Del Monte Dr             0.00000
+  128   204   0.00448  1  ; St Andrews Dr & Oakmont Ct (3)           0.00313
+  129   203   0.00448  1  ; Oakmont Ct (3)                           0.00313
+  130   225   0.00292  1  ; Kingsmill Ln (2)                         0.00204
+  131   201   0.00740  1  ; St Andrews Dr & Salishan (5)             0.00517
+  132   202   0.00594  1  ; Salishan Ct (4)                          0.00415
+  133   210   0.00292  1  ; Kingsmill Cir & Kingsmill (2)            0.00204
+  134   199   0.00594  1  ; St Andrews Dr & Kingsmill (4)            0.00415
+  135   199   0.00000  1  ; St Andrews Dr & Kingsmill                0.00000
+  1351  213   0.00000  1  ; Interp Elev     St Andrews               0.00000
+  1352  230   0.00000  1  ; Interp Elev     St Andrews               0.00000
+  137   126   0.00000  1  ; Pump 1 Outlet                            0.00000
+  138   126   0.00000  1  ; Pump 2 Outlet                            0.00000
+  139   138  -1.00000  2  ; WATERMAN TRTMT PLANT - model as pattern
+  140   126   0.00000  1  ; Pump 3 Outlet                            0.00000
+  141   240   0.00000  1  ; St Andrews Dr & Bear Crk Dr              0.00000
+  1411  268   0.00000  1  ; Interp Elev                              0.00000
+  1412  268   0.00000  1  ; Interp Elev                              0.00000
+  1413  289   0.00000  1  ; Interp Elev                              0.00000
+  142   235   0.03586  1  ; Bear Crk Dr & Pau Ct (24)                0.02505
+  143   289   0.01681  1  ; Costa Ct (11)                            0.01174
+  144   284   0.00885  1  ; Costa Ct (6)                             0.00618
+  1441  292   0.00000  1  ; Interp Elev                              0.00000
+  1442  306   0.00000  1  ; Interp Elev                              0.00000
+  1443  288   0.00000  1  ; Interp Elev                              0.00000
+  145   300   0.01681  1  ; Seminole Dr (11)                         0.01174
+  146   311   0.01457  1  ; Seminole Dr (10)                         0.01018
+  147   264   0.01681  1  ; Seminole Dr & Banff (11)                 0.01174
+  148   268   0.00740  1  ; St Andrews Dr (5)                        0.00517
+  149   245   0.01681  1  ; Seminole Cir & S Hills Dr(11)            0.01174
+  151   243   0.00000  1  ; St Andrews Dr                            0.00000
+  152   246   0.01457  1  ; S Hills Dr & S Hills Ct(10)              0.01018
+  1521  245   0.00000  1  ; Interp Elev                              0.00000
+  153   191   0.02465  1  ; Seminole Cir & Cherry V Cir (17)         0.01722
+  154   205   0.02801  1  ; Broadmoor & Cherry V Cir (19)            0.01957
+  1541  198   0.00000  1  ; Interp Elev                              0.00000
+  155   218   0.01233  1  ; Broadmoor (8)                            0.00861
+  156   198   0.02353  1  ; Seminole Cir (16)                        0.01644
+  157   208   0.02690  1  ; Seminole Cir & Broadmoor (18)            0.01879
+  158   217   0.01031  1  ; Seminole Cir & St Andrew (7)             0.00720
+  159   226   0.01344  1  ; (9)                                      0.00939
+  160   187   0.04034  1  ; Bear Crk Dr & Ayr Ct (27)                0.02818
+  161   250   0.01681  1  ; Wailea Cir & Kaanapali Dr (11)           0.01174
+  1611  262   0.00000  1  ; Interp Elev                              0.00000
+  162   212   0.02353  1  ; Cherry Valley Dr (16)                    0.01644
+  163   270   0.01457  1  ; Wailea Cir (10)                          0.01018
+  1631  275   0.00000  1  ; Interp Elev                              0.00000
+  164   235   0.01792  1  ; Cherry Valley Dr (12)                    0.01252
+  165   285   0.02017  1  ; Wailea Cir (14)                          0.01409
+  1651  296   0.00000  1  ; Interp Elev                              0.00000
+  167   311   0.00740  1  ; Kapalua Ct (5)                           0.00517
+  168   253   0.01457  1  ; Seminole Dr (10)                         0.01018
+  169   260   0.02353  1  ; Cherry Valley Dr (16)                    0.01644
+  171   260   0.01344  1  ; Cherry Valley Cir (9)                    0.00939
+  172   290   0.01905  1  ; Cherry Valley Cir (13)                   0.01331
+  1721  275   0.00000  1  ; Interp Elev                              0.00000
+  1722  260   0.00000  1  ; Interp Elev                              0.00000
+  1723  230   0.00000  1  ; Interp Elev                              0.00000
+  1724  216   0.00000  1  ; Interp Elev                              0.00000
+  173   228   0.01457  1  ; Cherry Valley Cir (10)                   0.01018
+  174   268   0.01031  1  ; Seminole Dr & Ganton Ct (7)              0.00720
+  175   263   0.00000  1  ; Seminole Dr & R S Parkway                0.00000
+  176   258   0.00000  1  ; R S Parkway                              0.00000
+  177   213   0.00000  1  ; R S Parkway                              0.00000
+  178   227   0.00000  1  ; R S Parkway                              0.00000
+  1781  209   0.00000  1  ; Interp Elev                              0.00000
+  179   236   0.08741  1  ; (59,Balance Of 1215Du)                   0.06106
+  1791  252   0.00000  1  ; Interp Elev                              0.00000
+  1792  289   0.00000  1  ; Interp Elev                              0.00000
+  1793  351   0.00000  1  ; Interp Elev                              0.00000
+  1794  385   0.00000  1  ; Interp Elev                              0.00000
+  180   190   0.00000  1  ; R S Parkway & Ascot Dr                   0.00000
+  1801  200   0.00000  1  ; Interp Elev                              0.00000
+  181   235   0.02353  1  ; Formby Ln & Ascot Dr (16)                0.01644
+  182   260   0.01681  1  ; Formby Ln (11)                           0.01174
+  1821  250   0.00000  1  ; Interp Elev                              0.00000
+  183   245   0.01233  1  ; Formby Ln (8)                            0.00861
+  184   200   0.02353  1  ; Bear Crk & Cherry Valley(16)             0.01644
+; 186   215   0.00000  1  ; (24)                                     0.02505
+; 187   180   0.00000  1  ; (11)                                     0.01174
+; 1871  183   0.00000  1  ; Interp Elev                              0.00000
+; 1872  199   0.00000  1  ; Interp Elev                              0.00000
+; 188   185   0.00000  1  ; (25)                                     0.02583
+; 189   210   0.00000  1  ; (25)                                     0.02583
+; 191   225   0.00000  1  ; (10)                                     0.01018
+; 192   235   0.00000  1  ; (5)                                      0.00517
+; 193   255   0.00000  1  ; (6)                                      0.00618
+; 194   290   0.00000  1  ; (8)                                      0.00861
+; 195   245   0.00000  1  ; (8)                                      0.00861
+; 196   245   0.00000  1  ; (3)                                      0.00313
+; 197   250   0.00000  1  ; (5)                                      0.00517
+; 198   255   0.00000  1  ; (7)                                      0.00720
+; 199   274   0.00000  1  ; (6)                                      0.00618
+; 201   290   0.00000  1  ; (6)                                      0.00618
+; 2011  272   0.00000  1  ; Interp Elev                              0.00000
+  202   264   0.01457  1  ; Pebble Bch Dr & Spyglass (10)            0.01018
+  203   227   0.01681  1  ; Pebble Beach Dr & Pebble Bch Ct (11)     0.01174
+; 204   235   0.00000  1  ; Pebble Beach Ct (10)                     0.01018
+; 205   306   0.00000  1  ; (9)                                      0.00939
+; 206   300   0.00000  1  ; Area "B"(40)                             0.04149
+  207   215   0.01681  1  ; St Andrews Dr (11)                       0.01174
+  2071  233   0.00000  1  ; Interp Elev                              0.00000
+  208   247   0.03138  1  ; Congressional Cir(21)                    0.02192
+  209   217   0.01792  1  ; St Andrews Dr (12)                       0.01252
+; 210   279   0.00000  1  ; Area "B" (15)                            0.01566
+  211   230   0.03698  1  ; Area "B" & Gleneagles Ct (25)            0.02583
+  2111  243   0.00000  1  ; Interp Elev                              0.00000
+  212   238   0.00885  1  ; Gleneagles Ct (6)                        0.00618
+  213   274   0.01681  1  ; Prestwick Ct (11)                        0.01174
+  214   272   0.01344  1  ; St Andrews & Turnberry Dr (9)            0.00939
+  215   286   0.00594  1  ; Turnberry Ct (4)                         0.00415
+  216   280   0.00448  1  ; Turnberry  Dr (3)                        0.00313
+  217   279   0.01233  1  ; St Andrews & Capilano Ct (8)             0.00861
+  218   280   0.00448  1  ; St Andrews & Capilano Ct (3)             0.00313
+  219   284   0.01681  1  ; St Andrews & Capilano Ct (11)            0.01174
+; 220   295   0.00000  1  ; Area "A" (8)                             0.00861
+  221   295   0.00000  1  ; Rs Parkway                               0.00000
+  222   358   0.00000  1  ; Turnberry Dr                             0.00000
+  223   240   0.00000  1  ; St Andrews Dr                            0.00000
+; 224   309   0.00000  1  ; Area "A" (15)                            0.01566
+; 225   308   0.00000  1  ; Area "A" (12)                            0.01252
+; 226   274   0.00000  1  ; Area "A" (14)                            0.01409
+; 227   259   0.00000  1  ; Area "A" (9)                             0.00939
+; 228   284   0.00000  1  ; Area "A" (9)                             0.00939
+  229   284   0.00000  1  ; TAKEOUT Zone 4 - not used                0.00000
+									
+[TANKS]
+; Nd        In     Min  Max
+; ID   Elv  Lvl    Lvl  Lvl  Diam  Comments
+; ---  ---  ----   ---  ---  ----  --------
+; 139  138  228                    ; Waterman Reservoir (211 Gpm)
+  185  402   15.9    1   26  135   ; Rancho Solano Reservoir
+									
+[PATTERNS]
+; Zone 3 Net System Demand During Study - Smoothed 1026 gpm Waterman
+; 1    99    99   348   596   529   529  331   331
+; 1   132   132   877   877   778   778  529   529
+; 1   331   331   298   298   298   298   99    99
+
+; Zone 3 Net System Demand During Study - Smoothed 900 gpm Waterman
+;       0     1     2     3     4     5    6     7
+  1    99    99   285   470   403   403  205   205
+;       8     9    10    11    12    13   14    15
+  1   106   106   651   651   652   652  403   403
+;      16    17    18    19    20    21   22    23
+  1   205   205   298   298   298   298   99    99
+
+; Waterman Treatment Plant input based on record flows during study - Smoothed
+  2     0     0   450   900   900   900   900   900   ;  900 gpm Waterman
+  2   900   900   900   900   900   900   900   900
+  2   900   900     0     0     0     0     0     0
+
+; Waterman Treatment Plant input based on record flows during study - Smoothed
+; 2     0     0   513  1026  1026  1026  1026  1026   ; 1026 gpm Waterman
+; 2  1026  1026  1026  1026  1026  1026  1026  1026
+; 2  1026  1026     0     0     0     0     0     0
+
+; Waterman Treatment Plant Fluoride Input Pattern
+  3  0.22  0.22  0.22  0.22  0.22  0.22  0.22  0.22
+  3  0.22  0.22  0.22  0.40  0.60  0.70  0.80  0.90
+  3  0.90  0.90  0.90  0.90  0.90  0.90  0.90  0.90
+
+; Zone 3 Net System Demand During Study
+; 1    99    99    99    99    99   364   777   867
+; 1   783   437   112   173   363   676   410   796
+; 1   143   259   123   199   371   767  1026   564
+; 1   564   564   835   726   533   533   533   533
+; 1   304   304   304   304   298   298   298   298
+; 1   298   298   298   298    99    99    99    99
+
+
+; Waterman Treatment Plant input based on record flows during study
+; 2     0     0     0     0     0  1364  1068   867
+; 2  1180  1187   753  1167   860  1173   907  1493
+; 2   487  1253   867   993   990   886  1145   819
+; 2   819   819  1090   981  1030  1030  1030  1030
+; 2  1000  1000  1000  1000     0     0     0     0
+; 2     0     0     0     0     0     0     0     0
+
+[PIPES]
+; Nd    St    End   Len   Dm  H-W
+; ID    Nd    Nd    [ft]  in  Cff    Comments
+; ---   ---   ---   ----  --  ---    --------
+  119   106   107    570  12  140  ; Cotswold Hill Dr
+  121   107   108    240   6  140  ; Bellevue Ct
+  122   107   109    440  12  140  ; Cotswold Hill Dr
+  123   109   111    220   6  140  ; Troon Ct
+  124   109   112    300  12  140  ; Cotswold Hill Dr
+  125   115   137     25   6  140  ; Pump 1
+  126   115   138     25   6  140  ; Pump 2
+  127   115   140     25   6  140  ; Pump 3
+  130   133   130    190   6  140  ; Kingsmill Ln
+  137   123   124    310   6  140  ; Pasatiempo Ct
+  138   123   125    570  12  140  ; Del Monte Dr
+  139   125   126    450   8  140  ; Del Monte Ct
+  141   125   127    190  12  140  ; Del Monte Dr
+  142   112   127    390  12  140  ; St Andrews Dr
+  143   127   128    260  12  140  ; St Andrews Dr
+  144   128   129    230   6  140  ; Oakmont Ct
+  145   128   131    320  12  140  ; St Andrews Dr
+  146   131   132    290   8  140  ; Salishan Ct
+  147   131   133    150  12  140  ; Kingsmill Cir
+  148   133   134    250  12  140  ; Kingsmill Cir
+  149   134   135    140  12  140  ; St Andrews Dr
+  150   139   115    570  12  140  ; Pump Suction
+  151   113   1131  1600  12  140  ; Pumped Supply Line
+  1511  1131  135    190  12  140  ; Connection St Andrews
+  152   137   113    111   6  140  ; Eq Pipe Length
+  153   138   113    111   6  140  ; Eq Pipe Length
+  154   135   1351   385  12  140  ; St Andrews Btw Kingsmill & Bear Cr
+  1541  1351  1352   490  12  140  ; St Andrews Btw Kingsmill & Bear Cr
+  1542  1352  141    280  12  140  ; St Andrews Btw Kingsmill & Bear Cr
+  155   141   142    260  12  140  ; Bear Crk Dr
+  156   141   1411   515  12  140  ; St Andrews
+  1561  1411  1412   120  12  140  ; St Andrews
+  1562  1412  143    365  12  140  ; St Andrews
+  157   1413  144    545  12  140  ; St Andrews
+  1571  143   1413   150  12  140  ; St Andrews
+  158   144   1441   405   8  140  ; Balmoral Dr
+  1581  1441  145    325   8  140  ; Balmoral Dr
+  159   1442  146    150   8  140  ; Seminole Cir
+  1591  145   1442   220   8  140  ; Seminole Cir
+  160   140   113    111   6  140  ; Eq Pipe Length
+  161   147   1443   350   8  140  ; Seminole Cir
+  1611  145   1443   230   8  140  ; Seminole Cir
+  162   147   149    210   8  140  ; Seminole Cir
+  163   148   147    920   8  140  ; Banff Dr
+  164   149   153    790   8  140  ; Seminole Cir
+  165   149   1521   460   8  140  ; Southern Hills Dr
+  1651  1521  152    350   8  140  ; Southern Hills Dr
+  166   144   148    210  12  140  ; St Andrews
+  167   148   151    270  12  140  ; St Andrews
+  168   151   152    180   8  140  ; Southern Hills Dr
+  169   151   158    560  12  140  ; St Andrews
+  171   154   155    420   8  140  ; Broadmoor
+  172   154   1541   420   8  140  ; Cherry Valley Dr
+  1721  1541  153    470   8  140  ; Cherry Valley Dr
+  173   153   156    560   8  140  ; Seminole Cir
+  174   156   157    880   8  140  ; Seminole Cir
+  175   157   154    490   8  140  ; Broadmoor
+  176   157   158    470   8  140  ; Seminole Cir
+  177   158   207    560  12  140  ; St Andrews Dr
+  178   207   2071   490   8  140  ; Congressional Cir
+  1781  2071  208    340   8  140  ; Congressional Cir
+  179   208   209    770   8  140  ; Congressional Cir
+  180   207   209    350  12  140  ; St Andrews Dr
+  181   209   223    630  12  140  ; St Andrews Dr
+  182   223   211    590  12  140  ; St Andrews Dr
+  183   2111  213    630   8  140  ; Prestwick Ct
+  1831  211   2111   260   8  140  ; Prestwick Ct
+  184   211   212    420   8  140  ; Gleneagles Ct
+  185   211   214   1050  12  140  ; St Andrews Dr
+  186   214   216    190   8  140  ; Turnberry Dr
+  187   216   215    470   8  140  ; Turnberry Ct
+  188   216   222    840   8  140  ; Turnberry Dr
+  189   214   217    560  12  140  ; St Andrews Dr
+  191   217   218    200  12  140  ; St Andrews Dr
+  192   218   219    790  12  140  ; St Andrews Dr
+  193   219   221    790  12  140 1000 ; Rs Parkway - Suspected Valve Loss
+  194   221   175   1890  12  140  ; Rs Parkway
+  195   175   176    580  12  140  ; Rs Parkway
+  196   175   174    550  12  140  ; Seminole Dr
+  197   174   168    470  12  140  ; Seminole Dr
+  198   168   159   1010  12  140  ; Seminole Dr
+  199   153   162    680  12  140  ; Cherry Valley Dr
+  200   163   161   1200   8  140  ; Kaanapali Dr
+  201   159   158    270  12  140  ; Seminole Dr
+  202   162   164    200   8  140  ; Cherry Valley Dr
+  203   161   159    270   8  140  ; Wailea Cir
+  204   168   163    230   8  140  ; Wailea Cir
+  205   1631  165    705   8  140  ; Wailea Cir
+  2051  163   1631   230   8  140  ; Wailea Cir
+  206   164   169    210   8  140  ; Cherry Valley Dr
+  207   1611  165    555   8  140  ; Wailea Cir
+  2071  161   1611   275   8  140  ; Wailea Cir
+  208   1651  167    310   8  140  ; Kapalua Ct
+  2081  165   1651   190   8  140  ; Kapalua Ct
+  209   169   172    680   8  140  ; Cherry Valley Cir
+  210   1722  169    770   8  140  ; Pine Valley Dr
+  2101  171   1722   505   8  140  ; Pine Valley Dr
+  211   1721  172    305   8  140  ; Cherry Valley Cir
+  2111  171   1721   325   8  140  ; Cherry Valley Cir
+  212   171   173    270   8  140  ; Cherry Valley Cir
+  213   184   1724   455   8  140  ; Cherry Valley Cir
+  2131  1724  173    455   8  140  ; Cherry Valley Cir
+  214   162   184   1070   8  140  ; Cherry Valley Cir
+  215   160   184    830  12  140  ; Bear Crk Dr
+  216   160   142    910  12  140  ; Bear Crk Dr
+  217   176   177   1150  12  140  ; Rs Parkway
+  218   177   178   1260  12  140  ; Rs Parkway
+  219   178   179    420  16  140  ; Rs Parkway
+  220   1723  164   1070   8  140  ; Sonoma Valley Dr
+  2201  173   1723   430   8  140  ; Sonoma Valley Dr
+  221   178   1781  1095  12  140  ; Rs Parkway
+  2211  1781  180   1095  12  140  ; Rs Parkway
+  222   180   106    420  12  140  ; RS Parkway To Cotswold H Dr
+  223   1801  181    470   8  140  ; Ascot Dr
+  2231  180   1801   180   8  140  ; Ascot Dr
+  224   181   1821   465   8  140  ; Formby Ln
+  2241  1821  182    295   8  140  ; Formby Ln
+  225   181   183    315   8  140  ; Formby Ln
+  226   1793  1792   515  16  140  ; Res. Line
+  2261  1791  179    135  16  140  ; Res. Line
+  2262  1792  1791   305  16  140  ; Res. Line
+  2263  1794  1793   285  16  140  ; Res. Line
+  2264  185   1794   125  16  140  ; Res. Line
+; 227   179   186    690   8  140  ;
+; 228   186   1872   535   8  140  ;
+; 2281  1872  187    625   8  140  ;
+; 229   1871  188   1025   8  140  ;
+; 2291  187   1871  1095   8  140  ;
+; 230   221   220    230  12  140  ; Area "A"
+; 231   188   189    460   8  140  ;
+; 232   189   191    610   8  140  ;
+; 233   191   192    460   8  140  ;
+; 234   192   195    210   8  140  ;
+; 235   195   196    110   8  140  ;
+; 236   196   197    150   8  140  ;
+; 237   197   198    280   8  140  ;
+; 238   198   202    250   8  140  ;
+; 239   195   2011   470   8  140  ;
+; 2391  2011  201    200   8  140  ;
+; 240   220   224    230   8  140  ; Area "A"
+; 241   201   199    270   8  140  ;
+; 242   197   199    380   8  140  ;
+; 243   198   199    400   8  140  ;
+; 244   202   205   1180   8  140  ; Spyglass Ct
+  245   202   203    860  12  140  ; Pebble Beach Dr
+; 246   203   204   1050   8  140  ; Pebble Beach Ct
+  247   203   177    740  12  140  ; Pebble Beach Dr
+; 248   193   194    470   8  140  ;
+; 249   192   193    310   8  140  ;
+; 250   210   206    690   8  140  ; Area "B"
+; 251   210   206    870   8  140  ; Area "B"
+; 252   210   176    840  12  140  ; Area "B"
+; 253   224   225    210   8  140  ; Area "A"
+; 254   220   226    325   8  140  ; Area "A"
+; 255   226   228    360   8  140  ; Area "A"
+; 256   226   227    325   8  140  ; Area "A"
+  257   219   229     45  16  140  ; Rancho Solano Takeout
+
+[STATUS]
+; 193 CLOSED
+
+[SOURCES]
+  139     1.7    ; Waterman WTP Chlorine
+
+[QUALITY]
+; Chlorine
+    1  3000   0.1    ; Systemwide initial Chlorine
+  185         0.01   ; Rancho Solano Tank initial Chlorine
+  139         1.7    ; Waterman WTP initial Chlorine
+
+[REACTIONS]
+; Chlorine
+  GLOBAL BULK -1.16
+
+[TIMES]
+  DURATION            24
+
+[OPTIONS]
+  MAP       frfld-3.map
+  QUALITY   Chlorine
+
+[END]
+
