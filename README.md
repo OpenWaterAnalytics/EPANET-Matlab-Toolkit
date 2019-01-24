@@ -47,7 +47,7 @@ alt="How to install Windows SDK compiler compiler #Matlab" width="280" height="2
 Detailed examples on how to use the toolkit can be found in the [publication](https://zenodo.org/record/831493#.W9B69PZRXIV) of the Toolkit , together with the [code](https://zenodo.org/record/437778). A presentation of its use is also provided [here](https://github.com/KIOS-Research/CCWI2016/blob/master/CCWI2016/Presentation/Eliades_CCWI2016.ppt).
 
 To start, you need to download the folder from GitHub (e.g., `Download ZIP`), and set the run path in Matlab within the saved folder by running the function `start_toolkit`.
-You can then execute all the toolkit functions from the folder `test_all_functions` or  try a use case example from the folder `use_cases`.
+You can then execute all the toolkit functions from the folder `tests` or  try a use case example from the folder `examples`.
 
 Minimum Example:
 
