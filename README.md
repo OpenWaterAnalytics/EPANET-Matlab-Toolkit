@@ -1,3 +1,5 @@
+<a href="http://www.kios.ucy.ac.cy"><img src="http://www.kios.ucy.ac.cy/templates/favourite/images/kios_logo_hover.png"/><a>
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493)
 
 
@@ -29,12 +31,27 @@ DOI={10.5281/zenodo.831493}}
 * [Matlab](http://www.mathworks.com/)
 * [EPANET 2.1](https://github.com/OpenWaterAnalytics/epanet) 
 
+# How to install necessary compilers # 
+
+In order to use the EPANET-MATLAB-Toolkit the <b> MinGW-w64 compiler </b> must be installed: <p>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=R_RABL3_6EY
+" target="_blank"><img src="http://img.youtube.com/vi/R_RABL3_6EY/0.jpg" 
+alt="How to install MinGW-w64 compiler #Matlab" width="280" height="220" border="5" /></a>
+
+In case you have a version of matlab older than 2015b install the <b> Windows SDK compiler</b>: <p>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=hc3OkDypd24
+" target="_blank"><img src="http://img.youtube.com/vi/hc3OkDypd24/0.jpg" 
+alt="How to install Windows SDK compiler compiler #Matlab" width="280" height="220" border="5" /></a>
+
 # How to use the Toolkit #
 Detailed examples on how to use the toolkit can be found in the [publication](https://zenodo.org/record/831493#.W9B69PZRXIV) of the Toolkit , together with the [code](https://zenodo.org/record/437778). A presentation of its use is also provided [here](https://github.com/KIOS-Research/CCWI2016/blob/master/CCWI2016/Presentation/Eliades_CCWI2016.ppt).
 
-To start, you need to download the folder from GitHub (e.g., `Download ZIP`), set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
+To start, you need to download the folder from GitHub (e.g., `Download ZIP`), and set the run path in Matlab within the saved folder by running the function `start_toolkit`.
+You can then execute all the toolkit functions from the folder `test_all_functions` or  try a use case example from the folder `use_cases`.
 
 Minimum Example:
+
+start_toolkit;
 
 d=epanet('Net1.inp')
 
@@ -42,6 +59,9 @@ d.getNodeCount
 
 d.getNodeElevations
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=7fQTeZ0mH8Q
+" target="_blank"><img src="http://img.youtube.com/vi/7fQTeZ0mH8Q/0.jpg" 
+alt="How to use EPANET-MATLAB-Toolkit" width="280" height="220" border="5" /></a>
 
 # How to fix/report bugs #
 To fix a bug `Fork` the `EPANET-Matlab Toolkit`, `Edit` the code and make the appropriate change, and then `Pull` it so that we evaluate it. 
@@ -200,6 +220,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getTimeStartTime|Retrieves the number of start time|
 |getTimeStatisticsType|Retrieves the type of time series post-processing ('NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE')|
 |getTimeStatisticsIndex|Retrieves the type of time series post-processing|
+|getUnits|Retrieves the Units of Measurement|
 |getVersion|Retrieve the current EPANET version of DLL|
 |getNodesInfo|Retrieves nodes info e.g. elevations, demand pattern indices, emitter coeff. , initial quality, source quality, source pattern indices, source type code, type indices|
 |getLinksInfo|Retrieves links info e.g. diameters, lengths, roughness coeff. , minor loss coeff. , initial status, initial settings, bulk reaction coeff. , wall reaction coeff. , nodes connecting link indices, type indices|
@@ -234,7 +255,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |saveHydraulicsOutputReportingFile|Transfers results of a hydraulic simulation from the binary Hydraulics file to the binary Output file, where results are only reported at uniform reporting intervals|
 |saveInputFile|Writes all current network input data to a file using the format of an EPANET input file|
 |plot|Plot the network input file|
-|setControl|Sets the parameters of a simple control statement|
+|setControls|Sets the parameters of a simple control statement|
 |setCurve|Sets x,y values for a specific curve|
 |setCurveValue|Retrieves x,y point for a specific point number and curve|
 |setLinkBulkReactionCoeff|Sets the values of bulk reactions|
@@ -247,6 +268,15 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkRoughnessCoeff|Sets the values of roughness coeff.|
 |setLinkSettings|Sets the values of settings|
 |setLinkStatus|Sets the values of status|
+|setLinkTypePipe|Set the link type pipe for a specified link|
+|setLinkTypePipeCV|Set the link type cvpipe for a specified link|
+|setLinkTypePump|Set the link type pump for a specified link|
+|setLinkTypeValveFCV|Set the link type valve FCV for a specified link|
+|setLinkTypeValveGPV|Set the link type valve PCV for a specified link|
+|setLinkTypeValvePBV|Set the link type valve PBV for a specified link|
+|setLinkTypeValvePRV|Set the link type valve PRV for a specified link|
+|setLinkTypeValvePSV|Set the link type valve PSV for a specified link|
+|setLinkTypeValveTCV|Set the link type valve TCV for a specified link|
 |setLinkWallReactionCoeff|Sets the values of wall reactions|
 |setNodeBaseDemands|Sets the values of demands|
 |setNodeCoordinates|Sets node coordinates|
@@ -313,6 +343,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |unloadMSX|Closes the EPANET-MSX toolkit system|
 |getMSXAtol|Retrieves the absolute concentration tolerance|
 |getMSXRtol|Retrieves the relative concentration tolerance|
+|getMSXComputedQualitySpecie|Retrieves the quality values for specific specie (e.g getMSXComputedQualitySpecie('CL2'))|
 |getMSXComputedQualityLink|Retrieves the concentration of a chemical species at a specific link of the network at the current simulation time step|
 |getMSXComputedQualityNode|Retrieves the concentration of a chemical species at a specific node of the network at the current simulation time step.|
 |getMSXConstantsCount|Retrieves the number of constants|
@@ -523,32 +554,83 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 
 |Function|Description|
 |--------|-----------|
-|ENgetpumptype|Retrieves the type of a pump for specific link index|
-|ENgetheadcurveindex|Retrieves index of a head curve for specific link index|
-|ENsetcurvevalue|Sets x,y point for a specific point and curve|
-|ENsetcurve|Sets x,y values for a specific curve|
 |ENaddcurve|Adds a new curve appended to the end of the existing curves|
-|ENgetcurvevalue|Retrieves x,y point for a specific point number and curve|
-|ENgetcurvelen|Retrieves number of points in a curve|
+|ENaddlink|Adds a new link| 
+|ENaddnode|Adds a new node| 
+|ENaddpattern|Adds a new time pattern to the network|
+|ENclose|Closes down the Toolkit system (including all files being processed)|
+|ENcloseH|Closes the hydraulic analysis system, freeing all allocated memory|
+|ENcloseQ|Closes the water quality analysis system, freeing all allocated memory|
+|ENdeletelink|Deletes a link| 
+|ENdeletenode|Deletes a node| 
+|ENepanet|Runs a complete EPANET simulation|
+|ENgetaveragepatternvalue|Retrieves the average value of a pattern|
+|ENgetbasedemand|Retrieves the nodes base demand for a category|
+|ENgetcontrol|Retrieves the parameters of a simple control statement|
+|ENgetcoord|Retrieves coordinate x, y for a node|
+|ENgetcount|Retrieves the number of network components of a specified type|
+|ENgetcurve|Retrieves a curve's properties|
 |ENgetcurveid|Retrieves ID of a curve with specific index|
 |ENgetcurveindex|Retrieves index of curve with specific ID|
-|ENsetcoord|Sets coordinate x, y for a node|
-|ENgetcoord|Retrieves coordinate x, y for a node|
-|ENgetstatistic|Retrieves hydraulic simulation statistic|
-|ENgetnumdemands|Retrieves the number of demand categories for a node|
-|ENgetbasedemand|Retrieves the nodes base demand for a category|
+|ENgetcurvelen|Retrieves number of points in a curve|
+|ENgetcurvevalue|Retrieves x,y point for a specific point number and curve|
 |ENgetdemandpattern|Retrieves the index of a demand pattern for a specific demand category of a node|
+|ENgeterror|Retrieves the text of the message associated with a particular error or warning code|
+|ENgetflowunits|Retrieves a code number indicating the units used to express all flow rates|
+|ENgetheadcurveindex|Retrieves index of a head curve for specific link index|
+|ENgetlinkid|Retrieves the ID label of a link with a specified index|
+|ENgetlinkindex|Retrieves the index of a link with a specified ID|
+|ENgetlinknodes|Retrieves the indexes of the end nodes of a specified link|
+|ENgetlinktype|Retrieves the link-type code for a specific link|
+|ENgetlinkvalue|Retrieves the value of a specific link parameter|
+|ENgetnodeid|Retrieves the ID label of a node with a specified index|
+|ENgetnodeindex|Retrieves the index of a node with a specified ID|
+|ENgetnodetype|Retrieves the node-type code for a specific node|
+|ENgetnodevalue|Retrieves the value of a specific link parameter|
+|ENgetnumdemands|Retrieves the number of demand categories for a node|
+|ENgetoption|Retrieves the value of a particular analysis option|
+|ENgetpatternid|Retrieves the ID label of a particular time pattern|
+|ENgetpatternindex|Retrieves the index of a particular time pattern|
+|ENgetpatternlen|Retrieves the number of time periods in a specific time pattern|
+|ENgetpatternvalue|Retrieves the multiplier factor for a specific time period in a time pattern|
+|ENgetpumptype|Retrieves the type of a pump for specific link index|
+|ENgetqualinfo|Retrieves quality analysis information (type, chemical name, units, trace node ID)|
+|ENgetqualtype|Retrieves the type of water quality analysis called for|
+|ENgetstatistic|Retrieves hydraulic simulation statistic|
+|ENgettimeparam|Retrieves the value of a specific analysis time parameter|
+|ENgetversion|Retrieves the version number|
+|ENinitH|Initializes hydraulic analysis|
+|ENinitQ|Initializes water quality analysis|
+|ENnextH|Determine time (in seconds) until next hydraulic event|
+|ENnextQ|Advances WQ simulation to next hydraulic event|
+|ENopen|Opens EPANET input file & reads in network data|
+|ENopenH|Sets up data structures for hydraulic analysis|
+|ENopenQ|Sets up data structures for WQ analysis|
+|ENreport|Writes simulation report to the report file|
+|ENresetreport|Resets report options to default values|
+|ENrunH|Run a hydraulic solution period|
+|ENrunQ|Retrieves hydraulic & WQ results at time t|
+|ENsaveH|Saves hydraulic results to binary file|
+|ENsavehydfile|Copies binary hydraulics file to disk|
+|ENsaveinpfile|Saves current data to "INP" formatted text file|
 |ENsetbasedemand|Sets the nodes base demand for a category|
-|ENgetaveragepatternvalue|Retrieves the average value of a pattern|
-
-
-# List of other new EPANET Functions Supported #
-
-|Function|Description|
-|--------|-----------|
-|ENaddnode|Adds a new node| 
-|ENaddlink|Adds a new link| 
-|ENdeletenode|Deletes a node| 
-|ENdeletelink|Deletes a link| 
+|ENsetcontrol|Specify parameters to define a simple control|
+|ENsetcoord|Sets coordinate x, y for a node|
+|ENsetcurve|Sets x,y values for a specific curve|
+|ENsetcurvevalue|Sets x,y point for a specific point and curve|
+|ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
-|ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index.|
+|ENsetlinkvalue|Set a proprty value for a link|
+|ENsetnodevalue|Set a property value for a node|
+|ENsetoption|Set a value for an anlysis option|
+|ENsetpattern|Set multipliers for a specific pattern|
+|ENsetpatternvalue|Set the multiplier for a specific pattern at a specific period|
+|ENsetqualtype|Sets the type of water quality analysis called|
+|ENsetreport|Processes a reporting format command|
+|ENsetstatusreport|Sets the level of hydraulic status reporting|
+|ENsettimeparam|Set the value for a time parameter|
+|ENsolveH|Solves the network hydraulics for all time periods|
+|ENsolveQ|Solves for network water quality in all time periods|
+|ENstepQ|Advances WQ simulation by a single WQ time step|
+|ENusehydfile|Opens previously saved binary hydraulics file|
+|ENwriteline|Writes line of text to the report file|
