@@ -25,6 +25,7 @@ d = epanet('net2-cl2.inp');
 qual_res = d.getComputedQualityTimeSeries %Value x Node, Value x Link
 
 % Compute Quality step by step
+% d.solveCompleteHydraulics #needed
 d.openQualityAnalysis
 d.initializeQualityAnalysis
 tleft=1; P=[];T=[];Q=[];  
