@@ -11,8 +11,12 @@ d = epanet('Net1.inp');
 
 % Set time hydraulic and quality steps
 % etstep = 300;
-% % d.setTimeHydraulicStep(etstep);
-% % d.setTimeQualityStep(etstep);
+% d.setTimeReportingStep(etstep);
+% d.setTimeHydraulicStep(etstep);
+% d.setTimeQualityStep(etstep);
+% Hstep = min(Pstep,Hstep)
+% Hstep = min(Rstep,Hstep)
+% Hstep = min(Qstep,Hstep)
 
 % Hydraulic and Quality analysis STEP-BY-STEP
 d.openHydraulicAnalysis;
