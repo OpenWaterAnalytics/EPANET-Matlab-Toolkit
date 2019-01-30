@@ -10,9 +10,9 @@ start_toolkit;
 d = epanet('Net1.inp');
 
 % Set time hydraulic and quality steps
-tstep = 3600;
-d.setTimeHydraulicStep(tstep);
-d.setTimeQualityStep(tstep);
+% tstep = 300;
+% % d.setTimeHydraulicStep(tstep);
+% % d.setTimeQualityStep(tstep);
 
 % Hydraulic and Quality analysis STEP-BY-STEP
 d.openHydraulicAnalysis;
@@ -20,6 +20,7 @@ d.openQualityAnalysis;
 d.initializeHydraulicAnalysis(0);
 d.initializeQualityAnalysis(d.ToolkitConstants.EN_NOSAVE);
 
+tstep = 1;
 T = []; P = []; F = []; QN = [];
 while (tstep>0)
     t = d.runHydraulicAnalysis;
@@ -30,9 +31,9 @@ while (tstep>0)
     
     QN = [QN; d.getNodeActualQuality];
     T = [T; t];
-    
-    qtstep = d.nextQualityAnalysisStep;
+
     tstep = d.nextHydraulicAnalysisStep;
+    qtstep = d.nextQualityAnalysisStep;
 end
 d.closeQualityAnalysis;
 d.closeHydraulicAnalysis;
