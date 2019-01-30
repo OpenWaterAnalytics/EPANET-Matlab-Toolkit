@@ -10,9 +10,9 @@ start_toolkit;
 d = epanet('Net1.inp');
 
 % Set time hydraulic and quality steps
-% tstep = 300;
-% % d.setTimeHydraulicStep(tstep);
-% % d.setTimeQualityStep(tstep);
+% etstep = 300;
+% % d.setTimeHydraulicStep(etstep);
+% % d.setTimeQualityStep(etstep);
 
 % Hydraulic and Quality analysis STEP-BY-STEP
 d.openHydraulicAnalysis;
