@@ -47,6 +47,7 @@ classdef epanet <handle
     %   implied. See the Licence for the specific language governing
     %   permissions and limitations under the Licence.
     properties
+        Condinional                  % 0: Delete all controls that contain object, 1: Cancel object deletion if contained in controls
         ControlLevelValues;          % The control level values
         ControlLinkIndex;            % Set of control links index
         ControlNodeIndex;            % Set of control nodes index
@@ -502,6 +503,10 @@ classdef epanet <handle
             end
             % Hide messages at command window from bin computed
             obj.CMDCODE=1;
+            
+            % Conditional for set link types - Default is 0: Delete all controls that contain object 
+            obj.Condinional = 0; 
+            % Using new variable for temp file
             obj.TempInpFile = obj.BinTempfile;
             % Load file only, return
             if nargin==2
@@ -659,7 +664,7 @@ classdef epanet <handle
             getFields_infoUnits = fields(infoUnits);
             for i=1:length(getFields_infoUnits)
                 obj.(getFields_infoUnits{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
-            end
+            end    
         end % End of epanet class constructor
         function Errcode = loadEPANETFile(obj, varargin)
             %Load epanet file when use bin functions
@@ -2203,7 +2208,6 @@ classdef epanet <handle
         end
         function value = getComputedQualityTimeSeries(obj, varargin)
             % Compute Quality simulation and retrieve all or some time-series
-            obj.solveCompleteHydraulics % Only call this ONLY once (see ENsolveH for more details)
             if ~obj.solve
                 obj.solveCompleteHydraulics;
                 obj.solve = 1;
@@ -7459,13 +7463,13 @@ if Errcode
     ENgeterror(Errcode, LibEPANET);
 end
 end
-% function [Errcode] = ENsetlinktype(id, paramcode, LibEPANET)
-% % EPANET Version 2.2 bug here in c code
-% [Errcode]=calllib(LibEPANET, 'ENsetlinktype', id, paramcode);
-% if Errcode
-%     ENgeterror(Errcode, LibEPANET);
-% end
-% end
+function [Errcode, index] = ENsetlinktype(id, paramcode, actionCode, LibEPANET)
+% EPANET Version 2.2 
+[Errcode, index]=calllib(LibEPANET, 'ENsetlinktype', id, paramcode, actionCode);
+if Errcode
+    ENgeterror(Errcode, LibEPANET);
+end
+end
 function [Errcode] = ENsetnodevalue(index, paramcode, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetnodevalue', index, paramcode, value);
 if Errcode
