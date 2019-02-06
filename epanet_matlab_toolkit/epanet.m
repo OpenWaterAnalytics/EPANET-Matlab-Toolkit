@@ -647,6 +647,7 @@ classdef epanet <handle
                 obj.LinkPumpPatternIndex = obj.getLinkPumpPatternIndex;
                 obj.LinkPumpTypeCode = obj.getLinkPumpTypeCode;
                 obj.LinkPumpType = obj.getLinkPumpType;
+                obj.CurvesInfo = obj.getCurvesInfo; 
             catch
             end
             %Get data from raw file (for information which cannot be
@@ -1449,11 +1450,12 @@ classdef epanet <handle
         end
         function value = getNodeSourceType(obj, varargin)
             %Retrieves the value of all node source type
+            [indices, ~] = getNodeIndices(obj,varargin);j=1;
+            value = cell(1, length(indices));
             for i=indices
                 [obj.Errcode, temp] = ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET);
                 if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end   
                 if ~isnan(temp)
-                    value(j)=obj.TYPESOURCE(temp+1);
                     value{j}=obj.TYPESOURCE(temp+1);
                 else
                     value{j}=[];
@@ -2329,12 +2331,15 @@ classdef epanet <handle
                 value.Units_US_Customary=0;
             end
 
+            value.LinkFlowUnits = obj.getFlowUnits;
             if value.Units_US_Customary
+                value.NodePressureUnits='psi';
+                value.PatternDemandsUnits=value.LinkFlowUnits;
                 value.LinkPipeDiameterUnits='inches';
                 value.NodeTankDiameterUnits='feet';
                 value.EnergyEfficiencyUnits='percent';
                 value.NodeElevationUnits='feet';
-                value.NodeDemandUnits=obj.getFlowUnits;
+                value.NodeDemandUnits=value.LinkFlowUnits;
                 value.NodeEmitterCoefficientUnits='flow units @ 1 psi drop';
                 value.EnergyUnits='kwatt-hours';
                 value.LinkFrictionFactorUnits='unitless';
@@ -2356,7 +2361,7 @@ classdef epanet <handle
                 value.NodeTankDiameterUnits='meters';
                 value.EnergyEfficiencyUnits='percent';
                 value.NodeElevationUnits='meters';
-                value.NodeDemandUnits=obj.getFlowUnits;
+                value.NodeDemandUnits=value.LinkFlowUnits;
                 value.NodeEmitterCoefficientUnits='flow units @ 1 meter drop';
                 value.EnergyUnits='kwatt-hours';
                 value.LinkFrictionFactorUnits='unitless';
@@ -2391,48 +2396,134 @@ classdef epanet <handle
             end
         end
         function index = addNodeJunction(obj, juncID)
+            % Add new junction
+            % Example:
+            %   juncID = 'J-1'
+            %   d.addNodeJunction(juncID)
             index = ENaddnode(obj, juncID, obj.ToolkitConstants.EN_JUNCTION);
         end
         function index = addNodeReservoir(obj, resID)
+            % Add new reservoir
+            % Example:
+            %   resID = 'R-1'
+            %   d.addNodeReservoir(resID)
             index = ENaddnode(obj, resID, obj.ToolkitConstants.EN_RESERVOIR);
         end
         function index = addNodeTank(obj, tankID)
+            % Add new tank
+            % Example:
+            %   tankID = 'T-1'
+            %   d.addNodeTank(tankID)
             index = ENaddnode(obj, tankID, obj.ToolkitConstants.EN_TANK);
         end
         function index = addLinkPipeCV(obj, cvpipeID, fromNode, toNode)
+            % Add new control valve pipe
+            % Example:
+            %   cvpipeID = 'CP-1'
+            %   fromNode = 'J-1'
+            %   toNode = 'J-2'
+            %   d.addLinkPipeCV(cvpipeID, fromNode, toNode)
             index = ENaddlink(obj, cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode);
         end
         function index = addLinkPipe(obj, pipeID, fromNode, toNode)
+            % Add new pipe
+            % Example:
+            %   pipeID = 'P-1'
+            %   fromNode = 'J-1'
+            %   toNode = 'J-2'
+            %   d.addLinkPipe(pipeID, fromNode, toNode)
             index = ENaddlink(obj, pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode);
         end
         function index = addLinkPump(obj, pumpID, fromNode, toNode)
+            % Add new pump
+            % Example:
+            %   pumpID = 'Pu-1'
+            %   fromNode = 'J-1'
+            %   toNode = 'J-2'
+            %   d.addLinkPump(pumpID, fromNode, toNode)
             index = ENaddlink(obj, pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode);
         end
         function index = addLinkValvePRV(obj, vID, fromNode, toNode)
+            % Add new PRV valve
+            % Example:
+            %   vID = 'PRV-1'
+            %   fromNode = 'J-1'
+            %   toNode = 'J-2'
+            %   d.addLinkValvePRV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode);
         end
         function index = addLinkValvePSV(obj, vID, fromNode, toNode)
+            % Add new PSV valve
+            % Example:
+            %   vID = 'PSV-1'
+            %   fromNode = 'J-1'
+            %   toNode = 'J-2'
+            %   d.addLinkValvePSV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode);
         end        
         function index = addLinkValvePBV(obj, vID, fromNode, toNode)
+            % Add new PBV valve
+            % Example:
+            %   vID = 'PBV-1'
+            %   fromNode = 'J-1'
+            %   toNode = 'J-2'
+            %   d.addLinkValvePBV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode);
         end
         function index = addLinkValveFCV(obj, vID, fromNode, toNode)
+            % Add new FCV valve
+            % Example:
+            %   vID = 'FCV-1'
+            %   fromNode = 'J-1'
+            %   toNode = 'J-2'
+            %   d.addLinkValveFCV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode);
         end
         function index = addLinkValveTCV(obj, vID, fromNode, toNode)
+            % Add new TCV valve
+            % Example:
+            %   vID = 'TCV-1'
+            %   fromNode = 'J-1'
+            %   toNode = 'J-2'
+            %   d.addLinkValveTCV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode);
         end
         function index = addLinkValveGPV(obj, vID, fromNode, toNode)
+            % Add new GPV valve
+            % Example:
+            %   vID = 'GPV-1'
+            %   fromNode = 'J-1'
+            %   toNode = 'J-2'
+            %   d.addLinkValveGPV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
         function Errcode = deleteNode(obj, indexNode)
+            % Delete a node
+            % Example:
+            %   indexNode = d.getNodeNameID(1)
+            %   d.deleteNode(indexNode)
             [Errcode] = ENdeletenode(obj, indexNode);
         end
         function Errcode = deleteLink(obj, indexLink)
+            % Delete a link
+            % Example:
+            %   indexLink = d.getLinkNameID(1)
+            %   d.deleteLink(indexNode)
             [Errcode] = ENdeletelink(obj, indexLink);
         end
         function setControls(obj, index, control)
+            % Sets the parameters of a simple control statement
+            % Example: 
+            %   d.setControls(1, 'LINK 9 CLOSED IF NODE 2 ABOVE 180')
+            %   %set many controls
+            %   controls = d.getControls;
+            %   d.setControls(controls)
+            %   d.getControls(1)
+            %
+            %   c = d.getControls;
+            %   d.setControls({c.Control})
+            %   d.setControls({'LINK 9 OPEN IF NODE 2 BELOW 110', 'LINK 9 CLOSED IF NODE 2 ABOVE 200'})
+            %   d.getControls(2)
             if isstruct(index)
                 for c=1:length(index)
                     setControlFunction(obj, c, index(c).Control)
@@ -2457,64 +2548,149 @@ classdef epanet <handle
             end
         end
         function index = addControls(obj, control)
+            % Adds a new simple control
+            % Example:
+            %   index = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');
+            %   d.getControls(index)
+            %   d.setControls(index, 'LINK 9 43.2392 AT TIME 14:00:00');
+            %   d.getControls(index)
             index = addControlFunction(obj, control); 
         end
         function setLinkDiameter(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
+            % Sets the values of diameters
+            % Example:
+            %   index_pipe = 1
+            %   d.setLinkDiameter(index_pipe, 100);
+            %   d.getLinkDiameter(index_pipe)
+            %   diameters = d.getLinkDiameter
+            %   qunc = 0.05;
+            %   ql=diameters-qunc*diameters;
+            %   qu=diameters+qunc*diameters;
+            %   diam_length=length(diameters);
+            %   diameters_unc=ql+rand(1,diam_length).*(qu-ql); 
+            %   d.setLinkDiameter(diameters_unc)
+            %   d.getLinkDiameter
+            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, value(j), obj.LibEPANET); j=j+1;
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
             end            
         end
+        function setConditional(obj, value)
+            % Return 0 if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % Return 1 if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default is 0.
+            % Example: 
+            %   d.setConditional(1)
+            obj.Condinional = value;
+        end
+        function value = getConditional(obj)
+            % Return 0 if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % Return 1 if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default is 0.
+            % Example: 
+            %   d.getConditional
+            value = obj.Condinional;
+        end
         function index = setLinkTypePipe(obj, id)
             % Set the link type pipe for a specified link
-            nodesID = setLinkType(obj, id);
-            index = obj.addLinkPipe(id, nodesID{1}, nodesID{2});
-            %[Errcode] = ENsetlinktype(id, obj.ToolkitConstants.EN_PIPE, obj.LibEPANET);
-%             if Errcode, error(obj.getError(Errcode)), return; end   
+            % Example:
+            %   d.setConditional(0)
+            %   linkid = '9';
+            %   d.setLinkTypePipe(linkid)
+            %   d.getLinkType
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PIPE, obj.Condinional, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
         function index = setLinkTypePipeCV(obj, id)
             % Set the link type cvpipe for a specified link
-            nodesID = setLinkType(obj, id);
-            index = obj.addLinkPipeCV(id, nodesID{1}, nodesID{2});
+            % Example:
+            %   d.setConditional(0)
+            %   linkid = '9';
+            %   d.setLinkTypePipeCV(linkid)
+            %   d.getLinkType
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_CVPIPE, obj.Condinional, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
         function index = setLinkTypePump(obj, id)
             % Set the link type pump for a specified link
-            nodesID = setLinkType(obj, id);
-            index = obj.addLinkPump(id, nodesID{1}, nodesID{2});
+            % Example:
+            %   d.setConditional(0)
+            %   linkid = '10';
+            %   d.setLinkTypePump(linkid)
+            %   d.getLinkType
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PUMP, obj.Condinional, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
         function index = setLinkTypeValveFCV(obj, id)
             % Set the link type valve FCV for a specified link
-            nodesID = setLinkType(obj, id);
-            index = obj.addLinkValveFCV(id, nodesID{1}, nodesID{2});
+            % Example:
+            %   linkid = '122';
+            %   d.setLinkTypeValveFCV(linkid)
+            %   d.getLinkType
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_FCV, obj.Condinional, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function index = setLinkTypeValveGPV(obj, id)
             % Set the link type valve GPV for a specified link
-            nodesID = setLinkType(obj, id);
-            index = obj.addLinkValveGPV(id, nodesID{1}, nodesID{2});
+            % Example:
+            %   linkid = '122';
+            %   d.setLinkTypeValveGPV(linkid)
+            %   d.getLinkType
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_GPV, obj.Condinional, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePBV(obj, id)
             % Set the link type valve PBV for a specified link
-            nodesID = setLinkType(obj, id);
-            index = obj.addLinkValvePBV(id, nodesID{1}, nodesID{2});
+            % Example:
+            %   linkid = '122';
+            %   d.setLinkTypeValvePBV(linkid)
+            %   d.getLinkType
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PBV, obj.Condinional, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePRV(obj, id)
             % Set the link type valve PRV for a specified link
-            nodesID = setLinkType(obj, id);
-            index = obj.addLinkValvePRV(id, nodesID{1}, nodesID{2});
+            % Example:
+            %   linkid = '122';
+            %   d.setLinkTypeValvePRV(linkid)
+            %   d.getLinkType
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PRV, obj.Condinional, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePSV(obj, id)
             % Set the link type valve PSV for a specified link
-            nodesID = setLinkType(obj, id);
-            index = obj.addLinkValvePSV(id, nodesID{1}, nodesID{2});
+            % Example:
+            %   linkid = '122';
+            %   d.setLinkTypeValvePSV(linkid)
+            %   d.getLinkType
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PSV, obj.Condinional, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValveTCV(obj, id)
             % Set the link type valve TCV for a specified link
-            nodesID = setLinkType(obj, id);
-            index = obj.addLinkValveTCV(id, nodesID{1}, nodesID{2});
+            % Example:
+            %   linkid = '122';
+            %   d.setLinkTypeValveTCV(linkid)
+            %   d.getLinkType
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_TCV, obj.Condinional, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function setLinkLength(obj, value, varargin)
+            % Sets the values of lengths
+            % Example:
+            %   index_pipe = 1
+            %   d.setLinkLength(index_pipe, 100);
+            %   d.getLinkLength(index_pipe)
+            %   lengths = d.getLinkLength
+            %   qunc = 0.05;
+            %   ql=lengths-qunc*lengths;
+            %   qu=lengths+qunc*lengths;
+            %   lengths_length=length(lengths);
+            %   lengths_unc=ql+rand(1,lengths_length).*(qu-ql); 
+            %   d.setLinkLength(lengths_unc)
+            %   d.getLinkLength
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -2525,8 +2701,8 @@ classdef epanet <handle
         function value = setLinkNameID(obj, value, varargin)
             % Sets the ID name for links
             % Example: 
-            %       d.setLinkNameID(1, 'newID');
-            %       d.setLinkNameID(cellarrayofnewIDs);
+            %    d.setLinkNameID(1, 'newID');
+            %    d.setLinkNameID(cellarrayofnewIDs);
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
@@ -3460,7 +3636,7 @@ classdef epanet <handle
             %            MSX_comp.NodeQuality % row: time, col: node index
             %            MSX_comp.LinkQuality % row: time, col: link index
             %            MSX_comp.Time
-           
+
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -3468,7 +3644,7 @@ classdef epanet <handle
             link_indices = 1:obj.getLinkCount;%for all link index
             node_indices = 1:obj.getNodeCount;%for all node index
             specie_name = obj.getMSXSpeciesIndex(specie);
-            
+
             value.NodeQuality = nan(1, length(node_indices));
             value.LinkQuality = nan(1, length(node_indices));
             % Obtain a hydraulic solution
@@ -3546,7 +3722,7 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k=1; tleft=1;t=0;
+            k = 1; tleft = 1; t = 0;
             value.Time(k, :)=0;
             time_step = obj.getMSXTimeStep;
             timeSmle=obj.getTimeSimulationDuration;%bug at time
@@ -3627,7 +3803,7 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k=1;tleft=1;
+            k = 1; tleft = 1;
             time_step = obj.getMSXTimeStep;
             value.Time(k, :)=0;
             while(tleft>0 && obj.Errcode==0)
