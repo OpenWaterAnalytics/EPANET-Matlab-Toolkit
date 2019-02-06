@@ -411,6 +411,9 @@ classdef epanet <handle
         MSXTYPENODE=0; % for a node
         MSXTYPELINK=1; % for a link
     end
+    properties (Access = private)
+        solve = 1;
+    end
     methods
         function obj = epanet(varargin)
             %Constructor of the EPANET Class
@@ -479,6 +482,8 @@ classdef epanet <handle
             ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
+            %For the getComputedQualityTimeSeries
+            obj.solve = 0;
             %Open the file
             obj.Errcode=ENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
             if obj.Errcode
@@ -660,6 +665,7 @@ classdef epanet <handle
             %Load epanet file when use bin functions
             % example: 
             %   d.loadEPANETFile(d.TempInpFile);
+            obj.solve = 0;
             if nargin==2
                 [Errcode] = ENopen(varargin{1}, [varargin{1}(1:end-4), '.txt'], [varargin{1}(1:end-4), '.bin'], obj.LibEPANET); 
             else
@@ -2198,6 +2204,10 @@ classdef epanet <handle
         function value = getComputedQualityTimeSeries(obj, varargin)
             % Compute Quality simulation and retrieve all or some time-series
             obj.solveCompleteHydraulics % Only call this ONLY once (see ENsolveH for more details)
+            if ~obj.solve
+                obj.solveCompleteHydraulics;
+                obj.solve = 1;
+            end
             obj.openQualityAnalysis;
             obj.initializeQualityAnalysis;
             %tleft=obj.nextQualityAnalysisStep;
