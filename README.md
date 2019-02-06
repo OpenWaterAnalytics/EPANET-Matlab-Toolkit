@@ -12,7 +12,22 @@ The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, 
 
 For support, please use the OWA community forum : http://community.wateranalytics.org/
 
-# How to cite #
+## Table of Contents
+
+- [How to cite](#how-to-cite)
+- [Requirements](#requirements)
+- [How to install necessary compilers](#How-to-install-necessary-compilers)
+- [How to use the Toolkit](#How-to-use-the-Toolkit)
+- [How to fix/report bugs](#How-to-fixreport-bugs)
+- [Licenses](#Licenses)
+- [Contributors](#Contributors)
+- [List of Matlab Class Functions](#List-of-Matlab-Class-Functions)
+- [List of EPANET 2.1 Functions Supported](#List-of-EPANET-21-Functions-Supported)
+- [List of EPANET 2.012 Functions Supported](#List-of-EPANET-2012-Functions-Supported)
+- [List of EPANET 2.2 Functions Supported](#List-of-EPANET-22-Functions-Supported)
+
+## How to cite 
+
 D.G. Eliades, M. Kyriakou, S. Vrachimis and M.M. Polycarpou, "EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB", in *Proc. 14th International Conference on Computing and Control for the Water Industry (CCWI)*, The Netherlands, Nov 2016, p.8. (doi:10.5281/zenodo.831493)
 
 ```
@@ -27,11 +42,16 @@ month={Nov},
 DOI={10.5281/zenodo.831493}}
 ```
 
-# Requirements #
+&uparrow; [Back to top](#table-of-contents)
+
+## Requirements
+
 * [Matlab](http://www.mathworks.com/)
 * [EPANET 2.1](https://github.com/OpenWaterAnalytics/epanet) 
 
-# How to install necessary compilers # 
+&uparrow; [Back to top](#table-of-contents)
+
+## How to install necessary compilers
 
 In order to use the EPANET-MATLAB-Toolkit the <b> MinGW-w64 compiler </b> must be install: <p>
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=R_RABL3_6EY
@@ -43,7 +63,10 @@ In case you have a version of matlab older than 2015b install the <b> Windows SD
 " target="_blank"><img src="http://img.youtube.com/vi/hc3OkDypd24/0.jpg" 
 alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="5" /></a>
 
-# How to use the Toolkit #
+&uparrow; [Back to top](#table-of-contents)
+
+## How to use the Toolkit
+
 Detailed examples on how to use the toolkit can be found in the [publication](https://zenodo.org/record/831493#.W9B69PZRXIV) of the Toolkit , together with the [code](https://zenodo.org/record/437778). A presentation of its use is also provided [here](https://github.com/KIOS-Research/CCWI2016/blob/master/CCWI2016/Presentation/Eliades_CCWI2016.ppt).
 
 To start, you need to download the folder from GitHub (e.g., `Download ZIP`), set the run path in Matlab within the saved folder, and run `RunTests.m`. This will execute all the commands which have been implemented in the Class.
@@ -56,23 +79,35 @@ d.getNodeCount
 
 d.getNodeElevations
 
+&uparrow; [Back to top](#table-of-contents)
 
-# How to fix/report bugs #
+## How to fix/report bugs
+
 To fix a bug `Fork` the `EPANET-Matlab Toolkit`, `Edit` the code and make the appropriate change, and then `Pull` it so that we evaluate it. 
 
 Keep in mind that some bugs may exist in the `EPANET` libraries, in case you are not receiving the expected results.
 
-# Licenses #
+&uparrow; [Back to top](#table-of-contents)
+
+## Licenses
+
 * `EPANET`: Public Domain
 * `EPANET-MSX`: GNU Lesser General Public License
 * `EPANET-Matlab Toolkit`: EUPL 
 
-# Contributors #
+&uparrow; [Back to top](#table-of-contents)
+
+## Contributors
+
 * Marios Kyriakou, [KIOS Research Center for Intelligent Systems and Networks, University of Cyprus](http://www.kios.ucy.ac.cy/)
 * Demetrios Eliades, [KIOS Research Center for Intelligent Systems and Networks, University of Cyprus](http://www.kios.ucy.ac.cy/c)
 
 The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](http://www.mathworks.com/matlabcentral/fileexchange/25100-epanet-matlab-toolkit) as well as the OpenWaterAnalytics [EPANET-Matlab Wrappers](https://github.com/OpenWaterAnalytics/epanet-matlab)
-# List of Matlab Class Functions #
+
+&uparrow; [Back to top](#table-of-contents)
+
+## List of Matlab Class Functions
+
 |Function|Description|
 |---------|---------|
 |epanet| Load Input file and open the EPANET Toolkit system|
@@ -564,7 +599,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setBinTimeStatisticsNone|Sets the statistic type to None|
 |setBinTimeStatisticsRange|Sets the statistic type to Range|
 
-# List of EPANET 2.012 Functions Supported #
+&uparrow; [Back to top](#table-of-contents)
+
+## List of EPANET 2.012 Functions Supported
 
 |Function|Description|
 |--------|-----------|
@@ -624,7 +661,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENusehydfile|Opens previously saved binary hydraulics file|
 |ENwriteline|Writes line of text to the report file|
 
-# List of EPANET 2.1 Functions Supported #
+&uparrow; [Back to top](#table-of-contents)
+
+## List of EPANET 2.1 Functions Supported
 
 |Function|Description|
 |--------|-----------|
@@ -648,7 +687,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetcurve|Sets x,y values for a specific curve|
 |ENsetcurvevalue|Sets x,y point for a specific point and curve|
 
-# List of EPANET 2.2 Functions Supported #
+&uparrow; [Back to top](#table-of-contents)
+
+## List of EPANET 2.2 Functions Supported
 
 |Function|Description|
 |--------|-----------|
@@ -665,3 +706,5 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetdemandmodel|Sets the type of demand model to use and its parameters|
 |ENsetnodeid|Change the ID name for a node|
 |ENsetlinkid|Change the ID name for a link|
+
+&uparrow; [Back to top](#table-of-contents)
