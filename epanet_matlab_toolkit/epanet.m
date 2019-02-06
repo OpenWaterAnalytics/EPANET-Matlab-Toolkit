@@ -7671,7 +7671,7 @@ function [Errcode] = ENsetheadcurveindex(obj, pumpindex, curveindex)
 disp(obj.getError(Errcode));
 end
 function [Errcode, cindex] = ENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
-[Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', 0, ctype, lindex, setting, nindex, level);
+[Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
 if Errcode
     ENgeterror(Errcode, LibEPANET);
 end
@@ -11761,7 +11761,7 @@ function setControlFunction(obj, index, value)
     if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
 end
 function controlRuleIndex = addControlFunction(obj, value)
-    [controlTypeIndex, linkIndex,controlSettingValue,...
+    [controlTypeIndex, linkIndex, controlSettingValue,...
     nodeIndex, controlLevel] = controlSettings(obj, value);
     [obj.Errcode, controlRuleIndex] = ENaddcontrol(controlTypeIndex, linkIndex,...
         controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
