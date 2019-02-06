@@ -1,0 +1,4 @@
+The pipe diameter for this network is
+float  DiameterAva[AVa]={150,200,250,300,350,400,450,500,600,700,750,800,900,1000}; //***Unit:mm****//
+float  Cost[AVa]={24.53,35.2,47.388,61.16,76.45,93.61,113.784,134.024,180.158,234.74,261.228,291.742,355.322,426.69}; ($/m)
+ Cost is cost per unit length

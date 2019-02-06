@@ -1,0 +1,100 @@
+[TITLE]
+NET3 Chloramine Decay Example
+
+[OPTIONS]
+AREA_UNITS  FT2
+RATE_UNITS  HR
+SOLVER      ROS2
+COUPLING    NONE
+TIMESTEP    300
+RTOL        0.0001
+ATOL        1.0e-8
+COMPILER    VC
+
+[SPECIES]
+BULK   HOCL    MMOL
+BULK   NH3     MMOL
+BULK   NH2CL   MMOL
+BULK   NHCL2   MMOL
+BULK   I       MMOL
+
+BULK   OCL     MMOL
+BULK   NH4     MMOL
+
+BULK   ALK     MMOL    ;total alkalinity
+BULK   H       MMOL    ;hydrogen ion
+BULK   OH      MMOL    ;hydroxide ion
+BULK   CO3     MMOL    ;carbonate ion
+BULK   HCO3    MMOL    ;bicarbonate ion
+BULK   H2CO3   MMOL    ;carbonic acid
+
+BULK   TOC     MG      ;total organic carbon   
+BULK   cNH3    MG      ;ammonia as mg/L        
+BULK   cNH2CL  MG      ;monochloramine as mg/L 
+
+
+[COEFFICIENTS]
+PARAMETER       k1   1.5e10
+PARAMETER       k2   7.6e-2
+PARAMETER       k3   1.0e6
+PARAMETER       k4   2.3e-3
+PARAMETER       k6   2.2e8
+PARAMETER       k7   4.0e5
+PARAMETER       k8   1.0e8
+PARAMETER       k9   3.0e7
+PARAMETER       k10   55.0
+
+PARAMETER       kDOC1 3.0E4
+PARAMETER       kDOC2 6.5E5
+CONSTANT        S1    0.02
+CONSTANT        S2    0.50
+
+[TERMS]
+ k5    (2.5e7*H) + (4.0e4*H2CO3) + (800*HCO3)
+ a1    k1*HOCL*NH3
+ a2    k2*NH2CL
+ a3    k3*HOCL*NH2CL
+ a4    k4*NHCL2
+ a5    k5*NH2CL*NH2CL
+ a6    k6*NHCL2*NH3*H
+ a7    k7*NHCL2*OH
+ a8    k8*I*NHCL2
+ a9    k9*I*NH2CL
+ a10   k10*NH2CL*NHCL2
+ a11   kDOC1*S1*TOC*NH2CL/12000
+ a12   kDOC2*S2*TOC*HOCL/12000
+
+[PIPE]
+RATE   HOCL    -a1 + a2 - a3 + a4 + a8 - a12
+RATE   NH3     -a1 + a2 + a5 - a6 + a11
+RATE   NH2CL    a1 - a2 - a3 + a4 - a5 + a6 - a9 - a10 - a11
+RATE   NHCL2    a3 - a4 + a5 - a6 - a7 - a8 - a10
+RATE   I        a7 - a8 - a9
+RATE   H        0
+RATE   ALK      0
+RATE   TOC      0
+
+EQUIL  OCL    H*OCL - 3.16E-8*HOCL
+EQUIL  NH4    H*NH3 - 5.01E-10*NH4
+EQUIL  CO3    H*CO3 - 5.01E-11*HCO3
+EQUIL  H2CO3  H*HCO3 - 5.01E-7*H2CO3
+EQUIL  HCO3   ALK - HCO3 - 2*CO3 - OH + H
+EQUIL  OH     H*OH - 1.0E-14
+
+FORMULA     cNH3     17000*NH3
+FORMULA     cNH2CL   51500*NH2CL
+
+[QUALITY]
+NODE   4     NH2CL 0.05E-3
+NODE   5     NH2CL 0.05E-3
+NODE   4     TOC   1.5
+NODE   5     TOC   3.0
+GLOBAL       ALK   0.004
+GLOBAL       H     2.818E-8
+GLOBAL       OH    3.55E-7
+
+[REPORT]
+NODES   ALL
+LINKS   ALL
+SPECIE  cNH3   YES  4
+SPECIE  cNH2CL YES  4

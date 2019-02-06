@@ -1,0 +1,39 @@
+[TITLE]
+Two-Source Chlorine Decay
+
+[OPTIONS]
+AREA_UNITS     FT2
+RATE_UNITS     HR
+SOLVER     RK5
+TIMESTEP     300
+ATOL     0.01
+RTOL     0.001
+
+[SPECIES]
+BULK     T1     MG     0.01     0.001  ;Source 1 tracer   
+BULK     CL2     MG     0.01     0.001 ;Free chlorine
+
+[COEFFICIENTS]
+CONSTANT     K1     1.3     ;Source 1 decay coeff.
+CONSTANT     K2     17.7    ;Source 2 decay coeff.
+
+[TERMS]
+K     (K1*T1 + K2*(1-T1))     
+
+[PIPES]
+RATE     T1     0           ;T1 is conservative
+RATE     CL2     -K*CL2     ;CL2 has first order decay 
+
+[SOURCES]
+
+[QUALITY]
+;Initial conditions (= 0 if not specified here)
+NODE    River   T1      1.0
+NODE    River   CL2     1.2
+NODE    Lake    CL2     1.2
+
+[PARAMETERS]
+[PATTERNS]
+[REPORT]
+NODES ALL
+LINKS ALL

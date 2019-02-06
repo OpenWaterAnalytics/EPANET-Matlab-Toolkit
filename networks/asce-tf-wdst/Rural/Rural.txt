@@ -1,0 +1,6 @@
+Rural
+No. of Pipes: 476
+No. of Nodes: 379
+No. of Reservoirs: 2
+No. of Tanks: 0
+Total system demand (average daily demand summed over all nodes): 8.36E+3 m3

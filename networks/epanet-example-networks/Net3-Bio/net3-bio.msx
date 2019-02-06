@@ -1,0 +1,74 @@
+[TITLE]
+Two-Source Biofilm Model
+
+[OPTIONS]
+AREA_UNITS  FT2
+RATE_UNITS  HR
+SOLVER      RK5
+TIMESTEP    300
+RTOL        0.001
+ATOL        0.0001
+
+[SPECIES]
+BULK   TL    MG   0.01  0.001  ;Lake tracer
+BULK   CL2   MG   0.01  0.001  ;chlorine
+BULK   S     MG   0.01  0.001  ;organic substrate
+BULK   Xb    UG   0.001 0.0001 ;free biomass
+WALL   Xa    UG   0.001 0.0001 ;attached biomass (ug/ft2)
+BULK   Nb    log(N)            ;number of free bacteria
+WALL   Na    log(N)            ;number of attached bacteria
+
+[COEFFICIENTS]
+CONSTANT  Kb1     1.3    ;source 1 decay const. (1/days)
+CONSTANT  Kb2     17.7   ;source 2 decay const. (1/days)
+CONSTANT  CL2C    0.20   ;characteristic CL2 (mg/L)
+CONSTANT  CL2Tb   0.03   ;threshold CL2 for Xb (mg/L)
+CONSTANT  CL2Ta   0.10   ;threshold CL2 for Xa (mg/L)
+CONSTANT  MUMAXb  0.20   ;max. growth rate for Xb (1/hr)
+CONSTANT  MUMAXa  0.20   ;max. growth rate for Xa (1/hr)
+CONSTANT  Ks      0.40   ;half saturation constant (mg/L)
+CONSTANT  Kd      0.06   ;bacterial decay constant (1/hr)
+CONSTANT  Kdep    0.25   ;deposition rate constant (1/hr)
+CONSTANT  Kdet    0.03   ;detachment rate constant (1/hr/(ft/s))
+CONSTANT  Yg      0.15   ;bacterial yield coefficient (mg/mg)
+
+[TERMS]
+Kb   Kb2/24*TL + Kb1/24*(1.0-TL)            ;CL2 decay coeff.
+Ib   EXP(-STEP(CL2-CL2Tb)*(CL2-CL2Tb)/CL2C) ;Xb inhibition coeff.
+Ia   EXP(-STEP(CL2-CL2Ta)*(CL2-CL2Ta)/CL2C) ;Xa inhibition coeff.
+MUb  MUMAXb*S/(S+Ks)*Ib                     ;Xb growth rate coeff.
+MUa  MUMAXa*S/(S+Ks)*Ia                     ;Xa growth rate coeff.
+
+[PIPE]
+RATE    TL     0.0
+RATE    CL2    -Kb*CL2
+RATE    S      -(MUa*Xa*Av + MUb*Xb)/Yg/1000
+RATE    Xb     (MUb-Kd)*Xb + Kdet*U*Xa*Av - Kdep*Xb
+RATE    Xa     (MUa-Kd)*Xa - Kdet*U*Xa + Kdep*Xb/Av
+FORMULA Nb     LOG10(1.0e6*Xb)
+FORMULA Na     LOG10(1.0e6*Xa)
+
+[TANK]
+RATE    TL     0.0
+RATE    CL2    -Kb*CL2
+RATE    S      -MUb*Xb/Yg/1000
+RATE    Xb     (MUb-Kd)*Xb
+FORMULA Nb     LOG10(1.0e6*Xb)
+
+[QUALITY]
+NODE   4   TL     0.0
+NODE   4   CL2    1.2
+NODE   4   S      0.4
+NODE   4   Xb     0.01
+NODE   5   TL     1.0
+NODE   5   CL2    1.2
+NODE   5   S      1.0
+NODE   5   Xb     0.01
+
+[REPORT]
+NODES   ALL
+LINKS   ALL
+SPECIE  CL2  YES
+SPECIE  S    YES
+SPECIE  Nb   YES
+SPECIE  Na   YES
