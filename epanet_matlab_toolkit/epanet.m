@@ -628,7 +628,7 @@ classdef epanet <handle
             obj.TimeReportingPeriods = obj.getTimeReportingPeriods;
             % Get EPANET version
             obj.Version = obj.getVersion;
-            try%EPANET Version 2.1.dll LibEPANET
+            try %EPANET Version 2.1.dll LibEPANET
                 obj.TimeStartTime = obj.getTimeStartTime;
                 obj.TimeHTime = obj.getTimeHTime;
                 obj.TimeHaltFlag = obj.getTimeHaltFlag;
@@ -647,7 +647,6 @@ classdef epanet <handle
                 obj.LinkPumpPatternIndex = obj.getLinkPumpPatternIndex;
                 obj.LinkPumpTypeCode = obj.getLinkPumpTypeCode;
                 obj.LinkPumpType = obj.getLinkPumpType;
-                obj.CurvesInfo = obj.getCurvesInfo; % EPANET Version 2.1
             catch
             end
             %Get data from raw file (for information which cannot be
@@ -1450,12 +1449,12 @@ classdef epanet <handle
         end
         function value = getNodeSourceType(obj, varargin)
             %Retrieves the value of all node source type
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, temp] = ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET);
                 if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end   
                 if ~isnan(temp)
                     value(j)=obj.TYPESOURCE(temp+1);
+                    value{j}=obj.TYPESOURCE(temp+1);
                 else
                     value{j}=[];
                 end
@@ -2331,8 +2330,6 @@ classdef epanet <handle
             end
 
             if value.Units_US_Customary
-                value.NodePressureUnits='pounds per square inch';
-                value.PatternDemandsUnits=obj.getFlowUnits;
                 value.LinkPipeDiameterUnits='inches';
                 value.NodeTankDiameterUnits='feet';
                 value.EnergyEfficiencyUnits='percent';
@@ -2354,7 +2351,7 @@ classdef epanet <handle
                 value.QualityWaterAgeUnits='hours';
             else % SI Metric
                 value.NodePressureUnits='meters';
-                value.PatternDemandsUnits=obj.getFlowUnits;
+                value.PatternDemandsUnits=value.LinkFlowUnits;
                 value.LinkPipeDiameterUnits='millimeters';
                 value.NodeTankDiameterUnits='meters';
                 value.EnergyEfficiencyUnits='percent';
