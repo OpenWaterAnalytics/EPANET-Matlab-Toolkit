@@ -256,6 +256,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getTimeStartTime|Retrieves the number of start time|
 |getTimeStatisticsType|Retrieves the type of time series post-processing ('NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE')|
 |getTimeStatisticsIndex|Retrieves the type of time series post-processing|
+|getTitle|Retrieves the title lines of the project|
 |getUnits|Retrieves the Units of Measurement|
 |getVersion|Retrieve the current EPANET version of DLL|
 |getNodesInfo|Retrieves nodes info e.g. elevations, demand pattern indices, emitter coeff. , initial quality, source quality, source pattern indices, source type code, type indices|
@@ -368,6 +369,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setTimeRuleControlStep|Sets the rule control step|
 |setTimeSimulationDuration|Sets the simulation duration|
 |setTimeStatisticsType|Sets the statistic type|
+|setTitle|Sets the title lines of the project|
 |solveCompleteHydraulics|Runs a complete hydraulic simulation with results for all time periods written to the binary Hydraulics file|
 |solveCompleteQuality|Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file|
 |stepQualityAnalysisTimeLeft|Advances the water quality simulation one water quality time step. The time remaining in the overall simulation is returned in tleft|
@@ -706,5 +708,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetdemandmodel|Sets the type of demand model to use and its parameters|
 |ENsetnodeid|Change the ID name for a node|
 |ENsetlinkid|Change the ID name for a link|
+|ENgettitle|Retrieves the title lines of the project|
+|ENsettitle|Sets the title lines of the project|
 
 &uparrow; [Back to top](#table-of-contents)
