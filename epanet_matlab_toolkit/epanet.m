@@ -415,6 +415,17 @@ classdef epanet <handle
     properties (Access = private)
         solve = 1;
     end
+    methods (Access = private)
+        function value = get_link_info(obj, constant, varargin)
+            [indices, value] = getLinkIndices(obj, varargin);
+            j=1;
+            for i=indices
+                [obj.Errcode, value(j)] = ENgetlinkvalue(i, constant, obj.LibEPANET);  
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                j=j+1;
+            end
+        end 
+    end
     methods
         function obj = epanet(varargin)
             %Constructor of the EPANET Class
@@ -666,6 +677,24 @@ classdef epanet <handle
                 obj.(getFields_infoUnits{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
             end    
         end % End of epanet class constructor
+        function openAnyInp(obj, varargin)
+            % Open as on matlab editor any EPANET input file using built
+            % function open. Open current loaded input file (not temporary)
+            % Example: 
+            %   d.openAnyInp;
+            %   d.openAnyInp('Net2.inp');
+            arg = obj.InputFile;
+            if nargin > 1
+                arg = varargin{1};
+            end
+            open(arg);
+        end
+        function openCurrentInp(obj, varargin)
+            % Open EPANET input file who is loaded
+            % Example: 
+            %   d.openCurrentInp;
+            open(obj.TempInpFile);
+        end
         function Errcode = loadEPANETFile(obj, varargin)
             %Load epanet file when use bin functions
             % example: 
@@ -983,198 +1012,167 @@ classdef epanet <handle
             end
         end
         function value = getLinkDiameter(obj, varargin)
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            %Retrieves the value of all link diameters
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET); 
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Retrieves the value of all link diameters
+            % Pipe/valve diameter
+            % Example:
+            %   d.getLinkDiameter
+            value = get_link_info(obj, obj.ToolkitConstants.EN_DIAMETER, varargin{:});
         end
         function value = getLinkLength(obj, varargin)
-            %Retrieves the value of all link lengths
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_LENGTH, obj.LibEPANET); 
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
-                j=j+1;
-            end
+            % Retrieves the value of all link lengths
+            % Pipe length
+            % Example:
+            %   d.getLinkLength
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LENGTH, varargin{:});
         end
         function value = getLinkRoughnessCoeff(obj, varargin)
-            %Retrieves the value of all link roughness
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_ROUGHNESS, obj.LibEPANET); 
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Retrieves the value of all link roughness
+            % Pipe roughness coefficient
+            % Example:
+            %   d.getLinkRoughnessCoeff
+            value = get_link_info(obj, obj.ToolkitConstants.EN_ROUGHNESS, varargin{:});
         end
         function value = getLinkMinorLossCoeff(obj, varargin)
-            %Retrieves the value of all link minor loss coefficients
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_MINORLOSS, obj.LibEPANET); 
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Retrieves the value of all link minor loss coefficients
+            % Pipe/valve minor loss coefficient
+            % Example:
+            %   d.getLinkMinorLossCoeff
+            value = get_link_info(obj, obj.ToolkitConstants.EN_MINORLOSS, varargin{:});
         end
         function value = getLinkInitialStatus(obj, varargin)
-            %Retrieves the value of all link initial status
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_INITSTATUS, obj.LibEPANET); 
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Retrieves the value of all link initial status
+            % Initial status (see @ref EN_LinkStatusType)
+            % Example:
+            %   d.getLinkInitialStatus
+            value = get_link_info(obj, obj.ToolkitConstants.EN_INITSTATUS, varargin{:});
         end
         function value = getLinkInitialSetting(obj, varargin)
-            %Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_INITSETTING, obj.LibEPANET); 
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves
+            % Initial pump speed or valve setting
+            % Example:
+            %   d.getLinkInitialSetting
+            value = get_link_info(obj, obj.ToolkitConstants.EN_INITSETTING, varargin{:});
         end
         function value = getLinkBulkReactionCoeff(obj, varargin)
-            %Retrieves the value of all link bulk reaction coefficients
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_KBULK, obj.LibEPANET); 
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Bulk chemical reaction coefficient
+            % Example:
+            %   d.getLinkBulkReactionCoeff
+            value = get_link_info(obj, obj.ToolkitConstants.EN_KBULK, varargin{:});
         end
         function value = getLinkWallReactionCoeff(obj, varargin)
-            %Retrieves the value of all link wall reaction coefficients
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_KWALL, obj.LibEPANET); 
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Pipe wall chemical reaction coefficient
+            % Example:
+            %   d.getLinkWallReactionCoeff
+            value = get_link_info(obj, obj.ToolkitConstants.EN_KWALL, varargin{:});
         end
         function value = getLinkFlows(obj, varargin)
-            %Retrieves the value of all computed link flow rates
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_FLOW, obj.LibEPANET);  
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Current computed flow rate (read only)
+            % Example:
+            %   % Using step-by-step hydraulic analysis
+            %   d.getLinkFlows
+            value = get_link_info(obj, obj.ToolkitConstants.EN_FLOW, varargin{:});
         end
         function value = getLinkVelocity(obj, varargin)
-            %Retrieves the value of all computed link velocities
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET); 
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Current computed flow velocity (read only)
+            % Example:
+            %   % Using step-by-step hydraulic analysis
+            %   d.getLinkVelocity
+            value = get_link_info(obj, obj.ToolkitConstants.EN_VELOCITY, varargin{:});
         end
         function value = getLinkHeadloss(obj, varargin)
-            %Retrieves the value of all computed link headloss
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET);  
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Current computed head loss (read only)
+            % Example:
+            %   % Using step-by-step hydraulic analysis
+            %   d.getLinkHeadloss
+            value = get_link_info(obj, obj.ToolkitConstants.EN_HEADLOSS, varargin{:});
         end
         function value = getLinkStatus(obj, varargin)
-            %Retrieves the value of all computed link status (0 = closed, 1 = open)
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_STATUS, obj.LibEPANET);  
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Current link status (see @ref EN_LinkStatusType) (0 = closed, 1 = open)
+            % Example: 
+            %   % Using step-by-step hydraulic analysis
+            %   d.getLinkStatus
+            value = get_link_info(obj, obj.ToolkitConstants.EN_STATUS, varargin{:});
         end
-        function value = getLinkState(obj, varargin)
-            %EPANET Version 2.2
-            % Status Code for Each Link
-            % 0 = closed (max. head exceeded)
-            % 1 = temporarily closed
-            % 2 = closed
-            % 3 = open
-            % 4 = active (partially open)
-            % 5 = open (max. flow exceeded)
-            % 6 = open (flow setting not met)
-            % 7 = open (pressure setting not met)
-			[indices, value] = getLinkIndices(obj, varargin);
-            if obj.getVersion > 20101
-                j=1;
-                for i=indices
-                    [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_STATE, obj.LibEPANET);  
-                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                    j=j+1;
-                end
-            else
-                value = value*NaN;
-                warning('Function getLinkState need: EPANET Version > 20012');
-            end
+        function value = getLinkPumpState(obj, varargin)
+            % Current computed pump state (read only) (see @ref EN_PumpStateType) #EPANET Version 2.2
+            % Example: 
+            %   % Using step-by-step hydraulic analysis
+            %   d.getLinkPumpState
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_STATE, varargin{:});
         end
         function value = getLinkSettings(obj, varargin)
-            %Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_SETTING, obj.LibEPANET);  
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves
+            % Current link setting
+            % Example:
+            %   % Using step-by-step hydraulic analysis
+            %   d.getLinkSettings
+            value = get_link_info(obj, obj.ToolkitConstants.EN_SETTING, varargin{:});
         end
         function value = getLinkEnergy(obj, varargin)
-            %Retrieves the value of all computed energy in kwatts
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET);  
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            % Current computed pump energy usage (read only)
+            % Example:
+            %   % Using step-by-step hydraulic analysis
+            %   d.getLinkEnergy
+            value = get_link_info(obj, obj.ToolkitConstants.EN_ENERGY, varargin{:});
         end
-        function value = getLinkQuality(obj, varargin)
-            %EPANET Version 2.1 #crash_matlab #check_this
-            [indices, value] = getLinkIndices(obj, varargin);
-            if obj.getVersion > 20012
-                j=1;
-                for i=indices
-                    [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_LINKQUAL, obj.LibEPANET);  
-                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                    j=j+1;
-                end
-            else
-                value = value*NaN;
-                warning('Function getLinkQuality need: EPANET Version > 20012');
-            end
+        function value = getLinkActualQuality(obj, varargin)
+            % Current computed link quality (read only) #EPANET Version 2.2
+            % Example: check examples/EX14_hydraulic_and_quality_analysis.m
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LINKQUAL, varargin{:});
         end
-        function value = getLinkEfficiency(obj, varargin)
-            %EPANET Version 2.1
-            %Retrieves link efficiency
-            [indices, value] = getLinkIndices(obj, varargin);
-            if obj.getVersion > 20012
-                j=1;
-                for i=indices
-                    [obj.Errcode, value(j)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_EFFICIENCY, obj.LibEPANET);  
-                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                    j=j+1;
-                end
-            else
-                value = value*NaN;
-                warning('Function getLinkEfficiency need: EPANET Version > 20012');
-            end
+        function value = getLinkPumpEfficiency(obj, varargin)
+            % Current computed pump efficiency (read only) #EPANET Version 2.2
+            % Example: 
+            %   d.getLinkPumpEfficiency
+            %   d.getLinkPumpEfficiency(1)
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_EFFIC, varargin{:});
         end
-        function value = getLinkPumpPatternIndex(obj)
-            %EPANET Version 2.1
-            %Retrieves link pump pattern index
-            value = int32(zeros(1, obj.getLinkPumpCount));v=1;
-            for i=obj.getLinkPumpIndex
-                [obj.Errcode, value(v)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_LINKPATTERN, obj.LibEPANET);
-                v=v+1;
-            end
+        function value = getLinkPumpPower(obj, varargin)
+            % Pump constant power rating #EPANET Version 2.2
+            % Example: 
+            %   d.getLinkPumpPower
+            %   d.getLinkPumpPower(2)
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_POWER, varargin{:});
+        end
+        function value = getLinkPumpHCurve(obj, varargin)
+            % Pump head v. flow curve index #EPANET Version 2.2
+            % Example: 
+            %   d.getLinkPumpHCurve
+            %   d.getLinkPumpHCurve(13)
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_HCURVE, varargin{:});
+        end
+        function value = getLinkPumpECurve(obj, varargin)
+            % Pump efficiency v. flow curve index #EPANET Version 2.2
+            % Example: 
+            %   d.getLinkPumpECurve
+            %   d.getLinkPumpECurve(13)
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_ECURVE, varargin{:});
+        end
+        function value = getLinkPumpECost(obj, varargin)
+            % Pump average energy price #EPANET Version 2.2
+            % Example: 
+            %   d.getLinkPumpECost
+            %   d.getLinkPumpECost(13)
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_ECOST, varargin{:});
+        end
+        function value = getLinkPumpEPat(obj, varargin)
+            % Pump energy price time pattern index #EPANET Version 2.2
+            % Example: 
+            %   d.getLinkPumpEPat
+            %   d.getLinkPumpEPat(13)
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_EPAT, varargin{:});
+        end
+        function value = getLinkPumpPatternIndex(obj, varargin)
+            % Pump speed time pattern index #EPANET Version 2.1
+            % Example: 
+            %   d.getLinkPumpPatternIndex
+            %   d.getLinkPumpPatternIndex(13)
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LINKPATTERN, varargin{:});
         end
         function value = getLinkPumpPatternNameID(obj)
-            %EPANET Version 2.1
-            %Retrieves link pump pattern name ID
+            % Retrieves link pump pattern name ID #EPANET Version 2.1
+            % Example: 
+            %   d.getLinkPumpPatternNameID
             v = obj.getLinkPumpPatternIndex;
             value = obj.getPatternNameID(v);
         end
@@ -1694,18 +1692,46 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsHeadError(obj)
-            % Retrieve the head error EPANET Version 2.2
+            % Retrieve the head error #EPANET Version 2.2
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_HEADERROR, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsFlowChange(obj)
-            % Retrieve flow change EPANET Version 2.2
+            % Retrieve flow change #EPANET Version 2.2
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_FLOWCHANGE, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsHeadLossFormula(obj)
-            % Retrieve headloss formula EPANET Version 2.2
+            % Retrieve headloss formula #EPANET Version 2.2
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsGlobalEffic(obj)
+            % Retrieve global efficiency pumps #EPANET Version 2.2
+            % Example:
+            %   d.getOptionsGlobalEffic
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_GLOBALEFFIC, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsGlobalPrice(obj)
+            % Retrieve global average energy price per kW-Hour #EPANET Version 2.2
+            % Example:
+            %   d.getOptionsGlobalPrice
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_GLOBALPRICE, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsGlobalPattern(obj)
+            % Retrieve global pattern #EPANET Version 2.2
+            % Example:
+            %   d.getOptionsGlobalPattern
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_GLOBALPATTERN, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsDemandCharge(obj)
+            % Retrieve energy price pattern #EPANET Version 2.2
+            % Example:
+            %   d.getOptionsDemandCharge
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_DEMANDCHARGE, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getPatternNameID(obj, varargin)
@@ -2197,7 +2223,7 @@ classdef epanet <handle
                     value.Energy(k, :)=obj.getLinkEnergy;
                 end
                 if find(strcmpi(varargin, 'efficiency'))
-                    value.Efficiency(k, :)=obj.getLinkEfficiency;
+                    value.Efficiency(k, :)=obj.getLinkPumpEfficiency;
                 end
                 if find(strcmpi(varargin, 'state'))
                     value.State(k, :)=obj.getLinkState;
@@ -2261,7 +2287,7 @@ classdef epanet <handle
                     value.NodeQuality(k, :)=obj.getNodeActualQuality;
                 end
                 if find(strcmpi(varargin, 'linkquality'))
-                    value.LinkQuality(k, :)=obj.getLinkQuality;
+                    value.LinkQuality(k, :)=obj.getLinkActualQuality;
                 end
                 if find(strcmpi(varargin, 'mass'))
                     value.MassFlowRate(k, :)=obj.getNodeMassFlowRate;
@@ -2702,7 +2728,7 @@ classdef epanet <handle
             % Sets the ID name for links
             % Example: 
             %    d.setLinkNameID(1, 'newID');
-            %    d.setLinkNameID(cellarrayofnewIDs);
+            %    d.setLinkNameID(cell_array_of_newIDs);
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
@@ -2716,6 +2742,19 @@ classdef epanet <handle
             end
         end
         function setLinkRoughnessCoeff(obj, value, varargin)
+            % Sets the values of roughness coeff.
+            % Example:
+            %   index_pipe = 1
+            %   d.setLinkRoughnessCoeff(index_pipe, 100);
+            %   d.getLinkRoughnessCoeff(index_pipe)
+            %   r = d.getLinkRoughnessCoeff
+            %   qunc = 0.05;
+            %   ql=r-qunc*r;
+            %   qu=r+qunc*r;
+            %   r_length=length(r);
+            %   r_unc=ql+rand(1,r_length).*(qu-ql); 
+            %   d.setLinkRoughnessCoeff(r_unc)
+            %   d.getLinkRoughnessCoeff
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -2724,6 +2763,11 @@ classdef epanet <handle
             end
         end
         function setLinkMinorLossCoeff(obj, value, varargin)
+            % Sets the values of minor loss coeff.
+            % Example:
+            %   index_pipe = 1
+            %   d.setLinkMinorLossCoeff(index_pipe, 1.1);
+            %   d.getLinkMinorLossCoeff(index_pipe)
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -2732,14 +2776,26 @@ classdef epanet <handle
             end
         end
         function setLinkInitialStatus(obj, value, varargin)
+            % Sets the values of initial status
+            % Example:
+            %   d.getLinkInitialStatus
+            %   d.setLinkInitialStatus(0*d.getLinkInitialStatus)
+            %   d.getLinkInitialStatus
+            % Note: Cannot set status for a check valve
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
-            for i=indices% Cannot set status for a check valve
+            for i=indices
                 [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_INITSTATUS, value(j), obj.LibEPANET); j=j+1;
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
             end
         end
         function setLinkInitialSetting(obj, value, varargin)
+            % Sets the values of initial status
+            % Example:
+            %   linkset=d.getLinkInitialSetting
+            %   linkset(end)=108;
+            %   d.setLinkInitialSetting(linkset)
+            %   d.getLinkInitialSetting
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices

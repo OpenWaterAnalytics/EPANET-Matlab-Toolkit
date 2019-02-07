@@ -132,13 +132,13 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
 |getFlowUnits|Retrieves the units used to express all flow rates|
 |getLibFunctions|Retrieves the functions of DLL|
-|getLinkBulkReactionCoeff|Retrieves the value of all link bulk reaction coefficients|
+|getLinkActualQuality|Current computed link quality (read only)|
+|getLinkBulkReactionCoeff|Bulk chemical reaction coefficient|
 |getLinkCount|Retrieves the number of links|
 |getLinkDiameter|Retrieves the value of all link diameters|
-|getLinkEnergy|Retrieves the value of all computed energy in kwatts|
-|getLinkEfficiency|Retrieves the value of all computed efficiency|
-|getLinkFlows|Retrieves the value of all computed link flow rates|
-|getLinkHeadloss|Retrieves the value of all computed link headloss|
+|getLinkEnergy|Current computed pump energy usage (read only)|
+|getLinkFlows|Current computed flow rate (read only)|
+|getLinkHeadloss|Current computed head loss (read only)|
 |getLinkIndex|Retrieves the indices of all links, or the indices of an ID set of links|
 |getLinkInitialSetting|Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves|
 |getLinkInitialStatus|Retrieves the value of all link initial status|
@@ -150,26 +150,31 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkPipeIndex|Retrieves the indices of pipes|
 |getLinkPipeNameID|Retrieves the pipe IDs|
 |getLinkPumpCount|Retrieves the number of pumps|
+|getLinkPumpEfficiency|Retrieves the value of all computed efficiency|
 |getLinkPumpHeadCurveIndex|Retrieves index of a head curve for specific link index|
 |getLinkPumpIndex|Retrieves the indices of pumps|
 |getLinkPumpNameID|Retrieves the pump IDs|
-|getLinkPumpPatternIndex|Retrieves the pump pattern indices|
+|getLinkPumpPatternIndex|Pump speed time pattern index|
 |getLinkPumpPatternNameID|Retrieves the pump pattern IDs|
+|getLinkPumpPower|Pump constant power rating|
+|getLinkPumpHCurve|Pump head v. flow curve index|
+|getLinkPumpECurve|Pump efficiency v. flow curve index|
+|getLinkPumpECost|Pump average energy price|
+|getLinkPumpEPat|Pump energy price time pattern index|
 |getLinkPumpType|Retrieves the type of a pump for specific link index|
 |getLinkPumpTypeCode|Retrieves the type code of a pump for specific link index|
+|getLinkPumpState|Current computed pump state (read only) (see @ref EN_PumpStateType)|
 |getLinkPumpSwitches|Calculates the number of pump switches|
-|getLinkQuality|Retrieves the quality of links|
 |getLinkRoughnessCoeff|Retrieves the value of all link roughness|
 |getLinkSettings|Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves|
-|getLinkState|Retrieves the value of all computed link states|
-|getLinkStatus|Retrieves the value of all computed link status (0 = closed, 1 = open)|
+|getLinkStatus|Current link status (see @ref EN_LinkStatusType)|
 |getLinkType|Retrieves the link-type for all links|
 |getLinkTypeIndex|Retrieves the link-type code for all links.|
 |getLinkValveCount|Retrieves the number of valves|
 |getLinkValveIndex|Retrieves the indices of valves|
 |getLinkValveNameID|Retrieves the valve IDs|
-|getLinkVelocity|Retrieves the value of all computed link velocities|
-|getLinkWallReactionCoeff|Retrieves the value of all link wall reaction coefficients|
+|getLinkVelocity|Current computed flow velocity (read only)|
+|getLinkWallReactionCoeff|Pipe wall chemical reaction coefficient|
 |getNodeActualDemand|Retrieves the computed value of all actual demands|
 |getNodeActualDemandSensingNodes|Retrieves the computed demand values at some sensing nodes|
 |getNodeActualQuality|Retrieves the computed values of the actual quality for all nodes|
@@ -221,8 +226,12 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeTypeIndex|Retrieves the node code-index for all nodes|
 |getNodesConnectingLinksID|Retrieves the id of the from/to nodes of all links|
 |getOptionsAccuracyValue|Retrieve the analysis convergence criterion (0.001)|
+|getOptionsDemandCharge|Retrieve energy price pattern|
 |getOptionsEmitterExponent|Retrieve power exponent for the emmitters (0.5)|
 |getOptionsFlowChange|Retrieve flow change|
+|getOptionsGlobalEffic|Retrieve global efficiency pumps|
+|getOptionsGlobalPrice|Retrieve global average energy price per kW-Hour|
+|getOptionsGlobalPattern|Retrieve global pattern|
 |getOptionsHeadError|Retrieve the head error|
 |getOptionsHeadLossFormula|Retrieve headloss formula code (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)|
 |getOptionsMaxTrials|Retrieve maximum number of analysis trials|
@@ -285,6 +294,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |initializeQualityAnalysis|Initializes water quality and the simulation clock time prior to running a water quality analysis|
 |nextHydraulicAnalysisStep|Determines the length of time until the next hydraulic event occurs in an extended period simulation|
 |nextQualityAnalysisStep|Advances the water quality simulation to the start of the next hydraulic time period|
+|openAnyInp|Open as on matlab editor any EPANET input file|
+|openCurrentInp|Open EPANET input file who is loaded|
 |openHydraulicAnalysis|Opens the hydraulics analysis system|
 |openQualityAnalysis|Opens the water quality analysis system|
 |runHydraulicAnalysis|Runs a single period hydraulic analysis, retrieving the current simulation clock time t|
