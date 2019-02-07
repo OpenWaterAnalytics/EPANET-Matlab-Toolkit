@@ -28,12 +28,13 @@ qual_res = d.getComputedQualityTimeSeries %Value x Node, Value x Link
 % d.solveCompleteHydraulics #needed
 d.openQualityAnalysis
 d.initializeQualityAnalysis
-tleft=1; P=[];T=[];Q=[];  
+tleft=1; P=[];T=[];QsN=[]; QsL=[]; 
 while (tleft>0)
     %Add code which changes something related to quality
     t=d.runQualityAnalysis;
     P=[P; d.getNodePressure];
-    Q=[Q; d.getNodeActualQuality];
+    QsN=[QsN; d.getNodeActualQuality];
+    QsL=[QsL; d.getLinkQuality];
     T=[T; t];
     tleft = d.stepQualityAnalysisTimeLeft;
 end

@@ -25,7 +25,7 @@ d.initializeHydraulicAnalysis(0);
 d.initializeQualityAnalysis(d.ToolkitConstants.EN_NOSAVE);
 
 tstep = 1;
-T = []; P = []; F = []; QN = [];
+T = []; P = []; F = []; QN = []; QL = [];
 while (tstep>0)
     t = d.runHydraulicAnalysis;
     qt = d.runQualityAnalysis;
@@ -34,6 +34,7 @@ while (tstep>0)
     F = [F; d.getLinkFlows];
     
     QN = [QN; d.getNodeActualQuality];
+    QL = [QL; d.getLinkActualQuality];
     T = [T; t];
 
     tstep = d.nextHydraulicAnalysisStep;
@@ -45,6 +46,7 @@ d.closeHydraulicAnalysis;
 P
 F
 QN
+QL
 
 % Unload library 
 d.unload;

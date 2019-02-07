@@ -22,7 +22,7 @@ d.setTimeSimulationDuration(hrs*3600);
 
 % Hydraulic analysis using ENepanet binary file (fastest)
 % (This function ignores events)
-hyd_res_1 = d.getComputedTimeSeries 
+hyd_res_1 = d.getComputedTimeSeries
 
 % Hydraulic analysis using epanet2d.exe binary file
 % (This function ignores events)
