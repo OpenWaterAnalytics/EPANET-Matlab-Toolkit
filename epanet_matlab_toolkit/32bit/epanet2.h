@@ -7,7 +7,7 @@
  Authors:      see AUTHORS
  Copyright:    see AUTHORS
  License:      see LICENSE
- Last Updated: 01/08/2019
+ Last Updated: 02/28/2019
  ******************************************************************************
  */
 
@@ -30,37 +30,23 @@ function in epanet2_2.h.
 // The legacy style EPANET API can be compiled with support for either single
 // precision or double precision floating point arguments, with the default
 // being single precision. To compile for double precision one must #define
-// EN_API_FLOAT_TYPE as double both here and in any client code that uses the 
+// EN_API_FLOAT_TYPE as double both here and in any client code that uses the
 // API.
 #ifndef EN_API_FLOAT_TYPE
   #define EN_API_FLOAT_TYPE float
 #endif
 
-#ifdef WITH_GENX
-   #include "epanet2_export.h"
-#else
-  // --- define WINDOWS
-  #undef WINDOWS
+#ifndef DLLEXPORT
   #ifdef _WIN32
-    #define WINDOWS
-  #endif
-  #ifdef __WIN32__
-    #define WINDOWS
-  #endif
-
-  // --- define DLLEXPORT
-  #ifndef DLLEXPORT
-    #ifdef WINDOWS
-      #ifdef __cplusplus
-        #define DLLEXPORT __declspec(dllexport)
-      #else
-        #define DLLEXPORT __declspec(dllexport) __stdcall
-      #endif // __cplusplus
-    #elif defined(CYGWIN)
-      #define DLLEXPORT __stdcall
+    #ifdef epanet2_EXPORTS
+      #define DLLEXPORT __declspec(dllexport) __stdcall
     #else
-      #define DLLEXPORT
+      #define DLLEXPORT __declspec(dllimport) __stdcall
     #endif
+  #elif defined(__CYGWIN__)
+    #define DLLEXPORT __stdcall
+  #else
+    #define DLLEXPORT
   #endif
 #endif
 
@@ -74,7 +60,7 @@ extern "C" {
 
 /********************************************************************
 
-    System Functions
+    Project Functions
 
 ********************************************************************/
 
@@ -86,6 +72,12 @@ extern "C" {
 
   int  DLLEXPORT ENopen(const char *inpFile, const char *rptFile,
                  const char *outFile);
+  
+  int  DLLEXPORT ENgettitle(char *line1, char *line2, char *line3);
+  
+  int  DLLEXPORT ENsettitle(char *line1, char *line2, char *line3);
+
+  int  DLLEXPORT ENgetcount(int object, int *count);
 
   int  DLLEXPORT ENsaveinpfile(const char *filename);
 
@@ -145,6 +137,10 @@ extern "C" {
 
   int  DLLEXPORT ENreport();
 
+  int  DLLEXPORT ENcopyreport(char *filename);
+
+  int  DLLEXPORT ENclearreport();
+
   int  DLLEXPORT ENresetreport();
 
   int  DLLEXPORT ENsetreport(char *format);
@@ -153,15 +149,10 @@ extern "C" {
 
   int  DLLEXPORT ENgetversion(int *version);
 
-  int  DLLEXPORT ENgetcount(int object, int *count);
-
   int  DLLEXPORT ENgeterror(int errcode, char *errmsg, int maxLen);
 
   int  DLLEXPORT ENgetstatistic(int type, EN_API_FLOAT_TYPE* value);
   
-  int DLLEXPORT ENgettitle(char *titleline1, char *titleline2, char *titleline3);
-  
-  int DLLEXPORT ENsettitle(char *titleline1, char *titleline2, char *titleline3);
 
 /********************************************************************
 
@@ -219,9 +210,9 @@ extern "C" {
                  EN_API_FLOAT_TYPE maxlvl, EN_API_FLOAT_TYPE diam,
                  EN_API_FLOAT_TYPE minvol, char *volcurve);
 
-  int  DLLEXPORT ENgetcoord(int index, EN_API_FLOAT_TYPE *x, EN_API_FLOAT_TYPE *y);
+  int  DLLEXPORT ENgetcoord(int index, double *x, double *y);
 
-  int  DLLEXPORT ENsetcoord(int index, EN_API_FLOAT_TYPE x, EN_API_FLOAT_TYPE y);
+  int  DLLEXPORT ENsetcoord(int index, double x, double y);
 
 /********************************************************************
 
@@ -303,9 +294,13 @@ extern "C" {
 
   int DLLEXPORT ENaddpattern(char *id);
 
+  int DLLEXPORT ENdeletepattern(int index);
+
   int DLLEXPORT ENgetpatternindex(char *id, int *index);
 
   int DLLEXPORT ENgetpatternid(int index, char *id);
+
+  int DLLEXPORT ENsetpatternid(int index, char *id);
 
   int DLLEXPORT ENgetpatternlen(int index, int *len);
 
@@ -325,9 +320,13 @@ extern "C" {
 
   int DLLEXPORT ENaddcurve(char *id);
 
+  int DLLEXPORT ENdeletecurve(int index);
+
   int DLLEXPORT ENgetcurveindex(char *id, int *index);
 
   int DLLEXPORT ENgetcurveid(int index, char *id);
+
+  int DLLEXPORT ENsetcurveid(int index, char *id);
 
   int DLLEXPORT ENgetcurvelen(int index, int *len);
 
@@ -404,9 +403,8 @@ extern "C" {
 
   int DLLEXPORT ENsetelseaction(int ruleIndex, int actionIndex, int linkIndex,
                 int status, EN_API_FLOAT_TYPE setting);
-
+  
   int DLLEXPORT ENsetrulepriority(int index, EN_API_FLOAT_TYPE priority);
-
 
   #if defined(__cplusplus)
   }
