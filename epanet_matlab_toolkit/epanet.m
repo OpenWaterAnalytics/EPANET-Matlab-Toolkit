@@ -1271,42 +1271,24 @@ classdef epanet <handle
             end
         end
         function value = getDemandModel(obj, varargin)
-            %Retrieves the type of demand model in use and its parameters
-            %EPANET Version 2.2
-            % 
+            % Retrieves the type of demand model in use and its parameters
             % Example: 
             %   model = d.getDemandModel()
-            
-            if obj.getVersion > 20101
-                [obj.Errcode, value.DemandModelCode, value.DemandModelPmin, value.DemandModelPreq, value.DemandModelPexp] = ENgetdemandmodel(obj.LibEPANET); 
-                value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
-            else
-                value.DemandModelCode = NaN;
-                value.DemandModelPmin = NaN;
-                value.DemandModelPreq = NaN;
-                value.DemandModelPexp = NaN;
-                value.DemandModelType = NaN;
-                warning('Function getDemandModel need: EPANET Version > 20101');
-            end
+            [obj.Errcode, value.DemandModelCode, value.DemandModelPmin, value.DemandModelPreq, value.DemandModelPexp] = ENgetdemandmodel(obj.LibEPANET); 
+            value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
         end
         function [Line1, Line2, Line3] = getTitle(obj, varargin)
-            %Retrieves the title lines of the project
-            %EPANET Version 2.2
-            %
-            %Example: 
+            % Retrieves the title lines of the project
+            % Example: 
             %   [Line1, Line2, Line3] = d.getTitle()
-            
-            if obj.getVersion > 20101
-                [obj.Errcode, Line1, Line2, Line3] = ENgettitle(obj.LibEPANET); 
-            else
-                Line1 = NaN;
-                Line2 = NaN;
-                Line3 = NaN;
-            end
+            [obj.Errcode, Line1, Line2, Line3] = ENgettitle(obj.LibEPANET); 
         end
         function value = getNodeBaseDemands(obj, varargin)
-            %Retrieves the value of all node base demands
-            
+            % Retrieves the value of all node base demands
+            % Example:
+            %   d.getNodeBaseDemands
+            %   % get categories 1
+            %   d.getNodeBaseDemands{1} % for epanet DLL version 2.1>
             if sum(strcmp(obj.libFunctions, 'ENgetbasedemand'))
                 %EPANET Version 2.1
                 numdemands = obj.getNodeDemandCategoriesNumber;
@@ -1331,7 +1313,9 @@ classdef epanet <handle
             end
         end
         function value = getNodeDemandCategoriesNumber(obj, varargin)
-            %EPANET Version 2.1
+            % Retrieves the value of all node base demands #EPANET Version 2.1
+            % Example:
+            %   d.getNodeDemandCategoriesNumber
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnumdemands(i, obj.LibEPANET); 
@@ -1340,7 +1324,10 @@ classdef epanet <handle
             end
         end
         function value = getNodeDemandPatternIndex(obj)
-            %EPANET Version 2.1
+            % Retrieves the value of all node base demands #EPANET Version 2.1
+            % Example:
+            %   d.getNodeDemandPatternIndex
+            %   d.getNodeDemandPatternIndex{1} % categories
             numdemands = obj.getNodeDemandCategoriesNumber;
             value = cell(1, max(numdemands));
             val = zeros(max(numdemands), obj.getNodeCount);
