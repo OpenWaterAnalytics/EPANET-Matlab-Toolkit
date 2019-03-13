@@ -11043,10 +11043,10 @@ function [fid, binfile, rptfile] = runEPANETexe(obj)
     if strcmp(arch, 'win64') || strcmp(arch, 'win32')
         [~, lpwd]=system(['cmd /c for %A in ("', obj.LibEPANETpath, '") do @echo %~sA']);
         libPwd=regexp(lpwd, '\s', 'split');
-        r = sprintf('%s//epanet2d.exe %s %s %s', libPwd{1}, inpfile, rptfile, binfile);
+        r = sprintf('%s//epanet2.exe %s %s %s', libPwd{1}, inpfile, rptfile, binfile);
     end
     if isunix
-        r = sprintf('%sepanet2d %s %s %s', obj.LibEPANETpath, obj.BinTempfile, rptfile, binfile);
+        r = sprintf('%sepanet2 %s %s %s', obj.LibEPANETpath, obj.BinTempfile, rptfile, binfile);
     elseif ismac
         r = sprintf('%runepanet %s %s %s', obj.LibEPANETpath, obj.BinTempfile, rptfile, binfile);
     end
