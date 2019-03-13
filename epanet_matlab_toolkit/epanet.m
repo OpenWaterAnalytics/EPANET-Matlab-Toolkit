@@ -380,7 +380,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='2.1.8'; % 24/1/2019
+        classversion='2.1.8.1'; % 13/03/2019
         
         TYPECONTROL={'LOWLEVEL','HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL','HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'VOLUME','PUMP','EFFICIENCY','HEADLOSS','GENERAL'}; % Constants for pump curves: 'PUMP','EFFICIENCY','VOLUME','HEADLOSS' % EPANET Version 2.2
