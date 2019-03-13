@@ -4194,24 +4194,23 @@ classdef epanet <handle
             % msx.patterns{1} = {''}; %patternID
             % msx.patterns{2} = {''}; %multiplier            
             space=5;
-            f = writenewTemp(msx.msxFile);
-            fprintf(f, '[TITLE]\n');
-            if isfield(msx, 'titleDescription')
-                for i=1:length(msx.titleDescription)
-                    fprintf(f, msx.titleDescription{i});
-                end
+            f = writenewTemp(msx.FILENAME);
+            fprintf(f,'[TITLE]\n');
+            if isfield(msx,'title')
+                fprintf(f,msx.TITLE);
             end
 
-            fprintf(f, '\n\n[OPTIONS]\n');
-            options = {'AREA_UNITS', 'RATE_UNITS', 'SOLVER', 'COUPLING', 'COMPILER', ...
+            fprintf(f,'\n\n[OPTIONS]\n');
+            options = {'AREA_UNITS', 'RATE_UNITS', 'SOLVER', 'COUPLING', 'COMPILER',...
                 'TIMESTEP', 'ATOL', 'RTOL'};
             spaces=blanks(space);
-            if isfield(msx, 'options')
-                for i=1:length(msx.options)
-                    fprintf(f, num2str(options{i}));
-                    fprintf(f, spaces);
-                    fprintf(f, num2str(msx.options{i}));
-                    fprintf(f, '\n');
+
+            for i=1:length(options)
+                if isfield(msx,options{i})
+                    fprintf(f,num2str(options{i}));
+                    fprintf(f,spaces);
+                    fprintf(f,num2str(msx.(options{i})));
+                    fprintf(f,'\n');
                 end
             end
 
@@ -4222,17 +4221,11 @@ classdef epanet <handle
                 if ~strcmpi(section, 'GLOBAL')
                     fprintf(f, ['\n[', section, ']\n']);
                 end
-                sp_field = lower(section);
-                if isfield(msx, lower(section))
-                    for u=1:length(eval(['msx.', sp_field, '{1}']))
-                        for i=1:length(eval(['msx.', sp_field]))
-                            if isnumeric(eval(['msx.', sp_field, '{i}{u}']))
-                                fprintf(f, num2str(eval(['msx.', sp_field, '{i}{u}'])));
-                            else
-                                fprintf(f, num2str(char(eval(['msx.', sp_field, '{i}{u}']))));
-                            end
-                            fprintf(f, spaces);
-                        end
+                sp_field = upper(section);
+                if isfield(msx, upper(section))
+                    species_all = eval(['msx.', sp_field]);
+                    for i=1:length(species_all)
+                        fprintf(f, species_all{i});
                         fprintf(f, '\n');
                     end
                 end
