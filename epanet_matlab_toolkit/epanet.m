@@ -3660,137 +3660,49 @@ classdef epanet <handle
         function saveMSXFile(obj,msxname)
             [obj.Errcode] = MSXsavemsxfile(msxname,obj.MSXLibEPANET);
         end
-        function msx = writeMSXFile(obj,msx)
-            % Input Arguments
-            % msx={};
-            % msx.msxFile = 'networks/MSXFileName.msx';
-            % % section Title
-            % msx.titleDescription{1} = 'Example: MSXFile.';
-            % % section Options
-            % msx.options{1}='FT2'; %AREA_UNITS FT2/M2/CM2
-            % msx.options{2}='DAY'; %TIME_UNITS SEC/MIN/HR/DAY
-            % msx.options{3}='EUL'; %SOLVER EUL/RK5/ROS2
-            % msx.options{4}='NONE'; %COUPLING FULL/NONE
-            % msx.options{5}='NONE'; %COMPILER NONE/VC/GC
-            % msx.options{6}=3600; %TIMESTEP in seconds
-            % msx.options{7}=0.01;  %ATOL value
-            % msx.options{8}=0.001;  %RTOL value
-            % % section Species
-            % % <type> <specieID> <units> (<atol> <rtol>)
-            % msx.species{1}={'BULK'}; %type BULK/WALL
-            % msx.species{2}={'CL2'}; %specieID
-            % msx.species{3}={'MG'}; %units UG/MG
-            % msx.species{4}={0.01}; %atol
-            % msx.species{5}={0.001}; %rtol
-            % 
-            % % section Coefficients 
-            % % CONSTANT name value % PARAMETER name value
-            % msx.coefficients{1}={'PARAMETER','PARAMETER'}; 
-            % msx.coefficients{2}={'Kb','Kw'}; 
-            % msx.coefficients{3}={0.3,1}; 
-            % 
-            % % section Terms
-            % % <termID> <expression>
-            % msx.terms{1}={'Kf'}; % termID
-            % msx.terms{2}={'1.5826e-4 * RE^0.88 / D'}; % expression
-            % 
-            % % section Pipes
-            % % EQUIL <specieID> <expression>
-            % % RATE <specieID> <expression>
-            % % FORMULA <specieID> <expression>
-            % msx.pipes{1} ={'RATE'}; %type
-            % msx.pipes{2} ={'CL2'}; %specieID
-            % msx.pipes{3} ={'-Kb*CL2 - (4/D)*Kw*Kf/(Kw+Kf)*CL2'}; %expression
-            % 
-            % % section Tanks
-            % % EQUIL <specieID> <expression>
-            % % RATE <specieID> <expression>
-            % % FORMULA <specieID> <expression>
-            % msx.tanks{1} ={'RATE'}; %type
-            % msx.tanks{2} ={'CL2'}; %specieID
-            % msx.tanks{3} ={'-Kb*CL2'}; %expression
-
-            % % section Sources
-            % % <type> <nodeID> <specieID> <strength> (<patternID>)
-            % msx.sources{1}={''}; %CONC/MASS/FLOW/SETPOINT
-            % msx.sources{2}={''}; %nodeID
-            % msx.sources{3}={''}; %specieID
-            % msx.sources{4}={''}; %strength
-            % msx.sources{5}={''}; %patternID
-            % 
-            % % section Quality Global
-            % % GLOBAL <specieID> <value>
-            % msx.global{1} = {''};
-            % msx.global{2} = {''};%specieID
-            % msx.global{3} = {''};%value
-            % % others
-            % % NODE <nodeID> <bulkSpecieID> <value>
-            % % LINK <linkID> <wallSpecieID> <value>
-            % msx.quality{1} = {''}; %NODE/LINK
-            % msx.quality{2} = {''}; %ID
-            % msx.quality{3} = {''}; %bulkSpecieID/wallSpecieID
-            % msx.quality{4} = {''}; %value
-            % 
-            % % section Parameters
-            % % PIPE <pipeID> <paramID> <value>
-            % % TANK <tankID> <paramID> <value>
-            % msx.parameters{1} = {''};
-            % msx.parameters{2} = {''};
-            % msx.parameters{3} = {''};
-            % msx.parameters{4} = {''};
-            % 
-            % % section Patterns
-            % % <patternID> <multiplier> <multiplier> 
-            % msx.patterns{1} = {''}; %patternID
-            % msx.patterns{2} = {''}; %multiplier            
+        function msx = writeMSXFile(obj, msx)
+            % Checkout example: /examples/EX15_write_msx_file.m
             space=5;
-            f = writenewTemp(msx.msxFile);
+            f = writenewTemp(msx.FILENAME);
             fprintf(f,'[TITLE]\n');
-            if isfield(msx,'titleDescription')
-                for i=1:length(msx.titleDescription)
-                    fprintf(f,msx.titleDescription{i});
-                end
+            if isfield(msx,'title')
+                fprintf(f,msx.TITLE);
             end
 
             fprintf(f,'\n\n[OPTIONS]\n');
             options = {'AREA_UNITS', 'RATE_UNITS', 'SOLVER', 'COUPLING', 'COMPILER',...
                 'TIMESTEP', 'ATOL', 'RTOL'};
             spaces=blanks(space);
-            if isfield(msx,'options')
-                for i=1:length(msx.options)
+
+            for i=1:length(options)
+                if isfield(msx,options{i})
                     fprintf(f,num2str(options{i}));
                     fprintf(f,spaces);
-                    fprintf(f,num2str(msx.options{i}));
+                    fprintf(f,num2str(msx.(options{i})));
                     fprintf(f,'\n');
                 end
             end
 
-            FIELDS = {'SPECIES', 'COEFFICIENTS', 'TERMS', 'PIPES',...
+            FIELDS = {'SPECIES', 'COEFFICIENTS', 'TERMS', 'PIPES', ...
                 'TANKS', 'SOURCES', 'QUALITY', 'GLOBAL', 'PARAMETERS', 'PATTERNS'};
             for sect=FIELDS
                 section = char(sect);
                 if ~strcmpi(section, 'GLOBAL')
-                    fprintf(f,['\n[',section,']\n']);
+                    fprintf(f, ['\n[', section, ']\n']);
                 end
-                sp_field = lower(section);
-                if isfield(msx,lower(section))
-                    for u=1:length(eval(['msx.',sp_field,'{1}']))
-                        for i=1:length(eval(['msx.',sp_field]))
-                            if isnumeric(eval(['msx.',sp_field,'{i}{u}']))
-                                fprintf(f,num2str(eval(['msx.',sp_field,'{i}{u}'])));
-                            else
-                                fprintf(f,num2str(char(eval(['msx.',sp_field,'{i}{u}']))));
-                            end
-                            fprintf(f,spaces);
-                        end
-                        fprintf(f,'\n');
+                sp_field = upper(section);
+                if isfield(msx, upper(section))
+                    species_all = eval(['msx.', sp_field]);
+                    for i=1:length(species_all)
+                        fprintf(f, species_all{i});
+                        fprintf(f, '\n');
                     end
                 end
             end
            
-            fprintf(f,'[REPORT]\n');
-            fprintf(f,'NODES ALL\n');
-            fprintf(f,'LINKS ALL\n');
+            fprintf(f, '[REPORT]\n');
+            fprintf(f, 'NODES ALL\n');
+            fprintf(f, 'LINKS ALL\n');
             fclose(f);
         end
         function unloadMSX(obj)
