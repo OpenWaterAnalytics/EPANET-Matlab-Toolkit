@@ -11208,19 +11208,20 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
         fread(fid, 1, 'float');
 
         for i=1:value.BinNumberReportingPeriods
-            value.BinnodeDemand(i,:)         = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinnodeHead(i,:)           = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinnodePressure(i,:)       = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinnodeQuality(i,:)        = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinlinkFlow(i,:)           = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkVelocity(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkHeadloss(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkQuality(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkStatus(i,:)         = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkSetting(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkReactionRate(i,:)   = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkFrictionFactor(i,:) = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinNodeDemand(i,:)         = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinNodeHead(i,:)           = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinNodePressure(i,:)       = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinNodeQuality(i,:)        = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinLinkFlow(i,:)           = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkVelocity(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkHeadloss(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkQuality(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkStatus(i,:)         = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkSetting(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkReactionRate(i,:)   = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkFrictionFactor(i,:) = fread(fid, value.BinNumberLinks, 'float')';
         end
+        
         value.BinAverageBulkReactionRate=fread(fid, 1, 'float')';
         value.BinAverageWallReactionRate=fread(fid, 1, 'float')';
         value.BinAverageTankReactionRate=fread(fid, 1, 'float')';
