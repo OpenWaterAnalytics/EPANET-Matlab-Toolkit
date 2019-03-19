@@ -11737,18 +11737,18 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
     end
     if ~isempty(varargin)
         v.Time = (0:value.BinReportingTimeStepSec:value.BinSimulationDurationSec)';
-        v.Pressure = value.BinnodePressure;
-        v.Demand = value.BinnodeDemand;
-        v.Head = value.BinnodeHead;
-        v.NodeQuality = value.BinnodeQuality;
-        v.Flow = value.BinlinkFlow;
-        v.Velocity = value.BinlinkVelocity;
-        v.HeadLoss = value.BinlinkHeadloss;
-        v.Status = value.BinlinkStatus;
-        v.Setting = value.BinlinkSetting;
-        v.ReactionRate = value.BinlinkReactionRate;
-        v.FrictionFactor = value.BinlinkFrictionFactor;
-        v.LinkQuality = value.BinlinkQuality;
+        v.Pressure = value.BinNodePressure;
+        v.Demand = value.BinNodeDemand;
+        v.Head = value.BinNodeHead;
+        v.NodeQuality = value.BinNodeQuality;
+        v.Flow = value.BinLinkFlow;
+        v.Velocity = value.BinLinkVelocity;
+        v.HeadLoss = value.BinLinkHeadloss;
+        v.Status = value.BinLinkStatus;
+        v.Setting = value.BinLinkSetting;
+        v.ReactionRate = value.BinLinkReactionRate;
+        v.FrictionFactor = value.BinLinkFrictionFactor;
+        v.LinkQuality = value.BinLinkQuality;
         clear value;
         value=v;
     end
