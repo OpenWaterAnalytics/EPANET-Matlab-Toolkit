@@ -8417,9 +8417,9 @@ for i=1:(nargin/2)
             error('Invalid property founobj.');
     end
 end
-drawnow;
 
 if axesid==0
+   drawnow;
    fig=figure;
    axesid=axes('Parent', fig);
 end
