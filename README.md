@@ -723,6 +723,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetlinkid|Change the ID name for a link|
 |ENgettitle|Retrieves the title lines of the project|
 |ENsettitle|Sets the title lines of the project|
+|ENsetlinktype|Changes the type of a particular link (e.g. pipe to pump)|
 |ENgetdemandname|Gets the name of a node's demand category|
 |ENsetdemandname|Assigns a name to a node's demand category|
 
