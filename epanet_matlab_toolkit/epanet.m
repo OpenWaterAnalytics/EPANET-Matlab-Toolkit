@@ -1277,6 +1277,26 @@ classdef epanet <handle
             [obj.Errcode, value.DemandModelCode, value.DemandModelPmin, value.DemandModelPreq, value.DemandModelPexp] = ENgetdemandmodel(obj.LibEPANET); 
             value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
         end
+        function value = getNodeJunctionDemandName(obj, varargin)
+            % Gets the name of a node's demand category
+            % Example: 
+            %   model = d.getNodeJunctionDemandName()
+            [indices, ~] = getNodeIndices(obj, varargin);
+            numdemands = obj.getNodeDemandCategoriesNumber(indices);
+            value = cell(1, max(numdemands));
+            cnt = length(indices);
+            val = cell(max(numdemands), cnt);j=1;
+            for i=indices
+                v=1;
+                for u=1:numdemands(j)
+                    [obj.Errcode, val{v, j}] = ENgetdemandname(i, u, obj.LibEPANET);v=v+1;
+                end
+                j=j+1;
+            end
+            for i=1:size(val, 1)
+                value{i} = val(i, :);
+            end
+        end
         function [Line1, Line2, Line3] = getTitle(obj, varargin)
             % Retrieves the title lines of the project
             % Example: 
@@ -1287,29 +1307,26 @@ classdef epanet <handle
             % Retrieves the value of all node base demands
             % Example:
             %   d.getNodeBaseDemands
-            %   % get categories 1
-            %   d.getNodeBaseDemands{1} % for epanet DLL version 2.1>
-            if sum(strcmp(obj.libFunctions, 'ENgetbasedemand'))
-                %EPANET Version 2.1
-                numdemands = obj.getNodeDemandCategoriesNumber;
-                value = cell(1, max(numdemands));
-                val = zeros(max(numdemands), obj.getNodeCount);
-                for i=obj.getNodeIndex
-                    v=1;
-                    for u=1:numdemands(i)
-                        [obj.Errcode, val(v, i)] = ENgetbasedemand(i, u, obj.LibEPANET);v=v+1;
-                    end
+            %   % Get categories 1
+            %   d.getNodeBaseDemands{1}
+            %   % Get node base demand with categories for specific node index
+            %   d.getNodeBaseDemands(1) 
+            %   d.getNodeBaseDemands(122)
+            %EPANET Version 2.2
+            [indices, ~] = getNodeIndices(obj, varargin);
+            numdemands = obj.getNodeDemandCategoriesNumber(indices);
+            value = cell(1, max(numdemands));
+            cnt = length(indices);
+            val = zeros(max(numdemands), cnt);j=1;
+            for i=indices
+                v=1;
+                for u=1:numdemands(j)
+                    [obj.Errcode, val(v, j)] = ENgetbasedemand(i, u, obj.LibEPANET);v=v+1;
                 end
-                for i=1:size(val, 1)
-                    value{i} = val(i, :);
-                end
-            else%EPANET Version 2.0012
-                [indices, value] = getNodeIndices(obj, varargin);j=1;
-                for i=indices
-                    [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_BASEDEMAND, obj.LibEPANET); 
-                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
-                    j=j+1;
-                end   
+                j=j+1;
+            end
+            for i=1:size(val, 1)
+                value{i} = val(i, :);
             end
         end
         function value = getNodeDemandCategoriesNumber(obj, varargin)
@@ -3054,7 +3071,15 @@ classdef epanet <handle
                 error('Please give Demand model type: DDA or PDA');
             end
             [obj.Errcode] = ENsetdemandmodel(model_type, pmin, preq, pexp, obj.LibEPANET);
-        end
+        end 
+        function setNodeJunctionDemandName(obj, nodeIndex, demandIndex, demandName)
+            % Assigns a name to a node's demand category
+            % EPANET Version 2.2
+            %
+            % Example: d.setNodeJunctionDemandName(1, 1, 'Demand category name');
+            %          d.getNodeJunctionDemandName
+            [obj.Errcode] = ENsetdemandname(nodeIndex, demandIndex, demandName, obj.LibEPANET);
+        end            
         function setTitle(obj, varargin)
             % Sets the title lines of the project
             % EPANET Version 2.2
@@ -7829,6 +7854,21 @@ end
 function [Errcode] = ENsetdemandmodel(type, pmin, preq, pexp, LibEPANET)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENsetdemandmodel', type, pmin, preq, pexp);
+if Errcode
+    ENgeterror(Errcode, LibEPANET);
+end
+end
+function [Errcode] = ENsetdemandname(node_index, demand_index, demand_name, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsetdemandname', node_index, demand_index, demand_name);
+if Errcode
+    ENgeterror(Errcode, LibEPANET);
+end
+end
+function [Errcode, demand_name] = ENgetdemandname(node_index, demand_index, LibEPANET)
+% EPANET Version 2.2
+demand_name = char(32*ones(1, 256));
+[Errcode, demand_name]=calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
 if Errcode
     ENgeterror(Errcode, LibEPANET);
 end

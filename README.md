@@ -191,6 +191,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeIndex|Retrieves the indices of all nodes or some nodes with a specified ID|
 |getNodeInitialQuality|Retrieves the value of all node initial quality|
 |getNodeJunctionCount|Retrieves the number of junctions|
+|getNodeJunctionDemandName|Gets the name of a node's demand category|
 |getNodeJunctionIndex|Retrieves the junctions indices|
 |getNodeJunctionNameID|Retrieves the junctions IDs|
 |getNodeMassFlowRate|Retrieves the computed mass flow rates per minute of chemical sources|
@@ -345,6 +346,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeElevations|Sets the values of elevations|
 |setNodeEmitterCoeff|Sets the values of emitter coeff.|
 |setNodeInitialQuality|Sets the values of initial qualities|
+|setNodeJunctionDemandName|Assigns a name to a node's demand category|
 |setNodeNameID|Sets the ID name for nodes|
 |setNodeSourcePatternIndex|Sets the values of source pattern indices|
 |setNodeSourceQuality|Sets the values of source qualities|
@@ -721,5 +723,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetlinkid|Change the ID name for a link|
 |ENgettitle|Retrieves the title lines of the project|
 |ENsettitle|Sets the title lines of the project|
+|ENgetdemandname|Gets the name of a node's demand category|
+|ENsetdemandname|Assigns a name to a node's demand category|
 
 &uparrow; [Back to top](#table-of-contents)
