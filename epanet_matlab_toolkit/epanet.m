@@ -1189,7 +1189,7 @@ classdef epanet <handle
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
                     [obj.Errcode, value{k}]=ENgetnodeid(i, obj.LibEPANET);
-                    if obj.Errcode==203, value=[]; return; end   
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
                     k=k+1;
                 end
             end
@@ -7265,220 +7265,126 @@ classdef epanet <handle
     end
 end
 function [Errcode] = ENwriteline (line, LibEPANET)
-    [Errcode]=calllib(LibEPANET, 'ENwriteline', line);
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+[Errcode]=calllib(LibEPANET, 'ENwriteline', line);
 end
 function [Errcode] = ENaddpattern(patid, LibEPANET)
-    Errcode=calllib(LibEPANET, 'ENaddpattern', patid);
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+Errcode=calllib(LibEPANET, 'ENaddpattern', patid);
 end
 function [Errcode] = ENclose(LibEPANET)
-    [Errcode]=calllib(LibEPANET, 'ENclose');
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+[Errcode]=calllib(LibEPANET, 'ENclose');
 end
 function [Errcode] = ENcloseH(LibEPANET)
-    [Errcode]=calllib(LibEPANET, 'ENcloseH');
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+[Errcode]=calllib(LibEPANET, 'ENcloseH');
 end
 function [Errcode, value] = ENgetnodevalue(index, paramcode, LibEPANET)
-    value=single(0);
-    %p=libpointer('singlePtr', value);
-    index=int32(index);
-    paramcode=int32(paramcode);
-    [Errcode, value]=calllib(LibEPANET, 'ENgetnodevalue', index, paramcode, value);
-    if Errcode==240, value=NaN; end
-    value = double(value);
+value=single(0);
+index=int32(index);
+paramcode=int32(paramcode);
+[Errcode, value]=calllib(LibEPANET, 'ENgetnodevalue', index, paramcode, value);
+if Errcode==240, value=NaN; end
+value = double(value);
 end
 function [Errcode, value] = ENgetbasedemand(index, numdemands, LibEPANET)
-    %epanet20100
-    [Errcode, value]=calllib(LibEPANET, 'ENgetbasedemand', index, numdemands, 0);
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+%epanet20100
+[Errcode, value]=calllib(LibEPANET, 'ENgetbasedemand', index, numdemands, 0);
 end
 function [Errcode, value] = ENgetnumdemands(index, LibEPANET)
-    %epanet20100
-    [Errcode, value]=calllib(LibEPANET, 'ENgetnumdemands', index, 0);
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+%epanet20100
+[Errcode, value]=calllib(LibEPANET, 'ENgetnumdemands', index, 0);
 end
 function [Errcode, value] = ENgetdemandpattern(index, numdemands, LibEPANET)
-    %epanet20100
-    [Errcode, value]=calllib(LibEPANET, 'ENgetdemandpattern', index, numdemands, 0);
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+%epanet20100
+[Errcode, value]=calllib(LibEPANET, 'ENgetdemandpattern', index, numdemands, 0);
 end
 function [Errcode, value] = ENgetstatistic(code, LibEPANET)
-    %epanet20100
-    [Errcode, value]=calllib(LibEPANET, 'ENgetstatistic', code, 0);
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+%epanet20100
+[Errcode, value]=calllib(LibEPANET, 'ENgetstatistic', code, 0);
 end
 function [Errcode] = ENcloseQ(LibEPANET)
-    [Errcode]=calllib(LibEPANET, 'ENcloseQ');
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+[Errcode]=calllib(LibEPANET, 'ENcloseQ');
 end
 function [Errcode, ctype, lindex, setting, nindex, level] = ENgetcontrol(cindex, LibEPANET)
-    [Errcode, ctype, lindex, setting, nindex, level]=calllib(LibEPANET, 'ENgetcontrol', cindex, 0, 0, 0, 0, 0);
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+[Errcode, ctype, lindex, setting, nindex, level]=calllib(LibEPANET, 'ENgetcontrol', cindex, 0, 0, 0, 0, 0);
 end
 function [Errcode, count] = ENgetcount(countcode, LibEPANET)
-    [Errcode, count]=calllib(LibEPANET, 'ENgetcount', countcode, 0);
-    if Errcode
-        ENgeterror(Errcode, LibEPANET);
-    end
+[Errcode, count]=calllib(LibEPANET, 'ENgetcount', countcode, 0);
 end
 function [errmsg, e] = ENgeterror(Errcode, LibEPANET)
-    e=0; errmsg='';
-    if Errcode
-        [e, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
-        if e, [e, errmsg] = calllib(LibEPANET, 'ENgeterror', e, char(32*ones(1, 79)), 79); end
-    end
+e=0; errmsg='';
+if Errcode
+[e, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
+if e, [e, errmsg] = calllib(LibEPANET, 'ENgeterror', e, char(32*ones(1, 79)), 79); end
+end
 end
 function [Errcode, flowunitsindex] = ENgetflowunits(LibEPANET)
 [Errcode, flowunitsindex]=calllib(LibEPANET, 'ENgetflowunits', 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, id] = ENgetlinkid(index, LibEPANET)
 id=char(32*ones(1, 31));
 [Errcode, id]=calllib(LibEPANET, 'ENgetlinkid', index, id);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetlinkid(index, newid, LibEPANET)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENsetlinkid', index, newid);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, index] = ENgetlinkindex(id, LibEPANET)
 [Errcode, ~, index]=calllib(LibEPANET, 'ENgetlinkindex', id, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, from, to] = ENgetlinknodes(index, LibEPANET)
 [Errcode, from, to]=calllib(LibEPANET, 'ENgetlinknodes', index, 0, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, typecode] = ENgetlinktype(index, LibEPANET)
 [Errcode, typecode]=calllib(LibEPANET, 'ENgetlinktype', index, 0);
 if ~isnumeric(typecode), typecode = getTypeLink(typecode); end
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, value] = ENgetlinkvalue(index, paramcode, LibEPANET)
 [Errcode, value]=calllib(LibEPANET, 'ENgetlinkvalue', index, paramcode, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 value = double(value);
 end
 function [Errcode, id] = ENgetnodeid(index, LibEPANET)
 id=char(32*ones(1, 31));
 [Errcode, id]=calllib(LibEPANET, 'ENgetnodeid', index, id);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetnodeid(index, newid, LibEPANET)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENsetnodeid', index, newid);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, index] = ENgetnodeindex(id, LibEPANET)
 [Errcode, ~, index]=calllib(LibEPANET, 'ENgetnodeindex', id, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, type] = ENgetnodetype(index, LibEPANET)
 [Errcode, type]=calllib(LibEPANET, 'ENgetnodetype', index, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, value] = ENgetoption(optioncode, LibEPANET)
 [Errcode, value]=calllib(LibEPANET, 'ENgetoption', optioncode, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, id] = ENgetpatternid(index, LibEPANET)
 id=char(32*ones(1, 31));
 [Errcode, id]=calllib(LibEPANET, 'ENgetpatternid', index, id);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, id] = ENgetcurveid(index, LibEPANET)
 % EPANET Version dev2.1
 id=char(32*ones(1, 31));
 [Errcode, id]=calllib(LibEPANET, 'ENgetcurveid', index, id);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, type] = ENgetcurvetype(index, LibEPANET)
 % EPANET Version 2.2
 [Errcode, type]=calllib(LibEPANET, 'ENgetcurvetype', index, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, index] = ENgetpatternindex(id, LibEPANET)
 [Errcode, ~, index]=calllib(LibEPANET, 'ENgetpatternindex', id, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, len] = ENgetpatternlen(index, LibEPANET)
 [Errcode, len]=calllib(LibEPANET, 'ENgetpatternlen', index, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, value] = ENgetpatternvalue(index, period, LibEPANET)
 [Errcode, value]=calllib(LibEPANET, 'ENgetpatternvalue', index, period, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, qualcode, tracenode] = ENgetqualtype(LibEPANET)
 [Errcode, qualcode, tracenode]=calllib(LibEPANET, 'ENgetqualtype', 0, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, timevalue] = ENgettimeparam(paramcode, LibEPANET)
 [Errcode, timevalue]=calllib(LibEPANET, 'ENgettimeparam', paramcode, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, LibEPANET] = ENgetversion(LibEPANET)
 [Errcode, LibEPANET]=calllib(LibEPANET, 'ENgetversion', 0);
@@ -7488,15 +7394,9 @@ end
 end
 function [Errcode] = ENinitH(flag, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENinitH', flag);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENinitQ(saveflag, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENinitQ', saveflag);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function ENMatlabCleanup(LibEPANET)
 % Load library
@@ -7531,15 +7431,9 @@ end
 end
 function [Errcode, tstep] = ENnextH(LibEPANET)
 [Errcode, tstep]=calllib(LibEPANET, 'ENnextH', int32(0));
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, tstep] = ENnextQ(LibEPANET)
 [Errcode, tstep]=calllib(LibEPANET, 'ENnextQ', int32(0));
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 tstep = double(tstep);
 end
 function [Errcode] = ENopen(inpname, repname, binname, LibEPANET) %DE
@@ -7551,168 +7445,90 @@ function [Errcode] = ENopen(inpname, repname, binname, LibEPANET) %DE
 end
 function [Errcode] = ENopenH(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENopenH');
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENopenQ(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENopenQ');
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENreport(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENreport');
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENresetreport(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENresetreport');
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, t] = ENrunH(LibEPANET)
 [Errcode, t]=calllib(LibEPANET, 'ENrunH', int32(0));
 t = double(t);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, t] = ENrunQ(LibEPANET)
 t=int32(0);
 [Errcode, t]=calllib(LibEPANET, 'ENrunQ', t);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsaveH(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsaveH');
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsavehydfile(fname, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsavehydfile', fname);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsaveinpfile(inpname, LibEPANET)
 Errcode=calllib(LibEPANET, 'ENsaveinpfile', inpname);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetcontrol', cindex, ctype, lindex, setting, nindex, level);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetlinkvalue(index, paramcode, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetlinkvalue', index, paramcode, value);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, index] = ENsetlinktype(id, paramcode, actionCode, LibEPANET)
 % EPANET Version 2.2 
 [Errcode, index]=calllib(LibEPANET, 'ENsetlinktype', id, paramcode, actionCode);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetnodevalue(index, paramcode, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetnodevalue', index, paramcode, value);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetoption(optioncode, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetoption', optioncode, value);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetpattern(index, factors, nfactors, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetpattern', index, factors, nfactors);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetpatternvalue(index, period, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetpatternvalue', index, period, value);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetqualtype', qualcode, chemname, chemunits, tracenode);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetreport(command, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetreport', command);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetstatusreport(statuslevel, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetstatusreport', statuslevel);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsettimeparam(paramcode, timevalue, LibEPANET)
 paramcode=int32(paramcode);
 timevalue=int32(timevalue);
 [Errcode]=calllib(LibEPANET, 'ENsettimeparam', paramcode, timevalue);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsolveH(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsolveH');
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsolveQ(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsolveQ');
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, tleft] = ENstepQ(LibEPANET)
 tleft=int32(0);
 [Errcode, tleft]=calllib(LibEPANET, 'ENstepQ', tleft);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 tleft=double(tleft);
 end
 function [Errcode] = ENusehydfile(hydfname, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENusehydfile', hydfname);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetcurve(index, x, y, nfactors, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENsetcurve', index, x, y, nfactors);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, x, y] = ENgetcurvevalue(index, period, LibEPANET)
 % EPANET Version 2.1
 [Errcode, x, y]=calllib(LibEPANET, 'ENgetcurvevalue', index, period, 0, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, x, y] = ENsetcurvevalue(index, pnt, x, y, LibEPANET)
 % EPANET Version 2.1
@@ -7722,94 +7538,55 @@ function [Errcode, x, y] = ENsetcurvevalue(index, pnt, x, y, LibEPANET)
 % y      = curve y value                            
 % sets x, y point for a specific point and curve 
 [Errcode]=calllib(LibEPANET, 'ENsetcurvevalue', index, pnt, x, y);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, index] = ENgetcurveindex(id, LibEPANET)
 % EPANET Version 2.1
 [Errcode, ~, index]=calllib(LibEPANET, 'ENgetcurveindex', id, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENaddcurve(cid, LibEPANET)
 % EPANET Version 2.1
 Errcode=calllib(LibEPANET, 'ENaddcurve', cid);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, ids, nvalue, xvalue, yvalue] = ENgetcurve(value, LibEPANET)
 [~, ~, nvalue, ~, ~]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, 0, 0);
 [Errcode, ids, ~, xvalue, yvalue]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, zeros(1, nvalue), zeros(1, nvalue));
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, len] = ENgetcurvelen(index, LibEPANET)
 % EPANET Version 2.1
 [Errcode, len]=calllib(LibEPANET, 'ENgetcurvelen', index, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, value] = ENgetheadcurveindex(pumpindex, LibEPANET)
 % EPANET Version 2.1
 [Errcode, value]=calllib(LibEPANET, 'ENgetheadcurveindex', pumpindex, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, value] = ENgetpumptype(pumpindex, LibEPANET)
 % EPANET Version 2.1
 [Errcode, value]=calllib(LibEPANET, 'ENgetpumptype', pumpindex, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, value] = ENgetaveragepatternvalue(index, LibEPANET) 
 % return  average pattern value
 % EPANET Version 2.1
 [Errcode, value]=calllib(LibEPANET, 'ENgetaveragepatternvalue', index, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, x, y] = ENgetcoord(index, LibEPANET)
 % EPANET Version 2.1
 [Errcode, x, y]=calllib(LibEPANET, 'ENgetcoord', index, 0, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetcoord(index, x, y, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENsetcoord', index, x, y);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetbasedemand(index, demandIdx, value, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENsetbasedemand', index, demandIdx, value);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetdemandpattern(index, demandIdx, patInd, LibEPANET)
 % New version 
 [Errcode]=calllib(LibEPANET, 'ENsetdemandpattern', index, demandIdx, patInd);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, qualcode, chemname, chemunits, tracenode] = ENgetqualinfo(LibEPANET)
 chm=char(32*ones(1, 31));
 [Errcode, qualcode, chemname, chemunits, tracenode]=calllib(LibEPANET, 'ENgetqualinfo', 0, chm, chm, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [index, Errcode] = ENaddnode(obj, nodeid, nodetype)
 % dev-net-builder
@@ -7840,52 +7617,32 @@ disp(obj.getError(Errcode));
 end
 function [Errcode, cindex] = ENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, type, pmin, preq, pexp] = ENgetdemandmodel(LibEPANET)
 % EPANET Version 2.2
 [Errcode, type, pmin, preq, pexp]=calllib(LibEPANET, 'ENgetdemandmodel', 0, 0, 0, 0);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetdemandmodel(type, pmin, preq, pexp, LibEPANET)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENsetdemandmodel', type, pmin, preq, pexp);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsetdemandname(node_index, demand_index, demand_name, LibEPANET)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENsetdemandname', node_index, demand_index, demand_name);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, demand_name] = ENgetdemandname(node_index, demand_index, LibEPANET)
 % EPANET Version 2.2
 demand_name = char(32*ones(1, 256));
 [Errcode, demand_name]=calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode, line1, line2, line3] = ENgettitle(LibEPANET)
 % EPANET Version 2.2
 c = char(32*ones(1, 79));
 [Errcode, line1, line2, line3]=calllib(LibEPANET, 'ENgettitle', c, c, c);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [Errcode] = ENsettitle(line1, line2, line3, LibEPANET)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENsettitle', line1, line2, line3);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
 end
 end
 % function [Errcode, nPremises, nTrueActions, nFalseActions, priority] = EN_getrule(cindex, LibEPANET)
@@ -7896,9 +7653,6 @@ end
 % end
 function [Errcode] = ENsetflowunits(LibEPANET, code)
 [Errcode]=calllib(LibEPANET, 'ENsetflowunits', code);
-if Errcode
-    ENgeterror(Errcode, LibEPANET);
-end
 end
 function [obj] = MSXMatlabSetup(obj, msxname, varargin)
 arch = computer('arch');
@@ -7910,8 +7664,7 @@ elseif strcmp(arch, 'win32')
 end
 if isunix
     obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
-end
-            
+end         
 if ~isempty(varargin)
     if varargin{1}{1}~=1
         if nargin==3 
