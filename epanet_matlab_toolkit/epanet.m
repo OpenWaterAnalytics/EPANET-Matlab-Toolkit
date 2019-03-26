@@ -900,8 +900,9 @@ classdef epanet <handle
         function value = getLinkNameID(obj, varargin)
             %Retrieves the ID label(s) of all links, or the IDs of an index set of links
             if isempty(varargin)
-                value=cell(1, obj.getLinkCount);
-                for i=1:obj.getLinkCount
+                cnt = obj.getLinkCount;
+                value=cell(1, cnt);
+                for i=1:cnt
                     [obj.Errcode, value{i}]=ENgetlinkid(i, obj.LibEPANET);
                 end
             else
@@ -1179,8 +1180,9 @@ classdef epanet <handle
         function value = getNodeNameID(obj, varargin)
             %Retrieves the ID label of all nodes or some nodes with a specified index.
             if isempty(varargin)
-                value = cell(1, obj.getNodeCount);
-                for i=1:obj.getNodeCount
+                cnt = obj.getNodeCount;
+                value = cell(1, cnt);
+                for i=1:cnt
                     [obj.Errcode, value{i}]=ENgetnodeid(i, obj.LibEPANET);
                 end
             else
@@ -1300,19 +1302,18 @@ classdef epanet <handle
         function [Line1, Line2, Line3] = getTitle(obj, varargin)
             % Retrieves the title lines of the project
             % Example: 
-            %   [Line1, Line2, Line3] = d.getTitle()
+            %       [Line1, Line2, Line3] = d.getTitle()
             [obj.Errcode, Line1, Line2, Line3] = ENgettitle(obj.LibEPANET); 
         end
         function value = getNodeBaseDemands(obj, varargin)
             % Retrieves the value of all node base demands
             % Example:
-            %   d.getNodeBaseDemands
-            %   % Get categories 1
-            %   d.getNodeBaseDemands{1}
-            %   % Get node base demand with categories for specific node index
-            %   d.getNodeBaseDemands(1) 
-            %   d.getNodeBaseDemands(122)
-            %EPANET Version 2.2
+            %       d.getNodeBaseDemands
+            %       % Get categories 1
+            %       d.getNodeBaseDemands{1}
+            %       % Get node base demand with categories for specific node index
+            %       d.getNodeBaseDemands(1) 
+            %       d.getNodeBaseDemands(122)
             [indices, ~] = getNodeIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
             value = cell(1, max(numdemands));
@@ -1332,7 +1333,7 @@ classdef epanet <handle
         function value = getNodeDemandCategoriesNumber(obj, varargin)
             % Retrieves the value of all node base demands #EPANET Version 2.1
             % Example:
-            %   d.getNodeDemandCategoriesNumber
+            %       d.getNodeDemandCategoriesNumber
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnumdemands(i, obj.LibEPANET); 
@@ -1343,8 +1344,8 @@ classdef epanet <handle
         function value = getNodeDemandPatternIndex(obj)
             % Retrieves the value of all node base demands #EPANET Version 2.1
             % Example:
-            %   d.getNodeDemandPatternIndex
-            %   d.getNodeDemandPatternIndex{1} % categories
+            %       d.getNodeDemandPatternIndex
+            %       d.getNodeDemandPatternIndex{1} % categories
             numdemands = obj.getNodeDemandCategoriesNumber;
             value = cell(1, max(numdemands));
             val = zeros(max(numdemands), obj.getNodeCount);
@@ -2429,40 +2430,40 @@ classdef epanet <handle
         function index = addNodeJunction(obj, juncID)
             % Add new junction
             % Example:
-            %   juncID = 'J-1'
-            %   d.addNodeJunction(juncID)
+            %       juncID = 'J-1'
+            %       d.addNodeJunction(juncID)
             index = ENaddnode(obj, juncID, obj.ToolkitConstants.EN_JUNCTION);
         end
         function index = addNodeReservoir(obj, resID)
             % Add new reservoir
             % Example:
-            %   resID = 'R-1'
-            %   d.addNodeReservoir(resID)
+            %       resID = 'R-1'
+            %       d.addNodeReservoir(resID)
             index = ENaddnode(obj, resID, obj.ToolkitConstants.EN_RESERVOIR);
         end
         function index = addNodeTank(obj, tankID)
             % Add new tank
             % Example:
-            %   tankID = 'T-1'
-            %   d.addNodeTank(tankID)
+            %       tankID = 'T-1'
+            %       d.addNodeTank(tankID)
             index = ENaddnode(obj, tankID, obj.ToolkitConstants.EN_TANK);
         end
         function index = addLinkPipeCV(obj, cvpipeID, fromNode, toNode)
             % Add new control valve pipe
             % Example:
-            %   cvpipeID = 'CP-1'
-            %   fromNode = 'J-1'
-            %   toNode = 'J-2'
-            %   d.addLinkPipeCV(cvpipeID, fromNode, toNode)
+            %       cvpipeID = 'CP-1'
+            %       fromNode = 'J-1'
+            %       toNode = 'J-2'
+            %       d.addLinkPipeCV(cvpipeID, fromNode, toNode)
             index = ENaddlink(obj, cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode);
         end
         function index = addLinkPipe(obj, pipeID, fromNode, toNode)
             % Add new pipe
             % Example:
-            %   pipeID = 'P-1'
-            %   fromNode = 'J-1'
-            %   toNode = 'J-2'
-            %   d.addLinkPipe(pipeID, fromNode, toNode)
+            %       pipeID = 'P-1'
+            %       fromNode = 'J-1'
+            %       toNode = 'J-2'
+            %       d.addLinkPipe(pipeID, fromNode, toNode)
             index = ENaddlink(obj, pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode);
         end
         function index = addLinkPump(obj, pumpID, fromNode, toNode)
@@ -2477,62 +2478,62 @@ classdef epanet <handle
         function index = addLinkValvePRV(obj, vID, fromNode, toNode)
             % Add new PRV valve
             % Example:
-            %   vID = 'PRV-1'
-            %   fromNode = 'J-1'
-            %   toNode = 'J-2'
-            %   d.addLinkValvePRV(vID, fromNode, toNode)
+            %       vID = 'PRV-1'
+            %       fromNode = 'J-1'
+            %       toNode = 'J-2'
+            %       d.addLinkValvePRV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode);
         end
         function index = addLinkValvePSV(obj, vID, fromNode, toNode)
             % Add new PSV valve
             % Example:
-            %   vID = 'PSV-1'
-            %   fromNode = 'J-1'
-            %   toNode = 'J-2'
-            %   d.addLinkValvePSV(vID, fromNode, toNode)
+            %       vID = 'PSV-1'
+            %       fromNode = 'J-1'
+            %       toNode = 'J-2'
+            %       d.addLinkValvePSV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode);
         end        
         function index = addLinkValvePBV(obj, vID, fromNode, toNode)
             % Add new PBV valve
             % Example:
-            %   vID = 'PBV-1'
-            %   fromNode = 'J-1'
-            %   toNode = 'J-2'
-            %   d.addLinkValvePBV(vID, fromNode, toNode)
+            %       vID = 'PBV-1'
+            %       fromNode = 'J-1'
+            %       toNode = 'J-2'
+            %       d.addLinkValvePBV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode);
         end
         function index = addLinkValveFCV(obj, vID, fromNode, toNode)
             % Add new FCV valve
             % Example:
-            %   vID = 'FCV-1'
-            %   fromNode = 'J-1'
-            %   toNode = 'J-2'
-            %   d.addLinkValveFCV(vID, fromNode, toNode)
+            %       vID = 'FCV-1'
+            %       fromNode = 'J-1'
+            %       toNode = 'J-2'
+            %       d.addLinkValveFCV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode);
         end
         function index = addLinkValveTCV(obj, vID, fromNode, toNode)
             % Add new TCV valve
             % Example:
-            %   vID = 'TCV-1'
-            %   fromNode = 'J-1'
-            %   toNode = 'J-2'
-            %   d.addLinkValveTCV(vID, fromNode, toNode)
+            %       vID = 'TCV-1'
+            %       fromNode = 'J-1'
+            %       toNode = 'J-2'
+            %       d.addLinkValveTCV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode);
         end
         function index = addLinkValveGPV(obj, vID, fromNode, toNode)
             % Add new GPV valve
             % Example:
-            %   vID = 'GPV-1'
-            %   fromNode = 'J-1'
-            %   toNode = 'J-2'
-            %   d.addLinkValveGPV(vID, fromNode, toNode)
+            %       vID = 'GPV-1'
+            %       fromNode = 'J-1'
+            %       toNode = 'J-2'
+            %       d.addLinkValveGPV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
         function Errcode = deleteNode(obj, indexNode)
             % Delete a node
             % Example:
-            %   indexNode = d.getNodeNameID(1)
-            %   d.deleteNode(indexNode)
+            %       indexNode = d.getNodeNameID(1)
+            %       d.deleteNode(indexNode)
             [Errcode] = ENdeletenode(obj, indexNode);
         end
         function Errcode = deleteLink(obj, indexLink)
@@ -2545,16 +2546,16 @@ classdef epanet <handle
         function setControls(obj, index, control)
             % Sets the parameters of a simple control statement
             % Example: 
-            %   d.setControls(1, 'LINK 9 CLOSED IF NODE 2 ABOVE 180')
-            %   %set many controls
-            %   controls = d.getControls;
-            %   d.setControls(controls)
-            %   d.getControls(1)
+            %       d.setControls(1, 'LINK 9 CLOSED IF NODE 2 ABOVE 180')
+            %       %set many controls
+            %       controls = d.getControls;
+            %       d.setControls(controls)
+            %       d.getControls(1)
             %
-            %   c = d.getControls;
-            %   d.setControls({c.Control})
-            %   d.setControls({'LINK 9 OPEN IF NODE 2 BELOW 110', 'LINK 9 CLOSED IF NODE 2 ABOVE 200'})
-            %   d.getControls(2)
+            %       c = d.getControls;
+            %       d.setControls({c.Control})
+            %       d.setControls({'LINK 9 OPEN IF NODE 2 BELOW 110', 'LINK 9 CLOSED IF NODE 2 ABOVE 200'})
+            %       d.getControls(2)
             if isstruct(index)
                 for c=1:length(index)
                     setControlFunction(obj, c, index(c).Control)
@@ -2581,26 +2582,26 @@ classdef epanet <handle
         function index = addControls(obj, control)
             % Adds a new simple control
             % Example:
-            %   index = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');
-            %   d.getControls(index)
-            %   d.setControls(index, 'LINK 9 43.2392 AT TIME 14:00:00');
-            %   d.getControls(index)
+            %       index = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');
+            %       d.getControls(index)
+            %       d.setControls(index, 'LINK 9 43.2392 AT TIME 14:00:00');
+            %       d.getControls(index)
             index = addControlFunction(obj, control); 
         end
         function setLinkDiameter(obj, value, varargin)
             % Sets the values of diameters
             % Example:
-            %   index_pipe = 1
-            %   d.setLinkDiameter(index_pipe, 100);
-            %   d.getLinkDiameter(index_pipe)
-            %   diameters = d.getLinkDiameter
-            %   qunc = 0.05;
-            %   ql=diameters-qunc*diameters;
-            %   qu=diameters+qunc*diameters;
-            %   diam_length=length(diameters);
-            %   diameters_unc=ql+rand(1,diam_length).*(qu-ql); 
-            %   d.setLinkDiameter(diameters_unc)
-            %   d.getLinkDiameter
+            %       index_pipe = 1
+            %       d.setLinkDiameter(index_pipe, 100);
+            %       d.getLinkDiameter(index_pipe)
+            %       diameters = d.getLinkDiameter
+            %       qunc = 0.05;
+            %       ql=diameters-qunc*diameters;
+            %       qu=diameters+qunc*diameters;
+            %       diam_length=length(diameters);
+            %       diameters_unc=ql+rand(1,diam_length).*(qu-ql); 
+            %       d.setLinkDiameter(diameters_unc)
+            %       d.getLinkDiameter
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
