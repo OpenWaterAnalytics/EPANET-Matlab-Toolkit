@@ -79,6 +79,10 @@ d.getNodeCount
 
 d.getNodeElevations
 
+Help Functions:
+
+help d.plot
+
 &uparrow; [Back to top](#table-of-contents)
 
 ## How to fix/report bugs
@@ -118,6 +122,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getComputedQualityTimeSeries|Computed Quality Time Series|
 |getComputedTimeSeries|Computed Hydraulic & Quality Time Series via ENepanet binary file|
 |getConnectivityMatrix|Return connectivity matrix of the network|
+|getCounts|Retrieves the number of network components|
 |getControlRulesCount|Retrieves the number of control rules|
 |getControls|Retrieves the controls|
 |getCurveCount|Retrieves the number of curves|
@@ -134,6 +139,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLibFunctions|Retrieves the functions of DLL|
 |getLinkActualQuality|Current computed link quality (read only)|
 |getLinkBulkReactionCoeff|Bulk chemical reaction coefficient|
+|getLinkComment|Retrieves the comment string assigned to the link object|
 |getLinkCount|Retrieves the number of links|
 |getLinkDiameter|Retrieves the value of all link diameters|
 |getLinkEnergy|Current computed pump energy usage (read only)|
@@ -180,6 +186,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeActualQuality|Retrieves the computed values of the actual quality for all nodes|
 |getNodeActualQualitySensingNodes|Retrieves the computed quality values at some sensing nodes|
 |getNodeBaseDemands|Retrieves the value of all node base demands|
+|getNodeComment|Retrieves the comment string assigned to the node object|
 |getNodeCoordinates|Retrieves coordinate x, y, and x, y vertices for a node|
 |getNodeCount|Retrieves the number of nodes|
 |getNodePatternIndex|Retrieves the value of all node pattern indices|
@@ -240,6 +247,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getOptionsQualityTolerance|Retrieve the water quality analysis tolerance|
 |getPattern|Retrieves the multiplier factor for all patterns and all times|
 |getPatternAveragePatternValue|Retrieves the average value of a pattern|
+|getPatternComment|Retrieves the comment string assigned to the pattern object|
 |getPatternCount|Retrieves the number of patterns|
 |getPatternIndex|Retrieves the index of all or some time patterns IDs|
 |getPatternLengths|Retrieves the number of time periods in all or some patterns|
@@ -320,6 +328,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setFlowUnitsMGD|Sets flow units to MGD|
 |setFlowUnitsMLD|Sets flow units to MLD|
 |setLinkBulkReactionCoeff|Sets the values of bulk reactions|
+|setLinkComment|Sets the comment string assigned to the link object|
 |setLinkDiameter|Sets the values of diameters|
 |setLinkPumpHeadCurveIndex|Sets the curves index for pumps index|
 |setLinkInitialSetting|Sets the values of initial settings|
@@ -341,6 +350,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkTypeValveTCV|Set the link type valve TCV for a specified link|
 |setLinkWallReactionCoeff|Sets the values of wall reactions|
 |setNodeBaseDemands|Sets the values of demands|
+|setNodeComment|Sets the comment string assigned to the node object|
 |setNodeCoordinates|Sets node coordinates|
 |setNodeDemandPatternIndex|Sets the values of demand pattern indices|
 |setNodeElevations|Sets the values of elevations|
@@ -365,6 +375,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setOptionsPatternDemandMultiplier|Sets the value of pattern demand multiplier|
 |setOptionsQualityTolerance|Sets the value of tolerance|
 |setPattern|Sets all of the multiplier factors for a specific time pattern|
+|setPatternComment|Sets the comment string assigned to the pattern object|
 |setPatternMatrix|Sets all of the multiplier factors for all patterns|
 |setPatternValue|Sets the multiplier factor for a specific period within a time pattern|
 |setQualityType|Sets the type of water quality analysis called for|
@@ -726,5 +737,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetlinktype|Changes the type of a particular link (e.g. pipe to pump)|
 |ENgetdemandname|Gets the name of a node's demand category|
 |ENsetdemandname|Assigns a name to a node's demand category|
+|ENgetcomment|Retrieves the comment string assigned to the object (NODE, LINK, TIMEPAT or CURVE)|
+|ENsetcomment|Sets the comment string assigned to the object (NODE, LINK, TIMEPAT or CURVE)|
 
 &uparrow; [Back to top](#table-of-contents)

@@ -835,6 +835,8 @@ classdef epanet <handle
 %         end
         function value = getNodeCount(obj)
             % Retrieves the number of nodes
+            % Example:
+            %       d.getNodeCount
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_NODECOUNT, obj.LibEPANET);
         end
         function value = getNodeTankReservoirCount(obj)
@@ -1264,7 +1266,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeElevations(obj, varargin)
-            %Retrieves the value of all node elevations
+            % Retrieves the value of all node elevations
+            % Example:
+            %       d.getNodeElevations
+            %       d.getNodeElevations(1)
+            %       d.getNodeElevations(5:7)
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET); 
@@ -1297,6 +1303,48 @@ classdef epanet <handle
             end
             for i=1:size(val, 1)
                 value{i} = val(i, :);
+            end
+        end
+        function value = getNodeComment(obj, varargin)
+            % Retrieves the comment string assigned to the node object
+            % Example: 
+            %       d.getNodeComment(1:5)
+            %       d.getNodeComment(4)
+            if isempty(varargin)
+                cnt = obj.getNodeCount;
+                value = cell(1, cnt);
+                for i=1:cnt
+                    [obj.Errcode, value{i}]=ENgetcomment(obj.ToolkitConstants.EN_NODE, i, obj.LibEPANET);
+                end
+            else
+                if isempty(varargin{1}), varargin{1}=0; end
+                k=1;
+                value = cell(1, length(varargin{1}));
+                for i=varargin{1}
+                    [obj.Errcode, value{k}]=ENgetcomment(obj.ToolkitConstants.EN_NODE, i, obj.LibEPANET);
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                    k=k+1;
+                end
+            end
+        end
+        function value = setNodeComment(obj, value, varargin)
+            % Sets the comment string assigned to the node object
+            % Example: 
+            %       d.setNodeComment(1, 'This is a node');
+            %       d.getNodeComment(1)
+            %       d.setNodeComment(1:2, {'This is a node', 'Test comm'});
+            %       d.getNodeComment(1:2)
+            %       d.getNodeComment
+            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            j=1;
+            if length(indices) == 1
+                [obj.Errcode] = ENsetcomment(obj.ToolkitConstants.EN_NODE, indices, value, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+            else
+                for i=indices
+                    [obj.Errcode] = ENsetcomment(obj.ToolkitConstants.EN_NODE, i, value{j}, obj.LibEPANET); j=j+1;
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                end   
             end
         end
         function [Line1, Line2, Line3] = getTitle(obj, varargin)
@@ -1739,6 +1787,28 @@ classdef epanet <handle
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_DEMANDCHARGE, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
+        function value = getPatternComment(obj, varargin)
+            % Retrieves the comment string assigned to the pattern object
+            % Example: 
+            %       d.getPatternComment(1)
+            %       d.getPatternComment
+            if isempty(varargin)
+                cnt = obj.getPatternCount;
+                value = cell(1, cnt);
+                for i=1:cnt
+                    [obj.Errcode, value{i}]=ENgetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, obj.LibEPANET);
+                end
+            else
+                if isempty(varargin{1}), varargin{1}=0; end
+                k=1;
+                value = cell(1, length(varargin{1}));
+                for i=varargin{1}
+                    [obj.Errcode, value{k}]=ENgetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, obj.LibEPANET);
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                    k=k+1;
+                end
+            end
+        end
         function value = getPatternNameID(obj, varargin)
             %Retrieves the ID label of all or some time patterns indices
             patCnt = obj.getPatternCount;
@@ -1837,11 +1907,54 @@ classdef epanet <handle
             indices = getCurveIndices(obj, varargin);
             value=obj.TYPECURVE(obj.getCurveTypeIndex(indices)+1);
         end
+        function value = getCurveComment(obj, varargin)
+            % Retrieves the comment string assigned to the node object
+            % Example: 
+            %       d.getCurveComment(1)
+            %       d.getCurveComment
+            if isempty(varargin)
+                cnt = obj.getCurveCount;
+                value = cell(1, cnt);
+                for i=1:cnt
+                    [obj.Errcode, value{i}]=ENgetcomment(obj.ToolkitConstants.EN_CURVE, i, obj.LibEPANET);
+                end
+            else
+                if isempty(varargin{1}), varargin{1}=0; end
+                k=1;
+                value = cell(1, length(varargin{1}));
+                for i=varargin{1}
+                    [obj.Errcode, value{k}]=ENgetcomment(obj.ToolkitConstants.EN_CURVE, i, obj.LibEPANET);
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                    k=k+1;
+                end
+            end
+        end
         function setCurve(obj, index, curveVector)
             %Sets x, y values for a specific curve
             %EPANET Version 2.1
             nfactors=size(curveVector, 1);%x = number of points in curve
             [obj.Errcode] = ENsetcurve(index, curveVector(:, 1), curveVector(:, 2), nfactors, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+        end
+        function value = setCurveComment(obj, value, varargin)
+            % Sets the comment string assigned to the curve object
+            % Example: 
+            %       d.setCurveComment(1, 'This is a curve');
+            %       d.getCurveComment(1)
+            %       d.setCurveComment(1:2, {'This is a curve', 'Test comm'});
+            %       d.getCurveComment(1:2)
+            %       d.getCurveComment
+            if nargin==3, indices = value; value=varargin{1}; else indices = getCurveIndices(obj, varargin); end
+            j=1;
+            if length(indices) == 1
+                [obj.Errcode] = ENsetcomment(obj.ToolkitConstants.EN_CURVE, indices, value, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+            else
+                for i=indices
+                    [obj.Errcode] = ENsetcomment(obj.ToolkitConstants.EN_CURVE, i, value{j}, obj.LibEPANET); j=j+1;
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                end   
+            end
         end
         function setCurveValue(obj, index, curvePnt, value)
             %Retrieves x, y point for a specific point number and curve
@@ -2008,14 +2121,32 @@ classdef epanet <handle
             %Returns: error code
             %Purpose: retrieves end nodes of a specific link
             for i=1:obj.getCurveCount
-                [obj.Errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = ENgetcurve(i, obj.LibEPANET);
+                [obj.Errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = ENgetcurve(obj, i, obj.LibEPANET);
             end
+        end
+        function value = getCounts(obj)
+            % Retrieves the number of network components (Nodes, Links, Junctions, Reservoirs, Tanks, Pipes, Pumps, Valves, Curves, ControlRules, Patterns)
+            % Example: 
+            %       d.getCounts()
+            value.Nodes = obj.getNodeCount;
+            value.Links = obj.getLinkCount;
+            value.Junctions = obj.getNodeJunctionCount;
+            value.Reservoirs = obj.getNodeReservoirCount;
+            value.Tanks = obj.getNodeTankCount;
+            value.Pipes = obj.getLinkPipeCount;
+            value.Pumps = obj.getLinkPumpCount;
+            value.Valves = obj.getLinkValveCount;
+            value.Curves = obj.getCurveCount;
+            value.ControlRules = obj.getControlRulesCount;
+            value.Patterns = obj.getPatternCount;
+            
         end
         function value = getConnectivityMatrix(obj, varargin)
             conn = obj.getNodesConnectingLinksID;
             nodesID = obj.getNodeNameID;
-            value = zeros(obj.getNodeCount, obj.getNodeCount);
-            for i=1:obj.getNodeCount
+            cnt = obj.getNodeCount;
+            value = zeros(cnt, cnt);
+            for i=1:cnt
                 mm = strcmp(nodesID(i), conn);
                 mS = mm(:, 1)+mm(:, 2);       
                 chIndex = find(mS);
@@ -2028,28 +2159,40 @@ classdef epanet <handle
         end
         function valueIndex = addCurve(obj, varargin)
             %EPANET Version 2.1
-            %Adds a new curve appended to the end of the existing curves
+            % Adds a new curve appended to the end of the existing curves
+            % Example:
+            %       curve_index = d.addCurve('NewCur2', [1800 200; 1500 400]);
+            %       d.getCurvesInfo
             valueIndex = 0;
             if (4>nargin && nargin>1) 
                 [obj.Errcode] = ENaddcurve(varargin{1}, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
                 valueIndex = getCurveIndex(obj, varargin{1});
                 if nargin==3
                     setCurve(obj, valueIndex, varargin{2});
                 end
             end
         end
-        function value = getCurveValue(obj, index, varargin)
+        function value = getCurveValue(obj, varargin)
             %EPANET Version 2.1
-            %Retrieves x, y point for a specific point number and curve
-            if nargin<3
-                tmplen = obj.getCurveLengths;
-                value = zeros(tmplen(index), 2);
-                for i=1:tmplen(index)
-                    [obj.Errcode, value(i, 1), value(i, 2)] = ENgetcurvevalue(index, i, obj.LibEPANET);
-                end
+            % Retrieves x, y point for a specific point number and curve
+            % Example:
+            %       d.getCurveValue
+            %       d.getCurveValue(1)
+            %       d.getCurveValue(2)
+            tmplen = obj.getCurveLengths;
+            cur_index = obj.getCurveIndex;
+            if nargin>1
+               index = varargin{1}; 
             else
-                [obj.Errcode, x, y] = ENgetcurvevalue(index, varargin{1}, obj.LibEPANET);
-                value = [x y];
+               index = cur_index;
+            end
+            value = cell(length(index), 1); j = 1;
+            for cur = cur_index(index)
+                for i=1:tmplen(cur)
+                    [obj.Errcode, value{j}(i, 1), value{j}(i, 2)] = ENgetcurvevalue(cur, i, obj.LibEPANET);
+                end
+                j=j+1;
             end
         end
         function [curveIndex, pumpIndex] = getLinkPumpHeadCurveIndex(obj)
@@ -2609,6 +2752,49 @@ classdef epanet <handle
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
             end            
         end
+        function value = getLinkComment(obj, varargin)
+            % Retrieves the comment string assigned to the link object
+            % Example: 
+            %       d.getLinkComment(1:5)
+            %       d.getLinkComment(4)
+            %       d.getLinkComment
+            if isempty(varargin)
+                cnt = obj.getLinkCount;
+                value = cell(1, cnt);
+                for i=1:cnt
+                    [obj.Errcode, value{i}]=ENgetcomment(obj.ToolkitConstants.EN_LINK, i, obj.LibEPANET);
+                end
+            else
+                if isempty(varargin{1}), varargin{1}=0; end
+                k=1;
+                value = cell(1, length(varargin{1}));
+                for i=varargin{1}
+                    [obj.Errcode, value{k}]=ENgetcomment(obj.ToolkitConstants.EN_LINK, i, obj.LibEPANET);
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                    k=k+1;
+                end
+            end
+        end
+        function value = setLinkComment(obj, value, varargin)
+            % Sets the comment string assigned to the link object
+            % Example: 
+            %       d.setLinkComment(1, 'This is a link');
+            %       d.getLinkComment(1)
+            %       d.setLinkComment(1:2, {'This is a node', 'Test comm'});
+            %       d.getLinkComment(1:2)
+            %       d.getLinkComment
+            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            j=1;
+            if length(indices) == 1
+                [obj.Errcode] = ENsetcomment(obj.ToolkitConstants.EN_LINK, indices, value, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+            else
+                for i=indices
+                    [obj.Errcode] = ENsetcomment(obj.ToolkitConstants.EN_LINK, i, value{j}, obj.LibEPANET); j=j+1;
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                end   
+            end
+        end
         function setConditional(obj, value)
             % Return 0 if is EN_UNCONDITIONAL: Delete all controls that contain object   
             % Return 1 if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
@@ -3080,6 +3266,7 @@ classdef epanet <handle
             % Example: d.setNodeJunctionDemandName(1, 1, 'Demand category name');
             %          d.getNodeJunctionDemandName
             [obj.Errcode] = ENsetdemandname(nodeIndex, demandIndex, demandName, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end            
         function setTitle(obj, varargin)
             % Sets the title lines of the project
@@ -3179,6 +3366,26 @@ classdef epanet <handle
 %         function value = setTimeNextEvent(obj)
 %             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENT, obj.LibEPANET);
 %         end
+        function value = setPatternComment(obj, value, varargin)
+            % Sets the comment string assigned to the pattern object
+            % Example: 
+            %       d.setPatternComment(1, 'This is a PATTERN');
+            %       d.getPatternComment(1)
+            %       d.setPatternComment(1:2, {'This is a pattern', 'Test comm'});
+            %       d.getPatternComment(1:2)
+            %       d.getPatternComment
+            if nargin==3, indices = value; value=varargin{1}; else indices = getPatternIndices(obj, varargin); end
+            j=1;
+            if length(indices) == 1
+                [obj.Errcode] = ENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, indices, value, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+            else
+                for i=indices
+                    [obj.Errcode] = ENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, value{j}, obj.LibEPANET); j=j+1;
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                end   
+            end
+        end
         function setPattern(obj, index, patternVector)
             nfactors=length(patternVector);
             [obj.Errcode] = ENsetpattern(index, patternVector, nfactors, obj.LibEPANET);
@@ -7546,11 +7753,10 @@ function [Errcode, index] = ENgetcurveindex(id, LibEPANET)
 end
 function [Errcode] = ENaddcurve(cid, LibEPANET)
 % EPANET Version 2.1
-Errcode=calllib(LibEPANET, 'ENaddcurve', cid);
+[Errcode]=calllib(LibEPANET, 'ENaddcurve', cid);
 end
-function [Errcode, ids, nvalue, xvalue, yvalue] = ENgetcurve(value, LibEPANET)
-[~, ~, nvalue, ~, ~]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, 0, 0);
-[Errcode, ids, ~, xvalue, yvalue]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, zeros(1, nvalue), zeros(1, nvalue));
+function [Errcode, ids, nvalue, xvalue, yvalue] = ENgetcurve(obj, value, LibEPANET)
+[Errcode, ids, nvalue, xvalue, yvalue]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, zeros(1, obj.getCurveLengths(value))', zeros(1, obj.getCurveLengths(value))');
 end
 function [Errcode, len] = ENgetcurvelen(index, LibEPANET)
 % EPANET Version 2.1
@@ -7633,7 +7839,7 @@ function [Errcode] = ENsetdemandname(node_index, demand_index, demand_name, LibE
 end
 function [Errcode, demand_name] = ENgetdemandname(node_index, demand_index, LibEPANET)
 % EPANET Version 2.2
-demand_name = char(32*ones(1, 256));
+demand_name = char(32*ones(1, 31));
 [Errcode, demand_name]=calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
 end
 function [Errcode, line1, line2, line3] = ENgettitle(LibEPANET)
@@ -7645,6 +7851,15 @@ function [Errcode] = ENsettitle(line1, line2, line3, LibEPANET)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENsettitle', line1, line2, line3);
 end
+function [Errcode] = ENsetcomment(object, index, comment, LibEPANET)
+% EPANET Version 2.2
+% Object a type of object (either EN_NODE, EN_LINK, EN_TIMEPAT or EN_CURVE)
+[Errcode]=calllib(LibEPANET, 'ENsetcomment', object, index, comment);
+end
+function [Errcode, comment] = ENgetcomment(object, index, LibEPANET)
+% EPANET Version 2.2
+comment = char(32*ones(1, 79));
+[Errcode, comment]=calllib(LibEPANET, 'ENgetcomment', object, index, comment);
 end
 % function [Errcode, nPremises, nTrueActions, nFalseActions, priority] = EN_getrule(cindex, LibEPANET)
 %     [Errcode, nPremises, nTrueActions, nFalseActions, priority]=calllib(LibEPANET, 'ENgetrule', cindex, 0, 0, 0, 0);
@@ -11130,6 +11345,10 @@ function [indices, value] = getNodeIndices(obj, varargin)
 end
 function [indices, value] = getCurveIndices(obj, varargin)
     indices = getIndices(obj.getCurveCount, varargin{1});
+    value = zeros(1, length(indices));
+end
+function [indices, value] = getPatternIndices(obj, varargin)
+    indices = getIndices(obj.getPatternCount, varargin{1});
     value = zeros(1, length(indices));
 end
 function indices = getIndices(cnt, varargin)
