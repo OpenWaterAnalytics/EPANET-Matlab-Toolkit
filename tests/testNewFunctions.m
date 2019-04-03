@@ -13,9 +13,9 @@ inpname='Net1.inp';
 d=epanet(inpname,'loadfile'); %Using loadfile: properties not calculated
 % d=epanet(inpname);
 
-if d.LinkPumpCount
+if d.getLinkPumpCount
     [HeadCurveIndex,PumpIndex] = d.getLinkPumpHeadCurveIndex;
-    indexCurve=d.addCurve('NewCur2', [1800 200; 1500 400]);
+    indexCurve=d.addCurve('NewCur2', [1500 400; 1800 200]);
     fromNode = d.getNodeNameID{2};
     toNode = d.getNodeNameID{6};
     index=d.addLinkPump('Pump',fromNode,toNode);
