@@ -47,7 +47,7 @@ classdef epanet <handle
     %   implied. See the Licence for the specific language governing
     %   permissions and limitations under the Licence.
     properties
-        Condinional                  % 0: Delete all controls that contain object, 1: Cancel object deletion if contained in controls
+        Conditional                  % 0: Delete all controls that contain object, 1: Cancel object deletion if contained in controls
         ControlLevelValues;          % The control level values
         ControlLinkIndex;            % Set of control links index
         ControlNodeIndex;            % Set of control nodes index
@@ -516,7 +516,7 @@ classdef epanet <handle
             obj.CMDCODE=1;
             
             % Conditional for set link types - Default is 0: Delete all controls that contain object 
-            obj.Condinional = 0; 
+            obj.Conditional = 0; 
             % Using new variable for temp file
             obj.TempInpFile = obj.BinTempfile;
             % Load file only, return
@@ -2818,7 +2818,7 @@ classdef epanet <handle
             % Default is 0.
             % Example: 
             %   d.setConditional(1)
-            obj.Condinional = value;
+            obj.Conditional = value;
         end
         function value = getConditional(obj)
             % Return 0 if is EN_UNCONDITIONAL: Delete all controls that contain object   
@@ -2826,7 +2826,7 @@ classdef epanet <handle
             % Default is 0.
             % Example: 
             %   d.getConditional
-            value = obj.Condinional;
+            value = obj.Conditional;
         end
         function index = setLinkTypePipe(obj, id)
             % Set the link type pipe for a specified link
@@ -2835,7 +2835,7 @@ classdef epanet <handle
             %   linkid = '9';
             %   d.setLinkTypePipe(linkid)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PIPE, obj.Condinional, obj.LibEPANET);
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PIPE, obj.Conditional, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
         function index = setLinkTypePipeCV(obj, id)
@@ -2845,7 +2845,7 @@ classdef epanet <handle
             %   linkid = '9';
             %   d.setLinkTypePipeCV(linkid)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_CVPIPE, obj.Condinional, obj.LibEPANET);
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_CVPIPE, obj.Conditional, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
         function index = setLinkTypePump(obj, id)
@@ -2855,7 +2855,7 @@ classdef epanet <handle
             %   linkid = '10';
             %   d.setLinkTypePump(linkid)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PUMP, obj.Condinional, obj.LibEPANET);
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PUMP, obj.Conditional, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
         function index = setLinkTypeValveFCV(obj, id)
@@ -2864,7 +2864,7 @@ classdef epanet <handle
             %   linkid = '122';
             %   d.setLinkTypeValveFCV(linkid)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_FCV, obj.Condinional, obj.LibEPANET);
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_FCV, obj.Conditional, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function index = setLinkTypeValveGPV(obj, id)
@@ -2873,7 +2873,7 @@ classdef epanet <handle
             %   linkid = '122';
             %   d.setLinkTypeValveGPV(linkid)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_GPV, obj.Condinional, obj.LibEPANET);
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_GPV, obj.Conditional, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePBV(obj, id)
@@ -2882,7 +2882,7 @@ classdef epanet <handle
             %   linkid = '122';
             %   d.setLinkTypeValvePBV(linkid)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PBV, obj.Condinional, obj.LibEPANET);
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PBV, obj.Conditional, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePRV(obj, id)
@@ -2891,7 +2891,7 @@ classdef epanet <handle
             %   linkid = '122';
             %   d.setLinkTypeValvePRV(linkid)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PRV, obj.Condinional, obj.LibEPANET);
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PRV, obj.Conditional, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePSV(obj, id)
@@ -2900,7 +2900,7 @@ classdef epanet <handle
             %   linkid = '122';
             %   d.setLinkTypeValvePSV(linkid)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PSV, obj.Condinional, obj.LibEPANET);
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PSV, obj.Conditional, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValveTCV(obj, id)
@@ -2909,7 +2909,7 @@ classdef epanet <handle
             %   linkid = '122';
             %   d.setLinkTypeValveTCV(linkid)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_TCV, obj.Condinional, obj.LibEPANET);
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_TCV, obj.Conditional, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function setLinkLength(obj, value, varargin)
@@ -7826,12 +7826,12 @@ index = obj.getLinkIndex(linkid);
 end
 function [Errcode] = ENdeletenode(obj, indexNode)
 % dev-net-builder
-[Errcode]=calllib(obj.LibEPANET, 'ENdeletenode', indexNode);
+[Errcode]=calllib(obj.LibEPANET, 'ENdeletenode', indexNode, obj.Conditional);
 disp(obj.getError(Errcode));
 end
 function [Errcode] = ENdeletelink(obj, indexLink)
 % dev-net-builder
-[Errcode]=calllib(obj.LibEPANET, 'ENdeletelink', indexLink);
+[Errcode]=calllib(obj.LibEPANET, 'ENdeletelink', indexLink, obj.Conditional);
 disp(obj.getError(Errcode));
 end
 function [Errcode] = ENsetheadcurveindex(obj, pumpindex, curveindex)
