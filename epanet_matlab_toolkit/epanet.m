@@ -2179,20 +2179,37 @@ classdef epanet <handle
             % Example:
             %       d.getCurveValue
             %       d.getCurveValue(1)
+            %       d.getCurveValue{1}
             %       d.getCurveValue(2)
+            %       %d.getCurveValue(indexCurve, pointindex)
+            %       d.getCurveValue(2, 2)
             tmplen = obj.getCurveLengths;
             cur_index = obj.getCurveIndex;
+            pnt = 0;
+            if nargin>2
+                pnt = varargin{2};
+            end
             if nargin>1
                index = varargin{1}; 
             else
                index = cur_index;
             end
-            value = cell(length(index), 1); j = 1;
-            for cur = cur_index(index)
-                for i=1:tmplen(cur)
-                    [obj.Errcode, value{j}(i, 1), value{j}(i, 2)] = ENgetcurvevalue(cur, i, obj.LibEPANET);
+            j = 1;
+            if find(index == cur_index)
+                for cur = cur_index(index)
+                    for i=1:tmplen(cur)
+                        if pnt
+                            [obj.Errcode, value(i, 1), value(i, 2)] = ENgetcurvevalue(cur, pnt, obj.LibEPANET);
+                            break;
+                        else
+                            [obj.Errcode, value{j}(i, 1), value{j}(i, 2)] = ENgetcurvevalue(cur, i, obj.LibEPANET);
+                        end
+                    end
+                    j=j+1;
                 end
-                j=j+1;
+            else
+                obj.Errcode = 206;
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
             end
         end
         function [curveIndex, pumpIndex] = getLinkPumpHeadCurveIndex(obj)
