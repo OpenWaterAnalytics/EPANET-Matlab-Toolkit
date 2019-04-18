@@ -47,7 +47,6 @@ classdef epanet <handle
     %   implied. See the Licence for the specific language governing
     %   permissions and limitations under the Licence.
     properties
-        Conditional                  % 0: Delete all controls that contain object, 1: Cancel object deletion if contained in controls
         ControlLevelValues;          % The control level values
         ControlLinkIndex;            % Set of control links index
         ControlNodeIndex;            % Set of control nodes index
@@ -515,8 +514,6 @@ classdef epanet <handle
             % Hide messages at command window from bin computed
             obj.CMDCODE=1;
             
-            % Conditional for set link types - Default is 0: Delete all controls that contain object 
-            obj.Conditional = 0; 
             % Using new variable for temp file
             obj.TempInpFile = obj.BinTempfile;
             % Load file only, return
@@ -2812,22 +2809,6 @@ classdef epanet <handle
                 end   
             end
         end
-        function setConditional(obj, value)
-            % Return 0 if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % Return 1 if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
-            % Default is 0.
-            % Example: 
-            %   d.setConditional(1)
-            obj.Conditional = value;
-        end
-        function value = getConditional(obj)
-            % Return 0 if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % Return 1 if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
-            % Default is 0.
-            % Example: 
-            %   d.getConditional
-            value = obj.Conditional;
-        end
         function index = setLinkTypePipe(obj, id)
             % Set the link type pipe for a specified link
             % Example:
@@ -3091,6 +3072,7 @@ classdef epanet <handle
                     x=value{1}(i);
                     y=value{2}(i);
                     [obj.Errcode] = ENsetcoord(i, x, y, obj.LibEPANET);
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
                 end
             end
         end
@@ -7814,30 +7796,28 @@ chm=char(32*ones(1, 31));
 end
 function [index, Errcode] = ENaddnode(obj, nodeid, nodetype)
 % dev-net-builder
-[Errcode]=calllib(obj.LibEPANET, 'ENaddnode', nodeid, nodetype);
-disp(obj.getError(Errcode));
-index = obj.getNodeIndex(nodeid);
+[Errcode, ~, index]=calllib(obj.LibEPANET, 'ENaddnode', nodeid, nodetype, 0);
+error(obj.getError(Errcode));
 end
 function [index, Errcode] = ENaddlink(obj, linkid, linktype, fromnode, tonode)
 % dev-net-builder
-[Errcode]=calllib(obj.LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode);
-disp(obj.getError(Errcode));
-index = obj.getLinkIndex(linkid);
+[Errcode, ~, ~, ~, index]=calllib(obj.LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
+error(obj.getError(Errcode));
 end
-function [Errcode] = ENdeletenode(obj, indexNode)
+function [Errcode] = ENdeletenode(obj, indexNode, condition)
 % dev-net-builder
-[Errcode]=calllib(obj.LibEPANET, 'ENdeletenode', indexNode, obj.Conditional);
-disp(obj.getError(Errcode));
+[Errcode]=calllib(obj.LibEPANET, 'ENdeletenode', indexNode, condition);
+error(obj.getError(Errcode));
 end
 function [Errcode] = ENdeletelink(obj, indexLink)
 % dev-net-builder
-[Errcode]=calllib(obj.LibEPANET, 'ENdeletelink', indexLink, obj.Conditional);
-disp(obj.getError(Errcode));
+[Errcode]=calllib(obj.LibEPANET, 'ENdeletelink', indexLink, condition);
+error(obj.getError(Errcode));
 end
 function [Errcode] = ENsetheadcurveindex(obj, pumpindex, curveindex)
 % dev-net-builder
 [Errcode]=calllib(obj.LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
-disp(obj.getError(Errcode));
+error(obj.getError(Errcode));
 end
 function [Errcode, cindex] = ENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
