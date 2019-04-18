@@ -19,17 +19,8 @@ function CN = EX16_create_multiple_scenarios()
     SourceInjectionRate=10; %mg/L (Concentration), instead of mg/minute
     SourcesInjectionTimes=[5 20]; %from...to in hours
 
-    %Uncertainties
+    %Uncertainty
     qunc=0.05;
-    Diameters = add_unc(d.LinkDiameter, qunc);
-    Lengths = add_unc(d.LinkLength, qunc);
-    Roughness = add_unc(d.LinkRoughnessCoeff, qunc);
-    Elevation = add_unc(d.NodeElevations, qunc);
-    BaseDemand = add_unc(d.NodeBaseDemands{1}, qunc);
-    tmpPat = d.Pattern;
-    for i = 1:size(tmpPat, 1)
-        Pattern = add_unc(tmpPat(i, :), qunc);
-    end
 
     % Create Multiple Scenarios
     % Set qual type
@@ -38,10 +29,21 @@ function CN = EX16_create_multiple_scenarios()
     d.setTimeSimulationDuration(SimulationTime*3600);
 
     % Run Scenarios
-    disp(['Number of Scenarios = NodeCount: ', num2str(d.NodeCount)])
+    disp(['Number of Scenarios = NodeCount: ', num2str(d.getNodeCount)])
 
-    for n = d.NodeIndex;
+    for n = 1:d.getNodeCount
         disp(['Scenario: ', num2str(n)])
+        
+        Diameters = add_unc(d.LinkDiameter, qunc);
+        Lengths = add_unc(d.LinkLength, qunc);
+        Roughness = add_unc(d.LinkRoughnessCoeff, qunc);
+        Elevation = add_unc(d.NodeElevations, qunc);
+        BaseDemand = add_unc(d.NodeBaseDemands{1}, qunc);
+        tmpPat = d.Pattern;
+        for i = 1:size(tmpPat, 1)
+            Pattern = add_unc(tmpPat(i, :), qunc);
+        end
+    
         d.setLinkDiameter(Diameters)
         d.setLinkLength(Lengths)
         d.setLinkRoughnessCoeff(Roughness)
