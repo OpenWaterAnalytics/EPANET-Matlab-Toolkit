@@ -2584,26 +2584,56 @@ classdef epanet <handle
                 setPattern(obj, index, varargin{2});
             end
         end
-        function index = addNodeJunction(obj, juncID)
+        function index = addNodeJunction(obj, juncID, varargin)
             % Add new junction
+            % Default coordinates is 0,0.
             % Example:
             %       juncID = 'J-1'
             %       d.addNodeJunction(juncID)
+            %       % or with coords
+            %       X = 20; Y = 10
+            %       d.addNodeJunction(juncID, [X Y])
+            %       d.plot
+            xy = [0 0];
+            if nargin == 3
+                xy = varargin{1};
+            end
             index = ENaddnode(obj, juncID, obj.ToolkitConstants.EN_JUNCTION);
+            obj.setNodeCoordinates(index,[xy(1),xy(2)]);
         end
-        function index = addNodeReservoir(obj, resID)
+        function index = addNodeReservoir(obj, resID, varargin)
             % Add new reservoir
+            % Default coordinates is 0,0.
             % Example:
             %       resID = 'R-1'
             %       d.addNodeReservoir(resID)
+            %       % or with coords
+            %       X = 20; Y = 20
+            %       d.addNodeReservoir(resID, [X Y])
+            %       d.plot
+            xy = [0 0];
+            if nargin == 3
+                xy = varargin{1};
+            end
             index = ENaddnode(obj, resID, obj.ToolkitConstants.EN_RESERVOIR);
+            obj.setNodeCoordinates(index,[xy(1),xy(2)]);
         end
-        function index = addNodeTank(obj, tankID)
+        function index = addNodeTank(obj, tankID, varargin)
             % Add new tank
+            % Default coordinates is 0,0.
             % Example:
             %       tankID = 'T-1'
             %       d.addNodeTank(tankID)
+            %       % or with coords
+            %       X = 20; Y = 20
+            %       d.addNodeTank(tankID, [X Y])
+            %       d.plot
+            xy = [0 0];
+            if nargin == 3
+                xy = varargin{1};
+            end
             index = ENaddnode(obj, tankID, obj.ToolkitConstants.EN_TANK);
+            obj.setNodeCoordinates(index,[xy(1),xy(2)]);
         end
         function index = addLinkPipeCV(obj, cvpipeID, fromNode, toNode)
             % Add new control valve pipe
@@ -2686,19 +2716,34 @@ classdef epanet <handle
             %       d.addLinkValveGPV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
-        function Errcode = deleteNode(obj, indexNode)
+        function Errcode = deleteNode(obj, indexNode, varargin)
             % Delete a node
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
             %       indexNode = d.getNodeNameID(1)
-            %       d.deleteNode(indexNode)
-            [Errcode] = ENdeletenode(obj, indexNode);
+            %       d.deleteNode(indexNode, condition)
+            condition = 0; 
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [Errcode] = ENdeletenode(obj, indexNode, condition);
         end
         function Errcode = deleteLink(obj, indexLink)
             % Delete a link
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
             %   indexLink = d.getLinkNameID(1)
             %   d.deleteLink(indexNode)
-            [Errcode] = ENdeletelink(obj, indexLink);
+            %   d.deleteLink(indexNode, condition)
+            condition = 0; 
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [Errcode] = ENdeletelink(obj, indexLink, condition);
         end
         function setControls(obj, index, control)
             % Sets the parameters of a simple control statement
@@ -2809,88 +2854,172 @@ classdef epanet <handle
                 end   
             end
         end
-        function index = setLinkTypePipe(obj, id)
+        function index = setLinkTypePipe(obj, id, varargin)
             % Set the link type pipe for a specified link
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
-            %   d.setConditional(0)
             %   linkid = '9';
             %   d.setLinkTypePipe(linkid)
+            %   % or
+            %   condition = 1;
+            %   d.setLinkTypePipe(linkid, condition)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PIPE, obj.Conditional, obj.LibEPANET);
+            condition = 0; % default
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PIPE, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
-        function index = setLinkTypePipeCV(obj, id)
+        function index = setLinkTypePipeCV(obj, id, varargin)
             % Set the link type cvpipe for a specified link
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
-            %   d.setConditional(0)
             %   linkid = '9';
             %   d.setLinkTypePipeCV(linkid)
+            %   % or
+            %   condition = 1;
+            %   d.setLinkTypePipeCV(linkid, condition)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_CVPIPE, obj.Conditional, obj.LibEPANET);
+            condition = 0; % default
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_CVPIPE, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
-        function index = setLinkTypePump(obj, id)
+        function index = setLinkTypePump(obj, id, varargin)
             % Set the link type pump for a specified link
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
-            %   d.setConditional(0)
             %   linkid = '10';
             %   d.setLinkTypePump(linkid)
+            %   % or
+            %   condition = 1;
+            %   d.setLinkTypePump(linkid, condition)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PUMP, obj.Conditional, obj.LibEPANET);
+            condition = 0; % default
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PUMP, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
-        function index = setLinkTypeValveFCV(obj, id)
+        function index = setLinkTypeValveFCV(obj, id, varargin)
             % Set the link type valve FCV for a specified link
             % Example:
             %   linkid = '122';
             %   d.setLinkTypeValveFCV(linkid)
+            %   % or
+            %   condition = 1;
+            %   d.setLinkTypeValveFCV(linkid, condition)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_FCV, obj.Conditional, obj.LibEPANET);
+            condition = 0; % default
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_FCV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
-        function index = setLinkTypeValveGPV(obj, id)
+        function index = setLinkTypeValveGPV(obj, id, varargin)
             % Set the link type valve GPV for a specified link
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
             %   linkid = '122';
             %   d.setLinkTypeValveGPV(linkid)
+            %   % or
+            %   condition = 1;
+            %   d.setLinkTypeValveGPV(linkid, condition)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_GPV, obj.Conditional, obj.LibEPANET);
+            condition = 0; % default
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_GPV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
-        function index = setLinkTypeValvePBV(obj, id)
+        function index = setLinkTypeValvePBV(obj, id, varargin)
             % Set the link type valve PBV for a specified link
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
             %   linkid = '122';
             %   d.setLinkTypeValvePBV(linkid)
+            %   % or
+            %   condition = 1;
+            %   d.setLinkTypeValvePBV(linkid, condition)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PBV, obj.Conditional, obj.LibEPANET);
+            condition = 0; % default
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PBV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
-        function index = setLinkTypeValvePRV(obj, id)
+        function index = setLinkTypeValvePRV(obj, id, varargin)
             % Set the link type valve PRV for a specified link
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
             %   linkid = '122';
             %   d.setLinkTypeValvePRV(linkid)
+            %   % or
+            %   condition = 1;
+            %   d.setLinkTypeValvePRV(linkid, condition)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PRV, obj.Conditional, obj.LibEPANET);
+            condition = 0; % default
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PRV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
-        function index = setLinkTypeValvePSV(obj, id)
+        function index = setLinkTypeValvePSV(obj, id, varargin)
             % Set the link type valve PSV for a specified link
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
             %   linkid = '122';
             %   d.setLinkTypeValvePSV(linkid)
+            %   % or
+            %   condition = 1;
+            %   d.setLinkTypeValvePSV(linkid, condition)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PSV, obj.Conditional, obj.LibEPANET);
+            condition = 0; % default
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PSV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
-        function index = setLinkTypeValveTCV(obj, id)
+        function index = setLinkTypeValveTCV(obj, id, varargin)
             % Set the link type valve TCV for a specified link
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Default condition is 0.
             % Example:
             %   linkid = '122';
             %   d.setLinkTypeValveTCV(linkid)
+            %   % or
+            %   condition = 1;
+            %   d.setLinkTypeValveTCV(linkid, condition)
             %   d.getLinkType
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_TCV, obj.Conditional, obj.LibEPANET);
+            condition = 0; % default
+            if nargin == 3      
+                condition = varargin{1};
+            end
+            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_TCV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function setLinkLength(obj, value, varargin)
@@ -7809,7 +7938,7 @@ function [Errcode] = ENdeletenode(obj, indexNode, condition)
 [Errcode]=calllib(obj.LibEPANET, 'ENdeletenode', indexNode, condition);
 error(obj.getError(Errcode));
 end
-function [Errcode] = ENdeletelink(obj, indexLink)
+function [Errcode] = ENdeletelink(obj, indexLink, condition)
 % dev-net-builder
 [Errcode]=calllib(obj.LibEPANET, 'ENdeletelink', indexLink, condition);
 error(obj.getError(Errcode));
