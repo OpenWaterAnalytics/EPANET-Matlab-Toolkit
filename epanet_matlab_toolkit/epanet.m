@@ -2846,6 +2846,7 @@ classdef epanet <handle
         function Errcode = saveInputFile(obj,inpname)
 %             [addSectionCoordinates,addSectionRules] = obj.getBinCoordRuleSections(obj.InputFile);
             [Errcode] = ENsaveinpfile(inpname,obj.LibEPANET);
+            if Errcode, error(obj.getError(Errcode)), return; end   
 %             [~,info] = obj.readInpFile;
 %             endSectionIndex=find(~cellfun(@isempty,regexp(info,'END','match')));
 %             endInpIndex=find(~cellfun(@isempty,regexp(addSectionCoordinates,'END','match')));
@@ -5322,7 +5323,7 @@ classdef epanet <handle
         end
         function [Errcode]=setBinLinkPipeStatus(obj,varargin)
            indexParameter=8;
-           if sum(strcmpi(varargin{1},'closed')+strcmpi(varargin{1},'open')+strcmpi(varargin{1},'cv'))==obj.BinLinkPipeCount
+           if sum(strcmpi(varargin{1},'closed')+strcmpi(varargin{1},'open')+strcmpi(varargin{1},'cv'))==obj.getBinLinksInfo.BinLinkPipeCount
                 parameter=varargin{1};
             else
                 warning('Invalid argument found.');Errcode=-1;
