@@ -12084,7 +12084,8 @@ function [controlTypeIndex, linkIndex,controlSettingValue,...
                 %LINK linkID status AT CLOCKTIME clocktime AM/PM 
                 nodeIndex = 0;
                 controlTypeIndex = 3; 
-                controlLevel = str2double(splitControl{6}); 
+                [~, ~, ~, H, MN, S] = datevec(splitControl{6});
+                controlLevel = H*3600+MN*60+S;
             else
                 %LINK linkID status AT TIME time
                 nodeIndex = 0;
