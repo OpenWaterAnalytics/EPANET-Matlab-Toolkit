@@ -1809,6 +1809,7 @@ classdef epanet <handle
         function value = getPatternNameID(obj, varargin)
             %Retrieves the ID label of all or some time patterns indices
             patCnt = obj.getPatternCount;
+            value = {};
             if patCnt
                 if isempty(varargin) 
                     value = cell(1, patCnt);
