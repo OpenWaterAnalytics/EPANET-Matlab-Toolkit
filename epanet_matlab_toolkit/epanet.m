@@ -2746,6 +2746,13 @@ classdef epanet <handle
             end
             [Errcode] = ENdeletelink(obj, indexLink, condition);
         end
+        function Errcode = deletePattern(obj, indexPat)
+            % Deletes a time pattern from a project
+            % Example:
+            %   indexPat = d.getPatternNameID(1)
+            %   d.deletePattern(indexPat)
+            [Errcode] = ENdeletepattern(obj, indexPat);
+        end
         function setControls(obj, index, control)
             % Sets the parameters of a simple control statement
             % Example: 
@@ -7988,6 +7995,12 @@ function [Errcode, comment] = ENgetcomment(object, index, LibEPANET)
 comment = char(32*ones(1, 79));
 [Errcode, comment]=calllib(LibEPANET, 'ENgetcomment', object, index, comment);
 end
+function [Errcode] = ENdeletepattern(obj, indexPat)
+% EPANET Version 2.2
+[Errcode]=calllib(obj.LibEPANET, 'ENdeletepattern', indexPat);
+error(obj.getError(Errcode));
+end
+
 % function [Errcode, nPremises, nTrueActions, nFalseActions, priority] = EN_getrule(cindex, LibEPANET)
 %     [Errcode, nPremises, nTrueActions, nFalseActions, priority]=calllib(LibEPANET, 'ENgetrule', cindex, 0, 0, 0, 0);
 %     if Errcode

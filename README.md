@@ -294,8 +294,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addLinkValveFCV|Adds a new FCV valve|
 |addLinkValveTCV|Adds a new TCV valve|
 |addLinkValveGPV|Adds a new GPV valve|
-|deleteNode|Deletes a node|
 |deleteLink|Deletes a link|
+|deleteNode|Deletes a node|
+|deletePattern|Deletes a time pattern from a project|
 |closeHydraulicAnalysis|Closes the hydraulic analysis system, freeing all allocated memory|
 |closeNetwork|Closes down the Toolkit system|
 |closeQualityAnalysis|Closes the water quality analysis system, freeing all allocated memory|
@@ -739,5 +740,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetdemandname|Assigns a name to a node's demand category|
 |ENgetcomment|Retrieves the comment string assigned to the object (NODE, LINK, TIMEPAT or CURVE)|
 |ENsetcomment|Sets the comment string assigned to the object (NODE, LINK, TIMEPAT or CURVE)|
+|ENdeletepattern|Deletes a time pattern from a project|
 
 &uparrow; [Back to top](#table-of-contents)
