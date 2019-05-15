@@ -929,6 +929,7 @@ classdef epanet <handle
         end
         function value = getLinkIndex(obj, varargin)
             %Retrieves the indices of all links, or the indices of an ID set of links
+            % e.g. getLinkIndex({''linkID''})) or getLinkIndex(''linkID''))
             value = [];
             if isempty(varargin)
                 value=1:obj.getLinkCount;
@@ -943,8 +944,6 @@ classdef epanet <handle
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = ENgetlinkindex(varargin{1}, obj.LibEPANET);
-            else
-                warning('e.g. getLinkIndex({''linkID''})) or getLinkIndex(''linkID''))');
             end
         end
         function value = getLinkPipeIndex(obj)
@@ -1205,6 +1204,7 @@ classdef epanet <handle
         end
         function value = getNodeIndex(obj, varargin)
             %Retrieves the indices of all nodes or some nodes with a specified ID
+            % e.g. getNodeIndex({''nodeID''})) or getNodeIndex(''nodeID''))
             value = [];
             if isempty(varargin)
                 value=1:obj.getNodeCount;
@@ -1219,8 +1219,6 @@ classdef epanet <handle
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = ENgetnodeindex(varargin{1}, obj.LibEPANET);
-            else
-                warning('e.g. getNodeIndex({''nodeID''})) or getNodeIndex(''nodeID''))');
             end
         end
         function value = getNodeReservoirIndex(obj)
@@ -1830,6 +1828,7 @@ classdef epanet <handle
             %Retrieves ID of a curve with specific index
             %EPANET Version 2.1
             curCnt = obj.getCurveCount;
+            value = {};
             if curCnt
                 if isempty(varargin) 
                     value = cell(1, curCnt);
@@ -1882,7 +1881,7 @@ classdef epanet <handle
                 value=1:obj.getCurveCount;
             elseif isa(varargin{1}, 'cell')
                 k=1;
-                value{length(varargin{1})}=[];
+                value = zeros(1, length(varargin{1}));
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(k)] = ENgetcurveindex(varargin{1}{j}, obj.LibEPANET);
                     k=k+1;
@@ -1966,7 +1965,7 @@ classdef epanet <handle
                 value=1:obj.getPatternCount;
             elseif isa(varargin{1}, 'cell')
                 k=1;
-                value{length(varargin{1})}=[];
+                value = zeros(1, length(varargin{1}));
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(k)] = ENgetpatternindex(varargin{1}{j}, obj.LibEPANET);
                     k=k+1;
@@ -2717,40 +2716,48 @@ classdef epanet <handle
             %       d.addLinkValveGPV(vID, fromNode, toNode)
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
-        function Errcode = deleteNode(obj, indexNode, varargin)
+        function Errcode = deleteNode(obj, idNode, varargin)
             % Delete a node
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
             % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
             % Default condition is 0.
             % Example:
-            %       indexNode = d.getNodeNameID(1)
-            %       d.deleteNode(indexNode, condition)
+            %       idNode = d.getNodeNameID(1)
+            %       d.deleteNode(idNode)
+            %       %OR
+            %       condition = 1;
+            %       d.deleteNode(idNode, condition)
             condition = 0; 
             if nargin == 3      
                 condition = varargin{1};
             end
+            indexNode = obj.getNodeIndex(idNode);
             [Errcode] = ENdeletenode(obj, indexNode, condition);
         end
-        function Errcode = deleteLink(obj, indexLink)
+        function Errcode = deleteLink(obj, idLink, varargin)
             % Delete a link
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
             % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
             % Default condition is 0.
             % Example:
-            %   indexLink = d.getLinkNameID(1)
-            %   d.deleteLink(indexNode)
-            %   d.deleteLink(indexNode, condition)
+            %   idLink = d.getLinkNameID(1)
+            %   d.deleteLink(idLink)
+            %   %OR
+            %   condition = 1;
+            %   d.deleteLink(idLink, condition)
             condition = 0; 
             if nargin == 3      
                 condition = varargin{1};
             end
+            indexLink = obj.getLinkIndex(idLink);
             [Errcode] = ENdeletelink(obj, indexLink, condition);
         end
-        function Errcode = deletePattern(obj, indexPat)
+        function Errcode = deletePattern(obj, idPat)
             % Deletes a time pattern from a project
             % Example:
-            %   indexPat = d.getPatternNameID(1)
-            %   d.deletePattern(indexPat)
+            %   idPat = d.getPatternNameID(1)
+            %   d.deletePattern(idPat)
+            indexPat = obj.getPatternIndex(idPat);
             [Errcode] = ENdeletepattern(obj, indexPat);
         end
         function Errcode = deleteCurve(obj, idCurve)
