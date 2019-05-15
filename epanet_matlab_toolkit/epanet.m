@@ -2753,6 +2753,14 @@ classdef epanet <handle
             %   d.deletePattern(indexPat)
             [Errcode] = ENdeletepattern(obj, indexPat);
         end
+        function Errcode = deleteCurve(obj, idCurve)
+            % Deletes a data curve from a project.
+            % Example:
+            %   idCurve = d.getCurveNameID(1)
+            %   d.deleteCurve(idCurve)
+            indexCurve = obj.getCurveIndex(idCurve);
+            [Errcode] = ENdeletecurve(obj, indexCurve);
+        end
         function setControls(obj, index, control)
             % Sets the parameters of a simple control statement
             % Example: 
@@ -7998,6 +8006,11 @@ end
 function [Errcode] = ENdeletepattern(obj, indexPat)
 % EPANET Version 2.2
 [Errcode]=calllib(obj.LibEPANET, 'ENdeletepattern', indexPat);
+error(obj.getError(Errcode));
+end
+function [Errcode] = ENdeletecurve(obj, indexCurve)
+% EPANET Version 2.2
+[Errcode]=calllib(obj.LibEPANET, 'ENdeletecurve', indexCurve);
 error(obj.getError(Errcode));
 end
 

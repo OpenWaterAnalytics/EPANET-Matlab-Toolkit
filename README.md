@@ -294,6 +294,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addLinkValveFCV|Adds a new FCV valve|
 |addLinkValveTCV|Adds a new TCV valve|
 |addLinkValveGPV|Adds a new GPV valve|
+|deleteCurve|Deletes a data curve from the project|
 |deleteLink|Deletes a link|
 |deleteNode|Deletes a node|
 |deletePattern|Deletes a time pattern from a project|
@@ -741,5 +742,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENgetcomment|Retrieves the comment string assigned to the object (NODE, LINK, TIMEPAT or CURVE)|
 |ENsetcomment|Sets the comment string assigned to the object (NODE, LINK, TIMEPAT or CURVE)|
 |ENdeletepattern|Deletes a time pattern from a project|
+|ENdeletecurve|Deletes a data curve from the project|
 
 &uparrow; [Back to top](#table-of-contents)
