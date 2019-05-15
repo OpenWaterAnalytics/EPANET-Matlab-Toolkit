@@ -56,8 +56,7 @@ d.plot('nodes','yes');
 
 disp('Delete a node')
 d.getNodeCount
-nodeIndex = d.getNodeIndex('Junction');
-d.deleteNode(nodeIndex);
+d.deleteNode('Junction');
 d.getNodeNameID
 d.getNodeCount
 d.plot('nodes','yes');
