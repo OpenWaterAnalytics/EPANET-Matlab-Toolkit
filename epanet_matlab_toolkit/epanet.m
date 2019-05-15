@@ -2117,6 +2117,7 @@ classdef epanet <handle
             %         *yValues = values for y
             %Returns: error code
             %Purpose: retrieves end nodes of a specific link
+            value = struct();
             for i=1:obj.getCurveCount
                 [obj.Errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = ENgetcurve(obj, i, obj.LibEPANET);
             end
@@ -2727,11 +2728,18 @@ classdef epanet <handle
             %       %OR
             %       condition = 1;
             %       d.deleteNode(idNode, condition)
+            %       %OR using index
+            %       index = 1;
+            %       d.deleteNode(1)   
             condition = 0; 
             if nargin == 3      
                 condition = varargin{1};
             end
-            indexNode = obj.getNodeIndex(idNode);
+            if ischar(idNode)
+                indexNode = obj.getNodeIndex(idNode);
+            else
+                indexNode = idNode;
+            end
             [Errcode] = ENdeletenode(obj, indexNode, condition);
         end
         function Errcode = deleteLink(obj, idLink, varargin)
@@ -2745,11 +2753,18 @@ classdef epanet <handle
             %   %OR
             %   condition = 1;
             %   d.deleteLink(idLink, condition)
+            %   %OR using index
+            %   index = 1;
+            %   d.deleteLink(1)
             condition = 0; 
             if nargin == 3      
                 condition = varargin{1};
             end
-            indexLink = obj.getLinkIndex(idLink);
+            if ischar(idLink)
+                indexLink = obj.getLinkIndex(idLink);
+            else
+                indexLink = idLink;
+            end
             [Errcode] = ENdeletelink(obj, indexLink, condition);
         end
         function Errcode = deletePattern(obj, idPat)
@@ -2757,7 +2772,14 @@ classdef epanet <handle
             % Example:
             %   idPat = d.getPatternNameID(1)
             %   d.deletePattern(idPat)
-            indexPat = obj.getPatternIndex(idPat);
+            %   %OR using index
+            %   index = 1;
+            %   d.deletePattern(1)
+            if ischar(idPat)
+                indexPat = obj.getPatternIndex(idPat);
+            else
+                indexPat = idPat;
+            end
             [Errcode] = ENdeletepattern(obj, indexPat);
         end
         function Errcode = deleteCurve(obj, idCurve)
@@ -2765,7 +2787,13 @@ classdef epanet <handle
             % Example:
             %   idCurve = d.getCurveNameID(1)
             %   d.deleteCurve(idCurve)
-            indexCurve = obj.getCurveIndex(idCurve);
+            %   index = 1;
+            %   d.deleteCurve(1)
+            if ischar(idCurve)
+                indexCurve = obj.getCurveIndex(idCurve);
+            else
+                indexCurve = idCurve;
+            end
             [Errcode] = ENdeletecurve(obj, indexCurve);
         end
         function setControls(obj, index, control)
