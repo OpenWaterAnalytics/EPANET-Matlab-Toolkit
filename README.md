@@ -743,5 +743,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetcomment|Sets the comment string assigned to the object (NODE, LINK, TIMEPAT or CURVE)|
 |ENdeletepattern|Deletes a time pattern from a project|
 |ENdeletecurve|Deletes a data curve from the project|
+|ENsetjuncdata|Sets a group of properties for a junction node|
 
 &uparrow; [Back to top](#table-of-contents)

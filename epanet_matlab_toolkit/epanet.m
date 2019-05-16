@@ -3453,7 +3453,29 @@ classdef epanet <handle
             %          d.getNodeJunctionDemandName
             [obj.Errcode] = ENsetdemandname(nodeIndex, demandIndex, demandName, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
-        end            
+        end   
+        function setNodeJunctionData(obj, index, elev, dmnd, dmndpat)
+            % Sets a group of properties for a junction node
+            %   index a junction node's index (starting from 1).
+            %   elev the value of the junction's elevation.
+            %   dmnd the value of the junction's primary base demand.
+            %   dmndpat the ID name of the demand's time pattern ("" for no pattern)
+            % EPANET Version 2.2
+            %
+            % Example: 
+            %          junctionIndex = 2;
+            %          elev = 35;
+            %          dmnd = 100;
+            %          dmndpat = '2';
+            %          d.addPattern(dmndpat)
+            %          d.setNodeJunctionData(junctionIndex, elev, dmnd, dmndpat);
+            %          d.getNodeElevations(junctionIndex)
+            %          d.getNodeBaseDemands(junctionIndex)
+            %          % primary base demand is the first category
+            %          d.getNodeDemandPatternNameID{1}(junctionIndex) 
+            [obj.Errcode] = ENsetjuncdata(obj.LibEPANET, index, elev, dmnd, dmndpat);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end 
         function setTitle(obj, varargin)
             % Sets the title lines of the project
             % EPANET Version 2.2
@@ -8050,8 +8072,17 @@ function [Errcode] = ENdeletecurve(LibEPANET, indexCurve)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENdeletecurve', indexCurve);
 end
+function [Errcode] = ENsetjuncdata(LibEPANET, index, elev, dmnd, dmndpat)
+%   @brief Sets a group of properties for a junction node.
+%   @param index a junction node's index (starting from 1).
+%   @param elev the value of the junction's elevation.
+%   @param dmnd the value of the junction's primary base demand.
+%   @param dmndpat the ID name of the demand's time pattern ("" for no pattern)
+%   @return an error code.
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsetjuncdata', index, elev, dmnd, dmndpat);
 end
-
+	
 % function [Errcode, nPremises, nTrueActions, nFalseActions, priority] = EN_getrule(cindex, LibEPANET)
 %     [Errcode, nPremises, nTrueActions, nFalseActions, priority]=calllib(LibEPANET, 'ENgetrule', cindex, 0, 0, 0, 0);
 %     if Errcode
