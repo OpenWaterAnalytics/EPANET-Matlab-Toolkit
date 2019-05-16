@@ -400,6 +400,7 @@ classdef epanet <handle
         TYPESOURCE={'CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'}; % Constants for sources: 'CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'
         TYPESTATS={'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'}; % Constants for statistics: 'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'
         TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
+        TYPEHEADLOSS={'HW', 'DW', 'CM'}; % Constants of headloss types: HW: Hazen-Williams, DW: Darcy-Weisbach, CM: Chezy-Manning
         TYPESTATUS = {'CLOSED', 'OPEN'}; % Link status
         DEMANDMODEL = {'DDA', 'PDA'}; % Demand model types. DDA #0 Demand driven analysis, PDA #1 Pressure driven analysis.
         MSXTYPEAREAUNITS={'FT2', 'M2', 'CM2'}; % sets the units used to express pipe wall surface area
@@ -1751,7 +1752,8 @@ classdef epanet <handle
         end
         function value = getOptionsHeadLossFormula(obj)
             % Retrieve headloss formula #EPANET Version 2.2
-            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, obj.LibEPANET);
+            [obj.Errcode, headloss] = ENgetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, obj.LibEPANET);
+            value= obj.TYPEHEADLOSS{headloss+1};
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsGlobalEffic(obj)
@@ -2740,7 +2742,8 @@ classdef epanet <handle
             else
                 indexNode = idNode;
             end
-            [Errcode] = ENdeletenode(obj, indexNode, condition);
+            [Errcode] = ENdeletenode(obj.LibEPANET, indexNode, condition);
+            error(obj.getError(Errcode));
         end
         function Errcode = deleteLink(obj, idLink, varargin)
             % Delete a link
@@ -2765,7 +2768,8 @@ classdef epanet <handle
             else
                 indexLink = idLink;
             end
-            [Errcode] = ENdeletelink(obj, indexLink, condition);
+            [Errcode] = ENdeletelink(obj.LibEPANET, indexLink, condition);
+            error(obj.getError(Errcode));
         end
         function Errcode = deletePattern(obj, idPat)
             % Deletes a time pattern from a project
@@ -2780,7 +2784,8 @@ classdef epanet <handle
             else
                 indexPat = idPat;
             end
-            [Errcode] = ENdeletepattern(obj, indexPat);
+            [Errcode] = ENdeletepattern(obj.LibEPANET, indexPat);
+            error(obj.getError(Errcode));
         end
         function Errcode = deleteCurve(obj, idCurve)
             % Deletes a data curve from a project.
@@ -2794,7 +2799,8 @@ classdef epanet <handle
             else
                 indexCurve = idCurve;
             end
-            [Errcode] = ENdeletecurve(obj, indexCurve);
+            [Errcode] = ENdeletecurve(obj.LibEPANET, indexCurve);
+            error(obj.getError(Errcode));
         end
         function setControls(obj, index, control)
             % Sets the parameters of a simple control statement
@@ -3419,7 +3425,8 @@ classdef epanet <handle
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
-                [obj.Errcode] = ENsetheadcurveindex(obj, i, value(j)); j=j+1;
+                [obj.Errcode] = ENsetheadcurveindex(obj.LibEPANET, i, value(j)); j=j+1;
+                error(obj.getError(obj.Errcode));
             end
         end
         function setNodeSourceType(obj, index, value)
@@ -7984,20 +7991,17 @@ function [index, Errcode] = ENaddlink(obj, linkid, linktype, fromnode, tonode)
 [Errcode, ~, ~, ~, index]=calllib(obj.LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
 error(obj.getError(Errcode));
 end
-function [Errcode] = ENdeletenode(obj, indexNode, condition)
+function [Errcode] = ENdeletenode(LibEPANET, indexNode, condition)
 % dev-net-builder
-[Errcode]=calllib(obj.LibEPANET, 'ENdeletenode', indexNode, condition);
-error(obj.getError(Errcode));
+[Errcode]=calllib(LibEPANET, 'ENdeletenode', indexNode, condition);
 end
-function [Errcode] = ENdeletelink(obj, indexLink, condition)
+function [Errcode] = ENdeletelink(LibEPANET, indexLink, condition)
 % dev-net-builder
-[Errcode]=calllib(obj.LibEPANET, 'ENdeletelink', indexLink, condition);
-error(obj.getError(Errcode));
+[Errcode]=calllib(LibEPANET, 'ENdeletelink', indexLink, condition);
 end
-function [Errcode] = ENsetheadcurveindex(obj, pumpindex, curveindex)
+function [Errcode] = ENsetheadcurveindex(LibEPANET, pumpindex, curveindex)
 % dev-net-builder
-[Errcode]=calllib(obj.LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
-error(obj.getError(Errcode));
+[Errcode]=calllib(LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
 end
 function [Errcode, cindex] = ENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
@@ -8038,15 +8042,14 @@ function [Errcode, comment] = ENgetcomment(object, index, LibEPANET)
 comment = char(32*ones(1, 79));
 [Errcode, comment]=calllib(LibEPANET, 'ENgetcomment', object, index, comment);
 end
-function [Errcode] = ENdeletepattern(obj, indexPat)
+function [Errcode] = ENdeletepattern(LibEPANET, indexPat)
 % EPANET Version 2.2
-[Errcode]=calllib(obj.LibEPANET, 'ENdeletepattern', indexPat);
-error(obj.getError(Errcode));
+[Errcode]=calllib(LibEPANET, 'ENdeletepattern', indexPat);
 end
-function [Errcode] = ENdeletecurve(obj, indexCurve)
+function [Errcode] = ENdeletecurve(LibEPANET, indexCurve)
 % EPANET Version 2.2
-[Errcode]=calllib(obj.LibEPANET, 'ENdeletecurve', indexCurve);
-error(obj.getError(Errcode));
+[Errcode]=calllib(LibEPANET, 'ENdeletecurve', indexCurve);
+end
 end
 
 % function [Errcode, nPremises, nTrueActions, nFalseActions, priority] = EN_getrule(cindex, LibEPANET)
