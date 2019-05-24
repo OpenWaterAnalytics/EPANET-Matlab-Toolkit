@@ -492,7 +492,7 @@ classdef epanet <handle
             end
             %Load EPANET Library
             ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
-            disp([' (EPANET-Matlab-Toolkit version {', obj.classversion,'}).'])
+            disp([' (EMT version {', obj.classversion,'}).'])
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
             %For the getComputedQualityTimeSeries
@@ -7822,7 +7822,7 @@ if ~libisloaded(LibEPANET)
 end
 if libisloaded(LibEPANET)
     [~, version]=calllib(LibEPANET, 'ENgetversion', 0);
-    LibEPANETString = ['EPANET version {', num2str(version), '} loaded.'];
+    LibEPANETString = ['EPANET version {', num2str(version), '} loaded'];
     fprintf(LibEPANETString);
 else
     warning('There was an error loading the EPANET library (DLL).')
