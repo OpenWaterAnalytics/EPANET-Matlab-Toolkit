@@ -510,7 +510,7 @@ classdef epanet <handle
             if obj.Errcode
                 error('Could not open the file, please check INP file.');
             else
-                disp(['Input File "', varargin{1}, '" loaded sucessfuly.'])
+                disp(['Loading File "', varargin{1}, '"...']);
             end
             % Hide messages at command window from bin computed
             obj.CMDCODE=1;
@@ -521,6 +521,7 @@ classdef epanet <handle
             if nargin==2
                 if strcmpi(varargin{2}, 'LOADFILE') 
                     obj.libFunctions = libfunctions(obj.LibEPANET);
+                    disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
                     return;
                 end
             end
@@ -674,6 +675,7 @@ classdef epanet <handle
             for i=1:length(getFields_infoUnits)
                 obj.(getFields_infoUnits{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
             end    
+            disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
         end % End of epanet class constructor
         function openAnyInp(obj, varargin)
             % Open as on matlab editor any EPANET input file using built
@@ -2474,42 +2476,21 @@ classdef epanet <handle
             end
             obj.closeQualityAnalysis;
         end
-        function value = getComputedTimeSeries(obj)
-            cnt = obj.getNodeCount;
-            LinkNodesIndex = unique(obj.getLinkNodesIndex);
-            if (length(LinkNodesIndex)~=cnt)
-                lenLinkNodes = [LinkNodesIndex; zeros(cnt-length(LinkNodesIndex), 1)];
-                value =[];
-                fIndex = setdiff(obj.getNodeIndex, lenLinkNodes);
-                for i=fIndex
-                    disp(['Input Error 233: Node ', obj.getNodeNameID{i}, ' is unconnected.']);  
-                end
-                return;
-            end
-            obj.saveInputFile(obj.BinTempfile);
-            [~, rptfile, binfile]= createTempfiles(obj.BinTempfile);
-            obj.loadEPANETFile(obj.BinTempfile);
-            obj.Errcode=calllib(obj.LibEPANET, 'ENepanet', obj.BinTempfile, rptfile, binfile, lib.pointer);
-            if sum(obj.Errcode==[302, 303])
-                while obj.Errcode %fix this error
-                    ENMatlabCleanup(obj.LibEPANET);
-                    ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
-                    obj.Errcode=calllib(obj.LibEPANET, 'ENepanet', obj.BinTempfile, rptfile, binfile, lib.pointer);
-                end
-            elseif ~sum(obj.Errcode==[0, 1, 2, 3, 4, 5, 6])
-                disp(obj.getError(obj.Errcode));
-                obj.loadEPANETFile(obj.BinTempfile);
-                value = obj.getComputedHydraulicTimeSeries;
-                v = obj.getComputedQualityTimeSeries; 
-                value.LinkQuality = v.LinkQuality;
-                value.NodeQuality = v.NodeQuality;
-                value.MassFlowRate = v.MassFlowRate;
-                return;
-            end
-                
-            fid = fopen(binfile, 'r');            
-            value = readEpanetBin(fid, binfile, rptfile, 0);
-            obj.loadEPANETFile(obj.BinTempfile);
+        function nvalue = getComputedTimeSeries(obj)
+            [fid,binfile,rptfile] = runEPANETexe(obj);
+            value = readEpanetBin(fid, binfile, rptfile);
+            nvalue.Pressure = value.BinNodePressure;
+            nvalue.Demand = value.BinNodeDemand;
+            nvalue.Head = value.BinNodeHead;
+            nvalue.NodeQuality = value.BinNodeQuality;
+            nvalue.Flow = value.BinLinkFlow;
+            nvalue.Velocity = value.BinLinkVelocity;
+            nvalue.Status = value.BinLinkStatus;            
+            nvalue.Setting = value.BinLinkSetting;
+            nvalue.ReactionRate = value.BinLinkReactionRate;
+            nvalue.FrictionFactor = value.BinLinkFrictionFactor;
+            nvalue.LinkQuality = value.BinLinkQuality;
+            clear value;
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement
