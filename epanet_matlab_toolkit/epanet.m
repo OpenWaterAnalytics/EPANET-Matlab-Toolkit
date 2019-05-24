@@ -2151,42 +2151,21 @@ classdef epanet <handle
             end
             obj.closeQualityAnalysis;
         end
-        function value = getComputedTimeSeries(obj)
-            cnt = obj.getNodeCount;
-            LinkNodesIndex = unique(obj.getLinkNodesIndex);
-            if (length(LinkNodesIndex)~=cnt)
-                lenLinkNodes = [LinkNodesIndex; zeros(cnt-length(LinkNodesIndex),1)];
-                value =[];
-                fIndex = setdiff(obj.getNodeIndex,lenLinkNodes);
-                for i=fIndex
-                    disp(['Input Error 233: Node ',obj.getNodeNameID{i},' is unconnected.']);  
-                end
-                return;
-            end
-            obj.saveInputFile(obj.BinTempfile);
-            [~, rptfile, binfile]= createTempfiles(obj.BinTempfile);
-            obj.loadEPANETFile(obj.BinTempfile);
-            obj.Errcode=calllib(obj.LibEPANET,'ENepanet',obj.BinTempfile,rptfile,binfile,lib.pointer);
-            if sum(obj.Errcode==[302,303])
-                while obj.Errcode %fix this error
-                    ENMatlabCleanup(obj.LibEPANET);
-                    ENLoadLibrary(obj.LibEPANETpath,obj.LibEPANET,0);
-                    obj.Errcode=calllib(obj.LibEPANET,'ENepanet',obj.BinTempfile,rptfile,binfile,lib.pointer);
-                end
-            elseif ~sum(obj.Errcode==[0,1,2,3,4,5,6])
-                disp(obj.getError(obj.Errcode));
-                obj.loadEPANETFile(obj.BinTempfile);
-                value = obj.getComputedHydraulicTimeSeries;
-                v = obj.getComputedQualityTimeSeries; 
-                value.LinkQuality = v.LinkQuality;
-                value.NodeQuality = v.NodeQuality;
-                value.MassFlowRate = v.MassFlowRate;
-                return;
-            end
-                
-            fid = fopen(binfile,'r');            
-            value = readEpanetBin(fid,binfile,rptfile,0);
-            obj.loadEPANETFile(obj.BinTempfile);
+        function nvalue = getComputedTimeSeries(obj)
+            [fid,binfile,rptfile] = runEPANETexe(obj);
+            value = readEpanetBin(fid, binfile, rptfile);
+            nvalue.Pressure = value.BinNodePressure;
+            nvalue.Demand = value.BinNodeDemand;
+            nvalue.Head = value.BinNodeHead;
+            nvalue.NodeQuality = value.BinNodeQuality;
+            nvalue.Flow = value.BinLinkFlow;
+            nvalue.Velocity = value.BinLinkVelocity;
+            nvalue.Status = value.BinLinkStatus;            
+            nvalue.Setting = value.BinLinkSetting;
+            nvalue.ReactionRate = value.BinLinkReactionRate;
+            nvalue.FrictionFactor = value.BinLinkFrictionFactor;
+            nvalue.LinkQuality = value.BinLinkQuality;
+            clear value
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement
