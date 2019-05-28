@@ -3418,8 +3418,12 @@ classdef epanet <handle
         function setDemandModel(obj, code, pmin, preq, pexp)
             % Sets the type of demand model to use and its parameters
             % EPANET Version 2.2
-            %
-            % Example: d.setDemandModel('PDA', 0, 0, 0.5);
+            %  % Arguments
+            %  type  Type of demand model.
+            %  pmin  Pressure below which there is no demand.
+            %  preq  Pressure required to deliver full demand.
+            %  pexp  Pressure exponent in demand function.
+            % Example: d.setDemandModel('PDA', 0, 0, 0.5); %type, pmin, preq, pexp
             %          d.getDemandModel
             model_type=find(strcmpi(obj.DEMANDMODEL, code)==1)-1;
             if isempty(model_type)

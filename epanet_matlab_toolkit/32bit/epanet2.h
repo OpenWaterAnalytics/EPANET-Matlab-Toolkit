@@ -190,7 +190,7 @@ extern "C" {
 
 ********************************************************************/
 
-   int DLLEXPORT ENaddnode(char *id, int nodeType);
+   int DLLEXPORT ENaddnode(char *id, int nodeType, int *index);
 
    int DLLEXPORT ENdeletenode(int index, int actionCode);
 
@@ -230,7 +230,14 @@ extern "C" {
   int DLLEXPORT ENsetdemandmodel(int model, EN_API_FLOAT_TYPE pmin,
                 EN_API_FLOAT_TYPE preq, EN_API_FLOAT_TYPE pexp);
 
+  int DLLEXPORT ENadddemand(int nodeIndex, EN_API_FLOAT_TYPE baseDemand,
+                char *demandPattern, char *demandName);
+
+  int DLLEXPORT ENdeletedemand(int nodeIndex, int demandIndex);
+  
   int DLLEXPORT ENgetnumdemands(int nodeIndex, int *numDemands);
+
+  int DLLEXPORT ENgetdemandindex(int nodeIndex, char *demandName, int *demandIndex);
 
   int DLLEXPORT ENgetbasedemand(int nodeIndex, int demandIndex,
                 EN_API_FLOAT_TYPE *baseDemand);
@@ -252,7 +259,7 @@ extern "C" {
 
 ********************************************************************/
 
-  int DLLEXPORT ENaddlink(char *id, int linkType, char *fromNode, char *toNode);
+  int DLLEXPORT ENaddlink(char *id, int linkType, char *fromNode, char *toNode, int *index);
 
   int DLLEXPORT ENdeletelink(int index, int actionCode);
 
@@ -343,7 +350,7 @@ extern "C" {
                 EN_API_FLOAT_TYPE x, EN_API_FLOAT_TYPE y);
 
   int DLLEXPORT ENgetcurve(int index, char* id, int *nPoints,
-                EN_API_FLOAT_TYPE **xValues, EN_API_FLOAT_TYPE **yValues);
+                EN_API_FLOAT_TYPE *xValues, EN_API_FLOAT_TYPE *yValues);
 
   int DLLEXPORT ENsetcurve(int index, EN_API_FLOAT_TYPE *xValues,
                 EN_API_FLOAT_TYPE *yValues, int nPoints);

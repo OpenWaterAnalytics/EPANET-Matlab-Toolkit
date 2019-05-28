@@ -165,7 +165,7 @@ typedef struct Project *EN_Project;
   @return an error code
   */
   int  DLLEXPORT EN_setcomment(EN_Project ph, int object, int index, char *comment);
-  
+
   /**
   @brief Retrieves the number of objects of a given type in a project.
   @param ph an EPANET project handle.
@@ -752,11 +752,12 @@ typedef struct Project *EN_Project;
   @param ph an EPANET project handle.
   @param id the ID name of the node to be added.
   @param nodeType the type of node being added (see @ref EN_NodeType)
+  @param[out] index the index of the newly added node
   @return an error code.
 
   When a new node is created all of it's properties (see @ref EN_NodeProperty) are set to 0.
   */
-  int DLLEXPORT EN_addnode(EN_Project ph, char *id, int nodeType);
+  int DLLEXPORT EN_addnode(EN_Project ph, char *id, int nodeType, int *index);
 
   /**
   @brief Deletes a node from a project.
@@ -850,7 +851,7 @@ typedef struct Project *EN_Project;
   These properties have units that depend on the units used for flow rate (see @ref Units).
   */
   int  DLLEXPORT EN_setjuncdata(EN_Project ph, int index, double elev, double dmnd,
-                 char *dmndpat);
+      char *dmndpat);
 
   /**
   @brief Sets a group of properties for a tank node.
@@ -931,6 +932,42 @@ typedef struct Project *EN_Project;
   */
   int DLLEXPORT EN_setdemandmodel(EN_Project ph, int type, double pmin,
                 double preq, double pexp);
+
+
+  /**
+  @brief appends a new demand to a junction node demands list.
+  @param ph an EPANET project handle.
+  @param nodeIndex the index of a node (starting from 1).
+  @param baseDemand the demand's base value.
+  @param demandPattern the name of a time pattern used by the demand
+  @param demandName the name of the demand's category
+  @return an error code.
+
+  A NULL or blank string can be used for `demandPattern` and for `demandName` to indicate
+  that no time pattern or category name is associated with the demand.
+  */
+  int DLLEXPORT EN_adddemand(EN_Project ph, int nodeIndex, double baseDemand,
+                char *demandPattern, char *demandName);
+
+  /**
+  @brief deletes a demand from a junction node.
+  @param ph an EPANET project handle.
+  @param nodeIndex the index of a node (starting from 1).
+  @param demandIndex the position of the demand in the node's demands list (starting from 1).
+  @return an error code.
+  */
+  int DLLEXPORT EN_deletedemand(EN_Project ph, int nodeIndex, int demandIndex);
+
+  /**
+  @brief Retrieves the index of a node's named demand category
+  @param ph an EPANET project handle.
+  @param nodeIndex the index of a node (starting from 1)
+  @param demandName the name of a demand category for the node
+  @param[out] demandIndex the index of the demand being sought
+  @return an error code
+  */
+  int DLLEXPORT EN_getdemandindex(EN_Project ph, int nodeIndex, char *demandName,
+                int *demandIndex);
 
   /**
   @brief Retrieves the number of demand categories for a junction node.
@@ -1027,6 +1064,7 @@ typedef struct Project *EN_Project;
   @param linkType The type of link being added (see @ref EN_LinkType)
   @param fromNode The ID name of the link's starting node.
   @param toNode The ID name of the link's ending node.
+  @param[out] index the index of the newly added link.
   @return an error code.
 
   A new pipe is assigned a diameter of 10 inches (or 254 mm), a length of 100
@@ -1039,7 +1077,8 @@ typedef struct Project *EN_Project;
 
   See @ref EN_LinkProperty.
   */
-  int DLLEXPORT EN_addlink(EN_Project ph, char *id, int linkType, char *fromNode, char *toNode);
+  int DLLEXPORT EN_addlink(EN_Project ph, char *id, int linkType, char *fromNode,
+                          char *toNode, int *index);
 
   /**
   @brief Deletes a link from the project.
@@ -1422,7 +1461,7 @@ typedef struct Project *EN_Project;
   @ref EN_MAXID characters.
   */
   int  DLLEXPORT EN_getcurve(EN_Project ph, int index, char* id, int *nPoints,
-                 double **xValues, double **yValues);
+                 double *xValues, double *yValues);
 
   /**
   @brief assigns a set of data points to a curve.
