@@ -2492,6 +2492,13 @@ classdef epanet <handle
             nvalue.FrictionFactor = value.BinLinkFrictionFactor;
             nvalue.LinkQuality = value.BinLinkQuality;
             clear value;
+            
+            % Remove report bin, files @#
+            warning off;
+            fclose('all');
+            files=dir('@#*');
+            if ~isempty(files); delete('@#*'); end
+            warning on; 
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement
@@ -6945,6 +6952,13 @@ classdef epanet <handle
         function value = getBinComputedAllParameters(obj, varargin)
             [fid, binfile, rptfile] = runEPANETexe(obj);
             value = readEpanetBin(fid, binfile, rptfile);
+            
+            % Remove report bin, files @#
+            warning off;
+            fclose('all');
+            files=dir('@#*');
+            if ~isempty(files); delete('@#*'); end
+            warning on; 
         end
         function [info, tline, allines] = readInpFile(obj, varargin)
             [info, tline, allines] = readAllFile(obj.BinTempfile);
