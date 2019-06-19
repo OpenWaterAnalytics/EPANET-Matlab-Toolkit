@@ -212,6 +212,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeSourceQuality|Retrieves the value of all nodes source quality|
 |getNodeSourceType|Retrieves the value of all node source type|
 |getNodeTankBulkReactionCoeff|Retrieves the tank bulk rate coefficient|
+|getNodeTankCanOverFlow|Retrieves the tank can overflow (= 1) or not (= 0)|
 |getNodeTankCount|Retrieves the number of tanks|
 |getNodeTankDiameter|Retrieves the tank diameters|
 |getNodeTankIndex|Retrieves the indices of tanks|
@@ -365,6 +366,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeSourceType|Sets the values of source types|
 |setNodeTankBulkReactionCoeff|Sets the values of tank bulk reaction coeff.|
 |setNodeTankDiameter|Sets the values of tanks diameter|
+|setNodeTankCanOverFlow|Sets the value of tank can overflow (= 1) or not (= 0)|
 |setNodeTankInitialLevel|Sets the values of tanks initial level|
 |setNodeTankMaximumWaterLevel|Sets the values of tanks maximum water level|
 |setNodeTankMinimumWaterLevel|Sets the values of tanks minimum water level|

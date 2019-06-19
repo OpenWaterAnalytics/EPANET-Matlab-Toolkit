@@ -1709,6 +1709,18 @@ classdef epanet <handle
                 j=j+1;
             end
         end
+        function value = getNodeTankCanOverFlow(obj, varargin)
+            % Retrieves the tank can overflow (= 1) or not (= 0)
+            % EPANET Version 2.2
+            % Example:
+            %   d.getNodeTankCanOverFlow
+            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            for i=indices
+                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_CANOVERFLOW, obj.LibEPANET); 
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+                j=j+1;
+            end
+        end
         function value = getNodeTankIndex(obj)
             %Retrieves the tank index
             tmpNodeTypes=obj.getNodeType;
@@ -3372,6 +3384,16 @@ classdef epanet <handle
             end
             for i=obj.getNodeTankIndex
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_MAXLEVEL, value(i), obj.LibEPANET);
+            end
+        end
+       function setNodeTankCanOverFlow(obj, value, varargin)
+            if nargin==3
+                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_CANOVERFLOW, varargin{1}, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
+                return;
+            end
+            for i=obj.getNodeTankIndex
+                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_CANOVERFLOW, value(i), obj.LibEPANET);
             end
         end
         function setNodeTankMinimumFraction(obj, value, varargin)
