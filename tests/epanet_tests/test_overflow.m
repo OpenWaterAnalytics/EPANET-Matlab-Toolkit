@@ -1,5 +1,6 @@
 %% Test overflow
 % https://github.com/OpenWaterAnalytics/EPANET/blob/dev/tests/test_overflow.cpp
+start_toolkit;
 
 d = epanet('Net1.inp');
 
@@ -19,27 +20,15 @@ d.solveCompleteHydraulics
 
 % Check that tank remains full
 level = d.getNodeTankInitialLevel(Nindex);
-if (abs(level - 130.0) < 0.0001)
-    fprintf('\nTrue');
-else
-    fprintf('\nFalse');
-end
+check_error(abs(level - 130.0) < 0.0001)
 
 % Check that there is no spillage
 spillage = d.getNodeActualDemand(Nindex);
-if (abs(spillage) < 0.0001)
-    fprintf('\nTrue');
-else
-    fprintf('\nFalse');
-end
+check_error(abs(spillage) < 0.0001)
 
 % Check that inflow link is closed
 inflow = d.getLinkFlows(Lindex);
-if abs(inflow) < 0.0001
-    fprintf('\nTrue');
-else
-    fprintf('\nFalse');
-end
+check_error(abs(inflow) < 0.0001)
 
 % Turn tank overflow option on
 d.setNodeTankCanOverFlow(Nindex, 1);
@@ -49,27 +38,15 @@ d.solveCompleteHydraulics
 
 % Check that tank remains full
 level = d.getNodeTankInitialLevel(Nindex);
-if (abs(level - 130.0) < 0.0001)
-    fprintf('\nTrue');
-else
-    fprintf('\nFalse');
-end
+check_error(abs(level - 130.0) < 0.0001)
 
 % Check that there is spillage equal to tank inflow
 % (inflow has neg. sign since tank is start node of inflow pipe)
 spillage = d.getNodeActualDemand(Nindex);
-if (abs(spillage) > 0.0001)
-    fprintf('\nTrue');
-else
-    fprintf('\nFalse');
-end
+check_error(abs(spillage) > 0.0001)
 
 inflow = d.getLinkFlows(Lindex);
-if (abs(-inflow - spillage) < 0.0001)
-    fprintf('\nTrue\n\n');
-else
-    fprintf('\nFalse\n\n');
-end
+check_error(abs(-inflow - spillage) < 0.0001)
 
 % % Save project to file and then close it
 d.saveInputFile('net1_overflow.inp');
@@ -81,11 +58,7 @@ d.solveCompleteHydraulics;
 % 
 % % Check that tank spillage has same value as before
 spillage2 = d.getNodeActualDemand(Nindex);
-if (abs(spillage - spillage2) < 0.0001)
-    fprintf('\nTrue\n\n');
-else
-    fprintf('\nFalse\n\n');
-end
- 
+check_error(abs(spillage - spillage2) < 0.0001)
+
 % % Clean up
 d.unload;
