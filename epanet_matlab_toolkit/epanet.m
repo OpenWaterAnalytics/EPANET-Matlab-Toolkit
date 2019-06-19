@@ -4611,6 +4611,10 @@ classdef epanet <handle
                        while isempty(tline)
                            tline = fgetl(fid);
                        end
+                       find_comm = strfind(tline, '//');
+                       if ~isempty(find_comm)
+                           tline = tline(1:find_comm-1);
+                       end
                        n = regexp(tline, {'\w*EN_\w*', '\d*'}, 'match');
                        if length(n{1})>1
                            constants(i) = n{1}(1);
