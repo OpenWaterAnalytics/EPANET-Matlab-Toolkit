@@ -1686,6 +1686,7 @@ classdef epanet <handle
         end
         function value = getNodeTankVolume(obj, varargin)
             %EPANET Version 2.1
+            %Retrieves the tank volume
             [indices, value] = getNodeIndices(obj, varargin);
             if obj.getVersion > 20012
                 j=1;
@@ -1702,6 +1703,7 @@ classdef epanet <handle
         end
         function value = getNodeTankMaximumWaterVolume(obj, varargin)
             %EPANET Version 2.1
+            %Retrieves the tank maximum water volume
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MAXVOLUME, obj.LibEPANET); 
@@ -3181,6 +3183,7 @@ classdef epanet <handle
             end
         end
         function setLinkBulkReactionCoeff(obj, value, varargin)
+            %Sets the value of bulk reaction coeff.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3189,6 +3192,7 @@ classdef epanet <handle
             end
         end
         function setLinkWallReactionCoeff(obj, value, varargin)
+            %Sets the value of wall reaction coeff.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
