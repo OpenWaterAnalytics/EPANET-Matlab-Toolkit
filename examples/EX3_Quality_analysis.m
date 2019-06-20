@@ -24,6 +24,21 @@ d = epanet('net2-cl2.inp');
 % (This function contains events)
 qual_res = d.getComputedQualityTimeSeries %Value x Node, Value x Link
 
+% Compute Quality step by step
+% d.solveCompleteHydraulics #needed
+d.openQualityAnalysis
+d.initializeQualityAnalysis
+tleft=1; P=[];T=[];Q=[];  
+while (tleft>0)
+    %Add code which changes something related to quality
+    t=d.runQualityAnalysis;
+    P=[P; d.getNodePressure];
+    Q=[Q; d.getNodeActualQuality];
+    T=[T; t];
+    tleft = d.stepQualityAnalysisTimeLeft;
+end
+d.closeQualityAnalysis;
+
 % Load EPANET-MSX files
 d.loadMSXFile('net2-cl2.msx')
 

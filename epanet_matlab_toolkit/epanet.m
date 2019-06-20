@@ -380,7 +380,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='2.1.8'; % 24/1/2019
+        classversion='2.1.8.1'; % 13/03/2019
         
         TYPECONTROL={'LOWLEVEL','HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL','HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'VOLUME','PUMP','EFFICIENCY','HEADLOSS','GENERAL'}; % Constants for pump curves: 'PUMP','EFFICIENCY','VOLUME','HEADLOSS' % EPANET Version 2.2
@@ -480,6 +480,8 @@ classdef epanet <handle
             obj.Errcode=ENopen(obj.InputFile,[obj.InputFile(1:end-4),'.txt'],'',obj.LibEPANET);
             if obj.Errcode
                 error('Could not open the file, please check INP file.');
+            else
+                disp(['Loading File "', varargin{1}, '"...']);
             end
             %Save the temporary input file
             obj.BinTempfile=[obj.InputFile(1:end-4),'_temp.inp'];
@@ -489,8 +491,6 @@ classdef epanet <handle
             obj.Errcode=ENopen(obj.BinTempfile,[obj.InputFile(1:end-4),'_temp.txt'], [obj.InputFile(1:end-4),'_temp.bin'],obj.LibEPANET);
             if obj.Errcode
                 error('Could not open the file, please check INP file.');
-            else
-                disp(['Input File "', varargin{1}, '" loaded sucessfuly.'])
             end
             % Hide messages at command window from bin computed
             obj.CMDCODE=1;
@@ -499,6 +499,7 @@ classdef epanet <handle
             if nargin==2
                 if strcmpi(varargin{2},'LOADFILE') 
                     obj.libFunctions = libfunctions(obj.LibEPANET);
+                    disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
                     return;
                 end
             end
@@ -642,7 +643,9 @@ classdef epanet <handle
             getFields_infoUnits = fields(infoUnits);
             for i=1:length(getFields_infoUnits)
                 obj.(getFields_infoUnits{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
-            end            
+            end    
+            disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
+            
         end % End of epanet class constructor
         function Errcode = loadEPANETFile(obj,varargin)
             %Load epanet file when use bin functions
@@ -2151,42 +2154,21 @@ classdef epanet <handle
             end
             obj.closeQualityAnalysis;
         end
-        function value = getComputedTimeSeries(obj)
-            cnt = obj.getNodeCount;
-            LinkNodesIndex = unique(obj.getLinkNodesIndex);
-            if (length(LinkNodesIndex)~=cnt)
-                lenLinkNodes = [LinkNodesIndex; zeros(cnt-length(LinkNodesIndex),1)];
-                value =[];
-                fIndex = setdiff(obj.getNodeIndex,lenLinkNodes);
-                for i=fIndex
-                    disp(['Input Error 233: Node ',obj.getNodeNameID{i},' is unconnected.']);  
-                end
-                return;
-            end
-            obj.saveInputFile(obj.BinTempfile);
-            [~, rptfile, binfile]= createTempfiles(obj.BinTempfile);
-            obj.loadEPANETFile(obj.BinTempfile);
-            obj.Errcode=calllib(obj.LibEPANET,'ENepanet',obj.BinTempfile,rptfile,binfile,lib.pointer);
-            if sum(obj.Errcode==[302,303])
-                while obj.Errcode %fix this error
-                    ENMatlabCleanup(obj.LibEPANET);
-                    ENLoadLibrary(obj.LibEPANETpath,obj.LibEPANET,0);
-                    obj.Errcode=calllib(obj.LibEPANET,'ENepanet',obj.BinTempfile,rptfile,binfile,lib.pointer);
-                end
-            elseif ~sum(obj.Errcode==[0,1,2,3,4,5,6])
-                disp(obj.getError(obj.Errcode));
-                obj.loadEPANETFile(obj.BinTempfile);
-                value = obj.getComputedHydraulicTimeSeries;
-                v = obj.getComputedQualityTimeSeries; 
-                value.LinkQuality = v.LinkQuality;
-                value.NodeQuality = v.NodeQuality;
-                value.MassFlowRate = v.MassFlowRate;
-                return;
-            end
-                
-            fid = fopen(binfile,'r');            
-            value = readEpanetBin(fid,binfile,rptfile,0);
-            obj.loadEPANETFile(obj.BinTempfile);
+        function nvalue = getComputedTimeSeries(obj)
+            [fid,binfile,rptfile] = runEPANETexe(obj);
+            value = readEpanetBin(fid, binfile, rptfile);
+            nvalue.Pressure = value.BinNodePressure;
+            nvalue.Demand = value.BinNodeDemand;
+            nvalue.Head = value.BinNodeHead;
+            nvalue.NodeQuality = value.BinNodeQuality;
+            nvalue.Flow = value.BinLinkFlow;
+            nvalue.Velocity = value.BinLinkVelocity;
+            nvalue.Status = value.BinLinkStatus;            
+            nvalue.Setting = value.BinLinkSetting;
+            nvalue.ReactionRate = value.BinLinkReactionRate;
+            nvalue.FrictionFactor = value.BinLinkFrictionFactor;
+            nvalue.LinkQuality = value.BinLinkQuality;
+            clear value
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement
@@ -2247,6 +2229,7 @@ classdef epanet <handle
             end 
         end
         function solveCompleteHydraulics(obj)
+            obj.solve = 1;
             [obj.Errcode] = ENsolveH(obj.LibEPANET);
         end
         function solveCompleteQuality(obj)
@@ -2845,6 +2828,7 @@ classdef epanet <handle
         function Errcode = saveInputFile(obj,inpname)
 %             [addSectionCoordinates,addSectionRules] = obj.getBinCoordRuleSections(obj.InputFile);
             [Errcode] = ENsaveinpfile(inpname,obj.LibEPANET);
+            if Errcode, error(obj.getError(Errcode)), return; end   
 %             [~,info] = obj.readInpFile;
 %             endSectionIndex=find(~cellfun(@isempty,regexp(info,'END','match')));
 %             endInpIndex=find(~cellfun(@isempty,regexp(addSectionCoordinates,'END','match')));
@@ -3660,137 +3644,49 @@ classdef epanet <handle
         function saveMSXFile(obj,msxname)
             [obj.Errcode] = MSXsavemsxfile(msxname,obj.MSXLibEPANET);
         end
-        function msx = writeMSXFile(obj,msx)
-            % Input Arguments
-            % msx={};
-            % msx.msxFile = 'networks/MSXFileName.msx';
-            % % section Title
-            % msx.titleDescription{1} = 'Example: MSXFile.';
-            % % section Options
-            % msx.options{1}='FT2'; %AREA_UNITS FT2/M2/CM2
-            % msx.options{2}='DAY'; %TIME_UNITS SEC/MIN/HR/DAY
-            % msx.options{3}='EUL'; %SOLVER EUL/RK5/ROS2
-            % msx.options{4}='NONE'; %COUPLING FULL/NONE
-            % msx.options{5}='NONE'; %COMPILER NONE/VC/GC
-            % msx.options{6}=3600; %TIMESTEP in seconds
-            % msx.options{7}=0.01;  %ATOL value
-            % msx.options{8}=0.001;  %RTOL value
-            % % section Species
-            % % <type> <specieID> <units> (<atol> <rtol>)
-            % msx.species{1}={'BULK'}; %type BULK/WALL
-            % msx.species{2}={'CL2'}; %specieID
-            % msx.species{3}={'MG'}; %units UG/MG
-            % msx.species{4}={0.01}; %atol
-            % msx.species{5}={0.001}; %rtol
-            % 
-            % % section Coefficients 
-            % % CONSTANT name value % PARAMETER name value
-            % msx.coefficients{1}={'PARAMETER','PARAMETER'}; 
-            % msx.coefficients{2}={'Kb','Kw'}; 
-            % msx.coefficients{3}={0.3,1}; 
-            % 
-            % % section Terms
-            % % <termID> <expression>
-            % msx.terms{1}={'Kf'}; % termID
-            % msx.terms{2}={'1.5826e-4 * RE^0.88 / D'}; % expression
-            % 
-            % % section Pipes
-            % % EQUIL <specieID> <expression>
-            % % RATE <specieID> <expression>
-            % % FORMULA <specieID> <expression>
-            % msx.pipes{1} ={'RATE'}; %type
-            % msx.pipes{2} ={'CL2'}; %specieID
-            % msx.pipes{3} ={'-Kb*CL2 - (4/D)*Kw*Kf/(Kw+Kf)*CL2'}; %expression
-            % 
-            % % section Tanks
-            % % EQUIL <specieID> <expression>
-            % % RATE <specieID> <expression>
-            % % FORMULA <specieID> <expression>
-            % msx.tanks{1} ={'RATE'}; %type
-            % msx.tanks{2} ={'CL2'}; %specieID
-            % msx.tanks{3} ={'-Kb*CL2'}; %expression
-
-            % % section Sources
-            % % <type> <nodeID> <specieID> <strength> (<patternID>)
-            % msx.sources{1}={''}; %CONC/MASS/FLOW/SETPOINT
-            % msx.sources{2}={''}; %nodeID
-            % msx.sources{3}={''}; %specieID
-            % msx.sources{4}={''}; %strength
-            % msx.sources{5}={''}; %patternID
-            % 
-            % % section Quality Global
-            % % GLOBAL <specieID> <value>
-            % msx.global{1} = {''};
-            % msx.global{2} = {''};%specieID
-            % msx.global{3} = {''};%value
-            % % others
-            % % NODE <nodeID> <bulkSpecieID> <value>
-            % % LINK <linkID> <wallSpecieID> <value>
-            % msx.quality{1} = {''}; %NODE/LINK
-            % msx.quality{2} = {''}; %ID
-            % msx.quality{3} = {''}; %bulkSpecieID/wallSpecieID
-            % msx.quality{4} = {''}; %value
-            % 
-            % % section Parameters
-            % % PIPE <pipeID> <paramID> <value>
-            % % TANK <tankID> <paramID> <value>
-            % msx.parameters{1} = {''};
-            % msx.parameters{2} = {''};
-            % msx.parameters{3} = {''};
-            % msx.parameters{4} = {''};
-            % 
-            % % section Patterns
-            % % <patternID> <multiplier> <multiplier> 
-            % msx.patterns{1} = {''}; %patternID
-            % msx.patterns{2} = {''}; %multiplier            
+        function msx = writeMSXFile(obj, msx)
+            % Checkout example: /examples/EX15_write_msx_file.m
             space=5;
-            f = writenewTemp(msx.msxFile);
+            f = writenewTemp(msx.FILENAME);
             fprintf(f,'[TITLE]\n');
-            if isfield(msx,'titleDescription')
-                for i=1:length(msx.titleDescription)
-                    fprintf(f,msx.titleDescription{i});
-                end
+            if isfield(msx,'title')
+                fprintf(f,msx.TITLE);
             end
 
             fprintf(f,'\n\n[OPTIONS]\n');
             options = {'AREA_UNITS', 'RATE_UNITS', 'SOLVER', 'COUPLING', 'COMPILER',...
                 'TIMESTEP', 'ATOL', 'RTOL'};
             spaces=blanks(space);
-            if isfield(msx,'options')
-                for i=1:length(msx.options)
+
+            for i=1:length(options)
+                if isfield(msx,options{i})
                     fprintf(f,num2str(options{i}));
                     fprintf(f,spaces);
-                    fprintf(f,num2str(msx.options{i}));
+                    fprintf(f,num2str(msx.(options{i})));
                     fprintf(f,'\n');
                 end
             end
 
-            FIELDS = {'SPECIES', 'COEFFICIENTS', 'TERMS', 'PIPES',...
+            FIELDS = {'SPECIES', 'COEFFICIENTS', 'TERMS', 'PIPES', ...
                 'TANKS', 'SOURCES', 'QUALITY', 'GLOBAL', 'PARAMETERS', 'PATTERNS'};
             for sect=FIELDS
                 section = char(sect);
                 if ~strcmpi(section, 'GLOBAL')
-                    fprintf(f,['\n[',section,']\n']);
+                    fprintf(f, ['\n[', section, ']\n']);
                 end
-                sp_field = lower(section);
-                if isfield(msx,lower(section))
-                    for u=1:length(eval(['msx.',sp_field,'{1}']))
-                        for i=1:length(eval(['msx.',sp_field]))
-                            if isnumeric(eval(['msx.',sp_field,'{i}{u}']))
-                                fprintf(f,num2str(eval(['msx.',sp_field,'{i}{u}'])));
-                            else
-                                fprintf(f,num2str(char(eval(['msx.',sp_field,'{i}{u}']))));
-                            end
-                            fprintf(f,spaces);
-                        end
-                        fprintf(f,'\n');
+                sp_field = upper(section);
+                if isfield(msx, upper(section))
+                    species_all = eval(['msx.', sp_field]);
+                    for i=1:length(species_all)
+                        fprintf(f, species_all{i});
+                        fprintf(f, '\n');
                     end
                 end
             end
            
-            fprintf(f,'[REPORT]\n');
-            fprintf(f,'NODES ALL\n');
-            fprintf(f,'LINKS ALL\n');
+            fprintf(f, '[REPORT]\n');
+            fprintf(f, 'NODES ALL\n');
+            fprintf(f, 'LINKS ALL\n');
             fclose(f);
         end
         function unloadMSX(obj)
@@ -5409,7 +5305,7 @@ classdef epanet <handle
         end
         function [Errcode]=setBinLinkPipeStatus(obj,varargin)
            indexParameter=8;
-           if sum(strcmpi(varargin{1},'closed')+strcmpi(varargin{1},'open')+strcmpi(varargin{1},'cv'))==obj.BinLinkPipeCount
+           if sum(strcmpi(varargin{1},'closed')+strcmpi(varargin{1},'open')+strcmpi(varargin{1},'cv'))==obj.getBinLinksInfo.BinLinkPipeCount
                 parameter=varargin{1};
             else
                 warning('Invalid argument found.');Errcode=-1;
@@ -7988,9 +7884,9 @@ for i=1:(nargin/2)
             error('Invalid property founobj.');
     end
 end
-drawnow;
 
 if axesid==0
+   drawnow;
    fig=figure;
    axesid=axes('Parent', fig);
 end
@@ -8266,7 +8162,11 @@ if strcmpi(slegend, 'show')
         legendString={'Pipes', 'Pumps', 'Valves', ...
             'Junctions', 'Reservoirs', 'Tanks'}; 
         legendIndices=sort(legendIndices, 'descend');
-        legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
+        try
+            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
+        catch
+            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
+        end
     end
 elseif strcmpi(slegend, 'hide')
     %skip
@@ -11291,19 +11191,20 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
         fread(fid, 1, 'float');
 
         for i=1:value.BinNumberReportingPeriods
-            value.BinnodeDemand(i,:)         = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinnodeHead(i,:)           = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinnodePressure(i,:)       = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinnodeQuality(i,:)        = fread(fid, value.BinNumberNodes, 'float')';
-            value.BinlinkFlow(i,:)           = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkVelocity(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkHeadloss(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkQuality(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkStatus(i,:)         = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkSetting(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkReactionRate(i,:)   = fread(fid, value.BinNumberLinks, 'float')';
-            value.BinlinkFrictionFactor(i,:) = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinNodeDemand(i,:)         = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinNodeHead(i,:)           = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinNodePressure(i,:)       = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinNodeQuality(i,:)        = fread(fid, value.BinNumberNodes, 'float')';
+            value.BinLinkFlow(i,:)           = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkVelocity(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkHeadloss(i,:)       = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkQuality(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkStatus(i,:)         = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkSetting(i,:)        = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkReactionRate(i,:)   = fread(fid, value.BinNumberLinks, 'float')';
+            value.BinLinkFrictionFactor(i,:) = fread(fid, value.BinNumberLinks, 'float')';
         end
+        
         value.BinAverageBulkReactionRate=fread(fid, 1, 'float')';
         value.BinAverageWallReactionRate=fread(fid, 1, 'float')';
         value.BinAverageTankReactionRate=fread(fid, 1, 'float')';
@@ -11314,18 +11215,18 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
     end
     if ~isempty(varargin)
         v.Time = (0:value.BinReportingTimeStepSec:value.BinSimulationDurationSec)';
-        v.Pressure = value.BinnodePressure;
-        v.Demand = value.BinnodeDemand;
-        v.Head = value.BinnodeHead;
-        v.NodeQuality = value.BinnodeQuality;
-        v.Flow = value.BinlinkFlow;
-        v.Velocity = value.BinlinkVelocity;
-        v.HeadLoss = value.BinlinkHeadloss;
-        v.Status = value.BinlinkStatus;
-        v.Setting = value.BinlinkSetting;
-        v.ReactionRate = value.BinlinkReactionRate;
-        v.FrictionFactor = value.BinlinkFrictionFactor;
-        v.LinkQuality = value.BinlinkQuality;
+        v.Pressure = value.BinNodePressure;
+        v.Demand = value.BinNodeDemand;
+        v.Head = value.BinNodeHead;
+        v.NodeQuality = value.BinNodeQuality;
+        v.Flow = value.BinLinkFlow;
+        v.Velocity = value.BinLinkVelocity;
+        v.HeadLoss = value.BinLinkHeadloss;
+        v.Status = value.BinLinkStatus;
+        v.Setting = value.BinLinkSetting;
+        v.ReactionRate = value.BinLinkReactionRate;
+        v.FrictionFactor = value.BinLinkFrictionFactor;
+        v.LinkQuality = value.BinLinkQuality;
         clear value;
         value=v;
     end
