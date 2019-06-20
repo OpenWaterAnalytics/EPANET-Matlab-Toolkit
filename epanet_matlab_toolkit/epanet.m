@@ -3387,6 +3387,13 @@ classdef epanet <handle
             end
         end
        function setNodeTankCanOverFlow(obj, value, varargin)
+            % Sets the tank can overflow (= 1) or not (= 0)
+            % EPANET Version 2.2
+            % Example:
+            %   Nindex = d.getNodeIndex('2');
+            %   d.getNodeTankCanOverFlow
+            %   d.setNodeTankCanOverFlow(Nindex, 1);
+            %   d.getNodeTankCanOverFlow
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_CANOVERFLOW, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
