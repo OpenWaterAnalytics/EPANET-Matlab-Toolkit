@@ -1687,6 +1687,11 @@ classdef epanet <handle
         function value = getNodeTankVolume(obj, varargin)
             %EPANET Version 2.1
             %Retrieves the tank volume
+            %Example:
+            %  Nindex = d.getNodeIndex('2'); % get tank index
+            %  d.getNodeTankVolume(Nindex)
+            %  d.getNodeTankVolume
+            %  d.getNodeTankVolume(1:5)
             [indices, value] = getNodeIndices(obj, varargin);
             if obj.getVersion > 20012
                 j=1;
@@ -1704,6 +1709,11 @@ classdef epanet <handle
         function value = getNodeTankMaximumWaterVolume(obj, varargin)
             %EPANET Version 2.1
             %Retrieves the tank maximum water volume
+            % Example:
+            %   Nindex = d.getNodeIndex('2'); % get tank index
+            %   d.getNodeTankMaximumWaterVolume(Nindex)
+            %   d.getNodeTankMaximumWaterVolume
+            %   d.getNodeTankMaximumWaterVolume(1:5)
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MAXVOLUME, obj.LibEPANET); 
@@ -3183,7 +3193,12 @@ classdef epanet <handle
             end
         end
         function setLinkBulkReactionCoeff(obj, value, varargin)
-            %Sets the value of bulk reaction coeff.
+            %Sets the value of bulk reaction coefficient
+            %Example
+            %   linkset=d.getLinkBulkReactionCoeff;
+            %   linkset(1)=0;   %change the value of bulk reaction coeff.
+            %   d.setLinkBulkReactionCoeff(linkset)
+            %   d.getLinkBulkReactionCoeff
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3192,7 +3207,12 @@ classdef epanet <handle
             end
         end
         function setLinkWallReactionCoeff(obj, value, varargin)
-            %Sets the value of wall reaction coeff.
+            %Sets the value of wall reaction coefficient
+            %Example
+            %   linkset=d.getLinkWallReactionCoeff;
+            %   linkset(1)=0;   %change the value of wall reaction coeff.
+            %   d.setLinkWallReactionCoeff(linkset)
+            %   d.getLinkWallReactionCoeff
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
