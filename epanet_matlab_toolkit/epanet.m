@@ -3193,12 +3193,11 @@ classdef epanet <handle
             end
         end
         function setLinkBulkReactionCoeff(obj, value, varargin)
-            %Sets the value of bulk reaction coefficient
-            %Example
+            % Sets the value of bulk reaction coefficient
+            % Example:
             %   linkset=d.getLinkBulkReactionCoeff;
-            %   linkset(1)=0;   %change the value of bulk reaction coeff.
+            %   linkset(1)=0;   % change the value of bulk reaction coeff.
             %   d.setLinkBulkReactionCoeff(linkset)
-            %   d.getLinkBulkReactionCoeff
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3207,10 +3206,10 @@ classdef epanet <handle
             end
         end
         function setLinkWallReactionCoeff(obj, value, varargin)
-            %Sets the value of wall reaction coefficient
-            %Example
+            % Sets the value of wall reaction coefficient
+            % Example:
             %   linkset=d.getLinkWallReactionCoeff;
-            %   linkset(1)=0;   %change the value of wall reaction coeff.
+            %   linkset(1)=0;   % change the value of wall reaction coeff.
             %   d.setLinkWallReactionCoeff(linkset)
             %   d.getLinkWallReactionCoeff
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
