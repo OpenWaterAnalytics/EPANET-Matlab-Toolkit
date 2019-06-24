@@ -3230,7 +3230,7 @@ classdef epanet <handle
             end
         end
         function setLinkInitialSetting(obj, value, varargin)
-            % Sets the values of initial settings
+            % Sets the values of initial status
             % Example:
             %   linkset=d.getLinkInitialSetting
             %   linkset(end)=108;
@@ -3271,15 +3271,6 @@ classdef epanet <handle
             end
         end
         function setLinkStatus(obj, value, varargin)
-            % Sets the values of status for links
-            % Example 1:
-            %   linkset=d.getLinkStatus;
-            %   d.setLinkStatus(0*linkset)   % Every link status = 0
-            %   d.getLinkStatus
-            % Example 2:
-            %   linkIndex = 1;
-            %   d.setLinkStatus(linkIndex,0)   % First link status = 0
-            %   d.getLinkStatus
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3288,15 +3279,6 @@ classdef epanet <handle
             end
         end
         function setLinkSettings(obj, value, varargin)
-            % Sets the values of settings for links
-            % Example 1:
-            %   linkset=d.getLinkSettings;
-            %   d.setLinkSettings(100*linkset)   % Every link setting = 100
-            %   d.getLinkSettings
-            % Example 2:
-            %   linkIndex = 1;
-            %   d.setLinkSettings(linkIndex,100)   % First link setting = 100
-            %   d.getLinkSettings
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3305,15 +3287,6 @@ classdef epanet <handle
             end
         end
         function setNodeElevations(obj, value, varargin)
-            % Sets the values of elevation for nodes
-            % Example 1:
-            %   nodeset=d.getNodeElevations;
-            %   d.setNodeElevations(100*nodeset)   % Every node elevation = 100
-            %   d.getNodeElevations
-            % Example 2:
-            %   nodeIndex = 1;
-            %   d.setNodeElevations(nodeIndex,500)   % First node elevation = 500
-            %   d.getNodeElevations
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3322,17 +3295,6 @@ classdef epanet <handle
             end
         end
         function setNodeBaseDemands(obj, value, varargin)
-            % Sets the values of base demands for nodes
-            % Example 1:
-            %   nodeset = d.getNodeBaseDemands;
-            %   nodeset{1} = 200;    % First node base demand = 200
-            %   d.setNodeBaseDemands(nodeset)
-            %   d.getNodeBaseDemands
-            % Example 2:
-            %   nodeIndex = 1;
-            %   d.setNodeBaseDemands(nodeIndex,200)   % First node base demand = 200 
-            %   d.getNodeBaseDemands
-            
             if nargin==3 
                 indices = value; value=varargin{1};j=1;
                 for i=indices
@@ -3404,16 +3366,6 @@ classdef epanet <handle
             end
         end
         function setNodeEmitterCoeff(obj, value, varargin)
-            % Sets the values of emitter coefficient for nodes
-            % Example 1:
-            %   nodeset=d.getNodeEmitterCoeff
-            %   nodeset(1)=0;   % First node emitter coefficient = 0
-            %   d.setNodeEmitterCoeff(nodeset)
-            %   d.getNodeEmitterCoeff
-            % Example 2:
-            %   nodeIndex = 1;
-            %   d.setNodeEmitterCoeff(nodeIndex,0)   % First node emitter coefficient = 0
-            %   d.getNodeEmitterCoeff
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3422,16 +3374,6 @@ classdef epanet <handle
             end
         end
         function setNodeInitialQuality(obj, value, varargin)
-            % Sets the values of initial quality for nodes
-            % Example 1:
-            %   nodeset=d.getNodeInitialQuality
-            %   nodeset(1)=0.5;   % First node initial quality = 0.5
-            %   d.setNodeInitialQuality(nodeset)
-            %   d.getNodeInitialQuality
-            % Example 2:
-            %   nodeIndex = 1;
-            %   d.setNodeInitialQuality(nodeIndex,0)   % First node initial quality = 0
-            %   d.getNodeInitialQuality
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3457,16 +3399,6 @@ classdef epanet <handle
             end
         end
         function setNodeTankInitialLevel(obj, value, varargin)
-            % Sets the values of initial level for tanks
-            % Example 1:
-            %   nodeset=d.getNodeTankInitialLevel
-            %   nodeset(end)=120;   % Last node(tank) initial level = 120
-            %   d.setNodeTankInitialLevel(nodeset)
-            %   d.getNodeTankInitialLevel
-            % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankInitialLevel(nodeIndex,120)   % Eleventh node(tank) initial level = 120
-            %   d.getNodeTankInitialLevel
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_TANKLEVEL, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3477,16 +3409,6 @@ classdef epanet <handle
             end
         end
         function setNodeTankMixingModelType(obj, value, varargin)
-            % Sets the mixing model type value for tanks
-            % Example 1:
-            %   nodeset=d.getNodeTankMixingModelType
-            %   nodeset(end)={'MIX1'};   % Last node(tank) mixing model type = MIX1
-            %   d.setNodeTankMixingModelType(nodeset)
-            %   d.getNodeTankMixingModelType
-            % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMixingModelType(nodeIndex,'MIX1')   % Eleventh node(tank) mixing model type = MIX1
-            %   d.getNodeTankMixingModelTypel
             if nargin==3
                 code=strfind(strcmpi(varargin{1}, obj.TYPEMIXMODEL), 1)-1;
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MIXMODEL, code, obj.LibEPANET);
@@ -3499,16 +3421,6 @@ classdef epanet <handle
             end
         end
         function setNodeTankDiameter(obj, value, varargin)
-            % Sets the diameter value for tanks
-            % Example 1:
-            %   nodeset=d.getNodeTankDiameter
-            %   nodeset(end)=50;   % Last node(tank) diameter = 50
-            %   d.setNodeTankDiameter(nodeset)
-            %   d.getNodeTankDiameter
-            % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankDiameter(nodeIndex,40)   % Eleventh node(tank) diameter = 40
-            %   d.getNodeTankDiameter
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_TANKDIAM, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3519,16 +3431,6 @@ classdef epanet <handle
             end
         end
         function setNodeTankMinimumWaterLevel(obj, value, varargin)
-            % Sets the minimum water level value for tanks
-            % Example 1:
-            %   nodeset=d.getNodeTankMinimumWaterLevel
-            %   nodeset(end)=100;   % Last node(tank) minimum water level = 100
-            %   d.setNodeTankMinimumWaterLevel(nodeset)
-            %   d.getNodeTankMinimumWaterLevel
-            % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMinimumWaterLevel(nodeIndex,90)   % Eleventh node(tank) minimum water level = 90
-            %   d.getNodeTankMinimumWaterLevel
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MINLEVEL, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3539,16 +3441,6 @@ classdef epanet <handle
             end
         end
         function setNodeTankMinimumWaterVolume(obj, value, varargin)
-            % Sets the minimum water volume value for tanks
-            % Example 1:
-            %   nodeset=d.getNodeTankMinimumWaterVolume
-            %   nodeset(end)=10000;   % Last node(tank) minimum water volume = 10000
-            %   d.setNodeTankMinimumWaterVolume(nodeset)
-            %   d.getNodeTankMinimumWaterVolume
-            % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMinimumWaterVolume(nodeIndex,10000)   % Eleventh node(tank) minimum water volume = 10000
-            %   d.getNodeTankMinimumWaterVolume
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MINVOLUME, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3559,16 +3451,6 @@ classdef epanet <handle
             end
         end
         function setNodeTankMaximumWaterLevel(obj, value, varargin)
-            % Sets the maximum water level value for tanks
-            % Example 1:
-            %   nodeset=d.getNodeTankMaximumWaterLevel
-            %   nodeset(end)=150;   % Last node(tank) maximum water level = 150
-            %   d.setNodeTankMaximumWaterLevel(nodeset)
-            %   d.getNodeTankMaximumWaterLevel
-            % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMaximumWaterLevel(nodeIndex,150)   % Eleventh node(tank) maximum water level = 150
-            %   d.getNodeTankMaximumWaterLevel
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MAXLEVEL, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3596,16 +3478,6 @@ classdef epanet <handle
             end
         end
         function setNodeTankMinimumFraction(obj, value, varargin)
-            % Sets the minimum fraction value for tanks
-            % Example 1:
-            %   nodeset=d.getNodeTankMinimumFraction
-            %   nodeset(end)=1;   % Last node(tank) minimum fraction = 1
-            %   d.setNodeTankMinimumFraction(nodeset)
-            %   d.getNodeTankMinimumFraction
-            % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMinimumFraction(nodeIndex,1)   % Eleventh node(tank) minimum fraction = 1
-            %   d.getNodeTankMinimumFraction
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MIXFRACTION, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
