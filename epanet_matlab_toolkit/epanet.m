@@ -1036,12 +1036,14 @@ classdef epanet <handle
         function value = getLinkLength(obj, varargin)
             % Retrieves the value of all link lengths
             % Pipe length
-            % Example:
-            %   d.getLinkLength
+            % Example 1:
+            %   d.getLinkLength   % Retrieves the value of all link lengths
+            % Example 2:
+            %   d.getLinkLength(1)   % Retrieves the value of the first link length
             value = get_link_info(obj, obj.ToolkitConstants.EN_LENGTH, varargin{:});
         end
         function value = getLinkRoughnessCoeff(obj, varargin)
-            % Retrieves the value of all link roughness
+            % Retrieves the value of all link roughness coefficients
             % Pipe roughness coefficient
             % Example 1:
             %   d.getLinkRoughnessCoeff   % Retrieves the value of all link roughness coefficients
