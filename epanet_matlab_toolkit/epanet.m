@@ -985,12 +985,20 @@ classdef epanet <handle
             end
         end
         function value = getLinkType(obj, varargin)
-            %Retrieves the link-type code for all links.
+            % Retrieves the link-type code for links
+            % Example 1:
+            %   d.getLinkType   % Retrieves the link-type code for all links
+            % Example 2:
+            %   d.getLinkType(1)   % Retrieves the link-type code for the first link
             if ~isempty(varargin), varargin=varargin{1}; end
             value=obj.TYPELINK(obj.getLinkTypeIndex(varargin)+1);
         end
         function value = getLinkTypeIndex(obj, varargin)
-            %Retrieves the link-type code for all links.
+            % Retrieves the link-type index for links
+            % Example 1:
+            %   d.getLinkTypeIndex   % Retrieves the link-type index for all links
+            % Example 2:
+            %   d.getLinkTypeIndex(1)   % Retrieves the link-type index for the first link
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetlinktype(i, obj.LibEPANET);  
@@ -999,7 +1007,9 @@ classdef epanet <handle
             end
         end
         function [value] = getLinksInfo(obj)
-            %Retrieves all link info
+            % Retrieves all link info
+            % Example:
+            %   d.getLinksInfo
             value = struct();
             for i=1:obj.getLinkCount
                 [~, value.LinkDiameter(i)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET);
@@ -1015,51 +1025,65 @@ classdef epanet <handle
             end
         end
         function value = getLinkDiameter(obj, varargin)
-            % Retrieves the value of all link diameters
+            % Retrieves the value of link diameters
             % Pipe/valve diameter
-            % Example:
-            %   d.getLinkDiameter
+            % Example 1:
+            %   d.getLinkDiameter   % Retrieves the value of all link diameters
+            % Example 2:
+            %   d.getLinkDiameter(1)   % Retrieves the value of the first link diameter
             value = get_link_info(obj, obj.ToolkitConstants.EN_DIAMETER, varargin{:});
         end
         function value = getLinkLength(obj, varargin)
-            % Retrieves the value of all link lengths
+            % Retrieves the value of link lengths
             % Pipe length
-            % Example:
-            %   d.getLinkLength
+            % Example 1:
+            %   d.getLinkLength   % Retrieves the value of all link lengths
+            % Example 2:
+            %   d.getLinkLength(1)   % Retrieves the value of the first link length
             value = get_link_info(obj, obj.ToolkitConstants.EN_LENGTH, varargin{:});
         end
         function value = getLinkRoughnessCoeff(obj, varargin)
-            % Retrieves the value of all link roughness
+            % Retrieves the value of link roughness coefficients
             % Pipe roughness coefficient
-            % Example:
-            %   d.getLinkRoughnessCoeff
+            % Example 1:
+            %   d.getLinkRoughnessCoeff   % Retrieves the value of all link roughness coefficients
+            % Example 2:
+            %   d.getLinkRoughnessCoeff(1)   % Retrieves the value of the first link roughness coefficient
             value = get_link_info(obj, obj.ToolkitConstants.EN_ROUGHNESS, varargin{:});
         end
         function value = getLinkMinorLossCoeff(obj, varargin)
-            % Retrieves the value of all link minor loss coefficients
+            % Retrieves the value of link minor loss coefficients
             % Pipe/valve minor loss coefficient
-            % Example:
-            %   d.getLinkMinorLossCoeff
+            % Example 1:
+            %   d.getLinkMinorLossCoeff   % Retrieves the value of all link minor loss coefficients
+            % Example 2:
+            %   d.getLinkMinorLossCoeff(1)   % Retrieves the value of the first link minor loss coefficient
             value = get_link_info(obj, obj.ToolkitConstants.EN_MINORLOSS, varargin{:});
         end
         function value = getLinkInitialStatus(obj, varargin)
             % Retrieves the value of all link initial status
             % Initial status (see @ref EN_LinkStatusType)
-            % Example:
-            %   d.getLinkInitialStatus
+            % Example 1:
+            %   d.getLinkInitialStatus   % Retrieves the value of all link initial status
+            % Example 2:
+            %   d.getLinkInitialStatus(1)   % Retrieves the value of the first link initial status
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSTATUS, varargin{:});
         end
         function value = getLinkInitialSetting(obj, varargin)
             % Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves
             % Initial pump speed or valve setting
-            % Example:
-            %   d.getLinkInitialSetting
+            % Example 1:
+            %   d.getLinkInitialSetting   % Retrieves the value of all link initial settings
+            % Example 2:
+            %   d.getLinkInitialSetting(1)   % Retrieves the value of the first link initial setting
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSETTING, varargin{:});
         end
         function value = getLinkBulkReactionCoeff(obj, varargin)
-            % Bulk chemical reaction coefficient
-            % Example:
-            %   d.getLinkBulkReactionCoeff
+            % Retrieves the value of all link bulk chemical reaction coefficient
+            % Example 1:
+            %   d.getLinkBulkReactionCoeff   % Retrieves the value of all link bulk chemical reaction coefficient
+            % Example 2:
+            %   d.getLinkBulkReactionCoeff(1)   % Retrieves the value of the first link bulk chemical reaction coefficient
             value = get_link_info(obj, obj.ToolkitConstants.EN_KBULK, varargin{:});
         end
         function value = getLinkWallReactionCoeff(obj, varargin)
