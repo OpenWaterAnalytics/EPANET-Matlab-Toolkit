@@ -1025,7 +1025,7 @@ classdef epanet <handle
             end
         end
         function value = getLinkDiameter(obj, varargin)
-            % Retrieves the value of all link diameters
+            % Retrieves the value of link diameters
             % Pipe/valve diameter
             % Example 1:
             %   d.getLinkDiameter   % Retrieves the value of all link diameters
@@ -1034,7 +1034,7 @@ classdef epanet <handle
             value = get_link_info(obj, obj.ToolkitConstants.EN_DIAMETER, varargin{:});
         end
         function value = getLinkLength(obj, varargin)
-            % Retrieves the value of all link lengths
+            % Retrieves the value of link lengths
             % Pipe length
             % Example 1:
             %   d.getLinkLength   % Retrieves the value of all link lengths
@@ -1052,7 +1052,7 @@ classdef epanet <handle
             value = get_link_info(obj, obj.ToolkitConstants.EN_ROUGHNESS, varargin{:});
         end
         function value = getLinkMinorLossCoeff(obj, varargin)
-            % Retrieves the value of all link minor loss coefficients
+            % Retrieves the value of link minor loss coefficients
             % Pipe/valve minor loss coefficient
             % Example 1:
             %   d.getLinkMinorLossCoeff   % Retrieves the value of all link minor loss coefficients
