@@ -985,12 +985,20 @@ classdef epanet <handle
             end
         end
         function value = getLinkType(obj, varargin)
-            %Retrieves the link-type code for all links.
+            % Retrieves the link-type code for all links
+            % Example 1:
+            %   d.getLinkType   % Retrieves the link-type code for all links
+            % Example 2:
+            %   d.getLinkType(1)   % Retrieves the link-type code for the first link
             if ~isempty(varargin), varargin=varargin{1}; end
             value=obj.TYPELINK(obj.getLinkTypeIndex(varargin)+1);
         end
         function value = getLinkTypeIndex(obj, varargin)
-            %Retrieves the link-type code for all links.
+            % Retrieves the link-type index for all links
+            % Example 1:
+            %   d.getLinkTypeIndex   % Retrieves the link-type index for all links
+            % Example 2:
+            %   d.getLinkTypeIndex(1)   % Retrieves the link-type index for the first link
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetlinktype(i, obj.LibEPANET);  
@@ -999,7 +1007,9 @@ classdef epanet <handle
             end
         end
         function [value] = getLinksInfo(obj)
-            %Retrieves all link info
+            % Retrieves all link info
+            % Example:
+            %   d.getLinksInfo
             value = struct();
             for i=1:obj.getLinkCount
                 [~, value.LinkDiameter(i)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET);
@@ -1017,55 +1027,71 @@ classdef epanet <handle
         function value = getLinkDiameter(obj, varargin)
             % Retrieves the value of all link diameters
             % Pipe/valve diameter
-            % Example:
-            %   d.getLinkDiameter
+            % Example 1:
+            %   d.getLinkDiameter   % Retrieves the value of all link diameters
+            % Example 2:
+            %   d.getLinkDiameter(1)   % Retrieves the value of the first link diameter
             value = get_link_info(obj, obj.ToolkitConstants.EN_DIAMETER, varargin{:});
         end
         function value = getLinkLength(obj, varargin)
             % Retrieves the value of all link lengths
             % Pipe length
-            % Example:
-            %   d.getLinkLength
+            % Example 1:
+            %   d.getLinkLength   % Retrieves the value of all link lengths
+            % Example 2:
+            %   d.getLinkLength(1)   % Retrieves the value of the first link length
             value = get_link_info(obj, obj.ToolkitConstants.EN_LENGTH, varargin{:});
         end
         function value = getLinkRoughnessCoeff(obj, varargin)
-            % Retrieves the value of all link roughness
+            % Retrieves the value of all link roughness coefficients
             % Pipe roughness coefficient
-            % Example:
-            %   d.getLinkRoughnessCoeff
+            % Example 1:
+            %   d.getLinkRoughnessCoeff   % Retrieves the value of all link roughness coefficients
+            % Example 2:
+            %   d.getLinkRoughnessCoeff(1)   % Retrieves the value of the first link roughness coefficient
             value = get_link_info(obj, obj.ToolkitConstants.EN_ROUGHNESS, varargin{:});
         end
         function value = getLinkMinorLossCoeff(obj, varargin)
             % Retrieves the value of all link minor loss coefficients
             % Pipe/valve minor loss coefficient
-            % Example:
-            %   d.getLinkMinorLossCoeff
+            % Example 1:
+            %   d.getLinkMinorLossCoeff   % Retrieves the value of all link minor loss coefficients
+            % Example 2:
+            %   d.getLinkMinorLossCoeff(1)   % Retrieves the value of the first link minor loss coefficient
             value = get_link_info(obj, obj.ToolkitConstants.EN_MINORLOSS, varargin{:});
         end
         function value = getLinkInitialStatus(obj, varargin)
             % Retrieves the value of all link initial status
             % Initial status (see @ref EN_LinkStatusType)
-            % Example:
-            %   d.getLinkInitialStatus
+            % Example 1:
+            %   d.getLinkInitialStatus   % Retrieves the value of all link initial status
+            % Example 2:
+            %   d.getLinkInitialStatus(1)   % Retrieves the value of the first link initial status
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSTATUS, varargin{:});
         end
         function value = getLinkInitialSetting(obj, varargin)
             % Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves
             % Initial pump speed or valve setting
-            % Example:
-            %   d.getLinkInitialSetting
+            % Example 1:
+            %   d.getLinkInitialSetting   % Retrieves the value of all link initial settings
+            % Example 2:
+            %   d.getLinkInitialSetting(1)   % Retrieves the value of the first link initial setting
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSETTING, varargin{:});
         end
         function value = getLinkBulkReactionCoeff(obj, varargin)
-            % Bulk chemical reaction coefficient
-            % Example:
-            %   d.getLinkBulkReactionCoeff
+            % Retrieves the value of all link bulk chemical reaction coefficient
+            % Example 1:
+            %   d.getLinkBulkReactionCoeff   % Retrieves the value of all link bulk chemical reaction coefficient
+            % Example 2:
+            %   d.getLinkBulkReactionCoeff(1)   % Retrieves the value of the first link bulk chemical reaction coefficient
             value = get_link_info(obj, obj.ToolkitConstants.EN_KBULK, varargin{:});
         end
         function value = getLinkWallReactionCoeff(obj, varargin)
-            % Pipe wall chemical reaction coefficient
-            % Example:
-            %   d.getLinkWallReactionCoeff
+            % Retrieves the value of all pipe wall chemical reaction coefficient
+            % Example 1:
+            %   d.getLinkWallReactionCoeff   % Retrieves the value of all pipe wall chemical reaction coefficient
+            % Example 2:
+            %   d.getLinkWallReactionCoeff(1)   % Retrieves the value of the first pipe wall chemical reaction coefficient
             value = get_link_info(obj, obj.ToolkitConstants.EN_KWALL, varargin{:});
         end
         function value = getLinkFlows(obj, varargin)
@@ -1138,38 +1164,48 @@ classdef epanet <handle
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_POWER, varargin{:});
         end
         function value = getLinkPumpHCurve(obj, varargin)
-            % Pump head v. flow curve index #EPANET Version 2.2
-            % Example: 
-            %   d.getLinkPumpHCurve
-            %   d.getLinkPumpHCurve(13)
+            % EPANET Version 2.2
+            % Retrieves the pump head v. flow curve index
+            % Example 1: 
+            %   d.getLinkPumpHCurve   % Retrieves the pump head v. flow curve index for all links
+            % Example 2:
+            %   d.getLinkPumpHCurve(13)   % Retrieves the pump head v. flow curve index for the thirteenth link
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_HCURVE, varargin{:});
         end
         function value = getLinkPumpECurve(obj, varargin)
-            % Pump efficiency v. flow curve index #EPANET Version 2.2
-            % Example: 
-            %   d.getLinkPumpECurve
-            %   d.getLinkPumpECurve(13)
+            % EPANET Version 2.2
+            % Retrieves the pump efficiency v. flow curve index
+            % Example 1: 
+            %   d.getLinkPumpECurve   % Retrieves the pump efficiency v. flow curve index for all links
+            % Example 2:
+            %   d.getLinkPumpECurve(13)   % Retrieves the pump efficiency v. flow curve index for the thirteenth link
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_ECURVE, varargin{:});
         end
         function value = getLinkPumpECost(obj, varargin)
-            % Pump average energy price #EPANET Version 2.2
-            % Example: 
-            %   d.getLinkPumpECost
-            %   d.getLinkPumpECost(13)
+            % EPANET Version 2.2
+            % Retrieves the pump average energy price
+            % Example 1: 
+            %   d.getLinkPumpECost   % Retrieves the pump average energy price for all links
+            % Example 2:
+            %   d.getLinkPumpECost(13)   % Retrieves the pump average energy price for the thirteenth link
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_ECOST, varargin{:});
         end
         function value = getLinkPumpEPat(obj, varargin)
-            % Pump energy price time pattern index #EPANET Version 2.2
-            % Example: 
-            %   d.getLinkPumpEPat
-            %   d.getLinkPumpEPat(13)
+            % EPANET Version 2.2
+            % Retrieves the pump energy price time pattern index
+            % Example 1: 
+            %   d.getLinkPumpEPat   % Retrieves the pump energy price time pattern index for all links
+            % Example 2:
+            %   d.getLinkPumpEPat(13)   % Retrieves the pump energy price time pattern index for the thirteenth link
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_EPAT, varargin{:});
         end
         function value = getLinkPumpPatternIndex(obj, varargin)
-            % Pump speed time pattern index #EPANET Version 2.1
-            % Example: 
-            %   d.getLinkPumpPatternIndex
-            %   d.getLinkPumpPatternIndex(13)
+            % EPANET Version 2.1
+            % Retrieves the pump speed time pattern index
+            % Example 1: 
+            %   d.getLinkPumpPatternIndex   % Retrieves the pump speed time pattern index for all links
+            % Example 2:
+            %   d.getLinkPumpPatternIndex(13)   % Retrieves the pump speed time pattern index for the thirteenth link
             value = get_link_info(obj, obj.ToolkitConstants.EN_LINKPATTERN, varargin{:});
         end
         function value = getLinkPumpPatternNameID(obj)
@@ -3179,12 +3215,16 @@ classdef epanet <handle
             end
         end
         function setLinkInitialSetting(obj, value, varargin)
-            % Sets the values of initial status
-            % Example:
+            % Sets the values of initial settings
+            % Example 1:
             %   linkset=d.getLinkInitialSetting
             %   linkset(end)=108;
-            %   d.setLinkInitialSetting(linkset)
+            %   d.setLinkInitialSetting(linkset)   % Last link initial setting = 108
             %   d.getLinkInitialSetting
+            % Example 2:
+            %   linkIndex = 1;
+            %   d.setLinkInitialSetting(linkIndex,110)   % First link initial setting = 110
+            %   d.getLinkInitialSetting(linkIndex)
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3220,6 +3260,15 @@ classdef epanet <handle
             end
         end
         function setLinkStatus(obj, value, varargin)
+            % Sets the values of status for links
+            % Example 1:
+            %   linkset=d.getLinkStatus;
+            %   d.setLinkStatus(0*linkset)   % Every link status = 0
+            %   d.getLinkStatus
+            % Example 2:
+            %   linkIndex = 1;
+            %   d.setLinkStatus(linkIndex,0)   % First link status = 0
+            %   d.getLinkStatus
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3228,6 +3277,15 @@ classdef epanet <handle
             end
         end
         function setLinkSettings(obj, value, varargin)
+            % Sets the values of settings for links
+            % Example 1:
+            %   linkset=d.getLinkSettings;
+            %   d.setLinkSettings(10+linkset)   % Every link setting = previous value + 10
+            %   d.getLinkSettings
+            % Example 2:
+            %   linkIndex = 1;
+            %   d.setLinkSettings(linkIndex,100)   % First link setting = 100
+            %   d.getLinkSettings
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3236,6 +3294,15 @@ classdef epanet <handle
             end
         end
         function setNodeElevations(obj, value, varargin)
+            % Sets the values of elevation for nodes
+            % Example 1:
+            %   nodeset=d.getNodeElevations;
+            %   d.setNodeElevations(0*nodeset+100)   % Every node elevation = 100
+            %   d.getNodeElevations
+            % Example 2:
+            %   nodeIndex = 1;
+            %   d.setNodeElevations(nodeIndex,500)   % First node elevation = 500
+            %   d.getNodeElevations
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3244,6 +3311,17 @@ classdef epanet <handle
             end
         end
         function setNodeBaseDemands(obj, value, varargin)
+            % Sets the values of base demands for nodes
+            % Example 1:
+            %   nodeset = d.getNodeBaseDemands;
+            %   nodeset{1} = 200;    % First node base demand = 200
+            %   d.setNodeBaseDemands(nodeset)
+            %   d.getNodeBaseDemands
+            % Example 2:
+            %   nodeIndex = 1;
+            %   d.setNodeBaseDemands(nodeIndex,200)   % First node base demand = 200 
+            %   d.getNodeBaseDemands
+            
             if nargin==3 
                 indices = value; value=varargin{1};j=1;
                 for i=indices
@@ -3315,6 +3393,16 @@ classdef epanet <handle
             end
         end
         function setNodeEmitterCoeff(obj, value, varargin)
+            % Sets the values of emitter coefficient for nodes
+            % Example 1:
+            %   nodeset=d.getNodeEmitterCoeff
+            %   nodeset(1)=0;   % First node emitter coefficient = 0
+            %   d.setNodeEmitterCoeff(nodeset)
+            %   d.getNodeEmitterCoeff
+            % Example 2:
+            %   nodeIndex = 1;
+            %   d.setNodeEmitterCoeff(nodeIndex,0)   % First node emitter coefficient = 0
+            %   d.getNodeEmitterCoeff
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3323,6 +3411,16 @@ classdef epanet <handle
             end
         end
         function setNodeInitialQuality(obj, value, varargin)
+            % Sets the values of initial quality for nodes
+            % Example 1:
+            %   nodeset=d.getNodeInitialQuality
+            %   nodeset(1)=0.5;   % First node initial quality = 0.5
+            %   d.setNodeInitialQuality(nodeset)
+            %   d.getNodeInitialQuality
+            % Example 2:
+            %   nodeIndex = 1;
+            %   d.setNodeInitialQuality(nodeIndex,0)   % First node initial quality = 0
+            %   d.getNodeInitialQuality
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3348,6 +3446,16 @@ classdef epanet <handle
             end
         end
         function setNodeTankInitialLevel(obj, value, varargin)
+            % Sets the values of initial level for tanks
+            % Example 1:
+            %   nodeset=d.getNodeTankInitialLevel
+            %   nodeset(end)=120;   % Last node(tank) initial level = 120
+            %   d.setNodeTankInitialLevel(nodeset)
+            %   d.getNodeTankInitialLevel
+            % Example 2:
+            %   nodeIndex = 11;
+            %   d.setNodeTankInitialLevel(nodeIndex,120)   % Eleventh node(tank) initial level = 120
+            %   d.getNodeTankInitialLevel
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_TANKLEVEL, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3358,6 +3466,16 @@ classdef epanet <handle
             end
         end
         function setNodeTankMixingModelType(obj, value, varargin)
+            % Sets the mixing model type value for tanks
+            % Example 1:
+            %   nodeset=d.getNodeTankMixingModelType
+            %   nodeset(end)={'MIX1'};   % Last node(tank) mixing model type = MIX1
+            %   d.setNodeTankMixingModelType(nodeset)
+            %   d.getNodeTankMixingModelType
+            % Example 2:
+            %   nodeIndex = 11;
+            %   d.setNodeTankMixingModelType(nodeIndex,'MIX1')   % Eleventh node(tank) mixing model type = MIX1
+            %   d.getNodeTankMixingModelType
             if nargin==3
                 code=strfind(strcmpi(varargin{1}, obj.TYPEMIXMODEL), 1)-1;
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MIXMODEL, code, obj.LibEPANET);
@@ -3370,6 +3488,16 @@ classdef epanet <handle
             end
         end
         function setNodeTankDiameter(obj, value, varargin)
+            % Sets the diameter value for tanks
+            % Example 1:
+            %   nodeset=d.getNodeTankDiameter
+            %   nodeset(end)=50;   % Last node(tank) diameter = 50
+            %   d.setNodeTankDiameter(nodeset)
+            %   d.getNodeTankDiameter
+            % Example 2:
+            %   nodeIndex = 11;
+            %   d.setNodeTankDiameter(nodeIndex,40)   % Eleventh node(tank) diameter = 40
+            %   d.getNodeTankDiameter
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_TANKDIAM, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3380,6 +3508,16 @@ classdef epanet <handle
             end
         end
         function setNodeTankMinimumWaterLevel(obj, value, varargin)
+            % Sets the minimum water level value for tanks
+            % Example 1:
+            %   nodeset=d.getNodeTankMinimumWaterLevel
+            %   nodeset(end)=100;   % Last node(tank) minimum water level = 100
+            %   d.setNodeTankMinimumWaterLevel(nodeset)
+            %   d.getNodeTankMinimumWaterLevel
+            % Example 2:
+            %   nodeIndex = 11;
+            %   d.setNodeTankMinimumWaterLevel(nodeIndex,90)   % Eleventh node(tank) minimum water level = 90
+            %   d.getNodeTankMinimumWaterLevel
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MINLEVEL, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3390,6 +3528,16 @@ classdef epanet <handle
             end
         end
         function setNodeTankMinimumWaterVolume(obj, value, varargin)
+            % Sets the minimum water volume value for tanks
+            % Example 1:
+            %   nodeset=d.getNodeTankMinimumWaterVolume
+            %   nodeset(end)=10000;   % Last node(tank) minimum water volume = 10000
+            %   d.setNodeTankMinimumWaterVolume(nodeset)
+            %   d.getNodeTankMinimumWaterVolume
+            % Example 2:
+            %   nodeIndex = 11;
+            %   d.setNodeTankMinimumWaterVolume(nodeIndex,10000)   % Eleventh node(tank) minimum water volume = 10000
+            %   d.getNodeTankMinimumWaterVolume(nodeIndex)
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MINVOLUME, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3400,6 +3548,16 @@ classdef epanet <handle
             end
         end
         function setNodeTankMaximumWaterLevel(obj, value, varargin)
+            % Sets the maximum water level value for tanks
+            % Example 1:
+            %   nodeset=d.getNodeTankMaximumWaterLevel
+            %   nodeset(end)=150;   % Last node(tank) maximum water level = 150
+            %   d.setNodeTankMaximumWaterLevel(nodeset)
+            %   d.getNodeTankMaximumWaterLevel
+            % Example 2:
+            %   nodeIndex = 11;
+            %   d.setNodeTankMaximumWaterLevel(nodeIndex,150)   % Eleventh node(tank) maximum water level = 150
+            %   d.getNodeTankMaximumWaterLevel(nodeIndex)
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MAXLEVEL, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3427,6 +3585,16 @@ classdef epanet <handle
             end
         end
         function setNodeTankMinimumFraction(obj, value, varargin)
+            % Sets the minimum fraction value for tanks
+            % Example 1:
+            %   nodeset=d.getNodeTankMinimumFraction
+            %   nodeset(end)=1;   % Last node(tank) minimum fraction = 1
+            %   d.setNodeTankMinimumFraction(nodeset)
+            %   d.getNodeTankMinimumFraction
+            % Example 2:
+            %   nodeIndex = 11;
+            %   d.setNodeTankMinimumFraction(nodeIndex,1)   % Eleventh node(tank) minimum fraction = 1
+            %   d.getNodeTankMinimumFraction(nodeIndex)
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MIXFRACTION, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
