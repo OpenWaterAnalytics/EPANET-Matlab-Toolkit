@@ -3216,11 +3216,15 @@ classdef epanet <handle
         end
         function setLinkInitialSetting(obj, value, varargin)
             % Sets the values of initial settings
-            % Example:
+            % Example 1:
             %   linkset=d.getLinkInitialSetting
             %   linkset(end)=108;
-            %   d.setLinkInitialSetting(linkset)
+            %   d.setLinkInitialSetting(linkset)   % Last link initial setting = 108
             %   d.getLinkInitialSetting
+            % Example 2:
+            %   linkIndex = 1;
+            %   d.setLinkInitialSetting(linkIndex,110)   % First link initial setting = 110
+            %   d.getLinkInitialSetting(linkIndex)
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -3276,7 +3280,7 @@ classdef epanet <handle
             % Sets the values of settings for links
             % Example 1:
             %   linkset=d.getLinkSettings;
-            %   d.setLinkSettings(100*linkset)   % Every link setting = 100
+            %   d.setLinkSettings(10+linkset)   % Every link setting = previous value + 10
             %   d.getLinkSettings
             % Example 2:
             %   linkIndex = 1;
@@ -3293,7 +3297,7 @@ classdef epanet <handle
             % Sets the values of elevation for nodes
             % Example 1:
             %   nodeset=d.getNodeElevations;
-            %   d.setNodeElevations(100*nodeset)   % Every node elevation = 100
+            %   d.setNodeElevations(0*nodeset+100)   % Every node elevation = 100
             %   d.getNodeElevations
             % Example 2:
             %   nodeIndex = 1;
@@ -3471,7 +3475,7 @@ classdef epanet <handle
             % Example 2:
             %   nodeIndex = 11;
             %   d.setNodeTankMixingModelType(nodeIndex,'MIX1')   % Eleventh node(tank) mixing model type = MIX1
-            %   d.getNodeTankMixingModelTypel
+            %   d.getNodeTankMixingModelType
             if nargin==3
                 code=strfind(strcmpi(varargin{1}, obj.TYPEMIXMODEL), 1)-1;
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MIXMODEL, code, obj.LibEPANET);
@@ -3533,7 +3537,7 @@ classdef epanet <handle
             % Example 2:
             %   nodeIndex = 11;
             %   d.setNodeTankMinimumWaterVolume(nodeIndex,10000)   % Eleventh node(tank) minimum water volume = 10000
-            %   d.getNodeTankMinimumWaterVolume
+            %   d.getNodeTankMinimumWaterVolume(nodeIndex)
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MINVOLUME, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3553,7 +3557,7 @@ classdef epanet <handle
             % Example 2:
             %   nodeIndex = 11;
             %   d.setNodeTankMaximumWaterLevel(nodeIndex,150)   % Eleventh node(tank) maximum water level = 150
-            %   d.getNodeTankMaximumWaterLevel
+            %   d.getNodeTankMaximumWaterLevel(nodeIndex)
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MAXLEVEL, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
@@ -3590,7 +3594,7 @@ classdef epanet <handle
             % Example 2:
             %   nodeIndex = 11;
             %   d.setNodeTankMinimumFraction(nodeIndex,1)   % Eleventh node(tank) minimum fraction = 1
-            %   d.getNodeTankMinimumFraction
+            %   d.getNodeTankMinimumFraction(nodeIndex)
             if nargin==3
                 [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MIXFRACTION, varargin{1}, obj.LibEPANET);
                 if obj.Errcode, error(obj.getError(obj.Errcode)); end 
