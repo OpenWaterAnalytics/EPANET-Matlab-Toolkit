@@ -1480,7 +1480,11 @@ classdef epanet <handle
             [obj.Errcode, value.RelativeError] = ENgetstatistic(obj.ToolkitConstants.EN_RELATIVEERROR, obj.LibEPANET);
         end    
         function value = getNodePatternIndex(obj, varargin)
-            %Retrieves the value of all node demand pattern indices
+            % Retrieves the value of all node demand pattern indices
+            % Example 1:
+            %   d.getNodePatternIndex   % Retrieves the value of all node demand pattern indices
+            % Example 2:
+            %   d.getNodePatternIndex(1)   % Retrieves the value of the first node demand pattern index
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET); 
@@ -1489,7 +1493,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeEmitterCoeff(obj, varargin)
-            %Retrieves the value of all node emmitter coefficients
+            % Retrieves the value of all node emmitter coefficients
+            % Example 1:
+            %   d.getNodeEmitterCoeff   % Retrieves the value of all node emmitter coefficients
+            % Example 2:
+            %   d.getNodeEmitterCoeff(1)   % Retrieves the value of the first node emmitter coefficient
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET); 
@@ -1498,7 +1506,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeInitialQuality(obj, varargin)
-            %Retrieves the value of all node initial quality
+            % Retrieves the value of all node initial quality
+            % Example 1:
+            %   d.getNodeInitialQuality   % Retrieves the value of all node initial quality
+            % Example 2:
+            %   d.getNodeInitialQuality(1)   % Retrieves the value of the first node initial quality
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET); 
@@ -1507,7 +1519,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeSourceQuality(obj, varargin)
-            %Retrieves the value of all nodes source quality
+            % Retrieves the value of all node source quality
+            % Example 1:
+            %   d.getNodeSourceQuality   % Retrieves the value of all node source quality
+            % Example 2:
+            %   d.getNodeSourceQuality(1)   % Retrieves the value of the first node source quality
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, obj.LibEPANET); 
@@ -1517,7 +1533,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeSourcePatternIndex(obj, varargin)
-            %Retrieves the value of all node source pattern index
+            % Retrieves the value of all node source pattern index
+            % Example 1:
+            %   d.getNodeSourcePatternIndex   % Retrieves the value of all node source pattern index
+            % Example 2:
+            %   d.getNodeSourcePatternIndex(1)   % Retrieves the value of the first node source pattern index
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, obj.LibEPANET); 
@@ -1526,7 +1546,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeSourceTypeIndex(obj, varargin)
-            %Retrieves the value of all node source index
+            % Retrieves the value of all node source type index
+            % Example 1:
+            %   d.getNodeSourceTypeIndex   % Retrieves the value of all node source type index
+            % Example 2:
+            %   d.getNodeSourceTypeIndex(1)   % Retrieves the value of the first node source type index
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET); 
@@ -1535,7 +1559,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeSourceType(obj, varargin)
-            %Retrieves the value of all node source type
+            % Retrieves the value of all node source type
+            % Example 1:
+            %   d.getNodeSourceType   % Retrieves the value of all node source type
+            % Example 2:
+            %   d.getNodeSourceType(1)   % Retrieves the value of the first node source type
             [indices, ~] = getNodeIndices(obj,varargin);j=1;
             value = cell(1, length(indices));
             for i=indices
@@ -1550,7 +1578,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeTankInitialLevel(obj, varargin)
-            %Retrieves the value of all tank initial water levels
+            % Retrieves the value of all tank initial water levels
+            % Example 1:
+            %   d.getNodeTankInitialLevel   % Retrieves the value of all tank initial water levels
+            % Example 2:
+            %   d.getNodeTankInitialLevel(11)   % Retrieves the value of the eleventh node(tank) water level
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_TANKLEVEL, obj.LibEPANET); 
@@ -1560,7 +1592,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeActualDemand(obj, varargin)
-            %Retrieves the computed value of all actual demands
+            % Retrieves the computed value of all node actual demands
+            % Example 1:
+            %   d.getNodeActualDemand   % Retrieves the computed value of all node actual demands
+            % Example 2:
+            %   d.getNodeActualDemand(1)   % Retrieves the computed value of the first node actual demand
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET); 
@@ -1569,7 +1605,9 @@ classdef epanet <handle
             end
         end
         function value = getNodeActualDemandSensingNodes(obj, varargin)
-            %Retrieves the computed demand values at some sensing nodes
+            % Retrieves the computed demand values at some sensing nodes
+            % Example :
+            %   d.getNodeActualDemandSensingNodes(1)   % Retrieves the computed demand value of the first sensing node 
             value=zeros(1, length(varargin{1}));v=1;
             for i=varargin{1}
                 [obj.Errcode, value(v)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET);v=v+1;
