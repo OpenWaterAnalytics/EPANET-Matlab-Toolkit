@@ -1388,12 +1388,12 @@ classdef epanet <handle
         end
         function value = setNodeComment(obj, value, varargin)
             % Sets the comment string assigned to the node object
-            % Example: 
-            %       d.setNodeComment(1, 'This is a node');
-            %       d.getNodeComment(1)
-            %       d.setNodeComment(1:2, {'This is a node', 'Test comm'});
-            %       d.getNodeComment(1:2)
-            %       d.getNodeComment
+            % Example 1:
+            %   d.setNodeComment(1, 'This is a node');   % Sets a comment to the 1st node
+            %   d.getNodeComment(1)
+            % Example 2:
+            %   d.setNodeComment(1:2, {'This is a node', 'Test comm'});   % Sets a comment to the 1st and 2nd node
+            %   d.getNodeComment(1:2)
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
@@ -1409,7 +1409,7 @@ classdef epanet <handle
         function [Line1, Line2, Line3] = getTitle(obj, varargin)
             % Retrieves the title lines of the project
             % Example: 
-            %       [Line1, Line2, Line3] = d.getTitle()
+            %   [Line1, Line2, Line3] = d.getTitle()    % Retrieves the three title lines of the project
             [obj.Errcode, Line1, Line2, Line3] = ENgettitle(obj.LibEPANET); 
         end
         function value = getNodeBaseDemands(obj, varargin)
@@ -1438,9 +1438,12 @@ classdef epanet <handle
             end
         end
         function value = getNodeDemandCategoriesNumber(obj, varargin)
-            % Retrieves the value of all node base demands #EPANET Version 2.1
-            % Example:
-            %       d.getNodeDemandCategoriesNumber
+            % EPANET Version 2.1
+            % Retrieves the value of all node base demands categorie number
+            % Example 1:
+            %	d.getNodeDemandCategoriesNumber   % Retrieves the value of all node base demands categorie number
+            % Example 2:
+            %	d.getNodeDemandCategoriesNumber(1)   % Retrieves the value of the first node base demand categorie number
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnumdemands(i, obj.LibEPANET); 
@@ -1449,10 +1452,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeDemandPatternIndex(obj)
-            % Retrieves the value of all node base demands #EPANET Version 2.1
-            % Example:
-            %       d.getNodeDemandPatternIndex
-            %       d.getNodeDemandPatternIndex{1} % categories
+            % EPANET Version 2.1
+            % Retrieves the value of all node base demands pattern index
+            % Example :
+            %   d.getNodeDemandPatternIndex
+            %   d.getNodeDemandPatternIndex{1}
             numdemands = obj.getNodeDemandCategoriesNumber;
             value = cell(1, max(numdemands));
             val = zeros(max(numdemands), obj.getNodeCount);
@@ -1467,7 +1471,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeDemandPatternNameID(obj, varargin)
-            %EPANET Version 2.1
+            % EPANET Version 2.1
+            % Retrieves the value of all node base demands pattern name ID
+            % Example :
+            %   d.getNodeDemandPatternNameID
+            %   d.getNodeDemandPatternNameID{1}
             v = obj.getNodeDemandPatternIndex;
             m = obj.getPatternNameID;
             if ~isempty(varargin)
@@ -1600,7 +1608,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeHydaulicHead(obj, varargin)
-            %Retrieves the computed values of all hydraulic heads
+            % Retrieves the computed values of all node hydraulic heads
+            % Example 1:
+            %   d.getNodeHydaulicHead   % Retrieves the computed value of all node hydraulic heads
+            % Example 2:
+            %   d.getNodeHydaulicHead(1)   % Retrieves the computed value of the first node hydraulic head
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_HEAD, obj.LibEPANET); 
@@ -1609,7 +1621,11 @@ classdef epanet <handle
             end
         end
         function value = getNodePressure(obj, varargin)
-            %Retrieves the computed values of all node pressures
+            % Retrieves the computed values of all node pressures
+            % Example 1:
+            %   d.getNodePressure   % Retrieves the computed values of all node pressures
+            % Example 2:
+            %   d.getNodePressure(1)   % Retrieves the computed value of the first node pressure
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET); 
@@ -1618,7 +1634,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeActualQuality(obj, varargin)
-            %Retrieves the computed values of the actual quality for all nodes
+            % Retrieves the computed values of the actual quality for all nodes
+            % Example 1:
+            %   d.getNodeActualQuality   % Retrieves the computed values of the actual quality for all nodes
+            % Example 2:
+            %   d.getNodeActualQuality(1)   % Retrieves the computed value of the actual quality for the first node
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET); 
@@ -1627,7 +1647,11 @@ classdef epanet <handle
             end
         end
         function value = getNodeMassFlowRate(obj, varargin)
-            %Retrieves the computed mass flow rates per minute of chemical sources
+            % Retrieves the computed mass flow rates per minute of chemical sources for all nodes
+            % Example 1:
+            %   d.getNodeMassFlowRate   % Retrieves the computed mass flow rates per minute of chemical sources for all nodes
+            % Example 2:
+            %   d.getNodeMassFlowRate(1)   % Retrieves the computed mass flow rates per minute of chemical sources for the first node
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET); 
@@ -1635,7 +1659,9 @@ classdef epanet <handle
             end
         end
         function value = getNodeActualQualitySensingNodes(obj, varargin)
-            %Retrieves the computed quality values at some sensing nodes
+            % Retrieves the computed quality values at some sensing nodes
+            % Example :
+            %   d.getNodeActualQualitySensingNodes(1)   % Retrieves the computed quality value at the first node
             value=zeros(1, length(varargin{1}));v=1;
             for i=varargin{1}
                 [obj.Errcode, value(v)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET);v=v+1;
