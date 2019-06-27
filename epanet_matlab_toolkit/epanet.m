@@ -986,19 +986,33 @@ classdef epanet <handle
         end
         function value = getLinkType(obj, varargin)
             % Retrieves the link-type code for all links
+            %
             % Example 1:
-            %   d.getLinkType   % Retrieves the link-type code for all links
+            %    d.getLinkType      % Retrieves the link-type code for all links
+            %
             % Example 2:
-            %   d.getLinkType(1)   % Retrieves the link-type code for the first link
+            %    d.getLinkType(1)   % Retrieves the link-type code for the first link
+            %
+            % see also getLinkTypeIndex, getLinksInfo, getLinkDiameter,
+            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
+            % getLinkInitialStatus, getLinkInitialSetting,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
             if ~isempty(varargin), varargin=varargin{1}; end
             value=obj.TYPELINK(obj.getLinkTypeIndex(varargin)+1);
         end
         function value = getLinkTypeIndex(obj, varargin)
             % Retrieves the link-type index for all links
+            %
             % Example 1:
-            %   d.getLinkTypeIndex   % Retrieves the link-type index for all links
+            %    d.getLinkTypeIndex      % Retrieves the link-type index for all links
+            %
             % Example 2:
-            %   d.getLinkTypeIndex(1)   % Retrieves the link-type index for the first link
+            %    d.getLinkTypeIndex(1)   % Retrieves the link-type index for the first link
+            %
+            % see also getLinkType, getLinksInfo, getLinkDiameter,
+            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
+            % getLinkInitialStatus, getLinkInitialSetting,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetlinktype(i, obj.LibEPANET);  
@@ -1008,8 +1022,14 @@ classdef epanet <handle
         end
         function [value] = getLinksInfo(obj)
             % Retrieves all link info
+            %
             % Example:
-            %   d.getLinksInfo
+            %    d.getLinksInfo
+            %
+            % see also getLinkType, getLinkTypeIndex, getLinkDiameter,
+            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
+            % getLinkInitialStatus, getLinkInitialSetting,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
             value = struct();
             for i=1:obj.getLinkCount
                 [~, value.LinkDiameter(i)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET);
@@ -1027,126 +1047,184 @@ classdef epanet <handle
         function value = getLinkDiameter(obj, varargin)
             % Retrieves the value of link diameters
             % Pipe/valve diameter
+            %
             % Example 1:
-            %   d.getLinkDiameter   % Retrieves the value of all link diameters
+            %    d.getLinkDiameter      % Retrieves the value of all link diameters
+            %
             % Example 2:
-            %   d.getLinkDiameter(1)   % Retrieves the value of the first link diameter
+            %    d.getLinkDiameter(1)   % Retrieves the value of the first link diameter
+            %
+            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
+            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
+            % getLinkInitialStatus, getLinkInitialSetting,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
             value = get_link_info(obj, obj.ToolkitConstants.EN_DIAMETER, varargin{:});
         end
         function value = getLinkLength(obj, varargin)
             % Retrieves the value of link lengths
             % Pipe length
+            %
             % Example 1:
-            %   d.getLinkLength   % Retrieves the value of all link lengths
+            %    d.getLinkLength      % Retrieves the value of all link lengths
+            %
             % Example 2:
-            %   d.getLinkLength(1)   % Retrieves the value of the first link length
+            %    d.getLinkLength(1)   % Retrieves the value of the first link length
+            %
+            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
+            % getLinkDiameter, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
+            % getLinkInitialStatus, getLinkInitialSetting,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
             value = get_link_info(obj, obj.ToolkitConstants.EN_LENGTH, varargin{:});
         end
         function value = getLinkRoughnessCoeff(obj, varargin)
             % Retrieves the value of all link roughness coefficients
             % Pipe roughness coefficient
+            %
             % Example 1:
-            %   d.getLinkRoughnessCoeff   % Retrieves the value of all link roughness coefficients
+            %    d.getLinkRoughnessCoeff      % Retrieves the value of all link roughness coefficients
+            %
             % Example 2:
-            %   d.getLinkRoughnessCoeff(1)   % Retrieves the value of the first link roughness coefficient
+            %    d.getLinkRoughnessCoeff(1)   % Retrieves the value of the first link roughness coefficient
+            %
+            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
+            % getLinkDiameter, getLinkLength, getLinkMinorLossCoeff,
+            % getLinkInitialStatus, getLinkInitialSetting,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
             value = get_link_info(obj, obj.ToolkitConstants.EN_ROUGHNESS, varargin{:});
         end
         function value = getLinkMinorLossCoeff(obj, varargin)
             % Retrieves the value of link minor loss coefficients
             % Pipe/valve minor loss coefficient
+            %
             % Example 1:
-            %   d.getLinkMinorLossCoeff   % Retrieves the value of all link minor loss coefficients
+            %   d.getLinkMinorLossCoeff      % Retrieves the value of all link minor loss coefficients
+            %
             % Example 2:
             %   d.getLinkMinorLossCoeff(1)   % Retrieves the value of the first link minor loss coefficient
+            %
+            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
+            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
+            % getLinkInitialStatus, getLinkInitialSetting,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
             value = get_link_info(obj, obj.ToolkitConstants.EN_MINORLOSS, varargin{:});
         end
         function value = getLinkInitialStatus(obj, varargin)
             % Retrieves the value of all link initial status
             % Initial status (see @ref EN_LinkStatusType)
+            %
             % Example 1:
-            %   d.getLinkInitialStatus   % Retrieves the value of all link initial status
+            %   d.getLinkInitialStatus      % Retrieves the value of all link initial status
+            %
             % Example 2:
             %   d.getLinkInitialStatus(1)   % Retrieves the value of the first link initial status
+            %
+            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
+            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
+            % getLinkMinorLossCoeff, getLinkInitialSetting,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSTATUS, varargin{:});
         end
         function value = getLinkInitialSetting(obj, varargin)
             % Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves
-            % Initial pump speed or valve setting
+            %
             % Example 1:
-            %   d.getLinkInitialSetting   % Retrieves the value of all link initial settings
+            %   d.getLinkInitialSetting      % Retrieves the value of all link initial settings
+            %
             % Example 2:
             %   d.getLinkInitialSetting(1)   % Retrieves the value of the first link initial setting
+            %
+            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
+            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
+            % getLinkMinorLossCoeff, getLinkInitialStatus,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSETTING, varargin{:});
         end
         function value = getLinkBulkReactionCoeff(obj, varargin)
             % Retrieves the value of all link bulk chemical reaction coefficient
+            %
             % Example 1:
-            %   d.getLinkBulkReactionCoeff   % Retrieves the value of all link bulk chemical reaction coefficient
+            %   d.getLinkBulkReactionCoeff      % Retrieves the value of all link bulk chemical reaction coefficient
+            %
             % Example 2:
             %   d.getLinkBulkReactionCoeff(1)   % Retrieves the value of the first link bulk chemical reaction coefficient
+            %
+            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
+            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
+            % getLinkMinorLossCoeff, getLinkInitialStatus,
+            % getLinkInitialSetting, getLinkWallReactionCoeff
             value = get_link_info(obj, obj.ToolkitConstants.EN_KBULK, varargin{:});
         end
         function value = getLinkWallReactionCoeff(obj, varargin)
             % Retrieves the value of all pipe wall chemical reaction coefficient
+            %
             % Example 1:
-            %   d.getLinkWallReactionCoeff   % Retrieves the value of all pipe wall chemical reaction coefficient
+            %   d.getLinkWallReactionCoeff      % Retrieves the value of all pipe wall chemical reaction coefficient
+            %
             % Example 2:
             %   d.getLinkWallReactionCoeff(1)   % Retrieves the value of the first pipe wall chemical reaction coefficient
+            %
+            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
+            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
+            % getLinkMinorLossCoeff, getLinkInitialStatus,
+            % getLinkInitialSetting, getLinkBulkReactionCoeff
             value = get_link_info(obj, obj.ToolkitConstants.EN_KWALL, varargin{:});
         end
         function value = getLinkFlows(obj, varargin)
             % Retrieves the current computed flow rate (read only)
-            % Using step-by-step hydraulic analysis. See also getLinkFlows.
+            % Using step-by-step hydraulic analysis
             %
             % Example 1:
-            %   d.getLinkFlows      % Retrieves the current computed flow rate for all links
+            %    d.getLinkFlows      % Retrieves the current computed flow rate for all links
             %
             % Example 2:
-            %   d.getLinkFlows(1)   % Retrieves the current computed flow rate for the first link
+            %    d.getLinkFlows(1)   % Retrieves the current computed flow rate for the first link
             %
             % Example 3:
+            %    % Hydraulic analysis step-by-step
             %    d.openHydraulicAnalysis;
             %    d.initializeHydraulicAnalysis;
             %    tstep=1;P=[];T_H=[];D=[];H=[];F=[];S=[];
             %    while (tstep>0)
-            %        t= d.runHydraulicAnalysis;
-            %        P = [P; d.getNodePressure];
-            %        D = [D; d.getNodeActualDemand];
-            %        H = [H; d.getNodeHydaulicHead];
-            %        S = [S; d.getLinkStatus];
-            %        F = [F; d.getLinkFlows];
-            %        T_H = [T_H; t];
-            %        tstep=d.nextHydraulicAnalysisStep;
+            %       t= d.runHydraulicAnalysis;
+            %       P = [P; d.getNodePressure];
+            %       D = [D; d.getNodeActualDemand];
+            %       H = [H; d.getNodeHydaulicHead];
+            %       S = [S; d.getLinkStatus];
+            %       F = [F; d.getLinkFlows];
+            %       T_H = [T_H; t];
+            %       tstep=d.nextHydraulicAnalysisStep;
             %    end
             %    d.closeHydraulicAnalysis;
             %
             % Example 4: 
-            %     % Hydraulic and Quality analysis step-by-step
-            %     d.openHydraulicAnalysis;
-            %     d.openQualityAnalysis;
-            %     d.initializeHydraulicAnalysis(0);
-            %     d.initializeQualityAnalysis(d.ToolkitConstants.EN_NOSAVE);
+            %    % Hydraulic and Quality analysis step-by-step
+            %    d.openHydraulicAnalysis;
+            %    d.openQualityAnalysis;
+            %    d.initializeHydraulicAnalysis(0);
+            %    d.initializeQualityAnalysis(d.ToolkitConstants.EN_NOSAVE);
             % 
-            %     tstep = 1;
-            %     T = []; P = []; F = []; QN = []; QL = [];
-            %     while (tstep>0)
-            %         t  = d.runHydraulicAnalysis;
-            %         qt = d.runQualityAnalysis;
+            %    tstep = 1;
+            %    T = []; P = []; F = []; QN = []; QL = [];
+            %    while (tstep>0)
+            %       t  = d.runHydraulicAnalysis;
+            %       qt = d.runQualityAnalysis;
             % 
-            %         P  = [P; d.getNodePressure];
-            %         F  = [F; d.getLinkFlows];
+            %       P  = [P; d.getNodePressure];
+            %       F  = [F; d.getLinkFlows];
             % 
-            %         QN = [QN; d.getNodeActualQuality];
-            %         QL = [QL; d.getLinkActualQuality];
-            %         T  = [T; t];
+            %       QN = [QN; d.getNodeActualQuality];
+            %       QL = [QL; d.getLinkActualQuality];
+            %       T  = [T; t];
             % 
-            %         tstep = d.nextHydraulicAnalysisStep;
-            %         qtstep = d.nextQualityAnalysisStep;
-            %     end
-            %     d.closeQualityAnalysis;
-            %     d.closeHydraulicAnalysis;
+            %       tstep = d.nextHydraulicAnalysisStep;
+            %       qtstep = d.nextQualityAnalysisStep;
+            %    end
+            %    d.closeQualityAnalysis;
+            %    d.closeHydraulicAnalysis;
             %
-            % See also getLinkFlows
+            % See also getLinkVelocity, getLinkHeadloss, getLinkStatus,
+            % getLinkPumpState, getLinkSettings, getLinkEnergy,
+            % getLinkActualQuality, getLinkPumpEfficiency
             
             value = get_link_info(obj, obj.ToolkitConstants.EN_FLOW, varargin{:});
         end
