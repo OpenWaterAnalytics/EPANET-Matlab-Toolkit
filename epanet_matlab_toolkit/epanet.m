@@ -1096,11 +1096,58 @@ classdef epanet <handle
         end
         function value = getLinkFlows(obj, varargin)
             % Retrieves the current computed flow rate (read only)
-            % Using step-by-step hydraulic analysis
+            % Using step-by-step hydraulic analysis. See also getLinkFlows.
+            %
             % Example 1:
-            %   d.getLinkFlows   % Retrieves the current computed flow rate for all links
+            %   d.getLinkFlows      % Retrieves the current computed flow rate for all links
+            %
             % Example 2:
             %   d.getLinkFlows(1)   % Retrieves the current computed flow rate for the first link
+            %
+            % Example 3:
+            %    d.openHydraulicAnalysis;
+            %    d.initializeHydraulicAnalysis;
+            %    tstep=1;P=[];T_H=[];D=[];H=[];F=[];S=[];
+            %    while (tstep>0)
+            %        t= d.runHydraulicAnalysis;
+            %        P = [P; d.getNodePressure];
+            %        D = [D; d.getNodeActualDemand];
+            %        H = [H; d.getNodeHydaulicHead];
+            %        S = [S; d.getLinkStatus];
+            %        F = [F; d.getLinkFlows];
+            %        T_H = [T_H; t];
+            %        tstep=d.nextHydraulicAnalysisStep;
+            %    end
+            %    d.closeHydraulicAnalysis;
+            %
+            % Example 4: 
+            %     % Hydraulic and Quality analysis step-by-step
+            %     d.openHydraulicAnalysis;
+            %     d.openQualityAnalysis;
+            %     d.initializeHydraulicAnalysis(0);
+            %     d.initializeQualityAnalysis(d.ToolkitConstants.EN_NOSAVE);
+            % 
+            %     tstep = 1;
+            %     T = []; P = []; F = []; QN = []; QL = [];
+            %     while (tstep>0)
+            %         t  = d.runHydraulicAnalysis;
+            %         qt = d.runQualityAnalysis;
+            % 
+            %         P  = [P; d.getNodePressure];
+            %         F  = [F; d.getLinkFlows];
+            % 
+            %         QN = [QN; d.getNodeActualQuality];
+            %         QL = [QL; d.getLinkActualQuality];
+            %         T  = [T; t];
+            % 
+            %         tstep = d.nextHydraulicAnalysisStep;
+            %         qtstep = d.nextQualityAnalysisStep;
+            %     end
+            %     d.closeQualityAnalysis;
+            %     d.closeHydraulicAnalysis;
+            %
+            % See also getLinkFlows
+            
             value = get_link_info(obj, obj.ToolkitConstants.EN_FLOW, varargin{:});
         end
         function value = getLinkVelocity(obj, varargin)
