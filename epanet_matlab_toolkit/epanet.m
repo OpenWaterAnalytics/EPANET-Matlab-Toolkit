@@ -2564,17 +2564,16 @@ classdef epanet <handle
         function nvalue = getComputedTimeSeries(obj)
             [fid,binfile,rptfile] = runEPANETexe(obj);
             value = readEpanetBin(fid, binfile, rptfile);
-            nvalue.Pressure = value.BinNodePressure;
-            nvalue.Demand = value.BinNodeDemand;
-            nvalue.Head = value.BinNodeHead;
-            nvalue.NodeQuality = value.BinNodeQuality;
-            nvalue.Flow = value.BinLinkFlow;
-            nvalue.Velocity = value.BinLinkVelocity;
-            nvalue.Status = value.BinLinkStatus;            
-            nvalue.Setting = value.BinLinkSetting;
-            nvalue.ReactionRate = value.BinLinkReactionRate;
-            nvalue.FrictionFactor = value.BinLinkFrictionFactor;
-            nvalue.LinkQuality = value.BinLinkQuality;
+            fields_param = {'BinNodePressure', 'BinNodeDemand', 'BinNodeHead', 'BinNodeQuality',...
+                'BinLinkFlow', 'BinLinkVelocity', 'BinLinkStatus', 'BinLinkSetting', ...
+                'BinLinkReactionRate', 'BinLinkFrictionFactor', 'BinLinkQuality'};
+            fields_new = {'Pressure', 'Demand', 'Head', 'NodeQuality',...
+                'Flow', 'Velocity', 'Status', 'Setting', ...
+                'ReactionRate', 'FrictionFactor', 'LinkQuality'};
+            nvalue = struct();
+            for i=1:length(fields_param)
+                nvalue.(fields_new{i}) = eval(['value.', fields_param{i}]);
+            end
             clear value;
             
             % Remove report bin, files @#
