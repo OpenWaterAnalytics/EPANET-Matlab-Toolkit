@@ -1404,11 +1404,16 @@ classdef epanet <handle
             value = obj.getPatternNameID(v);
         end
         function value = getNodeNameID(obj, varargin)
-            % Retrieves the ID label of all nodes or some nodes with a specified index
-            % Example 1: 
-            %   d.getNodeNameID   % Retrieves the ID label of all nodes
+            % Retrieves the ID label of all nodes or some nodes with a specified index.
+            %
+            % Example 1:
+            %   d.getNodeNameID      % Retrieves the ID label of all nodes
+            %
             % Example 2:
             %   d.getNodeNameID(1)   % Retrieves the ID label of the first node
+            %
+            % See also getNodeReservoirNameID, getNodeJunctionNameID,
+            %          getNodeIndex, getNodeType, getNodesInfo.
             if isempty(varargin)
                 cnt = obj.getNodeCount;
                 value = cell(1, cnt);
@@ -1427,20 +1432,37 @@ classdef epanet <handle
             end
         end
         function value = getNodeReservoirNameID(obj)
-            % Retrieves the reservoir id
+            % Retrieves the reservoir ID label.
+            %
             % Example : 
             %   d.getNodeReservoirNameID
+            %
+            % See also getNodeNameID, getNodeJunctionNameID, getNodeIndex,
+            %          getNodeReservoirIndex, getNodeType, getNodesInfo.
+            %          
             value=obj.getNodeNameID(obj.getNodeReservoirIndex);
         end
         function value = getNodeJunctionNameID(obj)
-            % Retrieves the junction id
-            % Example : 
+            % Retrieves the junction ID label.
+            %
+            % Example: 
             %   d.getNodeJunctionNameID
+            %
+            % See also getNodeNameID, getNodeReservoirNameID, getNodeIndex,
+            %          getNodeJunctionIndex, getNodeType, getNodesInfo.      
             value=obj.getNodeNameID(obj.getNodeJunctionIndex);
         end
         function value = getNodeIndex(obj, varargin)
-            %Retrieves the indices of all nodes or some nodes with a specified ID
-            % e.g. getNodeIndex({''nodeID''})) or getNodeIndex(''nodeID''))
+            % Retrieves the indices of all nodes or some nodes with a specified ID.
+            %
+            % Example 1:
+            %   d.getNodeIndex         % Retrieves the indices of all nodes
+            %
+            % Example 2:
+            %   d.getNodeIndex('11')   % Retrieves the node index with an ID value = '11'
+            %
+            % See also getNodeNameID, getNodeReservoirIndex, getNodeJunctionIndex,
+            %          getNodeType, getNodeTypeIndex, getNodesInfo.
             value = [];
             if isempty(varargin)
                 value=1:obj.getNodeCount;
@@ -1458,34 +1480,52 @@ classdef epanet <handle
             end
         end
         function value = getNodeReservoirIndex(obj)
-            % Retrieves the indices of reservoirs
-            % Example :
+            % Retrieves the indices of reservoirs.
+            %
+            % Example:
             %   d.getNodeReservoirIndex
+            %
+            % See also getNodeNameID, getNodeIndex, getNodeJunctionIndex,
+            %          getNodeType, getNodeTypeIndex, getNodesInfo.
             tmpNodeTypes=obj.getNodeType;
             value = find(strcmp(tmpNodeTypes, 'RESERVOIR'));
         end
         function value = getNodeJunctionIndex(obj)
-            % Retrieves the indices of junctions
-            % Example :
+            % Retrieves the indices of junctions.
+            %
+            % Example:
             %   d.getNodeJunctionIndex
+            %
+            % See also getNodeNameID, getNodeIndex, getNodeReservoirIndex,
+            %          getNodeType, getNodeTypeIndex, getNodesInfo.
             tmpNodeTypes=obj.getNodeType;
             value = find(strcmp(tmpNodeTypes, 'JUNCTION'));
         end
         function value = getNodeType(obj, varargin)
-            % Retrieves the node-type code for all nodes
+            % Retrieves the node-type code for all nodes.
+            %
             % Example 1: 
-            %   d.getNodeType   % Retrieves the node-type code for all nodes
+            %   d.getNodeType      % Retrieves the node-type code for all nodes
+            %
             % Example 2:
             %   d.getNodeType(1)   % Retrieves the node-type code for the first node
+            %
+            % See also getNodeNameID, getNodeIndex,
+            %          getNodeTypeIndex, getNodesInfo.
             indices = getNodeIndices(obj, varargin);
             value=obj.TYPENODE(obj.getNodeTypeIndex(indices)+1);
         end
         function value = getNodeTypeIndex(obj, varargin)
-            % Retrieves the node-type code index for all nodes
+            % Retrieves the node-type code index for all nodes.
+            %
             % Example 1: 
-            %   d.getNodeTypeIndex   % Retrieves the node-type code index for all nodes
+            %   d.getNodeTypeIndex      % Retrieves the node-type code index for all nodes
+            %
             % Example 2:
             %   d.getNodeTypeIndex(1)   % Retrieves the node-type code index for the first node
+            %
+            % See also getNodeNameID, getNodeIndex,
+            %          getNodeType, getNodesInfo.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodetype(i, obj.LibEPANET);  
@@ -1495,9 +1535,13 @@ classdef epanet <handle
         end
         function value = getNodesInfo(obj)
             % Retrieves nodes info (elevations, demand patterns, emmitter coeff, initial quality,
-            % source quality, source pattern index, source type index, node type index)
+            % source quality, source pattern index, source type index, node type index).
+            %
             % Example:
             %   d.getNodesInfo
+            %
+            % See also getNodeElevations, getNodeDemandPatternIndex, getNodeEmitterCoeff,
+            %          getNodeInitialQuality, NodeTypeIndex.
             value = struct();
             for i=1:obj.getNodeCount
                 [~, value.NodeElevations(i)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET);
@@ -1664,7 +1708,7 @@ classdef epanet <handle
         function value = getNodeDemandPatternNameID(obj, varargin)
             % EPANET Version 2.1
             % Retrieves the value of all node base demands pattern name ID
-            % Example :
+            % Example:
             %   d.getNodeDemandPatternNameID
             %   d.getNodeDemandPatternNameID{1}
             v = obj.getNodeDemandPatternIndex;
