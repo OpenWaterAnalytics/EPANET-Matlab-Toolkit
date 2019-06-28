@@ -994,9 +994,7 @@ classdef epanet <handle
             %    d.getLinkType(1)   % Retrieves the link-type code for the first link
             %
             % see also getLinkTypeIndex, getLinksInfo, getLinkDiameter,
-            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
-            % getLinkInitialStatus, getLinkInitialSetting,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
+            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             if ~isempty(varargin), varargin=varargin{1}; end
             value=obj.TYPELINK(obj.getLinkTypeIndex(varargin)+1);
         end
@@ -1010,9 +1008,7 @@ classdef epanet <handle
             %    d.getLinkTypeIndex(1)   % Retrieves the link-type index for the first link
             %
             % see also getLinkType, getLinksInfo, getLinkDiameter,
-            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
-            % getLinkInitialStatus, getLinkInitialSetting,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
+            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetlinktype(i, obj.LibEPANET);  
@@ -1027,9 +1023,7 @@ classdef epanet <handle
             %    d.getLinksInfo
             %
             % see also getLinkType, getLinkTypeIndex, getLinkDiameter,
-            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
-            % getLinkInitialStatus, getLinkInitialSetting,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
+            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = struct();
             for i=1:obj.getLinkCount
                 [~, value.LinkDiameter(i)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET);
@@ -1054,10 +1048,8 @@ classdef epanet <handle
             % Example 2:
             %    d.getLinkDiameter(1)   % Retrieves the value of the first link diameter
             %
-            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
-            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
-            % getLinkInitialStatus, getLinkInitialSetting,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
+            % see also getLinkType, getLinksInfo, getLinkLength,
+            % getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_DIAMETER, varargin{:});
         end
         function value = getLinkLength(obj, varargin)
@@ -1070,10 +1062,8 @@ classdef epanet <handle
             % Example 2:
             %    d.getLinkLength(1)   % Retrieves the value of the first link length
             %
-            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
-            % getLinkDiameter, getLinkRoughnessCoeff, getLinkMinorLossCoeff,
-            % getLinkInitialStatus, getLinkInitialSetting,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
+            % see also getLinkType, getLinksInfo, getLinkDiameter,
+            % getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_LENGTH, varargin{:});
         end
         function value = getLinkRoughnessCoeff(obj, varargin)
@@ -1086,10 +1076,8 @@ classdef epanet <handle
             % Example 2:
             %    d.getLinkRoughnessCoeff(1)   % Retrieves the value of the first link roughness coefficient
             %
-            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
-            % getLinkDiameter, getLinkLength, getLinkMinorLossCoeff,
-            % getLinkInitialStatus, getLinkInitialSetting,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
+            % see also getLinkType, getLinksInfo, getLinkDiameter,
+            % getLinkLength, getLinkMinorLossCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_ROUGHNESS, varargin{:});
         end
         function value = getLinkMinorLossCoeff(obj, varargin)
@@ -1102,10 +1090,8 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkMinorLossCoeff(1)   % Retrieves the value of the first link minor loss coefficient
             %
-            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
-            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
-            % getLinkInitialStatus, getLinkInitialSetting,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
+            % see also getLinkType, getLinksInfo, getLinkDiameter,
+            % getLinkLength, getLinkRoughnessCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_MINORLOSS, varargin{:});
         end
         function value = getLinkInitialStatus(obj, varargin)
@@ -1118,10 +1104,8 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkInitialStatus(1)   % Retrieves the value of the first link initial status
             %
-            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
-            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
-            % getLinkMinorLossCoeff, getLinkInitialSetting,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
+            % see also getLinkType, getLinksInfo, getLinkInitialSetting,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSTATUS, varargin{:});
         end
         function value = getLinkInitialSetting(obj, varargin)
@@ -1133,10 +1117,8 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkInitialSetting(1)   % Retrieves the value of the first link initial setting
             %
-            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
-            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
-            % getLinkMinorLossCoeff, getLinkInitialStatus,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff
+            % see also getLinkType, getLinksInfo, getLinkInitialStatus,
+            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSETTING, varargin{:});
         end
         function value = getLinkBulkReactionCoeff(obj, varargin)
@@ -1148,10 +1130,9 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkBulkReactionCoeff(1)   % Retrieves the value of the first link bulk chemical reaction coefficient
             %
-            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
-            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
+            % see also getLinkType, getLinksInfo, getLinkRoughnessCoeff,
             % getLinkMinorLossCoeff, getLinkInitialStatus,
-            % getLinkInitialSetting, getLinkWallReactionCoeff
+            % getLinkInitialSetting, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_KBULK, varargin{:});
         end
         function value = getLinkWallReactionCoeff(obj, varargin)
@@ -1163,10 +1144,9 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkWallReactionCoeff(1)   % Retrieves the value of the first pipe wall chemical reaction coefficient
             %
-            % see also getLinkType, getLinkTypeIndex, getLinksInfo,
-            % getLinkDiameter, getLinkLength, getLinkRoughnessCoeff,
+            % see also getLinkType, getLinksInfo, getLinkRoughnessCoeff,
             % getLinkMinorLossCoeff, getLinkInitialStatus,
-            % getLinkInitialSetting, getLinkBulkReactionCoeff
+            % getLinkInitialSetting, getLinkBulkReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_KWALL, varargin{:});
         end
         function value = getLinkFlows(obj, varargin)
@@ -1224,7 +1204,7 @@ classdef epanet <handle
             %
             % See also getLinkVelocity, getLinkHeadloss, getLinkStatus,
             % getLinkPumpState, getLinkSettings, getLinkEnergy,
-            % getLinkActualQuality, getLinkPumpEfficiency
+            % getLinkActualQuality, getLinkPumpEfficiency.
             
             value = get_link_info(obj, obj.ToolkitConstants.EN_FLOW, varargin{:});
         end
