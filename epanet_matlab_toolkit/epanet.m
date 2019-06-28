@@ -1284,63 +1284,91 @@ classdef epanet <handle
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_EFFIC, varargin{:});
         end
         function value = getLinkPumpPower(obj, varargin)
-            % EPANET Version 2.2
-            % Retrieves the pump constant power rating (read only)
+            % Retrieves the pump constant power rating (read only). (EPANET Version 2.2)
+            %
             % Example 1: 
-            %   d.getLinkPumpPower   % Retrieves the pump constant power rating for all links
+            %   d.getLinkPumpPower      % Retrieves the pump constant power rating for all links
+            %
             % Example 2:
             %   d.getLinkPumpPower(1)   % Retrieves the pump constant power rating for the first link
+            %
+            % See also getLinkPumpHCurve, getLinkPumpECurve,getLinkPumpECost,
+            %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_POWER, varargin{:});
         end
         function value = getLinkPumpHCurve(obj, varargin)
-            % EPANET Version 2.2
-            % Retrieves the pump head v. flow curve index
+            % Retrieves the pump head v. flow curve index. (EPANET Version 2.2)
+            %
             % Example 1: 
-            %   d.getLinkPumpHCurve   % Retrieves the pump head v. flow curve index for all links
+            %   d.getLinkPumpHCurve       % Retrieves the pump head v. flow curve index for all links
+            %
             % Example 2:
             %   d.getLinkPumpHCurve(13)   % Retrieves the pump head v. flow curve index for the thirteenth link
+            %
+            % See also getLinkPumpPower, getLinkPumpECurve,getLinkPumpECost,
+            %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_HCURVE, varargin{:});
         end
         function value = getLinkPumpECurve(obj, varargin)
-            % EPANET Version 2.2
-            % Retrieves the pump efficiency v. flow curve index
+            % Retrieves the pump efficiency v. flow curve index. (EPANET Version 2.2)
+            %
             % Example 1: 
-            %   d.getLinkPumpECurve   % Retrieves the pump efficiency v. flow curve index for all links
+            %   d.getLinkPumpECurve       % Retrieves the pump efficiency v. flow curve index for all links
+            %
             % Example 2:
             %   d.getLinkPumpECurve(13)   % Retrieves the pump efficiency v. flow curve index for the thirteenth link
+            %
+            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECost,
+            %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_ECURVE, varargin{:});
         end
         function value = getLinkPumpECost(obj, varargin)
-            % EPANET Version 2.2
-            % Retrieves the pump average energy price
+            % Retrieves the pump average energy price. (EPANET Version 2.2)
+            %
             % Example 1: 
-            %   d.getLinkPumpECost   % Retrieves the pump average energy price for all links
+            %   d.getLinkPumpECost       % Retrieves the pump average energy price for all links
+            %
             % Example 2:
             %   d.getLinkPumpECost(13)   % Retrieves the pump average energy price for the thirteenth link
+            %
+            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
+            %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_ECOST, varargin{:});
         end
         function value = getLinkPumpEPat(obj, varargin)
-            % EPANET Version 2.2
-            % Retrieves the pump energy price time pattern index
+            % Retrieves the pump energy price time pattern index. (EPANET Version 2.2)
+            %
             % Example 1: 
-            %   d.getLinkPumpEPat   % Retrieves the pump energy price time pattern index for all links
+            %   d.getLinkPumpEPat       % Retrieves the pump energy price time pattern index for all links
+            %
             % Example 2:
             %   d.getLinkPumpEPat(13)   % Retrieves the pump energy price time pattern index for the thirteenth link
+            %
+            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
+            %          getLinkPumpECost, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_EPAT, varargin{:});
         end
         function value = getLinkPumpPatternIndex(obj, varargin)
-            % EPANET Version 2.1
-            % Retrieves the pump speed time pattern index
+            % Retrieves the pump speed time pattern index. (EPANET Version 2.1)
+            %
             % Example 1: 
-            %   d.getLinkPumpPatternIndex   % Retrieves the pump speed time pattern index for all links
+            %   d.getLinkPumpPatternIndex       % Retrieves the pump speed time pattern index for all links
+            %
             % Example 2:
             %   d.getLinkPumpPatternIndex(13)   % Retrieves the pump speed time pattern index for the thirteenth link
+            %
+            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
+            %          getLinkPumpECost, getLinkPumpEPat,  getLinkPumpPatternNameID.
             value = get_link_info(obj, obj.ToolkitConstants.EN_LINKPATTERN, varargin{:});
         end
         function value = getLinkPumpPatternNameID(obj)
-            % Retrieves link pump pattern name ID #EPANET Version 2.1
+            % Retrieves link pump pattern name ID. (EPANET Version 2.1)
+            %
             % Example: 
             %   d.getLinkPumpPatternNameID
+            %
+            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
+            %          getLinkPumpECost, getLinkPumpEPat, getLinkPumpPatternIndex.
             v = obj.getLinkPumpPatternIndex;
             value = obj.getPatternNameID(v);
         end
