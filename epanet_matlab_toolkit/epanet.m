@@ -1161,8 +1161,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkVelocity(1)   % Retrieves the current computed flow velocity for the first link
             %
-            % Example 3: 
-            %   check examples/EX2_Hydraulic_analysis.m
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
             % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
@@ -1179,8 +1178,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkHeadloss(1)   % Retrieves the current computed head loss for the first link
             %
-            % Example 3: 
-            %   check examples/EX2_Hydraulic_analysis.m
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
             % See also getLinkFlows, getLinkVelocity, getLinkStatus, 
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
@@ -1197,8 +1195,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkStatus(1)   % Retrieves the current link status for the first link
             %
-            % Example 3: 
-            %   check examples/EX2_Hydraulic_analysis.m
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkPumpState, getLinkSettings.
@@ -1215,8 +1212,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkPumpState(1)   % Retrieves the current computed pump state for the first link
             %
-            % Example 3: 
-            %   check examples/EX2_Hydraulic_analysis.m
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
             % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
             %          getLinkSettings, getLinkEnergy, getLinkPumpEfficiency.
@@ -1234,8 +1230,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkSettings(1)   % Retrieves the current value of setting for the first link
             %
-            % Example 3: 
-            %   check examples/EX2_Hydraulic_analysis.m
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkEnergy.
@@ -1252,8 +1247,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkEnergy(1)   % Retrieves the current computed pump energy usage for the first link
             %
-            % Example 3: 
-            %   check examples/EX2_Hydraulic_analysis.m
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkPumpEfficiency.
@@ -1284,8 +1278,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkPumpEfficiency(1)   % Retrieves the current computed pump efficiency for the first link
             %
-            % Example 3: 
-            %   check examples/EX2_Hydraulic_analysis.m
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
             % See also getLinkFlows, getLinkStatus, getLinkPumpState,
             %          getLinkSettings, getLinkEnergy, getLinkActualQuality.
