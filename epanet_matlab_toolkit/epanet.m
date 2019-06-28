@@ -1837,7 +1837,7 @@ classdef epanet <handle
         function value = getNodeActualDemandSensingNodes(obj, varargin)
             % Retrieves the computed demand values at some sensing nodes.
             %
-            % Example :
+            % Example:
             %   d.getNodeActualDemandSensingNodes(1)   % Retrieves the computed demand value of the first sensing node
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
@@ -1972,7 +1972,7 @@ classdef epanet <handle
         function value = getNodeActualQualitySensingNodes(obj, varargin)
             % Retrieves the computed quality values at some sensing nodes
             %
-            % Example :
+            % Example:
             %   d.getNodeActualQualitySensingNodes(1)   % Retrieves the computed quality value at the first node
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
