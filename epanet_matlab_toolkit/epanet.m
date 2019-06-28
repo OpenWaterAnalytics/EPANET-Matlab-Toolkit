@@ -1161,6 +1161,9 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkVelocity(1)   % Retrieves the current computed flow velocity for the first link
             %
+            % Example 3: 
+            %   check examples/EX2_Hydraulic_analysis.m
+            %
             % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
             value = get_link_info(obj, obj.ToolkitConstants.EN_VELOCITY, varargin{:});
@@ -1175,6 +1178,9 @@ classdef epanet <handle
             %
             % Example 2:
             %   d.getLinkHeadloss(1)   % Retrieves the current computed head loss for the first link
+            %
+            % Example 3: 
+            %   check examples/EX2_Hydraulic_analysis.m
             %
             % See also getLinkFlows, getLinkVelocity, getLinkStatus, 
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
@@ -1191,6 +1197,9 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkStatus(1)   % Retrieves the current link status for the first link
             %
+            % Example 3: 
+            %   check examples/EX2_Hydraulic_analysis.m
+            %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkPumpState, getLinkSettings.
             value = get_link_info(obj, obj.ToolkitConstants.EN_STATUS, varargin{:});
@@ -1205,6 +1214,9 @@ classdef epanet <handle
             %
             % Example 2:
             %   d.getLinkPumpState(1)   % Retrieves the current computed pump state for the first link
+            %
+            % Example 3: 
+            %   check examples/EX2_Hydraulic_analysis.m
             %
             % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
             %          getLinkSettings, getLinkEnergy, getLinkPumpEfficiency.
@@ -1222,6 +1234,9 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkSettings(1)   % Retrieves the current value of setting for the first link
             %
+            % Example 3: 
+            %   check examples/EX2_Hydraulic_analysis.m
+            %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkEnergy.
             value = get_link_info(obj, obj.ToolkitConstants.EN_SETTING, varargin{:});
@@ -1236,6 +1251,9 @@ classdef epanet <handle
             %
             % Example 2:
             %   d.getLinkEnergy(1)   % Retrieves the current computed pump energy usage for the first link
+            %
+            % Example 3: 
+            %   check examples/EX2_Hydraulic_analysis.m
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkPumpEfficiency.
@@ -1265,6 +1283,9 @@ classdef epanet <handle
             %
             % Example 2:
             %   d.getLinkPumpEfficiency(1)   % Retrieves the current computed pump efficiency for the first link
+            %
+            % Example 3: 
+            %   check examples/EX2_Hydraulic_analysis.m
             %
             % See also getLinkFlows, getLinkStatus, getLinkPumpState,
             %          getLinkSettings, getLinkEnergy, getLinkActualQuality.
