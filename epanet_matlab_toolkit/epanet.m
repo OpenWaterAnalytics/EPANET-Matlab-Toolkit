@@ -1386,7 +1386,7 @@ classdef epanet <handle
         function value = getNodeJunctionNameID(obj)
             % Retrieves the junction ID label.
             %
-            % Example : 
+            % Example: 
             %   d.getNodeJunctionNameID
             %
             % See also getNodeNameID, getNodeReservoirNameID, getNodeIndex,
@@ -1423,7 +1423,7 @@ classdef epanet <handle
         function value = getNodeReservoirIndex(obj)
             % Retrieves the indices of reservoirs.
             %
-            % Example :
+            % Example:
             %   d.getNodeReservoirIndex
             %
             % See also getNodeNameID, getNodeIndex, getNodeJunctionIndex,
@@ -1434,7 +1434,7 @@ classdef epanet <handle
         function value = getNodeJunctionIndex(obj)
             % Retrieves the indices of junctions.
             %
-            % Example :
+            % Example:
             %   d.getNodeJunctionIndex
             %
             % See also getNodeNameID, getNodeIndex, getNodeReservoirIndex,
@@ -1649,7 +1649,7 @@ classdef epanet <handle
         function value = getNodeDemandPatternNameID(obj, varargin)
             % EPANET Version 2.1
             % Retrieves the value of all node base demands pattern name ID
-            % Example :
+            % Example:
             %   d.getNodeDemandPatternNameID
             %   d.getNodeDemandPatternNameID{1}
             v = obj.getNodeDemandPatternIndex;
