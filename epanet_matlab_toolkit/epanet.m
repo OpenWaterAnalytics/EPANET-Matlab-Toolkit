@@ -1209,78 +1209,137 @@ classdef epanet <handle
             value = get_link_info(obj, obj.ToolkitConstants.EN_FLOW, varargin{:});
         end
         function value = getLinkVelocity(obj, varargin)
-            % Retrieves the current computed flow velocity (read only)
-            % Using step-by-step hydraulic analysis
+            % Retrieves the current computed flow velocity (read only).
+            %
+            % Using step-by-step hydraulic analysis,
+            %
             % Example 1:
-            %   d.getLinkVelocity   % Retrieves the current computed flow velocity for all links
+            %   d.getLinkVelocity      % Retrieves the current computed flow velocity for all links
+            %
             % Example 2:
             %   d.getLinkVelocity(1)   % Retrieves the current computed flow velocity for the first link
+            %
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
+            %
+            % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
+            %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
             value = get_link_info(obj, obj.ToolkitConstants.EN_VELOCITY, varargin{:});
         end
         function value = getLinkHeadloss(obj, varargin)
-            % Retrieves the current computed head loss (read only)
-            % Using step-by-step hydraulic analysis
+            % Retrieves the current computed head loss (read only).
+            %
+            % Using step-by-step hydraulic analysis,
+            %
             % Example 1:
-            %   d.getLinkHeadloss   % Retrieves the current computed head loss for all links
+            %   d.getLinkHeadloss      % Retrieves the current computed head loss for all links
+            %
             % Example 2:
             %   d.getLinkHeadloss(1)   % Retrieves the current computed head loss for the first link
+            %
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
+            %
+            % See also getLinkFlows, getLinkVelocity, getLinkStatus, 
+            %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
             value = get_link_info(obj, obj.ToolkitConstants.EN_HEADLOSS, varargin{:});
         end
         function value = getLinkStatus(obj, varargin)
-            % Retrieves the current link status (see @ref EN_LinkStatusType) (0 = closed, 1 = open)
-            % Using step-by-step hydraulic analysis
+            % Retrieves the current link status (see @ref EN_LinkStatusType) (0 = closed, 1 = open).
+            %
+            % Using step-by-step hydraulic analysis,
+            %
             % Example 1: 
-            %   d.getLinkStatus   % Retrieves the current link status for all links
+            %   d.getLinkStatus      % Retrieves the current link status for all links
+            %
             % Example 2:
             %   d.getLinkStatus(1)   % Retrieves the current link status for the first link
+            %
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
+            %
+            % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
+            %          getLinkPumpState, getLinkSettings.
             value = get_link_info(obj, obj.ToolkitConstants.EN_STATUS, varargin{:});
         end
         function value = getLinkPumpState(obj, varargin)
-            % EPANET Version 2.2
-            % Retrieves the current computed pump state (read only) (see @ref EN_PumpStateType)
-            % Using step-by-step hydraulic analysis
+            % Retrieves the current computed pump state (read only) (see @ref EN_PumpStateType). (EPANET Version 2.2)
+            % 
+            % Using step-by-step hydraulic analysis,
+            %
             % Example 1:
-            %   d.getLinkPumpState   % Retrieves the current computed pump state for all links
+            %   d.getLinkPumpState      % Retrieves the current computed pump state for all links
+            %
             % Example 2:
             %   d.getLinkPumpState(1)   % Retrieves the current computed pump state for the first link
+            %
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
+            %
+            % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
+            %          getLinkSettings, getLinkEnergy, getLinkPumpEfficiency.
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_STATE, varargin{:});
         end
         function value = getLinkSettings(obj, varargin)
-            % Retrieves the current computed value of all link roughness for pipes or actual speed for pumps or actual setting for valves
-            % Using step-by-step hydraulic analysis
+            % Retrieves the current computed value of all link roughness for pipes 
+            % or actual speed for pumps or actual setting for valves.
+            %
+            % Using step-by-step hydraulic analysis,
+            %
             % Example 1:
-            %   d.getLinkSettings   % Retrieves the current values of settings for all links
+            %   d.getLinkSettings      % Retrieves the current values of settings for all links
+            %
             % Example 2:
             %   d.getLinkSettings(1)   % Retrieves the current value of setting for the first link
+            %
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
+            %
+            % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
+            %          getLinkStatus, getLinkPumpState, getLinkEnergy.
             value = get_link_info(obj, obj.ToolkitConstants.EN_SETTING, varargin{:});
         end
         function value = getLinkEnergy(obj, varargin)
-            % Retrieves the current computed pump energy usage (read only)
-            % Using step-by-step hydraulic analysis
+            % Retrieves the current computed pump energy usage (read only).
+            %
+            % Using step-by-step hydraulic analysis,
+            %
             % Example 1:
-            %   d.getLinkEnergy   % Retrieves the current computed pump energy usage for all links
+            %   d.getLinkEnergy      % Retrieves the current computed pump energy usage for all links
+            %
             % Example 2:
             %   d.getLinkEnergy(1)   % Retrieves the current computed pump energy usage for the first link
+            %
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
+            %
+            % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
+            %          getLinkStatus, getLinkPumpState, getLinkPumpEfficiency.
             value = get_link_info(obj, obj.ToolkitConstants.EN_ENERGY, varargin{:});
         end
         function value = getLinkActualQuality(obj, varargin)
-            % EPANET Version 2.2
-            % Retrieves the current computed link quality (read only)
+            % Retrieves the current computed link quality (read only). (EPANET Version 2.2)
+            %
             % Example 1:
-            %   d.getLinkActualQuality   % Retrieves the current computed link quality for all links
+            %   d.getLinkActualQuality      % Retrieves the current computed link quality for all links
+            %
             % Example 2:
             %   d.getLinkActualQuality(1)   % Retrieves the current computed link quality for the first link
+            %
             % Example 3: 
             %   check examples/EX14_hydraulic_and_quality_analysis.m
+            %
+            % See also getLinkFlows, getLinkStatus, getLinkPumpState,
+            %          getLinkSettings, getLinkPumpEfficiency.
             value = get_link_info(obj, obj.ToolkitConstants.EN_LINKQUAL, varargin{:});
         end
         function value = getLinkPumpEfficiency(obj, varargin)
-            % EPANET Version 2.2
-            % Retrieves the current computed pump efficiency (read only) 
+            % Retrieves the current computed pump efficiency (read only). (EPANET Version 2.2)
+            %
             % Example 1: 
-            %   d.getLinkPumpEfficiency   % Retrieves the current computed pump efficiency for all links
+            %   d.getLinkPumpEfficiency      % Retrieves the current computed pump efficiency for all links
+            %
             % Example 2:
             %   d.getLinkPumpEfficiency(1)   % Retrieves the current computed pump efficiency for the first link
+            %
+            % For more, you can type `help getLinkFlows` and check examples 3 & 4
+            %
+            % See also getLinkFlows, getLinkStatus, getLinkPumpState,
+            %          getLinkSettings, getLinkEnergy, getLinkActualQuality.
             value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_EFFIC, varargin{:});
         end
         function value = getLinkPumpPower(obj, varargin)
