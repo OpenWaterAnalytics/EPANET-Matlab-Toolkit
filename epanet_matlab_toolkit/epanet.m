@@ -1583,13 +1583,19 @@ classdef epanet <handle
             end
         end
         function value = getNodeElevations(obj, varargin)
-            % Retrieves the value of all node elevations
+            % Retrieves the value of all node elevations.
+            %
             % Example 1:
-            %   d.getNodeElevations   % Retrieves the value of all node elevations
+            %   d.getNodeElevations        % Retrieves the value of all node elevations
+            %
             % Example 2:
-            %   d.getNodeElevations(1)   % Retrieves the value of the first node elevation
+            %   d.getNodeElevations(1)     % Retrieves the value of the first node elevation
+            %
             % Example 3:
             %   d.getNodeElevations(5:7)   % Retrieves the value of the 5th to 7th node elevations
+            %
+            % See also setNodeElevations, getNodesInfo, getNodeNameID,
+            %          getNodeType,getNodeEmitterCoeff, getNodeInitialQuality.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET); 
@@ -1598,16 +1604,24 @@ classdef epanet <handle
             end
         end
         function value = getDemandModel(obj, varargin)
-            % Retrieves the type of demand model in use and its parameters
+            % Retrieves the type of demand model in use and its parameters.
+            %
             % Example: 
             %   model = d.getDemandModel()
+            %
+            % See also setDemandModel, getNodeBaseDemands, getNodeDemandCategoriesNumber
+            %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
             [obj.Errcode, value.DemandModelCode, value.DemandModelPmin, value.DemandModelPreq, value.DemandModelPexp] = ENgetdemandmodel(obj.LibEPANET); 
             value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
         end
         function value = getNodeJunctionDemandName(obj, varargin)
-            % Gets the name of a node's demand category
+            % Gets the name of a node's demand category.
+            %
             % Example: 
             %   model = d.getNodeJunctionDemandName()
+            %
+            % See also setNodeJunctionDemandName, getNodeBaseDemands, 
+            %          getNodeDemandCategoriesNumber, getNodeDemandPatternNameID.
             [indices, ~] = getNodeIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
             value = cell(1, max(numdemands));
@@ -1625,13 +1639,19 @@ classdef epanet <handle
             end
         end
         function value = getNodeComment(obj, varargin)
-            % Retrieves the comment string assigned to the node object
+            % Retrieves the comment string assigned to the node object.
+            %
             % Example 1:
-            %   d.getNodeComment   % Retrieves the comment string assigned to all node objects
+            %   d.getNodeComment        % Retrieves the comment string assigned to all node objects
+            %
             % Example 2: 
-            %   d.getNodeComment(4)   % Retrieves the comment string assigned to the 4th node object
+            %   d.getNodeComment(4)     % Retrieves the comment string assigned to the 4th node object
+            %
             % Example 3: 
             %   d.getNodeComment(1:5)   % Retrieves the comment string assigned to the 1st to 5th node object
+            %
+            % See also setNodeComment, getNodesInfo, 
+            %          getNodeNameID, getNodeType.
             if isempty(varargin)
                 cnt = obj.getNodeCount;
                 value = cell(1, cnt);
@@ -1650,13 +1670,18 @@ classdef epanet <handle
             end
         end
         function value = setNodeComment(obj, value, varargin)
-            % Sets the comment string assigned to the node object
+            % Sets the comment string assigned to the node object.
+            %
             % Example 1:
-            %   d.setNodeComment(1, 'This is a node');   % Sets a comment to the 1st node
+            %   d.setNodeComment(1, 'This is a node');                    % Sets a comment to the 1st node
             %   d.getNodeComment(1)
+            %
             % Example 2:
             %   d.setNodeComment(1:2, {'This is a node', 'Test comm'});   % Sets a comment to the 1st and 2nd node
             %   d.getNodeComment(1:2)
+            %
+            % See also getNodeComment, getNodesInfo, 
+            %          setNodeNameID, setNodeCoordinates.
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
@@ -1670,20 +1695,26 @@ classdef epanet <handle
             end
         end
         function [Line1, Line2, Line3] = getTitle(obj, varargin)
-            % Retrieves the title lines of the project
+            % Retrieves the title lines of the project.
+            %
             % Example: 
             %   [Line1, Line2, Line3] = d.getTitle()    % Retrieves the three title lines of the project
+            %
+            % See also setTitle.
             [obj.Errcode, Line1, Line2, Line3] = ENgettitle(obj.LibEPANET); 
         end
         function value = getNodeBaseDemands(obj, varargin)
-            % Retrieves the value of all node base demands
-            % Example:
-            %       d.getNodeBaseDemands
-            %       % Get categories 1
-            %       d.getNodeBaseDemands{1}
-            %       % Get node base demand with categories for specific node index
-            %       d.getNodeBaseDemands(1) 
-            %       d.getNodeBaseDemands(122)
+            % Retrieves the value of all node base demands.
+            %
+            % Example 1:
+            %   d.getNodeBaseDemands
+            %   d.getNodeBaseDemands{1}   % Get categories 1 
+            %
+            % Example 2:
+            %   d.getNodeBaseDemands(2)   % Get node base demand with categories for specific node index
+            %
+            % See also setNodeBaseDemands, getNodeDemandCategoriesNumber,
+            %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
             [indices, ~] = getNodeIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
             value = cell(1, max(numdemands));
@@ -1701,12 +1732,16 @@ classdef epanet <handle
             end
         end
         function value = getNodeDemandCategoriesNumber(obj, varargin)
-            % EPANET Version 2.1
-            % Retrieves the value of all node base demands categorie number
+            % Retrieves the value of all node base demands categorie number. (EPANET Version 2.1)
+            % 
             % Example 1:
-            %	d.getNodeDemandCategoriesNumber   % Retrieves the value of all node base demands categorie number
+            %	d.getNodeDemandCategoriesNumber      % Retrieves the value of all node base demands categorie number
+            %
             % Example 2:
             %	d.getNodeDemandCategoriesNumber(1)   % Retrieves the value of the first node base demand categorie number
+            %
+            % See also getNodeBaseDemands, getNodeDemandPatternIndex,
+            %          getNodeDemandPatternNameID.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnumdemands(i, obj.LibEPANET); 
@@ -1715,11 +1750,14 @@ classdef epanet <handle
             end
         end
         function value = getNodeDemandPatternIndex(obj)
-            % EPANET Version 2.1
-            % Retrieves the value of all node base demands pattern index
-            % Example :
+            % Retrieves the value of all node base demands pattern index. (EPANET Version 2.1)
+            %
+            % Example:
             %   d.getNodeDemandPatternIndex
             %   d.getNodeDemandPatternIndex{1}
+            %
+            % See also getNodeBaseDemands, getNodeDemandCategoriesNumber,
+            %          getNodeDemandPatternNameID.
             numdemands = obj.getNodeDemandCategoriesNumber;
             value = cell(1, max(numdemands));
             val = zeros(max(numdemands), obj.getNodeCount);
@@ -1734,11 +1772,14 @@ classdef epanet <handle
             end
         end
         function value = getNodeDemandPatternNameID(obj, varargin)
-            % EPANET Version 2.1
-            % Retrieves the value of all node base demands pattern name ID
+            % Retrieves the value of all node base demands pattern name ID. (EPANET Version 2.1)
+            %
             % Example:
             %   d.getNodeDemandPatternNameID
             %   d.getNodeDemandPatternNameID{1}
+            %
+            % See also getNodeBaseDemands, getNodeDemandCategoriesNumber,
+            %          getNodeDemandPatternIndex.
             v = obj.getNodeDemandPatternIndex;
             m = obj.getPatternNameID;
             if ~isempty(varargin)
