@@ -1887,11 +1887,18 @@ classdef epanet <handle
             end
         end
         function value = getNodeActualDemand(obj, varargin)
-            % Retrieves the computed value of all node actual demands
+            % Retrieves the computed value of all node actual demands.
+            %
             % Example 1:
-            %   d.getNodeActualDemand   % Retrieves the computed value of all node actual demands
+            %   d.getNodeActualDemand      % Retrieves the computed value of all node actual demands
+            %
             % Example 2:
             %   d.getNodeActualDemand(1)   % Retrieves the computed value of the first node actual demand
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also getNodeActualDemandSensingNodes, getNodeHydaulicHead, getNodePressure, 
+            %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET); 
@@ -1900,20 +1907,33 @@ classdef epanet <handle
             end
         end
         function value = getNodeActualDemandSensingNodes(obj, varargin)
-            % Retrieves the computed demand values at some sensing nodes
-            % Example :
-            %   d.getNodeActualDemandSensingNodes(1)   % Retrieves the computed demand value of the first sensing node 
+            % Retrieves the computed demand values at some sensing nodes.
+            %
+            % Example:
+            %   d.getNodeActualDemandSensingNodes(1)   % Retrieves the computed demand value of the first sensing node
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also getNodeActualDemand, getNodeHydaulicHead, getNodePressure, 
+            %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             value=zeros(1, length(varargin{1}));v=1;
             for i=varargin{1}
                 [obj.Errcode, value(v)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET);v=v+1;
             end
         end
         function value = getNodeHydaulicHead(obj, varargin)
-            % Retrieves the computed values of all node hydraulic heads
+            % Retrieves the computed values of all node hydraulic heads.
+            %
             % Example 1:
-            %   d.getNodeHydaulicHead   % Retrieves the computed value of all node hydraulic heads
+            %   d.getNodeHydaulicHead      % Retrieves the computed value of all node hydraulic heads
+            %
             % Example 2:
             %   d.getNodeHydaulicHead(1)   % Retrieves the computed value of the first node hydraulic head
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure, 
+            %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_HEAD, obj.LibEPANET); 
@@ -1922,11 +1942,59 @@ classdef epanet <handle
             end
         end
         function value = getNodePressure(obj, varargin)
-            % Retrieves the computed values of all node pressures
+            % Retrieves the computed values of all node pressures.
+            %
             % Example 1:
-            %   d.getNodePressure   % Retrieves the computed values of all node pressures
+            %    d.getNodePressure      % Retrieves the computed values of all node pressures
+            %
             % Example 2:
-            %   d.getNodePressure(1)   % Retrieves the computed value of the first node pressure
+            %    d.getNodePressure(1)   % Retrieves the computed value of the first node pressure
+            %
+            % Example 3:
+            %    % Hydraulic analysis step-by-step
+            %    d.openHydraulicAnalysis;
+            %    d.initializeHydraulicAnalysis;
+            %    tstep=1;P=[];T_H=[];D=[];H=[];F=[];S=[];
+            %    while (tstep>0)
+            %       t= d.runHydraulicAnalysis;
+            %       P = [P; d.getNodePressure];
+            %       D = [D; d.getNodeActualDemand];
+            %       H = [H; d.getNodeHydaulicHead];
+            %       S = [S; d.getLinkStatus];
+            %       F = [F; d.getLinkFlows];
+            %       T_H = [T_H; t];
+            %       tstep=d.nextHydraulicAnalysisStep;
+            %    end
+            %    d.closeHydraulicAnalysis;
+            %
+            % Example 4: 
+            %    % Hydraulic and Quality analysis step-by-step
+            %    d.openHydraulicAnalysis;
+            %    d.openQualityAnalysis;
+            %    d.initializeHydraulicAnalysis(0);
+            %    d.initializeQualityAnalysis(d.ToolkitConstants.EN_NOSAVE);
+            % 
+            %    tstep = 1;
+            %    T = []; P = []; F = []; QN = []; QL = [];
+            %    while (tstep>0)
+            %       t  = d.runHydraulicAnalysis;
+            %       qt = d.runQualityAnalysis;
+            % 
+            %       P  = [P; d.getNodePressure];
+            %       F  = [F; d.getLinkFlows];
+            % 
+            %       QN = [QN; d.getNodeActualQuality];
+            %       QL = [QL; d.getLinkActualQuality];
+            %       T  = [T; t];
+            % 
+            %       tstep = d.nextHydraulicAnalysisStep;
+            %       qtstep = d.nextQualityAnalysisStep;
+            %    end
+            %    d.closeQualityAnalysis;
+            %    d.closeHydraulicAnalysis;
+            %
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodeHydaulicHead
+            %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET); 
@@ -1935,11 +2003,18 @@ classdef epanet <handle
             end
         end
         function value = getNodeActualQuality(obj, varargin)
-            % Retrieves the computed values of the actual quality for all nodes
+            % Retrieves the computed values of the actual quality for all nodes.
+            %
             % Example 1:
-            %   d.getNodeActualQuality   % Retrieves the computed values of the actual quality for all nodes
+            %   d.getNodeActualQuality      % Retrieves the computed values of the actual quality for all nodes
+            %
             % Example 2:
             %   d.getNodeActualQuality(1)   % Retrieves the computed value of the actual quality for the first node
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure, 
+            %          getNodeHydaulicHead, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET); 
@@ -1948,11 +2023,18 @@ classdef epanet <handle
             end
         end
         function value = getNodeMassFlowRate(obj, varargin)
-            % Retrieves the computed mass flow rates per minute of chemical sources for all nodes
+            % Retrieves the computed mass flow rates per minute of chemical sources for all nodes.
+            %
             % Example 1:
-            %   d.getNodeMassFlowRate   % Retrieves the computed mass flow rates per minute of chemical sources for all nodes
+            %   d.getNodeMassFlowRate      % Retrieves the computed mass flow rates per minute of chemical sources for all nodes
+            %
             % Example 2:
             %   d.getNodeMassFlowRate(1)   % Retrieves the computed mass flow rates per minute of chemical sources for the first node
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure, 
+            %          getNodeHydaulicHead, getNodeActualQuality, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET); 
@@ -1961,8 +2043,14 @@ classdef epanet <handle
         end
         function value = getNodeActualQualitySensingNodes(obj, varargin)
             % Retrieves the computed quality values at some sensing nodes
-            % Example :
+            %
+            % Example:
             %   d.getNodeActualQualitySensingNodes(1)   % Retrieves the computed quality value at the first node
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure, 
+            %          getNodeHydaulicHead, getNodeActualQuality, getNodeMassFlowRate.
             value=zeros(1, length(varargin{1}));v=1;
             for i=varargin{1}
                 [obj.Errcode, value(v)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET);v=v+1;
