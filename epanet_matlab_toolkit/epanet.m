@@ -2136,7 +2136,16 @@ classdef epanet <handle
             end
         end
         function value = getNodeTankInitialWaterVolume(obj, varargin)
-            %Retrieves the tank initial volume
+            % Retrieves the tank initial water volume.
+            %
+            % Example 1:
+            %   d.getNodeTankInitialWaterVolume       % Retrieves the values of all nodes initial water volume
+            %
+            % Example 2:
+            %   d.getNodeTankInitialWaterVolume(11)   % Retrieves the value of the 11th node(i.e. tank) initial water volume
+            %
+            % See also getNodeTankInitialLevel,  getNodeTankVolume,
+            %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_INITVOLUME, obj.LibEPANET); 
@@ -2146,7 +2155,18 @@ classdef epanet <handle
             end
         end
         function value = getNodeTankMixiningModel(obj)
-            %Retrieves the tank mixing mode (mix1, mix2, fifo, lifo)
+            % Retrieves the tank mixing model code and type (mix1, mix2, fifo, lifo).
+            %
+            % Example 1:
+            %   d.getNodeTankMixiningModel      
+            %   d.getNodeTankMixiningModel{1}   % Retrieves the values of all nodes mixing model code
+            %
+            % Example 2:
+            %   d.getNodeTankMixiningModel
+            %   d.getNodeTankMixiningModel{2}   % Retrieves the values of all nodes mixing model type
+            %
+            % See also getNodeTankMixingModelCode, getNodeTankMixingModelType,
+            %          getNodeTankMixZoneVolume.
             obj.NodeTankInitialWaterVolume=nan(1, obj.getNodeCount);
             obj.NodeTankMixingModelCode=nan(1, obj.getNodeCount);
             obj.NodeTankMixingModelType={};
@@ -2159,15 +2179,36 @@ classdef epanet <handle
             value={obj.NodeTankMixingModelCode obj.NodeTankMixingModelType};
         end
         function value = getNodeTankMixingModelCode(obj)
-            %Retrieves the tank mixing model code (mix1, mix2, fifo, lifo)
+            % Retrieves the tank mixing model code (mix1, mix2, fifo, lifo).
+            %
+            % Example:
+            %   d.getNodeTankMixingModelCode   % Retrieves the values of all nodes mixing model code
+            %
+            % See also getNodeTankMixiningModel, getNodeTankMixingModelType,
+            %          getNodeTankMixZoneVolume.
             value = obj.getNodeTankMixiningModel{1};
         end
         function value = getNodeTankMixingModelType(obj)
-            %Retrieves the tank mixing model type (mix1, mix2, fifo, lifo)
+            % Retrieves the tank mixing model type (mix1, mix2, fifo, lifo).
+            %
+            % Example:
+            %   d.getNodeTankMixingModelType   % Retrieves the values of all nodes mixing model type
+            %
+            % See also getNodeTankMixiningModel, getNodeTankMixingModelCode,
+            %          getNodeTankMixZoneVolume.
             value = obj.getNodeTankMixiningModel{2};
         end
         function value = getNodeTankMixZoneVolume(obj, varargin)
-            %Retrieves the tank mixing zone volume
+            % Retrieves the tank mixing zone volume.
+            %
+            % Example 1:
+            %   d.getNodeTankMixZoneVolume       % Retrieves the values of all nodes mixing zone volume
+            %
+            % Example 2:
+            %   d.getNodeTankMixZoneVolume(11)   % Retrieves the value of the 11th node(i.e. tank) mixing zone volume
+            %
+            % See also getNodeTankMixiningModel, getNodeTankMixingModelCode,
+            %          getNodeTankMixingModelType.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MIXZONEVOL, obj.LibEPANET); 
@@ -2176,7 +2217,16 @@ classdef epanet <handle
             end
         end
         function value = getNodeTankDiameter(obj, varargin)
-            %Retrieves the tank diameters
+            % Retrieves the tank diameters.
+            %
+            % Example 1:
+            %   d.getNodeTankDiameter       % Retrieves the values of all nodes tank diameters
+            %
+            % Example 2:
+            %   d.getNodeTankDiameter(11)   % Retrieves the value of the 11th node(i.e. tank) tank diameter
+            %
+            % See also setNodeTankDiameter, getNodeTankBulkReactionCoeff, getNodeTankInitialLevel, 
+            %          getNodeTankMixingModelType, getNodeTankVolume, getNodeTankNameID.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_TANKDIAM, obj.LibEPANET); 
@@ -2185,7 +2235,16 @@ classdef epanet <handle
             end
         end
         function value = getNodeTankMinimumWaterVolume(obj, varargin)
-            %Retrieves the tank minimum volume
+            % Retrieves the tank minimum water volume.
+            %
+            % Example 1:
+            %   d.getNodeTankMinimumWaterVolume       % Retrieves the values of all nodes tank minimum water volume
+            %
+            % Example 2:
+            %   d.getNodeTankMinimumWaterVolume(11)   % Retrieves the value of the 11th node(i.e. tank) tank minimum water volume
+            %
+            % See also setNodeTankMinimumWaterVolume, getNodeTankMaximumWaterVolume, getNodeTankInitialWaterVolume,
+            %          getNodeTankInitialLevel,  getNodeTankVolume, getNodeTankMixZoneVolume.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MINVOLUME, obj.LibEPANET); 
@@ -2194,7 +2253,16 @@ classdef epanet <handle
             end
         end
         function value = getNodeTankVolumeCurveIndex(obj, varargin)
-            %Retrieves the tank volume curve index
+            % Retrieves the tank volume curve index.
+            %
+            % Example 1:
+            %   d.getNodeTankVolumeCurveIndex       % Retrieves the values of all nodes tank volume curve index
+            %
+            % Example 2:
+            %   d.getNodeTankVolumeCurveIndex(11)   % Retrieves the value of the 11th node(i.e. tank) tank volume curve index
+            %
+            % See also getNodeTankVolume, getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume,
+            %          getNodeTankInitialWaterVolume, getNodeTankMixZoneVolume.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_VOLCURVE, obj.LibEPANET); 
@@ -2203,7 +2271,16 @@ classdef epanet <handle
             end
         end
         function value = getNodeTankMinimumWaterLevel(obj, varargin)
-            %Retrieves the tank minimum water level
+            % Retrieves the tank minimum water level.
+            %
+            % Example 1:
+            %   d.getNodeTankMinimumWaterLevel       % Retrieves the values of all nodes tank minimum water level
+            %
+            % Example 2:
+            %   d.getNodeTankMinimumWaterLevel(11)   % Retrieves the value of the 11th node(i.e. tank) tank minimum water level
+            %
+            % See also setNodeTankMinimumWaterLevel, getNodeTankMaximumWaterLevel, getNodeTankInitialLevel,
+            %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MINLEVEL, obj.LibEPANET); 
@@ -2212,7 +2289,16 @@ classdef epanet <handle
             end
         end
         function value = getNodeTankMaximumWaterLevel(obj, varargin)
-            %Retrieves the tank maximum water level
+            % Retrieves the tank maximum water level.
+            %
+            % Example 1:
+            %   d.getNodeTankMaximumWaterLevel       % Retrieves the values of all nodes tank maximum water level
+            %
+            % Example 2:
+            %   d.getNodeTankMaximumWaterLevel(11)   % Retrieves the value of the 11th node(i.e. tank) tank maximum water level
+            %
+            % See also setNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel, getNodeTankInitialLevel,
+            %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MAXLEVEL, obj.LibEPANET); 
