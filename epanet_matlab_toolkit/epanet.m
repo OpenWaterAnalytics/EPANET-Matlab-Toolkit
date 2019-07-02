@@ -2854,6 +2854,9 @@ classdef epanet <handle
         function value = addDemand(obj, nodeIndex, baseDemand , demandPattern, demandName)
             [obj.Errcode]=ENadddemand(nodeIndex, baseDemand , demandPattern, demandName, obj.LibEPANET);
         end
+        function value = deleteDemand(obj, nodeIndex, demandIndex)
+            [obj.Errcode]=ENdeletedemand(nodeIndex, demandIndex, obj.LibEPANET);
+        end
         function value = getCurveValue(obj, varargin)
             %EPANET Version 2.1
             % Retrieves x, y point for a specific point number and curve
@@ -8813,6 +8816,10 @@ end
 function [Errcode] = ENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
 % EPANET Version 2.2
 [Errcode, ~, ~]=calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand , demandPattern, demandName);
+end
+function [Errcode] = ENdeletedemand(nodeIndex, demandIndex, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENdeletedemand', nodeIndex, demandIndex);
 end
 function [Errcode, ids, nvalue, xvalue, yvalue] = ENgetcurve(obj, value, LibEPANET)
 [Errcode, ids, nvalue, xvalue, yvalue]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, zeros(1, obj.getCurveLengths(value))', zeros(1, obj.getCurveLengths(value))');
