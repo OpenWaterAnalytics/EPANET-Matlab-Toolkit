@@ -1806,6 +1806,17 @@ classdef epanet <handle
                 value{i} = val(i, :);
             end
         end
+        function value = getNodeDemandIndex(obj,varargin)
+            % help-text
+            demandName = '' ;
+            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            for i=indices
+            [obj.Errcode, value(j)] = ENgetdemandindex(i, demandName, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
+            j=j+1;
+            if i+1>getNodeJunctionCount(obj),break; end
+            end
+         end
         function value = getStatistic(obj)
             % Returns error code. (EPANET Version 2.1)
             %
@@ -2839,6 +2850,9 @@ classdef epanet <handle
                     setCurve(obj, valueIndex, varargin{2});
                 end
             end
+        end
+        function value = addDemand(obj, nodeIndex, baseDemand , demandPattern, demandName)
+            [obj.Errcode]=ENadddemand(nodeIndex, baseDemand , demandPattern, demandName, obj.LibEPANET);
         end
         function value = getCurveValue(obj, varargin)
             %EPANET Version 2.1
@@ -8539,6 +8553,11 @@ function [Errcode, value] = ENgetdemandpattern(index, numdemands, LibEPANET)
 %epanet20100
 [Errcode, value]=calllib(LibEPANET, 'ENgetdemandpattern', index, numdemands, 0);
 end
+function [Errcode, demandIndex] = ENgetdemandindex(nodeindex, demandName, LibEPANET)
+% EPANET Version 2.2
+demandName = '';
+[Errcode, ~, demandIndex]=calllib(LibEPANET, 'ENgetdemandindex', nodeindex, demandName, 0);
+end
 function [Errcode, value] = ENgetstatistic(code, LibEPANET)
 %epanet20100
 [Errcode, value]=calllib(LibEPANET, 'ENgetstatistic', code, 0);
@@ -8790,6 +8809,10 @@ end
 function [Errcode] = ENaddcurve(cid, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENaddcurve', cid);
+end
+function [Errcode] = ENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
+% EPANET Version 2.2
+[Errcode, ~, ~]=calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand , demandPattern, demandName);
 end
 function [Errcode, ids, nvalue, xvalue, yvalue] = ENgetcurve(obj, value, LibEPANET)
 [Errcode, ids, nvalue, xvalue, yvalue]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, zeros(1, obj.getCurveLengths(value))', zeros(1, obj.getCurveLengths(value))');
