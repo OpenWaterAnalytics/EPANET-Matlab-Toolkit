@@ -3141,21 +3141,9 @@ classdef epanet <handle
             end
             obj.closeQualityAnalysis;
         end
-        function nvalue = getComputedTimeSeries(obj)
+        function value = getComputedTimeSeries(obj)
             [fid,binfile,rptfile] = runEPANETexe(obj);
-            value = readEpanetBin(fid, binfile, rptfile);
-            fields_param = {'BinNodePressure', 'BinNodeDemand', 'BinNodeHead', 'BinNodeQuality',...
-                'BinLinkFlow', 'BinLinkVelocity', 'BinLinkStatus', 'BinLinkSetting', ...
-                'BinLinkReactionRate', 'BinLinkFrictionFactor', 'BinLinkQuality'};
-            fields_new = {'Pressure', 'Demand', 'Head', 'NodeQuality',...
-                'Flow', 'Velocity', 'Status', 'Setting', ...
-                'ReactionRate', 'FrictionFactor', 'LinkQuality'};
-            nvalue = struct();
-            for i=1:length(fields_param)
-                nvalue.(fields_new{i}) = eval(['value.', fields_param{i}]);
-            end
-            clear value;
-            
+            value = readEpanetBin(fid, binfile, rptfile, 0);            
             % Remove report bin, files @#
             warning off;
             fclose('all');
@@ -12799,19 +12787,18 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
         value.BinMagicNumber=fread(fid, 1, 'uint32')';
     end
     if ~isempty(varargin)
+        v = struct();
         v.Time = (0:value.BinReportingTimeStepSec:value.BinSimulationDurationSec)';
-        v.Pressure = value.BinNodePressure;
-        v.Demand = value.BinNodeDemand;
-        v.Head = value.BinNodeHead;
-        v.NodeQuality = value.BinNodeQuality;
-        v.Flow = value.BinLinkFlow;
-        v.Velocity = value.BinLinkVelocity;
-        v.HeadLoss = value.BinLinkHeadloss;
-        v.Status = value.BinLinkStatus;
-        v.Setting = value.BinLinkSetting;
-        v.ReactionRate = value.BinLinkReactionRate;
-        v.FrictionFactor = value.BinLinkFrictionFactor;
-        v.LinkQuality = value.BinLinkQuality;
+
+        fields_param = {'BinNodePressure', 'BinNodeDemand', 'BinNodeHead', 'BinNodeQuality',...
+                        'BinLinkFlow', 'BinLinkVelocity', 'BinLinkHeadloss', 'BinLinkStatus', 'BinLinkSetting', ...
+                        'BinLinkReactionRate', 'BinLinkFrictionFactor', 'BinLinkQuality'};
+        fields_new = {'Pressure', 'Demand', 'Head', 'NodeQuality',...
+                    'Flow', 'Velocity', 'HeadLoss', 'Status', 'Setting', ...
+                    'ReactionRate', 'FrictionFactor', 'LinkQuality'};
+        for i=1:length(fields_param)
+        v.(fields_new{i}) = eval(['value.', fields_param{i}]);
+        end
         clear value;
         value=v;
     end
