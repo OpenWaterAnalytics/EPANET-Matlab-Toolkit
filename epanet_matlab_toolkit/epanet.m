@@ -2602,6 +2602,11 @@ classdef epanet <handle
             [obj.Errcode] = ENsetcurve(index, curveVector(:, 1), curveVector(:, 2), nfactors, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
         end
+        function setCurveNameID(obj, index, id)
+            % EPANET Version 2.2
+            [obj.Errcode] = ENsetcurveid(index, id, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
         function value = setCurveComment(obj, value, varargin)
             % Sets the comment string assigned to the curve object
             % Example: 
@@ -3563,6 +3568,11 @@ classdef epanet <handle
                 end   
             end
         end
+        function setLinkPipeData(obj, pindex, plength, pdiam, prough, pmloss)
+            % EPANET Version 2.2
+            [obj.Errcode] = ENsetpipedata(pindex, plength, pdiam, prough, pmloss, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
         function index = setLinkTypePipe(obj, id, varargin)
             % Set the link type pipe for a specified link
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
@@ -3896,6 +3906,11 @@ classdef epanet <handle
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
             end
         end
+        function setLinkNodes(obj, index, from, to)
+            % EPANET Version 2.2
+            [obj.Errcode] = ENsetlinknodes(index, from, to, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
+        end
         function setNodeElevations(obj, value, varargin)
             % Sets the values of elevation for nodes
             % Example 1:
@@ -4047,6 +4062,11 @@ classdef epanet <handle
                     if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
                 end   
             end
+        end
+        function setNodeTankData(obj, tindex, telev, tinitlvl, tminlvl, tmaxlvl, tdiam, tminvol, tvolcurve)
+            % EPANET Version 2.2
+            [obj.Errcode] = ENsettankdata(tindex, telev, tinitlvl, tminlvl, tmaxlvl, tdiam, tminvol, tvolcurve, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setNodeTankInitialLevel(obj, value, varargin)
             % Sets the values of initial level for tanks
@@ -4413,6 +4433,11 @@ classdef epanet <handle
         function setPattern(obj, index, patternVector)
             nfactors=length(patternVector);
             [obj.Errcode] = ENsetpattern(index, patternVector, nfactors, obj.LibEPANET);
+        end
+        function setPatternNameID(obj, index, id)
+            % EPANET Version 2.2
+            [obj.Errcode] = ENsetpatternid(index, id, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setPatternMatrix(obj, patternMatrix)
             nfactors=size(patternMatrix, 2);
@@ -8576,6 +8601,10 @@ end
 function [Errcode, from, to] = ENgetlinknodes(index, LibEPANET)
 [Errcode, from, to]=calllib(LibEPANET, 'ENgetlinknodes', index, 0, 0);
 end
+function [Errcode] = ENsetlinknodes(index, from, to, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsetlinknodes', index, from, to);
+end
 function [Errcode, typecode] = ENgetlinktype(index, LibEPANET)
 [Errcode, typecode]=calllib(LibEPANET, 'ENgetlinktype', index, 0);
 if ~isnumeric(typecode), typecode = getTypeLink(typecode); end
@@ -8726,6 +8755,10 @@ function [Errcode, index] = ENsetlinktype(id, paramcode, actionCode, LibEPANET)
 % EPANET Version 2.2 
 [Errcode, index]=calllib(LibEPANET, 'ENsetlinktype', id, paramcode, actionCode);
 end
+function [Errcode] = ENsetpipedata(index, length, diam, rough, mloss, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsetpipedata', index, length, diam, rough, mloss);
+end
 function [Errcode] = ENsetnodevalue(index, paramcode, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetnodevalue', index, paramcode, value);
 end
@@ -8734,6 +8767,10 @@ function [Errcode] = ENsetoption(optioncode, value, LibEPANET)
 end
 function [Errcode] = ENsetpattern(index, factors, nfactors, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetpattern', index, factors, nfactors);
+end
+function [Errcode] = ENsetpatternid(index, id, LibEPANET)
+% EPANET Version 2.2
+[Errcode,~]=calllib(LibEPANET, 'ENsetpatternid', index,id);
 end
 function [Errcode] = ENsetpatternvalue(index, period, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetpatternvalue', index, period, value);
@@ -8746,6 +8783,10 @@ function [Errcode] = ENsetreport(command, LibEPANET)
 end
 function [Errcode] = ENsetstatusreport(statuslevel, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetstatusreport', statuslevel);
+end
+function [Errcode] = ENsettankdata(index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsettankdata', index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve );
 end
 function [Errcode] = ENsettimeparam(paramcode, timevalue, LibEPANET)
 paramcode=int32(paramcode);
@@ -8769,6 +8810,10 @@ end
 function [Errcode] = ENsetcurve(index, x, y, nfactors, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENsetcurve', index, x, y, nfactors);
+end
+function [Errcode] = ENsetcurveid(index, id, LibEPANET)
+% EPANET Version 2.2
+[Errcode,~]=calllib(LibEPANET, 'ENsetcurveid', index,id);
 end
 function [Errcode, x, y] = ENgetcurvevalue(index, period, LibEPANET)
 % EPANET Version 2.1
