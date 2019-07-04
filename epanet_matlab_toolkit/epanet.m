@@ -3142,6 +3142,7 @@ classdef epanet <handle
             obj.closeQualityAnalysis;
         end
         function value = getComputedTimeSeries(obj)
+            obj.saveInputFile(obj.BinTempfile);
             [fid,binfile,rptfile] = runEPANETexe(obj);
             value = readEpanetBin(fid, binfile, rptfile, 0);            
             % Remove report bin, files @#
