@@ -1614,6 +1614,28 @@ classdef epanet <handle
             [obj.Errcode, value.DemandModelCode, value.DemandModelPmin, value.DemandModelPreq, value.DemandModelPexp] = ENgetdemandmodel(obj.LibEPANET); 
             value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
         end
+        function addNodeJunctionDemand(obj, nodeIndex, baseDemand , demandPattern, demandName)
+            % Adds a new demand to a junction given the junction index, base demand, demand time pattern and demand name categorie. (EPANET Version 2.2)
+            %
+            % Example:
+            %   % New demand added with a name 'new demand' to the 1st node, with 100 base demand, using the 1st time pattern.
+            %   d.addNodeJunctionDemand(1, 100, '1', 'new demand')
+            %
+            % See also deleteNodeJunctionDemand, d.getNodeJunctionDemandIndex, getNodeJunctionDemandName,
+            %          setNodeJunctionDemandName, getNodeBaseDemands.
+            [obj.Errcode]=ENadddemand(nodeIndex, baseDemand , demandPattern, demandName, obj.LibEPANET);
+        end
+        function deleteNodeJunctionDemand(obj, nodeIndex, demandIndex)
+            % Deletes a demand from a junction given the junction index and demand index. (EPANET Version 2.2)
+            % 
+            % Example:
+            %   % 2nd demand deleted from the 1st junction.
+            %   d.deleteNodeJunctionDemand(1,2)
+            %
+            % See also addNodeJunctionDemand, d.getNodeJunctionDemandIndex, getNodeJunctionDemandName,
+            %          setNodeJunctionDemandName, getNodeBaseDemands.
+            [obj.Errcode]=ENdeletedemand(nodeIndex, demandIndex, obj.LibEPANET);
+        end
         function value = getNodeJunctionDemandName(obj, varargin)
             % Gets the name of a node's demand category.
             %
@@ -1622,7 +1644,7 @@ classdef epanet <handle
             %
             % See also setNodeJunctionDemandName, getNodeBaseDemands, 
             %          getNodeDemandCategoriesNumber, getNodeDemandPatternNameID.
-            [indices, ~] = getNodeIndices(obj, varargin);
+            [indices, ~] = getNodeJunctionIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
             value = cell(1, max(numdemands));
             cnt = length(indices);
@@ -1804,6 +1826,36 @@ classdef epanet <handle
             end
             for i=1:size(val, 1)
                 value{i} = val(i, :);
+            end
+        end
+          function value = getNodeJunctionDemandIndex(obj, varargin)
+            % Retrieves the demand index of the junctions. (EPANET Version 2.2)
+            %
+            % Example 1:
+            %   d.getNodeJunctionDemandIndex         % Retrieves the demand index of all junctions
+            % 
+            % Example 2:
+            %   d.getNodeJunctionDemandIndex(1,'')   % Retrieves the demand index of the 1st junction given it's name
+            %
+            % See also getNodeJunctionDemandName, getNodeJunctionIndex,
+            %          getNodeJunctionCount, getNodeJunctionNameID.
+            if nargin==3
+                nodeIndex = varargin{1};
+				demandName = varargin{2};
+                [obj.Errcode, value] = ENgetdemandindex(nodeIndex, demandName, obj.LibEPANET);
+            elseif nargin==1
+				demandName = obj.getNodeJunctionDemandName;
+				[indices, ~] = getNodeJunctionIndices(obj, varargin);
+                value = zeros(length(demandName),length(indices));
+                for i=1:length(demandName)
+                    demandNameIn = demandName{i};
+                    for j=1:length(demandNameIn)
+                        demandNameInner = demandNameIn{j};
+                        [obj.Errcode, value(i,j)] = ENgetdemandindex(j, demandNameInner, obj.LibEPANET);
+                    end
+                end
+            else
+                error('Too many input arguments.')
             end
         end
         function value = getStatistic(obj)
@@ -8527,6 +8579,10 @@ function [Errcode, value] = ENgetdemandpattern(index, numdemands, LibEPANET)
 %epanet20100
 [Errcode, value]=calllib(LibEPANET, 'ENgetdemandpattern', index, numdemands, 0);
 end
+function [Errcode, demandIndex] = ENgetdemandindex(nodeindex, demandName, LibEPANET)
+% EPANET Version 2.2
+[Errcode, ~, demandIndex]=calllib(LibEPANET, 'ENgetdemandindex', nodeindex, demandName, 0);
+end
 function [Errcode, value] = ENgetstatistic(code, LibEPANET)
 %epanet20100
 [Errcode, value]=calllib(LibEPANET, 'ENgetstatistic', code, 0);
@@ -8806,6 +8862,14 @@ end
 function [Errcode] = ENsetcoord(index, x, y, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENsetcoord', index, x, y);
+end
+function [Errcode] = ENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
+% EPANET Version 2.2
+[Errcode, ~, ~]=calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand , demandPattern, demandName);
+end
+function [Errcode] = ENdeletedemand(nodeIndex, demandIndex, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENdeletedemand', nodeIndex, demandIndex);
 end
 function [Errcode] = ENsetbasedemand(index, demandIdx, value, LibEPANET)
 % EPANET Version 2.1
@@ -12379,6 +12443,11 @@ function indices = getControlIndices(obj, varargin)
 end
 function [indices, value] = getNodeIndices(obj, varargin)
     indices = getIndices(obj.getNodeCount, varargin{1});
+    value = zeros(1, length(indices));
+end
+function [indices, value] = getNodeJunctionIndices(obj, varargin)
+    % EPANET Version 2.2
+    indices = getIndices(obj.getNodeJunctionCount, varargin{1});
     value = zeros(1, length(indices));
 end
 function [indices, value] = getCurveIndices(obj, varargin)

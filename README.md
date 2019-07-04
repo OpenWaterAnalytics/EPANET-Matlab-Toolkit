@@ -199,6 +199,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeInitialQuality|Retrieves the value of all node initial quality|
 |getNodeJunctionCount|Retrieves the number of junctions|
 |getNodeJunctionDemandName|Gets the name of a node's demand category|
+|getNodeJunctionDemandIndex|Retrieves the demand index of the junctions|
 |getNodeJunctionIndex|Retrieves the junctions indices|
 |getNodeJunctionNameID|Retrieves the junctions IDs|
 |getNodeMassFlowRate|Retrieves the computed mass flow rates per minute of chemical sources|
@@ -286,6 +287,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addNodeJunction|Adds a new junction|
 |addNodeReservoir|Adds a new reservoir|
 |addNodeTank|Adds a new tank|
+|addNodeJunctionDemand|Adds a new demand to a junction|
 |addLinkPipeCV|Adds a new CV pipe|
 |addLinkPipe|Adds a new pipe|
 |addLinkPump|Adds a new pump|
@@ -299,6 +301,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deleteLink|Deletes a link|
 |deleteNode|Deletes a node|
 |deletePattern|Deletes a time pattern from a project|
+|deleteNodeJunctionDemand|Deletes a demand from a junction|
 |closeHydraulicAnalysis|Closes the hydraulic analysis system, freeing all allocated memory|
 |closeNetwork|Closes down the Toolkit system|
 |closeQualityAnalysis|Closes the water quality analysis system, freeing all allocated memory|
@@ -724,14 +727,17 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |Function|Description|
 |--------|-----------|
 |ENaddcontrol|Specify parameters to add a new simple control|
+|ENadddemand|Specify parameters to add a new demand|
 |ENaddlink|Adds a new link|
 |ENaddnode|Adds a new node|
+|ENdeletedemand|Deletes a demand|
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENgetcurvetype|Retrieves the type of a curve|
 |ENsetflowunits|Sets the flow units|
+|ENgetdemandindex|Retrieves the index of a node's named demand category|
 |ENgetdemandmodel|Retrieves the type of demand model in use and its parameters|
 |ENsetdemandmodel|Sets the type of demand model to use and its parameters|
 |ENsetnodeid|Change the ID name for a node|
