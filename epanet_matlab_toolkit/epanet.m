@@ -1614,6 +1614,84 @@ classdef epanet <handle
             [obj.Errcode, value.DemandModelCode, value.DemandModelPmin, value.DemandModelPreq, value.DemandModelPexp] = ENgetdemandmodel(obj.LibEPANET); 
             value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
         end
+        function categoryIndex = addNodeJunctionDemand(obj, varargin)
+            % Adds a new demand to a junction given the junction index, base demand, demand time pattern and demand category name. (EPANET Version 2.2)
+            % Returns the values of the new demand category index.
+            % A blank string can be used for demand time pattern and demand name category to indicate
+            % that no time pattern or category name is associated with the demand.
+            %
+            % Example 1:
+            %   % New demand added with the name 'new demand' to the 1st node, with 100 base demand, using the 1st time pattern.
+            %   d.addNodeJunctionDemand(1, 100, '1', 'new demand')
+            %   d.getNodeJunctionDemandIndex     % Retrieves the indices of all demands for all nodes.
+            %   d.getNodeJunctionDemandName{2}   % Retrieves the demand category names of the 2nd demand index for all nodes.
+            %
+            % Example 2:
+            %   % New demands added with the name 'new demand' to the 1st and 2nd node, with 100 base demand, using the 1st time pattern.
+            %   d.addNodeJunctionDemand([1, 2], 100, '1', 'new demand')
+            %   d.getNodeJunctionDemandIndex     % Retrieves the indices of all demands for all nodes.
+            %   d.getNodeJunctionDemandName{2}   % Retrieves the demand category names of the 2nd demand index for all nodes.
+            %
+            % Example 3:
+            %   % New demands added with the name 'new demand' to the 1st and 2nd node, with 100 and 110 base demand respectively, using the 1st time pattern.
+            %   d.addNodeJunctionDemand([1, 2], [100, 110], '1', 'new demand')
+            %   d.getNodeJunctionDemandIndex     % Retrieves the indices of all demands for all nodes.
+            %   d.getNodeJunctionDemandName{2}   % Retrieves the demand category names of the 2nd demand index for all nodes.
+            %
+            % Example 4:
+            %   % New demands added with the name 'new demand' to the 1st and 2nd node, with 100 and 110 base demand respectively, using the 1st time pattern.
+            %   d.addNodeJunctionDemand([1, 2], [100, 110], {'1', '1'}, 'new demand')
+            %   d.getNodeJunctionDemandIndex     % Retrieves the indices of all demands for all nodes.
+            %   d.getNodeJunctionDemandName{2}   % Retrieves the demand category names of the 2nd demand index for all nodes.
+            %
+            % Example 5:
+            %   % New demands added with the names 'new demand1' and 'new demand2' to the 1st and 2nd node, with 100 and 110 base demand respectively, using the 1st and 2nd(if exists) time pattern respectively.
+            %   d.addNodeJunctionDemand([1, 2], [100, 110], {'1', '2'}, {'new demand1', 'new demand2'})
+            %   d.getNodeJunctionDemandIndex     % Retrieves the indices of all demands for all nodes.
+            %   d.getNodeJunctionDemandName{2}   % Retrieves the demand category names of the 2nd demand index for all nodes.
+            %
+            % See also deleteNodeJunctionDemand, getNodeJunctionDemandIndex, getNodeJunctionDemandName,
+            %          setNodeJunctionDemandName, getNodeBaseDemands.
+            nodeIndex = varargin{1};
+            baseDemand = varargin{2};
+            if nargin==3
+                demandPattern = '';
+                demandName = '';
+            elseif nargin==4
+                demandPattern = varargin{3};
+                demandName = '';
+            elseif nargin==5
+                demandPattern = varargin{3};
+                demandName = varargin{4};
+            end
+            if isscalar(nodeIndex)
+                [obj.Errcode]=ENadddemand(nodeIndex, baseDemand , demandPattern, demandName, obj.LibEPANET);
+            elseif ~isscalar(nodeIndex)&&  isscalar(baseDemand) && ~iscell(demandPattern) && ~iscell(demandName)
+                for i=1:length(nodeIndex)
+                    [obj.Errcode]=ENadddemand(nodeIndex(i), baseDemand , demandPattern, demandName, obj.LibEPANET);
+                end
+            elseif ~isscalar(nodeIndex)&& ~isscalar(baseDemand) && ~iscell(demandPattern) && ~iscell(demandName)
+                for i=1:length(nodeIndex)
+                    [obj.Errcode]=ENadddemand(nodeIndex(i), baseDemand(i) , demandPattern, demandName, obj.LibEPANET);
+                end
+            elseif ~isscalar(nodeIndex) &&  ~isscalar(baseDemand) && iscell(demandPattern) && ~iscell(demandName)
+                for i=1:length(nodeIndex)
+                    [obj.Errcode]=ENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName, obj.LibEPANET);
+                end  
+            elseif ~isscalar(nodeIndex) &&  ~isscalar(baseDemand) && iscell(demandPattern) && iscell(demandName)
+                for i=1:length(nodeIndex)
+                    [obj.Errcode]=ENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName{i}, obj.LibEPANET);
+                end  
+            end
+            if ~isscalar(nodeIndex) && ~iscell(demandName)
+                demandNameCell=cell(1,length(nodeIndex));
+                for j=1:length(nodeIndex)
+                    demandNameCell{j}=demandName;
+                end
+                demandName=demandNameCell;
+            end
+            categoryIndex = obj.getNodeJunctionDemandIndex(nodeIndex,demandName);
+        end
         function value = getNodeJunctionDemandName(obj, varargin)
             % Gets the name of a node's demand category.
             %
@@ -1622,7 +1700,7 @@ classdef epanet <handle
             %
             % See also setNodeJunctionDemandName, getNodeBaseDemands, 
             %          getNodeDemandCategoriesNumber, getNodeDemandPatternNameID.
-            [indices, ~] = getNodeIndices(obj, varargin);
+            [indices, ~] = getNodeJunctionIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
             value = cell(1, max(numdemands));
             cnt = length(indices);
@@ -8808,6 +8886,10 @@ function [Errcode] = ENsetcoord(index, x, y, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENsetcoord', index, x, y);
 end
+function [Errcode] = ENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
+% EPANET Version 2.2
+[Errcode, ~, ~]=calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand , demandPattern, demandName);
+end
 function [Errcode] = ENsetbasedemand(index, demandIdx, value, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENsetbasedemand', index, demandIdx, value);
@@ -12380,6 +12462,11 @@ function indices = getControlIndices(obj, varargin)
 end
 function [indices, value] = getNodeIndices(obj, varargin)
     indices = getIndices(obj.getNodeCount, varargin{1});
+    value = zeros(1, length(indices));
+end
+function [indices, value] = getNodeJunctionIndices(obj, varargin)
+    % EPANET Version 2.2
+    indices = getIndices(obj.getNodeJunctionCount, varargin{1});
     value = zeros(1, length(indices));
 end
 function [indices, value] = getCurveIndices(obj, varargin)

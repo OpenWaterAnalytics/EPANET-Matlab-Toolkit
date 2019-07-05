@@ -284,6 +284,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addCurve|Adds a new curve appended to the end of the existing curves|
 |addPattern|Adds a new time pattern to the network|
 |addNodeJunction|Adds a new junction|
+|addNodeJunctionDemand|Adds a new demand to a junction given the junction index, base demand, demand time pattern and demand name category. (EPANET Version 2.2)|
 |addNodeReservoir|Adds a new reservoir|
 |addNodeTank|Adds a new tank|
 |addLinkPipeCV|Adds a new CV pipe|
@@ -726,6 +727,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENaddcontrol|Specify parameters to add a new simple control|
 |ENaddlink|Adds a new link|
 |ENaddnode|Adds a new node|
+|ENadddemand|Appends a new demand to a junction node demands list|
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
