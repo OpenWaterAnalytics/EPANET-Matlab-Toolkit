@@ -2155,6 +2155,7 @@ classdef epanet <handle
             obj.closeQualityAnalysis;
         end
         function nvalue = getComputedTimeSeries(obj)
+            obj.saveInputFile(obj.BinTempfile);
             [fid,binfile,rptfile] = runEPANETexe(obj);
             value = readEpanetBin(fid, binfile, rptfile);
             nvalue.Pressure = value.BinNodePressure;
