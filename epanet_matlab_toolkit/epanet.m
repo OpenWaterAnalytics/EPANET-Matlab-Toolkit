@@ -4123,7 +4123,7 @@ classdef epanet <handle
                     if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
                 end
             else
-                for i=1:length(value)
+                for i=1:length(value{1})
                     x=value{1}(i);
                     y=value{2}(i);
                     [obj.Errcode] = ENsetcoord(i, x, y, obj.LibEPANET);
