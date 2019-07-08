@@ -1884,6 +1884,68 @@ classdef epanet <handle
                 value{i} = val(i, :);
             end
         end
+        function value = getNodeJunctionDemandIndex(obj, varargin)
+            % Retrieves the demand index of the junctions. (EPANET Version 2.2)
+            %
+            % Example 1:
+            %   d.getNodeJunctionDemandIndex         % Retrieves the demand index of all junctions
+            % 
+            % Example 2:
+            %   d.getNodeJunctionDemandIndex(1,'')   % Retrieves the demand index of the 1st junction given it's name (i.e. '')
+            %
+            % Example 3:
+            %   d.getNodeJunctionDemandIndex(1:3)    % Retrieves the demand index of the first 3 junctions
+            %
+            % Example 4:
+            %   % Adds two new demands and retrieves the two new demand indices.
+            %   d.addNodeJunctionDemand([1, 2], [100, 110], {'1', '1'}, {'new demand1', 'new demand2'});
+            %   d.getNodeJunctionDemandIndex([1,2],{'new demand1','new demand2'})
+            %
+            % See also getNodeJunctionDemandName, getNodeJunctionIndex,
+            %          getNodeJunctionNameID, addNodeJunctionDemand, getNodeJunctionCount.
+            if nargin==3
+                nodeIndex = varargin{1};
+                demandName = varargin{2};
+                if isscalar(nodeIndex) && ~iscell(demandName)
+                    [obj.Errcode, value] = ENgetdemandindex(nodeIndex, demandName, obj.LibEPANET);
+                elseif ~isscalar(nodeIndex) && iscell(demandName)
+                    value=zeros(1,length(nodeIndex));
+                    for i=1:length(nodeIndex)
+                        [obj.Errcode, value(i)] = ENgetdemandindex(nodeIndex(i), demandName{i}, obj.LibEPANET);
+                    end
+                end
+            elseif nargin==2
+                nodeIndex = varargin{1};
+                demandName = obj.getNodeJunctionDemandName;
+                if isscalar(nodeIndex)
+                    value = zeros(length(demandName), 1);
+                    for i=1:length(demandName)
+                        demandNameIn = demandName{i};
+                        [obj.Errcode, value(i)] = ENgetdemandindex(nodeIndex, demandNameIn{varargin{1}}, obj.LibEPANET);
+                    end
+                else
+                    value = zeros(length(demandName),length(nodeIndex));
+                    for i=1:length(demandName)
+                        demandNameIn = demandName{i};
+                        for j=1:length(nodeIndex)
+                            [obj.Errcode, value(i,j)] = ENgetdemandindex(nodeIndex(j), demandNameIn{nodeIndex(j)}, obj.LibEPANET);
+                        end
+                    end
+                end
+            elseif nargin==1
+				demandName = obj.getNodeJunctionDemandName;
+				[indices, ~] = getNodeJunctionIndices(obj, varargin);
+                value = zeros(length(demandName),length(indices));
+                for i=1:length(demandName)
+                    for j=1:length(demandName{i})
+                        demandNameIn = demandName{i}{j};
+                        [obj.Errcode, value(i,j)] = ENgetdemandindex(j, demandNameIn, obj.LibEPANET);
+                    end
+                end
+            else
+                error(obj.getError(250))
+            end
+        end
         function value = getStatistic(obj)
             % Returns error code. (EPANET Version 2.1)
             %
@@ -8605,6 +8667,10 @@ end
 function [Errcode, value] = ENgetdemandpattern(index, numdemands, LibEPANET)
 %epanet20100
 [Errcode, value]=calllib(LibEPANET, 'ENgetdemandpattern', index, numdemands, 0);
+end
+function [Errcode, demandIndex] = ENgetdemandindex(nodeindex, demandName, LibEPANET)
+% EPANET Version 2.2
+[Errcode, ~, demandIndex]=calllib(LibEPANET, 'ENgetdemandindex', nodeindex, demandName, 0);
 end
 function [Errcode, value] = ENgetstatistic(code, LibEPANET)
 %epanet20100
