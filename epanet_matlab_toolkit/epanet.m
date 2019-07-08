@@ -2591,6 +2591,41 @@ classdef epanet <handle
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_DEMANDCHARGE, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
+        function value = getOptionsSpecificGravity(obj)
+            % Retrieves the specific gravity. (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsSpecificGravity
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_SP_GRAVITY, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsSpecificViscosity(obj)
+            % Retrieves the specific viscosity. (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsSpecificViscosity
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_SP_VISCOS, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsExtraTrials(obj)
+            % Retrieves the extra trials allowed if hydraulics don't converge. (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsExtraTrials
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_UNBALANCED, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsCheckFrequency(obj)
+            % Retrieves the frequency of hydraulic status checks. (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsCheckFrequency
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_CHECKFREQ, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsMaximumCheck(obj)
+            % Retrieves the maximum trials for status checking. (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsMaximumCheck
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_MAXCHECK, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
         function value = getPatternComment(obj, varargin)
             % Retrieves the comment string assigned to the pattern object
             % Example: 
@@ -4479,6 +4514,26 @@ classdef epanet <handle
         end
         function setOptionsDemandCharge(obj, value)
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_DEMANDCHARGE, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsSpecificGravity(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_SP_GRAVITY, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsSpecificViscosity(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_SP_VISCOS, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsExtraTrials(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_UNBALANCED, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsCheckFrequency(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_CHECKFREQ, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsMaximumCheck(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_MAXCHECK, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setTimeSimulationDuration(obj, value)
