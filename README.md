@@ -201,6 +201,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeJunctionDemandName|Gets the name of a node's demand category|
 |getNodeJunctionIndex|Retrieves the junctions indices|
 |getNodeJunctionNameID|Retrieves the junctions IDs|
+|getNodeJunctionDemandIndex|Retrieves the demand index of the junctions. (EPANET Version 2.2)|
 |getNodeMassFlowRate|Retrieves the computed mass flow rates per minute of chemical sources|
 |getNodeNameID|Retrieves the ID label of all nodes or some nodes with a specified index|
 |getNodeDemandCategoriesNumber|Retrieves the number of demand categories for a node|
@@ -733,6 +734,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENgetcurvetype|Retrieves the type of a curve|
+|ENgetdemandindex|Retrieves the index of a node's named demand category|
 |ENsetflowunits|Sets the flow units|
 |ENgetdemandmodel|Retrieves the type of demand model in use and its parameters|
 |ENsetdemandmodel|Sets the type of demand model to use and its parameters|
