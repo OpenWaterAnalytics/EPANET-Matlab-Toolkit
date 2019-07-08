@@ -376,6 +376,10 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeTankMinimumWaterVolume|Sets the values of tanks minimum water volume|
 |setNodeTankMixingModelType|Sets the values of tanks model|
 |setOptionsAccuracyValue|Sets the value of accurancy|
+|setOptionsGlobalEffic|Sets the value of global pump efficiency(percent)|
+|setOptionsGlobalPrice|Sets the value of global energy price per KWH|
+|setOptionsGlobalPattern|Sets the index of a global energy price pattern|
+|setOptionsDemandCharge|Sets the energy demand charge per max. KW usage|
 |setOptionsEmitterExponent|Sets the value of emitter exponent|
 |setOptionsMaxTrials|Sets the value of max trials|
 |setOptionsPatternDemandMultiplier|Sets the value of pattern demand multiplier|
