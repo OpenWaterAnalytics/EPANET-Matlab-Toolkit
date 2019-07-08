@@ -1692,6 +1692,54 @@ classdef epanet <handle
             end
             categoryIndex = obj.getNodeJunctionDemandIndex(nodeIndex,demandName);
         end
+        function demandIndex = deleteNodeJunctionDemand(obj, varargin)
+            % Deletes a demand from a junction given the junction index and demand index. (EPANET Version 2.2)
+            % Returns the remaining(if exist) node demand indices.
+            %
+            % Example 1:
+            %   d.getNodeJunctionDemandIndex                                    % Retrieves the indices of all demands for all nodes
+            %   d.addNodeJunctionDemand(1, 100, '1', 'new demand')              % Adds a new demand to the first node and returns the new demand index
+            %   d.deleteNodeJunctionDemand(1,2)                                 % Deletes the 2nd demand of the first node
+            %   d.getNodeJunctionDemandIndex  
+            %
+            % Example 2:
+            %   d.getNodeJunctionDemandIndex                                    % Retrieves the indices of all demands for all nodes
+            %   d.addNodeJunctionDemand(1, 100, '1', 'new demand')              % Adds a new demand to the first node and returns the new demand index
+            %   d.deleteNodeJunctionDemand(1)                                   % Deletes all the demands of the 1st node
+            %   d.getNodeJunctionDemandIndex 
+            %
+            % Example 3:
+            %   d.getNodeJunctionDemandIndex                                    % Retrieves the indices of all demands for all nodes
+            %   d.addNodeJunctionDemand([1, 2, 3], [100, 110, 150], ...
+            %   {'1', '1',''}, {'new demand1', 'new demand2', 'new demand3'})   % Adds 3 new demands to the first three nodes
+            %   d.deleteNodeJunctionDemand(1:3)                                 % Deletes all the demands of the first three nodes
+            %   d.getNodeJunctionDemandIndex 
+            %
+            % See also addNodeJunctionDemand, getNodeJunctionDemandIndex, getNodeJunctionDemandName,
+            %          setNodeJunctionDemandName, getNodeBaseDemands.
+            nodeIndex = varargin{1};
+            if nargin==2
+                if isscalar(nodeIndex)
+                    numDemand=size(obj.getNodeJunctionDemandIndex);
+                    for i=1:numDemand(1)
+                        [obj.Errcode]=ENdeletedemand(nodeIndex, 1, obj.LibEPANET);
+                    end
+                elseif ~isscalar(nodeIndex)
+                    for j=1:length(nodeIndex)
+                        numDemand=size(obj.getNodeJunctionDemandIndex);
+                        for i=1:numDemand(1)
+                            [obj.Errcode]=ENdeletedemand(nodeIndex(j), 1, obj.LibEPANET);
+                        end
+                    end
+                    
+                end
+            elseif nargin==3
+                [obj.Errcode]=ENdeletedemand(nodeIndex, varargin{2}, obj.LibEPANET);
+            else
+                error(obj.getError(250))
+            end
+            demandIndex = obj.getNodeJunctionDemandIndex(nodeIndex);
+        end
         function value = getNodeJunctionDemandName(obj, varargin)
             % Gets the name of a node's demand category.
             %
@@ -1901,8 +1949,8 @@ classdef epanet <handle
             %   d.addNodeJunctionDemand([1, 2], [100, 110], {'1', '1'}, {'new demand1', 'new demand2'});
             %   d.getNodeJunctionDemandIndex([1,2],{'new demand1','new demand2'})
             %
-            % See also getNodeJunctionDemandName, getNodeJunctionIndex,
-            %          getNodeJunctionNameID, addNodeJunctionDemand, getNodeJunctionCount.
+            % See also getNodeJunctionDemandName, getNodeJunctionIndex, getNodeJunctionNameID,
+            %          addNodeJunctionDemand, deleteNodeJunctionDemand, getNodeJunctionCount.
             if nargin==3
                 nodeIndex = varargin{1};
                 demandName = varargin{2};
@@ -8955,6 +9003,10 @@ end
 function [Errcode] = ENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
 % EPANET Version 2.2
 [Errcode, ~, ~]=calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand , demandPattern, demandName);
+end
+function [Errcode] = ENdeletedemand(nodeIndex, demandIndex, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENdeletedemand', nodeIndex, demandIndex);
 end
 function [Errcode] = ENsetbasedemand(index, demandIdx, value, LibEPANET)
 % EPANET Version 2.1
