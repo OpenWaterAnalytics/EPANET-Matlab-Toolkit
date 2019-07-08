@@ -2514,6 +2514,35 @@ classdef epanet <handle
                 end
             end
         end
+        function nameID = setCurveNameID(obj, index, id)
+            % Sets the name ID of a curve given it's index and the new ID. (EPANET Version 2.2)
+            % Returns the new curve name ID.
+            %
+            % Example 1:
+            %   d.getCurveNameID                                % Retrieves the name IDs of all the curves
+            %   d.setCurveNameID(1,'Curve1')                    % Sets to the 1st curve the new name ID 'Curve1'
+            %   d.getCurveNameID                                
+            %   
+            % Example 2:
+            %   d.getCurveNameID                                % Retrieves the name IDs of all the curves
+            %   d.setCurveNameID([1, 2],{'Curve1', 'Curve2'})   % Sets to the 1st and 2nd curve the new name IDs 'Curve1' and 'Curve2' respectively
+            %   d.getCurveNameID                                
+            %
+            % See also getCurveNameID, getCurveIndex, getCurveLengths,
+            %          setCurve, setCurveComment, getCurveComment.
+            if isscalar(index) && ischar(id)
+                [obj.Errcode] = ENsetcurveid(index, id, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
+                nameID = obj.getCurveNameID{index};
+            elseif isvector(index) && iscell(id)
+                nameID = cell(1,length(index));
+                for i=1:length(index)
+                    [obj.Errcode] = ENsetcurveid(index(i), id{i}, obj.LibEPANET);
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+                    nameID{i} = obj.getCurveNameID{index(i)};
+                end
+            end
+        end
         function value = getCurveLengths(obj, varargin)
             %Retrieves number of points in a curve 
             %EPANET Version 2.1
@@ -8598,6 +8627,10 @@ function [Errcode, id] = ENgetcurveid(index, LibEPANET)
 % EPANET Version dev2.1
 id=char(32*ones(1, 31));
 [Errcode, id]=calllib(LibEPANET, 'ENgetcurveid', index, id);
+end
+function [Errcode] = ENsetcurveid(index, id, LibEPANET)
+% EPANET Version 2.2
+[Errcode,~]=calllib(LibEPANET, 'ENsetcurveid', index,id);
 end
 function [Errcode, type] = ENgetcurvetype(index, LibEPANET)
 % EPANET Version 2.2

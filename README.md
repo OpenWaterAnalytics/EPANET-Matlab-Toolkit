@@ -318,6 +318,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |plot|Plot the network input file|
 |setControls|Sets the parameters of a simple control statement|
 |setCurve|Sets x,y values for a specific curve|
+|setCurveNameID|Sets the name ID of a curve given it's index and the new ID. (EPANET Version 2.2)|
 |setCurveValue|Retrieves x,y point for a specific point number and curve|
 |setDemandModel|Sets the type of demand model to use and its parameters|
 |setFlowUnitsAFD|Sets flow units to AFD|
@@ -728,6 +729,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENaddnode|Adds a new node|
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
+|ENcurveid|Changes the ID name of a data curve given its index|
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENgetcurvetype|Retrieves the type of a curve|
