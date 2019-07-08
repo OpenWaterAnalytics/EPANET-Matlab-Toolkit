@@ -237,6 +237,11 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodesConnectingLinksID|Retrieves the id of the from/to nodes of all links|
 |getOptionsAccuracyValue|Retrieve the analysis convergence criterion (0.001)|
 |getOptionsDemandCharge|Retrieve energy price pattern|
+|getOptionsSpecificGravity|Retrieves the specific gravity (EPANET Version 2.2)|
+|getOptionsSpecificViscosity|Retrieves the specific viscosity (EPANET Version 2.2)|
+|getOptionsExtraTrials|Retrieves the extra trials allowed if hydraulics don't converge (EPANET Version 2.2)|
+|getOptionsCheckFrequency|Retrieves the frequency of hydraulic status checks (EPANET Version 2.2)|
+|getOptionsMaximumCheck|Retrieves the maximum trials for status checking. (EPANET Version 2.2)|
 |getOptionsEmitterExponent|Retrieve power exponent for the emmitters (0.5)|
 |getOptionsFlowChange|Retrieve flow change|
 |getOptionsGlobalEffic|Retrieve global efficiency pumps|
@@ -376,10 +381,15 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeTankMinimumWaterVolume|Sets the values of tanks minimum water volume|
 |setNodeTankMixingModelType|Sets the values of tanks model|
 |setOptionsAccuracyValue|Sets the value of accurancy|
-|setOptionsGlobalEffic|Sets the value of global pump efficiency(percent)|
-|setOptionsGlobalPrice|Sets the value of global energy price per KWH|
-|setOptionsGlobalPattern|Sets the index of a global energy price pattern|
-|setOptionsDemandCharge|Sets the energy demand charge per max. KW usage|
+|setOptionsGlobalEffic|Sets the value of global pump efficiency(percent) (EPANET Version 2.2)|
+|setOptionsGlobalPrice|Sets the value of global energy price per KWH (EPANET Version 2.2)|
+|setOptionsGlobalPattern|Sets the index of a global energy price pattern (EPANET Version 2.2)|
+|setOptionsDemandCharge|Sets the energy demand charge per max. KW usage (EPANET Version 2.2)|
+|setOptionsSpecificGravity|Sets the specific gravity (EPANET Version 2.2)|
+|setOptionsSpecificViscosity|Sets the specific viscosity (EPANET Version 2.2)|
+|setOptionsExtraTrials|Sets the extra trials allowed if hydraulics don't converge (EPANET Version 2.2)|
+|setOptionsMaximumCheck|Sets the maximum trials for status checking. (EPANET Version 2.2)|
+|setOptionsCheckFrequency|Sets the frequency of hydraulic status checks (EPANET Version 2.2)|
 |setOptionsEmitterExponent|Sets the value of emitter exponent|
 |setOptionsMaxTrials|Sets the value of max trials|
 |setOptionsPatternDemandMultiplier|Sets the value of pattern demand multiplier|
