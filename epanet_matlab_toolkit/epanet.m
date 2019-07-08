@@ -4465,6 +4465,22 @@ classdef epanet <handle
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
+        function setOptionsGlobalEffic(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_GLOBALEFFIC, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsGlobalPrice(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_GLOBALPRICE, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsGlobalPattern(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_GLOBALPATTERN, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsDemandCharge(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_DEMANDCHARGE, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
         function setTimeSimulationDuration(obj, value)
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_DURATION, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
