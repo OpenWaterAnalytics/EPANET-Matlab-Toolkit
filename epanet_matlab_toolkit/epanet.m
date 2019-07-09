@@ -2626,6 +2626,48 @@ classdef epanet <handle
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_MAXCHECK, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
+        function value = getOptionsDampLimit(obj)
+            % Retrieves the accuracy level where solution damping begins. (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsDampLimit
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_DAMPLIMIT, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsSpecificDiffusivity(obj)
+            % Retrieves the specific diffusivity (relative to chlorine at 20 deg C). (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsSpecificDiffusivity
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_SP_DIFFUS, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsPipeBulkReactionOrder(obj)
+            % Retrieves the bulk water reaction order for pipes. (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsPipeBulkReactionOrder
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_BULKORDER, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsPipeWallReactionOrder(obj)
+            % Retrieves the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsWallReactionOrder
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_WALLORDER, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsTankBulkReactionOrder(obj)
+            % Retrieves the bulk water reaction order for tanks. (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsTankBulkReactionOrder
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_TANKORDER, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function value = getOptionsLimitingConcentration(obj)
+            % Retrieves the limiting concentration for growth reactions. (EPANET Version 2.2)
+            % Example:
+            %   d.getOptionsLimitingConcentration
+            [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_CONCENLIMIT, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
         function value = getPatternComment(obj, varargin)
             % Retrieves the comment string assigned to the pattern object
             % Example: 
@@ -4534,6 +4576,30 @@ classdef epanet <handle
         end
         function setOptionsMaximumCheck(obj, value)
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_MAXCHECK, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsDampLimit(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_DAMPLIMIT, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsSpecificDiffusivity(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_SP_DIFFUS, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsPipeBulkReactionOrder(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_BULKORDER, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsPipeWallReactionOrder(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_WALLORDER, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsTankBulkReactionOrder(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_TANKORDER, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+        end
+        function setOptionsLimitingConcentration(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_CONCENLIMIT, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setTimeSimulationDuration(obj, value)

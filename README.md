@@ -252,6 +252,12 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getOptionsMaxTrials|Retrieve maximum number of analysis trials|
 |getOptionsPatternDemandMultiplier|Retrieve the demand multiplier (x1)|
 |getOptionsQualityTolerance|Retrieve the water quality analysis tolerance|
+|getOptionsDampLimit|Retrieves the accuracy level where solution damping begins. (EPANET Version 2.2)|
+|getOptionsSpecificDiffusivity|Retrieves the specific diffusivity (relative to chlorine at 20 deg C). (EPANET Version 2.2)|
+|getOptionsPipeBulkReactionOrder|Retrieves the bulk water reaction order for pipes. (EPANET Version 2.2)|
+|getOptionsPipeWallReactionOrder|Retrieves the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)|
+|getOptionsTankBulkReactionOrder|Retrieves the bulk water reaction order for tanks. (EPANET Version 2.2)|
+|getOptionsLimitingConcentration|Retrieves the limiting concentration for growth reactions. (EPANET Version 2.2)|
 |getPattern|Retrieves the multiplier factor for all patterns and all times|
 |getPatternAveragePatternValue|Retrieves the average value of a pattern|
 |getPatternComment|Retrieves the comment string assigned to the pattern object|
@@ -390,6 +396,12 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setOptionsExtraTrials|Sets the extra trials allowed if hydraulics don't converge (EPANET Version 2.2)|
 |setOptionsMaximumCheck|Sets the maximum trials for status checking. (EPANET Version 2.2)|
 |setOptionsCheckFrequency|Sets the frequency of hydraulic status checks (EPANET Version 2.2)|
+|setOptionsDampLimit|Sets the accuracy level where solution damping begins. (EPANET Version 2.2)|
+|setOptionsSpecificDiffusivity|Sets the specific diffusivity (relative to chlorine at 20 deg C). (EPANET Version 2.2)|
+|setOptionsPipeBulkReactionOrder|Sets the bulk water reaction order for pipes. (EPANET Version 2.2)|
+|setOptionsPipeWallReactionOrder|Sets the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)|
+|setOptionsTankBulkReactionOrder|Sets the bulk water reaction order for tanks. (EPANET Version 2.2)|
+|setOptionsLimitingConcentration|Sets the limiting concentration for growth reactions. (EPANET Version 2.2)|
 |setOptionsEmitterExponent|Sets the value of emitter exponent|
 |setOptionsMaxTrials|Sets the value of max trials|
 |setOptionsPatternDemandMultiplier|Sets the value of pattern demand multiplier|
