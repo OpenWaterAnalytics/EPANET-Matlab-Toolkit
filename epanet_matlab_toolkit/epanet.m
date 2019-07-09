@@ -2523,64 +2523,113 @@ classdef epanet <handle
             value=obj.getNodeNameID(obj.getNodeTankIndex);
         end
         function value = getOptionsMaxTrials(obj)
-            % Retrieve maximum number of analysis trials
+            % Retrieves the maximum hydraulic trials allowed for hydraulic convergence.
+            %
+            % Example:
+            %   d.getOptionsMaxTrials
+            %
+            % See also setOptionsMaxTrials, getOptionsExtraTrials, getOptionsAccuracyValue.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_TRIALS, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsAccuracyValue(obj)
-            % Retrieve the analysis convergence criterion (0.001)
+            % Retrieves the total normalized flow change for hydraulic convergence.
+            % 
+            % Example:
+            %   d.getOptionsAccuracyValue
+            %
+            % See also setOptionsAccuracyValue, getOptionsExtraTrials, getOptionsMaxTrials.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_ACCURACY, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsQualityTolerance(obj)
-            % Retrieve the water quality analysis tolerance
+            % Retrieves the water quality analysis tolerance.
+            % 
+            % Example:
+            %   d.getOptionsQualityTolerance
+            %
+            % See also setOptionsQualityTolerance, getOptionsSpecificDiffusivity, getOptionsLimitingConcentration.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_TOLERANCE, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsEmitterExponent(obj)
-            % Retrieve power exponent for the emmitters (0.5)
+            % Retrieves the power exponent for the emmitters.
+            % 
+            % Example:
+            %   d.getOptionsEmitterExponent
+            %
+            % See also setOptionsEmitterExponent, getOptionsPatternDemandMultiplier, getOptionsAccuracyValue.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_EMITEXPON, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsPatternDemandMultiplier(obj)
-            % Retrieve the demand multiplier (x1)
+            % Retrieves the global pattern demand multiplier.
+            % 
+            % Example:
+            %   d.getOptionsPatternDemandMultiplier
+            %
+            % See also setOptionsPatternDemandMultiplier, getOptionsEmitterExponent, getOptionsAccuracyValue.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_DEMANDMULT, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsHeadError(obj)
-            % Retrieve the head error #EPANET Version 2.2
+            % Retrieves the maximum head loss error for hydraulic convergence. (EPANET Version 2.2)
+            % 
+            % Example:
+            %   d.getOptionsHeadError
+            %
+            % See also setOptionsHeadError, getOptionsEmitterExponent, getOptionsAccuracyValue.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_HEADERROR, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsFlowChange(obj)
-            % Retrieve flow change #EPANET Version 2.2
+            % Retrieves the maximum flow change for hydraulic convergence. (EPANET Version 2.2)
+            % 
+            % Example:
+            %   d.getOptionsFlowChange
+            %
+            % See also setOptionsFlowChange, getOptionsHeadError, getOptionsHeadLossFormula.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_FLOWCHANGE, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsHeadLossFormula(obj)
-            % Retrieve headloss formula #EPANET Version 2.2
+            % Retrieves the headloss formula. (EPANET Version 2.2)
+            % 
+            % Example:
+            %   d.getOptionsHeadLossFormula
+            %
+            % See also setOptionsHeadLossFormula, getOptionsHeadError, getOptionsFlowChange.
             [obj.Errcode, headloss] = ENgetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, obj.LibEPANET);
             value= obj.TYPEHEADLOSS{headloss+1};
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsGlobalEffic(obj)
-            % Retrieve global efficiency pumps #EPANET Version 2.2
+            % Retrieves the global efficiency for pumps(percent). (EPANET Version 2.2)
+            %
             % Example:
             %   d.getOptionsGlobalEffic
+            %
+            % See also setOptionsGlobalEffic, getOptionsGlobalPrice, getOptionsGlobalPattern.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_GLOBALEFFIC, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsGlobalPrice(obj)
-            % Retrieve global average energy price per kW-Hour #EPANET Version 2.2
+            % Retrieves the global average energy price per kW-Hour. (EPANET Version 2.2)
+            %
             % Example:
             %   d.getOptionsGlobalPrice
+            %
+            % See also setOptionsGlobalPrice, getOptionsGlobalEffic, getOptionsGlobalPattern.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_GLOBALPRICE, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function value = getOptionsGlobalPattern(obj)
-            % Retrieve global pattern #EPANET Version 2.2
+            % Retrieves the index of the global energy price pattern. (EPANET Version 2.2)
+            %
             % Example:
             %   d.getOptionsGlobalPattern
+            %
+            % See also setOptionsGlobalPattern, getOptionsGlobalEffic, getOptionsGlobalPrice.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_GLOBALPATTERN, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
@@ -4607,6 +4656,14 @@ classdef epanet <handle
             %
             % See also getOptionsPatternDemandMultiplier, setOptionsEmitterExponent, setOptionsAccuracyValue.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_DEMANDMULT, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function setOptionsHeadError(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_HEADERROR, value, obj.LibEPANET);
+            if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
+        end
+        function setOptionsFlowChange(obj, value)
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_FLOWCHANGE, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsHeadLossFormula(obj, value)
