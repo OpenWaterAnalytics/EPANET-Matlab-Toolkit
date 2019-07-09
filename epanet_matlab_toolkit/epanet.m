@@ -2678,7 +2678,7 @@ classdef epanet <handle
             % Retrieves the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)
             %
             % Example:
-            %   d.getOptionsWallReactionOrder
+            %   d.getOptionsPipeWallReactionOrder
             %
             % See also setOptionsPipeWallReactionOrder, getOptionsPipeBulkReactionOrder, getOptionsTankBulkReactionOrder.
             [obj.Errcode, value] = ENgetoption(obj.ToolkitConstants.EN_WALLORDER, obj.LibEPANET);
