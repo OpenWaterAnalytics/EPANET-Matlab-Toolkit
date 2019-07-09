@@ -4519,42 +4519,113 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsMaxTrials(obj, value)
+            % Sets the maximum hydraulic trials allowed for hydraulic convergence.
+            %
+            % Example:
+            %   d.setOptionsMaxTrials(40)
+            %   d.getOptionsMaxTrials
+            %
+            % See also getOptionsMaxTrials, setOptionsExtraTrials, setOptionsAccuracyValue.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_TRIALS, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsAccuracyValue(obj, value)
+            % Sets the total normalized flow change for hydraulic convergence.
+            % 
+            % Example:
+            %   d.setOptionsAccuracyValue(0.001)
+            %   d.getOptionsAccuracyValue
+            %
+            % See also getOptionsAccuracyValue, setOptionsExtraTrials, setOptionsMaxTrials.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_ACCURACY, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsQualityTolerance(obj, value)
+            % Sets the water quality analysis tolerance.
+            % 
+            % Example:
+            %   d.setOptionsQualityTolerance(0.01)
+            %   d.getOptionsQualityTolerance
+            %
+            % See also getOptionsQualityTolerance, setOptionsSpecificDiffusivity, setOptionsLimitingConcentration.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_TOLERANCE, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsEmitterExponent(obj, value)
+            % Sets the power exponent for the emmitters.
+            % 
+            % Example:
+            %   d.setOptionsEmitterExponent(0.5)
+            %   d.getOptionsEmitterExponent
+            %
+            % See also getOptionsEmitterExponent, setOptionsPatternDemandMultiplier, setOptionsAccuracyValue.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_EMITEXPON, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsPatternDemandMultiplier(obj, value)
+            % Sets the global pattern demand multiplier.
+            % 
+            % Example:
+            %   d.setOptionsPatternDemandMultiplier(1)
+            %   d.getOptionsPatternDemandMultiplier
+            %
+            % See also getOptionsPatternDemandMultiplier, setOptionsEmitterExponent, setOptionsAccuracyValue.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_DEMANDMULT, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsHeadLossFormula(obj, value)
+            % Sets the headloss formula. (EPANET Version 2.2)
+            % 'HW' = 0, 'DW' = 1, 'CM' = 2
+            %
+            % Example:
+            %   d.setOptionsHeadLossFormula(0)   % Sets the 'HW' headloss formula
+            %   d.getOptionsHeadLossFormula
+            %
+            % See also getOptionsHeadLossFormula, setOptionsHeadError, setOptionsFlowChange.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsGlobalEffic(obj, value)
+            % Sets the global efficiency for pumps(percent). (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsGlobalEffic(75)
+            %   d.getOptionsGlobalEffic
+            %
+            % See also getOptionsGlobalEffic, setOptionsGlobalPrice, setOptionsGlobalPattern.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_GLOBALEFFIC, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsGlobalPrice(obj, value)
+            % Sets the global average energy price per kW-Hour. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsGlobalPrice(0)
+            %   d.getOptionsGlobalPrice
+            %
+            % See also getOptionsGlobalPrice, setOptionsGlobalEffic, setOptionsGlobalPattern.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_GLOBALPRICE, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsGlobalPattern(obj, value)
+            % Sets the global energy price pattern. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsGlobalPattern(1)
+            %   d.getOptionsGlobalPattern
+            %
+            % See also getOptionsGlobalPattern, setOptionsGlobalEffic, setOptionsGlobalPrice.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_GLOBALPATTERN, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsDemandCharge(obj, value)
+            % Sets the energy charge per maximum KW usage. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsDemandCharge(0)
+            %   d.getOptionsDemandCharge
+            %
+            % See also getOptionsDemandCharge, setOptionsGlobalPrice, setOptionsGlobalPattern.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_DEMANDCHARGE, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
