@@ -4666,46 +4666,123 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsSpecificGravity(obj, value)
+            % Sets the specific gravity. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsSpecificGravity(1)
+            %   d.getOptionsSpecificGravity
+            %
+            % See also getOptionsSpecificGravity, setOptionsSpecificViscosity, setOptionsHeadLossFormula.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_SP_GRAVITY, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsSpecificViscosity(obj, value)
+            % Sets the specific viscosity. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsSpecificViscosity(1)
+            %   d.getOptionsSpecificViscosity
+            %
+            % See also getOptionsSpecificViscosity, setOptionsSpecificGravity, setOptionsHeadLossFormula.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_SP_VISCOS, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsExtraTrials(obj, value)
+            % Sets the extra trials allowed if hydraulics don't converge. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsExtraTrials(10)
+            %   d.getOptionsExtraTrials
+            %
+            % See also getOptionsExtraTrials, setOptionsMaxTrials, setOptionsMaximumCheck.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_UNBALANCED, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsCheckFrequency(obj, value)
+            % Sets the frequency of hydraulic status checks. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsCheckFrequency(2)
+            %   d.getOptionsCheckFrequency
+            %
+            % See also getOptionsCheckFrequency, setOptionsMaxTrials, setOptionsMaximumCheck.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_CHECKFREQ, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsMaximumCheck(obj, value)
+            % Sets the maximum trials for status checking. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsMaximumCheck(10)
+            %   d.getOptionsMaximumCheck
+            %
+            % See also getOptionsMaximumCheck, setOptionsMaxTrials, setOptionsCheckFrequency.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_MAXCHECK, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsDampLimit(obj, value)
+            % Sets the accuracy level where solution damping begins. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsDampLimit(0)
+            %   d.getOptionsDampLimit
+            %
+            % See also getOptionsDampLimit, setOptionsMaxTrials, setOptionsCheckFrequency.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_DAMPLIMIT, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsSpecificDiffusivity(obj, value)
+            % Sets the specific diffusivity (relative to chlorine at 20 deg C). (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsSpecificDiffusivity(1)
+            %   d.getOptionsSpecificDiffusivity
+            %
+            % See also getOptionsSpecificDiffusivity, setOptionsSpecificViscosity, setOptionsSpecificGravity.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_SP_DIFFUS, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsPipeBulkReactionOrder(obj, value)
+            % Sets the bulk water reaction order for pipes. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsPipeBulkReactionOrder(1)
+            %   d.getOptionsPipeBulkReactionOrder
+            %
+            % See also getOptionsPipeBulkReactionOrder, setOptionsPipeWallReactionOrder, setOptionsTankBulkReactionOrder.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_BULKORDER, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsPipeWallReactionOrder(obj, value)
+            % Sets the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsPipeWallReactionOrder(1)
+            %   d.getOptionsPipeWallReactionOrder
+            %
+            % See also getOptionsPipeWallReactionOrder, setOptionsPipeBulkReactionOrder, setOptionsTankBulkReactionOrder.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_WALLORDER, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsTankBulkReactionOrder(obj, value)
+            % Sets the bulk water reaction order for tanks. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsTankBulkReactionOrder(1)
+            %   d.getOptionsTankBulkReactionOrder
+            %
+            % See also getOptionsTankBulkReactionOrder, setOptionsPipeBulkReactionOrder, setOptionsPipeWallReactionOrder.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_TANKORDER, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setOptionsLimitingConcentration(obj, value)
+            % Sets the limiting concentration for growth reactions. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.setOptionsLimitingConcentration(0)
+            %   d.getOptionsLimitingConcentration
+            %
+            % See also getOptionsLimitingConcentration, setOptionsPipeBulkReactionOrder, setOptionsPipeWallReactionOrder.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_CONCENLIMIT, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
