@@ -4659,10 +4659,24 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsHeadError(obj, value)
+            % Sets the maximum head loss error for hydraulic convergence. (EPANET Version 2.2)
+            % 
+            % Example:
+            %   d.setOptionsHeadError(0)
+            %   d.getOptionsHeadError
+            %
+            % See also getOptionsHeadError, setOptionsEmitterExponent, setOptionsAccuracyValue.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_HEADERROR, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsFlowChange(obj, value)
+            % Sets the maximum flow change for hydraulic convergence. (EPANET Version 2.2)
+            % 
+            % Example:
+            %   d.setOptionsFlowChange(0)
+            %   d.getOptionsFlowChange
+            %
+            % See also getOptionsFlowChange, setOptionsHeadError, setOptionsHeadLossFormula.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_FLOWCHANGE, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
@@ -4671,11 +4685,18 @@ classdef epanet <handle
             % 'HW' = 0, 'DW' = 1, 'CM' = 2
             %
             % Example:
-            %   d.setOptionsHeadLossFormula(0)   % Sets the 'HW' headloss formula
+            %   d.setOptionsHeadLossFormula('HW')   % Sets the 'HW' headloss formula
             %   d.getOptionsHeadLossFormula
             %
             % See also getOptionsHeadLossFormula, setOptionsHeadError, setOptionsFlowChange.
-            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, value, obj.LibEPANET);
+            if value=='HW'
+                codevalue=0;
+            elseif value=='DW'
+                codevalue=1;
+            elseif value=='CM'
+                codevalue=2;
+            end
+            [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, codevalue, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end  
         end
         function setOptionsGlobalEffic(obj, value)
