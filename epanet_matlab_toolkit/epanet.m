@@ -4187,6 +4187,57 @@ classdef epanet <handle
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
             end
         end
+        function pumpPower = setLinkPumpPower(obj,value,varargin)
+            % Sets the power for pumps. (EPANET Version 2.2)
+            % Returns the new pump power value.
+            %
+            % Example 1:
+            %   d.getLinkPumpPower
+            %   d.setLinkPumpPower(10)                  % Sets the pump power = 10 to every pump
+            %
+            % Example 2:
+            %   d.getLinkPumpPower
+            %   pumpIndex = 13;
+            %   d.setLinkPumpPower(pumpIndex,10)        % Sets the pump power = 10 to the pump with index 13
+            %
+            % Example 3:
+            %   d.getLinkPumpPower
+            %   pumpIndex = [13, 14];
+            %   d.setLinkPumpPower(pumpIndex,10)        % Sets the pump power = 10 to the pumps with index 13 and 14
+            %
+            % Example 4:
+            %   d.getLinkPumpPower
+            %   pumpIndex = [13, 14];
+            %   d.setLinkPumpPower(pumpIndex,[10,15])   % Sets the pump power = 10 and 15 to the pumps with index 13 and 14 respectively
+            %
+            % See also getLinkPumpPower.
+            pumpCount = obj.getLinkPumpCount;
+            pumpIndices = obj.getLinkPumpIndex;
+            if nargin==2
+                for i=1:pumpCount
+                    [obj.Errcode] = ENsetlinkvalue(pumpIndices(i), obj.ToolkitConstants.EN_PUMP_POWER, value, obj.LibEPANET);
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+                end
+                pumpPower = obj.getLinkPumpPower(pumpIndices);
+            end
+            if nargin==3
+                if isscalar(value) && isscalar(varargin{1})
+                    [obj.Errcode] = ENsetlinkvalue(value, obj.ToolkitConstants.EN_PUMP_POWER, varargin{1}, obj.LibEPANET);
+                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+                elseif ~isscalar(value) && ~isscalar(varargin{1})
+                    for i=1:length(value)
+                        [obj.Errcode] = ENsetlinkvalue(value(i), obj.ToolkitConstants.EN_PUMP_POWER, varargin{1}(i), obj.LibEPANET);
+                        if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+                    end
+                elseif ~isscalar(value) && isscalar(varargin{1})
+                    for i=1:length(value)
+                        [obj.Errcode] = ENsetlinkvalue(value(i), obj.ToolkitConstants.EN_PUMP_POWER, varargin{1}, obj.LibEPANET);
+                        if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
+                    end
+                end
+                pumpPower = obj.getLinkPumpPower(value);
+            end
+        end
         function setNodeElevations(obj, value, varargin)
             % Sets the values of elevation for nodes
             % Example 1:
