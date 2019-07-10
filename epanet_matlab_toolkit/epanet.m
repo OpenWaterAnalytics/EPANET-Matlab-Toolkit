@@ -4187,6 +4187,25 @@ classdef epanet <handle
                 if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
             end
         end
+        function setLinkPumpPower(obj, value, varargin)
+            % Sets the values of power for pumps. (EPANET Version 2.2)
+            %
+            % Example 1:
+            %   d.setLinkPumpPower(10)             % Sets the pump power = 10 to every pump
+            %   d.getLinkPumpPower
+            %
+            % Example 2:
+            %   linkIndex = 13;
+            %   d.setLinkPumpPower(linkIndex,10)   % Sets the pump power = 10 to the pump with index 13
+            %   d.getLinkPumpPower
+            %
+            % See also getLinkPumpPower
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkPumpIndex; end
+            for i=indices
+                [obj.Errcode] = ENsetlinkvalue(i, obj.ToolkitConstants.EN_PUMP_POWER, value, obj.LibEPANET);
+                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end   
+            end
+        end
         function setNodeElevations(obj, value, varargin)
             % Sets the values of elevation for nodes
             % Example 1:
