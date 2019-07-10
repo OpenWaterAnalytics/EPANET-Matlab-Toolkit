@@ -3692,30 +3692,41 @@ classdef epanet <handle
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
         function Errcode = deleteNode(obj, idNode, varargin)
-            % Delete a node
+            % Delete nodes (EPANET Version 2.2)
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
             % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
             % Default condition is 0.
-            % Example:
+            %
+            % Example 1:
             %       idNode = d.getNodeNameID(1)
             %       d.deleteNode(idNode)
-            %       %OR
+            %       d.getNodeNameID
+            %
+            % Example 2:
             %       condition = 1;
-            %       d.deleteNode(idNode, condition)
-            %       %OR using index
+            %       d.deleteNode('11', condition)
+            %
+            % Example 3:
             %       index = 1;
-            %       d.deleteNode(1)   
+            %       d.deleteNode(1) 
+            %       d.getNodeNameID
+            %
+            % Example 4:
+            %       d.deleteNode({'10', '11'})
+            %       d.getNodeNameID
             condition = 0; 
             if nargin == 3      
                 condition = varargin{1};
             end
-            if ischar(idNode)
-                indexNode = obj.getNodeIndex(idNode);
+            if ischar(idNode) || iscell(idNode)
+                for j = 1:length(idNode)
+                    indexNode = obj.getNodeIndex(idNode(j));
+                    [Errcode] = ENdeletenode(obj.LibEPANET, indexNode, condition);
+                    error(obj.getError(Errcode));
+                end
             else
-                indexNode = idNode;
+                [Errcode] = ENdeletenode(obj.LibEPANET, idNode, condition);
             end
-            [Errcode] = ENdeletenode(obj.LibEPANET, indexNode, condition);
-            error(obj.getError(Errcode));
         end
         function Errcode = deleteLink(obj, idLink, varargin)
             % Delete a link
