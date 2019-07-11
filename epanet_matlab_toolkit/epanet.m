@@ -3726,6 +3726,7 @@ classdef epanet <handle
                 end
             else
                 [Errcode] = ENdeletenode(obj.LibEPANET, idNode, condition);
+                error(obj.getError(Errcode));
             end
         end
         function Errcode = deleteLink(obj, idLink, varargin)
