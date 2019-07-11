@@ -1692,28 +1692,44 @@ classdef epanet <handle
             end
             categoryIndex = obj.getNodeJunctionDemandIndex(nodeIndex,demandName);
         end
-        function demandIndex = deleteNodeJunctionDemand(obj, varargin)
+        function Errcode = deleteNodeJunctionDemand(obj, varargin)
             % Deletes a demand from a junction given the junction index and demand index. (EPANET Version 2.2)
             % Returns the remaining(if exist) node demand indices.
             %
             % Example 1:
-            %   d.getNodeJunctionDemandIndex                                    % Retrieves the indices of all demands for all nodes
-            %   d.addNodeJunctionDemand(1, 100, '1', 'new demand')              % Adds a new demand to the first node and returns the new demand index
-            %   d.deleteNodeJunctionDemand(1,2)                                 % Deletes the 2nd demand of the first node
-            %   d.getNodeJunctionDemandIndex  
+            %   nodeIndex = 1;
+            %   baseDemand = 100;
+            %   patternId = '1';
+            %   categoryIndex = 1;
+            %   d.getNodeJunctionDemandIndex(nodeIndex)                                                   % Retrieves the indices of all demands for the 1st node
+            %   d.getNodeJunctionDemandName                                                               % Retrieves the names of all nodes demand category
+            %   d.getNodeJunctionDemandName{categoryIndex}(nodeIndex)                                     % Retrieves the name of the 1st demand category of the 1st node
+            %   categoryIndex = d.addNodeJunctionDemand(nodeIndex, baseDemand, patternId, 'new demand')   % Adds a new demand to the 1st node and returns the new demand index
+            %   d.getNodeJunctionDemandIndex(nodeIndex)                                                   % Retrieves the indices of all demands for the 1st node
+            %   d.getNodeJunctionDemandName                                                               % Retrieves the names of all nodes demand category
+            %   d.getNodeJunctionDemandName{categoryIndex}(nodeIndex)                                     % Retrieves the name of the 2nd demand category of the 1st node
+            %   d.deleteNodeJunctionDemand(1,2)                                                           % Deletes the 2nd demand of the 1st node
+            %   d.getNodeJunctionDemandIndex(nodeIndex)                                                   % Retrieves the indices of all demands for the 1st node
             %
             % Example 2:
-            %   d.getNodeJunctionDemandIndex                                    % Retrieves the indices of all demands for all nodes
-            %   d.addNodeJunctionDemand(1, 100, '1', 'new demand')              % Adds a new demand to the first node and returns the new demand index
-            %   d.deleteNodeJunctionDemand(1)                                   % Deletes all the demands of the 1st node
-            %   d.getNodeJunctionDemandIndex 
+            %   nodeIndex = 1; 
+            %   baseDemand = 100;
+            %   patternId = '1';
+            %   categoryIndex_2 = d.addNodeJunctionDemand(nodeIndex, baseDemand, patternId, 'new demand_2')   % Adds a new demand to the first node and returns the new demand index
+            %   categoryIndex_3 = d.addNodeJunctionDemand(nodeIndex, baseDemand, patternId, 'new demand_3')   % Adds a new demand to the first node and returns the new demand index
+            %   d.getNodeJunctionDemandName{categoryIndex_2}(nodeIndex)                                       % Retrieves the name of the 2nd demand category of the 1st node
+            %   d.deleteNodeJunctionDemand(1)                                                                 % Deletes all the demands of the 1st node
+            %   d.getNodeJunctionDemandIndex(nodeIndex)                                                       % Retrieves the indices of all demands for the 1st node
             %
             % Example 3:
-            %   d.getNodeJunctionDemandIndex                                    % Retrieves the indices of all demands for all nodes
-            %   d.addNodeJunctionDemand([1, 2, 3], [100, 110, 150], ...
-            %   {'1', '1',''}, {'new demand1', 'new demand2', 'new demand3'})   % Adds 3 new demands to the first three nodes
-            %   d.deleteNodeJunctionDemand(1:3)                                 % Deletes all the demands of the first three nodes
-            %   d.getNodeJunctionDemandIndex 
+            %   nodeIndex = [1, 2, 3];
+            %   baseDemand = [100, 110, 150];
+            %   patternId = {'1', '1',''};
+            %   categoryIndex = d.addNodeJunctionDemand(nodeIndex, baseDemand, ...
+            %   patternId, {'new demand_1', 'new demand_2', 'new demand_3'})            % Adds 3 new demands to the first 3 nodes
+            %   d.getNodeJunctionDemandName{2}(nodeIndex)
+            %   d.deleteNodeJunctionDemand(1:3)                                         % Deletes all the demands of the first 3 nodes
+            %   d.getNodeJunctionDemandIndex(nodeIndex)                                 % Retrieves the indices of all demands for the first 3 nodes
             %
             % See also addNodeJunctionDemand, getNodeJunctionDemandIndex, getNodeJunctionDemandName,
             %          setNodeJunctionDemandName, getNodeBaseDemands.
@@ -1722,23 +1738,19 @@ classdef epanet <handle
                 if isscalar(nodeIndex)
                     numDemand=size(obj.getNodeJunctionDemandIndex);
                     for i=1:numDemand(1)
-                        [obj.Errcode]=ENdeletedemand(nodeIndex, 1, obj.LibEPANET);
+                        [Errcode]=ENdeletedemand(nodeIndex, 1, obj.LibEPANET);
                     end
                 elseif ~isscalar(nodeIndex)
                     for j=1:length(nodeIndex)
                         numDemand=size(obj.getNodeJunctionDemandIndex);
                         for i=1:numDemand(1)
-                            [obj.Errcode]=ENdeletedemand(nodeIndex(j), 1, obj.LibEPANET);
+                            [Errcode]=ENdeletedemand(nodeIndex(j), 1, obj.LibEPANET);
                         end
                     end
-                    
                 end
             elseif nargin==3
-                [obj.Errcode]=ENdeletedemand(nodeIndex, varargin{2}, obj.LibEPANET);
-            else
-                error(obj.getError(250))
+                [Errcode]=ENdeletedemand(nodeIndex, varargin{2}, obj.LibEPANET);
             end
-            demandIndex = obj.getNodeJunctionDemandIndex(nodeIndex);
         end
         function value = getNodeJunctionDemandName(obj, varargin)
             % Gets the name of a node's demand category.
@@ -13212,11 +13224,4 @@ function [controlTypeIndex, linkIndex,controlSettingValue,...
             end
         otherwise
     end
-end
-function nodesID = setLinkType(obj, id)
-    index = obj.getLinkIndex(id);
-    nodeLinkIndex = obj.getLinkNodesIndex();
-    nodesIndex = nodeLinkIndex(index, :);
-    nodesID = obj.getNodeNameID(nodesIndex);
-    obj.deleteLink(index);
 end
