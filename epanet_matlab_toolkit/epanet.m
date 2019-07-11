@@ -4303,7 +4303,6 @@ classdef epanet <handle
             %
             % Example 3:
             %   d.setLinkPumpPower(1,10)                % Sets the pump power = 10 to the 1st pump
-            %   or
             %   d.setLinkPumpPower(2,15)                % Sets the pump power = 15 to the 2nd pump
             %   d.getLinkPumpPower
             %
