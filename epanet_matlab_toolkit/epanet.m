@@ -4291,6 +4291,8 @@ classdef epanet <handle
         function setLinkPumpPower(obj,value,varargin)
             % Sets the power for pumps. (EPANET Version 2.2)
             %
+            % The example are based on d=epanet('Net3_trace.inp')
+            %
             % Example 1:
             %   d.getLinkPumpPower                      % Retrieves the power of all pumps
             %   d.setLinkPumpPower(10)                  % Sets the pump power = 10 to every pump
@@ -4303,22 +4305,23 @@ classdef epanet <handle
             %
             % Example 3:
             %   d.setLinkPumpPower(1,10)                % Sets the pump power = 10 to the 1st pump
+            %   or
             %   d.setLinkPumpPower(2,15)                % Sets the pump power = 15 to the 2nd pump
             %   d.getLinkPumpPower
             %
             % Example 4:
-            %   pumpIndex = 13;
-            %   d.setLinkPumpPower(pumpIndex,10)        % Sets the pump power = 10 to the pump with index 13
+            %   pumpIndex = 118;
+            %   d.setLinkPumpPower(pumpIndex,10)        % Sets the pump power = 10 to the pump with index 118 
             %   d.getLinkPumpPower
             %
             % Example 5:
-            %   pumpIndex = [13, 14];
-            %   d.setLinkPumpPower(pumpIndex,10)        % Sets the pump power = 10 to the pumps with index 13 and 14
+            %   pumpIndex = [118, 119];
+            %   d.setLinkPumpPower(pumpIndex,10)        % Sets the pump power = 10 to the pumps with index 118 and 119
             %   d.getLinkPumpPower
             %
             % Example 6:
-            %   pumpIndex = [13, 14];
-            %   d.setLinkPumpPower(pumpIndex,[10,15])   % Sets the pump power = 10 and 15 to the pumps with index 13 and 14 respectively
+            %   pumpIndex = [118, 119];
+            %   d.setLinkPumpPower(pumpIndex,[10,15])   % Sets the pump power = 10 and 15 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpPower
             %
             % See also getLinkPumpPower.
