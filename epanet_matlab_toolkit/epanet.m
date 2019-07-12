@@ -4288,10 +4288,10 @@ classdef epanet <handle
                 error(obj.getError(obj.Errcode)); 
             end
         end
-        function setLinkPumpPower(obj,value,varargin)
+        function setLinkPumpPower(obj, value, varargin)
             % Sets the power for pumps. (EPANET Version 2.2)
             %
-            % The example are based on d=epanet('Net3_trace.inp')
+            % The examples are based on d=epanet('Net3_trace.inp')
             %
             % Example 1:
             %   d.getLinkPumpPower                       % Retrieves the power of all pumps
