@@ -270,6 +270,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getQualityInfo|Retrieves the quality info - bug in ENgetqualinfo|
 |getQualityTraceNodeIndex|Retrieves the trace node index of water quality analysis type|
 |getQualityType|Retrieves the type of water quality analysis type|
+|getRuleCount|Retrieves the number of rules. (EPANET Version 2.2)|
 |getStatistic|Retrieves hydraulic simulation statistic|
 |getTimeHTime|Retrieves the number of htime|
 |getTimeQTime|Retrieves the number of qtime|
@@ -349,6 +350,10 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkDiameter|Sets the values of diameters|
 |setLinkPumpHeadCurveIndex|Sets the curves index for pumps index|
 |setLinkPumpPower|Sets the power for pumps. (EPANET Version 2.2)|
+|setLinkPumpHCurve|Sets the pump head v. flow curve index. (EPANET Version 2.2)|
+|setLinkPumpECurve|Sets the pump efficiency v. flow curve index. (EPANET Version 2.2)|
+|setLinkPumpECost|Sets the pump average energy price. (EPANET Version 2.2)|
+|setLinkPumpEPat|Sets the pump energy price time pattern index. (EPANET Version 2.2)|
 |setLinkInitialSetting|Sets the values of initial settings|
 |setLinkInitialStatus|Sets the values of initial status|
 |setLinkLength|Sets the values of lengths|
