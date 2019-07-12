@@ -425,6 +425,33 @@ classdef epanet <handle
                 j=j+1;
             end
         end 
+        function set_Link_Pump(obj, linkPropertie, value, varargin)
+            pumpCount = obj.getLinkPumpCount;
+            pumpIndices = obj.getLinkPumpIndex;
+            if isempty(varargin{1})
+                j=1;
+                for i=1:pumpCount
+                    [obj.Errcode] = ENsetlinkvalue(pumpIndices(i), linkPropertie, value(j), obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
+                    if ~isscalar(value)
+                        j=j+1;
+                    end
+                end
+            else
+                varargin{1} = varargin{1}{1};
+                if ~ismember(value, pumpIndices)
+                    value = pumpIndices(value);
+                end
+                j=1;
+                for i=1:length(value)
+                    [obj.Errcode] = ENsetlinkvalue(value(i), linkPropertie, varargin{1}(j), obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
+                    if ~isscalar(varargin{1})
+                        j=j+1;
+                    end
+                end
+            end
+        end
     end
     methods
         function obj = epanet(varargin)
@@ -860,10 +887,10 @@ classdef epanet <handle
             %Retrieves the number of controls
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_CONTROLCOUNT, obj.LibEPANET);
         end
-%         function value = getRuleCount(obj)
-%             %Retrieves the number of rules
-%             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_RULECOUNT, obj.LibEPANET);
-%         end
+        function value = getRuleCount(obj)
+            % Retrieves the number of rules. (EPANET Version 2.2)
+            [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_RULECOUNT, obj.LibEPANET);
+        end
         function value = getNodeTankCount(obj)
             %Retrieves the number of Tanks
             value = sum(strcmp(obj.getNodeType, 'TANK'));
@@ -4324,32 +4351,169 @@ classdef epanet <handle
             %   d.setLinkPumpPower(pumpIndex,[10, 15])   % Sets the pump power = 10 and 15 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpPower
             %
-            % See also getLinkPumpPower.
-            pumpCount = obj.getLinkPumpCount;
-            pumpIndices = obj.getLinkPumpIndex;
-            if nargin<=2
-                j=1;
-                for i=1:pumpCount
-                    [obj.Errcode] = ENsetlinkvalue(pumpIndices(i), obj.ToolkitConstants.EN_PUMP_POWER, value(j), obj.LibEPANET);
-                    error(obj.getError(obj.Errcode));
-                    if ~isscalar(value)
-                        j=j+1;
-                    end
-                end
-            end
-            if nargin==3
-                if ~ismember(value, pumpIndices)
-                    value = pumpIndices(value);
-                end
-                j=1;
-                for i=1:length(value)
-                    [obj.Errcode] = ENsetlinkvalue(value(i), obj.ToolkitConstants.EN_PUMP_POWER, varargin{1}(j), obj.LibEPANET);
-                    error(obj.getError(obj.Errcode));
-                    if ~isscalar(varargin{1})
-                        j=j+1;
-                    end
-                end
-            end
+            % See also getLinkPumpPower, setLinkPumpHCurve, setLinkPumpECurve,
+            %          setLinkPumpECost, setLinkPumpEPat.
+            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_POWER, value, varargin)
+        end
+        function setLinkPumpHCurve(obj, value, varargin)
+            % Sets the pump head v. flow curve index. (EPANET Version 2.2)
+            %
+            % The examples are based on d=epanet('Net3_trace.inp')
+            %
+            % Example 1:
+            %   d.getLinkPumpHCurve                     % Retrieves the pump head v. flow curve index of all pumps
+            %   d.setLinkPumpHCurve(1)                  % Sets the pump head v. flow curve index = 1 to every pump
+            %   d.getLinkPumpHCurve
+            %
+            % Example 2:
+            %   % The input array must have a length equal to the number of pumps
+            %   d.setLinkPumpHCurve([1, 2])             % Sets the pump head v. flow curve index = 1 and 2 to the 2 pumps
+            %   d.getLinkPumpHCurve
+            %
+            % Example 3:
+            %   d.setLinkPumpHCurve(1, 2)               % Sets the pump head v. flow curve index = 2 to the 1st pump
+            %   or
+            %   d.setLinkPumpHCurve(2, 1)               % Sets the pump head v. flow curve index = 1 to the 2nd pump
+            %   d.getLinkPumpHCurve
+            %
+            % Example 4:
+            %   pumpIndex = 118;
+            %   d.setLinkPumpHCurve(pumpIndex, 1)       % Sets the pump head v. flow curve index = 1 to the pump with index 118 
+            %   d.getLinkPumpHCurve
+            %
+            % Example 5:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpHCurve(pumpIndex, 1)       % Sets the pump head v. flow curve index = 1 to the pumps with index 118 and 119
+            %   d.getLinkPumpHCurve
+            %
+            % Example 6:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpHCurve(pumpIndex,[1, 2])   % Sets the pump head v. flow curve index = 1 and 2 to the pumps with index 118 and 119 respectively
+            %   d.getLinkPumpHCurve
+            %
+            % See also getLinkPumpHCurve, setLinkPumpPower, setLinkPumpECurve,
+            %          setLinkPumpECost, setLinkPumpEPat.
+            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_HCURVE, value, varargin)
+        end
+        function setLinkPumpECurve(obj, value, varargin)
+            % Sets the pump efficiency v. flow curve index. (EPANET Version 2.2)
+            %
+            % The examples are based on d=epanet('Net3_trace.inp')
+            %
+            % Example 1:
+            %   d.getLinkPumpECurve                     % Retrieves the pump efficiency v. flow curve index of all pumps
+            %   d.setLinkPumpECurve(1)                  % Sets the pump efficiency v. flow curve index = 1 to every pump
+            %   d.getLinkPumpECurve
+            %
+            % Example 2:
+            %   % The input array must have a length equal to the number of pumps
+            %   d.setLinkPumpECurve([1, 2])             % Sets the pump efficiency v. flow curve index = 1 and 2 to the 2 pumps
+            %   d.getLinkPumpECurve
+            %
+            % Example 3:
+            %   d.setLinkPumpECurve(1, 2)               % Sets the pump efficiency v. flow curve index = 2 to the 1st pump
+            %   or
+            %   d.setLinkPumpECurve(2, 1)               % Sets the pump efficiency v. flow curve index = 1 to the 2nd pump
+            %   d.getLinkPumpECurve
+            %
+            % Example 4:
+            %   pumpIndex = 118;
+            %   d.setLinkPumpECurve(pumpIndex, 1)       % Sets the pump efficiency v. flow curve index = 1 to the pump with index 118 
+            %   d.getLinkPumpECurve
+            %
+            % Example 5:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpECurve(pumpIndex, 1)       % Sets the pump efficiency v. flow curve index = 1 to the pumps with index 118 and 119
+            %   d.getLinkPumpECurve
+            %
+            % Example 6:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpECurve(pumpIndex,[1, 2])   % Sets the pump efficiency v. flow curve index = 1 and 2 to the pumps with index 118 and 119 respectively
+            %   d.getLinkPumpECurve
+            %
+            % See also getLinkPumpECurve, setLinkPumpPower, setLinkPumpHCurve,
+            %          setLinkPumpECost, setLinkPumpEPat.
+            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_ECURVE, value, varargin)
+        end
+        function setLinkPumpECost(obj, value, varargin)
+            % Sets the pump average energy price. (EPANET Version 2.2)
+            %
+            % The examples are based on d=epanet('Net3_trace.inp')
+            %
+            % Example 1:
+            %   d.getLinkPumpECost                            % Retrieves the pump average energy price of all pumps
+            %   d.setLinkPumpECost(0.10)                      % Sets the pump average energy price = 0.10 to every pump
+            %   d.getLinkPumpECost
+            %
+            % Example 2:
+            %   % The input array must have a length equal to the number of pumps
+            %   d.setLinkPumpECost([0.10, 0.12])              % Sets the pump average energy price = 0.10 and 0.12 to the 2 pumps
+            %   d.getLinkPumpECost
+            %
+            % Example 3:
+            %   d.setLinkPumpECost(1, 0.10)                   % Sets the pump average energy price = 0.10 to the 1st pump
+            %   or
+            %   d.setLinkPumpECost(2, 0.10)                   % Sets the pump average energy price = 0.10 to the 2nd pump
+            %   d.getLinkPumpECost
+            %
+            % Example 4:
+            %   pumpIndex = 118;
+            %   d.setLinkPumpECost(pumpIndex, 0.10)           % Sets the pump average energy price = 0.10 to the pump with index 118 
+            %   d.getLinkPumpECost
+            %
+            % Example 5:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpECost(pumpIndex, 0.10)           % Sets the pump average energy price = 0.10 to the pumps with index 118 and 119
+            %   d.getLinkPumpECost
+            %
+            % Example 6:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpECost(pumpIndex, [0.10, 0.12])   % Sets the pump average energy price = 0.10 and 0.12 to the pumps with index 118 and 119 respectively
+            %   d.getLinkPumpECost
+            %
+            % See also getLinkPumpECost, setLinkPumpPower, setLinkPumpHCurve,
+            %          setLinkPumpECurve, setLinkPumpEPat.
+            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_ECOST, value, varargin)
+        end
+        function setLinkPumpEPat(obj, value, varargin)
+            % Sets the pump energy price time pattern index. (EPANET Version 2.2)
+            %
+            % The examples are based on d=epanet('Net3_trace.inp')
+            %
+            % Example 1:
+            %   d.getLinkPumpEPat                     % Retrieves the pump energy price time pattern index of all pumps
+            %   d.setLinkPumpEPat(1)                  % Sets the pump energy price time pattern index = 1 to every pump
+            %   d.getLinkPumpEPat
+            %
+            % Example 2:
+            %   % The input array must have a length equal to the number of pumps
+            %   d.setLinkPumpEPat([1, 2])             % Sets the pump energy price time pattern index = 1 and 2 to the 2 pumps
+            %   d.getLinkPumpEPat
+            %
+            % Example 3:
+            %   d.setLinkPumpEPat(1, 2)               % Sets the pump energy price time pattern index = 2 to the 1st pump
+            %   or
+            %   d.setLinkPumpEPat(2, 1)               % Sets the pump energy price time pattern index = 1 to the 2nd pump
+            %   d.getLinkPumpEPat
+            %
+            % Example 4:
+            %   pumpIndex = 118;
+            %   d.setLinkPumpEPat(pumpIndex, 1)       % Sets the pump energy price time pattern index = 1 to the pump with index 118 
+            %   d.getLinkPumpEPat
+            %
+            % Example 5:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpEPat(pumpIndex, 1)       % Sets the pump energy price time pattern index = 1 to the pumps with index 118 and 119
+            %   d.getLinkPumpEPat
+            %
+            % Example 6:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpEPat(pumpIndex,[1, 2])   % Sets the pump energy price time pattern index = 1 and 2 to the pumps with index 118 and 119 respectively
+            %   d.getLinkPumpEPat
+            %
+            % See also getLinkPumpEPat, setLinkPumpPower, setLinkPumpHCurve,
+            %          setLinkPumpECurve, setLinkPumpECost.
+            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_EPAT, value, varargin)
         end
         function setNodeElevations(obj, value, varargin)
             % Sets the values of elevation for nodes
