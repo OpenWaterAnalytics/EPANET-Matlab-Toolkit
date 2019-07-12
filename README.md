@@ -759,7 +759,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENadddemand|Appends a new demand to a junction node demands list|
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
-|ENcurveid|Changes the ID name of a data curve given its index|
+|ENsetcurveid|Changes the ID name of a data curve given its index|
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENgetcurvetype|Retrieves the type of a curve|
