@@ -4321,7 +4321,7 @@ classdef epanet <handle
             %   d.setLinkPumpPower(pumpIndex,[10,15])   % Sets the pump power = 10 and 15 to the pumps with index 13 and 14 respectively
             %   d.getLinkPumpPower
             %
-            % See also getLinkPumpPower.
+            % See also getLinkPumpPower, setLinkPumpHCurve.
             pumpCount = obj.getLinkPumpCount;
             pumpIndices = obj.getLinkPumpIndex;
             if nargin==2
@@ -4341,6 +4341,69 @@ classdef epanet <handle
                 j=1;
                 for i=1:length(value)
                     [obj.Errcode] = ENsetlinkvalue(value(i), obj.ToolkitConstants.EN_PUMP_POWER, varargin{1}(j), obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
+                    if ~isscalar(varargin{1})
+                        j=j+1;
+                    end
+                end
+            end
+        end
+        function setLinkPumpHCurve(obj, value, varargin)
+            % Sets the pump head v. flow curve index. (EPANET Version 2.2)
+            %
+            % The examples are based on d=epanet('Net3_trace.inp')
+            %
+            % Example 1:
+            %   d.getLinkPumpHCurve                     % Retrieves the pump head v. flow curve index of all pumps
+            %   d.setLinkPumpHCurve(1)                  % Sets the pump head v. flow curve index = 1 to every pump
+            %   d.getLinkPumpHCurve
+            %
+            % Example 2:
+            %   % The input array must have a length equal to the number of pumps
+            %   d.setLinkPumpHCurve([1, 2])             % Sets the pump head v. flow curve index = 1 and 2 to the 2 pumps
+            %   d.getLinkPumpHCurve
+            %
+            % Example 3:
+            %   d.setLinkPumpHCurve(1, 2)               % Sets the pump head v. flow curve index = 2 to the 1st pump
+            %   or
+            %   d.setLinkPumpHCurve(2, 1)               % Sets the pump head v. flow curve index = 1 to the 2nd pump
+            %   d.getLinkPumpHCurve
+            %
+            % Example 4:
+            %   pumpIndex = 118;
+            %   d.setLinkPumpHCurve(pumpIndex, 1)       % Sets the pump head v. flow curve index = 1 to the pump with index 118 
+            %   d.getLinkPumpHCurve
+            %
+            % Example 5:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpHCurve(pumpIndex, 1)       % Sets the pump head v. flow curve index = 1 to the pumps with index 118 and 119
+            %   d.getLinkPumpHCurve
+            %
+            % Example 6:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpHCurve(pumpIndex,[1, 2])   % Sets the pump head v. flow curve index = 1 and 2 to the pumps with index 118 and 119 respectively
+            %   d.getLinkPumpHCurve
+            %
+            % See also getLinkPumpHCurve, setLinkPumpPower.
+            pumpCount = obj.getLinkPumpCount;
+            pumpIndices = obj.getLinkPumpIndex;
+            if nargin<=2
+                j=1;
+                for i=1:pumpCount
+                    [obj.Errcode] = ENsetlinkvalue(pumpIndices(i), obj.ToolkitConstants.EN_PUMP_HCURVE, value(j), obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
+                    if ~isscalar(value)
+                        j=j+1;
+                    end
+                end
+            end
+            if nargin==3
+                if ~ismember(value, pumpIndices)
+                    value = pumpIndices(value);
+                end
+                j=1;
+                for i=1:length(value)
+                    [obj.Errcode] = ENsetlinkvalue(value(i), obj.ToolkitConstants.EN_PUMP_HCURVE, varargin{1}(j), obj.LibEPANET);
                     error(obj.getError(obj.Errcode));
                     if ~isscalar(varargin{1})
                         j=j+1;
