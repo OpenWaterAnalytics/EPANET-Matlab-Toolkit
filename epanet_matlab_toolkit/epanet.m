@@ -2609,6 +2609,47 @@ classdef epanet <handle
             %Retrieves the tank id
             value=obj.getNodeNameID(obj.getNodeTankIndex);
         end
+        function tankData = getNodeTankData(obj)
+            % Retrieves a group of properties for a tank. (EPANET Version 2.2)
+            % 
+            % Tank data that is retrieved:
+            %
+            % 1) Index
+            % 2) Elevation
+            % 3) Initial Level
+            % 4) Minimum Water Level
+            % 5) Maximum Water Level
+            % 6) Diameter
+            % 7) Minimum Water Volume
+            % 8) Volume Curve Index
+            %
+            % Example 1:
+            %   tankData = d.getNodeTankData;
+            %   disp(tankData)
+            %
+            % See also setNodeTankData, getNodeElevations, getNodeTankInitialLevel,
+            %          getNodeTankMinimumWaterLevel, getNodeTankDiameter.
+            tankIndices = obj.getNodeTankIndex;
+            tankData = cell(8, length(tankIndices)+1);
+            tankData{1,1} = 'Index';
+            tankData{2,1} = 'Elevation';
+            tankData{3,1} = 'Initial Level';
+            tankData{4,1} = 'Minimum Water Level';
+            tankData{5,1} = 'Maximum Water Level';
+            tankData{6,1} = 'Diameter';
+            tankData{7,1} = 'Minimum Water Volume';
+            tankData{8,1} = 'Volume Curve Index';
+            for j=2:(length(tankIndices)+1)
+                tankData{1,j} = num2str(tankIndices(j-1));
+                tankData{2,j} = num2str(obj.getNodeElevations(tankIndices(j-1)));
+                tankData{3,j} = num2str(obj.getNodeTankInitialLevel(tankIndices(j-1)));
+                tankData{4,j} = num2str(obj.getNodeTankMinimumWaterLevel(tankIndices(j-1)));
+                tankData{5,j} = num2str(obj.getNodeTankMaximumWaterLevel(tankIndices(j-1)));
+                tankData{6,j} = num2str(obj.getNodeTankDiameter(tankIndices(j-1)));
+                tankData{7,j} = num2str(obj.getNodeTankMinimumWaterVolume(tankIndices(j-1)));
+                tankData{8,j} = num2str(obj.getNodeTankVolumeCurveIndex(tankIndices(j-1)));
+            end
+        end
         function value = getOptionsMaxTrials(obj)
             % Retrieves the maximum hydraulic trials allowed for hydraulic convergence.
             %
@@ -4665,6 +4706,55 @@ classdef epanet <handle
                     [obj.Errcode] = ENsetnodeid(i, value{j}, obj.LibEPANET); j=j+1;
                     error(obj.getError(obj.Errcode)); 
                 end   
+            end
+        end
+        function setNodeTankData(obj, index, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
+            % Sets a group of properties for a tank. (EPANET Version 2.2)
+            %
+            % Properties: elevation, initial water level, minimum water level, 
+            %             maximum water level, tank's diameter (0 if a volume curve is supplied), 
+            %             volume of the tank at its minimum water level, volume curve ("" for no curve).
+            % 
+            % The examples are based on d=epanet('Net3_trace.inp')
+            %
+            % Example 1:
+            %   % Sets to the 1st tank the following properties:
+            %   tankIndex = 1;   % You can also use tankIndex = 95; (i.e. the index of the tank).
+            %   elev = 100;
+            %   intlvl = 13;
+            %   minlvl =  0.2;
+            %   maxlvl = 33;
+            %   diam = 80;
+            %   minvol = 50000;
+            %   volcurve = '';   % For no curve
+            %   d.setNodeTankData(tankIndex, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
+            %   d.getNodeTankData
+            %
+            % Example 2:
+            %   % Sets to the 1st and 2nd tank the following properties:
+            %   tankIndex = [1, 2];   % You can also use tankIndex = [95, 96]; (i.e. the indices of the tanks).
+            %   elev = [100, 105];
+            %   intlvl = [13, 13.5];
+            %   minlvl =  [0.2, 0.25];
+            %   maxlvl = [30, 35];
+            %   diam = [80, 85];
+            %   minvol = [50000, 60000];
+            %   volcurve = {'', ''};   % For no curves
+            %   d.setNodeTankData(tankIndex, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
+            %   d.getNodeTankData
+            %
+            % See also getNodeTankData, setNodeTankInitialLevel,
+            %          setNodeTankMinimumWaterLevel, setNodeTankDiameter.
+            if ischar(volcurve)
+                volcurve={volcurve};
+            end
+            if ~ismember(index, obj.getNodeTankIndex)
+                tankIndices = obj.getNodeTankIndex;
+                index = tankIndices(index);
+            end
+            for i=1:length(index)
+                [obj.Errcode] = ENsettankdata(index(i), elev(i), intlvl(i), minlvl(i), maxlvl(i), diam(i), minvol(i), volcurve{i}, obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
             end
         end
         function setNodeTankInitialLevel(obj, value, varargin)
@@ -9592,6 +9682,10 @@ function [Errcode, index] = ENsetlinktype(id, paramcode, actionCode, LibEPANET)
 end
 function [Errcode] = ENsetnodevalue(index, paramcode, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetnodevalue', index, paramcode, value);
+end
+function [Errcode] = ENsettankdata(index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsettankdata', index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve );
 end
 function [Errcode] = ENsetoption(optioncode, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetoption', optioncode, value);
