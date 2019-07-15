@@ -4711,9 +4711,14 @@ classdef epanet <handle
         function setNodeTankData(obj, index, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
             % Sets a group of properties for a tank. (EPANET Version 2.2)
             %
-            % Properties: elevation, initial water level, minimum water level, 
-            %             maximum water level, tank's diameter (0 if a volume curve is supplied), 
-            %             volume of the tank at its minimum water level, volume curve ("" for no curve).
+            % Properties:
+            % 1) Elevation
+            % 2) Initial water Level
+            % 3) Minimum Water Level
+            % 4) Maximum Water Level
+            % 5) Diameter (0 if a volume curve is supplied)
+            % 6) Minimum Water Volume
+            % 7) Volume Curve Index ("" for no curve)
             % 
             % The examples are based on d=epanet('Net3_trace.inp')
             %
