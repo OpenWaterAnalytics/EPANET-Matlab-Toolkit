@@ -2882,6 +2882,28 @@ classdef epanet <handle
                 end
             end
         end
+        function setPatternNameID(obj, index, id)
+            % Sets the name ID of a time pattern given it's index and the new ID. (EPANET Version 2.2)
+            %
+            % Example 1:
+            %   d.getPatternNameID                                     % Retrieves the name IDs of all the time patterns
+            %   d.setPatternNameID(1, 'Pattern1')                      % Sets to the 1st time pattern the new name ID 'Pattern1'
+            %   d.getPatternNameID                                
+            %   
+            % Example 2:
+            %   d.setPatternNameID([1, 2], {'Pattern1', 'Pattern2'})   % Sets to the 1st and 2nd time pattern the new name IDs 'Pattern1' and 'Pattern2' respectively
+            %   d.getPatternNameID
+            %
+            % See also getPatternNameID, getPatternIndex, getPatternLengths,
+            %          setPatternComment, setPattern.
+            if ischar(id)
+                id={id};
+            end
+            for i=1:length(index)
+                [obj.Errcode] = ENsetpatternid(index(i), id{i}, obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
+            end
+        end
         function value = getCurveNameID(obj, varargin)
             %Retrieves ID of a curve with specific index
             %EPANET Version 2.1
@@ -2903,9 +2925,8 @@ classdef epanet <handle
                 end
             end
         end
-        function nameID = setCurveNameID(obj, index, id)
+        function setCurveNameID(obj, index, id)
             % Sets the name ID of a curve given it's index and the new ID. (EPANET Version 2.2)
-            % Returns the new curve name ID.
             %
             % Example 1:
             %   d.getCurveNameID                                % Retrieves the name IDs of all the curves
@@ -2913,23 +2934,17 @@ classdef epanet <handle
             %   d.getCurveNameID                                
             %   
             % Example 2:
-            %   d.getCurveNameID                                % Retrieves the name IDs of all the curves
             %   d.setCurveNameID([1, 2],{'Curve1', 'Curve2'})   % Sets to the 1st and 2nd curve the new name IDs 'Curve1' and 'Curve2' respectively
             %   d.getCurveNameID                                
             %
             % See also getCurveNameID, getCurveIndex, getCurveLengths,
             %          setCurve, setCurveComment, getCurveComment.
-            if isscalar(index) && ischar(id)
-                [obj.Errcode] = ENsetcurveid(index, id, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
-                nameID = obj.getCurveNameID{index};
-            elseif isvector(index) && iscell(id)
-                nameID = cell(1,length(index));
-                for i=1:length(index)
-                    [obj.Errcode] = ENsetcurveid(index(i), id{i}, obj.LibEPANET);
-                    if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
-                    nameID{i} = obj.getCurveNameID{index(i)};
-                end
+            if ischar(id)
+                id ={id};
+            end
+            for i=1:length(index)
+                [obj.Errcode] = ENsetcurveid(index(i), id{i}, obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
             end
         end
         function value = getCurveLengths(obj, varargin)
@@ -9473,6 +9488,10 @@ end
 function [Errcode] = ENsetcurveid(index, id, LibEPANET)
 % EPANET Version 2.2
 [Errcode,~]=calllib(LibEPANET, 'ENsetcurveid', index,id);
+end
+function [Errcode] = ENsetpatternid(index, id, LibEPANET)
+% EPANET Version 2.2
+[Errcode,~]=calllib(LibEPANET, 'ENsetpatternid', index,id);
 end
 function [Errcode, type] = ENgetcurvetype(index, LibEPANET)
 % EPANET Version 2.2

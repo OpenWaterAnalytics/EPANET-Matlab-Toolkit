@@ -415,6 +415,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setOptionsQualityTolerance|Sets the value of tolerance|
 |setPattern|Sets all of the multiplier factors for a specific time pattern|
 |setPatternComment|Sets the comment string assigned to the pattern object|
+|setPatternNameID|Sets the name ID of a time pattern given it's index and the new ID. (EPANET Version 2.2)|
 |setPatternMatrix|Sets all of the multiplier factors for all patterns|
 |setPatternValue|Sets the multiplier factor for a specific period within a time pattern|
 |setQualityType|Sets the type of water quality analysis called for|
@@ -765,6 +766,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
 |ENsetcurveid|Changes the ID name of a data curve given its index|
+|ENsetpatternid|Changes the ID name of a time pattern given its index|
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENgetcurvetype|Retrieves the type of a curve|
