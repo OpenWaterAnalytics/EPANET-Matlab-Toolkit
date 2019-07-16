@@ -349,6 +349,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkBulkReactionCoeff|Sets the values of bulk reactions|
 |setLinkComment|Sets the comment string assigned to the link object|
 |setLinkDiameter|Sets the values of diameters|
+|setLinkPipeData|Sets a group of properties for a pipe. (EPANET Version 2.2)|
 |setLinkPumpHeadCurveIndex|Sets the curves index for pumps index|
 |setLinkPumpPower|Sets the power for pumps. (EPANET Version 2.2)|
 |setLinkPumpHCurve|Sets the pump head v. flow curve index. (EPANET Version 2.2)|
@@ -779,6 +780,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetdemandmodel|Sets the type of demand model to use and its parameters|
 |ENsetnodeid|Change the ID name for a node|
 |ENsetlinkid|Change the ID name for a link|
+|ENsetpipedata|Sets a group of properties for a pipe link|
 |ENsettankdata|Sets a group of properties for a tank node|
 |ENgettitle|Retrieves the title lines of the project|
 |ENsettitle|Sets the title lines of the project|

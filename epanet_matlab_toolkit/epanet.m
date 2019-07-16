@@ -3986,6 +3986,42 @@ classdef epanet <handle
             %       d.getControls(index)
             index = addControlFunction(obj, control); 
         end
+        function setLinkPipeData(obj, Index, Length, Diameter, RoughnessCoeff, MinorLossCoeff)
+            % Sets a group of properties for a pipe. (EPANET Version 2.2)
+            %
+            % Properties:
+            % 1) Pipe Index
+            % 2) Length
+            % 3) Diameter
+            % 4) Roughness Coefficient
+            % 5) Minor Loss Coefficient
+            %
+            % Example 1:
+            %   % Sets to the 1st pipe the following properties:
+            %   pipeIndex = 1;
+            %   length = 1000;
+            %   diameter = 20;
+            %   RoughnessCoeff = 110;
+            %   MinorLossCoeff = 0.2;
+            %   d.getLinksInfo   % Retrieves all link info
+            %   d.setLinkPipeData(pipeIndex, length, diameter, RoughnessCoeff, MinorLossCoeff)
+            %   d.getLinksInfo
+            %
+            % Example 2:
+            %   % Sets to the 1st and 2nd pipe the following properties:
+            %   pipeIndex = [1, 2];
+            %   length = [1000, 1500];
+            %   diameter = [20, 23];
+            %   RoughnessCoeff = [110, 115];
+            %   MinorLossCoeff = [0.2, 0.3];
+            %   d.getLinksInfo   % Retrieves all link info
+            %   d.setLinkPipeData(pipeIndex, length, diameter, RoughnessCoeff, MinorLossCoeff)
+            %   d.getLinksInfo
+            %
+            % See also getLinksInfo, setLinkDiameter, setLinkLength,
+            %          setLinkStatus, setNodeTankData.
+            for i=1:length(Index)
+                [obj.Errcode] = ENsetpipedata(Index(i), Length(i), Diameter(i), RoughnessCoeff(i), MinorLossCoeff(i), obj.LibEPANET);
         function setLinkNodesIndex(obj, linkIndex, startNode, endNode)
             % Sets the indexes of a link's start- and end-nodes. (EPANET Version 2.2)
             %
@@ -9722,6 +9758,10 @@ function [Errcode, index] = ENsetlinknodes(index, startnode, endnode, LibEPANET)
 end
 function [Errcode] = ENsetlinkvalue(index, paramcode, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetlinkvalue', index, paramcode, value);
+end
+function [Errcode, index] = ENsetpipedata(index, length, diam, rough, mloss, LibEPANET)
+% EPANET Version 2.2 
+[Errcode]=calllib(LibEPANET, 'ENsetpipedata', index, length, diam, rough, mloss);
 end
 function [Errcode, index] = ENsetlinktype(id, paramcode, actionCode, LibEPANET)
 % EPANET Version 2.2 
