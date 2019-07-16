@@ -2614,7 +2614,7 @@ classdef epanet <handle
             % 
             % Tank data that is retrieved:
             %
-            % 1) Index
+            % 1) Tank index
             % 2) Elevation
             % 3) Initial Level
             % 4) Minimum Water Level
