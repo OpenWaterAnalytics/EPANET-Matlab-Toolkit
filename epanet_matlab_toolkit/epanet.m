@@ -4022,6 +4022,9 @@ classdef epanet <handle
             %          setLinkStatus, setNodeTankData.
             for i=1:length(Index)
                 [obj.Errcode] = ENsetpipedata(Index(i), Length(i), Diameter(i), RoughnessCoeff(i), MinorLossCoeff(i), obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
+            end
+        end
         function setLinkNodesIndex(obj, linkIndex, startNode, endNode)
             % Sets the indexes of a link's start- and end-nodes. (EPANET Version 2.2)
             %
