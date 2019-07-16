@@ -416,6 +416,28 @@ classdef epanet <handle
         solve = 1;
     end
     methods (Access = private)
+        function Errcode = setFlowUnits(obj, unitcode, typecode, varargin)
+            if ~typecode
+                [Errcode]=Options(obj, unitcode); 
+                if isempty(varargin{1})
+                    return
+                else
+                    varargin = char(varargin{1});
+                end
+                obj.saveBinInpFile(varargin);
+                
+            elseif typecode
+                [Errcode] = ENsetflowunits(obj.LibEPANET, unitcode); 
+                if nargin==4
+                    if isempty(varargin{1})
+                        return
+                    else
+                        varargin = char(varargin{1});
+                    end
+                    obj.saveInputFile(varargin);
+                end
+            end
+        end
         function value = get_link_info(obj, constant, varargin)
             [indices, value] = getLinkIndices(obj, varargin);
             j=1;
@@ -5422,35 +5444,35 @@ classdef epanet <handle
         function setReport(obj, value)
             [obj.Errcode] = ENsetreport(value, obj.LibEPANET);
         end
-        function [Errcode]=setFlowUnitsGPM(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_GPM); %gallons per minute
+        function [Errcode]=setFlowUnitsGPM(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_GPM, 1, varargin); % gallons per minute
         end
-        function [Errcode]=setFlowUnitsLPS(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_LPS); %liters per second
+        function [Errcode]=setFlowUnitsLPS(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_LPS, 1, varargin); % liters per second
         end
-        function [Errcode]=setFlowUnitsMGD(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_MGD); %million gallons per day
+        function [Errcode]=setFlowUnitsMGD(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_MGD, 1, varargin); % million gallons per day
         end
-        function [Errcode]=setFlowUnitsIMGD(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_IMGD); %Imperial mgd
+        function [Errcode]=setFlowUnitsIMGD(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_IMGD, 1, varargin); % imperial mgd
         end
-        function [Errcode]=setFlowUnitsCFS(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_CFS); %cubic feet per second
+        function [Errcode]=setFlowUnitsCFS(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CFS, 1, varargin); % cubic feet per second
         end
-        function [Errcode]=setFlowUnitsAFD(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_AFD); %acre-feet per day
+        function [Errcode]=setFlowUnitsAFD(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_AFD, 1, varargin); % acre-feet per day
         end
-        function [Errcode]=setFlowUnitsLPM(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_LPM); %liters per minute
+        function [Errcode]=setFlowUnitsLPM(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_LPM, 1, varargin); % liters per minute
         end
-        function [Errcode]=setFlowUnitsMLD(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_MLD); %million liters per day
+        function [Errcode]=setFlowUnitsMLD(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_MLD, 1, varargin); % million liters per day
         end
-        function [Errcode]=setFlowUnitsCMH(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_CMH); %cubic meters per hour
+        function [Errcode]=setFlowUnitsCMH(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CMH, 1, varargin); % cubic meters per hour
         end
-        function [Errcode]=setFlowUnitsCMD(obj)
-            [Errcode]=ENsetflowunits(obj.LibEPANET, obj.ToolkitConstants.EN_CMD); %cubic meters per day
+        function [Errcode]=setFlowUnitsCMD(obj, varargin)
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CMD, 1, varargin); % cubic meters per day
         end
         function closeNetwork(obj)
             [obj.Errcode] = ENclose(obj.LibEPANET);
@@ -5508,29 +5530,7 @@ classdef epanet <handle
             [obj.Errcode, tleft] = ENstepQ(obj.LibEPANET);
         end
         function Errcode = saveInputFile(obj, inpname)
-%             [addSectionCoordinates, addSectionRules] = obj.getBinCoordRuleSections(obj.InputFile);
             [Errcode] = ENsaveinpfile(inpname, obj.LibEPANET);
-%             [~, info] = obj.readInpFile;
-%             endSectionIndex=find(~cellfun(@isempty, regexp(info, 'END', 'match')));
-%             endInpIndex=find(~cellfun(@isempty, regexp(addSectionCoordinates, 'END', 'match')));
-%             info(endSectionIndex)='';
-%             f1 = writenewTemp(obj.BinTempfile);
-%             coordSectionIndex=find(~cellfun(@isempty, regexp(info, 'COORDINATES', 'match')));
-%             if ~isempty(coordSectionIndex)
-%                 fprintf(f1, '%s\n', info{1:coordSectionIndex-1});
-%             else
-%                 fprintf(f1, '%s\n', info{:});
-%             end
-%             if ~isempty(addSectionRules)
-%                 fprintf(f1, '%s\n', addSectionRules{:});
-%             end
-%             if ~isempty(addSectionCoordinates) % && isempty(coordSectionIndex)
-%                 fprintf(f1, '%s\n', addSectionCoordinates{:});
-%             end
-%             if isempty(endInpIndex)
-%                 fprintf(f1, '[END]\n');
-%             end
-%             fclose(f1);
         end
         function writeLineInReportFile(obj, line)
             [obj.Errcode] = ENwriteline (line, obj.LibEPANET);
@@ -7929,35 +7929,35 @@ classdef epanet <handle
         function [Errcode]=removeBinControlNodeID(obj, ID)
             [Errcode]=rmControl(obj, 0, ID);
         end
-        function [Errcode]=setBinFlowUnitsGPM(obj)
-            [Errcode]=Options(obj, 'GPM'); %gallons per minute
+        function [Errcode]=setBinFlowUnitsGPM(obj, varargin)
+            Errcode = obj.setFlowUnits('GPM', 0, varargin); % gallons per minute
         end
-        function [Errcode]=setBinFlowUnitsLPS(obj)
-            [Errcode]=Options(obj, 'LPS'); %liters per second
+        function [Errcode]=setBinFlowUnitsLPS(obj, varargin)
+            Errcode = obj.setFlowUnits('LPS', 0, varargin); %liters per second
         end
-        function [Errcode]=setBinFlowUnitsMGD(obj)
-            [Errcode]=Options(obj, 'MGD'); %million gallons per day
+        function [Errcode]=setBinFlowUnitsMGD(obj, varargin)
+            Errcode = obj.setFlowUnits('MGD', 0, varargin); %million gallons per day
         end
-        function [Errcode]=setBinFlowUnitsIMGD(obj)
-            [Errcode]=Options(obj, 'IMGD'); %Imperial mgd
+        function [Errcode]=setBinFlowUnitsIMGD(obj, varargin)
+            Errcode = obj.setFlowUnits('IMGD', 0, varargin); %Imperial mgd
         end
-        function [Errcode]=setBinFlowUnitsCFS(obj)
-            [Errcode]=Options(obj, 'CFS'); %cubic feet per second
+        function [Errcode]=setBinFlowUnitsCFS(obj, varargin)
+            Errcode = obj.setFlowUnits('CFS', 0, varargin); %cubic feet per second
         end
-        function [Errcode]=setBinFlowUnitsAFD(obj)
-            [Errcode]=Options(obj, 'AFD'); %acre-feet per day
+        function [Errcode]=setBinFlowUnitsAFD(obj, varargin)
+            Errcode = obj.setFlowUnits('AFD', 0, varargin); %acre-feet per day
         end
-        function [Errcode]=setBinFlowUnitsLPM(obj)
-            [Errcode]=Options(obj, 'LPM'); %liters per minute
+        function [Errcode]=setBinFlowUnitsLPM(obj, varargin)
+            Errcode = obj.setFlowUnits('LPM', 0, varargin); %liters per minute
         end
-        function [Errcode]=setBinFlowUnitsMLD(obj)
-            [Errcode]=Options(obj, 'MLD'); %million liters per day
+        function [Errcode]=setBinFlowUnitsMLD(obj, varargin)
+            Errcode = obj.setFlowUnits('MLD', 0, varargin); %million liters per day
         end
-        function [Errcode]=setBinFlowUnitsCMH(obj)
-            [Errcode]=Options(obj, 'CMH'); %cubic meters per hour
+        function [Errcode]=setBinFlowUnitsCMH(obj, varargin)
+            Errcode = obj.setFlowUnits('CMH', 0, varargin); %cubic meters per hour
         end
-        function [Errcode]=setBinFlowUnitsCMD(obj)
-            [Errcode]=Options(obj, 'CMD'); %cubic meters per day
+        function [Errcode]=setBinFlowUnitsCMD(obj, varargin)
+            Errcode = obj.setFlowUnits('CMD', 0, varargin); %cubic meters per day
         end
         function [Errcode]=setBinHeadlossHW(obj)
             [Errcode]=Options(obj, '', 'H-W');  %Hazen-Wiliams
