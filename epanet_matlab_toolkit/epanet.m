@@ -4702,13 +4702,14 @@ classdef epanet <handle
             % Sets a group of properties for a tank. (EPANET Version 2.2)
             %
             % Properties:
-            % 1) Elevation
-            % 2) Initial water Level
-            % 3) Minimum Water Level
-            % 4) Maximum Water Level
-            % 5) Diameter (0 if a volume curve is supplied)
-            % 6) Minimum Water Volume
-            % 7) Volume Curve Index ("" for no curve)
+	    % 1) Tank index
+            % 2) Elevation
+            % 3) Initial water Level
+            % 4) Minimum Water Level
+            % 5) Maximum Water Level
+            % 6) Diameter (0 if a volume curve is supplied)
+            % 7) Minimum Water Volume
+            % 8) Volume Curve Index ("" for no curve)
             % 
             % The examples are based on d=epanet('Net3_trace.inp')
             %
