@@ -2629,26 +2629,16 @@ classdef epanet <handle
             %
             % See also setNodeTankData, getNodeElevations, getNodeTankInitialLevel,
             %          getNodeTankMinimumWaterLevel, getNodeTankDiameter.
+            tankData = struct();
             tankIndices = obj.getNodeTankIndex;
-            tankData = cell(8, length(tankIndices)+1);
-            tankData{1,1} = 'Index';
-            tankData{2,1} = 'Elevation';
-            tankData{3,1} = 'Initial Level';
-            tankData{4,1} = 'Minimum Water Level';
-            tankData{5,1} = 'Maximum Water Level';
-            tankData{6,1} = 'Diameter';
-            tankData{7,1} = 'Minimum Water Volume';
-            tankData{8,1} = 'Volume Curve Index';
-            for j=2:(length(tankIndices)+1)
-                tankData{1,j} = num2str(tankIndices(j-1));
-                tankData{2,j} = num2str(obj.getNodeElevations(tankIndices(j-1)));
-                tankData{3,j} = num2str(obj.getNodeTankInitialLevel(tankIndices(j-1)));
-                tankData{4,j} = num2str(obj.getNodeTankMinimumWaterLevel(tankIndices(j-1)));
-                tankData{5,j} = num2str(obj.getNodeTankMaximumWaterLevel(tankIndices(j-1)));
-                tankData{6,j} = num2str(obj.getNodeTankDiameter(tankIndices(j-1)));
-                tankData{7,j} = num2str(obj.getNodeTankMinimumWaterVolume(tankIndices(j-1)));
-                tankData{8,j} = num2str(obj.getNodeTankVolumeCurveIndex(tankIndices(j-1)));
-            end
+            tankData.Index = tankIndices;
+            tankData.Elevation = obj.getNodeElevations(tankIndices);
+            tankData.Initial_Level = obj.getNodeTankInitialLevel(tankIndices);
+            tankData.Minimum_Water_Level = obj.getNodeTankMinimumWaterLevel(tankIndices);
+            tankData.Maximum_Water_Level = obj.getNodeTankMaximumWaterLevel(tankIndices);
+            tankData.Diameter = obj.getNodeTankDiameter(tankIndices);
+            tankData.Minimum_Water_Volume = obj.getNodeTankMinimumWaterVolume(tankIndices);
+            tankData.Volume_Curve_Index = obj.getNodeTankVolumeCurveIndex(tankIndices);
         end
         function value = getOptionsMaxTrials(obj)
             % Retrieves the maximum hydraulic trials allowed for hydraulic convergence.
