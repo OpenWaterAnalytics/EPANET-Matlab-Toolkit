@@ -3918,6 +3918,34 @@ classdef epanet <handle
             %       d.getControls(index)
             index = addControlFunction(obj, control); 
         end
+        function setLinkNodesIndex(obj, linkIndex, startNode, endNode)
+            % Sets the indexes of a link's start- and end-nodes. (EPANET Version 2.2)
+            %
+            % Example 1:
+            %   % Sets to the 1st link the start-node index = 2 and end-node index = 3
+            %   d.getLinkNodesIndex   % Retrieves the indexes of the from/to nodes of all links
+            %   linkIndex = 1;
+            %   startNode = 2;
+            %   endNode = 3;
+            %   d.setLinkNodesIndex(linkIndex, startNode, endNode)
+            %   d.getLinkNodesIndex
+            %
+            % Example 2:
+            %   % Sets to the 1st link the start-node index = 2 and end-node index = 3
+            %   % and to 2nd link the start-node index = 4 and end-node index = 5.
+            %   linkIndex = [1 ,2];
+            %   startNode = [2, 4];
+            %   endNode = [3, 5];
+            %   d.setLinkNodesIndex(linkIndex, startNode, endNode)
+            %   d.getLinkNodesIndex
+            %
+            % See also getLinkNodesIndex, setLinkDiameter, setLinkLength,
+            %          setLinkNameID, setLinkComment.
+            for i=1:length(linkIndex)
+                [obj.Errcode] = ENsetlinknodes(linkIndex(i), startNode(i), endNode(i), obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
+            end
+        end
         function setLinkDiameter(obj, value, varargin)
             % Sets the values of diameters
             % Example:
@@ -9582,6 +9610,10 @@ Errcode=calllib(LibEPANET, 'ENsaveinpfile', inpname);
 end
 function [Errcode] = ENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetcontrol', cindex, ctype, lindex, setting, nindex, level);
+end
+function [Errcode, index] = ENsetlinknodes(index, startnode, endnode, LibEPANET)
+% EPANET Version 2.2 
+[Errcode]=calllib(LibEPANET, 'ENsetlinknodes', index, startnode, endnode);
 end
 function [Errcode] = ENsetlinkvalue(index, paramcode, value, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetlinkvalue', index, paramcode, value);

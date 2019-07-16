@@ -359,6 +359,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkLength|Sets the values of lengths|
 |setLinkMinorLossCoeff|Sets the values of minor loss coeff.|
 |setLinkNameID|Sets the ID name for links|
+|setLinkNodesIndex|Sets the indexes of a link's start- and end-nodes. (EPANET Version 2.2)|
 |setLinkRoughnessCoeff|Sets the values of roughness coeff.|
 |setLinkSettings|Sets the values of settings|
 |setLinkStatus|Sets the values of status|
@@ -776,6 +777,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetlinkid|Change the ID name for a link|
 |ENgettitle|Retrieves the title lines of the project|
 |ENsettitle|Sets the title lines of the project|
+|ENsetlinknodes|Sets the indexes of a link's start- and end-nodes|
 |ENsetlinktype|Changes the type of a particular link (e.g. pipe to pump)|
 |ENgetdemandname|Gets the name of a node's demand category|
 |ENsetdemandname|Assigns a name to a node's demand category|
