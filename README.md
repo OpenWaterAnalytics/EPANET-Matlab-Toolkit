@@ -212,6 +212,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeSourcePatternIndex|Retrieves the value of all node source pattern index|
 |getNodeSourceQuality|Retrieves the value of all nodes source quality|
 |getNodeSourceType|Retrieves the value of all node source type|
+|getNodeTankData|Retrieves a group of properties for a tank. (EPANET Version 2.2)|
 |getNodeTankBulkReactionCoeff|Retrieves the tank bulk rate coefficient|
 |getNodeTankCanOverFlow|Retrieves the tank can overflow (= 1) or not (= 0)|
 |getNodeTankCount|Retrieves the number of tanks|
@@ -384,6 +385,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeSourcePatternIndex|Sets the values of source pattern indices|
 |setNodeSourceQuality|Sets the values of source qualities|
 |setNodeSourceType|Sets the values of source types|
+|setNodeTankData| Sets a group of properties for a tank. (EPANET Version 2.2)|
 |setNodeTankBulkReactionCoeff|Sets the values of tank bulk reaction coeff.|
 |setNodeTankDiameter|Sets the values of tanks diameter|
 |setNodeTankCanOverFlow|Sets the value of tank can overflow (= 1) or not (= 0)|
@@ -776,6 +778,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetdemandmodel|Sets the type of demand model to use and its parameters|
 |ENsetnodeid|Change the ID name for a node|
 |ENsetlinkid|Change the ID name for a link|
+|ENsettankdata|Sets a group of properties for a tank node|
 |ENgettitle|Retrieves the title lines of the project|
 |ENsettitle|Sets the title lines of the project|
 |ENsetlinktype|Changes the type of a particular link (e.g. pipe to pump)|
