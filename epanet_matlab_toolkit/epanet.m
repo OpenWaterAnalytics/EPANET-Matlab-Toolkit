@@ -4012,7 +4012,7 @@ classdef epanet <handle
             %          getControls, getControlRulesCount.
             obj = varargin{1};
             if nargin==1
-                index = 1:length(obj.getControls);
+                index = 1:obj.getControlRulesCount;
             else
                 index = varargin{2};
             end
