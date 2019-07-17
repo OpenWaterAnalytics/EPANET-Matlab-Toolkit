@@ -4025,6 +4025,7 @@ classdef epanet <handle
             %   d.deleteRule(1:3)   % Deletes the 1st to 3rd rule-based control
             %   d.getRuleCount
             %
+            % See also getRuleCount.
             obj = varargin{1};
             if nargin==1
                 index = 1:obj.getRuleCount;
