@@ -272,7 +272,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getQualityTraceNodeIndex|Retrieves the trace node index of water quality analysis type|
 |getQualityType|Retrieves the type of water quality analysis type|
 |getRuleCount|Retrieves the number of rules. (EPANET Version 2.2)|
-|getRuleID|Retrieves the ID name of a rule-based control. (EPANET Version 2.2)|
+|getRuleID|Retrieves the ID name of a rule-based control given its index. (EPANET Version 2.2)|
 |getStatistic|Retrieves hydraulic simulation statistic|
 |getTimeHTime|Retrieves the number of htime|
 |getTimeQTime|Retrieves the number of qtime|

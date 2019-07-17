@@ -884,7 +884,7 @@ classdef epanet <handle
 %             end
 %         end
         function value = getRuleID(obj, varargin)
-            % Retrieves the ID name of a rule-based control. (EPANET Version 2.2)
+            % Retrieves the ID name of a rule-based control given its index. (EPANET Version 2.2)
             %
             % % The examples are based on d=epanet('BWSN_Network_1.inp');
             %
