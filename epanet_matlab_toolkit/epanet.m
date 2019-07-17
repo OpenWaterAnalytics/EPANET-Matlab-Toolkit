@@ -10810,10 +10810,12 @@ if strcmpi(slegend, 'show')
         legendString={'Pipes', 'Pumps', 'Valves', ...
             'Junctions', 'Reservoirs', 'Tanks'}; 
         legendIndices=sort(legendIndices, 'descend');
-        try
-            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
-        catch
-            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
+        if exist('h','var')
+            try
+                legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
+            catch
+                legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
+            end
         end
     end
 elseif strcmpi(slegend, 'hide')
