@@ -883,6 +883,34 @@ classdef epanet <handle
 %                 end
 %             end
 %         end
+        function value = getRuleID(obj, varargin)
+            % Retrieves the ID name of a rule-based control. (EPANET Version 2.2)
+            %
+            % % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   d.getRuleID         % Retrieves the ID name of every rule-based control
+            %
+            % Example 2:
+            %   d.getRuleID(1)      % Retrieves the ID name of the 1st rule-based control
+            %
+            % Example 3:
+            %   d.getRuleID(1:3)    % Retrieves the ID names of the 1st to 3rd rule-based control
+            %
+            if nargin==1
+                index = 1:obj.getRuleCount;
+                value = cell(1, length(index));
+            elseif nargin==2
+                index = varargin{1};
+                value = cell(1,1);
+            end
+            j=1;
+            for i=1:length(index)
+                [Errcode, value{j}] = ENgetruleID(index(i), obj.LibEPANET);
+                error(obj.getError(Errcode));
+                j=j+1;
+            end
+        end
         function value = getNodeCount(obj)
             % Retrieves the number of nodes
             % Example:
@@ -9754,6 +9782,10 @@ Errcode=calllib(LibEPANET, 'ENsaveinpfile', inpname);
 end
 function [Errcode] = ENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetcontrol', cindex, ctype, lindex, setting, nindex, level);
+end
+function [Errcode, id] = ENgetruleID(index, LibEPANET)
+% EPANET Version 2.2 
+[Errcode, id]=calllib(LibEPANET, 'ENgetruleID', index,'');
 end
 function [Errcode, index] = ENsetlinknodes(index, startnode, endnode, LibEPANET)
 % EPANET Version 2.2 
