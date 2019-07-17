@@ -4007,6 +4007,35 @@ classdef epanet <handle
             % See also getControls, setControls, getControlRulesCount.
             index = addControlFunction(obj, control); 
         end
+        function deleteRule(varargin)
+            % Deletes an existing rule-based control given it's index. (EPANET Version 2.2)
+            %
+            % % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   d.getRuleCount      % Retrieves the number of rules
+            %   d.deleteRule        % Deletes all the rule-based control
+            %   d.getRuleCount
+            %
+            % Example 2:
+            %   d.deleteRule(1)     % Deletes the 1st rule-based control
+            %   d.getRuleCount
+            %
+            % Example 3:
+            %   d.deleteRule(1:3)   % Deletes the 1st to 3rd rule-based control
+            %   d.getRuleCount
+            %
+            obj = varargin{1};
+            if nargin==1
+                index = 1:obj.getRuleCount;
+            else
+                index = varargin{2};
+            end
+            for i=length(index):-1:1
+                [Errcode] = ENdeleterule(index(i), obj.LibEPANET);
+                error(obj.getError(Errcode));
+            end
+        end
         function setLinkPipeData(obj, Index, Length, Diameter, RoughnessCoeff, MinorLossCoeff)
             % Sets a group of properties for a pipe. (EPANET Version 2.2)
             %
@@ -9932,6 +9961,10 @@ function [Errcode] = ENsetheadcurveindex(LibEPANET, pumpindex, curveindex)
 end
 function [Errcode, cindex] = ENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
+end
+function [Errcode] = ENdeleterule(index, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENdeleterule', index);
 end
 function [Errcode, type, pmin, preq, pexp] = ENgetdemandmodel(LibEPANET)
 % EPANET Version 2.2

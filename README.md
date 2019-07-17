@@ -314,6 +314,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deleteLink|Deletes a link|
 |deleteNode|Deletes a node|
 |deletePattern|Deletes a time pattern from a project|
+|deleteRule|Deletes an existing rule-based control given it's index. (EPANET Version 2.2)|
 |closeHydraulicAnalysis|Closes the hydraulic analysis system, freeing all allocated memory|
 |closeNetwork|Closes down the Toolkit system|
 |closeQualityAnalysis|Closes the water quality analysis system, freeing all allocated memory|
@@ -791,6 +792,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENgetcomment|Retrieves the comment string assigned to the object (NODE, LINK, TIMEPAT or CURVE)|
 |ENsetcomment|Sets the comment string assigned to the object (NODE, LINK, TIMEPAT or CURVE)|
 |ENdeletepattern|Deletes a time pattern from a project|
+|ENdeleterule|Deletes an existing rule-based control|
 |ENdeletecurve|Deletes a data curve from the project|
 |ENsetjuncdata|Sets a group of properties for a junction node|
 
