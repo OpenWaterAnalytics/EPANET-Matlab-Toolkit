@@ -294,7 +294,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getVersion|Retrieve the current EPANET version of DLL|
 |getNodesInfo|Retrieves nodes info e.g. elevations, demand pattern indices, emitter coeff. , initial quality, source quality, source pattern indices, source type code, type indices|
 |getLinksInfo|Retrieves links info e.g. diameters, lengths, roughness coeff. , minor loss coeff. , initial status, initial settings, bulk reaction coeff. , wall reaction coeff. , nodes connecting link indices, type indices|
-|addControls|Adds a new simple control|
+|addControls|Adds a new simple control. (EPANET Version 2.2)|
 |addCurve|Adds a new curve appended to the end of the existing curves|
 |addPattern|Adds a new time pattern to the network|
 |addNodeJunction|Adds a new junction|

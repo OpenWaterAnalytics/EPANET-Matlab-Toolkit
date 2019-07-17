@@ -3978,12 +3978,33 @@ classdef epanet <handle
             end
         end
         function index = addControls(obj, control)
-            % Adds a new simple control
-            % Example:
-            %       index = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');
-            %       d.getControls(index)
-            %       d.setControls(index, 'LINK 9 43.2392 AT TIME 14:00:00');
-            %       d.getControls(index)
+            % Adds a new simple control. (EPANET Version 2.2)
+            %
+            % % The examples are based on d=epanet('Net1.inp');
+            %
+            % Example 1:
+            %   % Close Link 12 if the level in Tank 2 exceeds 20 ft.
+            %   index = d.addControls('LINK 12 CLOSED IF NODE 2 ABOVE 20');
+            %   d.getControls(index)
+            %
+            % Example 2:
+            %   % Open Link 12 if the pressure at Node 11 is under 30 psi
+            %   index = d.addControls('LINK 12 OPEN IF NODE 11 BELOW 30');
+            %   d.getControls(index)
+            %
+            % Example 3:
+            %   % Pump 9 speed is set to 1.5 at 16 hours into the simulation
+            %   index = d.addControls('LINK 9 1.5 AT TIME 16:00');
+            %   d.getControls(index)
+            %
+            % Example 4:
+            %   % Link 12 is closed at 10 am and opened at 8 pm throughout the simulation
+            %   index_3 = d.addControls('LINK 12 CLOSED AT CLOCKTIME 10:00');
+            %   d.getControls(index_3)
+            %   index_4 = d.addControls('LINK 12 OPEN AT CLOCKTIME 20:00');
+            %   d.getControls(index_4)
+            %
+            % See also getControls, setControls, getControlRulesCount.
             index = addControlFunction(obj, control); 
         end
         function setLinkPipeData(obj, Index, Length, Diameter, RoughnessCoeff, MinorLossCoeff)
