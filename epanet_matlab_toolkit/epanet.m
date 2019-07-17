@@ -3986,6 +3986,41 @@ classdef epanet <handle
             %       d.getControls(index)
             index = addControlFunction(obj, control); 
         end
+        function Errcode = deleteControls(varargin)
+            % Deletes an existing simple control. (EPANET Version 2.2)
+            %
+            % Example 1:
+            %   d.getControls                                                % Retrieves the parameters of all control statements
+            %   d.deleteControls                                             % Deletes the existing simple controls
+            %   d.getControls      
+            %
+            % Example 2:
+            %   index = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');     % Adds a new simple control(index = 3)
+            %   d.getControls(index)
+            %   d.deleteControls(index);                                      % Deletes the 3rd simple control
+            %   d.getControls
+            %
+            % Example 3:
+            %   index_3 = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');   % Adds a new simple control(index = 3)
+            %   index_4 = d.addControls('LINK 10 43.2392 AT TIME 4:00:00');  % Adds a new simple control(index = 4)
+            %   d.getControls(index_3)
+            %   d.getControls(index_4)
+            %   d.deleteControls([index_3, index_4]);                         % Deletes the 3rd and 4th simple controls
+            %   d.getControls
+            %
+            % See also addControls, setControls, 
+            %          getControls, getControlRulesCount.
+            obj = varargin{1};
+            if nargin==1
+                index = 1:length(obj.getControls);
+            else
+                index = varargin{2};
+            end
+            for i=length(index):-1:1
+                [Errcode] = ENdeletecontrol(index(i), obj.LibEPANET);
+                error(obj.getError(Errcode));
+            end
+        end
         function setLinkPipeData(obj, Index, Length, Diameter, RoughnessCoeff, MinorLossCoeff)
             % Sets a group of properties for a pipe. (EPANET Version 2.2)
             %
@@ -9911,6 +9946,10 @@ function [Errcode] = ENsetheadcurveindex(LibEPANET, pumpindex, curveindex)
 end
 function [Errcode, cindex] = ENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
+end
+function [Errcode] = ENdeletecontrol(index, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENdeletecontrol', index);
 end
 function [Errcode, type, pmin, preq, pexp] = ENgetdemandmodel(LibEPANET)
 % EPANET Version 2.2
