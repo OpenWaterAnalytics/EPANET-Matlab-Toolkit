@@ -272,6 +272,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getQualityTraceNodeIndex|Retrieves the trace node index of water quality analysis type|
 |getQualityType|Retrieves the type of water quality analysis type|
 |getRuleCount|Retrieves the number of rules. (EPANET Version 2.2)|
+|getRuleID|Retrieves the ID name of a rule-based control given its index. (EPANET Version 2.2)|
 |getStatistic|Retrieves hydraulic simulation statistic|
 |getTimeHTime|Retrieves the number of htime|
 |getTimeQTime|Retrieves the number of qtime|
@@ -776,6 +777,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENgetcurvetype|Retrieves the type of a curve|
 |ENgetdemandindex|Retrieves the index of a node's named demand category|
+|ENgetruleID|Gets the ID name of a rule-based control given its index|
 |ENsetflowunits|Sets the flow units|
 |ENgetdemandmodel|Retrieves the type of demand model in use and its parameters|
 |ENsetdemandmodel|Sets the type of demand model to use and its parameters|
