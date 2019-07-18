@@ -962,6 +962,36 @@ classdef epanet <handle
                 error(obj.getError(obj.Errcode));
             end
         end
+        function Errcode = deleteRule(varargin)
+            % Deletes an existing rule-based control given it's index. (EPANET Version 2.2)
+            %
+            % % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   d.getRuleCount      % Retrieves the number of rules
+            %   d.deleteRule;        % Deletes all the rule-based control
+            %   d.getRuleCount
+            %
+            % Example 2:
+            %   d.deleteRule(1);     % Deletes the 1st rule-based control
+            %   d.getRuleCount
+            %
+            % Example 3:
+            %   d.deleteRule(1:3);   % Deletes the 1st to 3rd rule-based control
+            %   d.getRuleCount
+            %
+            % See also getRuleCount.
+            obj = varargin{1};
+            if nargin==1
+                index = 1:obj.getRuleCount;
+            else
+                index = varargin{2};
+            end
+            for i=length(index):-1:1
+                [Errcode] = ENdeleterule(index(i), obj.LibEPANET);
+                error(obj.getError(Errcode));
+            end
+        end
         function value = getNodeCount(obj)
             % Retrieves the number of nodes
             % Example:
@@ -9820,6 +9850,10 @@ Errcode=calllib(LibEPANET, 'ENsaveinpfile', inpname);
 end
 function [Errcode] = ENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetcontrol', cindex, ctype, lindex, setting, nindex, level);
+end
+function [Errcode] = ENdeleterule(index, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENdeleterule', index);
 end
 function [Errcode, id] = ENgetruleID(index, LibEPANET)
 % EPANET Version 2.2 
