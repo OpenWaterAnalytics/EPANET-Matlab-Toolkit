@@ -474,6 +474,30 @@ classdef epanet <handle
                 end
             end
         end
+        function value = get_node_tank(obj, nodePropertie, varargin)
+            tankIndices = obj.getNodeTankIndex;
+            if isempty(varargin{1})
+                value = zeros(1, length(tankIndices));
+                j = 1;
+                for i=tankIndices
+                    [obj.Errcode, value(j)] = ENgetnodevalue(i, nodePropertie, obj.LibEPANET);
+                    j=j+1;
+                end
+            else
+                varargin{1} = varargin{1}{1};
+                if ~ismember(varargin{1}, tankIndices)
+                    varargin{1} = tankIndices(varargin{1});
+                end
+                value = zeros(1, length(varargin{1}));
+                j = 1;
+                for i=1:length(varargin{1})
+                    [obj.Errcode, value(j)] = ENgetnodevalue(varargin{1}(i), nodePropertie, obj.LibEPANET);
+                    if ~isscalar(varargin{1})
+                        j=j+1;
+                    end
+                end
+            end
+        end
     end
     methods
         function obj = epanet(varargin)
@@ -2261,13 +2285,7 @@ classdef epanet <handle
             %
             % See also setNodeTankInitialLevel, getNodeTankInitialWaterVolume, getNodeTankVolume,
             %          getNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_TANKLEVEL, obj.LibEPANET); 
-                if obj.Errcode==251, value(j)=NaN; end
-                if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_TANKLEVEL, varargin);
         end
         function value = getNodeActualDemand(obj, varargin)
             % Retrieves the computed value of all node actual demands.
@@ -2450,13 +2468,7 @@ classdef epanet <handle
             %
             % See also getNodeTankInitialLevel,  getNodeTankVolume,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_INITVOLUME, obj.LibEPANET); 
-                if obj.Errcode==251, value(j)=NaN; end
-                if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end   
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_INITVOLUME, varargin);
         end
         function value = getNodeTankMixiningModel(obj)
             % Retrieves the tank mixing model code and type (mix1, mix2, fifo, lifo).
@@ -2513,12 +2525,7 @@ classdef epanet <handle
             %
             % See also getNodeTankMixiningModel, getNodeTankMixingModelCode,
             %          getNodeTankMixingModelType.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MIXZONEVOL, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_MIXZONEVOL, varargin);
         end
         function value = getNodeTankDiameter(obj, varargin)
             % Retrieves the tank diameters.
@@ -2531,12 +2538,7 @@ classdef epanet <handle
             %
             % See also setNodeTankDiameter, getNodeTankBulkReactionCoeff, getNodeTankInitialLevel, 
             %          getNodeTankMixingModelType, getNodeTankVolume, getNodeTankNameID.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_TANKDIAM, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_TANKDIAM, varargin);
         end
         function value = getNodeTankMinimumWaterVolume(obj, varargin)
             % Retrieves the tank minimum water volume.
@@ -2549,12 +2551,7 @@ classdef epanet <handle
             %
             % See also setNodeTankMinimumWaterVolume, getNodeTankMaximumWaterVolume, getNodeTankInitialWaterVolume,
             %          getNodeTankInitialLevel,  getNodeTankVolume, getNodeTankMixZoneVolume.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MINVOLUME, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_MINVOLUME, varargin);
         end
         function value = getNodeTankVolumeCurveIndex(obj, varargin)
             % Retrieves the tank volume curve index.
@@ -2567,12 +2564,7 @@ classdef epanet <handle
             %
             % See also getNodeTankVolume, getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume,
             %          getNodeTankInitialWaterVolume, getNodeTankMixZoneVolume.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_VOLCURVE, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_VOLCURVE, varargin);
         end
         function value = getNodeTankMinimumWaterLevel(obj, varargin)
             % Retrieves the tank minimum water level.
@@ -2585,12 +2577,7 @@ classdef epanet <handle
             %
             % See also setNodeTankMinimumWaterLevel, getNodeTankMaximumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MINLEVEL, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_MINLEVEL, varargin);
         end
         function value = getNodeTankMaximumWaterLevel(obj, varargin)
             % Retrieves the tank maximum water level.
@@ -2603,30 +2590,15 @@ classdef epanet <handle
             %
             % See also setNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MAXLEVEL, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_MAXLEVEL, varargin);
         end
         function value = getNodeTankMinimumFraction(obj, varargin)
             %Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MIXFRACTION, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_MIXFRACTION, varargin);
         end
         function value = getNodeTankBulkReactionCoeff(obj, varargin)
             %Retrieves the tank bulk rate coefficient
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_TANK_KBULK, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_TANK_KBULK, varargin);
         end
         function value = getNodeTankVolume(obj, varargin)
             %EPANET Version 2.1
@@ -2636,19 +2608,7 @@ classdef epanet <handle
             %  d.getNodeTankVolume(Nindex)
             %  d.getNodeTankVolume
             %  d.getNodeTankVolume(1:5)
-            [indices, value] = getNodeIndices(obj, varargin);
-            if obj.getVersion > 20012
-                j=1;
-                for i=indices
-                    [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_TANKVOLUME, obj.LibEPANET); 
-                    if obj.Errcode==251, value(j)=NaN; end
-                    if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end   
-                    j=j+1;
-                end
-            else
-                value = value*NaN;
-                warning('Function getNodeTankVolume need: EPANET Version > 20012');
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_TANKVOLUME, varargin);
         end
         function value = getNodeTankMaximumWaterVolume(obj, varargin)
             %EPANET Version 2.1
@@ -2658,12 +2618,7 @@ classdef epanet <handle
             %   d.getNodeTankMaximumWaterVolume(Nindex)
             %   d.getNodeTankMaximumWaterVolume
             %   d.getNodeTankMaximumWaterVolume(1:5)
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MAXVOLUME, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_MAXVOLUME, varargin);
         end
         function value = getNodeTankCanOverFlow(obj, varargin)
             % Retrieves the tank can overflow (= 1) or not (= 0)
