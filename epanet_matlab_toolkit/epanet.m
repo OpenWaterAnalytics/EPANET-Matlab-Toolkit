@@ -911,6 +911,33 @@ classdef epanet <handle
                 j=j+1;
             end
         end
+        function value = getRuleInfo(obj, varargin)
+            % Retrieves summary information about a rule-based control given it's index. (EPANET Version 2.2)
+            %
+            % % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   d.getRuleInfo         % Retrieves summary information about every rule-based control
+            %
+            % Example 2:
+            %   d.getRuleInfo(1)      % Retrieves summary information about the 1st rule-based control
+            %
+            % Example 3:
+            %   d.getRuleInfo(1:3)    % Retrieves summary information about the 1st to 3rd rule-based control
+            %
+            % See also getRuleID.
+            value=struct();
+            if nargin==1
+                index = 1:obj.getRuleCount;
+            elseif nargin==2
+                index = varargin{1};
+            end
+            value.Index = index;
+            for i=1:length(index)
+                [Errcode, value.Premises(i), value.ThenActions(i), value.ElseActions(i), value.Priority(i)] = ENgetrule(index(i), obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
+            end
+        end
         function value = getNodeCount(obj)
             % Retrieves the number of nodes
             % Example:
@@ -9842,6 +9869,10 @@ end
 function [Errcode, id] = ENgetruleID(index, LibEPANET)
 % EPANET Version 2.2 
 [Errcode, id]=calllib(LibEPANET, 'ENgetruleID', index,'');
+end
+function [Errcode, nPremises, nThenActions, nElseActions, priority] = ENgetrule(index, LibEPANET)
+% EPANET Version 2.2
+[Errcode, nPremises, nThenActions, nElseActions, priority]=calllib(LibEPANET, 'ENgetrule', index, 0, 0, 0, 0);
 end
 function [Errcode, index] = ENsetlinknodes(index, startnode, endnode, LibEPANET)
 % EPANET Version 2.2 
