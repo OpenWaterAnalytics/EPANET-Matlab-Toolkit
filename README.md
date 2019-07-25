@@ -271,6 +271,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getQualityInfo|Retrieves the quality info - bug in ENgetqualinfo|
 |getQualityTraceNodeIndex|Retrieves the trace node index of water quality analysis type|
 |getQualityType|Retrieves the type of water quality analysis type|
+|getRules|Retrieves the rule - based control statements. (EPANET Version 2.2)|
 |getRuleCount|Retrieves the number of rules. (EPANET Version 2.2)|
 |getRuleID|Retrieves the ID name of a rule-based control given its index. (EPANET Version 2.2)|
 |getRuleInfo|Retrieves summary information about a rule-based control given it's index. (EPANET Version 2.2)|
@@ -312,6 +313,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addLinkValveFCV|Adds a new FCV valve|
 |addLinkValveTCV|Adds a new TCV valve|
 |addLinkValveGPV|Adds a new GPV valve|
+|addRules|Adds a new rule-based control to a project. (EPANET Version 2.2)|
 |deleteCurve|Deletes a data curve from the project|
 |deleteLink|Deletes a link|
 |deleteNode|Deletes a node|
@@ -430,6 +432,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setReport|Issues a report formatting command. Formatting commands are the same as used in the [REPORT] section of the EPANET Input file|
 |setReportFormatReset|Clears any report formatting commands that either appeared in the [REPORT] section of the EPANET Input file or were issued with the ENsetreport function|
 |setReportStatus|Sets the level of hydraulic status reporting|
+|setRuleElseAction|Sets rule - based control else actions. (EPANET Version 2.2)|
+|setRulePriority|Sets rule - based control priority. (EPANET Version 2.2)|
+|setRuleThenAction|Sets rule - based control then actions. (EPANET Version 2.2)|
 |setTimeHTime|Sets the htime|
 |setTimeHaltFlag|Sets the halt flag|
 |setTimeHydraulicStep|Sets the hydraulic step|
@@ -770,6 +775,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENaddcontrol|Specify parameters to add a new simple control|
 |ENaddlink|Adds a new link|
 |ENaddnode|Adds a new node|
+|ENaddrule|Adds a new rule-based control to a project|
 |ENadddemand|Appends a new demand to a junction node demands list|
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
@@ -779,15 +785,21 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetheadcurveindex|Sets the curve index for a specified pump index|
 |ENgetcurvetype|Retrieves the type of a curve|
 |ENgetdemandindex|Retrieves the index of a node's named demand category|
+|ENgetpremise|Gets the properties of a premise in a rule-based control|
+|ENgetelseaction|Gets the properties of an ELSE action in a rule-based control|
 |ENgetruleID|Gets the ID name of a rule-based control given its index|
 |ENgetrule|Retrieves summary information about a rule-based control|
+|ENgetthenaction|Gets the properties of a THEN action in a rule-based control|
 |ENsetflowunits|Sets the flow units|
 |ENgetdemandmodel|Retrieves the type of demand model in use and its parameters|
 |ENsetdemandmodel|Sets the type of demand model to use and its parameters|
+|ENsetelseaction|Sets the properties of an ELSE action in a rule-based control|
 |ENsetnodeid|Change the ID name for a node|
 |ENsetlinkid|Change the ID name for a link|
 |ENsetpipedata|Sets a group of properties for a pipe link|
+|ENsetrulepriority|Sets the priority of a rule-based control|
 |ENsettankdata|Sets a group of properties for a tank node|
+|ENsetthenaction|Sets the properties of a THEN action in a rule-based control|
 |ENgettitle|Retrieves the title lines of the project|
 |ENsettitle|Sets the title lines of the project|
 |ENsetlinknodes|Sets the indexes of a link's start- and end-nodes|
