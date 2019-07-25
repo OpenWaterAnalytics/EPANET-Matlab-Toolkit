@@ -1056,7 +1056,7 @@ classdef epanet <handle
             %   linkIndex = 2;
             %   type = 'STATUS';
             %   value = 2;
-            %   setRuleThenAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new then - action in the 1st rule - based control, in the 1st then-action.
+            %   setRuleThenAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new then - action in the 1st rule - based control, in the 1st then - action.
             %   rule = d.getRules(1)
             %
             % See also setRuleElseAction, setRulePriority, getRuleInfo,
@@ -1088,7 +1088,7 @@ classdef epanet <handle
             %   linkIndex = 2;
             %   type = 'STATUS';
             %   value = 2;
-            %   setRuleElseAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new else - action in the 1st rule - based control, in the 1st then-action.
+            %   setRuleElseAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new else - action in the 1st rule - based control, in the 1st else - action.
             %   rule = d.getRules(1)
             %
             % See also setRuleThenAction, setRulePriority, getRuleInfo,
@@ -1109,7 +1109,7 @@ classdef epanet <handle
             % % The examples are based on d=epanet('BWSN_Network_1.inp');
             %
             % Example:
-            %   d.getRules(1).Rule   % Retrieves the 1st rule - based control
+            %   d.getRules(1).Rule                       % Retrieves the 1st rule - based control
             %   ruleIndex = 1;
             %   priority = 2;
             %   d.setRulePriority(ruleIndex, priority)   % Sets the 1st rule - based control priority = 2
