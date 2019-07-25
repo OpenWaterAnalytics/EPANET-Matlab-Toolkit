@@ -10073,6 +10073,7 @@ function [Errcode] = ENdeleterule(index, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENdeleterule', index);
 end
 function [Errcode, logop, object, objIndex, variable, relop, status, value] = ENgetpremise(ruleIndex, premiseIndex, LibEPANET)
+% EPANET Version 2.2
 [Errcode, logop, object, objIndex, variable, relop, status, value]=calllib(LibEPANET, 'ENgetpremise', ruleIndex, premiseIndex,0,0,0,0,0,0,0);
 end
 function [Errcode, linkIndex, status, setting] = ENgetthenaction(ruleIndex, actionIndex, LibEPANET)
