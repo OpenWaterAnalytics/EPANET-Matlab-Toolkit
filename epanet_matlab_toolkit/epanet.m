@@ -3668,7 +3668,9 @@ classdef epanet <handle
             obj.closeQualityAnalysis;
         end
         function value = getComputedTimeSeries(obj)
-            obj.saveInputFile(obj.BinTempfile);
+            [~, inpname] = obj.saveInputFile('@#temp');%temporary code.
+            copyfile(inpname, obj.TempInpFile);
+
             [fid,binfile,rptfile] = runEPANETexe(obj);
             value = readEpanetBin(fid, binfile, rptfile, 0);            
             % Remove report bin, files @#
@@ -5692,7 +5694,7 @@ classdef epanet <handle
         function tleft=stepQualityAnalysisTimeLeft(obj)
             [obj.Errcode, tleft] = ENstepQ(obj.LibEPANET);
         end
-        function Errcode = saveInputFile(obj, inpname)
+        function [Errcode, inpname] = saveInputFile(obj, inpname)
             [Errcode] = ENsaveinpfile(inpname, obj.LibEPANET);
         end
         function writeLineInReportFile(obj, line)
