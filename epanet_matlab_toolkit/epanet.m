@@ -389,6 +389,11 @@ classdef epanet <handle
     properties (Constant = true)
         classversion='dev2.2'; % 06/02/2019
         
+        LOGOP={'IF', 'AND', 'OR'}
+        RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
+        RULEVARIABLE={'DEMAND', 'HEAD', 'GRADE', 'LEVEL', 'PRESSURE', 'FLOW', 'STATUS', 'SETTING', 'POWER', 'TIME', 'CLOCKTIME', 'FILLTIME', 'DRAINTIME'};
+        RULEOPERATOR={'=', '~=', '<=', '>=', '<', '>', '==', '~==', 'BELOW', 'ABOVE'};
+        RULESTATUS={'OPEN', 'CLOSED', 'ACTIVE'};
         TYPECONTROL={'LOWLEVEL', 'HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL', 'HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'VOLUME', 'PUMP', 'EFFICIENCY', 'HEADLOSS', 'GENERAL'}; % Constants for pump curves: 'PUMP', 'EFFICIENCY', 'VOLUME', 'HEADLOSS' % EPANET Version 2.2
         TYPELINK={'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'}; % Constants for links: 'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'VALVE'
@@ -893,20 +898,231 @@ classdef epanet <handle
                 j=j+1;
             end
         end
-%         function value = getRules(obj)
-%             value={};
-%             cnt=obj.getRuleCount;
-%             if cnt
-%                 obj.RulePremises(cnt)=NaN;
-%                 obj.RuleTrueActions(cnt)=NaN;
-%                 obj.RuleFalseActions(cnt)=NaN;
-%                 obj.RulePriority(cnt)=NaN;
-%                 for i=1:cnt
-%                     [obj.Errcode, obj.RulePremises(i), obj.RuleTrueActions(i), obj.RuleFalseActions(i), obj.RulePriority(i)] = ENgetrule(i, obj.LibEPANET);
-%                     value{i}={obj.RulePremises(i), obj.RuleTrueActions(i), obj.RuleFalseActions(i), obj.RulePriority(i)};
-%                 end
-%             end
-%         end
+        function value = getRules(obj, ruleIndex)
+            % Retrieves the rule - based control statements. (EPANET Version 2.2)
+            %
+            % % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   rules = d.getRules
+            %   rule_first_index = 1;
+            %   rule_first = rules(rule_first_index)                   % Retrieves all the statements of the 1st rule - based control
+            %   rule_second_index = 2;
+            %   rule_second = rules(rule_second_index)                 % Retrieves all the statements of the 2nd rule - based control
+            %
+            % Example 2:
+            %   rule_first = d.getRules(1)                             % Retrieves all the statements of the 1st rule - based control
+            %   rule_first_ID = d.getRules(1).Rule_ID                  % Retrieves the ID of the 1st rule - based control
+            %   rule_first_premises = d.getRules(1).Premises           % Retrieves all the premises of the 1st rule - based control
+            %   rule_first_Then_Actions = d.getRules(1).Then_Actions   % Retrieves all the then actions of the 1st rule - based control
+            %   rule_first_Else_Actions = d.getRules(1).Else_Actions   % Retrieves all the else actions of the 1st rule - based control
+            %   rule_first_Rule = d.getRules(1).Rule                   % Retrieves the 1st rule - based control
+            %
+            % See also getRuleInfo, getRuleID, getRuleCount,
+            %          deleteRules, addRules.
+            value = struct();
+            if nargin==1
+                ruleIndex = 1:obj.getRuleCount;
+            end
+            for i=ruleIndex
+                cnt = obj.getRuleInfo.Premises(i);
+                premises = cell(cnt, 1);
+                for j=1:obj.getRuleInfo.Premises(i)
+                    [obj.Errcode, logop, object, objIndex, variable, relop, status, value_premise] =  ENgetpremise(i, j, obj.LibEPANET);
+                    if j==1
+                        logop = 1;
+                    end
+                    if object==6
+                        objectNameID = obj.getNodeNameID(objIndex);
+                        space=' ';
+                    elseif object==7
+                        objectNameID = obj.getLinkNameID(objIndex);
+                        space=' ';
+                    elseif object==8
+                        objectNameID = ' ';
+                        space = '';
+                    end
+                    if variable >= 9
+                        value_premise = datestr((double(value_premise)/86400), 'HH:MM PM');
+                    else
+                        value_premise = num2str(value_premise);
+                    end
+                    if status==0
+                        ruleStatus = '';
+                    else
+                        ruleStatus = char([obj.RULESTATUS{status} ' ']);
+                    end
+                    premises{j, 1} = [obj.LOGOP{logop}, ' ', obj.RULEOBJECT{object-5 }, space, char(objectNameID), space, obj.RULEVARIABLE{variable+1}, ' ', obj.RULEOPERATOR{relop+1}, ' ', ruleStatus, value_premise];
+                    error(obj.getError(obj.Errcode));
+                end
+                cnt = obj.getRuleInfo.ThenActions(i);
+                thenactions = cell(cnt, 1);
+                for j=1:obj.getRuleInfo.ThenActions(i)
+                    [obj.Errcode, linkIndex, status, setting] = ENgetthenaction(i, j, obj.LibEPANET);
+                    if j==1
+                        logop = 'THEN';
+                    else
+                        logop = 'AND';
+                    end
+                    link_type = char(obj.getLinkType(linkIndex));
+                    linkNameID = char(obj.getLinkNameID(linkIndex));
+                    if ismember(status, [1,2,3])
+                        status = char([' STATUS IS ', char(obj.RULESTATUS{status})]);
+                    else
+                        status = '';
+                    end
+                    if setting>=0
+                        setting = char([' SETTING IS ', num2str(setting)]);
+                    else
+                        setting = '';
+                    end
+                    thenactions{j, 1} = [logop, ' ', link_type, ' ', linkNameID, status, setting];
+                    error(obj.getError(obj.Errcode));
+                end
+                cnt = obj.getRuleInfo.ElseActions(i);
+                elseactions = cell(cnt, 1);
+                for j=1:obj.getRuleInfo.ElseActions(i)
+                    [obj.Errcode, linkIndex, status, setting] = ENgetelseaction(i, j, obj.LibEPANET);
+                    if j==1
+                        logop = 'ELSE';
+                    else
+                        logop = 'AND';
+                    end
+                    link_type = char(obj.getLinkType(linkIndex));
+                    linkNameID = char(obj.getLinkNameID(linkIndex));
+                    if (status==1) || (status == 2) || (status == 3)
+                        status = char([' STATUS IS ', char(obj.RULESTATUS{status})]);
+                    else
+                        status = '';
+                    end
+                    if setting>=0
+                        setting = char([' SETTING IS ', num2str(setting)]);
+                    else
+                        setting = '';
+                    end
+                    elseactions{j, 1} = [logop, ' ', link_type, ' ', linkNameID, status, setting];
+                    error(obj.getError(obj.Errcode));
+                end
+                if nargin==1
+                    k = i;
+                elseif nargin==2
+                    k = 1;
+                end
+                value(k).Rule_ID = obj.getRuleID{i};
+                value(k).Premises=char(premises);
+                value(k).Then_Actions=char(thenactions);
+                value(k).Else_Actions=char(elseactions);
+                value(k).Rule=char(['RULE ' obj.getRuleID{i}; premises; thenactions; elseactions; {['PRIORITY ' num2str(obj.getRuleInfo.Priority(i))]}]);
+            end
+        end
+        function addRules(obj, rule)
+            % Adds a new rule-based control to a project. (EPANET Version 2.2)
+            %
+            % Rule format: Following the format used in an EPANET input file.
+            %              'RULE ruleid \n IF object objectid attribute relation attributevalue \n THEN object objectid STATUS/SETTING IS value \n PRIORITY value'
+            %
+            % See more: 'https://nepis.epa.gov/Adobe/PDF/P1007WWU.pdf' (Page 164)
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d.getRuleCount
+            %   d.addRules('RULE RULE-1 \n IF TANK 2 LEVEL >= 140 \n THEN PUMP 9 STATUS IS CLOSED \n PRIORITY 1')
+            %   d.getRuleCount
+            %   d.getRules(1).Rule
+            %
+            % See also deleteRules, getRules, getRuleInfo,
+            %          setRuleThenAction, setRuleElseAction, setRulePriority.
+            %rule_new = split(rule, '\n ');
+            rule_new = regexp(rule, '\\n', 'split');
+            rule_final = [];
+            for i=1:length(rule_new)
+                rule_final = [rule_final rule_new{i} char(10)];
+            end
+            [obj.Errcode] = ENaddrule(rule_final, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
+        end
+        function setRuleThenAction(obj, ruleIndex, actionIndex, linkIndex, type, value)
+            % Sets rule - based control then actions. (EPANET Version 2.2)
+            %
+            % Input Arguments: Rule Index, Action Index, Link Index, Type, Value.   % Where Type = 'STATUS' or 'SETTING' and Value = the value of STATUS/SETTING
+            %
+            % See more: 'https://nepis.epa.gov/Adobe/PDF/P1007WWU.pdf' (Page 164)
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d.addRules('RULE RULE-1 \n IF TANK 2 LEVEL >= 140 \n THEN PIPE 10 STATUS IS CLOSED \n ELSE PIPE 10 STATUS IS OPEN \n PRIORITY 1')   % Adds a new rule - based control
+            %   rule = d.getRules(1)   % Retrieves the 1st rule - based control
+            %   ruleIndex = 1;
+            %   actionIndex = 1;
+            %   linkIndex = 2;
+            %   type = 'STATUS';
+            %   value = 2;
+            %   setRuleThenAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new then - action in the 1st rule - based control, in the 1st then - action.
+            %   rule = d.getRules(1)
+            %
+            % See also setRuleElseAction, setRulePriority, getRuleInfo,
+            %          getRules, addRules, deleteRules.
+            if strcmp(type,'STATUS')
+                status = value;
+                setting = -1;
+            elseif strcmp(type,'SETTING')
+                status = -1;
+                setting = value;
+            end
+            [obj.Errcode] = ENsetthenaction(ruleIndex, actionIndex, linkIndex, status, setting, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
+        end
+        function setRuleElseAction(obj, ruleIndex, actionIndex, linkIndex, type, value)
+            % Sets rule - based control else actions. (EPANET Version 2.2)
+            %
+            % Input Arguments: Rule Index, Action Index, Link Index, Type, Value.   % Where Type = 'STATUS' or 'SETTING' and Value = the value of STATUS/SETTING
+            %
+            % See more: 'https://nepis.epa.gov/Adobe/PDF/P1007WWU.pdf' (Page 164)
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d.addRules('RULE RULE-1 \n IF TANK 2 LEVEL >= 140 \n THEN PIPE 10 STATUS IS CLOSED \n ELSE PIPE 10 STATUS IS OPEN \n PRIORITY 1')   % Adds a new rule - based control
+            %   rule = d.getRules(1)   % Retrieves the 1st rule - based control
+            %   ruleIndex = 1;
+            %   actionIndex = 1;
+            %   linkIndex = 2;
+            %   type = 'STATUS';
+            %   value = 2;
+            %   setRuleElseAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new else - action in the 1st rule - based control, in the 1st else - action.
+            %   rule = d.getRules(1)
+            %
+            % See also setRuleThenAction, setRulePriority, getRuleInfo,
+            %          getRules, addRules, deleteRules.
+            if strcmp(type,'STATUS')
+                status = value;
+                setting = -1;
+            elseif strcmp(type,'SETTING')
+                status = -1;
+                setting = value;
+            end
+            [obj.Errcode] = ENsetelseaction(ruleIndex, actionIndex, linkIndex, status, setting, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
+        end
+        function setRulePriority(obj, ruleIndex, priority)
+            % Sets rule - based control priority. (EPANET Version 2.2)
+            %
+            % % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example:
+            %   d.getRules(1).Rule                       % Retrieves the 1st rule - based control
+            %   ruleIndex = 1;
+            %   priority = 2;
+            %   d.setRulePriority(ruleIndex, priority)   % Sets the 1st rule - based control priority = 2
+            %   d.getRules(1).Rule
+            %
+            % See also setRuleThenAction, setRuleElseAction, getRuleInfo,
+            %          getRules, addRules, deleteRules.
+            [obj.Errcode] = ENsetrulepriority(ruleIndex, priority, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
+        end
         function value = getRuleID(obj, varargin)
             % Retrieves the ID name of a rule-based control given its index. (EPANET Version 2.2)
             %
@@ -9853,9 +10069,37 @@ end
 function [Errcode] = ENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENsetcontrol', cindex, ctype, lindex, setting, nindex, level);
 end
+function [Errcode] = ENaddrule(rule, LibEPANET)
+% EPANET Version 2.2 
+[Errcode, ~]=calllib(LibEPANET, 'ENaddrule', rule);
+end
 function [Errcode] = ENdeleterule(index, LibEPANET)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENdeleterule', index);
+end
+function [Errcode, logop, object, objIndex, variable, relop, status, value] = ENgetpremise(ruleIndex, premiseIndex, LibEPANET)
+% EPANET Version 2.2
+[Errcode, logop, object, objIndex, variable, relop, status, value]=calllib(LibEPANET, 'ENgetpremise', ruleIndex, premiseIndex,0,0,0,0,0,0,0);
+end
+function [Errcode, linkIndex, status, setting] = ENgetthenaction(ruleIndex, actionIndex, LibEPANET)
+% EPANET Version 2.2 
+[Errcode, linkIndex, status, setting]=calllib(LibEPANET, 'ENgetthenaction', ruleIndex, actionIndex,0,0,0);
+end
+function [Errcode] = ENsetthenaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET)
+% EPANET Version 2.2 
+[Errcode]=calllib(LibEPANET, 'ENsetthenaction', ruleIndex, actionIndex, linkIndex, status, setting);
+end
+function [Errcode, linkIndex, status, setting] = ENgetelseaction(ruleIndex, actionIndex, LibEPANET)
+% EPANET Version 2.2 
+[Errcode, linkIndex, status, setting]=calllib(LibEPANET, 'ENgetelseaction', ruleIndex, actionIndex,0,0,0);
+end
+function [Errcode] = ENsetelseaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET)
+% EPANET Version 2.2 
+[Errcode]=calllib(LibEPANET, 'ENsetelseaction', ruleIndex, actionIndex, linkIndex, status, setting);
+end
+function [Errcode] = ENsetrulepriority(ruleIndex, priority, LibEPANET)
+% EPANET Version 2.2 
+[Errcode]=calllib(LibEPANET, 'ENsetrulepriority', ruleIndex, priority);
 end
 function [Errcode, id] = ENgetruleID(index, LibEPANET)
 % EPANET Version 2.2 
