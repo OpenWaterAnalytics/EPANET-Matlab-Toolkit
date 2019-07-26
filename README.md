@@ -787,7 +787,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENgetdemandindex|Retrieves the index of a node's named demand category|
 |ENgetpremise|Gets the properties of a premise in a rule-based control|
 |ENgetelseaction|Gets the properties of an ELSE action in a rule-based control|
-|ENgetruleID|Gets the ID name of a rule-based control given its index|
+|ENgetruleid|Gets the ID name of a rule-based control given its index|
 |ENgetrule|Retrieves summary information about a rule-based control|
 |ENgetthenaction|Gets the properties of a THEN action in a rule-based control|
 |ENsetflowunits|Sets the flow units|
