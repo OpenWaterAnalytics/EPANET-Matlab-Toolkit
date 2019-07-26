@@ -942,15 +942,17 @@ classdef epanet <handle
                         objectNameID = ' ';
                         space = '';
                     end
-                    if variable >= 10
-                        value_premise = value_premise/3600;
+                    if variable >= 9
+                        value_premise = datestr((double(value_premise)/86400), 'HH:MM PM');
+                    else
+                        value_premise = num2str(value_premise);
                     end
                     if status==0
                         ruleStatus = '';
                     else
                         ruleStatus = char([obj.RULESTATUS{status} ' ']);
                     end
-                    premises{j, 1} = [obj.LOGOP{logop}, ' ', obj.RULEOBJECT{object-5 }, space, char(objectNameID), space, obj.RULEVARIABLE{variable+1}, ' ', obj.RULEOPERATOR{relop+1}, ' ', ruleStatus, num2str(value_premise)];
+                    premises{j, 1} = [obj.LOGOP{logop}, ' ', obj.RULEOBJECT{object-5 }, space, char(objectNameID), space, obj.RULEVARIABLE{variable+1}, ' ', obj.RULEOPERATOR{relop+1}, ' ', ruleStatus, value_premise];
                     error(obj.getError(obj.Errcode));
                 end
                 cnt = obj.getRuleInfo.ThenActions(i);
@@ -964,7 +966,7 @@ classdef epanet <handle
                     end
                     link_type = char(obj.getLinkType(linkIndex));
                     linkNameID = char(obj.getLinkNameID(linkIndex));
-                    if status==1 || (status(j) == 2) || (status == 3)
+                    if status==1 || (status == 2) || (status == 3)
                         status = char([' STATUS IS ', char(obj.RULESTATUS{status})]);
                     else
                         status = '';
@@ -1031,7 +1033,8 @@ classdef epanet <handle
             %
             % See also deleteRules, getRules, getRuleInfo,
             %          setRuleThenAction, setRuleElseAction, setRulePriority.
-            rule_new = split(rule, '\n ');
+            %rule_new = split(rule, '\n ');
+            rule_new = regexp(rule, '\\n', 'split');
             rule_final = [];
             for i=1:length(rule_new)
                 rule_final = [rule_final rule_new{i} char(10)];
