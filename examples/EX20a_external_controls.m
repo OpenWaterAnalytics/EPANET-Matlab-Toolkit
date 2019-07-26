@@ -1,5 +1,5 @@
-%% External Controls
-% Add controls in hydraulic analysis STEP-BY-STEP
+%% a) External Controls 
+% Change control status of pump STEP BY STEP
 clear; close('all'); clc;
 start_toolkit;
 
@@ -19,30 +19,29 @@ tankElevation = d.getNodeElevations(tankIndex);
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis(0);
 
-tstep = 1;
-T = []; P = []; F = []; S= [];i=1;
+tstep = 1; i = 1;
+T = []; P = []; F = []; S= [];
 
 % CONTROLS
+Below = 110;
+Above = 140;
+tankHead = [];
 while (tstep>0)
     
     H = d.getNodeHydaulicHead;
     tankHead(i) = H(tankIndex)-tankElevation;
-    i = i+1;
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % add new controls in live
-    Below = 110;
-    Above = 140;
-    status = {'OPEN', 'CLOSED'};
-
     % LINK 9 OPEN IF NODE 2 BELOW 110
-    d.addControls(['LINK ', pumpID, ' ', status{1}, ' IF NODE ', tankID,...
-        ' BELOW ', num2str(Below)]);
-    
+    if tankHead(i) < Below
+        d.setLinkStatus(pumpIndex, 1);
+    end
     % LINK 9 CLOSED IF NODE 2 ABOVE 140
-    d.addControls(['LINK ', pumpID, ' ', status{2}, ' IF NODE ', tankID,...
-        ' ABOVE ', num2str(Above)]);
-    
+    if tankHead(i) > Above
+        d.setLinkStatus(pumpIndex, 0);
+    end
+    i = i+1;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
@@ -54,9 +53,6 @@ while (tstep>0)
     T = [T; t];
     
     tstep = d.nextHydraulicAnalysisStep;
-    
-    % delete controls
-    d.deleteControls();
 end
 d.closeHydraulicAnalysis;
 d.unload;
