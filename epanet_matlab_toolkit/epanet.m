@@ -1058,14 +1058,15 @@ classdef epanet <handle
             %   actionIndex = 1;
             %   linkIndex = 2;
             %   type = 'STATUS';
-            %   value = 2;
+            %   value = 'CLOSED';
             %   setRuleThenAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new then - action in the 1st rule - based control, in the 1st then - action.
             %   rule = d.getRules(1)
             %
             % See also setRuleElseAction, setRulePriority, getRuleInfo,
             %          getRules, addRules, deleteRules.
             if strcmp(type,'STATUS')
-                status = value;
+                param = strcmp(obj.RULESTATUS,value);
+                status = find(param, 1);
                 setting = -1;
             elseif strcmp(type,'SETTING')
                 status = -1;
@@ -1090,14 +1091,15 @@ classdef epanet <handle
             %   actionIndex = 1;
             %   linkIndex = 2;
             %   type = 'STATUS';
-            %   value = 2;
+            %   value = 'CLOSED';
             %   setRuleElseAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new else - action in the 1st rule - based control, in the 1st else - action.
             %   rule = d.getRules(1)
             %
             % See also setRuleThenAction, setRulePriority, getRuleInfo,
             %          getRules, addRules, deleteRules.
             if strcmp(type,'STATUS')
-                status = value;
+                param = strcmp(obj.RULESTATUS,value);
+                status = find(param, 1);
                 setting = -1;
             elseif strcmp(type,'SETTING')
                 status = -1;
