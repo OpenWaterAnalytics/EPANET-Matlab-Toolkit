@@ -966,7 +966,7 @@ classdef epanet <handle
                     end
                     link_type = char(obj.getLinkType(linkIndex));
                     linkNameID = char(obj.getLinkNameID(linkIndex));
-                    if status==1 || (status == 2) || (status == 3)
+                    if ismember(status, [1,2,3])
                         status = char([' STATUS IS ', char(obj.RULESTATUS{status})]);
                     else
                         status = '';
