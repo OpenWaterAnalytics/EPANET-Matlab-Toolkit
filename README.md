@@ -320,6 +320,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deletePattern|Deletes a time pattern from a project|
 |deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
 |deleteRules|Deletes an existing rule-based control given it's index. (EPANET Version 2.2)|
+|clearReport|Clears the contents of a project's report file. (EPANET Version 2.2)|
+|copyReport|Copies the current contents of a project's report file to another file. (EPANET Version 2.2)|
 |closeHydraulicAnalysis|Closes the hydraulic analysis system, freeing all allocated memory|
 |closeNetwork|Closes down the Toolkit system|
 |closeQualityAnalysis|Closes the water quality analysis system, freeing all allocated memory|
@@ -777,6 +779,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENaddnode|Adds a new node|
 |ENaddrule|Adds a new rule-based control to a project|
 |ENadddemand|Appends a new demand to a junction node demands list|
+|ENclearreport|Clears the contents of a project's report file|
+|ENcopyreport|Copies the current contents of a project's report file to another file|
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
 |ENsetcurveid|Changes the ID name of a data curve given its index|
