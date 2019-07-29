@@ -5922,6 +5922,25 @@ classdef epanet <handle
             %Writes a formatted text report on simulation results to the Report file
             [obj.Errcode]=ENreport(obj.LibEPANET);
         end
+        function copyReport(obj, fileName)
+            % Copies the current contents of a project's report file to another file. (EPANET Version 2.2)
+            %
+            % Example:
+            %   fileName = 'Report_copy';
+            %   d.copyReport(fileName)
+            %
+            % See also writeReport, writeLineInReportFile, clearReport.
+            [obj.Errcode] = ENcopyreport (fileName, obj.LibEPANET);
+        end
+        function clearReport(obj)
+            % Clears the contents of a project's report file. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.clearReport
+            %
+            % See also writeReport, writeLineInReportFile, copyReport.
+            [obj.Errcode] = ENclearreport (obj.LibEPANET);
+        end
         function unload(obj)
             %ENclose(obj.LibEPANET);
             ENMatlabCleanup(obj.LibEPANET);
@@ -10047,6 +10066,14 @@ function [Errcode] = ENopenQ(LibEPANET)
 end
 function [Errcode] = ENreport(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENreport');
+end
+function [Errcode] = ENcopyreport(filename, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENcopyreport', filename);
+end
+function [Errcode] = ENclearreport(LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENclearreport');
 end
 function [Errcode] = ENresetreport(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENresetreport');
