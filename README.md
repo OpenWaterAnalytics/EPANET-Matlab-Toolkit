@@ -435,6 +435,10 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setReportFormatReset|Clears any report formatting commands that either appeared in the [REPORT] section of the EPANET Input file or were issued with the ENsetreport function|
 |setReportStatus|Sets the level of hydraulic status reporting|
 |setRuleElseAction|Sets rule - based control else actions. (EPANET Version 2.2)|
+|setRulePremise|Sets the premise of a rule - based control. (EPANET Version 2.2)|
+|setRulePremiseObejctNameID|Sets the ID of an object in a premise of a rule-based control. (EPANET Version 2.2)|
+|setRulePremiseStatus|Sets the status being compared to in a premise of a rule-based control. (EPANET Version 2.2)|
+|setRulePremiseValue|Sets the value being compared to in a premise of a rule-based control. (EPANET Version 2.2)|
 |setRulePriority|Sets rule - based control priority. (EPANET Version 2.2)|
 |setRuleThenAction|Sets rule - based control then actions. (EPANET Version 2.2)|
 |setTimeHTime|Sets the htime|
@@ -801,6 +805,10 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetnodeid|Change the ID name for a node|
 |ENsetlinkid|Change the ID name for a link|
 |ENsetpipedata|Sets a group of properties for a pipe link|
+|ENsetpremise|Sets the properties of a premise in a rule-based control|
+|ENsetpremiseindex|Sets the index of an object in a premise of a rule-based control|
+|ENsetpremisestatus|Sets the status being compared to in a premise of a rule-based control|
+|ENsetpremisevalue|Sets the value in a premise of a rule-based control|
 |ENsetrulepriority|Sets the priority of a rule-based control|
 |ENsettankdata|Sets a group of properties for a tank node|
 |ENsetthenaction|Sets the properties of a THEN action in a rule-based control|
