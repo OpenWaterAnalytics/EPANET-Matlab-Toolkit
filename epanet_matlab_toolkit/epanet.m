@@ -394,6 +394,7 @@ classdef epanet <handle
         RULEVARIABLE={'DEMAND', 'HEAD', 'GRADE', 'LEVEL', 'PRESSURE', 'FLOW', 'STATUS', 'SETTING', 'POWER', 'TIME', 'CLOCKTIME', 'FILLTIME', 'DRAINTIME'};
         RULEOPERATOR={'=', '~=', '<=', '>=', '<', '>', '==', '~==', 'BELOW', 'ABOVE'};
         RULESTATUS={'OPEN', 'CLOSED', 'ACTIVE'};
+        RULEPREMISECHECK={'NODE', 'JUNCTION', 'RESERVOIR', 'TANK', 'LINK', 'PIPE', 'PUMP', 'VALVE', 'SYSTEM'};
         TYPECONTROL={'LOWLEVEL', 'HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL', 'HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'VOLUME', 'PUMP', 'EFFICIENCY', 'HEADLOSS', 'GENERAL'}; % Constants for pump curves: 'PUMP', 'EFFICIENCY', 'VOLUME', 'HEADLOSS' % EPANET Version 2.2
         TYPELINK={'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'}; % Constants for links: 'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'VALVE'
@@ -951,6 +952,7 @@ classdef epanet <handle
                         ruleStatus = '';
                     else
                         ruleStatus = char([obj.RULESTATUS{status} ' ']);
+                        value_premise = '';
                     end
                     premises{j, 1} = [obj.LOGOP{logop}, ' ', obj.RULEOBJECT{object-5 }, space, char(objectNameID), space, obj.RULEVARIABLE{variable+1}, ' ', obj.RULEOPERATOR{relop+1}, ' ', ruleStatus, value_premise];
                     error(obj.getError(obj.Errcode));
@@ -1033,6 +1035,7 @@ classdef epanet <handle
             %
             % See also deleteRules, getRules, getRuleInfo,
             %          setRuleThenAction, setRuleElseAction, setRulePriority.
+            
             %rule_new = split(rule, '\n ');
             rule_new = regexp(rule, '\\n', 'split');
             rule_final = [];
@@ -1109,7 +1112,7 @@ classdef epanet <handle
         function setRulePriority(obj, ruleIndex, priority)
             % Sets rule - based control priority. (EPANET Version 2.2)
             %
-            % % The examples are based on d=epanet('BWSN_Network_1.inp');
+            % % The example is based on d=epanet('BWSN_Network_1.inp');
             %
             % Example:
             %   d.getRules(1).Rule                       % Retrieves the 1st rule - based control
@@ -1121,6 +1124,142 @@ classdef epanet <handle
             % See also setRuleThenAction, setRuleElseAction, getRuleInfo,
             %          getRules, addRules, deleteRules.
             [obj.Errcode] = ENsetrulepriority(ruleIndex, priority, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
+        end
+        function setRulePremise(obj, ruleIndex, premiseIndex, premise)
+            % Sets the premise of a rule - based control. (EPANET Version 2.2)
+            %
+            % % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   d.getRules(1).Premises                               % Retrieves the premise of the 1st rule
+            %   ruleIndex = 1;
+            %   premiseIndex = 1;
+            %   premise = 'IF SYSTEM CLOCKTIME >= 8 PM';
+            %   d.setRulePremise(ruleIndex, premiseIndex, premise)   % Sets the 1st premise of the 1st rule - based control
+            %   d.getRules(1).Premises
+            %
+            % Example 2:
+            %   d.getRules(1).Premises
+            %   ruleIndex = 1;
+            %   premiseIndex = 1;
+            %   premise = 'IF NODE TANK-131 LEVEL > 20';
+            %   d.setRulePremise(1, 1, premise)                      % Sets the 1st premise of the 1st rule - based control
+            %   d.getRules(1).Premises
+            %
+            % See also setRulePremiseObejctNameID, setRulePremiseStatus, setRulePremiseValue,
+            %          getRules, addRules, deleteRules.
+            
+            %  premise_new = split(premise, ' ');
+            premise_new = regexp(premise, '\s', 'split');
+            logop_code = ismember(obj.LOGOP, premise_new{1});
+            logop = find(logop_code, 1);
+            object_check = ismember(obj.RULEPREMISECHECK, premise_new(2));
+            object_code = find(object_check, 1);
+            if (object_code >= 1) && (object_code<=4)
+                object = 6;
+                objIndex = obj.getNodeIndex(premise_new{3});
+            elseif (object_code >= 5) && (object_code<=8)
+                object = 7;
+                objIndex = obj.getLinkIndex(premise_new{3});
+            elseif (object_code == 9)
+                object = 8;
+                objIndex = 0;
+            end
+            if object==8
+                j = 3; k = 4; m = 5;
+            else
+                j = 4; k = 5; m = 6;
+            end
+            variable_code = ismember(obj.RULEVARIABLE, premise_new{j});
+            variable = find(variable_code, 1) - 1;
+            opearator_code = ismember(obj.RULEOPERATOR, premise_new{k});
+            relop = find(opearator_code, 1) - 1;
+            if variable==6
+                value = -1;
+                status_code = ismember(obj.RULESTATUS, premise_new{m});
+                status = find(status_code, 1);
+            else
+                value = str2double(premise_new{m});
+                status = 0;
+            end
+            if object == 8
+               if strcmp(premise_new(6), 'AM')
+                   value = value*3600;
+               elseif strcmp(premise_new(6), 'PM')
+                   value = value*3600 + 43200;
+               end
+            end
+            [obj.Errcode] = ENsetpremise(ruleIndex, premiseIndex, logop, object, objIndex, variable, relop, status, value, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
+        end
+        function setRulePremiseObejctNameID(obj, ruleIndex, premiseIndex, objNameID)
+            % Sets the ID of an object in a premise of a rule-based control. (EPANET Version 2.2)
+            %
+            % % The example is based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   d.getRules(1).Premises
+            %   ruleIndex = 1;
+            %   premiseIndex = 1;
+            %   objNameID = 'TANK-131';
+            %   d.setRulePremiseObejctNameID(ruleIndex, premiseIndex, objNameID)   % Sets the node's ID = 'TANK-131' to the 1st premise of the 1st rule - based control
+            %   d.getRules(1).Premises
+            %
+            % See also setRulePremise, setRulePremiseStatus, setRulePremiseValue,
+            %          getRules, addRules, deleteRules.
+            [obj.Errcode, ~, object, objIndex, ~, ~, ~, ~] =  ENgetpremise(ruleIndex, premiseIndex, obj.LibEPANET);
+            if object == 6
+                objIndex = obj.getNodeIndex(objNameID);
+            elseif object == 7
+                objIndex = obj.getLinkIndex(objNameID);
+            end
+            [obj.Errcode] = ENsetpremiseindex(ruleIndex, premiseIndex, objIndex, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
+        end
+        function setRulePremiseStatus(obj, ruleIndex, premiseIndex, status)
+            % Sets the status being compared to in a premise of a rule-based control. (EPANET Version 2.2)
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d.getRules
+            %   d.addRules('RULE RULE-1 \n IF LINK 110 STATUS = CLOSED \n THEN PUMP 9 STATUS IS CLOSED \n PRIORITY 1')
+            %   d.getRules(1)
+            %   ruleIndex = 1;
+            %   premiseIndex = 1;
+            %   status = 'OPEN';
+            %   d.setRulePremiseStatus(ruleIndex, premiseIndex, status)   % Sets the status = 'OPEN' to the 1st premise of the 1st rule - based control
+            %   d.getRules(1).Premises
+            %
+            % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseValue,
+            %          getRules, addRules, deleteRules.
+            if strcmp(status,'OPEN')
+                status_code = 1;
+            elseif strcmp(status,'CLOSED')
+                status_code = 2;
+            elseif strcmp(status,'ACTIVE')
+                status_code = 3;
+            end
+            [obj.Errcode] = ENsetpremisestatus(ruleIndex, premiseIndex, status_code, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
+        end
+        function setRulePremiseValue(obj, ruleIndex, premiseIndex, value)
+            % Sets the value being compared to in a premise of a rule-based control. (EPANET Version 2.2)
+            %
+            % % The example is based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example:
+            %   d.getRules(1).Premises
+            %   ruleIndex = 1;
+            %   premiseIndex = 1;
+            %   value = 20;
+            %   d.setRulePremiseValue(ruleIndex, premiseIndex, value)   % Sets the value = 20 to the 1st premise of the 1st rule - based control
+            %   d.getRules(1).Premises
+            %
+            % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseStatus,
+            %          getRules, addRules, deleteRules.
+            [obj.Errcode] = ENsetpremisevalue(ruleIndex, premiseIndex, value, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
         function value = getRuleID(obj, varargin)
@@ -10100,6 +10239,22 @@ end
 function [Errcode] = ENsetrulepriority(ruleIndex, priority, LibEPANET)
 % EPANET Version 2.2 
 [Errcode]=calllib(LibEPANET, 'ENsetrulepriority', ruleIndex, priority);
+end
+function [Errcode] = ENsetpremise(ruleIndex, premiseIndex, logop, object, objIndex, variable, relop, status, value, LibEPANET)
+% EPANET Version 2.2 
+[Errcode]=calllib(LibEPANET, 'ENsetpremise', ruleIndex, premiseIndex, logop, object, objIndex, variable, relop, status, value);
+end
+function [Errcode] = ENsetpremiseindex(ruleIndex, premiseIndex, objIndex, LibEPANET)
+% EPANET Version 2.2 
+[Errcode]=calllib(LibEPANET, 'ENsetpremiseindex', ruleIndex, premiseIndex, objIndex);
+end
+function [Errcode] = ENsetpremisestatus(ruleIndex, premiseIndex, status, LibEPANET)
+% EPANET Version 2.2 
+[Errcode]=calllib(LibEPANET, 'ENsetpremisestatus', ruleIndex, premiseIndex, status);
+end
+function [Errcode] = ENsetpremisevalue(ruleIndex, premiseIndex, value, LibEPANET)
+% EPANET Version 2.2 
+[Errcode]=calllib(LibEPANET, 'ENsetpremisevalue', ruleIndex, premiseIndex, value);
 end
 function [Errcode, id] = ENgetruleID(index, LibEPANET)
 % EPANET Version 2.2 
