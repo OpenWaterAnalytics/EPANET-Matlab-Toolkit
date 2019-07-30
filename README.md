@@ -190,6 +190,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeCoordinates|Retrieves coordinate x, y, and x, y vertices for a node|
 |getNodeCount|Retrieves the number of nodes|
 |getNodePatternIndex|Retrieves the value of all node pattern indices|
+|getNodeDemandDeficit|Retrieves the amount that full demand is reduced under PDA. (EPANET Version 2.2)|
 |getNodeDemandPatternIndex|Retrieves the value of all node demand pattern indices|
 |getNodeDemandPatternNameID|Retrieves the value of all node demand pattern IDs|
 |getNodeElevations|Retrieves the value of all node elevations|

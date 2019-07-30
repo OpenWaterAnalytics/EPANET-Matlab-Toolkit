@@ -2530,6 +2530,8 @@ classdef epanet <handle
             %           *relerr = convergence error in solution
             [obj.Errcode, value.Iterations] = ENgetstatistic(obj.ToolkitConstants.EN_ITERATIONS, obj.LibEPANET);
             [obj.Errcode, value.RelativeError] = ENgetstatistic(obj.ToolkitConstants.EN_RELATIVEERROR, obj.LibEPANET);
+            [obj.Errcode, value.DeficientNodes] = ENgetstatistic(obj.ToolkitConstants.EN_DEFICIENTNODES, obj.LibEPANET);
+            [obj.Errcode, value.DemandReduction] = ENgetstatistic(obj.ToolkitConstants.EN_DEMANDREDUCTION, obj.LibEPANET);
         end    
         function value = getNodePatternIndex(obj, varargin)
             % Retrieves the value of all node demand pattern indices.
@@ -3015,6 +3017,25 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_CANOVERFLOW, obj.LibEPANET); 
+                error(obj.getError(obj.Errcode)); 
+                j=j+1;
+            end
+        end
+        function value = getNodeDemandDeficit(obj, varargin)
+            % Retrieves the amount that full demand is reduced under PDA. (EPANET Version 2.2)
+            %
+            % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d.setDemandModel('PDA', 0, 0.1, 0.5);   % Sets a type of demand model and its parameters
+            %   d.getComputedHydraulicTimeSeries        % Computes hydraulic simulation and retrieve all time-series
+            %   d.getNodeDemandDeficit                  % Retrieves the amount that full demand is reduced under PDA
+            %
+            % See also setDemandModel, getComputedHydraulicTimeSeries,
+            %          getNodeActualDemand, getNodeActualDemandSensingNodes.
+            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            for i=indices
+                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_DEMANDDEFICIT, obj.LibEPANET); 
                 error(obj.getError(obj.Errcode)); 
                 j=j+1;
             end
@@ -5515,7 +5536,7 @@ classdef epanet <handle
             %  pmin  Pressure below which there is no demand.
             %  preq  Pressure required to deliver full demand.
             %  pexp  Pressure exponent in demand function.
-            % Example: d.setDemandModel('PDA', 0, 0, 0.5); %type, pmin, preq, pexp
+            % Example: d.setDemandModel('PDA', 0, 0.1, 0.5); %type, pmin, preq, pexp
             %          d.getDemandModel
             model_type=find(strcmpi(obj.DEMANDMODEL, code)==1)-1;
             if isempty(model_type)
