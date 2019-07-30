@@ -920,7 +920,7 @@ classdef epanet <handle
             %   rule_first_Rule = d.getRules(1).Rule                   % Retrieves the 1st rule - based control
             %
             % See also getRuleInfo, getRuleID, getRuleCount,
-            %          deleteRules, addRules.
+            %          setRules, deleteRules, addRules.
             value = struct();
             if nargin==1
                 ruleIndex = 1:obj.getRuleCount;
@@ -1033,7 +1033,7 @@ classdef epanet <handle
             %   d.getRuleCount
             %   d.getRules(1).Rule
             %
-            % See also deleteRules, getRules, getRuleInfo,
+            % See also deleteRules, setRules, getRules, getRuleInfo,
             %          setRuleThenAction, setRuleElseAction, setRulePriority.
             
             %rule_new = split(rule, '\n ');
@@ -1045,10 +1045,48 @@ classdef epanet <handle
             [obj.Errcode] = ENaddrule(rule_final, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
-        function setRuleThenAction(obj, ruleIndex, actionIndex, linkIndex, type, value)
+        function setRules(obj, ruleIndex, rule)
+            % Sets a rule - based control. (EPANET Version 2.2)
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   rule = 'RULE RULE-1 \n IF NODE 2 LEVEL >= 140 \n THEN PIPE 10 STATUS IS CLOSED \n ELSE PIPE 10 STATUS IS OPEN \n PRIORITY 1';
+            %   d.addRules(rule)                  % Adds a new rule - based control
+            %   d.getRules(1).Rule                % Retrieves the 1st rule - based control
+            %   ruleIndex = 1;
+            %   rule_new = 'IF NODE 2 LEVEL > 150 \n THEN PIPE 10 STATUS IS OPEN \n ELSE PIPE 11 STATUS IS OPEN \n PRIORITY 2';
+            %   d.setRules(ruleIndex, rule_new)   % Sets rule - based control
+            %   d.getRules(1).Rule
+            %
+            % See also setRulePremise, setRuleThenAction, setRuleElseAction,
+            %          getRules, addRules, deleteRules.
+            rule_new = regexp(rule, '\\n ', 'split');
+            i = 1;
+            while strcmp(rule_new{i}(1:2), 'IF') || strcmp(rule_new{i}(1:3), 'AND') || strcmp(rule_new{i}(1:2), 'OR')
+                obj.setRulePremise(ruleIndex, i, rule_new{i})
+                i = i+1;
+            end
+            j = 1;
+            while strcmp(rule_new{i}(1:4), 'THEN') || strcmp(rule_new{i}(1:3), 'AND')
+                obj.setRuleThenAction(ruleIndex, j, rule_new{i})
+                i = i+1;
+                j = j+1;
+            end
+            j = 1;
+            while strcmp(rule_new{i}(1:4), 'ELSE') || strcmp(rule_new{i}(1:3), 'AND')
+                obj.setRuleElseAction(ruleIndex, j, rule_new{i})
+                i = i+1;
+                j = j+1;
+            end
+            if obj.getRuleInfo.Priority(ruleIndex) ~= 0
+                obj.setRulePriority(ruleIndex, str2num(rule_new{i}(end)));
+            end
+        end
+        function setRuleThenAction(obj, ruleIndex, actionIndex, then_action)
             % Sets rule - based control then actions. (EPANET Version 2.2)
             %
-            % Input Arguments: Rule Index, Action Index, Link Index, Type, Value.   % Where Type = 'STATUS' or 'SETTING' and Value = the value of STATUS/SETTING
+            % Input Arguments: Rule Index, Action Index, Then clause.
             %
             % See more: 'https://nepis.epa.gov/Adobe/PDF/P1007WWU.pdf' (Page 164)
             %
@@ -1059,25 +1097,25 @@ classdef epanet <handle
             %   rule = d.getRules(1)   % Retrieves the 1st rule - based control
             %   ruleIndex = 1;
             %   actionIndex = 1;
-            %   linkIndex = 2;
-            %   type = 'STATUS';
-            %   value = 'CLOSED';
-            %   setRuleThenAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new then - action in the 1st rule - based control, in the 1st then - action.
+            %   then_action = 'THEN PIPE 11 STATUS IS OPEN';
+            %   d.setRuleThenAction(ruleIndex, actionIndex, then_action)
             %   rule = d.getRules(1)
             %
-            % See also setRuleElseAction, setRulePriority, getRuleInfo,
-            %          getRules, addRules, deleteRules.
-            if strcmp(type,'STATUS')
-                status = eval(['obj.ToolkitConstants.EN_R_IS_', value]);
+            % See also setRules, setRuleElseAction, setRulePriority,
+            %          getRuleInfo, getRules, addRules, deleteRules.
+            then_new = regexp(then_action, '\s', 'split');
+            if strcmp(then_new{4},'STATUS')
+                status = eval(['obj.ToolkitConstants.EN_R_IS_', then_new{6}]);
                 setting = -1;
-            elseif strcmp(type,'SETTING')
+            elseif strcmp(then_new{4},'SETTING')
                 status = -1;
-                setting = value;
+                setting = str2num(then_new{6});
             end
+            linkIndex = obj.getLinkIndex(then_new{3});
             [obj.Errcode] = ENsetthenaction(ruleIndex, actionIndex, linkIndex, status, setting, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
-        function setRuleElseAction(obj, ruleIndex, actionIndex, linkIndex, type, value)
+        function setRuleElseAction(obj, ruleIndex, actionIndex, else_action)
             % Sets rule - based control else actions. (EPANET Version 2.2)
             %
             % Input Arguments: Rule Index, Action Index, Link Index, Type, Value.   % Where Type = 'STATUS' or 'SETTING' and Value = the value of STATUS/SETTING
@@ -1091,21 +1129,21 @@ classdef epanet <handle
             %   rule = d.getRules(1)   % Retrieves the 1st rule - based control
             %   ruleIndex = 1;
             %   actionIndex = 1;
-            %   linkIndex = 2;
-            %   type = 'STATUS';
-            %   value = 'CLOSED';
-            %   setRuleElseAction(d, ruleIndex, actionIndex, linkIndex, type, value)   % Sets the new else - action in the 1st rule - based control, in the 1st else - action.
+            %   else_action = 'ELSE PIPE 11 STATUS IS CLOSED';
+            %   d.setRuleElseAction(ruleIndex, actionIndex, else_action)   % Sets the new else - action in the 1st rule - based control, in the 1st else - action.
             %   rule = d.getRules(1)
             %
-            % See also setRuleThenAction, setRulePriority, getRuleInfo,
-            %          getRules, addRules, deleteRules.
-            if strcmp(type,'STATUS')
-                status = eval(['obj.ToolkitConstants.EN_R_IS_', value]);
+            % See also setRules, setRuleThenAction, setRulePriority,
+            %          getRuleInfo, getRules, addRules, deleteRules.
+            else_new = regexp(else_action, '\s', 'split');
+            if strcmp(else_new{4},'STATUS')
+                status = eval(['obj.ToolkitConstants.EN_R_IS_', else_new{6}]);
                 setting = -1;
-            elseif strcmp(type,'SETTING')
+            elseif strcmp(else_new{4},'SETTING')
                 status = -1;
-                setting = value;
+                setting = str2num(else_new{6});
             end
+            linkIndex = obj.getLinkIndex(else_new{3});
             [obj.Errcode] = ENsetelseaction(ruleIndex, actionIndex, linkIndex, status, setting, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
@@ -1121,8 +1159,8 @@ classdef epanet <handle
             %   d.setRulePriority(ruleIndex, priority)   % Sets the 1st rule - based control priority = 2
             %   d.getRules(1).Rule
             %
-            % See also setRuleThenAction, setRuleElseAction, getRuleInfo,
-            %          getRules, addRules, deleteRules.
+            % See also setRules, setRuleThenAction, setRuleElseAction,
+            %          getRuleInfo, getRules, addRules, deleteRules.
             [obj.Errcode] = ENsetrulepriority(ruleIndex, priority, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
@@ -1148,7 +1186,7 @@ classdef epanet <handle
             %   d.getRules(1).Premises
             %
             % See also setRulePremiseObejctNameID, setRulePremiseStatus, setRulePremiseValue,
-            %          getRules, addRules, deleteRules.
+            %          setRules, getRules, addRules, deleteRules.
             
             %  premise_new = split(premise, ' ');
             premise_new = regexp(premise, '\s', 'split');
@@ -1201,7 +1239,7 @@ classdef epanet <handle
             %   d.getRules(1).Premises
             %
             % See also setRulePremise, setRulePremiseStatus, setRulePremiseValue,
-            %          getRules, addRules, deleteRules.
+            %          setRules, getRules, addRules, deleteRules.
             [obj.Errcode, ~, object, objIndex, ~, ~, ~, ~] =  ENgetpremise(ruleIndex, premiseIndex, obj.LibEPANET);
             if object == obj.ToolkitConstants.EN_R_NODE
                 objIndex = obj.getNodeIndex(objNameID);
@@ -1227,7 +1265,7 @@ classdef epanet <handle
             %   d.getRules(1).Premises
             %
             % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseValue,
-            %          getRules, addRules, deleteRules.
+            %          setRules, getRules, addRules, deleteRules.
             if strcmp(status,'OPEN')
                 status_code = obj.ToolkitConstants.EN_R_IS_OPEN;
             elseif strcmp(status,'CLOSED')
@@ -1252,7 +1290,7 @@ classdef epanet <handle
             %   d.getRules(1).Premises
             %
             % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseStatus,
-            %          getRules, addRules, deleteRules.
+            %          setRules, getRules, addRules, deleteRules.
             [obj.Errcode] = ENsetpremisevalue(ruleIndex, premiseIndex, value, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
