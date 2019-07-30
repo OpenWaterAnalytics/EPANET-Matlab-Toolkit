@@ -435,6 +435,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setReport|Issues a report formatting command. Formatting commands are the same as used in the [REPORT] section of the EPANET Input file|
 |setReportFormatReset|Clears any report formatting commands that either appeared in the [REPORT] section of the EPANET Input file or were issued with the ENsetreport function|
 |setReportStatus|Sets the level of hydraulic status reporting|
+|setRules|Sets a rule - based control. (EPANET Version 2.2)|
 |setRuleElseAction|Sets rule - based control else actions. (EPANET Version 2.2)|
 |setRulePremise|Sets the premise of a rule - based control. (EPANET Version 2.2)|
 |setRulePremiseObejctNameID|Sets the ID of an object in a premise of a rule-based control. (EPANET Version 2.2)|
