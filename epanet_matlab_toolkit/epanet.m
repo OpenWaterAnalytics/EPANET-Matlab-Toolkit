@@ -3864,7 +3864,7 @@ classdef epanet <handle
             initnodematrix=zeros(totalsteps, obj.getNodeCount);
             initlinkmatrix=zeros(totalsteps, obj.getLinkCount);
             if size(varargin, 2)==0
-                varargin={'time', 'pressure', 'demand', 'head', 'tankvolume', 'flow', 'velocity', 'headloss', 'status', 'setting', 'energy', 'efficiency', 'state'};
+                varargin={'time', 'pressure', 'demand', 'demanddeficit', 'head', 'tankvolume', 'flow', 'velocity', 'headloss', 'status', 'setting', 'energy', 'efficiency', 'state'};
                 if ~sum(strcmpi(fields(obj.ToolkitConstants), 'EN_EFFICIENCY'))
                     varargin{end}={''};
                 end
@@ -3883,6 +3883,9 @@ classdef epanet <handle
             end
             if find(strcmpi(varargin, 'demand'))
                 value.Demand=initnodematrix;
+            end
+            if find(strcmpi(varargin, 'demanddeficit'))
+                value.DemandDeficit=initnodematrix;
             end
             if find(strcmpi(varargin, 'demandSensingNodes'))
                 value.DemandSensingNodes=zeros(totalsteps, length(varargin{sensingnodes}));
@@ -3930,6 +3933,9 @@ classdef epanet <handle
                 end
                 if find(strcmpi(varargin, 'demand'))
                     value.Demand(k, :)=obj.getNodeActualDemand;
+                end
+                if find(strcmpi(varargin, 'demanddeficit'))
+                    value.DemandDeficit(k, :)=obj.getNodeDemandDeficit;
                 end
                 if find(strcmpi(varargin, 'demandSensingNodes'))
                     value.DemandSensingNodes(k, :)=obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
