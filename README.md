@@ -151,7 +151,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkLength|Retrieves the value of all link lengths|
 |getLinkMinorLossCoeff|Retrieves the value of all link minor loss coefficients|
 |getLinkNameID|Retrieves the ID label(s) of all links, or the IDs of an index set of links|
-|getLinkNodesIndex|Retrieves the indexes of the from/to nodes of all links|
+|getLinkNodesIndex-getNodesConnectingLinksIndex|Retrieves the indexes of the from/to nodes of all links|
 |getLinkPipeCount|Retrieves the number of pipes|
 |getLinkPipeIndex|Retrieves the indices of pipes|
 |getLinkPipeNameID|Retrieves the pipe IDs|

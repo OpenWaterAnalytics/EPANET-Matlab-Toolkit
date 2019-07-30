@@ -1474,6 +1474,10 @@ classdef epanet <handle
             %Retrieves the valve indices
             value = obj.getLinkPipeCount+obj.getLinkPumpCount+1:obj.getLinkCount;
         end
+        function value = getNodesConnectingLinksIndex(obj)
+            % Duplicate function with getLinkNodesIndex for new version
+            value = obj.getLinkNodesIndex;
+        end
         function value = getLinkNodesIndex(obj)
             %Retrieves the indexes of the from/to nodes of all links.
             value(obj.getLinkCount, 1:2)=[nan nan];
