@@ -392,7 +392,7 @@ classdef epanet <handle
         LOGOP={'IF', 'AND', 'OR'}
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
         RULEVARIABLE={'DEMAND', 'HEAD', 'GRADE', 'LEVEL', 'PRESSURE', 'FLOW', 'STATUS', 'SETTING', 'POWER', 'TIME', 'CLOCKTIME', 'FILLTIME', 'DRAINTIME'};
-        RULEOPERATOR={'=', '~=', '<=', '>=', '<', '>', '==', '~==', 'BELOW', 'ABOVE'};
+        RULEOPERATOR={'=', '~=', '<=', '>=', '<', '>', 'IS', 'NOT', 'BELOW', 'ABOVE'};
         RULESTATUS={'OPEN', 'CLOSED', 'ACTIVE'};
         RULEPREMISECHECK={'NODE', 'JUNCTION', 'RESERVOIR', 'TANK', 'LINK', 'PIPE', 'PUMP', 'VALVE', 'SYSTEM'};
         TYPECONTROL={'LOWLEVEL', 'HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL', 'HILEVEL', 'TIMER', 'TIMEOFDAY'
@@ -933,17 +933,17 @@ classdef epanet <handle
                     if j==1
                         logop = 1;
                     end
-                    if object==6
+                    if object == obj.ToolkitConstants.EN_R_NODE
                         objectNameID = obj.getNodeNameID(objIndex);
                         space=' ';
-                    elseif object==7
+                    elseif object == obj.ToolkitConstants.EN_R_LINK
                         objectNameID = obj.getLinkNameID(objIndex);
                         space=' ';
-                    elseif object==8
+                    elseif object == obj.ToolkitConstants.EN_R_SYSTEM
                         objectNameID = ' ';
                         space = '';
                     end
-                    if variable >= 9
+                    if variable >= obj.ToolkitConstants.EN_R_TIME
                         value_premise = datestr((double(value_premise)/86400), 'HH:MM PM');
                     else
                         value_premise = num2str(value_premise);
@@ -1068,8 +1068,7 @@ classdef epanet <handle
             % See also setRuleElseAction, setRulePriority, getRuleInfo,
             %          getRules, addRules, deleteRules.
             if strcmp(type,'STATUS')
-                param = strcmp(obj.RULESTATUS,value);
-                status = find(param, 1);
+                status = eval(['obj.ToolkitConstants.EN_R_IS_', value]);
                 setting = -1;
             elseif strcmp(type,'SETTING')
                 status = -1;
@@ -1101,8 +1100,7 @@ classdef epanet <handle
             % See also setRuleThenAction, setRulePriority, getRuleInfo,
             %          getRules, addRules, deleteRules.
             if strcmp(type,'STATUS')
-                param = strcmp(obj.RULESTATUS,value);
-                status = find(param, 1);
+                status = eval(['obj.ToolkitConstants.EN_R_IS_', value]);
                 setting = -1;
             elseif strcmp(type,'SETTING')
                 status = -1;
@@ -1156,36 +1154,30 @@ classdef epanet <handle
             premise_new = regexp(premise, '\s', 'split');
             logop_code = ismember(obj.LOGOP, premise_new{1});
             logop = find(logop_code, 1);
-            object_check = ismember(obj.RULEPREMISECHECK, premise_new(2));
-            object_code = find(object_check, 1);
-            if (object_code >= 1) && (object_code<=4)
-                object = 6;
+            object = eval(['obj.ToolkitConstants.EN_R_', premise_new{2}]);
+            if object == obj.ToolkitConstants.EN_R_NODE
                 objIndex = obj.getNodeIndex(premise_new{3});
-            elseif (object_code >= 5) && (object_code<=8)
-                object = 7;
+            elseif object == obj.ToolkitConstants.EN_R_LINK
                 objIndex = obj.getLinkIndex(premise_new{3});
-            elseif (object_code == 9)
-                object = 8;
+            elseif object == obj.ToolkitConstants.EN_R_SYSTEM
                 objIndex = 0;
             end
-            if object==8
+            if object == obj.ToolkitConstants.EN_R_SYSTEM
                 j = 3; k = 4; m = 5;
             else
                 j = 4; k = 5; m = 6;
             end
-            variable_code = ismember(obj.RULEVARIABLE, premise_new{j});
-            variable = find(variable_code, 1) - 1;
+            variable = eval(['obj.ToolkitConstants.EN_R_', premise_new{j}]);
             opearator_code = ismember(obj.RULEOPERATOR, premise_new{k});
             relop = find(opearator_code, 1) - 1;
-            if variable==6
+            if variable == obj.ToolkitConstants.EN_R_STATUS
                 value = -1;
-                status_code = ismember(obj.RULESTATUS, premise_new{m});
-                status = find(status_code, 1);
+                status = eval(['obj.ToolkitConstants.EN_R_IS_', premise_new{m}]);
             else
                 value = str2double(premise_new{m});
                 status = 0;
             end
-            if object == 8
+            if object == obj.ToolkitConstants.EN_R_SYSTEM
                if strcmp(premise_new(6), 'AM')
                    value = value*3600;
                elseif strcmp(premise_new(6), 'PM')
@@ -1211,9 +1203,9 @@ classdef epanet <handle
             % See also setRulePremise, setRulePremiseStatus, setRulePremiseValue,
             %          getRules, addRules, deleteRules.
             [obj.Errcode, ~, object, objIndex, ~, ~, ~, ~] =  ENgetpremise(ruleIndex, premiseIndex, obj.LibEPANET);
-            if object == 6
+            if object == obj.ToolkitConstants.EN_R_NODE
                 objIndex = obj.getNodeIndex(objNameID);
-            elseif object == 7
+            elseif object == obj.ToolkitConstants.EN_R_LINK
                 objIndex = obj.getLinkIndex(objNameID);
             end
             [obj.Errcode] = ENsetpremiseindex(ruleIndex, premiseIndex, objIndex, obj.LibEPANET);
@@ -1237,11 +1229,11 @@ classdef epanet <handle
             % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseValue,
             %          getRules, addRules, deleteRules.
             if strcmp(status,'OPEN')
-                status_code = 1;
+                status_code = obj.ToolkitConstants.EN_R_IS_OPEN;
             elseif strcmp(status,'CLOSED')
-                status_code = 2;
+                status_code = obj.ToolkitConstants.EN_R_IS_CLOSED;
             elseif strcmp(status,'ACTIVE')
-                status_code = 3;
+                status_code = obj.ToolkitConstants.EN_R_IS_ACTIVE;
             end
             [obj.Errcode] = ENsetpremisestatus(ruleIndex, premiseIndex, status_code, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
