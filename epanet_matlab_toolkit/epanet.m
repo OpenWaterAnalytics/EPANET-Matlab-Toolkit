@@ -4322,7 +4322,7 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            if ischar(idLink)
+            if ischar(idLink) || iscell(idLink)
                 indexLink = obj.getLinkIndex(idLink);
             else
                 indexLink = idLink;
@@ -4338,7 +4338,7 @@ classdef epanet <handle
             %   %OR using index
             %   index = 1;
             %   d.deletePattern(1)
-            if ischar(idPat)
+            if ischar(idPat) || iscell(idPat)
                 indexPat = obj.getPatternIndex(idPat);
             else
                 indexPat = idPat;
@@ -4353,7 +4353,7 @@ classdef epanet <handle
             %   d.deleteCurve(idCurve)
             %   index = 1;
             %   d.deleteCurve(1)
-            if ischar(idCurve)
+            if ischar(idCurve) || iscell(idCurve)
                 indexCurve = obj.getCurveIndex(idCurve);
             else
                 indexCurve = idCurve;
