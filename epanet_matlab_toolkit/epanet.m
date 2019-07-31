@@ -1593,11 +1593,22 @@ classdef epanet <handle
             value = obj.getLinkPipeCount+obj.getLinkPumpCount+1:obj.getLinkCount;
         end
         function value = getNodesConnectingLinksIndex(obj)
-            % Duplicate function with getLinkNodesIndex for new version
+            % Retrieves the indexes of the from/to nodes of all links.
+            % Duplicate function with getLinkNodesIndex for new version.
+            %
+            % Example:
+            %   d.getNodesConnectingLinksIndex
+            %
+            % See also getLinkNodesIndex, getNodesConnectingLinksID.
             value = obj.getLinkNodesIndex;
         end
         function value = getLinkNodesIndex(obj)
-            %Retrieves the indexes of the from/to nodes of all links.
+            % Retrieves the indexes of the from/to nodes of all links.
+            %
+            % Example:
+            %   d.getLinkNodesIndex
+            %
+            % See also getNodesConnectingLinksID.
             value(obj.getLinkCount, 1:2)=[nan nan];
             for i=1:obj.getLinkCount
                 [obj.Errcode, linkFromNode, linkToNode] = ENgetlinknodes(i, obj.LibEPANET);
@@ -1605,7 +1616,16 @@ classdef epanet <handle
             end
         end
         function value = getNodesConnectingLinksID(obj)
-            %Retrieves the id of the from/to nodes of all links.
+            % Retrieves the id of the from/to nodes of all links.
+            %
+            % Example 1:
+            %   d.getNodesConnectingLinksID           % Retrieves the id of the from/to nodes of all links
+            %
+            % Example 2:
+            %   linkIndex = 1;
+            %   d.getNodesConnectingLinksID{1, 1:2}   % Retrieves the id of the from/to nodes of the 1st link
+            %
+            % See also getLinkNodesIndex.
             value={};
             obj.NodesConnectingLinksIndex=obj.getLinkNodesIndex;
             if obj.getLinkCount
@@ -1614,7 +1634,7 @@ classdef epanet <handle
             end
         end
         function value = getLinkType(obj, varargin)
-            % Retrieves the link-type code for all links
+            % Retrieves the link-type code for all links.
             %
             % Example 1:
             %    d.getLinkType      % Retrieves the link-type code for all links
@@ -1623,12 +1643,12 @@ classdef epanet <handle
             %    d.getLinkType(1)   % Retrieves the link-type code for the first link
             %
             % See also getLinkTypeIndex, getLinksInfo, getLinkDiameter,
-            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
+            %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             if ~isempty(varargin), varargin=varargin{1}; end
             value=obj.TYPELINK(obj.getLinkTypeIndex(varargin)+1);
         end
         function value = getLinkTypeIndex(obj, varargin)
-            % Retrieves the link-type index for all links
+            % Retrieves the link-type index for all links.
             %
             % Example 1:
             %    d.getLinkTypeIndex      % Retrieves the link-type index for all links
@@ -1637,7 +1657,7 @@ classdef epanet <handle
             %    d.getLinkTypeIndex(1)   % Retrieves the link-type index for the first link
             %
             % See also getLinkType, getLinksInfo, getLinkDiameter,
-            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
+            %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetlinktype(i, obj.LibEPANET);  
@@ -1646,13 +1666,13 @@ classdef epanet <handle
             end
         end
         function [value] = getLinksInfo(obj)
-            % Retrieves all link info
+            % Retrieves all link info.
             %
             % Example:
             %    d.getLinksInfo
             %
             % See also getLinkType, getLinkTypeIndex, getLinkDiameter,
-            % getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
+            %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = struct();
             for i=1:obj.getLinkCount
                 [~, value.LinkDiameter(i)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET);
@@ -1668,7 +1688,7 @@ classdef epanet <handle
             end
         end
         function value = getLinkDiameter(obj, varargin)
-            % Retrieves the value of link diameters
+            % Retrieves the value of link diameters.
             % Pipe/valve diameter
             %
             % Example 1:
@@ -1678,11 +1698,11 @@ classdef epanet <handle
             %    d.getLinkDiameter(1)   % Retrieves the value of the first link diameter
             %
             % See also getLinkType, getLinksInfo, getLinkLength,
-            % getLinkRoughnessCoeff, getLinkMinorLossCoeff.
+            %          getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_DIAMETER, varargin{:});
         end
         function value = getLinkLength(obj, varargin)
-            % Retrieves the value of link lengths
+            % Retrieves the value of link lengths.
             % Pipe length
             %
             % Example 1:
@@ -1692,11 +1712,11 @@ classdef epanet <handle
             %    d.getLinkLength(1)   % Retrieves the value of the first link length
             %
             % See also getLinkType, getLinksInfo, getLinkDiameter,
-            % getLinkRoughnessCoeff, getLinkMinorLossCoeff.
+            %          getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_LENGTH, varargin{:});
         end
         function value = getLinkRoughnessCoeff(obj, varargin)
-            % Retrieves the value of all link roughness coefficients
+            % Retrieves the value of all link roughness coefficients.
             % Pipe roughness coefficient
             %
             % Example 1:
@@ -1706,11 +1726,11 @@ classdef epanet <handle
             %    d.getLinkRoughnessCoeff(1)   % Retrieves the value of the first link roughness coefficient
             %
             % See also getLinkType, getLinksInfo, getLinkDiameter,
-            % getLinkLength, getLinkMinorLossCoeff.
+            %          getLinkLength, getLinkMinorLossCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_ROUGHNESS, varargin{:});
         end
         function value = getLinkMinorLossCoeff(obj, varargin)
-            % Retrieves the value of link minor loss coefficients
+            % Retrieves the value of link minor loss coefficients.
             % Pipe/valve minor loss coefficient
             %
             % Example 1:
@@ -1720,11 +1740,11 @@ classdef epanet <handle
             %   d.getLinkMinorLossCoeff(1)   % Retrieves the value of the first link minor loss coefficient
             %
             % See also getLinkType, getLinksInfo, getLinkDiameter,
-            % getLinkLength, getLinkRoughnessCoeff.
+            %          getLinkLength, getLinkRoughnessCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_MINORLOSS, varargin{:});
         end
         function value = getLinkInitialStatus(obj, varargin)
-            % Retrieves the value of all link initial status
+            % Retrieves the value of all link initial status.
             % Initial status (see @ref EN_LinkStatusType)
             %
             % Example 1:
@@ -1734,11 +1754,11 @@ classdef epanet <handle
             %   d.getLinkInitialStatus(1)   % Retrieves the value of the first link initial status
             %
             % See also getLinkType, getLinksInfo, getLinkInitialSetting,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
+            %          getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSTATUS, varargin{:});
         end
         function value = getLinkInitialSetting(obj, varargin)
-            % Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves
+            % Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves.
             %
             % Example 1:
             %   d.getLinkInitialSetting      % Retrieves the value of all link initial settings
@@ -1747,11 +1767,11 @@ classdef epanet <handle
             %   d.getLinkInitialSetting(1)   % Retrieves the value of the first link initial setting
             %
             % See also getLinkType, getLinksInfo, getLinkInitialStatus,
-            % getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
+            %          getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSETTING, varargin{:});
         end
         function value = getLinkBulkReactionCoeff(obj, varargin)
-            % Retrieves the value of all link bulk chemical reaction coefficient
+            % Retrieves the value of all link bulk chemical reaction coefficient.
             %
             % Example 1:
             %   d.getLinkBulkReactionCoeff      % Retrieves the value of all link bulk chemical reaction coefficient
@@ -1760,12 +1780,12 @@ classdef epanet <handle
             %   d.getLinkBulkReactionCoeff(1)   % Retrieves the value of the first link bulk chemical reaction coefficient
             %
             % See also getLinkType, getLinksInfo, getLinkRoughnessCoeff,
-            % getLinkMinorLossCoeff, getLinkInitialStatus,
-            % getLinkInitialSetting, getLinkWallReactionCoeff.
+            %          getLinkMinorLossCoeff, getLinkInitialStatus,
+            %          getLinkInitialSetting, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_KBULK, varargin{:});
         end
         function value = getLinkWallReactionCoeff(obj, varargin)
-            % Retrieves the value of all pipe wall chemical reaction coefficient
+            % Retrieves the value of all pipe wall chemical reaction coefficient.
             %
             % Example 1:
             %   d.getLinkWallReactionCoeff      % Retrieves the value of all pipe wall chemical reaction coefficient
@@ -1774,12 +1794,12 @@ classdef epanet <handle
             %   d.getLinkWallReactionCoeff(1)   % Retrieves the value of the first pipe wall chemical reaction coefficient
             %
             % See also getLinkType, getLinksInfo, getLinkRoughnessCoeff,
-            % getLinkMinorLossCoeff, getLinkInitialStatus,
-            % getLinkInitialSetting, getLinkBulkReactionCoeff.
+            %          getLinkMinorLossCoeff, getLinkInitialStatus,
+            %          getLinkInitialSetting, getLinkBulkReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_KWALL, varargin{:});
         end
         function value = getLinkFlows(obj, varargin)
-            % Retrieves the current computed flow rate (read only)
+            % Retrieves the current computed flow rate (read only).
             % Using step-by-step hydraulic analysis
             %
             % Example 1:
@@ -1832,8 +1852,8 @@ classdef epanet <handle
             %    d.closeHydraulicAnalysis;
             %
             % See also getLinkVelocity, getLinkHeadloss, getLinkStatus,
-            % getLinkPumpState, getLinkSettings, getLinkEnergy,
-            % getLinkActualQuality, getLinkPumpEfficiency.
+            %          getLinkPumpState, getLinkSettings, getLinkEnergy,
+            %          getLinkActualQuality, getLinkPumpEfficiency.
             
             value = get_link_info(obj, obj.ToolkitConstants.EN_FLOW, varargin{:});
         end
@@ -3096,44 +3116,99 @@ classdef epanet <handle
             value = get_node_tank(obj, obj.ToolkitConstants.EN_MAXLEVEL, varargin);
         end
         function value = getNodeTankMinimumFraction(obj, varargin)
-            %Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank
+            % Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank.
+            %
+            % Example 1:
+            %    d.getNodeTankMinimumFraction             % Retrieves the minimum fraction of all tanks
+            %
+            % Example 2:
+            %   d.getNodeTankMinimumFraction(1)           % Retrieves the minimum fraction of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankMinimumFraction(1:2)         % Retrieves the minimum fraction of the first 2 tanks
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMinimumFraction(tankIndex)   % Retrieves the minimum fraction of the tanks given their indices
+            %
+            % See also setNodeTankMinimumFraction, getNodeTankData.
             value = get_node_tank(obj, obj.ToolkitConstants.EN_MIXFRACTION, varargin);
         end
         function value = getNodeTankBulkReactionCoeff(obj, varargin)
-            %Retrieves the tank bulk rate coefficient
+            % Retrieves the tank bulk rate coefficient.
+            %
+            % Example 1:
+            %   d.getNodeTankBulkReactionCoeff              % Retrieves the bulk rate coefficient of all tanks
+            %
+            % Example 2:
+            %   d.getNodeTankBulkReactionCoeff(1)           % Retrieves the bulk rate coefficient of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankBulkReactionCoeff(1:2)         % Retrieves the bulk rate coefficient of the first 2 tanks
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankBulkReactionCoeff(tankIndex)   % Retrieves the bulk rate coefficient of the tanks given their indices
+            %
+            % See also setNodeTankBulkReactionCoeff, getNodeTankData.
             value = get_node_tank(obj, obj.ToolkitConstants.EN_TANK_KBULK, varargin);
         end
         function value = getNodeTankVolume(obj, varargin)
-            %EPANET Version 2.1
-            %Retrieves the tank volume
-            %Example:
-            %  Nindex = d.getNodeIndex('2'); % get tank index
-            %  d.getNodeTankVolume(Nindex)
-            %  d.getNodeTankVolume
-            %  d.getNodeTankVolume(1:5)
+            % Retrieves the tank volume. (EPANET Version 2.1)
+            %
+            % Example 1:
+            %   d.getNodeTankVolume              % Retrieves the volume of all tanks
+            %
+            % Example 2:
+            %   d.getNodeTankVolume(1)           % Retrieves the volume of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankVolume(1:2)         % Retrieves the volume of the first 2 tanks
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankVolume(tankIndex)   % Retrieves the volume of the tanks given their indices
+            %
+            % See also getNodeTankData.
             value = get_node_tank(obj, obj.ToolkitConstants.EN_TANKVOLUME, varargin);
         end
         function value = getNodeTankMaximumWaterVolume(obj, varargin)
-            %EPANET Version 2.1
-            %Retrieves the tank maximum water volume
-            % Example:
-            %   Nindex = d.getNodeIndex('2'); % get tank index
-            %   d.getNodeTankMaximumWaterVolume(Nindex)
-            %   d.getNodeTankMaximumWaterVolume
-            %   d.getNodeTankMaximumWaterVolume(1:5)
+            % Retrieves the tank maximum water volume. (EPANET Version 2.1)
+            %
+            % Example 1:
+            %   d.getNodeTankMaximumWaterVolume              % Retrieves the maximum water volume of all tanks
+            %
+            % Example 2:
+            %   d.getNodeTankMaximumWaterVolume(1)           % Retrieves the maximum water volume of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankMaximumWaterVolume(1:2)         % Retrieves the maximum water volume of the first 2 tanks
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMaximumWaterVolume(tankIndex)   % Retrieves the maximum water volume of the tanks given their indices
+            %
+            % See also getNodeTankMinimumWaterVolume, getNodeTankData.
             value = get_node_tank(obj, obj.ToolkitConstants.EN_MAXVOLUME, varargin);
         end
         function value = getNodeTankCanOverFlow(obj, varargin)
-            % Retrieves the tank can overflow (= 1) or not (= 0)
-            % EPANET Version 2.2
-            % Example:
-            %   d.getNodeTankCanOverFlow
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_CANOVERFLOW, obj.LibEPANET); 
-                error(obj.getError(obj.Errcode)); 
-                j=j+1;
-            end
+            % Retrieves the tank can overflow (= 1) or not (= 0). (EPANET Version 2.2)
+            % 
+            % Example 1:
+            %   d.getNodeTankCanOverFlow              % Retrieves the can overflow of all tanks
+            %
+            % Example 2:
+            %   d.getNodeTankCanOverFlow(1)           % Retrieves the can overflow of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankCanOverFlow(1:2)         % Retrieves the can overflow of the first 2 tanks
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankCanOverFlow(tankIndex)   % Retrieves the can overflow of the tanks given their indices
+            %
+            % See also setNodeTankCanOverFlow, getNodeTankData.
+            value = get_node_tank(obj, obj.ToolkitConstants.EN_CANOVERFLOW, varargin);
         end
         function value = getNodeDemandDeficit(obj, varargin)
             % Retrieves the amount that full demand is reduced under PDA. (EPANET Version 2.2)
