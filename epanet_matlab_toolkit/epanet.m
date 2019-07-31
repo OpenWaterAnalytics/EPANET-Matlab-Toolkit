@@ -1517,16 +1517,36 @@ classdef epanet <handle
             value = obj.getLinkCount - pipepump;
         end
         function [errmssg, Errcode] = getError(obj, Errcode)
-            %Retrieves the text of the message associated with a particular error or warning code.
+            % Retrieves the text of the message associated with a particular error or warning code.
+            %
+            % Example:
+            %   error = 250;
+            %   d.getError(error)
             [errmssg , Errcode] = ENgeterror(Errcode, obj.LibEPANET);
         end
         function value = getFlowUnits(obj)
-            %Retrieves flow units used to express all flow rates.
+            % Retrieves flow units used to express all flow rates.
+            %
+            % Example:
+            %   d.getFlowUnits
             [obj.Errcode, flowunitsindex] = ENgetflowunits(obj.LibEPANET);
             value=obj.TYPEUNITS{flowunitsindex+1};
         end
         function value = getLinkNameID(obj, varargin)
-            %Retrieves the ID label(s) of all links, or the IDs of an index set of links
+            % Retrieves the ID label(s) of all links, or the IDs of an index set of links.
+            %
+            % Example 1:
+            %   d.getLinkNameID                % Retrieves the ID's of all links
+            %
+            % Example 2:
+            %   linkIndex = 1;
+            %   d.getLinkNameID(linkIndex)     % Retrieves the ID of the link with index = 1
+            %
+            % Example 3:
+            %   linkIndices = 1:3;
+            %   d.getLinkNameID(linkIndices)   % Retrieves the IDs of the links with indices = 1, 2, 3
+            %
+            % See also getNodeNameID, getLinkPipeNameID, getLinkIndex. 
             if isempty(varargin)
                 cnt = obj.getLinkCount;
                 value=cell(1, cnt);
@@ -1545,20 +1565,65 @@ classdef epanet <handle
             end
         end
         function value = getLinkPipeNameID(obj)
-            %Retrieves the pipe id
+            % Retrieves the pipe ID.
+            %
+            % Example 1:
+            %   d.getLinkPipeNameID        % Retrieves the ID's of all pipes
+            %
+            % Example 2:
+            %   d.getLinkPipeNameID{1}     % Retrieves the ID of the 1st pipe
+            %
+            % Example 3:
+            %   d.getLinkPipeNameID{1:3}   % Retrieves the ID of the first 3 pipes
+            %
+            % See also getLinkNameID, getLinkPumpNameID, getNodeNameID.
             value=obj.getLinkNameID(obj.getLinkPipeIndex);
         end
         function value = getLinkPumpNameID(obj)
-            %Retrieves the pump id
+            % Retrieves the pump ID.
+            %
+            % Example 1:
+            %   d.getLinkPumpNameID        % Retrieves the ID's of all pumps
+            %
+            % Example 2:
+            %   d.getLinkPumpNameID{1}     % Retrieves the ID of the 1st pump
+            %
+            % Example 3:
+            %   d.getLinkPumpNameID{1:2}   % Retrieves the ID of the first 2 pumps
+            %
+            % See also getLinkNameID, getLinkPipeNameID, getNodeNameID.
             value=obj.getLinkNameID(obj.getLinkPumpIndex);
         end
         function value = getLinkValveNameID(obj)
-            %Retrieves the valve id
+            % Retrieves the valve ID.
+            %
+            % Example 1:
+            %   d.getLinkValveNameID        % Retrieves the ID's of all valves
+            %
+            % Example 2:
+            %   d.getLinkValveNameID{1}     % Retrieves the ID of the 1st valve
+            %
+            % Example 3:
+            %   d.getLinkValveNameID{1:3}   % Retrieves the ID of the first 3 valves
+            %
+            % See also getLinkNameID, getLinkPumpNameID, getNodeNameID.
             value=obj.getLinkNameID(obj.getLinkValveIndex);
         end
         function value = getLinkIndex(obj, varargin)
-            %Retrieves the indices of all links, or the indices of an ID set of links
-            % e.g. getLinkIndex({''linkID''})) or getLinkIndex(''linkID''))
+            % Retrieves the indices of all links, or the indices of an ID set of links.
+            %
+            % Example 1:
+            %   d.getLinkIndex           % Retrieves the indices of all links
+            %
+            % Example 2:
+            %   linkID = d.getLinkNameID{1};  
+            %   d.getLinkIndex(linkID)   % Retrieves the index of the 1st link given it's ID
+            %
+            % Example 3:
+            %   linkID = d.getLinkNameID(1:3);
+            %   d.getLinkIndex(linkID)   % Retrieves the indices of the first 3 links given their ID
+            %
+            % See also getLinkNameID, getLinkPipeIndex, getNodeIndex.
             value = [];
             if isempty(varargin)
                 value=1:obj.getLinkCount;
@@ -1576,12 +1641,28 @@ classdef epanet <handle
             end
         end
         function value = getLinkPipeIndex(obj)
-            %Retrieves the pipe indices
+            % Retrieves the pipe indices.
+            %
+            % Example:
+            %   d.getLinkPipeIndex
+            %
+            % See also getLinkIndex, getLinkPumpIndex.
             tmpLinkTypes=obj.getLinkType;
             value = find(strcmp(tmpLinkTypes, 'PIPE'));
         end
         function value = getLinkPumpIndex(obj, varargin)
-            %Retrieves the pump indices
+            % Retrieves the pump indices.
+            %
+            % Example 1:
+            %   d.getLinkPumpIndex        % Retrieves the indices of all pumps
+            %
+            % Example 2:
+            %   d.getLinkPumpIndex(1)     % Retrieves the index of the 1st pump
+            %
+            % Example 3:
+            %   d.getLinkPumpIndex(1:2)   % Retrieves the indices of the first 2 pumps
+            %   
+            % See also getLinkIndex, getLinkPipeIndex, getLinkValveIndex.
             tmpLinkTypes=obj.getLinkType;
             value = find(strcmp(tmpLinkTypes, 'PUMP'));
             if ~isempty(varargin)
@@ -1589,7 +1670,12 @@ classdef epanet <handle
             end
         end
         function value = getLinkValveIndex(obj)
-            %Retrieves the valve indices
+            % Retrieves the valve indices.
+            %
+            % Example:
+            %   d.getLinkValveIndex
+            %
+            % See also getLinkIndex, getLinkPipeIndex, getLinkPumpIndex.
             value = obj.getLinkPipeCount+obj.getLinkPumpCount+1:obj.getLinkCount;
         end
         function value = getNodesConnectingLinksIndex(obj)
