@@ -389,12 +389,13 @@ classdef epanet <handle
     properties (Constant = true)
         classversion='dev2.2'; % 06/02/2019
         
-        LOGOP={'IF', 'AND', 'OR'}
+        LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
-        RULEVARIABLE={'DEMAND', 'HEAD', 'GRADE', 'LEVEL', 'PRESSURE', 'FLOW', 'STATUS', 'SETTING', 'POWER', 'TIME', 'CLOCKTIME', 'FILLTIME', 'DRAINTIME'};
-        RULEOPERATOR={'=', '~=', '<=', '>=', '<', '>', 'IS', 'NOT', 'BELOW', 'ABOVE'};
-        RULESTATUS={'OPEN', 'CLOSED', 'ACTIVE'};
-        RULEPREMISECHECK={'NODE', 'JUNCTION', 'RESERVOIR', 'TANK', 'LINK', 'PIPE', 'PUMP', 'VALVE', 'SYSTEM'};
+        RULEVARIABLE={'DEMAND', 'HEAD', 'GRADE', 'LEVEL', 'PRESSURE', 'FLOW', 'STATUS', ... % Constants for rule-based controls: 'DEMAND', 'HEAD', 'GRADE' etc. % EPANET Version 2.2
+        'SETTING', 'POWER', 'TIME', 'CLOCKTIME', 'FILLTIME', 'DRAINTIME'}; 
+        RULEOPERATOR={'=', '~=', '<=', '>=', '<', '>', 'IS', 'NOT', 'BELOW', 'ABOVE'}; % Constants for rule-based controls: '=', '~=', '<=' etc. % EPANET Version 2.2
+        RULESTATUS={'OPEN', 'CLOSED', 'ACTIVE'}; % Constants for rule-based controls: 'OPEN', 'CLOSED', 'ACTIVE' % EPANET Version 2.2
+        RULEPREMISECHECK={'NODE', 'JUNCTION', 'RESERVOIR', 'TANK', 'LINK', 'PIPE', 'PUMP', 'VALVE', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'JUNCTION' etc. % EPANET Version 2.2
         TYPECONTROL={'LOWLEVEL', 'HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL', 'HILEVEL', 'TIMER', 'TIMEOFDAY'
         TYPECURVE={'VOLUME', 'PUMP', 'EFFICIENCY', 'HEADLOSS', 'GENERAL'}; % Constants for pump curves: 'PUMP', 'EFFICIENCY', 'VOLUME', 'HEADLOSS' % EPANET Version 2.2
         TYPELINK={'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'}; % Constants for links: 'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'VALVE'
@@ -855,7 +856,21 @@ classdef epanet <handle
             [value] = plotnet(obj, 'bin', 0, varargin{:});
         end
         function value = getControls(obj, varargin)
-            %Retrieves the parameters of all control statements
+            % Retrieves the parameters of all control statements.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d.getControls              % Retrieves the parameters of all control statements
+            %   d.getControls(1).Type      % Retrieves the type of the 1st control
+            %   d.getControls(1).LinkID    % Retrieves the ID of the link associated with the 1st control
+            %   d.getControls(1).Setting   % Retrieves the setting of the link associated with the 1st control
+            %   d.getControls(1).NodeID    % Retrieves the ID of the node associated with the 1st control
+            %   d.getControls(1).Value     % Retrieves the value of the node associated with the 1st control
+            %   d.getControls(1).Control   % Retrieves the 1st control statement
+            %
+            % See also setControls, addControls, deleteControls,
+            %          getRules, setRules, addRules, deleteRules.
             indices = getControlIndices(obj, varargin);j=1;            
             value=struct();
             obj.ControlTypes={};
@@ -1308,6 +1323,7 @@ classdef epanet <handle
             % Example 3:
             %   d.getRuleID(1:3)    % Retrieves the ID names of the 1st to 3rd rule-based control
             %
+            % See also getRules, getRuleInfo, addRules.
             if nargin==1
                 index = 1:obj.getRuleCount;
                 value = cell(1, length(index));
@@ -1336,7 +1352,7 @@ classdef epanet <handle
             % Example 3:
             %   d.getRuleInfo(1:3)    % Retrieves summary information about the 1st to 3rd rule-based control
             %
-            % See also getRuleID.
+            % See also getRuleID, getRules, addRules.
             value=struct();
             if nargin==1
                 index = 1:obj.getRuleCount;
@@ -1351,11 +1367,12 @@ classdef epanet <handle
         end
         function Errcode = deleteRules(varargin)
             % Deletes an existing rule-based control given it's index. (EPANET Version 2.2)
+            % Returns error code.
             %
             % % The examples are based on d=epanet('BWSN_Network_1.inp');
             %
             % Example 1:
-            %   d.getRuleCount      % Retrieves the number of rules
+            %   d.getRuleCount        % Retrieves the number of rules
             %   d.deleteRules;        % Deletes all the rule-based control
             %   d.getRuleCount
             %
@@ -1367,7 +1384,7 @@ classdef epanet <handle
             %   d.deleteRules(1:3);   % Deletes the 1st to 3rd rule-based control
             %   d.getRuleCount
             %
-            % See also getRuleCount.
+            % See also addRules, getRules, setRules, getRuleCount.
             obj = varargin{1};
             if nargin==1
                 index = 1:obj.getRuleCount;
@@ -1380,58 +1397,121 @@ classdef epanet <handle
             end
         end
         function value = getNodeCount(obj)
-            % Retrieves the number of nodes
+            % Retrieves the number of nodes.
+            %
             % Example:
-            %       d.getNodeCount
+            %   d.getNodeCount
+            %
+            % See also getNodeIndex, getLinkCount.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_NODECOUNT, obj.LibEPANET);
         end
         function value = getNodeTankReservoirCount(obj)
-            % Retrieves the number of tanks
+            % Retrieves the number of tanks.
+            %
+            % Example:
+            %   d.getNodeTankReservoirCount
+            %
+            % See also getNodeTankIndex, getNodeReservoirIndex.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_TANKCOUNT, obj.LibEPANET);
         end
         function value = getLinkCount(obj)
-            %Retrieves the number of links
+            % Retrieves the number of links.
+            %
+            % Example:
+            %   d.getLinkCount
+            %
+            % See also getLinkIndex, getNodeCount.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_LINKCOUNT, obj.LibEPANET);
         end
         function value = getPatternCount(obj)
-            %Retrieves the number of patterns
+            % Retrieves the number of patterns.
+            %
+            % Example:
+            %   d.getPatternCount
+            %
+            % See also getPatternIndex, getPattern.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_PATCOUNT, obj.LibEPANET);
         end
         function value = getCurveCount(obj)
-            %Retrieves the number of curves
+            % Retrieves the number of curves.
+            %
+            % Example:
+            %   d.getCurveCount
+            %
+            % See also getCurveIndex, getCurvesInfo.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_CURVECOUNT, obj.LibEPANET);
         end
         function value = getControlRulesCount(obj)
-            %Retrieves the number of controls
+            % Retrieves the number of controls.
+            %
+            % Example:
+            %   d.getControlRulesCount
+            %
+            % See also getControls, getRuleCount.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_CONTROLCOUNT, obj.LibEPANET);
         end
         function value = getRuleCount(obj)
             % Retrieves the number of rules. (EPANET Version 2.2)
+            %
+            % Example:
+            %   d.getRuleCount
+            %
+            % See also getRules, getControlRulesCount.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_RULECOUNT, obj.LibEPANET);
         end
         function value = getNodeTankCount(obj)
-            %Retrieves the number of Tanks
+            % Retrieves the number of Tanks.
+            %
+            % Example:
+            %   d.getNodeTankCount
+            %
+            % See also getNodeReservoirCount, getNodeCount.
             value = sum(strcmp(obj.getNodeType, 'TANK'));
         end
         function value = getNodeReservoirCount(obj)
-            %Retrieves the number of Reservoirs
+            % Retrieves the number of Reservoirs.
+            %
+            % Example:
+            %   d.getNodeReservoirCount
+            %
+            % See also getNodeTankCount, getNodeCount.
             value = sum(strcmp(obj.getNodeType, 'RESERVOIR'));
         end
         function value = getNodeJunctionCount(obj)
-            %Retrieves the number of junction nodes
+            % Retrieves the number of junction nodes.
+            %
+            % Example:
+            %   d.getNodeJunctionCount
+            %
+            % See also getNodeTankCount, getNodeCount.
             value = obj.getNodeCount - obj.getNodeTankReservoirCount;
         end
         function value = getLinkPipeCount(obj)
-            %Retrieves the number of pipes
+            % Retrieves the number of pipes.
+            %
+            % Example:
+            %   d.getLinkPipeCount
+            %
+            % See also getLinkPumpCount, getLinkCount.
             LinkType1=obj.getLinkType;
             value = sum(strcmp(LinkType1, 'PIPE')+strcmp(LinkType1, 'CVPIPE'));
         end
         function value = getLinkPumpCount(obj)
-            %Retrieves the number of pumps
+            % Retrieves the number of pumps.
+            %
+            % Example:
+            %   d.getLinkPumpCount
+            %
+            % See also getLinkPipeCount, getLinkCount.
             value = sum(strcmp(obj.getLinkType, 'PUMP'));
         end
         function value = getLinkValveCount(obj)
-            %Retrieves the number of valves
+            % Retrieves the number of valves.
+            %
+            % Example:
+            %   d.getLinkValveCount
+            %
+            % See also getLinkPumpCount, getLinkCount.
             LinkType1=obj.getLinkType;
             pipepump = sum(strcmp(LinkType1, 'PIPE')+strcmp(LinkType1, 'CVPIPE')+strcmp(LinkType1, 'PUMP'));
             value = obj.getLinkCount - pipepump;
