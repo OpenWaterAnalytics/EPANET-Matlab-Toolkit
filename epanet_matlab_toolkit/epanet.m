@@ -3316,12 +3316,25 @@ classdef epanet <handle
             end
         end
         function value = getNodeTankIndex(obj)
-            %Retrieves the tank index
+            % Retrieves the tank indices.
+            %
+            % Example:
+            %   d.getNodeTankIndex
+            %
+            % See also getNodeTankCount, getNodeTankNameID.
             tmpNodeTypes=obj.getNodeType;
             value = find(strcmp(tmpNodeTypes, 'TANK'));
         end
         function value = getNodeTankNameID(obj)
-            %Retrieves the tank id
+            % Retrieves the tank IDs.
+            %
+            % Example 1:
+            %   d.getNodeTankNameID      % Retrieves the IDs of all tanks
+            %
+            % Example 2:
+            %   d.getNodeTankNameID{1}   % Retrieves the ID of the 1st tank
+            %
+            % See also getNodeTankCount, getNodeTankIndex.
             value=obj.getNodeNameID(obj.getNodeTankIndex);
         end
         function tankData = getNodeTankData(obj)
@@ -3339,8 +3352,12 @@ classdef epanet <handle
             % 8) Volume Curve Index
             %
             % Example 1:
-            %   tankData = d.getNodeTankData;
+            %   tankData = d.getNodeTankData;                  % Retrieves all the data of all tanks
             %   disp(tankData)
+            %
+            % Example 2:
+            %   tankElevation = d.getNodeTankData.Elevation;   % Retrieves the elevations of all tanks.
+            %   disp(tankElevation)
             %
             % See also setNodeTankData, getNodeElevations, getNodeTankInitialLevel,
             %          getNodeTankMinimumWaterLevel, getNodeTankDiameter.
@@ -3587,10 +3604,18 @@ classdef epanet <handle
             error(obj.getError(obj.Errcode));
         end
         function value = getPatternComment(obj, varargin)
-            % Retrieves the comment string assigned to the pattern object
-            % Example: 
-            %       d.getPatternComment(1)
-            %       d.getPatternComment
+            % Retrieves the comment string assigned to the pattern object.
+            %
+            % Example 1:
+            %   d.getPatternComment        % Retrieves the comments of all the patterns
+            %
+            % Example 2:
+            %   d.getPatternComment(1)     % Retrieves the comment of the 1st pattern
+            %
+            % Example 3:
+            %   d.getPatternComment(1:2)   % Retrieves the comments of the first 2 patterns
+            %
+            % See also setPatternComment, getPattern.
             if isempty(varargin)
                 cnt = obj.getPatternCount;
                 value = cell(1, cnt);
@@ -3609,7 +3634,18 @@ classdef epanet <handle
             end
         end
         function value = getPatternNameID(obj, varargin)
-            %Retrieves the ID label of all or some time patterns indices
+            % Retrieves the ID label of all or some time patterns indices.
+            %
+            % Example 1:
+            %   d.getPatternNameID        % Retrieves the IDs of all the patterns
+            %
+            % Example 2:
+            %   d.getPatternNameID(1)     % Retrieves the ID of the 1st pattern
+            %
+            % Example 3:
+            %   d.getPatternNameID(1:2)   % Retrieves the IDs of the first 2 patterns
+            %
+            % See also setPatternNameID, getPattern.
             patCnt = obj.getPatternCount;
             value = {};
             if patCnt
@@ -3651,8 +3687,18 @@ classdef epanet <handle
             end
         end
         function value = getCurveNameID(obj, varargin)
-            %Retrieves ID of a curve with specific index
-            %EPANET Version 2.1
+            % Retrieves the IDs of curves. (EPANET Version 2.1)
+            %
+            % Example 1:
+            %   d.getCurveNameID        % Retrieves the IDs of all the curves
+            %
+            % Example 2:
+            %   d.getCurveNameID(1)     % Retrieves the ID of the 1st curve
+            %
+            % Example 3:
+            %   d.getCurveNameID(1:2)   % Retrieves the IDs of the first 2 curves
+            %
+            % See also setCurveNameID, getCurvesInfo.
             curCnt = obj.getCurveCount;
             value = {};
             if curCnt
@@ -3694,8 +3740,18 @@ classdef epanet <handle
             end
         end
         function value = getCurveLengths(obj, varargin)
-            %Retrieves number of points in a curve 
-            %EPANET Version 2.1
+            % Retrieves number of points in a curve. (EPANET Version 2.1)
+            %
+            % Example 1:
+            %   d.getCurveLengths        % Retrieves the number of points in all the curves
+            %
+            % Example 2:
+            %   d.getCurveLengths(1)     % Retrieves the number of points in the 1st curve
+            %
+            % Example 3:
+            %   d.getCurveLengths(1:2)   % Retrieves the number of points in the first 2 curves
+            %
+            % See also getCurvesInfo, setCurve.
             if isempty(varargin)
                 curCnt = obj.getCurveCount;
                 tmpCurves = 1:curCnt;
@@ -3723,8 +3779,20 @@ classdef epanet <handle
             end
         end
         function value = getCurveIndex(obj, varargin)
-            %Retrieves index of curve with specific ID
-            %EPANET Version 2.1
+            % Retrieves the index of a curve with specific ID. (EPANET Version 2.1)
+            %
+            % Example 1:
+            %   d.getCurveIndex            % Retrieves the indices of all the curves
+            %
+            % Example 2:
+            %   curveID = d.getCurveNameID(1);
+            %   d.getCurveIndex(curveID)   % Retrieves the index of the 1st curve given it's ID
+            %
+            % Example 3:
+            %   curveID = d.getCurveNameID(1:2);
+            %   d.getCurveIndex(curveID)   % Retrieves the indices of the first 2 curves given their ID
+            %
+            % See also getCurveNameID, getCurvesInfo.
             if isempty(varargin)
                 value=1:obj.getCurveCount;
             elseif isa(varargin{1}, 'cell')
@@ -3739,7 +3807,18 @@ classdef epanet <handle
             end
         end
         function value = getCurveTypeIndex(obj, varargin)
-            %Retrieves the curve-type index for all curves
+            % Retrieves the curve-type index for all curves.
+            %
+            % Example 1:
+            %   d.getCurveTypeIndex        % Retrieves the curve-type index for all curves
+            %
+            % Example 2:
+            %   d.getCurveTypeIndex(1)     % Retrieves the curve-type index for the 1st curve
+            %
+            % Example 3:
+            %   d.getCurveTypeIndex(1:2)   % Retrieves the curve-type index for the first 2 curves
+            %
+            % See also getCurveType, getCurvesInfo.
             [indices, value] = getCurveIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = ENgetcurvetype(i, obj.LibEPANET);  
@@ -3748,7 +3827,18 @@ classdef epanet <handle
             end
         end
         function value = getCurveType(obj, varargin)
-            %Retrieves the curve-type for all curves
+            % Retrieves the curve-type for all curves.
+            %
+            % Example 1:
+            %   d.getCurveType        % Retrieves the curve-type for all curves
+            %
+            % Example 2:
+            %   d.getCurveType(1)     % Retrieves the curve-type for the 1st curve
+            %
+            % Example 3:
+            %   d.getCurveType(1:2)   % Retrieves the curve-type for the first 2 curves
+            %
+            % See also getCurveTypeIndex, getCurvesInfo.
             indices = getCurveIndices(obj, varargin);
             value=obj.TYPECURVE(obj.getCurveTypeIndex(indices)+1);
         end
