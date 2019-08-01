@@ -579,9 +579,7 @@ classdef epanet <handle
             obj.solve = 0;
             %Open the file
             obj.Errcode=ENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
-            if obj.Errcode
-                error('Could not open the file, please check INP file.');
-            end
+            error(obj.getError(obj.Errcode)); 
             %Save the temporary input file
             obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
             obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
@@ -589,7 +587,7 @@ classdef epanet <handle
             %Load temporary file
             obj.Errcode=ENopen(obj.BinTempfile, [obj.InputFile(1:end-4), '_temp.txt'], [obj.InputFile(1:end-4), '_temp.bin'], obj.LibEPANET);
             if obj.Errcode
-                error('Could not open the file, please check INP file.');
+                error(obj.getError(obj.Errcode)); 
             else
                 disp(['Loading File "', varargin{1}, '"...']);
             end
@@ -10628,9 +10626,12 @@ function [Errcode, index] = ENgetlinkindex(id, LibEPANET)
 end
 function [Errcode, from, to] = ENgetlinknodes(index, LibEPANET)
 [Errcode, from, to]=calllib(LibEPANET, 'ENgetlinknodes', index, 0, 0);
+from = double(from);
+to = double(to);
 end
 function [Errcode, typecode] = ENgetlinktype(index, LibEPANET)
 [Errcode, typecode]=calllib(LibEPANET, 'ENgetlinktype', index, 0);
+typecode = double(typecode);
 if ~isnumeric(typecode), typecode = getTypeLink(typecode); end
 end
 function [Errcode, value] = ENgetlinkvalue(index, paramcode, LibEPANET)
