@@ -3937,7 +3937,7 @@ classdef epanet <handle
             %   d.getCurvesInfo.CurveXvalue{curveIndex}
             %   d.getCurvesInfo.CurveYvalue{curveIndex}
             %
-            % See also setCurve, getCurvesInfo.
+            % See also getCurveValue, setCurve, getCurvesInfo.
             x=value(1); y=value(2);
             [obj.Errcode] = ENsetcurvevalue(index, curvePnt, x, y, obj.LibEPANET);
         end
@@ -4278,22 +4278,42 @@ classdef epanet <handle
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENTTANK, obj.LibEPANET);
         end
         function value = getCurvesInfo(obj)
-            %EPANET Version 2.1
-            %Input:   curveIndex = curve index
-            %Output:  *nValues = number of points on curve
-            %         *xValues = values for x
-            %         *yValues = values for y
-            %Returns: error code
-            %Purpose: retrieves end nodes of a specific link
+            % Retrieves all the info of curves. (EPANET Version 2.1)
+            %
+            % Returns the following informations:
+            %   1) Curve Name ID
+            %   2) Number of points on curve
+            %   3) X values of points
+            %   4) Y values of points
+            %
+            % Example:
+            %   d.getCurvesInfo
+            %   d.getCurvesInfo.CurveNameID      % Retrieves the IDs of curves
+            %   d.getCurvesInfo.CurveNvalue      % Retrieves the number of points on curve
+            %   d.getCurvesInfo.CurveXvalue      % Retrieves the X values of points of all curves
+            %   d.getCurvesInfo.CurveXvalue{1}   % Retrieves the X values of points of the 1st curve
+            %   d.getCurvesInfo.CurveYvalue      % Retrieves the Y values of points of all curves
+            %   d.getCurvesInfo.CurveYvalue{1}   % Retrieves the Y values of points of the 1st curve
+            %
+            % See also setCurve, getCurveType, getCurveLengths,
+            %          getCurveValue, getCurveNameID, getCurveComment.
             value = struct();
             for i=1:obj.getCurveCount
                 [obj.Errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = ENgetcurve(obj, i, obj.LibEPANET);
             end
         end
         function value = getCounts(obj)
-            % Retrieves the number of network components (Nodes, Links, Junctions, Reservoirs, Tanks, Pipes, Pumps, Valves, Curves, ControlRules, Patterns)
+            % Retrieves the number of network components.
+            % Nodes, Links, Junctions, Reservoirs, Tanks, Pipes, Pumps, 
+            % Valves, Curves, SimpleControls, RuleBasedControls, Patterns.
+            %
             % Example: 
-            %       d.getCounts()
+            %   d.getCounts                  % Retrieves the number of all network components
+            %   d.getCounts.Nodes            % Retrieves the number of nodes
+            %   d.getCounts.SimpleControls   % Retrieves the number of simple controls
+            %
+            % See also getNodeCount, getNodeJunctionCount,
+            %          getLinkCount, getControlRulesCount.
             value.Nodes = obj.getNodeCount;
             value.Links = obj.getLinkCount;
             value.Junctions = obj.getNodeJunctionCount;
@@ -4303,7 +4323,8 @@ classdef epanet <handle
             value.Pumps = obj.getLinkPumpCount;
             value.Valves = obj.getLinkValveCount;
             value.Curves = obj.getCurveCount;
-            value.ControlRules = obj.getControlRulesCount;
+            value.SimpleControls = obj.getControlRulesCount;
+            value.RuleBasedControls = obj.getRuleCount;
             value.Patterns = obj.getPatternCount;
             
         end
@@ -4324,11 +4345,20 @@ classdef epanet <handle
             end
         end
         function valueIndex = addCurve(obj, varargin)
-            %EPANET Version 2.1
-            % Adds a new curve appended to the end of the existing curves
+            % Adds a new curve appended to the end of the existing curves. (EPANET Version 2.1)
+            % Returns the new curve's index.
+            %
             % Example:
-            %       curve_index = d.addCurve('NewCur2', [1800 200; 1500 400]);
-            %       d.getCurvesInfo
+            %   new_curve_ID = 'NewCurve';                        % ID selected without a space in between the letters
+            %   x_y_1 = [0, 730];
+            %   x_y_2 = [1000, 500];
+            %   x_y_3 = [1350, 260];
+            %   values = [x_y_1; x_y_2; x_y_3];                   % X and Y values selected
+            %   curve_index = d.addCurve(new_curve_ID, values);   % New curve added
+            %   d.getCurvesInfo                                   % Retrieves all the info of curves
+            %
+            % See also getCurvesInfo, getCurveType, setCurve,
+            %          setCurveValue, setCurveNameID, setCurveComment.
             valueIndex = 0;
             if (4>nargin && nargin>1) 
                 [obj.Errcode] = ENaddcurve(varargin{1}, obj.LibEPANET);
@@ -4340,15 +4370,22 @@ classdef epanet <handle
             end
         end
         function value = getCurveValue(obj, varargin)
-            %EPANET Version 2.1
-            % Retrieves x, y point for a specific point number and curve
-            % Example:
-            %       d.getCurveValue
-            %       d.getCurveValue(1)
-            %       d.getCurveValue{1}
-            %       d.getCurveValue(2)
-            %       %d.getCurveValue(indexCurve, pointindex)
-            %       d.getCurveValue(2, 2)
+            % Retrieves the X, Y values of points of curves. (EPANET Version 2.1)
+            %
+            % Example 1:
+            %   d.getCurveValue                           % Retrieves all the X and Y values of all curves
+            %
+            % Example 2:
+            %   curveIndex = 1;
+            %   d.getCurveValue(curveIndex)
+            %   d.getCurveValue{curveIndex}               % Retrieves all the X and Y values of the 1st curve
+            %
+            % Example 3:
+            %   curveIndex = 1;
+            %   pointIndex = 1;
+            %   d.getCurveValue(curveIndex, pointIndex)   % Retrieves the X and Y values of the 1st point of the 1st curve
+            %
+            % See also setCurveValue, setCurve, getCurvesInfo.
             tmplen = obj.getCurveLengths;
             cur_index = obj.getCurveIndex;
             pnt = 0;
@@ -4379,8 +4416,12 @@ classdef epanet <handle
             end
         end
         function [curveIndex, pumpIndex] = getLinkPumpHeadCurveIndex(obj)
-            %EPANET Version 2.1
-            %Retrieves index of a head curve for specific link index
+            % Retrieves the index of a head curve for all pumps. (EPANET Version 2.1)
+            %
+            % Example:
+            %   [curveIndex, pumpIndex] = d.getLinkPumpHeadCurveIndex
+            %
+            % See also getLinkPumpHCurve, getLinkPumpECurve.
             j = 1;
             pumpIndex = obj.getLinkPumpIndex;
             curveIndex = zeros(1, length(pumpIndex));
@@ -4390,11 +4431,17 @@ classdef epanet <handle
             end
         end
         function value = getLinkPumpTypeCode(obj)
-            %EPANET Version 2.1
-            %Input:   index = index of pump in list of links
-            %Output:  type = PumpType
-            %Returns: error code                              
-            %Purpose: retrieves type of a pump for specific link index
+            % Retrieves the code of type of a pump. (EPANET Version 2.1)
+            %
+            % Type of pump codes:
+            %   0 = Constant horsepower
+            %   1 = Power function
+            %   2 = User-defined custom curve
+            %
+            % Example:
+            %   d.getLinkPumpTypeCode
+            %
+            % See also getLinkPumpType, getLinkPumpPower.
             j = 1;
             pumpCnt = obj.getLinkPumpCount;
             value = ones(1, pumpCnt);
@@ -4406,12 +4453,23 @@ classdef epanet <handle
             end
         end
         function value = getLinkPumpType(obj)
-            %EPANET Version 2.1
+            % Retrieves the type of a pump. (EPANET Version 2.1)
+            %
+            % Example:
+            %   d.getLinkPumpType
+            %
+            % See also getLinkPumpTypeCode, getLinkPumpPower.
             v = obj.getLinkPumpTypeCode;
             value = obj.TYPEPUMP(v+1);
         end
         function value = getPatternAverageValue(obj)
-            %EPANET Version 2.1
+            % Retrieves the average values of all the time patterns. (EPANET Version 2.1)
+            %
+            % Example:
+            %   d.getPatternAverageValue
+            %
+            % See also getPattern, setPattern,
+            %          getPatternValue, getPatternLengths.
             value = zeros(1, obj.getPatternCount);
             for i=obj.getPatternIndex
                 [obj.Errcode, value(i)] = ENgetaveragepatternvalue(i, obj.LibEPANET);
