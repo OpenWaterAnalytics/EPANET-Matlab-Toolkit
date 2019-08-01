@@ -3974,7 +3974,20 @@ classdef epanet <handle
             end
         end
         function value = getPatternLengths(obj, varargin)
-            %Retrieves the number of time periods in all or some patterns
+            % Retrieves the number of time periods in all or some time patterns.
+            %
+            % Example 1:
+            %   d.getPatternLengths                 % Retrieves the number of time periods of all time patterns
+            %
+            % Example 2:
+            %   patternIndex = 1;
+            %   d.getPatternLengths(patternIndex)   % Retrieves the number of time periods of the 1st time pattern
+            %
+            % Example 3:
+            %   patternIndex = 1:2;
+            %   d.getPatternLengths(patternIndex)   % Retrieves the number of time periods of the first 2 time patterns
+            %
+            % See also getPatternIndex, getPattern.
             if isempty(varargin)
                 patCnt = obj.getPatternCount;
                 tmpPatterns=1:patCnt;
@@ -4002,7 +4015,12 @@ classdef epanet <handle
             end
         end
         function value = getPattern(obj)
-            %Retrieves the multiplier factor for all patterns and all times
+            % Retrieves the multiplier factor for all patterns and all times.
+            %
+            % Example:
+            %   d.getPattern
+            %
+            % See also getPatternLengths, getPatternValue, getPatternAverageValue.
             tmpmaxlen=max(obj.getPatternLengths);
             value=nan(obj.getPatternCount, tmpmaxlen);
             for i=1:obj.getPatternCount
@@ -4018,7 +4036,14 @@ classdef epanet <handle
             end
         end
         function value = getPatternValue(obj, patternIndex, patternStep)
-            %Retrieves the multiplier factor for a certain pattern and time
+            % Retrieves the multiplier factor for a certain pattern and time.
+            %
+            % Example:
+            %   patternIndex = 1;
+            %   patternStep = 5;
+            %   d.getPatternValue(patternIndex, patternStep)   % Retrieves the 5th multiplier factor of the 1st time pattern
+            %
+            % See also getPattern, getPatternLengths, getPatternAverageValue.
             [obj.Errcode, value] = ENgetpatternvalue(patternIndex, patternStep, obj.LibEPANET);
         end
         function value = getQualityType(obj, varargin)
