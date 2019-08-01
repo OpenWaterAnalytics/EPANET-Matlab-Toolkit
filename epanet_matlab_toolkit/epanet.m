@@ -4165,46 +4165,119 @@ classdef epanet <handle
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_REPORTSTEP, obj.LibEPANET);
         end
         function value = getTimeReportingStart(obj)
-            %Retrieves the value of the reporting start time
+            % Retrieves the value of the reporting start time.
+            %
+            % Example:
+            %   d.getTimeReportingStart
+            %
+            % See also getTimeReportingPeriods, getTimeReportingStep.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_REPORTSTART, obj.LibEPANET);
         end
         function value = getTimeRuleControlStep(obj)
-            %Retrieves the time step for evaluating rule-based controls
+            % Retrieves the time step for evaluating rule-based controls.
+            %
+            % Example:
+            %   d.getTimeRuleControlStep
+            %
+            % See also getTimeHydraulicStep.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_RULESTEP, obj.LibEPANET);
         end
         function value = getTimeStatisticsType(obj)
-            %Retrieves the type of time series post-processing ('NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE')
+            % Retrieves the type of time series post-processing.
+            %
+            % Types:
+            %   1) NONE:    Reports the full time series for all quantities for all nodes and links (default)
+            %   2) AVERAGE: Reports a set of time-averaged results
+            %   3) MINIMUM: Reports only the minimum values
+            %   3) MAXIMUM: Reports only the maximum values
+            %   4) RANGE:   Reports the difference between the minimum and maximum values
+            %
+            % Example:
+            %   d.getTimeStatisticsType
+            %
+            % See also getTimeStatisticsIndex, getTimeSimulationDuration.
             [obj.Errcode, obj.TimeStatisticsIndex] = ENgettimeparam(obj.ToolkitConstants.EN_STATISTIC, obj.LibEPANET);
             value=obj.TYPESTATS(obj.TimeStatisticsIndex+1);
         end
         function value = getTimeStatisticsIndex(obj)
-            %Retrieves the type of time series post-processing ('NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE')
+            % Retrieves the index of the type of time series post-processing.
+            %
+            % Type of time series post-processing:
+            %   0 = 'NONE'
+            %   1 = 'AVERAGE'
+            %   2 = 'MINIMUM'
+            %   3 = 'MAXIMUM'
+            %   4 = 'RANGE'
+            %
+            % Example:
+            %   d.getTimeStatisticsIndex
+            %
+            % See also getTimeStatisticsType, getTimeSimulationDuration.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_STATISTIC, obj.LibEPANET);
         end
         function value = getTimeReportingPeriods(obj)
-            %Retrieves the number of reporting periods saved to the binary
+            % Retrieves the number of reporting periods saved to the binary.
+            %
+            % Example:
+            %   d.getTimeReportingPeriods
+            %
+            % See also getTimeReportingStart, getTimeReportingStep.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_PERIODS, obj.LibEPANET);
         end
         %%%%% EPANET Version 2.1 %%%%%
         function value = getTimeStartTime(obj)
-            %Retrieves the number of start time
+            % Retrieves the simulation starting time of day.
+            %
+            % Example:
+            %   d.getTimeStartTime
+            %
+            % See also getTimeSimulationDuration, getTimePatternStart.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_STARTTIME, obj.LibEPANET);
         end
         function value = getTimeHTime(obj)
-            %Retrieves the number of htime
+            % Retrieves the elapsed time of current hydraulic solution.
+            %
+            % Example:
+            %   d.getTimeHTime
+            %
+            % See also getTimeHydraulicStep, getComputedHydraulicTimeSeries.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_HTIME, obj.LibEPANET);
         end
         function value = getTimeQTime(obj)
-            %Retrieves the number of qtime
+            % Retrieves the elapsed time of current quality solution.
+            %
+            % Example:
+            %   d.getTimeQTime
+            %
+            % See also getTimeQualityStep, getComputedQualityTimeSeries.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_QTIME, obj.LibEPANET);
         end
         function value = getTimeHaltFlag(obj)
-            %Retrieves the number of  halt flag
+            % Retrieves the number of halt flag indicating if the simulation was halted.
+            %
+            % Example:
+            %   d.getTimeHaltFlag
+            %
+            % See also getTimeStartTime, getTimeSimulationDuration.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_HALTFLAG, obj.LibEPANET);
         end
         function value = getTimeNextEvent(obj)
-            %Retrieves the number of next event 
+            % Retrieves the shortest time until a tank becomes empty or full.
+            %
+            % Example:
+            %   d.getTimeNextEvent
+            %
+            % See also getTimeNextEventTank.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENT, obj.LibEPANET);
+        end
+        function value = getTimeNextEventTank(obj)
+            % Retrieves the index of tank with shortest time to become empty or full.
+            %
+            % Example:
+            %   d.getTimeNextEventTank
+            %
+            % See also getTimeNextEvent.
+            [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENTTANK, obj.LibEPANET);
         end
         function value = getCurvesInfo(obj)
             %EPANET Version 2.1
@@ -6420,26 +6493,9 @@ classdef epanet <handle
             tmpindex=find(strcmpi(obj.TYPESTATS, value)==1)-1;
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_STATISTIC, tmpindex, obj.LibEPANET);
         end
-        function setTimeHTime(obj, value)
-            % epanet20100
-            [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_HTIME, value, obj.LibEPANET);
-        end
-%         function setTimeQTime(obj, value)
-%             % epanet20100
-%             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_QTIME, value, obj.LibEPANET);
-%         end
-        function setTimeHaltFlag(obj, value)
-            % epanet20100
-            [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_HALTFLAG, value, obj.LibEPANET);
-        end
-%         function value = setTimeReportingPeriods(obj)
-%             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_PERIODS, obj.LibEPANET);
         function setTimeStartTime(obj, value)
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_STARTTIME, value, obj.LibEPANET);
         end
-%         function value = setTimeNextEvent(obj)
-%             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENT, obj.LibEPANET);
-%         end
         function value = setPatternComment(obj, value, varargin)
             % Sets the comment string assigned to the pattern object
             % Example: 
