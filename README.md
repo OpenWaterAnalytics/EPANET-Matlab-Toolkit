@@ -282,6 +282,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getTimeHaltFlag|Retrieves the number of  halt flag|
 |getTimeHydraulicStep|Retrieves the value of the hydraulic time step|
 |getTimeNextEvent|Retrieves the number of next event|
+|getTimeNextEventTank|Retrieves the index of tank with shortest time to become empty or full|
 |getTimePatternStart|Retrieves the value of pattern start time|
 |getTimePatternStep|Retrieves the value of the pattern time step|
 |getTimeQualityStep|Retrieves the value of the water quality time step|
@@ -443,8 +444,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setRulePremiseValue|Sets the value being compared to in a premise of a rule-based control. (EPANET Version 2.2)|
 |setRulePriority|Sets rule - based control priority. (EPANET Version 2.2)|
 |setRuleThenAction|Sets rule - based control then actions. (EPANET Version 2.2)|
-|setTimeHTime|Sets the htime|
-|setTimeHaltFlag|Sets the halt flag|
 |setTimeHydraulicStep|Sets the hydraulic step|
 |setTimePatternStart|Sets the pattern start|
 |setTimePatternStep|Sets the pattern step|
