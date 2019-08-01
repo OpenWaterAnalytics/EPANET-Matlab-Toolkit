@@ -5020,8 +5020,8 @@ classdef epanet <handle
             %   d.setLinkPipeData(pipeIndex, length, diameter, RoughnessCoeff, MinorLossCoeff)
             %   d.getLinksInfo
             %
-            % See also getLinksInfo, setLinkDiameter, setLinkLength,
-            %          setLinkStatus, setNodeTankData.
+            % See also getLinksInfo, setLinkComment, setLinkDiameter,
+            %          setLinkLength, setLinkStatus, setNodeTankData.
             for i=1:length(Index)
                 [obj.Errcode] = ENsetpipedata(Index(i), Length(i), Diameter(i), RoughnessCoeff(i), MinorLossCoeff(i), obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
