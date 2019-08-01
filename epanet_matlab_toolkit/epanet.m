@@ -3879,8 +3879,8 @@ classdef epanet <handle
             %
             % Example:
             %   curveIndex = 1;
-            %   d.getCurvesInfo.CurveXvalue{curveIndex}   % Retrieves the X values of the 1st curve.
-            %   d.getCurvesInfo.CurveYvalue{curveIndex}   % Retrieves the Y values of the 1st curve.
+            %   d.getCurvesInfo.CurveXvalue{curveIndex}   % Retrieves the X values of the 1st curve
+            %   d.getCurvesInfo.CurveYvalue{curveIndex}   % Retrieves the Y values of the 1st curve
             %   x_y_1 = [0, 730];
             %   x_y_2 = [1000, 500];
             %   x_y_3 = [1350, 260];
@@ -3898,17 +3898,17 @@ classdef epanet <handle
             % Sets the comment string of a curve.
             %
             % Example:
-            %   d.getCurveComment
+            %   d.getCurveComment                         % Retrieves the comments of all the curves
             %   curveIndex = 1;
             %   comment = 'This is a curve';
-            %   d.setCurveComment(curveIndex, comment);
+            %   d.setCurveComment(curveIndex, comment);   % Sets a comment to the 1st curve
             %   d.getCurveComment(curveIndex)
             %
             % Example 2:
             %   d.getCurveComment
             %   curveIndex = 1:2;
             %   comment = {'This is the 1st curve', 'This is the 2nd curve'};
-            %   d.setCurveComment(curveIndex, comment);
+            %   d.setCurveComment(curveIndex, comment);   % Sets comments to the first 2 curves
             %   d.getCurveComment(curveIndex)
             %
             % See also getCurveComment, getCurveIndex, getCurvesInfo.
@@ -3931,10 +3931,10 @@ classdef epanet <handle
             %
             % Example:
             %   curveIndex = 1;
-            %   d.getCurvesInfo.CurveXvalue{curveIndex}               % Retrieves the X values of the 1st curve.
-            %   d.getCurvesInfo.CurveYvalue{curveIndex}               % Retrieves the Y values of the 1st curve.
+            %   d.getCurvesInfo.CurveXvalue{curveIndex}               % Retrieves the X values of the 1st curve
+            %   d.getCurvesInfo.CurveYvalue{curveIndex}               % Retrieves the Y values of the 1st curve
             %   curvePoint = 1;                                       % Point of the curve selected
-            %   x_y_values = [10, 400];                               % X and Y values selected.
+            %   x_y_values = [10, 400];                               % X and Y values selected
             %   d.setCurveValue(curveIndex, curvePoint, x_y_values)   % Sets the X and Y values of the 1st point on the 1st curve
             %   d.getCurvesInfo.CurveXvalue{curveIndex}
             %   d.getCurvesInfo.CurveYvalue{curveIndex}
@@ -3952,12 +3952,12 @@ classdef epanet <handle
             % Example 2:
             %   patternIndex = 1;
             %   patternID = d.getPatternNameID(patternIndex);
-            %   d.getPatternIndex(patternID)   % Retrieves the index of the 1st time pattern given it's ID.
+            %   d.getPatternIndex(patternID)   % Retrieves the index of the 1st time pattern given it's ID
             %
             % Example 3:
             %   patternIndex = 1:2;
             %   patternID = d.getPatternNameID(patternIndex);
-            %   d.getPatternIndex(patternID)   % Retrieves the index of the first 2 time patterns given their IDs.
+            %   d.getPatternIndex(patternID)   % Retrieves the index of the first 2 time patterns given their IDs
             %
             % See also getPatternNameID, getPattern.
             if isempty(varargin)
