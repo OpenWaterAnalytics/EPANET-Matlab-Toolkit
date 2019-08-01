@@ -3961,7 +3961,12 @@ classdef epanet <handle
             [obj.Errcode, value] = ENgetpatternvalue(patternIndex, patternStep, obj.LibEPANET);
         end
         function value = getQualityType(obj, varargin)
-            %Retrieves the type of water quality analysis type
+            % Retrieves the type of water quality analysis type.
+            %
+            % Example:
+            %   d.getQualityType
+            %
+            % See also getQualityInfo, getQualityCode.
             if any(strcmp(obj.getLibFunctions, 'ENgetqualinfo'))
                 [obj.Errcode, ~, value] = ENgetqualinfo(obj.LibEPANET); 
             else
@@ -3970,39 +3975,107 @@ classdef epanet <handle
             end
         end 
         function value = getQualityInfo(obj)
+            % Retrieves quality analysis information (type, chemical name, units, trace node ID).
+            %
+            % Information that is retrieved:
+            %   1) Water quality analysis code
+            %      0 = No quality analysis
+            %      1 = Chemical analysis
+            %      2 = Water age analysis
+            %      3 = Source tracing
+            %   2) Name of the chemical being analyzed
+            %   3) Units that the chemical is measured in
+            %   4) Index of node traced in a source tracing analysis
+            %   5) Quality type
+            %
+            % Example:
+            %   d.getQualityInfo                    % Retrieves all the quality info
+            %   d.getQualityInfo.QualityCode        % Retrieves the water quality analysis code
+            %   d.getQualityInfo.QualityChemName    % Retrieves the name of the chemical being analyzed
+            %   d.getQualityInfo.QualityChemUnits   % Retrieves the units that the chemical is measured in
+            %   d.getQualityInfo.TraceNode          % Retrieves the index of node traced in a source tracing analysis
+            %   d.getQualityInfo.QualityType        % Retrieves the quality type
+            %
+            % See also getQualityType, getQualityCode.
             [obj.Errcode, value.QualityCode, value.QualityChemName, value.QualityChemUnits, value.TraceNode] = ENgetqualinfo(obj.LibEPANET);
             value.QualityType = obj.TYPEQUALITY(value.QualityCode+1);
         end
         function value = getQualityCode(obj)
-            %Retrieves the code of water quality analysis type
+            % Retrieves the code of water quality analysis type.
+            %
+            % Water quality analysis code:
+            %   0 = No quality analysis
+            %   1 = Chemical analysis
+            %   2 = Water age analysis
+            %   3 = Source tracing
+            %
+            % Example:
+            %   d.getQualityCode
+            %
+            % See also getQualityInfo, getQualityType.
             [obj.Errcode, value, obj.QualityTraceNodeIndex] = ENgetqualtype(obj.LibEPANET);
         end
         function value = getQualityTraceNodeIndex(obj)
-            %Retrieves the trace node index of water quality analysis type
+            % Retrieves the trace node index of water quality analysis type.
+            %
+            % Example:
+            %   d.getQualityTraceNodeIndex
+            %
+            % See also getQualityInfo, getQualityType.
             [obj.Errcode, obj.QualityCode, value] = ENgetqualtype(obj.LibEPANET);
         end
         function value = getTimeSimulationDuration(obj)
-            %Retrieves the value of simulation duration
+            % Retrieves the value of simulation duration.
+            %
+            % Example:
+            %   d.getTimeSimulationDuration
+            %
+            % See also getTimePatternStep, getTimeHydraulicStep.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_DURATION, obj.LibEPANET);
         end
         function value = getTimeHydraulicStep(obj)
-            %Retrieves the value of the hydraulic time step
+            % Retrieves the value of the hydraulic time step.
+            %
+            % Example:
+            %   d.getTimeHydraulicStep
+            %
+            % See also getTimeQualityStep, getTimeSimulationDuration.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_HYDSTEP, obj.LibEPANET);
         end
         function value = getTimeQualityStep(obj)
-            %Retrieves the value of the water quality time step
+            % Retrieves the value of the water quality time step.
+            %
+            % Example:
+            %   d.getTimeQualityStep
+            %
+            % See also getTimeHydraulicStep, getTimeSimulationDuration.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_QUALSTEP, obj.LibEPANET);
         end
         function value = getTimePatternStep(obj)
-            %Retrieves the value of the pattern time step
+            % Retrieves the value of the pattern time step.
+            %
+            % Example:
+            %   d.getTimePatternStep
+            %
+            % See also getTimePatternStart, getTimeSimulationDuration.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_PATTERNSTEP, obj.LibEPANET);
         end
         function value = getTimePatternStart(obj)
-            %Retrieves the value of pattern start time
+            % Retrieves the value of pattern start time.
+            %
+            % Example:
+            %   d.getTimePatternStart
+            %
+            % See also getTimePatternStep, getTimeSimulationDuration.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_PATTERNSTART, obj.LibEPANET);
         end
         function value = getTimeReportingStep(obj)
-            %Retrieves the value of the reporting time step
+            % Retrieves the value of the reporting time step.
+            %
+            % Example:
+            %   d.getTimeReportingStep
+            %
+            % See also getTimeReportingPeriods, getTimeReportingStart.
             [obj.Errcode, value] = ENgettimeparam(obj.ToolkitConstants.EN_REPORTSTEP, obj.LibEPANET);
         end
         function value = getTimeReportingStart(obj)
