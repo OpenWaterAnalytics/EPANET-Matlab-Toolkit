@@ -3897,7 +3897,7 @@ classdef epanet <handle
         function value = setCurveComment(obj, value, varargin)
             % Sets the comment string of a curve.
             %
-            % Example:
+            % Example 1:
             %   d.getCurveComment                         % Retrieves the comments of all the curves
             %   curveIndex = 1;
             %   comment = 'This is a curve';
