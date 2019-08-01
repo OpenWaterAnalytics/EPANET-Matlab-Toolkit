@@ -3843,10 +3843,18 @@ classdef epanet <handle
             value=obj.TYPECURVE(obj.getCurveTypeIndex(indices)+1);
         end
         function value = getCurveComment(obj, varargin)
-            % Retrieves the comment string assigned to the node object
-            % Example: 
-            %       d.getCurveComment(1)
-            %       d.getCurveComment
+            % Retrieves the comment string of a curve.
+            %
+            % Example 1:
+            %   d.getCurveComment        % Retrieves the comment string assigned to all the curves
+            %
+            % Example 2: 
+            %   d.getCurveComment(1)     % Retrieves the comment string assigned to the 1st curve
+            %
+            % Example 3: 
+            %   d.getCurveComment(1:2)   % Retrieves the comment string assigned to the first 2 curves
+            %
+            % See also getCurveNameID, getCurveType, getCurvesInfo, 
             if isempty(varargin)
                 cnt = obj.getCurveCount;
                 value = cell(1, cnt);
@@ -3865,20 +3873,45 @@ classdef epanet <handle
             end
         end
         function setCurve(obj, index, curveVector)
-            %Sets x, y values for a specific curve
-            %EPANET Version 2.1
+            % Sets x, y values for a specific curve. (EPANET Version 2.1)
+            %
+            % % The example is based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example:
+            %   curveIndex = 1;
+            %   d.getCurvesInfo.CurveXvalue{curveIndex}   % Retrieves the X values of the 1st curve
+            %   d.getCurvesInfo.CurveYvalue{curveIndex}   % Retrieves the Y values of the 1st curve
+            %   x_y_1 = [0, 730];
+            %   x_y_2 = [1000, 500];
+            %   x_y_3 = [1350, 260];
+            %   values = [x_y_1; x_y_2; x_y_3];           % X and Y values selected.
+            %   d.setCurve(curveIndex, values)            % Sets the X and Y values of the 1st curve
+            %   d.getCurvesInfo.CurveXvalue{curveIndex}
+            %   d.getCurvesInfo.CurveYvalue{curveIndex}
+            %
+            % See also setCurveValue, getCurvesInfo.
             nfactors=size(curveVector, 1);%x = number of points in curve
             [obj.Errcode] = ENsetcurve(index, curveVector(:, 1), curveVector(:, 2), nfactors, obj.LibEPANET);
             error(obj.getError(obj.Errcode)); 
         end
         function value = setCurveComment(obj, value, varargin)
-            % Sets the comment string assigned to the curve object
-            % Example: 
-            %       d.setCurveComment(1, 'This is a curve');
-            %       d.getCurveComment(1)
-            %       d.setCurveComment(1:2, {'This is a curve', 'Test comm'});
-            %       d.getCurveComment(1:2)
-            %       d.getCurveComment
+            % Sets the comment string of a curve.
+            %
+            % Example 1:
+            %   d.getCurveComment                         % Retrieves the comments of all the curves
+            %   curveIndex = 1;
+            %   comment = 'This is a curve';
+            %   d.setCurveComment(curveIndex, comment);   % Sets a comment to the 1st curve
+            %   d.getCurveComment(curveIndex)
+            %
+            % Example 2:
+            %   d.getCurveComment
+            %   curveIndex = 1:2;
+            %   comment = {'This is the 1st curve', 'This is the 2nd curve'};
+            %   d.setCurveComment(curveIndex, comment);   % Sets comments to the first 2 curves
+            %   d.getCurveComment(curveIndex)
+            %
+            % See also getCurveComment, getCurveIndex, getCurvesInfo.
             if nargin==3, indices = value; value=varargin{1}; else indices = getCurveIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
@@ -3892,13 +3925,41 @@ classdef epanet <handle
             end
         end
         function setCurveValue(obj, index, curvePnt, value)
-            %Retrieves x, y point for a specific point number and curve
-            %EPANET Version 2.1
+            % Sets x, y point for a specific point number and curve. (EPANET Version 2.1)
+            %
+            % % The example is based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example:
+            %   curveIndex = 1;
+            %   d.getCurvesInfo.CurveXvalue{curveIndex}               % Retrieves the X values of the 1st curve
+            %   d.getCurvesInfo.CurveYvalue{curveIndex}               % Retrieves the Y values of the 1st curve
+            %   curvePoint = 1;                                       % Point of the curve selected
+            %   x_y_values = [10, 400];                               % X and Y values selected
+            %   d.setCurveValue(curveIndex, curvePoint, x_y_values)   % Sets the X and Y values of the 1st point on the 1st curve
+            %   d.getCurvesInfo.CurveXvalue{curveIndex}
+            %   d.getCurvesInfo.CurveYvalue{curveIndex}
+            %
+            % See also setCurve, getCurvesInfo.
             x=value(1); y=value(2);
             [obj.Errcode] = ENsetcurvevalue(index, curvePnt, x, y, obj.LibEPANET);
         end
         function value = getPatternIndex(obj, varargin)
-            %Retrieves the index of all or some time patterns IDs
+            % Retrieves the index of all or some time patterns given their IDs.
+            %
+            % Example 1:
+            %   d.getPatternIndex              % Retrieves the indices of all time patterns
+            %
+            % Example 2:
+            %   patternIndex = 1;
+            %   patternID = d.getPatternNameID(patternIndex);
+            %   d.getPatternIndex(patternID)   % Retrieves the index of the 1st time pattern given it's ID
+            %
+            % Example 3:
+            %   patternIndex = 1:2;
+            %   patternID = d.getPatternNameID(patternIndex);
+            %   d.getPatternIndex(patternID)   % Retrieves the index of the first 2 time patterns given their IDs
+            %
+            % See also getPatternNameID, getPattern.
             if isempty(varargin)
                 value=1:obj.getPatternCount;
             elseif isa(varargin{1}, 'cell')
@@ -3913,7 +3974,20 @@ classdef epanet <handle
             end
         end
         function value = getPatternLengths(obj, varargin)
-            %Retrieves the number of time periods in all or some patterns
+            % Retrieves the number of time periods in all or some time patterns.
+            %
+            % Example 1:
+            %   d.getPatternLengths                 % Retrieves the number of time periods of all time patterns
+            %
+            % Example 2:
+            %   patternIndex = 1;
+            %   d.getPatternLengths(patternIndex)   % Retrieves the number of time periods of the 1st time pattern
+            %
+            % Example 3:
+            %   patternIndex = 1:2;
+            %   d.getPatternLengths(patternIndex)   % Retrieves the number of time periods of the first 2 time patterns
+            %
+            % See also getPatternIndex, getPattern.
             if isempty(varargin)
                 patCnt = obj.getPatternCount;
                 tmpPatterns=1:patCnt;
@@ -3941,7 +4015,12 @@ classdef epanet <handle
             end
         end
         function value = getPattern(obj)
-            %Retrieves the multiplier factor for all patterns and all times
+            % Retrieves the multiplier factor for all patterns and all times.
+            %
+            % Example:
+            %   d.getPattern
+            %
+            % See also getPatternLengths, getPatternValue, getPatternAverageValue.
             tmpmaxlen=max(obj.getPatternLengths);
             value=nan(obj.getPatternCount, tmpmaxlen);
             for i=1:obj.getPatternCount
@@ -3957,7 +4036,14 @@ classdef epanet <handle
             end
         end
         function value = getPatternValue(obj, patternIndex, patternStep)
-            %Retrieves the multiplier factor for a certain pattern and time
+            % Retrieves the multiplier factor for a certain pattern and time.
+            %
+            % Example:
+            %   patternIndex = 1;
+            %   patternStep = 5;
+            %   d.getPatternValue(patternIndex, patternStep)   % Retrieves the 5th multiplier factor of the 1st time pattern
+            %
+            % See also getPattern, getPatternLengths, getPatternAverageValue.
             [obj.Errcode, value] = ENgetpatternvalue(patternIndex, patternStep, obj.LibEPANET);
         end
         function value = getQualityType(obj, varargin)
