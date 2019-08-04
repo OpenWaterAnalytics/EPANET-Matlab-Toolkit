@@ -4476,6 +4476,12 @@ classdef epanet <handle
             end
         end
         function value = getENfunctionsImpemented(obj)
+            % Retrieves the epanet functions that have been developed.
+            %
+            % Example:
+            %   d.getENfunctionsImpemented
+            %
+            % See also getLibFunctions, getVersion.
             [tline]=regexp(fileread([mfilename, '.m']), '\n', 'split');
             u=1;obj.Errcode;
             value = cell(1, 1);
@@ -4494,14 +4500,29 @@ classdef epanet <handle
             value = unique(value)';
         end
         function value = getLibFunctions(obj)
+            % Retrieves the functions of DLL.
+            %
+            % Example:
+            %   d.getLibFunctions
+            %
+            % See also getENfunctionsImpemented, getVersion.
             value = obj.libFunctions;
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function value = getVersion(obj)
-            % Retrieve the current EPANET LibEPANET
+            % Retrieves the current EPANET version of DLL.
+            %
+            % Example:
+            %   d.getVersion
+            %
+            % See also getENfunctionsImpemented, getLibFunctions.
             [obj.Errcode, value] = ENgetversion(obj.LibEPANET);
         end
         function value = getLinkPumpSwitches(obj)
+            % Retrieves the number of pump switches.
+            %
+            % Example:
+            %   d.getLinkPumpSwitches
             value=[];
             s = obj.getComputedTimeSeries;
             for i=1:obj.getLinkPumpCount
@@ -4510,7 +4531,32 @@ classdef epanet <handle
             end
         end
         function value = getComputedHydraulicTimeSeries(obj, varargin)
-            % Compute hydraulic simulation and retrieve all time-series
+            % Computes hydraulic simulation and retrieves all time-series.
+            %
+            % Data that is computed:
+            %   1) Time              8)  Velocity
+            %   2) Pressure          9)  HeadLoss
+            %   3) Demand            10) Status
+            %   4) DemandDeficit     11) Setting
+            %   5) Head              12) Energy
+            %   6) TankVolume        13) Efficiency
+            %   7) Flow
+            %
+            % Example 1:
+            %   d.getComputedHydraulicTimeSeries          % Retrieves all the time-series data
+            %
+            % Example 2:
+            %   d.getComputedHydraulicTimeSeries.Demand   % Retrieves all the time-series demands
+            %   d.getComputedHydraulicTimeSeries.Flow     % Retrieves all the time-series flows
+            %
+            % Example 3:
+            %   data = d.getComputedHydraulicTimeSeries('Time', ...
+            %    'Pressure', 'Velocity');                  %  Retrieves all the time-series Time, Pressure, Velocity
+            %   time = data.Time;
+            %   pressure = data.Pressure;
+            %   velocity = data.Velocity;
+            %
+            % See also getComputedQualityTimeSeries, getComputedTimeSeries.
             obj.openHydraulicAnalysis;
             obj.initializeHydraulicAnalysis
             totalsteps=obj.getTimeSimulationDuration/obj.getTimeHydraulicStep;
@@ -4629,7 +4675,29 @@ classdef epanet <handle
             obj.closeHydraulicAnalysis;
         end
         function value = getComputedQualityTimeSeries(obj, varargin)
-            % Compute Quality simulation and retrieve all or some time-series
+            % Computes Quality simulation and retrieves all or some time-series.
+            %
+            % Data that is computed:
+            %   1) Time
+            %   2) NodeQuality
+            %   3) LinkQuality
+            %   4) MassFlowRate
+            %
+            % Example 1:
+            %   d.getComputedQualityTimeSeries               % Retrieves all the time-series data
+            %
+            % Example 2:
+            %   d.getComputedQualityTimeSeries.NodeQuality   % Retrieves all the time-series node quality
+            %   d.getComputedQualityTimeSeries.LinkQuality   % Retrieves all the time-series link quality
+            %
+            % Example 3:
+            %   data = d.getComputedQualityTimeSeries('Time', ...
+            %   'NodeQuality', 'LinkQuality');              %  Retrieves all the time-series Time, NodeQuality, LinkQuality
+            %   time = data.Time;
+            %   node_quality = data.NodeQuality;
+            %   link_quality = data.LinkQuality;
+            %
+            % See also getComputedHydraulicTimeSeries, getComputedTimeSeries.
             if ~obj.solve
                 obj.solveCompleteHydraulics;
                 obj.solve = 1;
@@ -4716,8 +4784,18 @@ classdef epanet <handle
             warning on; 
         end
         function value = getUnits(obj)
-            % Retrieves the Units of Measurement
+            % Retrieves the Units of Measurement.
+            %
+            % Example 1:
+            %   allUnits = d.getUnits           % Retrieves all the units
+            %
+            % Example 2:
+            %   d.getUnits.NodeElevationUnits   % Retrieves elevation units
+            %   d.getUnits.LinkVelocityUnits    % Retrieves velocity units
+            %
             % More info: https://github.com/OpenWaterAnalytics/EPANET/wiki/Units-of-Measurement
+            %
+            % See also getFlowUnits.
             if find(strcmp(obj.getFlowUnits, obj.TYPEUNITS))<6
                 value.Units_US_Customary=1;
                 value.Units_SI_Metric=0;
@@ -4774,13 +4852,45 @@ classdef epanet <handle
             end 
         end
         function solveCompleteHydraulics(obj)
+            % Runs a complete hydraulic simulation with results for all time periods written to the binary Hydraulics file.
+            %
+            % Example:
+            %   d.solveCompleteHydraulics
+            %
+            % See also solveCompleteQuality.
             obj.solve = 1;
             [obj.Errcode] = ENsolveH(obj.LibEPANET);
         end
         function solveCompleteQuality(obj)
+            % Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file.
+            %
+            % Example:
+            %   d.solveCompleteQuality
+            %
+            % See also solveCompleteHydraulics.
             [obj.Errcode] = ENsolveQ(obj.LibEPANET);
         end
         function index = addPattern(obj, varargin)
+            % Adds a new time pattern to the network.
+            %
+            % Example 1:
+            %   d.getPatternNameID                                     % Retrieves the ID labels of time patterns
+            %   patternID = 'new_pattern';
+            %   patternIndex = d.addPattern(patternID);                % Adds a new time pattern given it's ID
+            %   d.getPatternNameID
+            %
+            % Example 2:
+            %   patternID = 'new_pattern';
+            %   patternMult = [1.56, 1.36, 1.17, 1.13, 1.08, ...
+            %   1.04, 1.2, 0.64, 1.08, 0.53, 0.29, 0.9, 1.11, ...
+            %   1.06, 1.00, 1.65, 0.55, 0.74, 0.64, 0.46, ...
+            %   0.58, 0.64, 0.71, 0.66];
+            %   patternIndex = d.addPattern(patternID, patternMult);   % Adds a new time pattern given it's ID and the multiplier
+            %   d.getPatternNameID
+            %   d.getPattern
+            %
+            % See also getPattern, setPattern, setPatternNameID
+            %          setPatternValue, setPatternComment.
             index=-1;
             if nargin==2
                 [obj.Errcode] = ENaddpattern(varargin{1}, obj.LibEPANET);
