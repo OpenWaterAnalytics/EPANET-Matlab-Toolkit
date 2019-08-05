@@ -4902,15 +4902,24 @@ classdef epanet <handle
             end
         end
         function index = addNodeJunction(obj, juncID, varargin)
-            % Add new junction
-            % Default coordinates is 0,0.
-            % Example:
-            %       juncID = 'J-1'
-            %       d.addNodeJunction(juncID)
-            %       % or with coords
-            %       X = 20; Y = 10
-            %       d.addNodeJunction(juncID, [X Y])
-            %       d.plot
+            % Adds a new junction.
+            % Returns the index of the new junction.
+            %
+            % Example 1:
+            %   % Adds a new junction with the default coordinates (i.e. [0, 0])
+            %   junctionID = 'newJunction_1';
+            %   junctionIndex = d.addNodeJunction(junctionID);
+            %   d.plot
+            %
+            % Example 2:
+            %   % Adds a new junction with coordinates [X, Y] = [20, 30].
+            %   junctionID = 'newJunction_2';
+            %   junctionCoords = [20 30];
+            %   junctionIndex = d.addNodeJunction(junctionID, junctionCoords);
+            %   d.plot
+            % 
+            % See also plot, setLinkNodesIndex, addNodeReservoir, 
+            %          addLinkPipe, deleteNode, setNodeBaseDemands.
             xy = [0 0];
             if nargin == 3
                 xy = varargin{1};
@@ -4919,15 +4928,24 @@ classdef epanet <handle
             obj.setNodeCoordinates(index,[xy(1),xy(2)]);
         end
         function index = addNodeReservoir(obj, resID, varargin)
-            % Add new reservoir
-            % Default coordinates is 0,0.
-            % Example:
-            %       resID = 'R-1'
-            %       d.addNodeReservoir(resID)
-            %       % or with coords
-            %       X = 20; Y = 20
-            %       d.addNodeReservoir(resID, [X Y])
-            %       d.plot
+            % Adds a new reservoir.
+            % Returns the index of the new reservoir.
+            %
+            % Example 1:
+            %   % Adds a new reservoir with the default coordinates (i.e. [0, 0])
+            %   reservoirID = 'newReservoir_1';
+            %   reservoirIndex = d.addNodeReservoir(reservoirID);
+            %   d.plot
+            %
+            % Example 2:
+            %   % Adds a new reservoir with coordinates [X, Y] = [20, 30].
+            %   reservoirID = 'newReservoir_2';
+            %   reservoirCoords = [20 30];
+            %   reservoirIndex = d.addNodeReservoir(reservoirID, reservoirCoords);
+            %   d.plot
+            % 
+            % See also plot, setLinkNodesIndex, addNodeJunction, 
+            %          addLinkPipe, deleteNode, setNodeBaseDemands.
             xy = [0 0];
             if nargin == 3
                 xy = varargin{1};
@@ -4936,15 +4954,24 @@ classdef epanet <handle
             obj.setNodeCoordinates(index,[xy(1),xy(2)]);
         end
         function index = addNodeTank(obj, tankID, varargin)
-            % Add new tank
-            % Default coordinates is 0,0.
-            % Example:
-            %       tankID = 'T-1'
-            %       d.addNodeTank(tankID)
-            %       % or with coords
-            %       X = 20; Y = 20
-            %       d.addNodeTank(tankID, [X Y])
-            %       d.plot
+            % Adds a new tank.
+            % Returns the index of the new tank.
+            %
+            % Example 1:
+            %   % Adds a new tank with the default coordinates (i.e. [0, 0])
+            %   tankID = 'newTank_1';
+            %   tankIndex = d.addNodeTank(tankID);
+            %   d.plot
+            %
+            % Example 2:
+            %   % Adds a new tank with coordinates [X, Y] = [20, 30].
+            %   tankID = 'newTank_2';
+            %   tankCoords = [20 30];
+            %   tankIndex = d.addNodeTank(tankID, tankCoords);
+            %   d.plot
+            % 
+            % See also plot, setLinkNodesIndex, addNodeJunction, 
+            %          addLinkPipe, deleteNode, setNodeBaseDemands.
             xy = [0 0];
             if nargin == 3
                 xy = varargin{1};
@@ -4953,84 +4980,156 @@ classdef epanet <handle
             obj.setNodeCoordinates(index,[xy(1),xy(2)]);
         end
         function index = addLinkPipeCV(obj, cvpipeID, fromNode, toNode)
-            % Add new control valve pipe
+            % Adds a new control valve pipe.
+            % Returns the index of the new control valve pipe.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
             % Example:
-            %       cvpipeID = 'CP-1'
-            %       fromNode = 'J-1'
-            %       toNode = 'J-2'
-            %       d.addLinkPipeCV(cvpipeID, fromNode, toNode)
+            %   cvpipeID = 'newPipeCV';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   cvpipeIndex = d.addLinkPipeCV(cvpipeID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            %          addNodeJunction, deleteLink, setLinkDiameter.
             index = ENaddlink(obj, cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode);
         end
         function index = addLinkPipe(obj, pipeID, fromNode, toNode)
-            % Add new pipe
+            % Adds a new pipe.
+            % Returns the index of the new pipe.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
             % Example:
-            %       pipeID = 'P-1'
-            %       fromNode = 'J-1'
-            %       toNode = 'J-2'
-            %       d.addLinkPipe(pipeID, fromNode, toNode)
+            %   pipeID = 'newPipe';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   pipeIndex = d.addLinkPipe(pipeID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipeCV, 
+            %          addNodeJunction, deleteLink, setLinkDiameter.
             index = ENaddlink(obj, pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode);
         end
         function index = addLinkPump(obj, pumpID, fromNode, toNode)
-            % Add new pump
+            % Adds a new pump.
+            % Returns the index of the new pump.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
             % Example:
-            %   pumpID = 'Pu-1'
-            %   fromNode = 'J-1'
-            %   toNode = 'J-2'
-            %   d.addLinkPump(pumpID, fromNode, toNode)
+            %   pumpID = 'newPump';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   pumpIndex = d.addLinkPump(pumpID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            %          addNodeJunction, deleteLink, setLinkDiameter.
             index = ENaddlink(obj, pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode);
         end
         function index = addLinkValvePRV(obj, vID, fromNode, toNode)
-            % Add new PRV valve
+            % Adds a new PRV valve.
+            % Returns the index of the new PRV valve.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
             % Example:
-            %       vID = 'PRV-1'
-            %       fromNode = 'J-1'
-            %       toNode = 'J-2'
-            %       d.addLinkValvePRV(vID, fromNode, toNode)
+            %   valveID = 'newValvePRV';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   valveIndex = d.addLinkValvePRV(valveID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            %          addLinkValvePSV, deleteLink, setLinkTypeValveFCV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode);
         end
         function index = addLinkValvePSV(obj, vID, fromNode, toNode)
-            % Add new PSV valve
+            % Adds a new PSV valve.
+            % Returns the index of the new PSV valve.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
             % Example:
-            %       vID = 'PSV-1'
-            %       fromNode = 'J-1'
-            %       toNode = 'J-2'
-            %       d.addLinkValvePSV(vID, fromNode, toNode)
+            %   valveID = 'newValvePSV';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   valveIndex = d.addLinkValvePSV(valveID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            %          addLinkValvePRV, deleteLink, setLinkTypeValveGPV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode);
         end        
         function index = addLinkValvePBV(obj, vID, fromNode, toNode)
-            % Add new PBV valve
+            % Adds a new PBV valve.
+            % Returns the index of the new PBV valve.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
             % Example:
-            %       vID = 'PBV-1'
-            %       fromNode = 'J-1'
-            %       toNode = 'J-2'
-            %       d.addLinkValvePBV(vID, fromNode, toNode)
+            %   valveID = 'newValvePBV';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   valveIndex = d.addLinkValvePBV(valveID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            %          addLinkValvePRV, deleteLink, setLinkTypeValvePRV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode);
         end
         function index = addLinkValveFCV(obj, vID, fromNode, toNode)
-            % Add new FCV valve
+            % Adds a new FCV valve.
+            % Returns the index of the new FCV valve.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
             % Example:
-            %       vID = 'FCV-1'
-            %       fromNode = 'J-1'
-            %       toNode = 'J-2'
-            %       d.addLinkValveFCV(vID, fromNode, toNode)
+            %   valveID = 'newValveFCV';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   valveIndex = d.addLinkValveFCV(valveID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            %          addLinkValvePRV, deleteLink, setLinkTypeValveTCV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode);
         end
         function index = addLinkValveTCV(obj, vID, fromNode, toNode)
-            % Add new TCV valve
+            % Adds a new TCV valve.
+            % Returns the index of the new TCV valve.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
             % Example:
-            %       vID = 'TCV-1'
-            %       fromNode = 'J-1'
-            %       toNode = 'J-2'
-            %       d.addLinkValveTCV(vID, fromNode, toNode)
+            %   valveID = 'newValveTCV';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   valveIndex = d.addLinkValveTCV(valveID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode);
         end
         function index = addLinkValveGPV(obj, vID, fromNode, toNode)
-            % Add new GPV valve
+            % Adds a new GPV valve.
+            % Returns the index of the new GPV valve.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
             % Example:
-            %       vID = 'GPV-1'
-            %       fromNode = 'J-1'
-            %       toNode = 'J-2'
-            %       d.addLinkValveGPV(vID, fromNode, toNode)
+            %   valveID = 'newValveGPV';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   valveIndex = d.addLinkValveGPV(valveID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
         function Errcode = deleteNode(obj, idNode, varargin)
