@@ -5896,12 +5896,25 @@ classdef epanet <handle
             end
         end
         function setLinkInitialStatus(obj, value, varargin)
-            % Sets the values of initial status
-            % Example:
-            %   d.getLinkInitialStatus
-            %   d.setLinkInitialStatus(0*d.getLinkInitialStatus)
-            %   d.getLinkInitialStatus
+            % Sets the values of initial status.
+            %
             % Note: Cannot set status for a check valve
+            %
+            % Example 1:
+            %   index_pipe = 1;
+            %   d.getLinkInitialStatus(index_pipe)            % Retrieves the initial status of the 1st link
+            %   status = 0;
+            %   d.setLinkInitialStatus(index_pipe, status);   % Sets the initial status of the 1st link
+            %   d.getLinkInitialStatus(index_pipe)
+            %
+            % Example 2:
+            %   statuses = d.getLinkInitialStatus;            % Retrieves the initial status of all links
+            %   statuses_new = zeros(1, length(statuses));
+            %   d.setLinkInitialStatus(statuses_new);         % Sets the initial status of all links
+            %   d.getLinkInitialStatus
+            %
+            % See also getLinkInitialStatus, setLinkInitialSetting, setLinkDiameter,
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -5910,16 +5923,23 @@ classdef epanet <handle
             end
         end
         function setLinkInitialSetting(obj, value, varargin)
-            % Sets the values of initial settings
+            % Sets the values of initial settings, roughness for pipes or initial speed for pumps or initial setting for valves.
+            %
             % Example 1:
-            %   linkset=d.getLinkInitialSetting
-            %   linkset(end)=108;
-            %   d.setLinkInitialSetting(linkset)   % Last link initial setting = 108
-            %   d.getLinkInitialSetting
+            %   index_pipe = 1;
+            %   d.getLinkInitialSetting(index_pipe)             % Retrieves the initial setting of the 1st link
+            %   setting = 80;
+            %   d.setLinkInitialSetting(index_pipe, setting);   % Sets the initial setting of the 1st link
+            %   d.getLinkInitialSetting(index_pipe)
+            %
             % Example 2:
-            %   linkIndex = 1;
-            %   d.setLinkInitialSetting(linkIndex,110)   % First link initial setting = 110
-            %   d.getLinkInitialSetting(linkIndex)
+            %   settings = d.getLinkInitialSetting;             % Retrieves the initial setting of all links
+            %   settings_new = settings + 40;
+            %   d.setLinkInitialSetting(settings_new);          % Sets the initial setting of all links
+            %   d.getLinkInitialSetting
+            %
+            % See also getLinkInitialSetting, setLinkInitialStatus, setLinkRoughnessCoeff,
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -5928,11 +5948,23 @@ classdef epanet <handle
             end
         end
         function setLinkBulkReactionCoeff(obj, value, varargin)
-            % Sets the value of bulk reaction coefficient
-            % Example:
-            %   linkset=d.getLinkBulkReactionCoeff;
-            %   linkset(1)=0;   % change the value of bulk reaction coeff.
-            %   d.setLinkBulkReactionCoeff(linkset)
+            % Sets the value of bulk chemical reaction coefficient.
+            %
+            % Example 1:
+            %   index_pipe = 1;
+            %   d.getLinkBulkReactionCoeff(index_pipe)           % Retrieves the bulk chemical reaction coefficient of the 1st link
+            %   coeff = 0;
+            %   d.setLinkBulkReactionCoeff(index_pipe, coeff);   % Sets the bulk chemical reaction coefficient of the 1st link
+            %   d.getLinkBulkReactionCoeff(index_pipe)
+            %
+            % Example 2:
+            %   coeffs = d.getLinkBulkReactionCoeff;             % Retrieves the bulk chemical reaction coefficients of all links
+            %   coeffs_new = 0*coeffs;
+            %   d.setLinkBulkReactionCoeff(coeffs_new);          % Sets the bulk chemical reaction coefficient of all links
+            %   d.getLinkBulkReactionCoeff
+            %
+            % See also getLinkBulkReactionCoeff, setLinkRoughnessCoeff, 
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -5941,12 +5973,23 @@ classdef epanet <handle
             end
         end
         function setLinkWallReactionCoeff(obj, value, varargin)
-            % Sets the value of wall reaction coefficient
-            % Example:
-            %   linkset=d.getLinkWallReactionCoeff;
-            %   linkset(1)=0;   % change the value of wall reaction coeff.
-            %   d.setLinkWallReactionCoeff(linkset)
+            % Sets the value of wall chemical reaction coefficient.
+            %
+            % Example 1:
+            %   index_pipe = 1;
+            %   d.getLinkWallReactionCoeff(index_pipe)           % Retrieves the wall chemical reaction coefficient of the 1st link
+            %   coeff = 0;
+            %   d.setLinkWallReactionCoeff(index_pipe, coeff);   % Sets the wall chemical reaction coefficient of the 1st link
+            %   d.getLinkWallReactionCoeff(index_pipe)
+            %
+            % Example 2:
+            %   coeffs = d.getLinkWallReactionCoeff;             % Retrieves the wall chemical reaction coefficients of all links
+            %   coeffs_new = 0*coeffs;
+            %   d.setLinkWallReactionCoeff(coeffs_new);          % Sets the wall chemical reaction coefficient of all links
             %   d.getLinkWallReactionCoeff
+            %
+            % See also getLinkWallReactionCoeff, setLinkBulkReactionCoeff, 
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -5955,15 +5998,25 @@ classdef epanet <handle
             end
         end
         function setLinkStatus(obj, value, varargin)
-            % Sets the values of status for links
+            % Sets the values of current status for links.
+            %
+            % Note: Cannot set status for a check valve
+            %
             % Example 1:
-            %   linkset=d.getLinkStatus;
-            %   d.setLinkStatus(0*linkset)   % Every link status = 0
-            %   d.getLinkStatus
+            %   index_pipe = 1;
+            %   d.getLinkStatus(index_pipe)            % Retrieves the current status of the 1st link
+            %   status = 1;
+            %   d.setLinkStatus(index_pipe, status);   % Sets the current status of the 1st link
+            %   d.getLinkStatus(index_pipe)
+            %
             % Example 2:
-            %   linkIndex = 1;
-            %   d.setLinkStatus(linkIndex,0)   % First link status = 0
+            %   statuses = d.getLinkStatus;            % Retrieves the current status of all links
+            %   statuses_new = zeros(1, length(statuses));
+            %   d.setLinkStatus(statuses_new);         % Sets the current status of all links
             %   d.getLinkStatus
+            %
+            % See also getLinkStatus, setLinkInitialStatus, setLinkDiameter,
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -5972,15 +6025,23 @@ classdef epanet <handle
             end
         end
         function setLinkSettings(obj, value, varargin)
-            % Sets the values of settings for links
+            % Sets the values of current settings, roughness for pipes or initial speed for pumps or initial setting for valves.
+            %
             % Example 1:
-            %   linkset=d.getLinkSettings;
-            %   d.setLinkSettings(10+linkset)   % Every link setting = previous value + 10
-            %   d.getLinkSettings
+            %   index_pipe = 1;
+            %   d.getLinkSettings(index_pipe)             % Retrieves the current setting of the 1st link
+            %   setting = 80;
+            %   d.setLinkSettings(index_pipe, setting);   % Sets the current setting of the 1st link
+            %   d.getLinkSettings(index_pipe)
+            %
             % Example 2:
-            %   linkIndex = 1;
-            %   d.setLinkSettings(linkIndex,100)   % First link setting = 100
+            %   settings = d.getLinkSettings;             % Retrieves the current setting of all links
+            %   settings_new = settings + 40;
+            %   d.setLinkSettings(settings_new);          % Sets the current setting of all links
             %   d.getLinkSettings
+            %
+            % See also getLinkSettings, setLinkStatus, setLinkRoughnessCoeff,
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -6189,15 +6250,23 @@ classdef epanet <handle
             set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_EPAT, value, varargin)
         end
         function setNodeElevations(obj, value, varargin)
-            % Sets the values of elevation for nodes
+            % Sets the values of elevation for nodes.
+            %
             % Example 1:
-            %   nodeset=d.getNodeElevations;
-            %   d.setNodeElevations(0*nodeset+100)   % Every node elevation = 100
-            %   d.getNodeElevations
+            %   index_node = 1;
+            %   d.getNodeElevations(index_node)          % Retrieves the elevation of the 1st node
+            %   elev = 500;
+            %   d.setNodeElevations(index_node, elev);   % Sets the elevation of the 1st node
+            %   d.getNodeElevations(index_node)
+            %
             % Example 2:
-            %   nodeIndex = 1;
-            %   d.setNodeElevations(nodeIndex,500)   % First node elevation = 500
+            %   elevs = d.getNodeElevations;             % Retrieves the elevations of all the nodes
+            %   elevs_new = elevs + 100;
+            %   d.setNodeElevations(elevs_new);          % Sets the elevations of all nodes
             %   d.getNodeElevations
+            %
+            % See also getNodeElevations, setNodeCoordinates, setNodeBaseDemands,
+            %          setNodeJunctionData, addNodeJunction, deleteNode.
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -6206,17 +6275,23 @@ classdef epanet <handle
             end
         end
         function setNodeBaseDemands(obj, value, varargin)
-            % Sets the values of base demands for nodes
+            % Sets the values of primary demand baseline for nodes.
+            %
             % Example 1:
-            %   nodeset = d.getNodeBaseDemands;
-            %   nodeset{1} = 200;    % First node base demand = 200
-            %   d.setNodeBaseDemands(nodeset)
-            %   d.getNodeBaseDemands
+            %   index_node = 1;
+            %   d.getNodeBaseDemands{1}(index_node)                         % Retrieves the demand of the 1st node
+            %   demand = 5;
+            %   d.setNodeBaseDemands(index_node, demand);                   % Sets the demand of the 1st node
+            %   d.getNodeBaseDemands{1}(index_node)
+            %
             % Example 2:
-            %   nodeIndex = 1;
-            %   d.setNodeBaseDemands(nodeIndex,200)   % First node base demand = 200 
-            %   d.getNodeBaseDemands
-            
+            %   demands = d.getNodeBaseDemands{1};                          % Retrieves the demands of all the nodes
+            %   demands_new = demands + 15;
+            %   d.setNodeBaseDemands(1:length(demands_new), demands_new);   % Sets the demands of all nodes
+            %   d.getNodeBaseDemands{1}
+            %
+            % See also getNodeBaseDemands, setNodeJunctionDemandName,
+            %          setNodeJunctionData, addNodeJunction, deleteNode.
             if nargin==3 
                 indices = value; value=varargin{1};j=1;
                 for i=indices
@@ -6244,6 +6319,27 @@ classdef epanet <handle
             end
         end
         function setNodeCoordinates(obj, value, varargin)
+            % Sets node coordinates.
+            %
+            % Example 1:
+            %   nodeIndex = 1;
+            %   d.getNodeCoordinates{1}(nodeIndex)             % Retrieves the X coordinates of the 1st node
+            %   d.getNodeCoordinates{2}(nodeIndex)             % Retrieves the Y coordinates of the 1st node
+            %   coords = [0, 0];
+            %   d.setNodeCoordinates(nodeIndex, coords)        % Sets the coordinates of the 1st node
+            %   d.getNodeCoordinates{1}(nodeIndex)
+            %   d.getNodeCoordinates{2}(nodeIndex)
+            %
+            % Example 2:
+            %   x_values = d.getNodeCoordinates{1};
+            %   y_values = d.getNodeCoordinates{2};
+            %   new_coords = {x_values + 10, y_values + 10};   % Creates a cell array with the new coordinates
+            %   d.setNodeCoordinates(new_coords)               % Sets the coordinates of all nodes
+            %   d.getNodeCoordinates{1}
+            %   d.getNodeCoordinates{2}
+            %   
+            % See also getNodeCoordinates, setNodeElevations, plot,
+            %          addNodeJunction, addNodeTank, deleteNode.
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             if ~isempty(varargin)
                 for i=indices
@@ -6260,6 +6356,25 @@ classdef epanet <handle
             end
         end
         function setNodeDemandPatternIndex(obj, value, varargin)
+            % Sets the values of primary demand time pattern indices.
+            %
+            % Example 1:
+            %   nodeIndex = 1;
+            %   d.getNodeDemandPatternIndex{1}(nodeIndex);             % Retrieves the index of the category's time pattern of the 1st node
+            %   patternIndex = 2;
+            %   d.setNodeDemandPatternIndex(nodeIndex, patternIndex)   % Sets the primary demand time pattern index to the 1st node
+            %   d.getNodeDemandPatternIndex{1}(nodeIndex)
+            %
+            % Example 2:
+            %   patternIndices_1 = d.getNodeDemandPatternIndex{1};
+            %   patternIndices_2 = d.getNodeDemandPatternIndex{2};
+            %   patternIndices_new = {patternIndices_1 + 1, patternIndices_2 + 1};
+            %   d.setNodeDemandPatternIndex(patternIndices_new)        % Sets all primary demand time pattern indices
+            %   d.getNodeDemandPatternIndex{1}
+            %   d.getNodeDemandPatternIndex{2}
+            %
+            % See also getNodeDemandPatternIndex, getNodeDemandCategoriesNumber
+            %          getNodeDemandPatternNameID, addPattern, deletePattern.
             if nargin==3
                 indices = value; value=varargin{1};j=1;
                 for i=indices
