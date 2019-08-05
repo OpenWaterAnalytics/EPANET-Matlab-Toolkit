@@ -5133,33 +5133,43 @@ classdef epanet <handle
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
         function Errcode = deleteNode(obj, idNode, varargin)
-            % Delete nodes (EPANET Version 2.2)
-            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Deletes nodes. (EPANET Version 2.2)
+            %
+            % condition = 0 | if is EN_UNCONDITIONAL: Deletes all controls, rules and links related to the object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls, rules and links
             % Default condition is 0.
             %
             % Example 1:
-            %       idNode = d.getNodeNameID(1)
-            %       d.deleteNode(idNode)
-            %       d.getNodeNameID
+            %   d.getNodeNameID                   % Retrieves the ID label of all nodes
+            %   idNode = d.getNodeNameID(1);      % Retrieves the ID label of the 1st node
+            %   d.deleteNode(idNode)              % Deletes the 1st node given it's ID
+            %   d.getNodeNameID
             %
             % Example 2:
-            %       condition = 1;
-            %       d.deleteNode('11', condition)
+            %   idNode = d.getNodeNameID(1);
+            %   condition = 1;
+            %   d.deleteNode(idNode, condition)   % Attempts to delete a node connected to links (error occurs)
             %
             % Example 3:
-            %       index = 1;
-            %       d.deleteNode(1) 
-            %       d.getNodeNameID
+            %   index = 1;
+            %   d.deleteNode(index)               % Deletes the 1st node given it's index
+            %   d.getNodeNameID
             %
             % Example 4:
-            %       d.deleteNode({'10', '11'})
-            %       d.getNodeNameID
+            %   idNodes = d.getNodeNameID(1:2);
+            %   d.deleteNode(idNodes)             % Deletes 2 nodes given their IDs
+            %   d.getNodeNameID
+            %
+            % See also addNodeJunction, deleteLink, deleteRules,
+            %          setNodeCoordinates, setNodeJunctionData.
             condition = 0; 
             if nargin == 3      
                 condition = varargin{1};
             end
-            if ischar(idNode) || iscell(idNode)
+            if ischar(idNode)
+                idNode = {idNode};
+            end
+            if iscell(idNode)
                 for j = 1:length(idNode)
                     indexNode = obj.getNodeIndex(idNode(j));
                     [Errcode] = ENdeletenode(obj.LibEPANET, indexNode, condition);
@@ -5171,19 +5181,30 @@ classdef epanet <handle
             end
         end
         function Errcode = deleteLink(obj, idLink, varargin)
-            % Delete a link
-            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % Deletes a link.
+            %
+            % condition = 0 | if is EN_UNCONDITIONAL: Deletes all controls and rules related to the object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls and rules
             % Default condition is 0.
-            % Example:
-            %   idLink = d.getLinkNameID(1)
-            %   d.deleteLink(idLink)
-            %   %OR
+            %
+            % Example 1:
+            %   d.getLinkNameID                     % Retrieves the ID label of all links
+            %   idLink = d.getLinkNameID(1);        % Retrieves the ID label of the 1st link
+            %   d.deleteLink(idLink)                % Deletes the 1st link given it's ID
+            %   d.getLinkNameID
+            %
+            % Example 2:
+            %   idLink = d.getLinkPumpNameID{1};
             %   condition = 1;
-            %   d.deleteLink(idLink, condition)
-            %   %OR using index
-            %   index = 1;
-            %   d.deleteLink(1)
+            %   d.deleteLink(idLink, condition)     % Attempts to delete a link contained in controls (error occurs)
+            %
+            % Example 3:
+            %   indexLink = 1;
+            %   d.deleteLink(indexLink)             % Deletes the 1st link given it's index
+            %   d.getLinkNameID
+            %
+            % See also addLinkPipe, deleteNode, deleteRules,
+            %          setNodeCoordinates, setLinkPipeData.
             condition = 0; 
             if nargin == 3      
                 condition = varargin{1};
@@ -5197,13 +5218,20 @@ classdef epanet <handle
             error(obj.getError(Errcode));
         end
         function Errcode = deletePattern(obj, idPat)
-            % Deletes a time pattern from a project
-            % Example:
-            %   idPat = d.getPatternNameID(1)
-            %   d.deletePattern(idPat)
-            %   %OR using index
+            % Deletes a time pattern from a project.
+            %
+            % Example 1:
+            %   idPat = d.getPatternNameID(1);   % Retrieves the ID of the 1st pattern
+            %   d.deletePattern(idPat)           % Deletes the 1st pattern given it's ID
+            %   d.getPatternNameID
+            %
+            % Example 2:
             %   index = 1;
-            %   d.deletePattern(1)
+            %   d.deletePattern(index)           % Deletes the 1st pattern given it's index
+            %   d.getPatternNameID
+            %
+            % See also addPattern, setPattern, setPatternNameID,
+            %          setPatternValue, setPatternComment.
             if ischar(idPat) || iscell(idPat)
                 indexPat = obj.getPatternIndex(idPat);
             else
@@ -5214,11 +5242,19 @@ classdef epanet <handle
         end
         function Errcode = deleteCurve(obj, idCurve)
             % Deletes a data curve from a project.
-            % Example:
-            %   idCurve = d.getCurveNameID(1)
-            %   d.deleteCurve(idCurve)
+            %
+            % Example 1:
+            %   idCurve = d.getCurveNameID(1);   % Retrieves the ID of the 1st curve
+            %   d.deleteCurve(idCurve)           % Deletes a curve given it's ID
+            %   d.getCurveNameID
+            %
+            % Example 2:
             %   index = 1;
-            %   d.deleteCurve(1)
+            %   d.deleteCurve(index)             % Deletes a curve given it's index
+            %   d.getCurveNameID
+            %
+            % See also addCurve, setCurve, setCurveNameID,
+            %          setCurveValue, setCurveComment.
             if ischar(idCurve) || iscell(idCurve)
                 indexCurve = obj.getCurveIndex(idCurve);
             else
@@ -5228,18 +5264,31 @@ classdef epanet <handle
             error(obj.getError(Errcode));
         end
         function setControls(obj, index, control)
-            % Sets the parameters of a simple control statement
-            % Example: 
-            %       d.setControls(1, 'LINK 9 CLOSED IF NODE 2 ABOVE 180')
-            %       %set many controls
-            %       controls = d.getControls;
-            %       d.setControls(controls)
-            %       d.getControls(1)
+            % Sets the parameters of a simple control statement.
             %
-            %       c = d.getControls;
-            %       d.setControls({c.Control})
-            %       d.setControls({'LINK 9 OPEN IF NODE 2 BELOW 110', 'LINK 9 CLOSED IF NODE 2 ABOVE 200'})
-            %       d.getControls(2)
+            % % The examples are based on d=epanet('Net1.inp');
+            %
+            % Example 1:
+            %   controlIndex = 1;
+            %   d.getControls(controlIndex)            % Retrieves the 1st control
+            %   control = 'LINK 9 CLOSED IF NODE 2 ABOVE 180';
+            %   d.setControls(controlIndex, control)   % Sets a control given it's index and the control statement
+            %   d.getControls(1)
+            %
+            % Example 2:
+            %   controls = d.getControls;
+            %   d.setControls(controls)                % Sets multiple controls given as structs with fields
+            %
+            % Example 3:
+            %   control_1 = 'LINK 9 OPEN IF NODE 2 BELOW 110';
+            %   control_2 = 'LINK 9 CLOSED IF NODE 2 ABOVE 200';
+            %   controls = {control_1, control_2};
+            %   d.setControls(controls)                % Sets multiple controls given as cell
+            %   d.getControls(1)
+            %   d.getControls(2)
+            %   
+            % See also getControls, getControlRulesCount,
+            %          addControls, deleteControls.
             if isstruct(index)
                 for c=1:length(index)
                     setControlFunction(obj, c, index(c).Control)
@@ -5290,26 +5339,27 @@ classdef epanet <handle
             %   index_4 = d.addControls('LINK 12 OPEN AT CLOCKTIME 20:00');
             %   d.getControls(index_4)
             %
-            % See also getControls, setControls, getControlRulesCount.
+            % See also deleteControls, getControls,
+            %          setControls, getControlRulesCount.
             index = addControlFunction(obj, control); 
         end
         function Errcode = deleteControls(varargin)
             % Deletes an existing simple control. (EPANET Version 2.2)
             %
             % Example 1:
-            %   d.getControls                                                % Retrieves the parameters of all control statements
-            %   d.deleteControls                                             % Deletes the existing simple controls
+            %   d.getControls                                                 % Retrieves the parameters of all control statements
+            %   d.deleteControls                                              % Deletes the existing simple controls
             %   d.getControls      
             %
             % Example 2:
-            %   index = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');     % Adds a new simple control(index = 3)
+            %   index = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');      % Adds a new simple control(index = 3)
             %   d.getControls(index)
             %   d.deleteControls(index);                                      % Deletes the 3rd simple control
             %   d.getControls
             %
             % Example 3:
-            %   index_3 = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');   % Adds a new simple control(index = 3)
-            %   index_4 = d.addControls('LINK 10 43.2392 AT TIME 4:00:00');  % Adds a new simple control(index = 4)
+            %   index_3 = d.addControls('LINK 9 43.2392 AT TIME 4:00:00');    % Adds a new simple control(index = 3)
+            %   index_4 = d.addControls('LINK 10 43.2392 AT TIME 4:00:00');   % Adds a new simple control(index = 4)
             %   d.getControls(index_3)
             %   d.getControls(index_4)
             %   d.deleteControls([index_3, index_4]);                         % Deletes the 3rd and 4th simple controls
@@ -5396,19 +5446,29 @@ classdef epanet <handle
             end
         end
         function setLinkDiameter(obj, value, varargin)
-            % Sets the values of diameters
-            % Example:
-            %       index_pipe = 1
-            %       d.setLinkDiameter(index_pipe, 100);
-            %       d.getLinkDiameter(index_pipe)
-            %       diameters = d.getLinkDiameter
-            %       qunc = 0.05;
-            %       ql=diameters-qunc*diameters;
-            %       qu=diameters+qunc*diameters;
-            %       diam_length=length(diameters);
-            %       diameters_unc=ql+rand(1,diam_length).*(qu-ql); 
-            %       d.setLinkDiameter(diameters_unc)
-            %       d.getLinkDiameter
+            % Sets the values of diameters.
+            %
+            % Example 1:
+            %   d.getLinkDiameter                            % Retrieves the diameters of all links
+            %   index_pipe = 1;
+            %   diameter = 20;
+            %   d.setLinkDiameter(index_pipe, diameter);     % Sets the diameter of the 1st pipe
+            %   d.getLinkDiameter(index_pipe)
+            %
+            % Example 2:
+            %   index_pipes = [1, 2];
+            %   diameters = [20, 25];
+            %   d.setLinkDiameter(index_pipes, diameters);   % Sets the diameters of the first 2 pipes
+            %   d.getLinkDiameter(index_pipes)
+            %
+            % Example 3:
+            %   diameters = d.getLinkDiameter;
+            %   diameters = diameters*1.5;
+            %   d.setLinkDiameter(diameters)                 % Sets the diameters of all the links
+            %   d.getLinkDiameter
+            %
+            % See also setLinkPipeData, setLinkLength,
+            %          setLinkBulkReactionCoeff, setLinkTypePipe.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -5417,11 +5477,20 @@ classdef epanet <handle
             end            
         end
         function value = getLinkComment(obj, varargin)
-            % Retrieves the comment string assigned to the link object
-            % Example: 
-            %       d.getLinkComment(1:5)
-            %       d.getLinkComment(4)
-            %       d.getLinkComment
+            % Retrieves the comment string assigned to the link object.
+            %
+            % Example 1:
+            %   d.getLinkComment              % Retrieves the comments of all links
+            %
+            % Example 2:
+            %   linkIndex = 1;
+            %   d.getLinkComment(linkIndex)   % Retrieves the comment of the 1st link
+            %
+            % Example 3:
+            %   linkIndex = 1:5;
+            %   d.getLinkComment(linkIndex)   % Retrieves the comments of the first 5 links
+            %
+            % See also setLinkComment, getLinkNameID, getLinksInfo.
             if isempty(varargin)
                 cnt = obj.getLinkCount;
                 value = cell(1, cnt);
@@ -5440,13 +5509,23 @@ classdef epanet <handle
             end
         end
         function value = setLinkComment(obj, value, varargin)
-            % Sets the comment string assigned to the link object
-            % Example: 
-            %       d.setLinkComment(1, 'This is a link');
-            %       d.getLinkComment(1)
-            %       d.setLinkComment(1:2, {'This is a node', 'Test comm'});
-            %       d.getLinkComment(1:2)
-            %       d.getLinkComment
+            % Sets the comment string assigned to the link object.
+            %
+            % Example 1:
+            %   linkIndex = 1;
+            %   d.getLinkComment(linkIndex)
+            %   comment = 'This is a link';
+            %   d.setLinkComment(linkIndex, comment);   % Sets a comment to the 1st link
+            %   d.getLinkComment(linkIndex)
+            %
+            % Example 2:
+            %   linkIndex = [1, 2];
+            %   d.getLinkComment(linkIndex)
+            %   comment = {'This is link 1', 'This is link 2'};
+            %   d.setLinkComment(linkIndex, comment);   % Sets comments to the first 2 links
+            %   d.getLinkComment(linkIndex)
+            %
+            % See also getLinkComment, setLinkNameID, setLinkPipeData.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
@@ -5460,17 +5539,26 @@ classdef epanet <handle
             end
         end
         function index = setLinkTypePipe(obj, id, varargin)
-            % Set the link type pipe for a specified link
+            % Sets the link type pipe for a specified link.
+            %
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
             % Default condition is 0.
-            % Example:
-            %   linkid = '9';
-            %   d.setLinkTypePipe(linkid)
-            %   % or
-            %   condition = 1;
-            %   d.setLinkTypePipe(linkid, condition)
+            %
+            % Example 1:
             %   d.getLinkType
+            %   linkid = d.getLinkPumpNameID{1};
+            %   index = d.setLinkTypePipe(linkid);             % Changes the 1st pump to pipe given it's ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPumpNameID{1};
+            %   condition = 1;
+            %   index = d.setLinkTypePipe(linkid, condition)   % Changes the 1st pump to pipe given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPumpNameID, setLinkTypePipeCV,
+            %          setLinkTypePump, setLinkTypeValveFCV.
             condition = 0; % default
             if nargin == 3      
                 condition = varargin{1};
