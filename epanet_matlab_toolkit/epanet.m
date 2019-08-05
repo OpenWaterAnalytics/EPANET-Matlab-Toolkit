@@ -5330,7 +5330,7 @@ classdef epanet <handle
             end
         end
         function index = setLinkTypePipe(obj, id, varargin)
-            % Set the link type pipe for a specified link.
+            % Sets the link type pipe for a specified link.
             %
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
             % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
@@ -5339,14 +5339,14 @@ classdef epanet <handle
             % Example 1:
             %   d.getLinkType
             %   linkid = d.getLinkPumpNameID{1};
-            %   d.setLinkTypePipe(linkid);             % Changes the 1st pump to pipe given it's ID
-            %   d.getLinkType
+            %   index = d.setLinkTypePipe(linkid);             % Changes the 1st pump to pipe given it's ID
+            %   d.getLinkType(index)
             %
             % Example 2:
             %   linkid = d.getLinkPumpNameID{1};
             %   condition = 1;
-            %   d.setLinkTypePipe(linkid, condition)   % Changes the 1st pump to pipe given it's ID and a condition (if possible)
-            %   d.getLinkType
+            %   index = d.setLinkTypePipe(linkid, condition)   % Changes the 1st pump to pipe given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
             %
             % See also getLinkType, getLinkPumpNameID, setLinkTypePipeCV,
             %          setLinkTypePump, setLinkTypeValveFCV.
