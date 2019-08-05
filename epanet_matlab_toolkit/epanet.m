@@ -5140,10 +5140,10 @@ classdef epanet <handle
             % Default condition is 0.
             %
             % Example 1:
-            %   d.getNodeNameID                   % Retrieves the ID label of all nodes
+            %   d.getNodeCount                   % Retrieves the ID label of all nodes
             %   idNode = d.getNodeNameID(1);      % Retrieves the ID label of the 1st node
             %   d.deleteNode(idNode)              % Deletes the 1st node given it's ID
-            %   d.getNodeNameID
+            %   d.getNodeCount
             %
             % Example 2:
             %   idNode = d.getNodeNameID(1);
@@ -5157,8 +5157,9 @@ classdef epanet <handle
             %
             % Example 4:
             %   idNodes = d.getNodeNameID(1:2);
+            %   d.getNodeCount
             %   d.deleteNode(idNodes)             % Deletes 2 nodes given their IDs
-            %   d.getNodeNameID
+            %   d.getNodeCount
             %
             % See also addNodeJunction, deleteLink, deleteRules,
             %          setNodeCoordinates, setNodeJunctionData.
@@ -6392,7 +6393,6 @@ classdef epanet <handle
                         [obj.Errcode] = ENsetdemandpattern(i, u, value{u}(i), obj.LibEPANET);
                     end
                 end
-%                 warning('Can changes the demand pattern index based on the number of categories.');
             else
                 if iscell(value)
                     value=value{1};
