@@ -5270,17 +5270,26 @@ classdef epanet <handle
             error(obj.getError(obj.Errcode)); 
         end
         function index = setLinkTypePipeCV(obj, id, varargin)
-            % Set the link type cvpipe for a specified link
+            % Sets the link type cvpipe(pipe with check valve) for a specified link.
+            %
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
             % Default condition is 0.
-            % Example:
-            %   linkid = '9';
-            %   d.setLinkTypePipeCV(linkid)
-            %   % or
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                  % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                  % Retrieves the ID of the 1t pipe
+            %   index = d.setLinkTypePipeCV(linkid);              % Changes the 1st pipe to cvpipe given it's ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
             %   condition = 1;
-            %   d.setLinkTypePipeCV(linkid, condition)
-            %   d.getLinkType
+            %   index = d.setLinkTypePipeCV(linkid, condition);   % Changes the 1st pipe to cvpipe given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePump, setLinkTypeValveFCV.
             condition = 0; % default
             if nargin == 3      
                 condition = varargin{1};
@@ -5289,17 +5298,26 @@ classdef epanet <handle
             error(obj.getError(obj.Errcode)); 
         end
         function index = setLinkTypePump(obj, id, varargin)
-            % Set the link type pump for a specified link
+            % Sets the link type pump for a specified link.
+            %
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
             % Default condition is 0.
-            % Example:
-            %   linkid = '10';
-            %   d.setLinkTypePump(linkid)
-            %   % or
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                % Retrieves the ID of the 1t pipe
+            %   index = d.setLinkTypePump(linkid);              % Changes the 1st pipe to pump given it's ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
             %   condition = 1;
-            %   d.setLinkTypePump(linkid, condition)
-            %   d.getLinkType
+            %   index = d.setLinkTypePump(linkid, condition);   % Changes the 1st pipe to pump given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePipeCV, setLinkTypeValveFCV.
             condition = 0; % default
             if nargin == 3      
                 condition = varargin{1};
@@ -5308,14 +5326,27 @@ classdef epanet <handle
             error(obj.getError(obj.Errcode)); 
         end
         function index = setLinkTypeValveFCV(obj, id, varargin)
-            % Set the link type valve FCV for a specified link
-            % Example:
-            %   linkid = '122';
-            %   d.setLinkTypeValveFCV(linkid)
-            %   % or
+            % Sets the link type valve FCV(flow control valve) for a specified link.
+            %
+            % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
+            % Default condition is 0.
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                    % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                    % Retrieves the ID of the 1t pipe
+            %   index = d.setLinkTypeValveFCV(linkid);              % Changes the 1st pipe to valve FCV given it's ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
             %   condition = 1;
-            %   d.setLinkTypeValveFCV(linkid, condition)
-            %   d.getLinkType
+            %   index = d.setLinkTypeValveFCV(linkid, condition);   % Changes the 1st pipe to valve FCV given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePump, setLinkTypeValveGPV.
+            condition = 0; % default
             condition = 0; % default
             if nargin == 3      
                 condition = varargin{1};
@@ -5324,17 +5355,26 @@ classdef epanet <handle
             error(obj.getError(obj.Errcode));
         end
         function index = setLinkTypeValveGPV(obj, id, varargin)
-            % Set the link type valve GPV for a specified link
+            % Sets the link type valve GPV(general purpose valve) for a specified link.
+            %
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
             % Default condition is 0.
-            % Example:
-            %   linkid = '122';
-            %   d.setLinkTypeValveGPV(linkid)
-            %   % or
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                    % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                    % Retrieves the ID of the 1t pipe
+            %   index = d.setLinkTypeValveGPV(linkid);              % Changes the 1st pipe to valve GPV given it's ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
             %   condition = 1;
-            %   d.setLinkTypeValveGPV(linkid, condition)
-            %   d.getLinkType
+            %   index = d.setLinkTypeValveGPV(linkid, condition);   % Changes the 1st pipe to valve GPV given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePump, setLinkTypeValveFCV.
             condition = 0; % default
             if nargin == 3      
                 condition = varargin{1};
@@ -5343,17 +5383,26 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePBV(obj, id, varargin)
-            % Set the link type valve PBV for a specified link
+            % Sets the link type valve PBV(pressure breaker valve) for a specified link.
+            %
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
             % Default condition is 0.
-            % Example:
-            %   linkid = '122';
-            %   d.setLinkTypeValvePBV(linkid)
-            %   % or
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                    % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                    % Retrieves the ID of the 1t pipe
+            %   index = d.setLinkTypeValvePBV(linkid);              % Changes the 1st pipe to valve PBV given it's ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
             %   condition = 1;
-            %   d.setLinkTypeValvePBV(linkid, condition)
-            %   d.getLinkType
+            %   index = d.setLinkTypeValvePBV(linkid, condition);   % Changes the 1st pipe to valve PBV given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePump, setLinkTypeValvePRV.
             condition = 0; % default
             if nargin == 3      
                 condition = varargin{1};
@@ -5362,17 +5411,26 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePRV(obj, id, varargin)
-            % Set the link type valve PRV for a specified link
+            % Sets the link type valve PRV(pressure reducing valve) for a specified link.
+            %
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
             % Default condition is 0.
-            % Example:
-            %   linkid = '122';
-            %   d.setLinkTypeValvePRV(linkid)
-            %   % or
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                    % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                    % Retrieves the ID of the 1t pipe
+            %   index = d.setLinkTypeValvePRV(linkid);              % Changes the 1st pipe to valve PRV given it's ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
             %   condition = 1;
-            %   d.setLinkTypeValvePRV(linkid, condition)
-            %   d.getLinkType
+            %   index = d.setLinkTypeValvePRV(linkid, condition);   % Changes the 1st pipe to valve PRV given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePump, setLinkTypeValvePSV.
             condition = 0; % default
             if nargin == 3      
                 condition = varargin{1};
@@ -5381,17 +5439,26 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePSV(obj, id, varargin)
-            % Set the link type valve PSV for a specified link
+            % Sets the link type valve PSV(pressure sustaining valve) for a specified link.
+            %
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
             % Default condition is 0.
-            % Example:
-            %   linkid = '122';
-            %   d.setLinkTypeValvePSV(linkid)
-            %   % or
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                    % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                    % Retrieves the ID of the 1t pipe
+            %   index = d.setLinkTypeValvePSV(linkid);              % Changes the 1st pipe to valve PSV given it's ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
             %   condition = 1;
-            %   d.setLinkTypeValvePSV(linkid, condition)
-            %   d.getLinkType
+            %   index = d.setLinkTypeValvePSV(linkid, condition);   % Changes the 1st pipe to valve PSV given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePump, setLinkTypeValvePBV.
             condition = 0; % default
             if nargin == 3      
                 condition = varargin{1};
@@ -5400,17 +5467,26 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValveTCV(obj, id, varargin)
-            % Set the link type valve TCV for a specified link
+            % Sets the link type valve TCV(throttle control valve) for a specified link.
+            %
             % condition = 0 | if is EN_UNCONDITIONAL: Delete all controls that contain object   
-            % condition = 1 | if is EN_CONDITIONAL: Cancel object deletion if contained in controls  
+            % condition = 1 | if is EN_CONDITIONAL: Cancel object type change if contained in controls  
             % Default condition is 0.
-            % Example:
-            %   linkid = '122';
-            %   d.setLinkTypeValveTCV(linkid)
-            %   % or
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                    % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                    % Retrieves the ID of the 1t pipe
+            %   index = d.setLinkTypeValveTCV(linkid);              % Changes the 1st pipe to valve TCV given it's ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
             %   condition = 1;
-            %   d.setLinkTypeValveTCV(linkid, condition)
-            %   d.getLinkType
+            %   index = d.setLinkTypeValveTCV(linkid, condition);   % Changes the 1st pipe to valve TCV given it's ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePump, setLinkTypeValveGPV.
             condition = 0; % default
             if nargin == 3      
                 condition = varargin{1};
@@ -5419,19 +5495,23 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function setLinkLength(obj, value, varargin)
-            % Sets the values of lengths
-            % Example:
-            %   index_pipe = 1
-            %   d.setLinkLength(index_pipe, 100);
+            % Sets the values of lengths.
+            %
+            % Example 1:
+            %   index_pipe = 1;
+            %   d.getLinkLength(index_pipe)                 % Retrieves the length of the 1st link
+            %   length_pipe = 100;
+            %   d.setLinkLength(index_pipe, length_pipe);   % Sets the length of the 1st link
             %   d.getLinkLength(index_pipe)
-            %   lengths = d.getLinkLength
-            %   qunc = 0.05;
-            %   ql=lengths-qunc*lengths;
-            %   qu=lengths+qunc*lengths;
-            %   lengths_length=length(lengths);
-            %   lengths_unc=ql+rand(1,lengths_length).*(qu-ql); 
-            %   d.setLinkLength(lengths_unc)
+            %
+            % Example 2:
+            %   lengths = d.getLinkLength;                  % Retrieves the lengths of all the links
+            %   lengths_new = lengths*1.5;
+            %   d.setLinkLength(lengths_new);               % Sets the new lengths of all links
             %   d.getLinkLength
+            %
+            % See also getLinkLength, setLinkDiameter, setLinkMinorLossCoeff, 
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -5440,10 +5520,22 @@ classdef epanet <handle
             end
         end
         function value = setLinkNameID(obj, value, varargin)
-            % Sets the ID name for links
-            % Example: 
-            %    d.setLinkNameID(1, 'newID');
-            %    d.setLinkNameID(cell_array_of_newIDs);
+            % Sets the ID name for links.
+            %
+            % Example 1:
+            %   index_pipe = 1;
+            %   d.getLinkNameID(index_pipe)            % Retrieves the ID of the 1st link
+            %   linkID = 'New_ID';                     % ID selected without a space in between the letters
+            %   d.setLinkNameID(index_pipe, linkID);   % Sets the ID name of the 1st link
+            %   d.getLinkNameID(index_pipe)
+            %(the size of the cell must equal to the number of links)
+            % Example 2:
+            %   IDs = {'1', '2', '3', '4'};            % Select the IDs of all the links (the size of the cell must equal the number of links)
+            %   d.setLinkNameID(IDs);                  % Sets the ID names of all links
+            %   d.getLinkNameID
+            %
+            % See also getLinkNameID, setLinkComment, setLinkDiameter, 
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
@@ -5457,19 +5549,23 @@ classdef epanet <handle
             end
         end
         function setLinkRoughnessCoeff(obj, value, varargin)
-            % Sets the values of roughness coeff.
-            % Example:
-            %   index_pipe = 1
-            %   d.setLinkRoughnessCoeff(index_pipe, 100);
+            % Sets the values of roughness coefficient.
+            %
+            % Example 1:
+            %   index_pipe = 1;
+            %   d.getLinkRoughnessCoeff(index_pipe)           % Retrieves the roughness coefficient of the 1st link
+            %   coeff = 105;
+            %   d.setLinkRoughnessCoeff(index_pipe, coeff);   % Sets the roughness coefficient of the 1st link
             %   d.getLinkRoughnessCoeff(index_pipe)
-            %   r = d.getLinkRoughnessCoeff
-            %   qunc = 0.05;
-            %   ql=r-qunc*r;
-            %   qu=r+qunc*r;
-            %   r_length=length(r);
-            %   r_unc=ql+rand(1,r_length).*(qu-ql); 
-            %   d.setLinkRoughnessCoeff(r_unc)
+            %
+            % Example 2:
+            %   coeffs = d.getLinkRoughnessCoeff;             % Retrieves the roughness coefficients of all the links
+            %   coeffs_new = coeffs + 10;
+            %   d.setLinkRoughnessCoeff(coeffs_new);          % Sets the roughness coefficient of all links
             %   d.getLinkRoughnessCoeff
+            %
+            % See also getLinkRoughnessCoeff, setLinkDiameter, setLinkMinorLossCoeff, 
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -5478,11 +5574,23 @@ classdef epanet <handle
             end
         end
         function setLinkMinorLossCoeff(obj, value, varargin)
-            % Sets the values of minor loss coeff.
-            % Example:
-            %   index_pipe = 1
-            %   d.setLinkMinorLossCoeff(index_pipe, 1.1);
+            % Sets the values of minor loss coefficient.
+            %
+            % Example 1:
+            %   index_pipe = 1;
+            %   d.getLinkMinorLossCoeff(index_pipe)           % Retrieves the minor loss coefficient of the 1st link
+            %   coeff = 105;
+            %   d.setLinkMinorLossCoeff(index_pipe, coeff);   % Sets the minor loss coefficient of the 1st link
             %   d.getLinkMinorLossCoeff(index_pipe)
+            %
+            % Example 2:
+            %   coeffs = d.getLinkMinorLossCoeff;             % Retrieves the minor loss coefficients of all the links
+            %   coeffs_new = coeffs + 0.2;
+            %   d.setLinkMinorLossCoeff(coeffs_new);          % Sets the minor loss coefficient of all links
+            %   d.getLinkMinorLossCoeff
+            %
+            % See also getLinkMinorLossCoeff, setLinkDiameter, setLinkRoughnessCoeff, 
+            %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
