@@ -505,6 +505,38 @@ classdef epanet <handle
                 end
             end
         end
+        function set_node_demand_pattern(obj, fun, propertie, value, extra)
+            chckfunctions=libfunctions(obj.LibEPANET);
+            if sum(strcmp(chckfunctions, fun))
+                categ = 1;
+                if length(extra) == 2
+                    indices = value;
+                    categ = extra{1};
+                    param = extra{2};
+                elseif length(extra) == 1
+                    indices = value;
+                    param = extra{1};
+                elseif isempty(extra)
+                    [indices, ~] = getNodeJunctionIndices(obj,[]);
+                    param = value;
+                end
+                for i = 1:length(indices)
+                    [obj.Errcode] = eval([fun, '(indices(i), categ, param(i), obj.LibEPANET)']);
+                end
+            else
+                if isempty(extra)
+                    indices = getNodeJunctionIndices(obj, []);
+                elseif length(extra) == 1
+                    indices = value;
+                    value = extra{1};
+                end
+                j = 1;
+                for i = indices
+                    [obj.Errcode] = ENsetnodevalue(i, propertie, value(j), obj.LibEPANET);
+                    j=j+1;
+                end
+            end
+        end
     end
     methods
         function obj = epanet(varargin)
@@ -6276,48 +6308,53 @@ classdef epanet <handle
             end
         end
         function setNodeBaseDemands(obj, value, varargin)
-            % Sets the values of primary demand baseline for nodes.
+            % Sets the values of demand for nodes.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
             %
             % Example 1:
             %   index_node = 1;
-            %   d.getNodeBaseDemands{1}(index_node)                         % Retrieves the demand of the 1st node
+            %   d.getNodeBaseDemands{1}(index_node)                       % Retrieves the demand of the 1st node
             %   demand = 5;
-            %   d.setNodeBaseDemands(index_node, demand);                   % Sets the demand of the 1st node
+            %   d.setNodeBaseDemands(index_node, demand);                 % Sets the demand of the 1st node
             %   d.getNodeBaseDemands{1}(index_node)
             %
             % Example 2:
-            %   demands = d.getNodeBaseDemands{1};                          % Retrieves the demands of all the nodes
+            %   nodeIndex = 1:5;
+            %   d.getNodeBaseDemands{1}(nodeIndex)                        % Retrieves the demands of first 5 nodes
+            %   demands = [10, 5, 15, 20, 5];
+            %   d.setNodeBaseDemands(nodeIndex, demands)                  % Sets the demands of first 5 nodes
+            %   d.getNodeBaseDemands{1}(nodeIndex)
+            %
+            % Example 3:
+            %   demands = d.getNodeBaseDemands{1};                        % Retrieves the demands of all nodes
             %   demands_new = demands + 15;
-            %   d.setNodeBaseDemands(1:length(demands_new), demands_new);   % Sets the demands of all nodes
+            %   d.setNodeBaseDemands(demands_new);                        % Sets the demands of all nodes
             %   d.getNodeBaseDemands{1}
             %
+            % For the following examples EPANET Version 2.1 or higher is required.
+            %
+            % If a category is not given, the default is categoryIndex = 1.
+            %
+            % Example 4:
+            %   nodeIndex = 121;
+            %   categoryIndex = 2;
+            %   d.getNodeBaseDemands{categoryIndex}(nodeIndex)            % Retrieves the demand of the 2nd category of the 121th node
+            %   demand = 25;
+            %   d.setNodeBaseDemands(nodeIndex, categoryIndex, demand)    % Sets the demand of the 2nd category of the 121th node
+            %   d.getNodeBaseDemands{categoryIndex}(nodeIndex)
+            %
+            % Example 5:
+            %   nodeIndex = 1:5;
+            %   categoryIndex = 1;
+            %   d.getNodeBaseDemands{categoryIndex}(nodeIndex)            % Retrieves the demands of the 1st category of the first 5 nodes
+            %   demands = [10, 5, 15, 20, 5];
+            %   d.setNodeBaseDemands(nodeIndex, categoryIndex, demands)   % Sets the demands of the 1st category of the first 5 nodes
+            %   d.getNodeBaseDemands{categoryIndex}(nodeIndex)
+            %
             % See also getNodeBaseDemands, setNodeJunctionDemandName,
-            %          setNodeJunctionData, addNodeJunction, deleteNode.
-            if nargin==3 
-                indices = value; value=varargin{1};j=1;
-                for i=indices
-                    [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_BASEDEMAND, value(j), obj.LibEPANET); j=j+1;
-                    error(obj.getError(obj.Errcode)); 
-                end
-                return;
-            end
-            %EPANET Version 2.1
-            chckfunctions=libfunctions(obj.LibEPANET);
-            if sum(strcmp(chckfunctions, 'ENsetbasedemand'))
-                NodeNumDemandC=obj.getNodeDemandCategoriesNumber;
-                for i=1:obj.getNodeJunctionCount
-                    for u=1:NodeNumDemandC(i)
-                        [obj.Errcode] = ENsetbasedemand(i, u, value{u}(i), obj.LibEPANET);
-                    end
-                end
-            else %version epanet20012
-                if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
-                j=1;
-                for i=indices
-                    [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_BASEDEMAND, value(j), obj.LibEPANET); j=j+1;
-                    error(obj.getError(obj.Errcode)); 
-                end
-            end
+            %          setNodeDemandPatternIndex, addNodeJunction, deleteNode.
+            set_node_demand_pattern(obj, 'ENsetbasedemand', obj.ToolkitConstants.EN_BASEDEMAND, value, varargin)
         end
         function setNodeCoordinates(obj, value, varargin)
             % Sets node coordinates.
@@ -6357,50 +6394,53 @@ classdef epanet <handle
             end
         end
         function setNodeDemandPatternIndex(obj, value, varargin)
-            % Sets the values of primary demand time pattern indices.
+            % Sets the values of demand time pattern indices.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
             %
             % Example 1:
             %   nodeIndex = 1;
-            %   d.getNodeDemandPatternIndex{1}(nodeIndex);             % Retrieves the index of the category's time pattern of the 1st node
+            %   d.getNodeDemandPatternIndex{1}(nodeIndex)                               % Retrieves the index of the 1st category's time pattern of the 1st node
             %   patternIndex = 2;
-            %   d.setNodeDemandPatternIndex(nodeIndex, patternIndex)   % Sets the primary demand time pattern index to the 1st node
+            %   d.setNodeDemandPatternIndex(nodeIndex, patternIndex)                    % Sets the demand time pattern index to the 1st node
             %   d.getNodeDemandPatternIndex{1}(nodeIndex)
             %
             % Example 2:
-            %   patternIndices_1 = d.getNodeDemandPatternIndex{1};
-            %   patternIndices_2 = d.getNodeDemandPatternIndex{2};
-            %   patternIndices_new = {patternIndices_1 + 1, patternIndices_2 + 1};
-            %   d.setNodeDemandPatternIndex(patternIndices_new)        % Sets all primary demand time pattern indices
+            %   nodeIndex = 1:5;
+            %   d.getNodeDemandPatternIndex{1}(nodeIndex)
+            %   patternIndices = [1, 3, 2, 4, 2];
+            %   d.setNodeDemandPatternIndex(nodeIndex, patternIndices)                  % Sets the demand time pattern index to the first 5 nodes
+            %   d.getNodeDemandPatternIndex{1}(nodeIndex)
+            %
+            % Example 3:
+            %   patternIndices = d.getNodeDemandPatternIndex{1};
+            %   patternIndices_new = patternIndices + 1;
+            %   d.setNodeDemandPatternIndex(patternIndices_new)                         % Sets all primary demand time pattern indices
             %   d.getNodeDemandPatternIndex{1}
-            %   d.getNodeDemandPatternIndex{2}
+            %
+            % For the following examples EPANET Version 2.1 or higher is required.
+            %
+            % If a category is not given, the default is categoryIndex = 1.
+            %
+            % Example 4:
+            %   nodeIndex = 121;
+            %   categoryIndex = 2;
+            %   d.getNodeDemandPatternIndex{categoryIndex}(nodeIndex)                   % Retrieves the index of the 2nd category's time pattern of the 121th node
+            %   patternIndex = 4;
+            %   d.setNodeDemandPatternIndex(nodeIndex, categoryIndex, patternIndex)     % Sets the demand time pattern index of the 2nd category of the 121th node
+            %   d.getNodeDemandPatternIndex{categoryIndex}(nodeIndex)
+            %
+            % Example 5:
+            %   nodeIndex = 1:5;
+            %   categoryIndex = 1;
+            %   d.getNodeDemandPatternIndex{categoryIndex}(nodeIndex)
+            %   patternIndices = [1, 3, 2, 4, 2];
+            %   d.setNodeDemandPatternIndex(nodeIndex, categoryIndex, patternIndices)   % Sets the demand time pattern index of the 1st category of the first 5 nodes
+            %   d.getNodeDemandPatternIndex{categoryIndex}(nodeIndex)
             %
             % See also getNodeDemandPatternIndex, getNodeDemandCategoriesNumber
-            %          getNodeDemandPatternNameID, addPattern, deletePattern.
-            if nargin==3
-                indices = value; value=varargin{1};j=1;
-                for i=indices
-                    [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, value(j), obj.LibEPANET); j=j+1;
-                    error(obj.getError(obj.Errcode)); 
-                end
-                return;
-            end
-
-            chckfunctions=libfunctions(obj.LibEPANET);
-            if sum(strcmp(chckfunctions, 'ENsetdemandpattern')) && iscell(value)
-                NodeNumDemandC=obj.getNodeDemandCategoriesNumber;
-                for i=1:obj.getNodeJunctionCount
-                    for u=1:NodeNumDemandC(i)
-                        [obj.Errcode] = ENsetdemandpattern(i, u, value{u}(i), obj.LibEPANET);
-                    end
-                end
-            else
-                if iscell(value)
-                    value=value{1};
-                end
-                for i=1:length(value)
-                    [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, value(i), obj.LibEPANET);
-                end
-            end
+            %          setNodeBaseDemands, addPattern, deletePattern.
+            set_node_demand_pattern(obj, 'ENsetdemandpattern', obj.ToolkitConstants.EN_PATTERN, value, varargin)
         end
         function setNodeEmitterCoeff(obj, value, varargin)
             % Sets the values of emitter coefficient for nodes
