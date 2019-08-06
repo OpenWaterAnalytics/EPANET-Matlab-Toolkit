@@ -505,6 +505,38 @@ classdef epanet <handle
                 end
             end
         end
+        function set_node_demand_pattern(obj, fun, propertie, value, extra)
+            chckfunctions=libfunctions(obj.LibEPANET);
+            if sum(strcmp(chckfunctions, fun))
+                categ = 1;
+                if length(extra) == 2
+                    indices = value;
+                    categ = extra{1};
+                    param = extra{2};
+                elseif length(extra) == 1
+                    indices = value;
+                    param = extra{1};
+                elseif isempty(extra)
+                    [indices, ~] = getNodeJunctionIndices(obj,[]);
+                    param = value;
+                end
+                for i = 1:length(indices)
+                    [obj.Errcode] = eval([fun, '(indices(i), categ, param(i), obj.LibEPANET)']);
+                end
+            else
+                if nargin_1 == 4
+                    indices = getNodeJunctionIndices(obj, []);
+                elseif nargin_1 == 5
+                    indices = value;
+                    value = varargin{1}{1};
+                end
+                j = 1;
+                for i = indices
+                    [obj.Errcode] = ENsetnodevalue(i, propertie, value(j), obj.LibEPANET);
+                    j=j+1;
+                end
+            end
+        end
     end
     methods
         function obj = epanet(varargin)
@@ -6321,37 +6353,7 @@ classdef epanet <handle
             %
             % See also getNodeBaseDemands, setNodeJunctionDemandName,
             %          setNodeDemandPatternIndex, addNodeJunction, deleteNode.
-            chckfunctions=libfunctions(obj.LibEPANET);
-            if sum(strcmp(chckfunctions, 'ENsetbasedemand'))
-                categ = 1;
-                if nargin == 4
-                    index = value;
-                    categ = varargin{1};
-                    demand = varargin{2};
-                elseif nargin == 3
-                    index = value;
-                    demand = varargin{1};
-                elseif nargin == 2
-                    [index, ~] = getNodeJunctionIndices(obj,[]);
-                    demand = value;
-                end
-                for i = 1:length(index)
-                    [obj.Errcode] = ENsetbasedemand(index(i), categ, demand(i), obj.LibEPANET);
-                    error(obj.getError(obj.Errcode));
-                end
-            else
-                if nargin == 2
-                    indices = getNodeJunctionIndices(obj, []);
-                elseif nargin == 3
-                    indices = value;
-                    value = varargin{1};
-                end
-                j = 1;
-                for i = indices
-                    [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_BASEDEMAND, value(j), obj.LibEPANET);
-                    j=j+1;
-                end
-            end
+            set_node_demand_pattern(obj, 'ENsetbasedemand', obj.ToolkitConstants.EN_BASEDEMAND, value, varargin)
         end
         function setNodeCoordinates(obj, value, varargin)
             % Sets node coordinates.
@@ -6437,36 +6439,7 @@ classdef epanet <handle
             %
             % See also getNodeDemandPatternIndex, getNodeDemandCategoriesNumber
             %          setNodeBaseDemands, addPattern, deletePattern.
-            chckfunctions=libfunctions(obj.LibEPANET);
-            if sum(strcmp(chckfunctions, 'ENsetbasedemand'))
-                categ = 1;
-                if nargin == 4
-                    indices = value;
-                    categ = varargin{1};
-                    pattern = varargin{2};
-                elseif nargin == 3
-                    indices = value;
-                    pattern = varargin{1};
-                elseif nargin == 2
-                    [indices, ~] = getNodeJunctionIndices(obj,[]);
-                    pattern = value;
-                end
-                for i = 1:length(indices)
-                    [obj.Errcode] = ENsetdemandpattern(indices(i), categ, pattern(i), obj.LibEPANET);
-                end
-            else
-                if nargin == 2
-                    indices = getNodeJunctionIndices(obj, []);
-                elseif nargin == 3
-                    indices = value;
-                    value = varargin{1};
-                end
-                j = 1;
-                for i = indices
-                    [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, value(j), obj.LibEPANET);
-                    j=j+1;
-                end
-            end
+            set_node_demand_pattern(obj, 'ENsetdemandpattern', obj.ToolkitConstants.EN_PATTERN, value, varargin)
         end
         function setNodeEmitterCoeff(obj, value, varargin)
             % Sets the values of emitter coefficient for nodes
