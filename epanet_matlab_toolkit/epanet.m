@@ -524,11 +524,11 @@ classdef epanet <handle
                     [obj.Errcode] = eval([fun, '(indices(i), categ, param(i), obj.LibEPANET)']);
                 end
             else
-                if nargin_1 == 4
+                if isempty(extra)
                     indices = getNodeJunctionIndices(obj, []);
-                elseif nargin_1 == 5
+                elseif length(extra) == 1
                     indices = value;
-                    value = varargin{1}{1};
+                    value = extra{1};
                 end
                 j = 1;
                 for i = indices
