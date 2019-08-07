@@ -3375,7 +3375,7 @@ classdef epanet <handle
             % See also getNodeTankCount, getNodeTankIndex.
             value=obj.getNodeNameID(obj.getNodeTankIndex);
         end
-        function tankData = getNodeTankData(obj)
+        function tankData = getNodeTankData(obj, varargin)
             % Retrieves a group of properties for a tank. (EPANET Version 2.2)
             % 
             % Tank data that is retrieved:
@@ -3394,13 +3394,21 @@ classdef epanet <handle
             %   disp(tankData)
             %
             % Example 2:
+            %   tankIndex = d.getNodeTankIndex;
+            %   tankData = d.getNodeTankData(tankIndex);       % Retrieves all the data given the index/indices of tanks.
+            %
+            % Example 3:
             %   tankElevation = d.getNodeTankData.Elevation;   % Retrieves the elevations of all tanks.
             %   disp(tankElevation)
             %
             % See also setNodeTankData, getNodeElevations, getNodeTankInitialLevel,
             %          getNodeTankMinimumWaterLevel, getNodeTankDiameter.
             tankData = struct();
-            tankIndices = obj.getNodeTankIndex;
+            if nargin == 1
+                tankIndices = obj.getNodeTankIndex;
+            elseif nargin == 2
+                tankIndices = varargin{1};
+            end
             tankData.Index = tankIndices;
             tankData.Elevation = obj.getNodeElevations(tankIndices);
             tankData.Initial_Level = obj.getNodeTankInitialLevel(tankIndices);
@@ -5053,20 +5061,74 @@ classdef epanet <handle
             %   d.plot
             %
             % Example 2:
-            %   % Adds a new tank with coordinates [X, Y] = [20, 30].
+            %   % Adds a new tank with coordinates [X, Y] = [10, 10].
             %   tankID = 'newTank_2';
-            %   tankCoords = [20 30];
+            %   tankCoords = [10 10];
             %   tankIndex = d.addNodeTank(tankID, tankCoords);
             %   d.plot
             % 
+            % Example 3:
+            %   % Adds a new tank with coordinates [X, Y] = [20, 20] and elevation = 100.
+            %   tankID = 'newTank_3';
+            %   tankCoords = [20 20];
+            %   elevation = 100;
+            %   tankIndex = d.addNodeTank(tankID, tankCoords, elevation);
+            %   d.plot;
+            %
+            % Example 4:
+            %   % Adds a new tank with coordinates [X, Y] = [20, 30], elevation = 100, initial level = 130, minimum water level = 110, 
+            %   % maximum water level = 160, diameter = 60, minimum water volume = 200000, volume curve ID = '';.
+            %   tankID = 'newTank_4';
+            %   tankCoords = [20 30];
+            %   elevation = 100;
+            %   initialLevel = 130;
+            %   minimumWaterLevel = 110;
+            %   maximumWaterLevel = 160;
+            %   diameter = 60;
+            %   minimumWaterVolume = 200000;
+            %   volumeCurveID = '';   % Empty for no curve
+            %   tankIndex = d.addNodeTank(tankID, tankCoords, elevation, initialLevel, minimumWaterLevel, ...
+            %   maximumWaterLevel, diameter, minimumWaterVolume, volumeCurveID);
+            %   d.getNodeTankData(tankIndex)
+            %   d.plot;
+            %
             % See also plot, setLinkNodesIndex, addNodeJunction, 
             %          addLinkPipe, deleteNode, setNodeBaseDemands.
             xy = [0 0];
-            if nargin == 3
+            elev = 0;
+            intlvl = 0;
+            minlvl =  0;
+            maxlvl = 0;
+            diam = 0;
+            minvol = 0;
+            volcurve = '';
+            if nargin >= 3
                 xy = varargin{1};
+            end
+            if nargin >= 4
+                elev = varargin{2};
+            end
+            if nargin >= 5
+                intlvl = varargin{3};
+            end
+            if nargin >= 6
+                minlvl = varargin{4};
+            end
+            if nargin >= 7
+                maxlvl = varargin{5};
+            end
+            if nargin >= 8
+                diam = varargin{6};
+            end
+            if nargin >= 9
+                minvol = varargin{7};
+            end
+            if nargin >= 10
+                volcurve = varargin{8};
             end
             index = ENaddnode(obj, tankID, obj.ToolkitConstants.EN_TANK);
             obj.setNodeCoordinates(index,[xy(1),xy(2)]);
+            obj.setNodeTankData(index, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
         end
         function index = addLinkPipeCV(obj, cvpipeID, fromNode, toNode)
             % Adds a new control valve pipe.
