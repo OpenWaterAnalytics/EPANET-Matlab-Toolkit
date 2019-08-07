@@ -6107,21 +6107,14 @@ classdef epanet <handle
             %
             % Example 3:
             %   d.setLinkPumpPower(1, 10)                % Sets the pump power = 10 to the 1st pump
-            %   or
-            %   d.setLinkPumpPower(2, 15)                % Sets the pump power = 15 to the 2nd pump
             %   d.getLinkPumpPower
             %
             % Example 4:
-            %   pumpIndex = 118;
-            %   d.setLinkPumpPower(pumpIndex, 10)        % Sets the pump power = 10 to the pump with index 118 
-            %   d.getLinkPumpPower
-            %
-            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpPower(pumpIndex, 10)        % Sets the pump power = 10 to the pumps with index 118 and 119
             %   d.getLinkPumpPower
             %
-            % Example 6:
+            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpPower(pumpIndex,[10, 15])   % Sets the pump power = 10 and 15 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpPower
@@ -6147,21 +6140,14 @@ classdef epanet <handle
             %
             % Example 3:
             %   d.setLinkPumpHCurve(1, 2)               % Sets the pump head v. flow curve index = 2 to the 1st pump
-            %   or
-            %   d.setLinkPumpHCurve(2, 1)               % Sets the pump head v. flow curve index = 1 to the 2nd pump
             %   d.getLinkPumpHCurve
             %
             % Example 4:
-            %   pumpIndex = 118;
-            %   d.setLinkPumpHCurve(pumpIndex, 1)       % Sets the pump head v. flow curve index = 1 to the pump with index 118 
-            %   d.getLinkPumpHCurve
-            %
-            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpHCurve(pumpIndex, 1)       % Sets the pump head v. flow curve index = 1 to the pumps with index 118 and 119
             %   d.getLinkPumpHCurve
             %
-            % Example 6:
+            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpHCurve(pumpIndex,[1, 2])   % Sets the pump head v. flow curve index = 1 and 2 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpHCurve
@@ -6187,21 +6173,14 @@ classdef epanet <handle
             %
             % Example 3:
             %   d.setLinkPumpECurve(1, 2)               % Sets the pump efficiency v. flow curve index = 2 to the 1st pump
-            %   or
-            %   d.setLinkPumpECurve(2, 1)               % Sets the pump efficiency v. flow curve index = 1 to the 2nd pump
             %   d.getLinkPumpECurve
             %
             % Example 4:
-            %   pumpIndex = 118;
-            %   d.setLinkPumpECurve(pumpIndex, 1)       % Sets the pump efficiency v. flow curve index = 1 to the pump with index 118 
-            %   d.getLinkPumpECurve
-            %
-            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpECurve(pumpIndex, 1)       % Sets the pump efficiency v. flow curve index = 1 to the pumps with index 118 and 119
             %   d.getLinkPumpECurve
             %
-            % Example 6:
+            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpECurve(pumpIndex,[1, 2])   % Sets the pump efficiency v. flow curve index = 1 and 2 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpECurve
@@ -6227,21 +6206,14 @@ classdef epanet <handle
             %
             % Example 3:
             %   d.setLinkPumpECost(1, 0.10)                   % Sets the pump average energy price = 0.10 to the 1st pump
-            %   or
-            %   d.setLinkPumpECost(2, 0.10)                   % Sets the pump average energy price = 0.10 to the 2nd pump
             %   d.getLinkPumpECost
             %
             % Example 4:
-            %   pumpIndex = 118;
-            %   d.setLinkPumpECost(pumpIndex, 0.10)           % Sets the pump average energy price = 0.10 to the pump with index 118 
-            %   d.getLinkPumpECost
-            %
-            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpECost(pumpIndex, 0.10)           % Sets the pump average energy price = 0.10 to the pumps with index 118 and 119
             %   d.getLinkPumpECost
             %
-            % Example 6:
+            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpECost(pumpIndex, [0.10, 0.12])   % Sets the pump average energy price = 0.10 and 0.12 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpECost
@@ -6267,21 +6239,14 @@ classdef epanet <handle
             %
             % Example 3:
             %   d.setLinkPumpEPat(1, 2)               % Sets the pump energy price time pattern index = 2 to the 1st pump
-            %   or
-            %   d.setLinkPumpEPat(2, 1)               % Sets the pump energy price time pattern index = 1 to the 2nd pump
             %   d.getLinkPumpEPat
             %
             % Example 4:
-            %   pumpIndex = 118;
-            %   d.setLinkPumpEPat(pumpIndex, 1)       % Sets the pump energy price time pattern index = 1 to the pump with index 118 
-            %   d.getLinkPumpEPat
-            %
-            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpEPat(pumpIndex, 1)       % Sets the pump energy price time pattern index = 1 to the pumps with index 118 and 119
             %   d.getLinkPumpEPat
             %
-            % Example 6:
+            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpEPat(pumpIndex,[1, 2])   % Sets the pump energy price time pattern index = 1 and 2 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpEPat
@@ -6307,28 +6272,41 @@ classdef epanet <handle
             %
             % Example 3:
             %   d.setLinkPumpPatternIndex(1, 2)               % Sets the pump speed time pattern index = 2 to the 1st pump
-            %   or
-            %   d.setLinkPumpPatternIndex(2, 1)               % Sets the pump speed time pattern index = 1 to the 2nd pump
             %   d.getLinkPumpPatternIndex
             %
             % Example 4:
-            %   pumpIndex = 118;
-            %   d.setLinkPumpPatternIndex(pumpIndex, 1)       % Sets the pump speed time pattern index = 1 to the pump with index 118 
-            %   d.getLinkPumpPatternIndex
-            %
-            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpPatternIndex(pumpIndex, 1)       % Sets the pump speed time pattern index = 1 to the pumps with index 118 and 119
             %   d.getLinkPumpPatternIndex
             %
-            % Example 6:
+            % Example 5:
             %   pumpIndex = d.getLinkPumpIndex;
-            %   d.setLinkPumpPatternIndex(pumpIndex,[1, 2])   % Sets the pump speed time pattern index = 1 and 2 to the pumps with index 118 and 119 respectively
+            %   d.setLinkPumpPatternIndex(pumpIndex, [1, 2])   % Sets the pump speed time pattern index = 1 and 2 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpPatternIndex
-            %
+            % 
+	    % Example 6:
+            %   % To remove the pattern index from the pumps you can use input 0
+            %   pumpIndex = d.getLinkPumpIndex;
+	    %   d.setLinkPumpPatternIndex(pumpIndex, 0)
+	    %
             % See also getLinkPumpPatternIndex, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
             set_Link_Pump(obj, obj.ToolkitConstants.EN_LINKPATTERN, value, varargin)
+        end
+        function value = setLinkPumpHeadCurveIndex(obj, value, varargin)
+	    % Example 1:
+	    %   To remove curve index from the pumps you can use input 0
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpHeadCurveIndex(pumpIndex, 0)
+	    %
+            % See also setLinkPumpPatternIndex, getLinkPumpPower, setLinkPumpHCurve,
+            %          setLinkPumpECurve, setLinkPumpECost.
+            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            j=1;
+            for i=indices
+                [obj.Errcode] = ENsetheadcurveindex(obj.LibEPANET, i, value(j)); j=j+1;
+                error(obj.getError(obj.Errcode));
+            end
         end
         function setNodeElevations(obj, value, varargin)
             % Sets the values of elevation for nodes.
@@ -6781,14 +6759,6 @@ classdef epanet <handle
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, value(j), obj.LibEPANET); j=j+1;
                 error(obj.getError(obj.Errcode)); 
-            end
-        end
-        function value = setLinkPumpHeadCurveIndex(obj, value, varargin)
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
-            j=1;
-            for i=indices
-                [obj.Errcode] = ENsetheadcurveindex(obj.LibEPANET, i, value(j)); j=j+1;
-                error(obj.getError(obj.Errcode));
             end
         end
         function setNodeSourceType(obj, index, value)
