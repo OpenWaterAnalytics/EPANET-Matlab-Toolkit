@@ -3117,49 +3117,65 @@ classdef epanet <handle
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume.
             value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_INITVOLUME, varargin);
         end
-        function value = getNodeTankMixiningModel(obj)
+        function value = getNodeTankMixiningModel(obj, varargin)
             % Retrieves the tank mixing model code and type (mix1, mix2, fifo, lifo).
             %
             % Example 1:
-            %   d.getNodeTankMixiningModel      
-            %   d.getNodeTankMixiningModel{1}   % Retrieves the values of all nodes mixing model code
+            %   d.getNodeTankMixiningModel              % Retrieves the values of all tanks mixing model code and type
+            %   d.getNodeTankMixiningModel{1}           % Retrieves the values of all tanks mixing model code
+            %   d.getNodeTankMixiningModel{2}           % Retrieves the values of all tanks mixing model type
             %
             % Example 2:
-            %   d.getNodeTankMixiningModel
-            %   d.getNodeTankMixiningModel{2}   % Retrieves the values of all nodes mixing model type
+            %   d.getNodeTankMixiningModel(1)           % Retrieves the values of the 1st tank mixing model code and type
+            %   d.getNodeTankMixiningModel{1}(1)        % Retrieves the values of the 1st tank mixing model code
+            %   d.getNodeTankMixiningModel{2}(1)        % Retrieves the values of the 1st tank mixing model type
+            %
+            % Example 3:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMixiningModel(tankIndex)   % Retrieves the values of all tanks mixing model code and type
             %
             % See also getNodeTankMixingModelCode, getNodeTankMixingModelType,
             %          getNodeTankMixZoneVolume.
-            obj.NodeTankInitialWaterVolume=nan(1, obj.getNodeCount);
-            obj.NodeTankMixingModelCode=nan(1, obj.getNodeCount);
-            obj.NodeTankMixingModelType={};
-            if obj.getNodeTankCount
-                for i=obj.getNodeTankIndex
-                    [obj.Errcode, obj.NodeTankMixingModelCode(i)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_MIXMODEL, obj.LibEPANET);
-                    obj.NodeTankMixingModelType(i)=obj.TYPEMIXMODEL(obj.NodeTankMixingModelCode(i)+1);
-                end
-            end
+            obj.NodeTankMixingModelCode = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MIXMODEL, varargin);
+            obj.NodeTankMixingModelType = obj.TYPEMIXMODEL(obj.NodeTankMixingModelCode + 1);
             value={obj.NodeTankMixingModelCode obj.NodeTankMixingModelType};
         end
-        function value = getNodeTankMixingModelCode(obj)
+        function value = getNodeTankMixingModelCode(obj, varargin)
             % Retrieves the tank mixing model code (mix1, mix2, fifo, lifo).
             %
-            % Example:
-            %   d.getNodeTankMixingModelCode   % Retrieves the values of all nodes mixing model code
+            % Example 1:
+            %   d.getNodeTankMixingModelCode              % Retrieves the values of all tanks mixing model code
+            %
+            % Example 2:
+            %   d.getNodeTankMixingModelCode(1)           % Retrieves the value of the 1st tank mixing model code
+            %
+            % Example 3:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMixingModelCode(tankIndex)   % Retrieves the values of all tanks mixing model code given their index
             %
             % See also getNodeTankMixiningModel, getNodeTankMixingModelType,
             %          getNodeTankMixZoneVolume.
-            value = obj.getNodeTankMixiningModel{1};
+            value = obj.getNodeTankMixiningModel(varargin{:});
+            value = value{1};
         end
-        function value = getNodeTankMixingModelType(obj)
+        function value = getNodeTankMixingModelType(obj, varargin)
             % Retrieves the tank mixing model type (mix1, mix2, fifo, lifo).
             %
-            % Example:
-            %   d.getNodeTankMixingModelType   % Retrieves the values of all nodes mixing model type
+            % Example 1:
+            %   d.getNodeTankMixingModelType              % Retrieves the values of all tanks mixing model type
+            %
+            % Example 2:
+            %   d.getNodeTankMixingModelType(1)           % Retrieves the value of the 1st tank mixing model type
+            %
+            % Example 3:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMixingModelType(tankIndex)   % Retrieves the values of all tanks mixing model type given their index
+            %
             %
             % See also getNodeTankMixiningModel, getNodeTankMixingModelCode,
             %          getNodeTankMixZoneVolume.
-            value = obj.getNodeTankMixiningModel{2};
+            value = obj.getNodeTankMixiningModel(varargin{:});
+            value = value{2};
         end
         function value = getNodeTankMixZoneVolume(obj, varargin)
             % Retrieves the tank mixing zone volume.
