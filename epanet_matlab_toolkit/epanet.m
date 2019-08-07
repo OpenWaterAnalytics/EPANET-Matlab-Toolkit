@@ -4937,27 +4937,73 @@ classdef epanet <handle
             % Adds a new junction.
             % Returns the index of the new junction.
             %
+            % The following data can be set(optional):
+            %   1) Coordinates
+            %   2) Elevation
+            %   3) Primary base demand
+            %   4) ID name of the demand's time pattern
+            %
             % Example 1:
             %   % Adds a new junction with the default coordinates (i.e. [0, 0])
             %   junctionID = 'newJunction_1';
             %   junctionIndex = d.addNodeJunction(junctionID);
-            %   d.plot
+            %   d.plot;
             %
             % Example 2:
-            %   % Adds a new junction with coordinates [X, Y] = [20, 30].
+            %   % Adds a new junction with coordinates [X, Y] = [20, 10].
             %   junctionID = 'newJunction_2';
-            %   junctionCoords = [20 30];
+            %   junctionCoords = [20 10];
             %   junctionIndex = d.addNodeJunction(junctionID, junctionCoords);
-            %   d.plot
-            % 
+            %   d.plot;
+            %
+            % Example 3:
+            %   % Adds a new junction with coordinates [X, Y] = [20, 20] and elevation = 500.
+            %   junctionID = 'newJunction_3';
+            %   junctionCoords = [20 20];
+            %   junctionElevation = 500;
+            %   junctionIndex = d.addNodeJunction(junctionID, junctionCoords, junctionElevation);
+            %   d.plot;
+            %
+            % Example 4:
+            %   % Adds a new junction with coordinates [X, Y] = [10, 10], elevation = 500 and demand = 50.
+            %   junctionID = 'newJunction_4';
+            %   junctionCoords = [10 10];
+            %   junctionElevation = 500;
+            %   demand = 50;
+            %   junctionIndex = d.addNodeJunction(junctionID, junctionCoords, junctionElevation, demand);
+            %   d.plot;
+            %
+            % Example 5:
+            %   % Adds a new junction with coordinates [X, Y] = [10, 20], elevation = 500, demand = 50 and pattern ID = the 1st time pattern ID(if exists).
+            %   junctionID = 'newJunction_5';
+            %   junctionCoords = [10 20];
+            %   junctionElevation = 500;
+            %   demand = 50;
+            %   demandPatternID = d.getPatternNameID{1};
+            %   junctionIndex = d.addNodeJunction(junctionID, junctionCoords, junctionElevation, demand, demandPatternID);
+            %   d.plot;
+            %
             % See also plot, setLinkNodesIndex, addNodeReservoir, 
-            %          addLinkPipe, deleteNode, setNodeBaseDemands.
+            %          setNodeComment, deleteNode, setNodeBaseDemands.
             xy = [0 0];
-            if nargin == 3
+            elev = 0;
+            dmnd = 0;
+            dmndpat = '';
+            if nargin >= 3
                 xy = varargin{1};
+            end
+            if nargin >= 4
+                elev = varargin{2};
+            end
+            if nargin >= 5
+                dmnd = varargin{3};
+            end
+            if nargin == 6
+                dmndpat = varargin{4};
             end
             index = ENaddnode(obj, juncID, obj.ToolkitConstants.EN_JUNCTION);
             obj.setNodeCoordinates(index,[xy(1),xy(2)]);
+            obj.setNodeJunctionData(index, elev, dmnd, dmndpat);
         end
         function index = addNodeReservoir(obj, resID, varargin)
             % Adds a new reservoir.
