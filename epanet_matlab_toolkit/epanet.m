@@ -4962,6 +4962,7 @@ classdef epanet <handle
             %   junctionCoords = [20 20];
             %   junctionElevation = 500;
             %   junctionIndex = d.addNodeJunction(junctionID, junctionCoords, junctionElevation);
+            %   d.getNodeElevations(junctionIndex)
             %   d.plot;
             %
             % Example 4:
@@ -4971,6 +4972,7 @@ classdef epanet <handle
             %   junctionElevation = 500;
             %   demand = 50;
             %   junctionIndex = d.addNodeJunction(junctionID, junctionCoords, junctionElevation, demand);
+            %   d.getNodeBaseDemands{1}(junctionIndex)
             %   d.plot;
             %
             % Example 5:
@@ -4981,6 +4983,7 @@ classdef epanet <handle
             %   demand = 50;
             %   demandPatternID = d.getPatternNameID{1};
             %   junctionIndex = d.addNodeJunction(junctionID, junctionCoords, junctionElevation, demand, demandPatternID);
+            %   d.getNodeDemandPatternNameID{1}(junctionIndex)
             %   d.plot;
             %
             % See also plot, setLinkNodesIndex, addNodeReservoir, 
