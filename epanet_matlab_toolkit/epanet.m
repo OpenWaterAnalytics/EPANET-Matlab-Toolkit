@@ -2189,7 +2189,7 @@ classdef epanet <handle
             %          getLinkPumpECost, getLinkPumpEPat,  getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, varargin);
         end
-        function value = getLinkPumpPatternNameID(obj)
+        function value = getLinkPumpPatternNameID(obj, varargin)
             % Retrieves link pump pattern name ID. (EPANET Version 2.1)
             %
             % Example: 
@@ -2197,8 +2197,12 @@ classdef epanet <handle
             %
             % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
             %          getLinkPumpECost, getLinkPumpEPat, getLinkPumpPatternIndex.
-            v = obj.getLinkPumpPatternIndex;
-            value = obj.getPatternNameID(v);
+            if isempty(varargin)
+                patindices = obj.getLinkPumpPatternIndex;
+            else
+                patindices = obj.getLinkPumpPatternIndex(varargin{1});
+            end
+            value = obj.getPatternNameID(patindices);
         end
         function value = getNodeNameID(obj, varargin)
             % Retrieves the ID label of all nodes or some nodes with a specified index.
@@ -6285,6 +6289,46 @@ classdef epanet <handle
             % See also getLinkPumpEPat, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
             set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_EPAT, value, varargin)
+        end
+        function setLinkPumpPatternIndex(obj, value, varargin)
+            % Sets the pump speed time pattern index. (EPANET Version 2.2)
+            %
+            % The examples are based on d=epanet('Net3_trace.inp');
+            %
+            % Example 1:
+            %   d.getLinkPumpPatternIndex                     % Retrieves the pump speed time pattern index of all pumps
+            %   d.setLinkPumpPatternIndex(1)                  % Sets the speed time pattern index = 1 to every pump
+            %   d.getLinkPumpPatternIndex
+            %
+            % Example 2:
+            %   % The input array must have a length equal to the number of pumps
+            %   d.setLinkPumpPatternIndex([1, 2])             % Sets the pump speed time pattern index = 1 and 2 to the 2 pumps
+            %   d.getLinkPumpPatternIndex
+            %
+            % Example 3:
+            %   d.setLinkPumpPatternIndex(1, 2)               % Sets the pump speed time pattern index = 2 to the 1st pump
+            %   or
+            %   d.setLinkPumpPatternIndex(2, 1)               % Sets the pump speed time pattern index = 1 to the 2nd pump
+            %   d.getLinkPumpPatternIndex
+            %
+            % Example 4:
+            %   pumpIndex = 118;
+            %   d.setLinkPumpPatternIndex(pumpIndex, 1)       % Sets the pump speed time pattern index = 1 to the pump with index 118 
+            %   d.getLinkPumpPatternIndex
+            %
+            % Example 5:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpPatternIndex(pumpIndex, 1)       % Sets the pump speed time pattern index = 1 to the pumps with index 118 and 119
+            %   d.getLinkPumpPatternIndex
+            %
+            % Example 6:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.setLinkPumpPatternIndex(pumpIndex,[1, 2])   % Sets the pump speed time pattern index = 1 and 2 to the pumps with index 118 and 119 respectively
+            %   d.getLinkPumpPatternIndex
+            %
+            % See also getLinkPumpPatternIndex, setLinkPumpPower, setLinkPumpHCurve,
+            %          setLinkPumpECurve, setLinkPumpECost.
+            set_Link_Pump(obj, obj.ToolkitConstants.EN_LINKPATTERN, value, varargin)
         end
         function setNodeElevations(obj, value, varargin)
             % Sets the values of elevation for nodes.
