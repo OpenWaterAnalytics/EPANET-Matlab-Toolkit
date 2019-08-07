@@ -361,6 +361,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkDiameter|Sets the values of diameters|
 |setLinkPipeData|Sets a group of properties for a pipe. (EPANET Version 2.2)|
 |setLinkPumpHeadCurveIndex|Sets the curves index for pumps index|
+|setLinkPumpPatternIndex|Sets the pump speed time pattern index. (EPANET Version 2.2)|
 |setLinkPumpPower|Sets the power for pumps. (EPANET Version 2.2)|
 |setLinkPumpHCurve|Sets the pump head v. flow curve index. (EPANET Version 2.2)|
 |setLinkPumpECurve|Sets the pump efficiency v. flow curve index. (EPANET Version 2.2)|
