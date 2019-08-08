@@ -5197,6 +5197,87 @@ classdef epanet <handle
             %          addNodeJunction, deleteLink, setLinkDiameter.
             index = ENaddlink(obj, pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode);
         end
+        function index = addLinkValve(obj, vID, fromNode, toNode, varargin)
+            % Adds a new valve.
+            % Returns the index of the new valve.
+            %
+            % % Properties that can be set(optional):
+            % 1) Type: PRV (Pressure reducing valve)
+            %          PSV (Pressure sustaining valve)
+            %          PBV (Pressure breaker valve)
+            %          FCV (Flow control valve)
+            %          TCV (Throttle control valve)
+            %          GPV (General purpose valve)
+            % 2) Diameter
+            % 3) Initial Setting
+            % 4) Minor Loss Coefficient
+            %
+            % % If no properties are given, the default values are:
+            %   type = 'GPV'
+            %   diameter = 10 inches (25.4 cm)
+            %   initial setting = 0
+            %   minor Loss Coefficient = 0
+            %
+            % % The examples are based on d = epanet('NET1.inp');
+            %
+            % Example 1:
+            %   % Adds a new valve given no properties.
+            %   valveID = 'newValve_1';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   d.getLinkValveCount                  % Retrieves the number of valves
+            %   valveIndex = d.addLinkValve(valveID, fromNode, toNode);
+            %   d.getLinkValveCount
+            %   d.plot;                              % Plots the network in a new MATLAB figure
+            %
+            % Example 2:
+            %   % Adds a new valve given it's type.
+            %   valveID = 'newValve_2';
+            %   fromNode = '11';
+            %   toNode = '22';
+            %   type = 'PRV';
+            %   d.getLinkValveCount
+            %   valveIndex = d.addLinkValve(valveID, fromNode, toNode, type);
+            %   d.getLinkValveCount
+            %   d.getLinkType(valveIndex)           % Retrieves the new valve's type
+            %   d.plot;
+            %
+            % Example 3:
+            %   % Adds a new valve given it's type, diameter, initial setting and minor loss coefficient.
+            %   valveID = 'newValve_3';
+            %   fromNode = '31';
+            %   toNode = '22';
+            %   type = 'FCV';
+            %   diameter = 15;
+            %   initialSetting = 1;
+            %   minorLossCoeff = 0.2;
+            %   d.getLinkValveCount
+            %   valveIndex = d.addLinkValve(valveID, fromNode, toNode, type, diameter, initialSetting, minorLossCoeff);
+            %   d.getLinkValveCount
+            %   d.getLinkType(valveIndex)
+            %   d.getLinkDiameter(valveIndex)         % Retrieves the new valve's diameter
+            %   d.getLinkInitialSetting(valveIndex)   % Retrieves the new valve's initial setting
+            %   d.getLinkMinorLossCoeff(valveIndex)   % Retrieves the new valve's minor loss coefficient
+            %   d.plot;
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            %          addNodeJunction, deleteLink, setLinkDiameter.
+            if nargin >= 5
+                vtype = eval(['obj.ToolkitConstants.EN_', varargin{1}]);
+            else
+                vtype = obj.ToolkitConstants.EN_GPV;
+            end
+            index = ENaddlink(obj, vID, vtype, fromNode, toNode);
+            if nargin >= 6
+                obj.setLinkDiameter(index, varargin{2});
+            end
+            if nargin >= 7
+                obj.setLinkInitialSetting(index, varargin{3});
+            end
+            if nargin == 8
+                obj.setLinkMinorLossCoeff(index, varargin{4});
+            end
+        end
         function index = addLinkValvePRV(obj, vID, fromNode, toNode)
             % Adds a new PRV valve.
             % Returns the index of the new PRV valve.
