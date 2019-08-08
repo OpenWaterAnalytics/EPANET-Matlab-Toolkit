@@ -229,7 +229,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeTankMixZoneVolume|Retrieves the tank mixing zone volume|
 |getNodeTankMixingModelCode|Retrieves the tank mixing model code|
 |getNodeTankMixingModelType|Retrieves the tank mixing model type (mix1, mix2, fifo, lifo)|
-|getNodeTankMixiningModel|Retrieves the tank mixing model|
 |getNodeTankNameID|Retrieves the tanks IDs|
 |getNodeTankReservoirCount|Retrieves the number of tanks|
 |getNodeTankVolume|Retrieves the tank volume|
