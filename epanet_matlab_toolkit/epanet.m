@@ -5164,22 +5164,79 @@ classdef epanet <handle
             %          addNodeJunction, deleteLink, setLinkDiameter.
             index = ENaddlink(obj, pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode);
         end
-        function index = addLinkPump(obj, pumpID, fromNode, toNode)
+        function index = addLinkPump(obj, pumpID, fromNode, toNode, varargin)
             % Adds a new pump.
             % Returns the index of the new pump.
             %
-            % % The example is based on d=epanet('NET1.inp');
+            % % Properties that can be set(optional):
+            % 1) Initial Status
+            % 2) Initial Speed setting
+            % 3) Power
+            % 4) Pattern index
             %
-            % Example:
-            %   pumpID = 'newPump';
+            % % If no properties are given, the default values are:
+            %   initial status = 1 (OPEN)
+            %   initial speed setting = 1
+            %   power = 0
+            %   pattern index = 0
+            %
+            % % The examples are based on d=epanet('NET1.inp');
+            %
+            % Example 1:
+            %   % Adds a new pump given no properties.
+            %   pumpID = 'newPump_1';
             %   fromNode = '10';
             %   toNode = '21';
+            %   d.getLinkPumpCount                     % Retrieves the number of pumps
             %   pumpIndex = d.addLinkPump(pumpID, fromNode, toNode);
-            %   d.plot
+            %   d.getLinkPumpCount
+            %   d.plot;                                % Plots the network in a new MATLAB figure
+            %
+            % Example 2:
+            %   % Adds a new pump given it's initial status.
+            %   pumpID = 'newPump_2';
+            %   fromNode = '31';
+            %   toNode = '22';
+            %   initialStatus = 0;   % (CLOSED)
+            %   d.getLinkPumpCount
+            %   pumpIndex = d.addLinkPump(pumpID, fromNode, toNode, initialStatus);
+            %   d.getLinkPumpCount
+            %   d.getLinkInitialStatus(pumpIndex)      % Retrieves the new pump's initial status
+            %   d.plot;
+            %   
+            % Example 3:
+            %   % Adds a new pump given it's initial status, initial speed setting, power and pattern index.
+            %   pumpID = 'newPump_3';
+            %   fromNode = '11';
+            %   toNode = '22';
+            %   initialStatus = 1;   % (OPEN)
+            %   initialSetting = 1.2;
+            %   power = 10;
+            %   patternIndex = 1;
+            %   d.getLinkPumpCount
+            %   pumpIndex = d.addLinkPump(pumpID, fromNode, toNode, initialStatus, initialSetting, power, patternIndex);
+            %   d.getLinkPumpCount
+            %   d.getLinkInitialStatus(pumpIndex)
+            %   d.getLinkInitialSetting(pumpIndex)     % Retrieves the new pump's initial setting
+            %   d.getLinkPumpPower(pumpIndex)          % Retrieves the new pump's power
+            %   d.getLinkPumpPatternIndex(pumpIndex)   % Retrieves the new pump's pattern index
+            %   d.plot;
             %
             % See also plot, setLinkNodesIndex, addLinkPipe, 
-            %          addNodeJunction, deleteLink, setLinkDiameter.
+            %          addNodeJunction, deleteLink, setLinkInitialStatus.
             index = ENaddlink(obj, pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode);
+            if nargin >= 5
+                obj.setLinkInitialStatus(index, varargin{1});
+            end
+            if nargin >= 6
+                obj.setLinkInitialSetting(index, varargin{2});
+            end
+            if nargin >= 7
+                obj.setLinkPumpPower(index, varargin{3});
+            end
+            if nargin == 8
+                obj.setLinkPumpPatternIndex(index, varargin{4});
+            end
         end
         function index = addLinkValvePRV(obj, vID, fromNode, toNode)
             % Adds a new PRV valve.
