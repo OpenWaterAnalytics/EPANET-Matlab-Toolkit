@@ -5142,22 +5142,81 @@ classdef epanet <handle
             %          addNodeJunction, deleteLink, setLinkDiameter.
             index = ENaddlink(obj, cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode);
         end
-        function index = addLinkPipe(obj, pipeID, fromNode, toNode)
+        function index = addLinkPipe(obj, pipeID, fromNode, toNode, varargin)
             % Adds a new pipe.
             % Returns the index of the new pipe.
             %
-            % % The example is based on d=epanet('NET1.inp');
+            % % Properties that can be set(optional):
+            % 1) Length
+            % 2) Diameter
+            % 3) Roughness Coefficient
+            % 4) Minor Loss Coefficient
             %
-            % Example:
-            %   pipeID = 'newPipe';
+            % % If no properties are given, the default values are:
+            %   length = 330 feet (~100.5 m)
+            %   diameter = 10 inches (25.4 cm)
+            %   roughness coefficient = 130 (Hazen-Williams formula) or
+            %                           0.15 mm (Darcy-Weisbach formula) or
+            %                           0.01 (Chezy-Manning formula)
+            %   minor Loss Coefficient = 0
+            %
+            % % The examples are based on d = epanet('NET1.inp');
+            %
+            % Example 1:
+            %   % Adds a new pipe given no properties.
+            %   pipeID = 'newPipe_1';
             %   fromNode = '10';
             %   toNode = '21';
+            %   d.getLinkPipeCount                   % Retrieves the number of links
             %   pipeIndex = d.addLinkPipe(pipeID, fromNode, toNode);
-            %   d.plot
+            %   d.getLinkPipeCount
+            %   d.plot;                              % Plots the network in a new MATLAB figure
+            %
+            % Example 2:
+            %   % Adds a new pipe given it's length.
+            %   pipeID = 'newPipe_2';
+            %   fromNode = '11';
+            %   toNode = '22';
+            %   length = 600;
+            %   d.getLinkPipeCount
+            %   pipeIndex = d.addLinkPipe(pipeID, fromNode, toNode, length);
+            %   d.getLinkPipeCount
+            %   d.getLinkLength(pipeIndex)           % Retrieves the new link's length
+            %   d.plot;
+            %
+            % Example 3:
+            %   % Adds a new pipe given it's length, diameter, roughness coefficient and minor loss coefficient.
+            %   pipeID = 'newPipe_3';
+            %   fromNode = '31';
+            %   toNode = '22';
+            %   length = 500;
+            %   diameter = 15;
+            %   roughness = 120;
+            %   minorLossCoeff = 0.2;
+            %   d.getLinkPipeCount
+            %   pipeIndex = d.addLinkPipe(pipeID, fromNode, toNode, length, diameter, roughness, minorLossCoeff);
+            %   d.getLinkPipeCount
+            %   d.getLinkLength(pipeIndex)
+            %   d.getLinkDiameter(pipeIndex)         % Retrieves the new link's diameter
+            %   d.getLinkRoughnessCoeff(pipeIndex)   % Retrieves the new link's roughness coefficient
+            %   d.getLinkMinorLossCoeff(pipeIndex)   % Retrieves the new link's minor loss coefficient
+            %   d.plot;
             %
             % See also plot, setLinkNodesIndex, addLinkPipeCV, 
             %          addNodeJunction, deleteLink, setLinkDiameter.
             index = ENaddlink(obj, pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode);
+            if nargin >= 5
+                obj.setLinkLength(index, varargin{1});
+            end
+            if nargin >= 6
+                obj.setLinkDiameter(index, varargin{2});
+            end
+            if nargin >= 7
+                obj.setLinkRoughnessCoeff(index, varargin{3});
+            end
+            if nargin == 8
+                obj.setLinkMinorLossCoeff(index, varargin{4});
+            end
         end
         function index = addLinkPump(obj, pumpID, fromNode, toNode)
             % Adds a new pump.
