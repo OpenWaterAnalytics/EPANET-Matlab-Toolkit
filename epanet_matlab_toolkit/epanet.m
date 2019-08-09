@@ -6604,8 +6604,8 @@ classdef epanet <handle
             % Sets the values of emitter coefficient for nodes.
             %
             % Example 1:
-            %   nodeset=d.getNodeEmitterCoeff                    % Retrieves the value of all nodes emmitter coefficients
-            %   nodeset(1)=0.1;                                  % First node emitter coefficient = 0.1
+            %   nodeset = d.getNodeEmitterCoeff                  % Retrieves the value of all nodes emmitter coefficients
+            %   nodeset(1) = 0.1;                                % First node emitter coefficient = 0.1
             %   d.setNodeEmitterCoeff(nodeset)                   % Sets the value of all nodes emitter coefficient
             %   d.getNodeEmitterCoeff
             %
@@ -6628,8 +6628,8 @@ classdef epanet <handle
             % Sets the values of initial quality for nodes.
             %
             % Example 1:
-            %   nodeset=d.getNodeInitialQuality                      % Retrieves the value of all nodes initial qualities
-            %   nodeset(1)=0.5;                                      % First node initial quality = 0.5
+            %   nodeset = d.getNodeInitialQuality                    % Retrieves the value of all nodes initial qualities
+            %   nodeset(1) = 0.5;                                    % First node initial quality = 0.5
             %   d.setNodeInitialQuality(nodeset)                     % Sets the values of all nodes initial quality
             %   d.getNodeInitialQuality
             %
