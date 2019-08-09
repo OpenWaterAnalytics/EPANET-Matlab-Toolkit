@@ -454,13 +454,18 @@ classdef epanet <handle
                 j=j+1;
             end
         end 
-        function set_Link_Pump(obj, linkPropertie, value, varargin)
-            pumpCount = obj.getLinkPumpCount;
-            pumpIndices = obj.getLinkPumpIndex;
+        function set_Node_Link(obj, param, fun, propertie, value, varargin)
+            if strcmp(param, 'tank')
+                count = obj.getNodeTankCount;
+                indices = obj.getNodeTankIndex;
+            elseif strcmp(param, 'pump')
+                count = obj.getLinkPumpCount;
+                indices = obj.getLinkPumpIndex;
+            end
             if isempty(varargin{1})
                 j=1;
-                for i=1:pumpCount
-                    [obj.Errcode] = ENsetlinkvalue(pumpIndices(i), linkPropertie, value(j), obj.LibEPANET);
+                for i=1:count
+                    [obj.Errcode] = eval([fun, '(indices(i), propertie, value(j), obj.LibEPANET)']);
                     error(obj.getError(obj.Errcode));
                     if ~isscalar(value)
                         j=j+1;
@@ -468,12 +473,12 @@ classdef epanet <handle
                 end
             else
                 varargin{1} = varargin{1}{1};
-                if ~ismember(value, pumpIndices)
-                    value = pumpIndices(value);
+                if ~ismember(value, indices)
+                    value = indices(value);
                 end
                 j=1;
                 for i=1:length(value)
-                    [obj.Errcode] = ENsetlinkvalue(value(i), linkPropertie, varargin{1}(j), obj.LibEPANET);
+                    [obj.Errcode] = eval([fun, '(value(i), propertie, varargin{1}(j), obj.LibEPANET)']);
                     error(obj.getError(obj.Errcode));
                     if ~isscalar(varargin{1})
                         j=j+1;
@@ -6248,7 +6253,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpPower, setLinkPumpHCurve, setLinkPumpECurve,
             %          setLinkPumpECost, setLinkPumpEPat.
-            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_POWER, value, varargin)
+            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_POWER, value, varargin)
         end
         function setLinkPumpHCurve(obj, value, varargin)
             % Sets the pump head v. flow curve index. (EPANET Version 2.2)
@@ -6281,7 +6286,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpHCurve, setLinkPumpPower, setLinkPumpECurve,
             %          setLinkPumpECost, setLinkPumpEPat.
-            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_HCURVE, value, varargin)
+            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, value, varargin)
         end
         function setLinkPumpECurve(obj, value, varargin)
             % Sets the pump efficiency v. flow curve index. (EPANET Version 2.2)
@@ -6314,7 +6319,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpECurve, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECost, setLinkPumpEPat.
-            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_ECURVE, value, varargin)
+            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, value, varargin)
         end
         function setLinkPumpECost(obj, value, varargin)
             % Sets the pump average energy price. (EPANET Version 2.2)
@@ -6347,7 +6352,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpECost, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpEPat.
-            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_ECOST, value, varargin)
+            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, value, varargin)
         end
         function setLinkPumpEPat(obj, value, varargin)
             % Sets the pump energy price time pattern index. (EPANET Version 2.2)
@@ -6380,7 +6385,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpEPat, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
-            set_Link_Pump(obj, obj.ToolkitConstants.EN_PUMP_EPAT, value, varargin)
+            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, value, varargin)
         end
         function setLinkPumpPatternIndex(obj, value, varargin)
             % Sets the pump speed time pattern index. (EPANET Version 2.2)
@@ -6418,7 +6423,7 @@ classdef epanet <handle
 	    %
             % See also getLinkPumpPatternIndex, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
-            set_Link_Pump(obj, obj.ToolkitConstants.EN_LINKPATTERN, value, varargin)
+            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, value, varargin)
         end
         function value = setLinkPumpHeadCurveIndex(obj, value, varargin)
 	    % Example 1:
@@ -6596,34 +6601,46 @@ classdef epanet <handle
             set_node_demand_pattern(obj, 'ENsetdemandpattern', obj.ToolkitConstants.EN_PATTERN, value, varargin)
         end
         function setNodeEmitterCoeff(obj, value, varargin)
-            % Sets the values of emitter coefficient for nodes
+            % Sets the values of emitter coefficient for nodes.
+            %
             % Example 1:
-            %   nodeset=d.getNodeEmitterCoeff
-            %   nodeset(1)=0;   % First node emitter coefficient = 0
-            %   d.setNodeEmitterCoeff(nodeset)
+            %   nodeset=d.getNodeEmitterCoeff                    % Retrieves the value of all nodes emmitter coefficients
+            %   nodeset(1)=0.1;                                  % First node emitter coefficient = 0.1
+            %   d.setNodeEmitterCoeff(nodeset)                   % Sets the value of all nodes emitter coefficient
             %   d.getNodeEmitterCoeff
+            %
             % Example 2:
             %   nodeIndex = 1;
-            %   d.setNodeEmitterCoeff(nodeIndex,0)   % First node emitter coefficient = 0
-            %   d.getNodeEmitterCoeff
+            %   d.getNodeEmitterCoeff(nodeIndex)
+            %   emitterCoeff = 0;
+            %   d.setNodeEmitterCoeff(nodeIndex, emitterCoeff)   % Sets the value of the 1st node emitter coefficient = 0
+            %   d.getNodeEmitterCoeff(nodeIndex)
+            %
+            % See also getNodeEmitterCoeff, setNodeBaseDemands, setNodeJunctionData.
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, value(j), obj.LibEPANET); j=j+1;
-%                 error(obj.getError(obj.Errcode)); 
+                error(obj.getError(obj.Errcode)); 
             end
         end
         function setNodeInitialQuality(obj, value, varargin)
-            % Sets the values of initial quality for nodes
+            % Sets the values of initial quality for nodes.
+            %
             % Example 1:
-            %   nodeset=d.getNodeInitialQuality
-            %   nodeset(1)=0.5;   % First node initial quality = 0.5
-            %   d.setNodeInitialQuality(nodeset)
+            %   nodeset=d.getNodeInitialQuality                      % Retrieves the value of all nodes initial qualities
+            %   nodeset(1)=0.5;                                      % First node initial quality = 0.5
+            %   d.setNodeInitialQuality(nodeset)                     % Sets the values of all nodes initial quality
             %   d.getNodeInitialQuality
+            %
             % Example 2:
             %   nodeIndex = 1;
-            %   d.setNodeInitialQuality(nodeIndex,0)   % First node initial quality = 0
-            %   d.getNodeInitialQuality
+            %   d.getNodeInitialQuality(nodeIndex)
+            %   initialQuality = 1;
+            %   d.setNodeInitialQuality(nodeIndex, initialQuality)   % Sets the value of the 1st node initial quality
+            %   d.getNodeInitialQuality(nodeIndex)
+            %
+            % See also getNodeInitialQuality, getNodeActualQuality, setNodeJunctionData.
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -6632,20 +6649,33 @@ classdef epanet <handle
             end
         end
         function value = setNodeNameID(obj, value, varargin)
-            % Sets the ID name for nodes
-            % Example: 
-            %       d.setNodeNameID(1, 'newID');
-            %       d.setNodeNameID(cellarrayofnewIDs);
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
-            j=1;
-            if length(indices) == 1
-                [obj.Errcode] = ENsetnodeid(indices, value, obj.LibEPANET);
-                error(obj.getError(obj.Errcode)); 
+            % Sets the ID name for nodes.
+            %
+            % Example 1:
+            %   nodeIndex = 1;
+            %   d.getNodeNameID(nodeIndex)            % Retrieves the ID of the 1st node
+            %   nameID = 'newID';
+            %   d.setNodeNameID(nodeIndex, nameID);   % Sets the ID of the 1st node.
+            %   d.getNodeNameID(nodeIndex)
+            %
+            % Example 2:
+            %   nameID = d.getNodeNameID;             % Retrieves the IDs of all nodes
+            %   nameID{1} = 'newID_1';
+            %   nameID{5} = 'newID_5';
+            %   d.setNodeNameID(nameID);              % Sets the IDs of all nodes
+            %   d.getNodeNameID
+            %
+            % See also getNodeNameID, setNodeComment, setNodeJunctionData.
+            if nargin==3 
+                indices = value;
+                value = {};
+                value{indices}=varargin{1}; 
             else
-                for i=indices
-                    [obj.Errcode] = ENsetnodeid(i, value{j}, obj.LibEPANET); j=j+1;
-                    error(obj.getError(obj.Errcode)); 
-                end   
+                indices = find(~strcmp(obj.getNodeNameID, value));
+            end
+            for i=indices
+                [obj.Errcode] = ENsetnodeid(i, value{i}, obj.LibEPANET);
+                error(obj.getError(obj.Errcode)); 
             end
         end
         function setNodeTankData(obj, index, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
@@ -6704,173 +6734,319 @@ classdef epanet <handle
             end
         end
         function setNodeTankInitialLevel(obj, value, varargin)
-            % Sets the values of initial level for tanks
+            % Sets the values of initial level for tanks.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
             % Example 1:
-            %   nodeset=d.getNodeTankInitialLevel
-            %   nodeset(end)=120;   % Last node(tank) initial level = 120
-            %   d.setNodeTankInitialLevel(nodeset)
+            %   d.getNodeTankInitialLevel                       % Retrieves the initial level of all tanks
+            %   d.setNodeTankInitialLevel(10)                   % Sets the initial level = 10 to every tank
             %   d.getNodeTankInitialLevel
+            %
             % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankInitialLevel(nodeIndex,120)   % Eleventh node(tank) initial level = 120
+            %   % The input array must have a length equal to the number of tanks
+            %   d.setNodeTankInitialLevel([10, 15])             % Sets the initial level = 10 and 15 to the 2 tanks
             %   d.getNodeTankInitialLevel
-            if nargin==3
-                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_TANKLEVEL, varargin{1}, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
-                return;
-            end
-            for i=obj.getNodeTankIndex
-                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_TANKLEVEL, value(i), obj.LibEPANET);
-            end
+            %
+            % Example 3:
+            %   d.setNodeTankInitialLevel(1, 10)                % Sets the initial level = 10 to the 1st tank
+            %   d.getNodeTankInitialLevel
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankInitialLevel(tankIndex, 10)        % Sets the initial level = 10 to the tanks with index 128 and 129
+            %   d.getNodeTankInitialLevel
+            %
+            % Example 5:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankInitialLevel(tankIndex,[10, 15])   % Sets the initial level = 10 and 15 to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankInitialLevel
+            %
+            % See also getNodeTankInitialLevel, setNodeTankMinimumWaterLevel, setNodeTankMaximumWaterLevel,
+            %          setNodeTankMinimumWaterVolume, setNodeTankMinimumFraction, setNodeTankData.
+            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, value, varargin)
         end
         function setNodeTankMixingModelType(obj, value, varargin)
-            % Sets the mixing model type value for tanks
+            % Sets the mixing model type value for tanks.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
             % Example 1:
-            %   nodeset=d.getNodeTankMixingModelType
-            %   nodeset(end)={'MIX1'};   % Last node(tank) mixing model type = MIX1
-            %   d.setNodeTankMixingModelType(nodeset)
+            %   d.getNodeTankMixingModelType                                % Retrieves the  mixing model type of all tanks
+            %   d.setNodeTankMixingModelType('MIX2')                        % Sets the  mixing model type = 'MIX2' to every tank
             %   d.getNodeTankMixingModelType
+            %
             % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMixingModelType(nodeIndex,'MIX1')   % Eleventh node(tank) mixing model type = MIX1
+            %   % The input array must have a length equal to the number of tanks
+            %   d.setNodeTankMixingModelType({'MIX1', 'LIFO'})              % Sets the  mixing model type = 'MIX1' and 'LIFO' to the 2 tanks
             %   d.getNodeTankMixingModelType
-            if nargin==3
-                code=strfind(strcmpi(varargin{1}, obj.TYPEMIXMODEL), 1)-1;
-                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MIXMODEL, code, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
-                return;
+            %
+            % Example 3:
+            %   d.setNodeTankMixingModelType(1, 'FIFO')                     % Sets the  mixing model type = 'FIFO' to the 1st tank
+            %   d.getNodeTankMixingModelType
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMixingModelType(tankIndex, 'MIX1')             % Sets the  mixing model type = 'MIX1' to the tanks with index 128 and 129
+            %   d.getNodeTankMixingModelType
+            %
+            % Example 5:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMixingModelType(tankIndex, {'MIX2', 'LIFO'})   % Sets the  mixing model type = 'MIX2' and 'LIFO' to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankMixingModelType
+            %
+            % See also getNodeTankMixingModelType, setNodeTankBulkReactionCoeff, setNodeTankMinimumFraction,
+            %          setNodeTankMinimumWaterVolume, setNodeTankMinimumWaterLevel, setNodeTankData.
+            if nargin == 2
+                type = value;
+            elseif nargin == 3
+                type = varargin{1};
             end
-            for i=obj.getNodeTankIndex
-                code=strfind(strcmpi(value(i), obj.TYPEMIXMODEL), 1)-1;
-                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_MIXMODEL, code, obj.LibEPANET);
+            if iscell(type)
+                code = zeros(1, length(type));
+                for i = 1:length(type)
+                    code(i)=strfind(strcmpi(type{i}, obj.TYPEMIXMODEL), 1)-1;
+                end
+            elseif ischar(type)
+                code=strfind(strcmpi(type, obj.TYPEMIXMODEL), 1)-1;
             end
+            if nargin == 2
+                value = code;
+            elseif nargin == 3
+                varargin{1} = code;
+            end
+            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MIXMODEL, value, varargin)
         end
         function setNodeTankDiameter(obj, value, varargin)
-            % Sets the diameter value for tanks
+            % Sets the diameter value for tanks.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
             % Example 1:
-            %   nodeset=d.getNodeTankDiameter
-            %   nodeset(end)=50;   % Last node(tank) diameter = 50
-            %   d.setNodeTankDiameter(nodeset)
+            %   d.getNodeTankDiameter                         % Retrieves the diameter of all tanks
+            %   d.setNodeTankDiameter(120)                    % Sets the diameter = 120 to every tank
             %   d.getNodeTankDiameter
+            %
             % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankDiameter(nodeIndex,40)   % Eleventh node(tank) diameter = 40
+            %   % The input array must have a length equal to the number of tanks
+            %   d.setNodeTankDiameter([110, 130])             % Sets the diameter = 110 and 130 to the 2 tanks
             %   d.getNodeTankDiameter
-            if nargin==3
-                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_TANKDIAM, varargin{1}, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
-                return;
-            end
-            for i=obj.getNodeTankIndex
-                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_TANKDIAM, value(i), obj.LibEPANET);
-            end
+            %
+            % Example 3:
+            %   d.setNodeTankDiameter(1, 120)                 % Sets the diameter = 120 to the 1st tank
+            %   d.getNodeTankDiameter
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankDiameter(tankIndex, 150)         % Sets the diameter = 150 to the tanks with index 128 and 129
+            %   d.getNodeTankDiameter
+            %
+            % Example 5:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankDiameter(tankIndex,[100, 120])   % Sets the diameter = 100 and 120 to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankDiameter
+            %
+            % See also getNodeTankDiameter, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
+            %          setNodeTankBulkReactionCoeff, setNodeTankCanOverFlow, setNodeTankData.
+            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_TANKDIAM, value, varargin)
         end
         function setNodeTankMinimumWaterLevel(obj, value, varargin)
-            % Sets the minimum water level value for tanks
+            % Sets the minimum water level value for tanks.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
             % Example 1:
-            %   nodeset=d.getNodeTankMinimumWaterLevel
-            %   nodeset(end)=100;   % Last node(tank) minimum water level = 100
-            %   d.setNodeTankMinimumWaterLevel(nodeset)
+            %   d.getNodeTankMinimumWaterLevel                      % Retrieves the minimum water level of all tanks
+            %   d.setNodeTankMinimumWaterLevel(5)                   % Sets the minimum water level = 5 to every tank
             %   d.getNodeTankMinimumWaterLevel
+            %
             % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMinimumWaterLevel(nodeIndex,90)   % Eleventh node(tank) minimum water level = 90
+            %   % The input array must have a length equal to the number of tanks
+            %   d.setNodeTankMinimumWaterLevel([10, 15])            % Sets the minimum water level = 10 and 15 to the 2 tanks
             %   d.getNodeTankMinimumWaterLevel
-            if nargin==3
-                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MINLEVEL, varargin{1}, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
-                return;
-            end
-            for i=obj.getNodeTankIndex
-                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_MINLEVEL, value(i), obj.LibEPANET);
-            end
+            %
+            % Example 3:
+            %   d.setNodeTankMinimumWaterLevel(1, 5)                % Sets the minimum water level = 5 to the 1st tank
+            %   d.getNodeTankMinimumWaterLevel
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMinimumWaterLevel(tankIndex, 10)       % Sets the minimum water level = 10 to the tanks with index 128 and 129
+            %   d.getNodeTankMinimumWaterLevel
+            %
+            % Example 5:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMinimumWaterLevel(tankIndex,[5, 15])   % Sets the minimum water level = 5 and 15 to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankMinimumWaterLevel
+            %
+            % See also getNodeTankMinimumWaterLevel, setNodeTankInitialLevel, setNodeTankMaximumWaterLevel,
+            %          setNodeTankMinimumWaterVolume, setNodeTankMinimumFraction, setNodeTankData.
+            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, value, varargin)
         end
         function setNodeTankMinimumWaterVolume(obj, value, varargin)
-            % Sets the minimum water volume value for tanks
+            % Sets the minimum water volume value for tanks.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
             % Example 1:
-            %   nodeset=d.getNodeTankMinimumWaterVolume
-            %   nodeset(end)=10000;   % Last node(tank) minimum water volume = 10000
-            %   d.setNodeTankMinimumWaterVolume(nodeset)
+            %   d.getNodeTankMinimumWaterVolume                           % Retrieves the minimum water volume of all tanks
+            %   d.setNodeTankMinimumWaterVolume(1000)                     % Sets the minimum water volume = 1000 to every tank
             %   d.getNodeTankMinimumWaterVolume
+            %
             % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMinimumWaterVolume(nodeIndex,10000)   % Eleventh node(tank) minimum water volume = 10000
-            %   d.getNodeTankMinimumWaterVolume(nodeIndex)
-            if nargin==3
-                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MINVOLUME, varargin{1}, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
-                return;
-            end
-            for i=obj.getNodeTankIndex
-                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_MINVOLUME, value(i), obj.LibEPANET);
-            end
+            %   % The input array must have a length equal to the number of tanks
+            %   d.setNodeTankMinimumWaterVolume([1500, 2000])             % Sets the minimum water volume = 1500 and 2000 to the 2 tanks
+            %   d.getNodeTankMinimumWaterVolume
+            %
+            % Example 3:
+            %   d.setNodeTankMinimumWaterVolume(1, 1000)                  % Sets the minimum water volume = 1000 to the 1st tank
+            %   d.getNodeTankMinimumWaterVolume
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMinimumWaterVolume(tankIndex, 1500)          % Sets the minimum water volume = 1500 to the tanks with index 128 and 129
+            %   d.getNodeTankMinimumWaterVolume
+            %
+            % Example 5:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMinimumWaterVolume(tankIndex,[1000, 2000])   % Sets the minimum water volume = 1000 and 2000 to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankMinimumWaterVolume
+            %
+            % See also getNodeTankMinimumWaterVolume, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
+            %          setNodeTankMaximumWaterLevel, setNodeTankMinimumFraction, setNodeTankData.
+            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, value, varargin)
         end
         function setNodeTankMaximumWaterLevel(obj, value, varargin)
-            % Sets the maximum water level value for tanks
+            % Sets the maximum water level value for tanks.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
             % Example 1:
-            %   nodeset=d.getNodeTankMaximumWaterLevel
-            %   nodeset(end)=150;   % Last node(tank) maximum water level = 150
-            %   d.setNodeTankMaximumWaterLevel(nodeset)
+            %   d.getNodeTankMaximumWaterLevel                       % Retrieves the maximum water level of all tanks
+            %   d.setNodeTankMaximumWaterLevel(35)                   % Sets the maximum water level = 35 to every tank
             %   d.getNodeTankMaximumWaterLevel
+            %
             % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMaximumWaterLevel(nodeIndex,150)   % Eleventh node(tank) maximum water level = 150
-            %   d.getNodeTankMaximumWaterLevel(nodeIndex)
-            if nargin==3
-                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MAXLEVEL, varargin{1}, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
-                return;
-            end
-            for i=obj.getNodeTankIndex
-                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_MAXLEVEL, value(i), obj.LibEPANET);
-            end
+            %   % The input array must have a length equal to the number of tanks
+            %   d.setNodeTankMaximumWaterLevel([30, 40])             % Sets the maximum water level = 30 and 40 to the 2 tanks
+            %   d.getNodeTankMaximumWaterLevel
+            %
+            % Example 3:
+            %   d.setNodeTankMaximumWaterLevel(1, 35)                % Sets the maximum water level = 35 to the 1st tank
+            %   d.getNodeTankMaximumWaterLevel
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMaximumWaterLevel(tankIndex, 30)        % Sets the maximum water level = 30 to the tanks with index 128 and 129
+            %   d.getNodeTankMaximumWaterLevel
+            %
+            % Example 5:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMaximumWaterLevel(tankIndex,[35, 45])   % Sets the maximum water level = 35 and 45 to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankMaximumWaterLevel
+            %
+            % See also getNodeTankMaximumWaterLevel, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
+            %          setNodeTankMinimumWaterVolume, setNodeTankMinimumFraction, setNodeTankData.
+            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, value, varargin)
         end
        function setNodeTankCanOverFlow(obj, value, varargin)
-            % Sets the tank can overflow (= 1) or not (= 0)
-            % EPANET Version 2.2
-            % Example:
-            %   Nindex = d.getNodeIndex('2');
+            % Sets the tank can-overflow (= 1) or not (= 0). (EPANET Version 2.2)
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   d.getNodeTankCanOverFlow                     % Retrieves the can-overflow of all tanks
+            %   d.setNodeTankCanOverFlow(1)                  % Sets the can-overflow = 1 to every tank
             %   d.getNodeTankCanOverFlow
-            %   d.setNodeTankCanOverFlow(Nindex, 1);
+            %
+            % Example 2:
+            %   % The input array must have a length equal to the number of tanks
+            %   d.setNodeTankCanOverFlow([1, 0])             % Sets the can-overflow = 1 and 0 to the 2 tanks
             %   d.getNodeTankCanOverFlow
-            if nargin==3
-                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_CANOVERFLOW, varargin{1}, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
-                return;
-            end
-            for i=obj.getNodeTankIndex
-                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_CANOVERFLOW, value(i), obj.LibEPANET);
-            end
+            %
+            % Example 3:
+            %   d.setNodeTankCanOverFlow(1, 0)               % Sets the can-overflow = 0 to the 1st tank
+            %   d.getNodeTankCanOverFlow
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankCanOverFlow(tankIndex, 1)       % Sets the can-overflow = 1 to the tanks with index 128 and 129
+            %   d.getNodeTankCanOverFlow
+            %
+            % Example 5:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankCanOverFlow(tankIndex,[0, 1])   % Sets the can-overflow = 0 and 1 to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankCanOverFlow
+            %
+            % See also getNodeTankCanOverFlow, setNodeTankBulkReactionCoeff, setNodeTankMinimumWaterLevel,
+            %          setNodeTankMinimumWaterVolume, setNodeTankDiameter, setNodeTankData.
+            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_CANOVERFLOW, value, varargin)
         end
         function setNodeTankMinimumFraction(obj, value, varargin)
-            % Sets the minimum fraction value for tanks
+            % Sets the tank mixing fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
             % Example 1:
-            %   nodeset=d.getNodeTankMinimumFraction
-            %   nodeset(end)=1;   % Last node(tank) minimum fraction = 1
-            %   d.setNodeTankMinimumFraction(nodeset)
+            %   d.getNodeTankMinimumFraction                     % Retrieves the mixing fraction of all tanks
+            %   d.setNodeTankMinimumFraction(0)                  % Sets the mixing fraction = 0 to every tank
             %   d.getNodeTankMinimumFraction
+            %
             % Example 2:
-            %   nodeIndex = 11;
-            %   d.setNodeTankMinimumFraction(nodeIndex,1)   % Eleventh node(tank) minimum fraction = 1
-            %   d.getNodeTankMinimumFraction(nodeIndex)
-            if nargin==3
-                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_MIXFRACTION, varargin{1}, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
-                return;
-            end
-            for i=obj.getNodeTankIndex
-                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_MIXFRACTION, value(i), obj.LibEPANET);
-            end
+            %   % The input array must have a length equal to the number of tanks
+            %   d.setNodeTankMinimumFraction([1, 0])             % Sets the mixing fraction = 1 and 0 to the 2 tanks
+            %   d.getNodeTankMinimumFraction
+            %
+            % Example 3:
+            %   d.setNodeTankMinimumFraction(1, 0)               % Sets the mixing fraction = 0 to the 1st tank
+            %   d.getNodeTankMinimumFraction
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMinimumFraction(tankIndex, 1)       % Sets the mixing fraction = 1 to the tanks with index 128 and 129
+            %   d.getNodeTankMinimumFraction
+            %
+            % Example 5:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankMinimumFraction(tankIndex,[1, 0])   % Sets the mixing fraction = 1 and 0 to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankMinimumFraction
+            %
+            % See also getNodeTankMinimumFraction, setNodeTankMixingModelType, setNodeTankMinimumWaterLevel,
+            %          setNodeTankMinimumWaterVolume, setNodeTankDiameter, setNodeTankData.
+            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, value, varargin)
         end
         function setNodeTankBulkReactionCoeff(obj, value, varargin)
-            if nargin==3
-                [obj.Errcode] = ENsetnodevalue(value, obj.ToolkitConstants.EN_TANK_KBULK, varargin{1}, obj.LibEPANET);
-                if obj.Errcode, error(obj.getError(obj.Errcode)); end 
-                return;
-            end
-            for i=obj.getNodeTankIndex
-                [obj.Errcode] = ENsetnodevalue(i, obj.ToolkitConstants.EN_TANK_KBULK, value(i), obj.LibEPANET);
-            end
+            % Sets the tank bulk reaction coefficient.
+            %
+            % The examples are based on d=epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   d.getNodeTankBulkReactionCoeff                        % Retrieves the  bulk reaction coefficient of all tanks
+            %   d.setNodeTankBulkReactionCoeff(-0.5)                  % Sets the bulk reaction coefficient = -0.5 to every tank
+            %   d.getNodeTankBulkReactionCoeff
+            %
+            % Example 2:
+            %   % The input array must have a length equal to the number of tanks
+            %   d.setNodeTankBulkReactionCoeff([0, -0.5])             % Sets the bulk reaction coefficient = 0 and -0.5 to the 2 tanks
+            %   d.getNodeTankBulkReactionCoeff
+            %
+            % Example 3:
+            %   d.setNodeTankBulkReactionCoeff(1, -0.5)               % Sets the bulk reaction coefficient = -0.5 to the 1st tank
+            %   d.getNodeTankBulkReactionCoeff
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankBulkReactionCoeff(tankIndex, 0)          % Sets the bulk reaction coefficient = 0 to the tanks with index 128 and 129
+            %   d.getNodeTankBulkReactionCoeff
+            %
+            % Example 5:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.setNodeTankBulkReactionCoeff(tankIndex,[-0.5, 0])   % Sets the bulk reaction coefficient = -0.5 and 0 to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankBulkReactionCoeff
+            %
+            % See also getNodeTankBulkReactionCoeff, setNodeTankInitialLevel, setNodeTankMixingModelType,
+            %          setNodeTankCanOverFlow, setNodeTankDiameter, setNodeTankData.
+            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, value, varargin)
         end
         function setNodeSourceQuality(obj, value, varargin)
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
