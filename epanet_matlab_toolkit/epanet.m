@@ -12757,24 +12757,24 @@ while 1
         % Options
     elseif sect == 1
         atline = checktlines(tline);
-        
+        res = atline{2};
         switch atline{1}
             case 'TIMESTEP'
-                value.TimeStep=str2double(atline{2}); 
+                value.TimeStep=str2double(res); 
             case 'AREA_UNITS'
-                value.AreaUnits=atline{2};  
+                value.AreaUnits=res;  
             case 'RATE_UNITS'
-                value.RateUnits=atline{2};  
+                value.RateUnits=res;  
             case 'SOLVER'
-                value.Solver=atline{2};  
+                value.Solver=res;  
             case 'RTOL'
-                value.Rtol=str2double(atline{2});  
+                value.Rtol=str2double(res);  
             case 'ATOL'
-                value.Atol=str2double(atline{2});  
+                value.Atol=str2double(res);  
             case 'COUPLING'
-                value.Coupling=atline{2};   
+                value.Coupling=res;   
             case 'COMPILER'
-                value.Compiler=atline{2};  
+                value.Compiler=res;  
         end
     end
 end
