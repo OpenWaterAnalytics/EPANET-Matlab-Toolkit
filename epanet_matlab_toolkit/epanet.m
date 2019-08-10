@@ -528,6 +528,9 @@ classdef epanet <handle
                 elseif isempty(extra)
                     [indices, ~] = getNodeJunctionIndices(obj,[]);
                     param = value;
+                    if iscell(value)
+                        param = value{1};
+                    end
                 end
                 for i = 1:length(indices)
                     [obj.Errcode] = eval([fun, '(indices(i), categ, param(i), obj.LibEPANET)']);
@@ -6733,6 +6736,7 @@ classdef epanet <handle
             % For the following examples EPANET Version 2.1 or higher is required.
             %
             % If a category is not given, the default is categoryIndex = 1.
+            %   d = epanet('BWSN_Network_1.inp');
             %
             % Example 4:
             %   nodeIndex = 121;
