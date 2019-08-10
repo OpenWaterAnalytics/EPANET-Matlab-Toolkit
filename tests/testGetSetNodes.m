@@ -1,7 +1,7 @@
 %% EPANET-Matlab Toolkit Test Part 2
 % This file is provided to ensure that all functions can be executed
 % correctly.
-% Press F10 for step-by-step execution. You may also use the breakpoints, 
+% Press F10 for step-by-step execution. You may also use the breakpoints,  
 % indicated with a short dash (-) on the left of each line number.
 clc;
 clear;
@@ -11,7 +11,7 @@ close all;
 inpname='Net1.inp';  
 % Net1 Net2 Net3 BWSN_Network_1 
 d=epanet(inpname);
-% d=epanet(inpname, 'epanet2');
+% d=epanet(inpname,  'epanet2');
 
 %% *Get Nodes Data (EXAMPLES)*
 all_elevations = d.getNodeElevations;
@@ -27,16 +27,16 @@ elevationsSp = d.getNodeElevations([1 5 10]);
 disp(elevationsSp);
 
 
-newFunctionsDev2_1 = {'ENgetpumptype' , 'ENgetheadcurveindex', 'ENsetcurvevalue',...
-            'ENsetcurve', 'ENaddcurve', 'ENgetcurvevalue', 'ENgetcurve',...
-            'ENgetcurvelen', 'ENgetcurveid', 'ENgetcurveindex', 'ENsetcoord',...
-            'ENgetcoord', 'ENgetstatistic', 'ENgetnumdemands', 'ENgetbasedemand',...	
-            'ENgetdemandpattern', 'ENsetbasedemand', 'ENgetaveragepatternvalue'};
+newFunctionsDev2_1 = {'ENgetpumptype' ,  'ENgetheadcurveindex',  'ENsetcurvevalue', ...
+            'ENsetcurve',  'ENaddcurve',  'ENgetcurvevalue',  'ENgetcurve', ...
+            'ENgetcurvelen',  'ENgetcurveid',  'ENgetcurveindex',  'ENsetcoord', ...
+            'ENgetcoord',  'ENgetstatistic',  'ENgetnumdemands',  'ENgetbasedemand', ...	
+            'ENgetdemandpattern',  'ENsetbasedemand',  'ENgetaveragepatternvalue'};
         
 %% New Functions 2.1
 nF=0; % old dll
 for i=1:length(newFunctionsDev2_1)
-    if sum(strcmp(d.libFunctions,newFunctionsDev2_1(i)))
+    if sum(strcmp(d.libFunctions, newFunctionsDev2_1(i)))
         nF=1; % new dll
         break;
     end
@@ -156,95 +156,95 @@ d.getNodeElevations
 d.setNodeElevations(2*d.getNodeElevations);
 d.getNodeElevations
 d.getNodeElevations(2)
-d.setNodeElevations(2,200); %index, value
+d.setNodeElevations(2, 200); %index,  value
 d.getNodeElevations(2)
 
 d.getNodeEmitterCoeff
-d.setNodeEmitterCoeff(2*ones(1,d.NodeCount));
+d.setNodeEmitterCoeff(2*ones(1, d.NodeCount));
 d.getNodeEmitterCoeff
 d.getNodeEmitterCoeff(2)
-d.setNodeEmitterCoeff(2,1.5); %index, value
+d.setNodeEmitterCoeff(2, 1.5); %index,  value
 d.getNodeEmitterCoeff(2)
 
 d.getNodeInitialQuality
 d.setNodeInitialQuality(2*d.getNodeInitialQuality);
 d.getNodeInitialQuality
 d.getNodeInitialQuality(2)
-d.setNodeInitialQuality(2,1.5); %index, value
+d.setNodeInitialQuality(2, 1.5); %index,  value
 d.getNodeInitialQuality(2)
 
 if nF==1
     d.getNodeCoordinates(2)
-    d.setNodeCoordinates(2,[10 10]);
+    d.setNodeCoordinates(2, [10 10]);
     d.getNodeCoordinates(2)
 
     d.getNodeBaseDemands{1}
-    d.setNodeBaseDemands(3,20);
+    d.setNodeBaseDemands(3, 20);
     d.getNodeBaseDemands{1}
 
     d.getNodeDemandPatternIndex{1}
-    d.setNodeDemandPatternIndex(3,0); %remove pattern..
+    d.setNodeDemandPatternIndex(3, 0); %remove pattern..
     d.getNodeDemandPatternIndex{1}
 end
 
 d.getNodeSourceType
-d.setNodeSourceType(1,'MASS')
-d.setNodeSourceType(2,'CONCEN')
-d.setNodeSourceType(3,'SETPOINT')
-d.setNodeSourceType(4,'FLOWPACED')
+d.setNodeSourceType(1, 'MASS')
+d.setNodeSourceType(2, 'CONCEN')
+d.setNodeSourceType(3, 'SETPOINT')
+d.setNodeSourceType(4, 'FLOWPACED')
 d.getNodeSourceType
 
 d.getNodeSourcePatternIndex
-d.setNodeSourcePatternIndex(1,1);
+d.setNodeSourcePatternIndex(1, 1);
 d.getNodeSourcePatternIndex
 
 d.getNodeSourceQuality
 d.setNodeSourceQuality(2*d.getNodeSourceQuality);
 d.getNodeSourceQuality
-d.setNodeSourceQuality(3,20);
+d.setNodeSourceQuality(3, 20);
 d.getNodeSourceQuality
 
 %% Set tanks info
 d.getNodeTankInitialLevel
 d.setNodeTankInitialLevel(d.getNodeTankInitialLevel+20);
 v=d.getNodeTankInitialLevel
-d.setNodeTankInitialLevel(tankInd,v(tankInd)+10);
+d.setNodeTankInitialLevel(tankInd, v+10);
 d.getNodeTankInitialLevel
 
 d.getNodeTankDiameter
 d.setNodeTankDiameter(d.getNodeTankDiameter+20);
 d.getNodeTankDiameter
-d.setNodeTankDiameter(tankInd,100);
+d.setNodeTankDiameter(tankInd, 100);
 d.getNodeTankDiameter
 
 d.getNodeTankBulkReactionCoeff
 d.setNodeTankBulkReactionCoeff(d.getNodeTankBulkReactionCoeff+1);
 d.getNodeTankBulkReactionCoeff
-d.setNodeTankBulkReactionCoeff(tankInd,-1);
+d.setNodeTankBulkReactionCoeff(tankInd, -1);
 d.getNodeTankBulkReactionCoeff
 
 d.getNodeTankMaximumWaterLevel
 d.setNodeTankMaximumWaterLevel(d.getNodeTankMaximumWaterLevel+21);
 d.getNodeTankMaximumWaterLevel
-d.setNodeTankMaximumWaterLevel(tankInd,200);
+d.setNodeTankMaximumWaterLevel(tankInd, 200);
 d.getNodeTankMaximumWaterLevel
 
 d.getNodeTankMinimumWaterLevel
 d.setNodeTankMinimumWaterLevel(d.getNodeTankMinimumWaterLevel-21);
 n=d.getNodeTankMinimumWaterLevel
-d.setNodeTankMinimumWaterLevel(tankInd,n(tankInd)+20);
+d.setNodeTankMinimumWaterLevel(tankInd, n+20);
 d.getNodeTankMinimumWaterLevel
 
 d.getNodeTankMinimumFraction
-d.setNodeTankMinimumFraction(d.getNodeTankMinimumFraction+0.1);
+d.setNodeTankMinimumFraction(d.getNodeTankMinimumFraction-0.1);
 d.getNodeTankMinimumFraction
-d.setNodeTankMinimumFraction(tankInd,0.2);
+d.setNodeTankMinimumFraction(tankInd, 0.2);
 d.getNodeTankMinimumFraction
 
 d.getNodeTankMinimumWaterVolume
 d.setNodeTankMinimumWaterVolume(d.getNodeTankMinimumWaterVolume+10000);
 d.getNodeTankMinimumWaterVolume
-d.setNodeTankMinimumWaterVolume(tankInd,20000);
+d.setNodeTankMinimumWaterVolume(tankInd, 20000);
 d.getNodeTankMinimumWaterVolume
 
 values = d.getNodeTankMixingModelType 
@@ -253,7 +253,7 @@ values{end}='MIX2';
 d.setNodeTankMixingModelType(values);
 d.getNodeTankMixingModelType 
 d.getNodeTankMixingModelCode
-d.setNodeTankMixingModelType(tankInd,'FIFO');
+d.setNodeTankMixingModelType(tankInd, 'FIFO');
 d.getNodeTankMixingModelType 
 d.getNodeTankMixingModelCode
 
