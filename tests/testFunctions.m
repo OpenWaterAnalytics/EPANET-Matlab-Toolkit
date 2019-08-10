@@ -357,7 +357,7 @@ d.getNodeInitialQuality
 
 if d.getNodeTankCount
     values = d.getNodeTankInitialLevel
-    values(end)=100; 
+    values(end)= values(end) + 10; 
     d.setNodeTankInitialLevel(values)  
     d.getNodeTankInitialLevel
 
