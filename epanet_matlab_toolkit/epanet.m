@@ -7904,38 +7904,38 @@ classdef epanet <handle
             [~, ~, value] = getEquations(obj.MSXFile);
         end
         function value = getMSXOptions(obj)
-            [value] = get_MSX_Options(obj.MSXFile);
+            [value] = get_MSX_Options(obj.MSXFile, '', 1);
         end
         function value = getMSXTimeStep(obj)
-            [value] = get_MSX_Options(obj.MSXFile);
+            [value] = get_MSX_Options(obj.MSXFile, 'timestep', 0);
             value = value.TimeStep;
         end
         function value = getMSXSolver(obj)
-            [value] = get_MSX_Options(obj.MSXFile);
+            [value] = get_MSX_Options(obj.MSXFile, 'solver', 0);
             value = value.Solver;
         end
         function value = getMSXAreaUnits(obj)
-            [value] = get_MSX_Options(obj.MSXFile);
+            [value] = get_MSX_Options(obj.MSXFile, 'area_units', 0);
             value = value.AreaUnits;
         end        
         function value = getMSXRateUnits(obj)
-            [value] = get_MSX_Options(obj.MSXFile);
+            [value] = get_MSX_Options(obj.MSXFile, 'rate_units', 0);
             value = value.RateUnits;
         end 
         function value = getMSXRtol(obj)
-            [value] = get_MSX_Options(obj.MSXFile);
+            [value] = get_MSX_Options(obj.MSXFile, 'rtol', 0);
             value = value.Rtol;
         end 
         function value = getMSXAtol(obj)
-            [value] = get_MSX_Options(obj.MSXFile);
+            [value] = get_MSX_Options(obj.MSXFile, 'atol', 0);
             value = value.Atol;
         end
         function value = getMSXCoupling(obj)
-            [value] = get_MSX_Options(obj.MSXFile);
+            [value] = get_MSX_Options(obj.MSXFile, 'COUPLING', 0);
             value = value.Coupling;
         end
         function value = getMSXCompiler(obj)
-            [value] = get_MSX_Options(obj.MSXFile);
+            [value] = get_MSX_Options(obj.MSXFile, 'compiler', 0);
             value = value.Compiler;
         end
         function value = getMSXSpeciesCount(obj)
@@ -12706,7 +12706,7 @@ while 1
 end
 fclose(fid);
 end
-function value = get_MSX_Options(msxname)
+function value = get_MSX_Options(msxname, param, getall)
 
 if isempty(msxname)
     warning('Please load MSX File.');
@@ -12758,23 +12758,29 @@ while 1
     elseif sect == 1
         atline = checktlines(tline);
         res = atline{2};
-        switch atline{1}
-            case 'TIMESTEP'
-                value.TimeStep=str2double(res); 
-            case 'AREA_UNITS'
-                value.AreaUnits=res;  
-            case 'RATE_UNITS'
-                value.RateUnits=res;  
-            case 'SOLVER'
-                value.Solver=res;  
-            case 'RTOL'
-                value.Rtol=str2double(res);  
-            case 'ATOL'
-                value.Atol=str2double(res);  
-            case 'COUPLING'
-                value.Coupling=res;   
-            case 'COMPILER'
-                value.Compiler=res;  
+        if strcmpi(atline{1}, param) || (isempty(param))
+            switch atline{1}
+                case 'TIMESTEP'
+                   value.TimeStep = str2double(res);
+                case 'AREA_UNITS'
+                    value.AreaUnits=res;  
+                case 'RATE_UNITS'
+                    value.RateUnits=res;  
+                case 'SOLVER'
+                    value.Solver=res;  
+                case 'RTOL'
+                    value.Rtol=str2double(res);  
+                case 'ATOL'
+                    value.Atol=str2double(res);  
+                case 'COUPLING'
+                    value.Coupling=res;   
+                case 'COMPILER'
+                    value.Compiler=res;  
+            end
+            if (getall == 0 && ~isempty(param))
+                fclose(fid);
+                return
+            end
         end
     end
 end
