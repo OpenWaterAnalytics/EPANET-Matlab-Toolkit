@@ -488,9 +488,9 @@ classdef epanet <handle
         end
         function value = get_node_link(obj, param, fun, propertie, varargin)
             if strcmp(param, 'tank')
-                indices = obj.getNodeTankIndex;
+                indices = obj.getNodeTankIndex; % obj.getNodeIndex;
             elseif strcmp(param, 'pump')
-                indices = obj.getLinkPumpIndex;
+                indices = obj.getLinkPumpIndex; % obj.getLinkIndex;
             end
             if isempty(varargin{1})
                 value = zeros(1, length(indices));
@@ -3178,10 +3178,11 @@ classdef epanet <handle
             % Retrieves the tank diameters.
             %
             % Example 1:
-            %   d.getNodeTankDiameter       % Retrieves the values of all nodes tank diameters
+            %   d.getNodeTankDiameter            % Retrieves the values of all nodes tank diameters
             %
             % Example 2:
-            %   d.getNodeTankDiameter(11)   % Retrieves the value of the 11th node(i.e. tank) tank diameter
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankDiameter(tankIndex) % Retrieves the value of the 11th node(i.e. tank) tank diameter
             %
             % See also setNodeTankDiameter, getNodeTankBulkReactionCoeff, getNodeTankInitialLevel, 
             %          getNodeTankMixingModelType, getNodeTankVolume, getNodeTankNameID.
@@ -3191,10 +3192,11 @@ classdef epanet <handle
             % Retrieves the tank minimum water volume.
             %
             % Example 1:
-            %   d.getNodeTankMinimumWaterVolume       % Retrieves the values of all nodes tank minimum water volume
+            %   d.getNodeTankMinimumWaterVolume             % Retrieves the values of all nodes tank minimum water volume
             %
             % Example 2:
-            %   d.getNodeTankMinimumWaterVolume(11)   % Retrieves the value of the 11th node(i.e. tank) tank minimum water volume
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMinimumWaterVolume(tankIndex)  % Retrieves the value of the 11th node(i.e. tank) tank minimum water volume
             %
             % See also setNodeTankMinimumWaterVolume, getNodeTankMaximumWaterVolume, getNodeTankInitialWaterVolume,
             %          getNodeTankInitialLevel,  getNodeTankVolume, getNodeTankMixZoneVolume.
@@ -3204,10 +3206,11 @@ classdef epanet <handle
             % Retrieves the tank volume curve index.
             %
             % Example 1:
-            %   d.getNodeTankVolumeCurveIndex       % Retrieves the values of all nodes tank volume curve index
+            %   d.getNodeTankVolumeCurveIndex              % Retrieves the values of all nodes tank volume curve index
             %
             % Example 2:
-            %   d.getNodeTankVolumeCurveIndex(11)   % Retrieves the value of the 11th node(i.e. tank) tank volume curve index
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankVolumeCurveIndex(tankIndex)   % Retrieves the value of the 11th node(i.e. tank) tank volume curve index
             %
             % See also getNodeTankVolume, getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume,
             %          getNodeTankInitialWaterVolume, getNodeTankMixZoneVolume.
@@ -3217,10 +3220,11 @@ classdef epanet <handle
             % Retrieves the tank minimum water level.
             %
             % Example 1:
-            %   d.getNodeTankMinimumWaterLevel       % Retrieves the values of all nodes tank minimum water level
+            %   d.getNodeTankMinimumWaterLevel             % Retrieves the values of all nodes tank minimum water level
             %
             % Example 2:
-            %   d.getNodeTankMinimumWaterLevel(11)   % Retrieves the value of the 11th node(i.e. tank) tank minimum water level
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMinimumWaterLevel(tankIndex)  % Retrieves the value of the 11th node(i.e. tank) tank minimum water level
             %
             % See also setNodeTankMinimumWaterLevel, getNodeTankMaximumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
@@ -3230,10 +3234,11 @@ classdef epanet <handle
             % Retrieves the tank maximum water level.
             %
             % Example 1:
-            %   d.getNodeTankMaximumWaterLevel       % Retrieves the values of all nodes tank maximum water level
+            %   d.getNodeTankMaximumWaterLevel             % Retrieves the values of all nodes tank maximum water level
             %
             % Example 2:
-            %   d.getNodeTankMaximumWaterLevel(11)   % Retrieves the value of the 11th node(i.e. tank) tank maximum water level
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMaximumWaterLevel(tankIndex)  % Retrieves the value of the 11th node(i.e. tank) tank maximum water level
             %
             % See also setNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
@@ -4608,117 +4613,117 @@ classdef epanet <handle
             obj.openHydraulicAnalysis;
             obj.initializeHydraulicAnalysis
             totalsteps=obj.getTimeSimulationDuration/obj.getTimeHydraulicStep;
-            initnodematrix=zeros(totalsteps, obj.getNodeCount);
-            initlinkmatrix=zeros(totalsteps, obj.getLinkCount);
+            initnodematrix = zeros(totalsteps, obj.getNodeCount);
+            initlinkmatrix = zeros(totalsteps, obj.getLinkCount);
             if size(varargin, 2)==0
-                varargin={'time', 'pressure', 'demand', 'demanddeficit', 'head', 'tankvolume', 'flow', 'velocity', 'headloss', 'status', 'setting', 'energy', 'efficiency', 'state'};
+                varargin = {'time', 'pressure', 'demand', 'demanddeficit', 'head', 'tankvolume', 'flow', 'velocity', 'headloss', 'status', 'setting', 'energy', 'efficiency', 'state'};
                 if ~sum(strcmpi(fields(obj.ToolkitConstants), 'EN_EFFICIENCY'))
-                    varargin{end}={''};
+                    varargin{end} = {''};
                 end
             else
-                for i=1:length(varargin)
+                for i = 1:length(varargin)
                     if isnumeric(varargin{i})
-                        sensingnodes=i;
+                        sensingnodes = i;
                     end
                 end
             end
             if find(strcmpi(varargin, 'time'))
-                value.Time=zeros(totalsteps, 1);
+                value.Time = zeros(totalsteps, 1);
             end
             if find(strcmpi(varargin, 'pressure'))
-                value.Pressure=initnodematrix;
+                value.Pressure = initnodematrix;
             end
             if find(strcmpi(varargin, 'demand'))
-                value.Demand=initnodematrix;
+                value.Demand = initnodematrix;
             end
             if find(strcmpi(varargin, 'demanddeficit'))
-                value.DemandDeficit=initnodematrix;
+                value.DemandDeficit = initnodematrix;
             end
             if find(strcmpi(varargin, 'demandSensingNodes'))
-                value.DemandSensingNodes=zeros(totalsteps, length(varargin{sensingnodes}));
-                value.SensingNodesIndices=varargin{sensingnodes};
+                value.DemandSensingNodes = zeros(totalsteps, length(varargin{sensingnodes}));
+                value.SensingNodesIndices = varargin{sensingnodes};
             end
             if find(strcmpi(varargin, 'head'))
-                value.Head=initnodematrix;
+                value.Head = initnodematrix;
             end
             if find(strcmpi(varargin, 'tankvolume'))
-                value.TankVolume=initnodematrix;
+                value.TankVolume = initnodematrix;
             end
             if find(strcmpi(varargin, 'flow'))
-                value.Flow=initlinkmatrix;
+                value.Flow = initlinkmatrix;
             end
             if find(strcmpi(varargin, 'velocity'))
-                value.Velocity=initlinkmatrix;
+                value.Velocity = initlinkmatrix;
             end
             if find(strcmpi(varargin, 'headloss'))
-                value.HeadLoss=initlinkmatrix;
+                value.HeadLoss = initlinkmatrix;
             end
             if find(strcmpi(varargin, 'status'))
-                value.Status=initlinkmatrix;
+                value.Status = initlinkmatrix;
             end
             if find(strcmpi(varargin, 'setting'))
-                value.Setting=initlinkmatrix;
+                value.Setting = initlinkmatrix;
             end
             if find(strcmpi(varargin, 'energy'))
-                value.Energy=initlinkmatrix;
+                value.Energy = initlinkmatrix;
             end
             if find(strcmpi(varargin, 'efficiency'))
-                value.Efficiency=initlinkmatrix;
+                value.Efficiency = initlinkmatrix;
             end
             if find(strcmpi(varargin, 'state'))
-                value.State=initlinkmatrix;
+                value.State = initlinkmatrix;
             end
             clear initlinkmatrix initnodematrix;
-            k=1;tstep=1;
+            k = 1;tstep = 1;
             while (tstep>0)
-                t=obj.runHydraulicAnalysis;
+                t = obj.runHydraulicAnalysis;
                 if find(strcmpi(varargin, 'time'))
-                    value.Time(k, :)=t;
+                    value.Time(k, :) = t;
                 end
                 if find(strcmpi(varargin, 'pressure'))
-                    value.Pressure(k, :)=obj.getNodePressure;
+                    value.Pressure(k, :) = obj.getNodePressure;
                 end
                 if find(strcmpi(varargin, 'demand'))
-                    value.Demand(k, :)=obj.getNodeActualDemand;
+                    value.Demand(k, :) = obj.getNodeActualDemand;
                 end
                 if find(strcmpi(varargin, 'demanddeficit'))
-                    value.DemandDeficit(k, :)=obj.getNodeDemandDeficit;
+                    value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
                 end
                 if find(strcmpi(varargin, 'demandSensingNodes'))
-                    value.DemandSensingNodes(k, :)=obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
+                    value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
                 end
                 if find(strcmpi(varargin, 'head'))
-                    value.Head(k, :)=obj.getNodeHydaulicHead;
+                    value.Head(k, :) = obj.getNodeHydaulicHead;
                 end
                 if find(strcmpi(varargin, 'tankvolume'))
-                    value.TankVolume(k, :)=obj.getNodeTankVolume;
+                    value.TankVolume(k, :) = [zeros(1, obj.getNodeJunctionCount+obj.getNodeReservoirCount) obj.getNodeTankVolume];
                 end
                 if find(strcmpi(varargin, 'flow'))
-                    value.Flow(k, :)=obj.getLinkFlows;
+                    value.Flow(k, :) = obj.getLinkFlows;
                 end
                 if find(strcmpi(varargin, 'velocity'))
-                    value.Velocity(k, :)=obj.getLinkVelocity;
+                    value.Velocity(k, :) = obj.getLinkVelocity;
                 end
                 if find(strcmpi(varargin, 'headloss'))
-                    value.HeadLoss(k, :)=obj.getLinkHeadloss;
+                    value.HeadLoss(k, :) = obj.getLinkHeadloss;
                 end
                 if find(strcmpi(varargin, 'status'))
-                    value.Status(k, :)=obj.getLinkStatus;
+                    value.Status(k, :) = obj.getLinkStatus;
                 end
                 if find(strcmpi(varargin, 'setting'))
-                    value.Setting(k, :)=obj.getLinkSettings;
+                    value.Setting(k, :) = obj.getLinkSettings;
                 end
                 if find(strcmpi(varargin, 'energy'))
-                    value.Energy(k, :)=obj.getLinkEnergy;
+                    value.Energy(k, :) = obj.getLinkEnergy;
                 end
                 if find(strcmpi(varargin, 'efficiency'))
-                    value.Efficiency(k, :)=obj.getLinkPumpEfficiency;
+                    value.Efficiency(k, :) = [zeros(1, obj.getLinkPipeCount) obj.getLinkPumpEfficiency zeros(1, obj.getLinkValveCount)];
                 end
                 if find(strcmpi(varargin, 'state'))
-                    value.State(k, :)=obj.getLinkState;
+                    value.State(k, :) = obj.getLinkState;
                 end
                 tstep = obj.nextHydraulicAnalysisStep;
-                k=k+1;
+                k = k+1;
             end
             obj.closeHydraulicAnalysis;
         end
