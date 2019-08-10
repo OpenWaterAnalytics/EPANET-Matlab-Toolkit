@@ -215,7 +215,6 @@ d.getNodeActualQuality
 d.getNodeMassFlowRate
 d.getNodeActualQualitySensingNodes([1 2 34 25 5]) 
 
-d.getNodeTankMixiningModel
 d.getNodeTankMixingModelCode
 d.getNodeTankMixingModelType
 
