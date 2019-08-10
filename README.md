@@ -489,6 +489,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getMSXError|Returns the text for an error message given its error code|
 |getMSXLinkInitqualValue|Retrieves the initial concentration of chemical species assigned to links of the pipe network|
 |getMSXNodeInitqualValue|Retrieves the initial concentration of chemical species assigned to nodes|
+|getMSXOptions|Retrieves all the msx option parameters|
 |getMSXParametersCount|Retrieves the number of parameters|
 |getMSXParametersIndex|Retrieves the indices of parameters|
 |getMSXParametersNameID|Retrieves the ID name of parameters|

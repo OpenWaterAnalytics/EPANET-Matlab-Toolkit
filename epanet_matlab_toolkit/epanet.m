@@ -7903,37 +7903,40 @@ classdef epanet <handle
         function value = getMSXEquationsTanks(obj)
             [~, ~, value] = getEquations(obj.MSXFile);
         end
+        function value = getMSXOptions(obj)
+            [value] = get_MSX_Options(obj.MSXFile);
+        end
         function value = getMSXTimeStep(obj)
-            [value] = getMSXOptions(obj.MSXFile);
-            value = value.timestep;
+            [value] = get_MSX_Options(obj.MSXFile);
+            value = value.TimeStep;
         end
         function value = getMSXSolver(obj)
-            [value] = getMSXOptions(obj.MSXFile);
-            value = value.solver;
+            [value] = get_MSX_Options(obj.MSXFile);
+            value = value.Solver;
         end
         function value = getMSXAreaUnits(obj)
-            [value] = getMSXOptions(obj.MSXFile);
-            value = value.areaunits;
+            [value] = get_MSX_Options(obj.MSXFile);
+            value = value.AreaUnits;
         end        
         function value = getMSXRateUnits(obj)
-            [value] = getMSXOptions(obj.MSXFile);
-            value = value.rateunits;
+            [value] = get_MSX_Options(obj.MSXFile);
+            value = value.RateUnits;
         end 
         function value = getMSXRtol(obj)
-            [value] = getMSXOptions(obj.MSXFile);
-            value = value.rtol;
+            [value] = get_MSX_Options(obj.MSXFile);
+            value = value.Rtol;
         end 
         function value = getMSXAtol(obj)
-            [value] = getMSXOptions(obj.MSXFile);
-            value = value.atol;
+            [value] = get_MSX_Options(obj.MSXFile);
+            value = value.Atol;
         end
         function value = getMSXCoupling(obj)
-            [value] = getMSXOptions(obj.MSXFile);
-            value = value.coupling;
+            [value] = get_MSX_Options(obj.MSXFile);
+            value = value.Coupling;
         end
         function value = getMSXCompiler(obj)
-            [value] = getMSXOptions(obj.MSXFile);
-            value = value.compiler;
+            [value] = get_MSX_Options(obj.MSXFile);
+            value = value.Compiler;
         end
         function value = getMSXSpeciesCount(obj)
             % Species, Constants, Parameters, Patterns
@@ -12703,12 +12706,13 @@ while 1
 end
 fclose(fid);
 end
-function value=getMSXOptions(msxname)
+function value = get_MSX_Options(msxname)
 
 if isempty(msxname)
     warning('Please load MSX File.');
     return;
 end
+
 % Open epanet input file
 [fid, message] = fopen(msxname, 'rt');
 if fid < 0
@@ -12716,14 +12720,14 @@ if fid < 0
     return
 end
 % DEFAULT OPTIONS
-value.areaunits='FT2'; 
-value.rateunits='HR';
-value.solver='EUL';
-value.timestep=300;
-value.atol=0.01;
-value.rtol=0.001;
-value.coupling='NONE';
-value.compiler='NONE';
+value.AreaUnits='FT2'; 
+value.RateUnits='HR';
+value.Solver='EUL';
+value.TimeStep=300;
+value.Atol=0.01;
+value.Rtol=0.001;
+value.Coupling='NONE';
+value.Compiler='NONE';
 sect=0;
 while 1
     tline = fgetl(fid);
@@ -12752,24 +12756,25 @@ while 1
         
         % Options
     elseif sect == 1
-        atline={};
         atline = checktlines(tline);
-        if strcmpi(atline{1}, 'TIMESTEP')
-            value.timestep=str2double(atline{2});%return;
-        elseif strcmpi(atline{1}, 'AREA_UNITS')
-            value.areaunits=atline{2};%return;
-        elseif strcmpi(atline{1}, 'RATE_UNITS')
-            value.rateunits=atline{2};%return;
-        elseif strcmpi(atline{1}, 'SOLVER')
-            value.solver=atline{2};%return;
-        elseif strcmpi(atline{1}, 'RTOL')
-            value.rtol=str2double(atline{2});%return; 
-        elseif strcmpi(atline{1}, 'ATOL')
-            value.atol=str2double(atline{2});%return;   
-        elseif strcmpi(atline{1}, 'COUPLING')
-            value.coupling=atline{2};%return;    
-        elseif strcmpi(atline{1}, 'COMPILER')
-            value.compiler=atline{2};%return;
+        
+        switch atline{1}
+            case 'TIMESTEP'
+                value.TimeStep=str2double(atline{2}); 
+            case 'AREA_UNITS'
+                value.AreaUnits=atline{2};  
+            case 'RATE_UNITS'
+                value.RateUnits=atline{2};  
+            case 'SOLVER'
+                value.Solver=atline{2};  
+            case 'RTOL'
+                value.Rtol=str2double(atline{2});  
+            case 'ATOL'
+                value.Atol=str2double(atline{2});  
+            case 'COUPLING'
+                value.Coupling=atline{2};   
+            case 'COMPILER'
+                value.Compiler=atline{2};  
         end
     end
 end
