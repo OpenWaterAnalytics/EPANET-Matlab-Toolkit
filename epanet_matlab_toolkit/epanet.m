@@ -2128,10 +2128,17 @@ classdef epanet <handle
             % Retrieves the pump constant power rating (read only). (EPANET Version 2.2)
             %
             % Example 1: 
-            %   d.getLinkPumpPower      % Retrieves the pump constant power rating for all links
+            %   d.getLinkPumpPower              % Retrieves the constant power rating of all pumps
             %
             % Example 2:
-            %   d.getLinkPumpPower(1)   % Retrieves the pump constant power rating for the first link
+            %   d.getLinkPumpPower(1)           % Retrieves the constant power rating of the 1st pump
+            %
+            % Example 3:
+            %   d.getLinkPumpPower(1:2)         % Retrieves the constant power rating of the first 2 pumps
+            %
+            % Example 4:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.getLinkPumpPower(pumpIndex)   % Retrieves the constant power rating of the pumps given their indices
             %
             % See also getLinkPumpHCurve, getLinkPumpECurve,getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
@@ -2141,12 +2148,19 @@ classdef epanet <handle
             % Retrieves the pump head v. flow curve index. (EPANET Version 2.2)
             %
             % Example 1: 
-            %   d.getLinkPumpHCurve       % Retrieves the pump head v. flow curve index for all links
+            %   d.getLinkPumpHCurve              % Retrieves the head v. flow curve index of all pumps
             %
             % Example 2:
-            %   d.getLinkPumpHCurve(13)   % Retrieves the pump head v. flow curve index for the thirteenth link
+            %   d.getLinkPumpHCurve(1)           % Retrieves the head v. flow curve index of the 1st pump
             %
-            % See also getLinkPumpPower, getLinkPumpECurve,getLinkPumpECost,
+            % Example 3:
+            %   d.getLinkPumpHCurve(1:2)         % Retrieves the head v. flow curve index of the first 2 pumps
+            %
+            % Example 4:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.getLinkPumpHCurve(pumpIndex)   % Retrieves the head v. flow curve index of the pumps given their indices
+            %
+            % See also setLinkPumpHCurve, getLinkPumpECurve,getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, varargin);
         end
@@ -2154,12 +2168,19 @@ classdef epanet <handle
             % Retrieves the pump efficiency v. flow curve index. (EPANET Version 2.2)
             %
             % Example 1: 
-            %   d.getLinkPumpECurve       % Retrieves the pump efficiency v. flow curve index for all links
+            %   d.getLinkPumpECurve              % Retrieves the efficiency v. flow curve index of all pumps
             %
             % Example 2:
-            %   d.getLinkPumpECurve(13)   % Retrieves the pump efficiency v. flow curve index for the thirteenth link
+            %   d.getLinkPumpECurve(1)           % Retrieves the efficiency v. flow curve index of the 1st pump
             %
-            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECost,
+            % Example 3:
+            %   d.getLinkPumpECurve(1:2)         % Retrieves the efficiency v. flow curve index of the first 2 pumps
+            %
+            % Example 4:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.getLinkPumpECurve(pumpIndex)   % Retrieves the efficiency v. flow curve index of the pumps given their indices
+            %
+            % See also setLinkPumpECurve, getLinkPumpHCurve, getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, varargin);
         end
@@ -2167,12 +2188,19 @@ classdef epanet <handle
             % Retrieves the pump average energy price. (EPANET Version 2.2)
             %
             % Example 1: 
-            %   d.getLinkPumpECost       % Retrieves the pump average energy price for all links
+            %   d.getLinkPumpECost              % Retrieves the average energy price of all pumps
             %
             % Example 2:
-            %   d.getLinkPumpECost(13)   % Retrieves the pump average energy price for the thirteenth link
+            %   d.getLinkPumpECost(1)           % Retrieves the average energy price of the 1st pump
             %
-            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
+            % Example 3:
+            %   d.getLinkPumpECost(1:2)         % Retrieves the average energy price of the first 2 pumps
+            %
+            % Example 4:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.getLinkPumpECost(pumpIndex)   % Retrieves the average energy price of the pumps given their indices
+            %
+            % See also setLinkPumpECost, getLinkPumpPower, getLinkPumpHCurve,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, varargin);
         end
@@ -2180,12 +2208,19 @@ classdef epanet <handle
             % Retrieves the pump energy price time pattern index. (EPANET Version 2.2)
             %
             % Example 1: 
-            %   d.getLinkPumpEPat       % Retrieves the pump energy price time pattern index for all links
+            %   d.getLinkPumpEPat              % Retrieves the energy price time pattern index of all pumps
             %
             % Example 2:
-            %   d.getLinkPumpEPat(13)   % Retrieves the pump energy price time pattern index for the thirteenth link
+            %   d.getLinkPumpEPat(1)           % Retrieves the energy price time pattern index of the 1st pump
             %
-            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
+            % Example 3:
+            %   d.getLinkPumpEPat(1:2)         % Retrieves the energy price time pattern index of the first 2 pumps
+            %
+            % Example 4:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.getLinkPumpEPat(pumpIndex)   % Retrieves the energy price time pattern index of the pumps given their indices
+            %
+            % See also setLinkPumpEPat, getLinkPumpHCurve, getLinkPumpECurve,
             %          getLinkPumpECost, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, varargin);
         end
@@ -2193,20 +2228,37 @@ classdef epanet <handle
             % Retrieves the pump speed time pattern index. (EPANET Version 2.1)
             %
             % Example 1: 
-            %   d.getLinkPumpPatternIndex       % Retrieves the pump speed time pattern index for all links
+            %   d.getLinkPumpPatternIndex              % Retrieves the speed time pattern index of all pumps
             %
             % Example 2:
-            %   d.getLinkPumpPatternIndex(13)   % Retrieves the pump speed time pattern index for the thirteenth link
+            %   d.getLinkPumpPatternIndex(1)           % Retrieves the speed time pattern index of the 1st pump
             %
-            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
+            % Example 3:
+            %   d.getLinkPumpPatternIndex(1:2)         % Retrieves the speed time pattern index of the first 2 pumps
+            %
+            % Example 4:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.getLinkPumpPatternIndex(pumpIndex)   % Retrieves the speed time pattern index of the pumps given their indices
+            %
+            % See also setLinkPumpPatternIndex, getLinkPumpPower, getLinkPumpHCurve,
             %          getLinkPumpECost, getLinkPumpEPat,  getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, varargin);
         end
         function value = getLinkPumpPatternNameID(obj, varargin)
-            % Retrieves link pump pattern name ID. (EPANET Version 2.1)
+            % Retrieves pump pattern name ID. (EPANET Version 2.1)
             %
-            % Example: 
-            %   d.getLinkPumpPatternNameID
+            % Example 1: 
+            %   d.getLinkPumpPatternNameID              % Retrieves the pattern name ID of all pumps
+            %
+            % Example 2:
+            %   d.getLinkPumpPatternNameID(1)           % Retrieves the pattern name ID of the 1st pump
+            %
+            % Example 3:
+            %   d.getLinkPumpPatternNameID(1:2)         % Retrieves the pattern name ID of the first 2 pumps
+            %
+            % Example 4:
+            %   pumpIndex = d.getLinkPumpIndex;
+            %   d.getLinkPumpPatternNameID(pumpIndex)   % Retrieves the pattern name ID of the pumps given their indices
             %
             % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
             %          getLinkPumpECost, getLinkPumpEPat, getLinkPumpPatternIndex.
@@ -2221,10 +2273,14 @@ classdef epanet <handle
             % Retrieves the ID label of all nodes or some nodes with a specified index.
             %
             % Example 1:
-            %   d.getNodeNameID      % Retrieves the ID label of all nodes
+            %   d.getNodeNameID                  % Retrieves the ID label of all nodes
             %
             % Example 2:
-            %   d.getNodeNameID(1)   % Retrieves the ID label of the first node
+            %   d.getNodeNameID(1)               % Retrieves the ID label of the first node
+            %
+            % Example 3:
+            %   junctionIndex = d.getNodeJunctionIndex;
+            %   d.getNodeNameID(junctionIndex)   % Retrieves the ID labels of all junctions give their indices
             %
             % See also getNodeReservoirNameID, getNodeJunctionNameID,
             %          getNodeIndex, getNodeType, getNodesInfo.
@@ -2270,10 +2326,11 @@ classdef epanet <handle
             % Retrieves the indices of all nodes or some nodes with a specified ID.
             %
             % Example 1:
-            %   d.getNodeIndex         % Retrieves the indices of all nodes
+            %   d.getNodeIndex           % Retrieves the indices of all nodes
             %
             % Example 2:
-            %   d.getNodeIndex('11')   % Retrieves the node index with an ID value = '11'
+            %   nameID = d.getNodeNameID(1)
+            %   d.getNodeIndex(nameID)   % Retrieves the node index given the ID label of the 1st node
             %
             % See also getNodeNameID, getNodeReservoirIndex, getNodeJunctionIndex,
             %          getNodeType, getNodeTypeIndex, getNodesInfo.
@@ -2331,6 +2388,11 @@ classdef epanet <handle
         end
         function value = getNodeTypeIndex(obj, varargin)
             % Retrieves the node-type code index for all nodes.
+            %
+            % Code meaning:
+            %   0 = Junction
+            %   1 = Tank
+            %   2 = Reservoir
             %
             % Example 1: 
             %   d.getNodeTypeIndex      % Retrieves the node-type code index for all nodes
