@@ -7416,6 +7416,23 @@ classdef epanet <handle
             set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, value, varargin)
         end
         function setNodeSourceQuality(obj, value, varargin)
+            % Sets the values of quality source strength.
+            %
+            % Example 1:
+            %   nodeIndex = 1;
+            %   d.getNodeSourceQuality(nodeIndex)                   % Retrieves the quality source strength of the 1st node
+            %   sourceStrength = 10;
+            %   d.setNodeSourceQuality(nodeIndex, sourceStrength)   % Sets the quality source strength = 10 to the 1st node
+            %   d.getNodeSourceQuality(nodeIndex)
+            %
+            % Example 2:
+            %   nodeIndex = 1:3;
+            %   d.getNodeSourceQuality(nodeIndex)                   % Retrieves the quality source strength of the first 3 nodes
+            %   sourceStrength = [10, 12, 8];
+            %   d.setNodeSourceQuality(nodeIndex, sourceStrength)   % Sets the quality source strength = 10, 12 and 8 to the first 3 nodes
+            %   d.getNodeSourceQuality(nodeIndex)
+            %
+            % See also getNodeSourceQuality, setNodeSourcePatternIndex, setNodeSourceType.
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -7424,6 +7441,23 @@ classdef epanet <handle
             end
         end
         function setNodeSourcePatternIndex(obj, value, varargin)
+            % Sets the values of quality source pattern index.
+            %
+            % Example 1:
+            %   nodeIndex = 1;
+            %   d.getNodeSourcePatternIndex(nodeIndex)                       % Retrieves the quality source pattern index of the 1st node
+            %   sourcePatternIndex = 1;
+            %   d.setNodeSourcePatternIndex(nodeIndex, sourcePatternIndex)   % Sets the quality source pattern index = 1 to the 1st node
+            %   d.getNodeSourcePatternIndex(nodeIndex)
+            %
+            % Example 2:
+            %   nodeIndex = 1:3;
+            %   d.getNodeSourcePatternIndex(nodeIndex)                       % Retrieves the quality source pattern index of the first 3 nodes
+            %   sourcePatternIndex = [1, 1, 1];
+            %   d.setNodeSourcePatternIndex(nodeIndex, sourcePatternIndex)   % Sets the quality source pattern index = 1 to the first 3 nodes
+            %   d.getNodeSourcePatternIndex(nodeIndex)
+            %
+            % See also getNodeSourcePatternIndex, setNodeSourceQuality, setNodeSourceType.
             if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
@@ -7432,19 +7466,47 @@ classdef epanet <handle
             end
         end
         function setNodeSourceType(obj, index, value)
+            % Sets the values of quality source type.
+            %
+            % Types of external water quality sources that can be set:
+            %   1) CONCEN      Sets the concentration of external inflow entering a node
+            %   2) MASS        Injects a given mass/minute into a node
+            %   3) SETPOINT    Sets the concentration leaving a node to a given value
+            %   4) FLOWPACED   Adds a given value to the concentration leaving a node
+            %
+            % Example:
+            %   nodeIndex = 1;
+            %   d.getNodeSourceType{nodeIndex}               % Retrieves the quality source type of the 1st node
+            %   sourceType = 'MASS';
+            %   d.setNodeSourceType(nodeIndex, sourceType)   % Sets the quality source type = 'MASS' to the 1st node
+            %   d.getNodeSourceType{nodeIndex}
+            %
+            % See also getNodeSourceType, setNodeSourceQuality, setNodeSourcePatternIndex.
             value=find(strcmpi(obj.TYPESOURCE, value)==1)-1;
             [obj.Errcode] = ENsetnodevalue(index, obj.ToolkitConstants.EN_SOURCETYPE, value, obj.LibEPANET);
         end
         function setDemandModel(obj, code, pmin, preq, pexp)
-            % Sets the type of demand model to use and its parameters
-            % EPANET Version 2.2
-            %  % Arguments
-            %  type  Type of demand model.
-            %  pmin  Pressure below which there is no demand.
-            %  preq  Pressure required to deliver full demand.
-            %  pexp  Pressure exponent in demand function.
-            % Example: d.setDemandModel('PDA', 0, 0.1, 0.5); %type, pmin, preq, pexp
-            %          d.getDemandModel
+            % Sets the type of demand model to use and its parameters. (EPANET Version 2.2)
+            %
+            % Input Arguments:
+            %   type - Type of demand model
+            %       'DDA' = Demand driven analysis (in which case the remaining three parameter values are ignored)
+            %       'PDA' = Pressure driven analysis
+            %   pmin - Pressure below which there is no demand
+            %   preq - Pressure required to deliver full demand
+            %   pexp - Pressure exponent in demand function
+            %
+            % Example:
+            %   d.getDemandModel                            % Retrieves the demand model
+            %   type = 'PDA';
+            %   pmin = 0;
+            %   preq = 0.1;
+            %   pexp = 0.5;
+            %   d.setDemandModel(type, pmin, preq, pexp);   % Sets the demand model
+            %   d.getDemandModel
+            %
+            % See also getDemandModel, setNodeBaseDemands, setNodeJunctionDemandName,
+            %          addNodeJunctionDemand, deleteNodeJunctionDemand.
             model_type=find(strcmpi(obj.DEMANDMODEL, code)==1)-1;
             if isempty(model_type)
                 error('Please give Demand model type: DDA or PDA');
@@ -7452,51 +7514,66 @@ classdef epanet <handle
             [obj.Errcode] = ENsetdemandmodel(model_type, pmin, preq, pexp, obj.LibEPANET);
         end 
         function setNodeJunctionDemandName(obj, nodeIndex, demandIndex, demandName)
-            % Assigns a name to a node's demand category
-            % EPANET Version 2.2
+            % Assigns a name to a node's demand category. (EPANET Version 2.2)
             %
-            % Example: d.setNodeJunctionDemandName(1, 1, 'Demand category name');
-            %          d.getNodeJunctionDemandName
+            % Example:
+            %   nodeIndex = 1;
+            %   demandIndex = 1;
+            %   d.getNodeJunctionDemandName{demandIndex}{nodeIndex}                % Retrieves the name of the 1st node, 1st demand category
+            %   demandName = 'NEW NAME';
+            %   d.setNodeJunctionDemandName(nodeIndex, demandIndex, demandName);   % Sets a new name of the 1st node, 1st demand category
+            %   d.getNodeJunctionDemandName{demandIndex}{nodeIndex}
+            %
+            % See also getNodeJunctionDemandName, setNodeBaseDemands, setDemandModel,
+            %          addNodeJunctionDemand, deleteNodeJunctionDemand.
             [obj.Errcode] = ENsetdemandname(nodeIndex, demandIndex, demandName, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end   
         function setNodeJunctionData(obj, index, elev, dmnd, dmndpat)
-            % Sets a group of properties for a junction node
-            %   index a junction node's index (starting from 1).
-            %   elev the value of the junction's elevation.
-            %   dmnd the value of the junction's primary base demand.
-            %   dmndpat the ID name of the demand's time pattern ("" for no pattern)
-            % EPANET Version 2.2
+            % Sets a group of properties for a junction node. (EPANET Version 2.2)
+            %
+            % Properties that can be set:
+            %   1) index = a junction node's index (starting from 1).
+            %   2) elev = the value of the junction's elevation.
+            %   3) dmnd = the value of the junction's primary base demand.
+            %   4) dmndpat = the ID name of the demand's time pattern ("" for no pattern)
             %
             % Example: 
-            %          junctionIndex = 2;
-            %          elev = 35;
-            %          dmnd = 100;
-            %          dmndpat = '2';
-            %          d.addPattern(dmndpat)
-            %          d.setNodeJunctionData(junctionIndex, elev, dmnd, dmndpat);
-            %          d.getNodeElevations(junctionIndex)
-            %          d.getNodeBaseDemands(junctionIndex)
-            %          % primary base demand is the first category
-            %          d.getNodeDemandPatternNameID{1}(junctionIndex) 
+            %   junctionIndex = 1;
+            %   elev = 35;
+            %   dmnd = 100;
+            %   dmndpat = 'NEW_PATTERN';
+            %   d.addPattern(dmndpat)                                        % Adds a new pattern
+            %   d.setNodeJunctionData(junctionIndex, elev, dmnd, dmndpat);   % Sets the elevation, primary base demand and time pattern of the 1st junction
+            %   d.getNodeElevations(junctionIndex)                           % Retrieves the elevation of the 1st junction
+            %   d.getNodeBaseDemands(junctionIndex)                          % Retrieves the primary base demand of the 1st junction
+            %   d.getNodeDemandPatternNameID{1}(junctionIndex)               % Retrieves the demand pattern ID (primary base demand is the first category)
+            %
+            % See also setNodeTankData, getNodeElevations, getNodeBaseDemands,
+            %          getNodeDemandPatternNameID, addPattern, setNodeJunctionDemandName.
             [obj.Errcode] = ENsetjuncdata(obj.LibEPANET, index, elev, dmnd, dmndpat);
             error(obj.getError(obj.Errcode));
         end 
         function setTitle(obj, varargin)
-            % Sets the title lines of the project
-            % EPANET Version 2.2
+            % Sets the title lines of the project. (EPANET Version 2.2)
             %
-            % Example: 
-            %   d.setTitle('Example 1', 'This is a test line 2', 'This is a test line 3');
-            %   [Line1, Line2, Line3] = d.getTitle()
-            
+            % Example:
+            %   line_1 = 'This is a title';
+            %   line_2 = 'This is a test line 2';
+            %   line_3 = 'This is a test line 3';
+            %   d.setTitle(line_1, line_2, line_3);
+            %   [Line1, Line2, Line3] = d.getTitle
+            %
+            % See also getTitle, setLinkComment, setNodeComment.
             line2 = '';
             line3 = '';
             if nargin > 1 
                 line1 = varargin{1};
-            elseif nargin > 2
+            end
+            if nargin > 2
                 line2 = varargin{2};
-            elseif nargin > 3
+            end
+            if nargin > 3
                 line3 = varargin{3};
             end
             [obj.Errcode] = ENsettitle(line1, line2, line3, obj.LibEPANET);
@@ -7764,17 +7841,37 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
         end
         function setTimeSimulationDuration(obj, value)
+            % Sets the simulation duration (in seconds).
+            %
+            % Example:
+            %   simulationDuration = 172800;   % 172800 seconds = 2days
+            %   d.setTimeSimulationDuration(simulationDuration)
+            %   d.getTimeSimulationDuration
+            %
+            % See also getTimeSimulationDuration, getTimeStartTime, getTimeHaltFlag.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_DURATION, value, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
         function setTimeHydraulicStep(obj, value)
-            % Hstep = min(Pstep, Hstep)
-            % Hstep = min(Rstep, Hstep)
-            % Hstep = min(Qstep, Hstep)
+            % Sets the hydraulic time step.
+            %
+            % Example:
+            %   Hstep = 1800;
+            %   d.setTimeHydraulicStep(Hstep)
+            %   d.getTimeHydraulicStep
+            %
+            % See also getTimeHydraulicStep, setTimeQualityStep, setTimePatternStep.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_HYDSTEP, value, obj.LibEPANET);
         end
         function setTimeQualityStep(obj, value)
-            % Qstep = min(Qstep, Hstep)
+            % Sets the quality time step.
+            %
+            % Example:
+            %   Qstep = 1800;
+            %   d.setTimeQualityStep(Qstep)
+            %   d.getTimeQualityStep
+            %
+            % See also getTimeQualityStep, setTimeHydraulicStep, setTimePatternStep.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_QUALSTEP, value, obj.LibEPANET);
         end
         function setTimePatternStep(obj, value)
