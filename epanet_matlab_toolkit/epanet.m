@@ -16503,7 +16503,9 @@ function value = NodeCoords(obj, varargin)
         % Open epanet input file
         [~, info] = obj.readInpFile;
         sect = 0;
-        for h=1:length(info)
+        IndexC = strfind(info,'[COORDINATES]');
+        Index = find(not(cellfun('isempty',IndexC)));
+        for h=Index:length(info)
             tline = info{h};
             if ~ischar(tline),   break,   end
             % Get first token in the line
