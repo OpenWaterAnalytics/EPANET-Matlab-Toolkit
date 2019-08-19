@@ -3121,46 +3121,71 @@ classdef epanet <handle
             % Retrieves the tank initial water volume.
             %
             % Example 1:
-            %   d.getNodeTankInitialWaterVolume       % Retrieves the values of all nodes initial water volume
+            %   d.getNodeTankInitialWaterVolume              % Retrieves the initial water volume of all tanks
             %
             % Example 2:
-            %   d.getNodeTankInitialWaterVolume(11)   % Retrieves the value of the 11th node(i.e. tank) initial water volume
+            %   d.getNodeTankInitialWaterVolume(1)           % Retrieves the initial water volume of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankInitialWaterVolume(1:2)         % Retrieves the initial water volume of the first 2 tanks
+            %
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankInitialWaterVolume(tankIndex)   % Retrieves the initial water volume of the tanks given their indices
             %
             % See also getNodeTankInitialLevel,  getNodeTankVolume,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume.
             value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_INITVOLUME, varargin);
         end
         function value = getNodeTankMixingModelCode(obj, varargin)
-            % Retrieves the tank mixing model code (mix1, mix2, fifo, lifo).
+            % Retrieves the tank mixing model code.
+            %
+            % Code meaning:
+            %   0 = Complete mix model (MIX1)
+            %   1 = 2-compartment model (MIX2)
+            %   2 = First in, first out model (FIFO)
+            %   3 = Last in, first out model (LIFO)
             %
             % Example 1:
-            %   d.getNodeTankMixingModelCode              % Retrieves the values of all tanks mixing model code
+            %   d.getNodeTankMixingModelCode              % Retrieves the mixing model code of all tanks
             %
             % Example 2:
-            %   d.getNodeTankMixingModelCode(1)           % Retrieves the value of the 1st tank mixing model code
+            %   d.getNodeTankMixingModelCode(1)           % Retrieves the mixing model code of the 1st tank
             %
             % Example 3:
-            %   tankIndex = d.getNodeTankIndex;
-            %   d.getNodeTankMixingModelCode(tankIndex)   % Retrieves the values of all tanks mixing model code given their index
+            %   d.getNodeTankMixingModelCode(1:2)         % Retrieves the mixing model code of the first 2 tanks
             %
-            % See also getNodeTankMixingModelType, getNodeTankMixZoneVolume.
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMixingModelCode(tankIndex)   % Retrieves the mixing model code of the tanks given their indices
+            %
+            % See also setNodeTankMixingModelType, getNodeTankMixingModelType, getNodeTankMixZoneVolume.
             value = obj.get_node_tank_mixining_model(varargin{:});
             value = value{1};
         end
         function value = getNodeTankMixingModelType(obj, varargin)
-            % Retrieves the tank mixing model type (mix1, mix2, fifo, lifo).
+            % Retrieves the tank mixing model type.
+            %
+            % Types of models that describe water quality mixing in storage tanks:
+            %   MIX1 = Complete mix model
+            %   MIX2 = 2-compartment model
+            %   FIFO = First in, first out model
+            %   LIFO = Last in, first out model
             %
             % Example 1:
-            %   d.getNodeTankMixingModelType              % Retrieves the values of all tanks mixing model type
+            %   d.getNodeTankMixingModelType              % Retrieves the mixing model type of all tanks
             %
             % Example 2:
-            %   d.getNodeTankMixingModelType(1)           % Retrieves the value of the 1st tank mixing model type
+            %   d.getNodeTankMixingModelType(1)           % Retrieves the mixing model type of the 1st tank
             %
             % Example 3:
-            %   tankIndex = d.getNodeTankIndex;
-            %   d.getNodeTankMixingModelType(tankIndex)   % Retrieves the values of all tanks mixing model type given their index
+            %   d.getNodeTankMixingModelType(1:2)         % Retrieves the mixing model type of the first 2 tanks
             %
-            % See also getNodeTankMixingModelCode, getNodeTankMixZoneVolume.
+            % Example 4:
+            %   tankIndex = d.getNodeTankIndex;
+            %   d.getNodeTankMixingModelType(tankIndex)   % Retrieves the mixing model type of the tanks given their indices
+            %
+            % See also setNodeTankMixingModelType, getNodeTankMixingModelCode, getNodeTankMixZoneVolume.
             value = obj.get_node_tank_mixining_model(varargin{:});
             value = value{2};
         end
@@ -3168,11 +3193,17 @@ classdef epanet <handle
             % Retrieves the tank mixing zone volume.
             %
             % Example 1:
-            %   d.getNodeTankMixZoneVolume            % Retrieves the values of all nodes mixing zone volume
+            %   d.getNodeTankMixZoneVolume              % Retrieves the mixing zone volume of all tanks
             %
             % Example 2:
+            %   d.getNodeTankMixZoneVolume(1)           % Retrieves the mixing zone volume of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankMixZoneVolume(1:2)         % Retrieves the mixing zone volume of the first 2 tanks
+            %
+            % Example 4:
             %   tankIndex = d.getNodeTankIndex;
-            %   d.getNodeTankMixZoneVolume(tankIndex) % Retrieves the value of the 11th node(i.e. tank) mixing zone volume
+            %   d.getNodeTankMixZoneVolume(tankIndex)   % Retrieves the mixing zone volume of the tanks given their indices
             %
             % See also getNodeTankMixingModelCode, getNodeTankMixingModelType.
             value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MIXZONEVOL, varargin);
@@ -3181,11 +3212,17 @@ classdef epanet <handle
             % Retrieves the tank diameters.
             %
             % Example 1:
-            %   d.getNodeTankDiameter            % Retrieves the values of all nodes tank diameters
+            %   d.getNodeTankDiameter              % Retrieves the diameters of all tanks
             %
             % Example 2:
+            %   d.getNodeTankDiameter(1)           % Retrieves the diameter of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankDiameter(1:2)         % Retrieves the diameters of the first 2 tanks
+            %
+            % Example 4:
             %   tankIndex = d.getNodeTankIndex;
-            %   d.getNodeTankDiameter(tankIndex) % Retrieves the value of the 11th node(i.e. tank) tank diameter
+            %   d.getNodeTankDiameter(tankIndex)   % Retrieves the diameters of the tanks given their indices
             %
             % See also setNodeTankDiameter, getNodeTankBulkReactionCoeff, getNodeTankInitialLevel, 
             %          getNodeTankMixingModelType, getNodeTankVolume, getNodeTankNameID.
@@ -3195,11 +3232,17 @@ classdef epanet <handle
             % Retrieves the tank minimum water volume.
             %
             % Example 1:
-            %   d.getNodeTankMinimumWaterVolume             % Retrieves the values of all nodes tank minimum water volume
+            %   d.getNodeTankMinimumWaterVolume              % Retrieves the minimum water volume of all tanks
             %
             % Example 2:
+            %   d.getNodeTankMinimumWaterVolume(1)           % Retrieves the minimum water volume of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankMinimumWaterVolume(1:2)         % Retrieves the minimum water volume of the first 2 tanks
+            %
+            % Example 4:
             %   tankIndex = d.getNodeTankIndex;
-            %   d.getNodeTankMinimumWaterVolume(tankIndex)  % Retrieves the value of the 11th node(i.e. tank) tank minimum water volume
+            %   d.getNodeTankMinimumWaterVolume(tankIndex)   % Retrieves the minimum water volume of the tanks given their indices
             %
             % See also setNodeTankMinimumWaterVolume, getNodeTankMaximumWaterVolume, getNodeTankInitialWaterVolume,
             %          getNodeTankInitialLevel,  getNodeTankVolume, getNodeTankMixZoneVolume.
@@ -3209,11 +3252,17 @@ classdef epanet <handle
             % Retrieves the tank volume curve index.
             %
             % Example 1:
-            %   d.getNodeTankVolumeCurveIndex              % Retrieves the values of all nodes tank volume curve index
+            %   d.getNodeTankVolumeCurveIndex              % Retrieves the volume curve index of all tanks
             %
             % Example 2:
+            %   d.getNodeTankVolumeCurveIndex(1)           % Retrieves the volume curve index of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankVolumeCurveIndex(1:2)         % Retrieves the volume curve index of the first 2 tanks
+            %
+            % Example 4:
             %   tankIndex = d.getNodeTankIndex;
-            %   d.getNodeTankVolumeCurveIndex(tankIndex)   % Retrieves the value of the 11th node(i.e. tank) tank volume curve index
+            %   d.getNodeTankVolumeCurveIndex(tankIndex)   % Retrieves the volume curve index of the tanks given their indices
             %
             % See also getNodeTankVolume, getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume,
             %          getNodeTankInitialWaterVolume, getNodeTankMixZoneVolume.
@@ -3223,11 +3272,17 @@ classdef epanet <handle
             % Retrieves the tank minimum water level.
             %
             % Example 1:
-            %   d.getNodeTankMinimumWaterLevel             % Retrieves the values of all nodes tank minimum water level
+            %   d.getNodeTankMinimumWaterLevel              % Retrieves the minimum water level of all tanks
             %
             % Example 2:
+            %   d.getNodeTankMinimumWaterLevel(1)           % Retrieves the minimum water level of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankMinimumWaterLevel(1:2)         % Retrieves the minimum water level of the first 2 tanks
+            %
+            % Example 4:
             %   tankIndex = d.getNodeTankIndex;
-            %   d.getNodeTankMinimumWaterLevel(tankIndex)  % Retrieves the value of the 11th node(i.e. tank) tank minimum water level
+            %   d.getNodeTankMinimumWaterLevel(tankIndex)   % Retrieves the minimum water level of the tanks given their indices
             %
             % See also setNodeTankMinimumWaterLevel, getNodeTankMaximumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
@@ -3237,11 +3292,17 @@ classdef epanet <handle
             % Retrieves the tank maximum water level.
             %
             % Example 1:
-            %   d.getNodeTankMaximumWaterLevel             % Retrieves the values of all nodes tank maximum water level
+            %   d.getNodeTankMaximumWaterLevel              % Retrieves the maximum water level of all tanks
             %
             % Example 2:
+            %   d.getNodeTankMaximumWaterLevel(1)           % Retrieves the maximum water level of the 1st tank
+            %
+            % Example 3:
+            %   d.getNodeTankMaximumWaterLevel(1:2)         % Retrieves the maximum water level of the first 2 tanks
+            %
+            % Example 4:
             %   tankIndex = d.getNodeTankIndex;
-            %   d.getNodeTankMaximumWaterLevel(tankIndex)  % Retrieves the value of the 11th node(i.e. tank) tank maximum water level
+            %   d.getNodeTankMaximumWaterLevel(tankIndex)   % Retrieves the maximum water level of the tanks given their indices
             %
             % See also setNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
