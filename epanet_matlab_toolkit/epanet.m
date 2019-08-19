@@ -7778,36 +7778,112 @@ classdef epanet <handle
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_QUALSTEP, value, obj.LibEPANET);
         end
         function setTimePatternStep(obj, value)
+            % Sets the time pattern step.
+            %
+            % Example:
+            %   patternStep = 3600;
+            %   d.setTimePatternStep(patternStep)
+            %   d.getTimePatternStep
+            %
+            % See also getTimePatternStep, setTimePatternStart, setTimeHydraulicStep.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_PATTERNSTEP, value, obj.LibEPANET);
         end
         function setTimePatternStart(obj, value)
+            % Sets the time when time patterns begin.
+            %
+            % Example:
+            %   patternStart = 0;
+            %   d.setTimePatternStart(patternStart)
+            %   d.getTimePatternStart
+            %
+            % See also getTimePatternStart, setTimePatternStep, setTimeHydraulicStep.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_PATTERNSTART, value, obj.LibEPANET);
         end
         function setTimeReportingStep(obj, value)
+            % Sets the reporting time step.
+            %
+            % Example:
+            %   reportingStep = 3600;
+            %   d.setTimeReportingStep(reportingStep)
+            %   d.getTimeReportingStep
+            %
+            % See also getTimeReportingStep, setTimeReportingStart, setTimeRuleControlStep.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_REPORTSTEP, value, obj.LibEPANET);
         end
         function setTimeReportingStart(obj, value)
+            % Sets the time when reporting starts.
+            %
+            % Example:
+            %   reportingStart = 0;
+            %   d.setTimeReportingStart(reportingStart)
+            %   d.getTimeReportingStart
+            %
+            % See also getTimeReportingStart, setTimeReportingStep, setTimePatternStart.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_REPORTSTART, value, obj.LibEPANET);
         end
         function setTimeRuleControlStep(obj, value)
+            % Sets the rule-based control evaluation time step.
+            %
+            % Example:
+            %   ruleControlStep = 360;
+            %   d.setTimeRuleControlStep(ruleControlStep)
+            %   d.getTimeRuleControlStep
+            %
+            % See also getTimeRuleControlStep, setTimeReportingStep, setTimePatternStep.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_RULESTEP, value, obj.LibEPANET);
         end
         function setTimeStatisticsType(obj, value)
-            %'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'
+            % Sets the statistic type.
+            %
+            % Types that can be set:
+            %   1) 'NONE'
+            %   2) 'AVERAGE'
+            %   3) 'MINIMUM'
+            %   4) 'MAXIMUM'
+            %   5) 'RANGE'
+            %
+            % Example:
+            %   d.getTimeStatisticsType
+            %   statisticsType = 'AVERAGE';
+            %   d.setTimeStatisticsType(statisticsType)
+            %   d.getTimeStatisticsType
+            %
+            % See also getTimeStatisticsType, setTimeReportingStart, setTimeReportingStep.
             tmpindex=find(strcmpi(obj.TYPESTATS, value)==1)-1;
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_STATISTIC, tmpindex, obj.LibEPANET);
         end
         function setTimeStartTime(obj, value)
+            % Sets the simulation starting time of day.
+            %
+            % Example:
+            %   startTime = 0;
+            %   d.setTimeStartTime(startTime)
+            %   d.getTimeStartTime
+            %
+            % See also getTimeStartTime, setTimeReportingStart, setTimePatternStart.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_STARTTIME, value, obj.LibEPANET);
         end
         function value = setPatternComment(obj, value, varargin)
-            % Sets the comment string assigned to the pattern object
-            % Example: 
-            %       d.setPatternComment(1, 'This is a PATTERN');
-            %       d.getPatternComment(1)
-            %       d.setPatternComment(1:2, {'This is a pattern', 'Test comm'});
-            %       d.getPatternComment(1:2)
-            %       d.getPatternComment
+            % Sets the comment string assigned to the pattern object.
+            %
+            % Example 1:
+            %   patternIndex = 1;
+            %   patternComment = 'This is a PATTERN';
+            %   d.setPatternComment(patternIndex, patternComment);   % Sets the comment of the 1st pattern
+            %   d.getPatternComment(patternIndex)                    % Retrieves the comment of the 1st pattern
+            %
+            % Example 2:
+            %   patternIndex = 1:2;
+            %   patternComment = {'1st PATTERN', '2nd PATTERN'};
+            %   d.setPatternComment(patternIndex, patternComment);   % Sets the comments of the first 2 patterns (if exist)
+            %   d.getPatternComment(patternIndex)
+            %
+            % Example 3:
+            %   patternComment = {'1st PATTERN', '2nd PATTERN'};
+            %   d.setPatternComment(patternComment);                 % Sets the comments of all the patterns (the length of the cell must equal the number of patterns)
+            %   d.getPatternComment
+            %
+            % See also getPatternComment, setPatternNameID, setPattern.
             if nargin==3, indices = value; value=varargin{1}; else indices = getPatternIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
