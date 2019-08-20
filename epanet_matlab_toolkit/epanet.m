@@ -8079,10 +8079,8 @@ classdef epanet <handle
             % See also getQualityInfo, getQualityType, getQualityCode, getQualityTraceNodeIndex.
             qualcode=obj.ToolkitConstants.EN_NONE;chemname='';chemunits='';tracenode='';
             if find(strcmpi(varargin, 'none')==1)
-                [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);
             elseif find(strcmpi(varargin, 'age')==1)
                 qualcode=obj.ToolkitConstants.EN_AGE;
-                [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);
             elseif find(strcmpi(varargin, 'chem')==1)
                 qualcode=obj.ToolkitConstants.EN_CHEM;
                 chemname=varargin{2};
@@ -8091,11 +8089,9 @@ classdef epanet <handle
                 else
                     chemunits=varargin{3};
                 end
-                [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);
             elseif find(strcmpi(varargin, 'trace')==1)
                 qualcode=obj.ToolkitConstants.EN_TRACE;
                 tracenode=varargin{2};
-                [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);
             else
                 qualcode=obj.ToolkitConstants.EN_CHEM;
                 chemname=varargin{1};
@@ -8104,8 +8100,8 @@ classdef epanet <handle
                 else
                     chemunits=varargin{2};
                 end
-                [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);                
             end
+            [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
         function setReportFormatReset(obj)
