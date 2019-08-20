@@ -7992,40 +7992,112 @@ classdef epanet <handle
             end
         end
         function setPattern(obj, index, patternVector)
+            % Sets all of the multiplier factors for a specific time pattern.
+            %
+            % Example:
+            %   patternID = 'new_pattern';
+            %   patternIndex = d.addPattern(patternID)    % Adds a new time pattern
+            %   patternMult = [1.56, 1.36, 1.17, 1.13, 1.08, ...
+            %       1.04, 1.2, 0.64, 1.08, 0.53, 0.29, 0.9, 1.11, ...
+            %       1.06, 1.00, 1.65, 0.55, 0.74, 0.64, 0.46, ...
+            %       0.58, 0.64, 0.71, 0.66];
+            %   d.setPattern(patternIndex, patternMult)   % Sets the multiplier factors for the new time pattern
+            %   d.getPattern                              % Retrieves the multiplier factor for all patterns and all times
+            %
+            % See also getPattern, setPatternValue, setPatternMatrix,
+            %          setPatternNameID, addPattern, deletePattern.
             nfactors=length(patternVector);
             [obj.Errcode] = ENsetpattern(index, patternVector, nfactors, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function setPatternMatrix(obj, patternMatrix)
+            % Sets all of the multiplier factors for all time patterns.
+            %
+            % Example:
+            %   patternID_1 = 'new_pattern_1';
+            %   patternIndex_1 = d.addPattern(patternID_1)    % Adds a new time pattern
+            %   patternID_2 = 'new_pattern_2';
+            %   patternIndex_2 = d.addPattern(patternID_2)    % Adds a new time pattern
+            %   patternMult = d.getPattern
+            %   patternMult(patternIndex_1, 2) = 5;           % The 2nd multiplier = 5 of the 1st time pattern
+            %   patternMult(patternIndex_2, 3) = 7;           % The 3rd multiplier = 7 of the 2nd time pattern
+            %   d.setPatternMatrix(patternMult)               % Sets all of the multiplier factors for all the time patterns given a matrix
+            %   d.getPattern                                  % Retrieves the multiplier factor for all patterns and all times
+            %
+            % See also getPattern, setPattern, setPatternValue,
+            %          setPatternNameID, addPattern, deletePattern.
             nfactors=size(patternMatrix, 2);
             for i=1:size(patternMatrix, 1)
                 [obj.Errcode] = ENsetpattern(i, patternMatrix(i, :), nfactors, obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
             end
         end
         function setPatternValue(obj, index, patternTimeStep, patternFactor)
+            % Sets the multiplier factor for a specific period within a time pattern.
+            %
+            % Example:
+            %   patternID = 'new_pattern';
+            %   patternIndex = d.addPattern(patternID)                            % Adds a new time pattern
+            %   patternTimeStep = 2;
+            %   patternFactor = 5;
+            %   d.setPatternValue(patternIndex, patternTimeStep, patternFactor)   % Sets the multiplier factor = 5 to the 2nd time period of the new time pattern
+            %   d.getPattern                                                      % Retrieves the multiplier factor for all patterns and all times
+            %
+            % See also getPattern, setPattern, setPatternMatrix,
+            %          setPatternNameID, addPattern, deletePattern.
             [obj.Errcode] = ENsetpatternvalue(index, patternTimeStep, patternFactor, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function setQualityType(obj, varargin)
-            qualcode=0;chemname='';chemunits='';tracenode='';
+            % Sets the type of water quality analysis called for.
+            %
+            % Example 1:
+            %   d.setQualityType('none')                        % Sets no quality analysis.
+            %   d.getQualityInfo                                % Retrieves quality analysis information
+            %
+            % Example 2:
+            %   d.setQualityType('age')                         % Sets water age analysis
+            %   d.getQualityInfo
+            %
+            % Example 3:
+            %   d.setQualityType('chem', 'Chlorine')            % Sets chemical analysis given the name of the chemical being analyzed
+            %   d.getQualityInfo
+            %   d.setQualityType('chem', 'Chlorine', 'mg/Kg')   % Sets chemical analysis given the name of the chemical being analyzed and units that the chemical is measured in
+            %   d.getQualityInfo
+            %
+            % Example 4:
+            %   d.setQualityType('Chlorine')                    % Sets chemical analysis given the name of the chemical being analyzed
+            %   d.getQualityInfo
+            %   d.setQualityType('Chlorine', 'mg/Kg')           % Sets chemical analysis given the name of the chemical being analyzed and units that the chemical is measured in
+            %   d.getQualityInfo
+            %
+            % Example 5:
+            %   nodeID = d.getNodeNameID{1};
+            %   d.setQualityType('trace', nodeID)               % Sets source tracing analysis given the ID label of node traced in a source tracing analysis
+            %   d.getQualityInfo
+            %   
+            % See also getQualityInfo, getQualityType, getQualityCode, getQualityTraceNodeIndex.
+            qualcode=obj.ToolkitConstants.EN_NONE;chemname='';chemunits='';tracenode='';
             if find(strcmpi(varargin, 'none')==1)
                 [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);
             elseif find(strcmpi(varargin, 'age')==1)
-                qualcode=2;
+                qualcode=obj.ToolkitConstants.EN_AGE;
                 [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);
             elseif find(strcmpi(varargin, 'chem')==1)
-                qualcode=1;
-                chemname=varargin{1};
-                if nargin<3
+                qualcode=obj.ToolkitConstants.EN_CHEM;
+                chemname=varargin{2};
+                if nargin<=3
                     chemunits='mg/L';
                 else
-                    chemunits=varargin{2};
+                    chemunits=varargin{3};
                 end
                 [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);
             elseif find(strcmpi(varargin, 'trace')==1)
-                qualcode=3;
+                qualcode=obj.ToolkitConstants.EN_TRACE;
                 tracenode=varargin{2};
                 [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);
             else
-                qualcode=1;
+                qualcode=obj.ToolkitConstants.EN_CHEM;
                 chemname=varargin{1};
                 if nargin<3
                     chemunits='mg/L';
@@ -8034,14 +8106,33 @@ classdef epanet <handle
                 end
                 [obj.Errcode] = ENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET);                
             end
+            error(obj.getError(obj.Errcode));
         end
         function setReportFormatReset(obj)
+            % Resets a project's report options to their default values.
+            %
+            % Example:
+            %   d.setReportFormatReset
+            %
+            % See also setReport, setReportStatus.
             [obj.Errcode]=ENresetreport(obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function setReportStatus(obj, value)
-            %'yes', 'no', 'full'
+            % Sets the level of hydraulic status reporting.
+            %
+            % Possible status that can be set:
+            %   1) 'yes'
+            %   2) 'no'
+            %   3) 'full'
+            %
+            % Example:
+            %   d.setReportStatus('full')
+            %
+            % See also setReport, setReportFormatReset.
             statuslevel=find(strcmpi(obj.TYPEREPORT, value)==1)-1;
             [obj.Errcode] = ENsetstatusreport(statuslevel, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function setReport(obj, value)
             [obj.Errcode] = ENsetreport(value, obj.LibEPANET);
