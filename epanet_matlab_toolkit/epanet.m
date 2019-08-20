@@ -5070,13 +5070,11 @@ classdef epanet <handle
             %
             % See also getPattern, setPattern, setPatternNameID
             %          setPatternValue, setPatternComment.
-            index=-1;
+            [obj.Errcode] = ENaddpattern(varargin{1}, obj.LibEPANET);
+            index = getPatternIndex(obj, varargin{1});
             if nargin==2
-                [obj.Errcode] = ENaddpattern(varargin{1}, obj.LibEPANET);
-                index = getPatternIndex(obj, varargin{1});
+                setPattern(obj, index, ones(1, max(obj.getPatternLengths)));
             elseif nargin==3
-                [obj.Errcode] = ENaddpattern(varargin{1}, obj.LibEPANET);
-                index = getPatternIndex(obj, varargin{1});
                 setPattern(obj, index, varargin{2});
             end
         end
