@@ -5668,27 +5668,27 @@ classdef epanet <handle
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
-        function addVertices(obj, linkID, x, y)
+        function addLinkVertices(obj, linkID, x, y)
             % Adds interior vertex points to network links.
             %
             % % The example is based on d=epanet('NET1.inp');
             %
             % Example 1:
             %   linkID='10';
-            %   x = 28;                       % One X coordinate selected for a vortex.
-            %   y = 68;                       % One Y coordinate selected for a vortex.
-            %   d.addVertices(linkID, x, y)   % Adds one vertex to the link with ID label = '10'
+            %   x = 28;                           % One X coordinate selected for a vortex.
+            %   y = 68;                           % One Y coordinate selected for a vortex.
+            %   d.addLinkVertices(linkID, x, y)   % Adds one vertex to the link with ID label = '10'
             %
             % Example 2:
             %   linkID='10';
-            %   x=[20, 25];                   % Two X coordinates selected for a vortex.
-            %   y=[66, 67];                   % Two Y coordinates selected for a vortex.
-            %   d.addVertices(linkID, x, y)   % Adds two vertices to the link with ID label = '10'
+            %   x=[20, 25];                       % Two X coordinates selected for a vortex.
+            %   y=[66, 67];                       % Two Y coordinates selected for a vortex.
+            %   d.addLinkVertices(linkID, x, y)   % Adds two vertices to the link with ID label = '10'
             %
             %   linkID='11';
             %   x=[33, 38, 43, 45, 48];
             %   y=[74, 76, 76, 73, 74];
-            %   d.addVertices(linkID, x, y)   % Adds multiple vertices to the link with ID label = '11'
+            %   d.addLinkVertices(linkID, x, y)   % Adds multiple vertices to the link with ID label = '11'
             %
             % See also addLinkPipe, addNodeJunction, setNodeCoordinates,
             %          deleteLink, deleteNode.
