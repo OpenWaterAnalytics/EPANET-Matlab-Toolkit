@@ -5668,6 +5668,61 @@ classdef epanet <handle
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
+        function addLinkVertices(obj, linkID, x, y)
+            % Adds interior vertex points to network links.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example 1:
+            %   linkID='10';
+            %   x = 28;                           % One X coordinate selected for a vortex.
+            %   y = 68;                           % One Y coordinate selected for a vortex.
+            %   d.addLinkVertices(linkID, x, y)   % Adds one vertex to the link with ID label = '10'
+            %
+            % Example 2:
+            %   linkID='10';
+            %   x=[20, 25];                       % Two X coordinates selected for a vortex.
+            %   y=[66, 67];                       % Two Y coordinates selected for a vortex.
+            %   d.addLinkVertices(linkID, x, y)   % Adds two vertices to the link with ID label = '10'
+            %
+            %   linkID='11';
+            %   x=[33, 38, 43, 45, 48];
+            %   y=[74, 76, 76, 73, 74];
+            %   d.addLinkVertices(linkID, x, y)   % Adds multiple vertices to the link with ID label = '11'
+            %
+            % See also addLinkPipe, addNodeJunction, setNodeCoordinates,
+            %          deleteLink, deleteNode.
+            filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
+            inpfile = filepath{end};
+            fid = fopen(inpfile); % Opens the file for read access
+            %
+            % Creates the string that will be set under the [VERTICES] section
+            %
+            str = linkID;
+            for i=1:length(x)
+                if i>1
+                    str = [str, linkID];
+                end
+                str = [str, blanks(10), num2str(x(i)), blanks(10) num2str(y(i)), char(10)];
+            end
+            %
+            % Creates the entire text that will replace the .inp file
+            %
+            texta = char;
+            while feof(fid) == 0
+                aline = fgetl(fid);
+                texta = [texta, aline, char(10)];
+                if strcmp(aline, '[VERTICES]')
+                   texta = [texta, fgetl(fid), char(10)];
+                   texta = [texta, str];
+                end
+            end
+            %
+            fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
+            fprintf(fid, texta);   % Writes the new text in the .inp file
+            fclose('all');  
+            if obj.Bin, obj.Errcode = closeOpenNetwork(obj); end
+        end
         function Errcode = deleteNode(obj, idNode, varargin)
             % Deletes nodes. (EPANET Version 2.2)
             %
