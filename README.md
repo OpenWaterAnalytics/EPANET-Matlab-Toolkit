@@ -315,6 +315,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addLinkValveTCV|Adds a new TCV valve|
 |addLinkValveGPV|Adds a new GPV valve|
 |addLinkVertices|Adds interior vertex points to network links|
+|getLinkVertices|Retrieves the link vertices|
 |addRules|Adds a new rule-based control to a project. (EPANET Version 2.2)|
 |deleteCurve|Deletes a data curve from the project|
 |deleteLink|Deletes a link|
