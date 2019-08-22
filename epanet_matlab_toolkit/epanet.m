@@ -5671,27 +5671,33 @@ classdef epanet <handle
         function addLinkVertices(obj, linkID, x, y)
             % Adds interior vertex points to network links.
             %
-            % % The example is based on d=epanet('NET1.inp');
+            % % The examples are based on d=epanet('NET1.inp');
             %
             % Example 1:
+            %   d = epanet('NET1.inp');
             %   linkID='10';
-            %   x = 28;                           % One X coordinate selected for a vortex.
-            %   y = 68;                           % One Y coordinate selected for a vortex.
-            %   d.addLinkVertices(linkID, x, y)   % Adds one vertex to the link with ID label = '10'
+            %   x = 28;                             % One X coordinate selected for a vertex.
+            %   y = 68;                             % One Y coordinate selected for a vertex.
+            %   d.addLinkVertices(linkID, x, y)     % Adds one vertex to the link with ID label = '10'
+            %   d.getLinkVertices(linkID)           % Retrieves the link's vertex
             %
             % Example 2:
-            %   linkID='10';
-            %   x=[20, 25];                       % Two X coordinates selected for a vortex.
-            %   y=[66, 67];                       % Two Y coordinates selected for a vortex.
-            %   d.addLinkVertices(linkID, x, y)   % Adds two vertices to the link with ID label = '10'
+            %   d = epanet('NET1.inp');
+            %   linkID_1 = '10';
+            %   x = [20, 25];                         % Two X coordinates selected for a vertex.
+            %   y = [66, 67];                         % Two Y coordinates selected for a vertex.
+            %   d.addLinkVertices(linkID_1, x, y)     % Adds two vertices to the link with ID label = '10'
             %
-            %   linkID='11';
-            %   x=[33, 38, 43, 45, 48];
-            %   y=[74, 76, 76, 73, 74];
-            %   d.addLinkVertices(linkID, x, y)   % Adds multiple vertices to the link with ID label = '11'
+            %   linkID_2='11';
+            %   x = [33, 38, 43, 45, 48];
+            %   y = [74, 76, 76, 73, 74];
+            %   d.addLinkVertices(linkID_2, x, y)     % Adds multiple vertices to the link with ID label = '11'
+            %   
+            %   d.getLinkVertices(linkID_1)           % Retrieves the link's vertices.
+            %   d.getLinkVertices(linkID_2)
             %
             % See also addLinkPipe, addNodeJunction, setNodeCoordinates,
-            %          deleteLink, deleteNode.
+            %          getLinkVertices, deleteLink, deleteNode.
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
             inpfile = filepath{end};
             fid = fopen(inpfile); % Opens the file for read access
@@ -5722,6 +5728,45 @@ classdef epanet <handle
             fprintf(fid, texta);   % Writes the new text in the .inp file
             fclose('all');  
             if obj.Bin, obj.Errcode = closeOpenNetwork(obj); end
+        end
+        function value = getLinkVertices(obj, varargin)
+            % Retrieves the link vertices.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d = epanet('NET1.inp');
+            %   linkID = '10';
+            %   x = [20, 25];                             % Two X coordinates selected for a vertex
+            %   y = [66, 67];                             % Two Y coordinates selected for a vertex
+            %   d.addLinkVertices(linkID, x, y)           % Adds two vertices to the link with ID label = '10'
+            %   
+            %   d.getLinkVertices                         % Retrieves all vertices of all links and stores them in cells
+            %   d.getLinkVertices(linkID)                 % Retrieves all vertices of a link given it's ID label
+            %   first_vertex = 1;
+            %   d.getLinkVertices(linkID, first_vertex)   % Retrieves a vertex of a link given it's ID label and the index of the vertex
+            %
+            % See also addLinkVertices, getNodeCoordinates, setNodeCoordinates,
+            %          addLinkPipe, deleteLink, deleteNode.
+            verts_coords = obj.getNodeCoordinates;
+            x_all = verts_coords{3};
+            y_all = verts_coords{4};
+            if nargin > 1
+                linkIndex = obj.getLinkIndex(varargin{1});
+                x = x_all{linkIndex};
+                y = y_all{linkIndex};
+            end
+            if nargin == 1
+                value = [x_all, y_all];
+            elseif nargin == 2
+                lx = length(x);
+                value = zeros(lx, 2);
+                for i =1:lx
+                    value(i, :) = [x(i), y(i)];
+                end
+            elseif nargin == 3
+                value = [x(varargin{2}), y(varargin{2})];
+            end
         end
         function Errcode = deleteNode(obj, idNode, varargin)
             % Deletes nodes. (EPANET Version 2.2)
