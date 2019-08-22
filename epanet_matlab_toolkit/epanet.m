@@ -5729,6 +5729,113 @@ classdef epanet <handle
             fclose('all');  
             if obj.Bin, obj.Errcode = closeOpenNetwork(obj); end
         end
+        function Errcode = deleteLinkVertices(obj, varargin)
+            % Deletes interior vertex points of network links.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d = epanet('NET1.inp');
+            %   linkID = '10';
+            %   x = [20, 25];                               % Two X coordinates selected for a vertex
+            %   y = [66, 67];                               % Two Y coordinates selected for a vertex
+            %   d.addLinkVertices(linkID, x, y)             % Adds two vertices to the link with ID label = '10'
+            %   
+            %   d.getLinkVertices(linkID)                   % Retrieves all vertices of a link given it's ID label
+            %
+            %   d.deleteLinkVertices                        % Deletes all vertices from all links
+            %   d.deleteLinkVertices(linkID)                % Deletes all vertices from a link given it's ID label
+            %   vertexIndex = 1;
+            %   d.deleteLinkVertices(linkID, vertexIndex)   % Deletes a certain vertex from a link given the link ID label and the vertex index
+            %   
+            %   d.getLinkVertices(linkID)
+            %
+            % See also addLinkVertices, getLinkVertices, getLinkVerticesCount,
+            %          addLinkPipe, addNodeJunction, setNodeCoordinates.
+            cnt = obj.getLinkVerticesCount;
+            Errcode = 0;
+            if cnt == 0
+                Errcode = 'No vertices found in the network';
+                error(Errcode)
+            end
+            filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
+            inpfile = filepath{end};
+            fid = fopen(inpfile); % Opens the file for read access
+            %
+            % Creates the string that will be set under the [VERTICES] section
+            %
+            %
+            % Creates the entire text that will replace the .inp file
+            %
+            texta = char;
+            while feof(fid) == 0
+                aline = fgetl(fid);
+                texta = [texta, aline, char(10)];
+                if strcmp(aline, '[VERTICES]')
+                   texta = [texta, fgetl(fid), char(10)];
+                   % If no input arguments given, deletes all vertices
+                   if nargin == 1
+                       for i = 1:cnt
+                           fgetl(fid);
+                       end
+                   % If one input is given(i.e. link ID), deletes all vertices of this link
+                   elseif nargin == 2
+                       linkID = varargin{1};
+                       for i = 1:cnt
+                           aline = fgetl(fid);
+                           if isempty(strfind(aline, linkID))
+                                texta = [texta, aline, char(10)];
+                           end
+                       end
+                   % If 2 inputs are given(i.e. link ID & integer), deletes the certain vertex of that link
+                   elseif nargin == 3
+                       linkID = varargin{1};
+                       j = 1;
+                       for i = 1:cnt
+                           aline = fgetl(fid);
+                           if isempty(strfind(aline, linkID))
+                                texta = [texta, aline, char(10)];
+                           else
+                               if j ~= varargin{2}
+                                   texta = [texta, aline, char(10)];
+                               end
+                               j = j + 1;
+                           end
+                       end
+                   end
+                end
+            end
+            fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
+            fprintf(fid, texta);   % Writes the new text in the .inp file
+            fclose('all');
+            if obj.Bin, obj.Errcode = closeOpenNetwork(obj); end
+        end
+        function value = getLinkVerticesCount(obj)
+            % Retrieves the number of vertices.
+            %
+            % Example:
+            %   d.getlinkVerticesCount
+            %
+            % See also getLinkVertices, getLinkCount, getNodeCount.
+            filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
+            inpfile = filepath{end};
+            fid = fopen(inpfile); % Opens the file for read access
+            value = 0;
+            while feof(fid) == 0
+                aline = fgetl(fid);
+                if strcmp(aline, '[VERTICES]')
+                    while true
+                        aline = fgetl(fid);
+                        if strfind(aline, '[')
+                            value = value - 2;
+                            break
+                        end
+                        value = value + 1;
+                    end
+                end
+            end
+            fclose('all');
+        end
         function value = getLinkVertices(obj, varargin)
             % Retrieves the link vertices.
             %

@@ -141,6 +141,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkBulkReactionCoeff|Bulk chemical reaction coefficient|
 |getLinkComment|Retrieves the comment string assigned to the link object|
 |getLinkCount|Retrieves the number of links|
+|getLinkVertices|Retrieves the link vertices|
+|getLinkVerticesCount|Retrieves the number of vertices|
 |getLinkDiameter|Retrieves the value of all link diameters|
 |getLinkEnergy|Current computed pump energy usage (read only)|
 |getLinkFlows|Current computed flow rate (read only)|
@@ -318,6 +320,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addRules|Adds a new rule-based control to a project. (EPANET Version 2.2)|
 |deleteCurve|Deletes a data curve from the project|
 |deleteLink|Deletes a link|
+|deleteLinkVertices|Deletes interior vertex points of network links|
 |deleteNode|Deletes a node|
 |deletePattern|Deletes a time pattern from a project|
 |deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
