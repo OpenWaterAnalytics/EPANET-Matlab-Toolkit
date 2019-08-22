@@ -5855,25 +5855,48 @@ classdef epanet <handle
             %
             % See also addLinkVertices, getNodeCoordinates, setNodeCoordinates,
             %          addLinkPipe, deleteLink, deleteNode.
-            verts_coords = obj.getNodeCoordinates;
-            x_all = verts_coords{3};
-            y_all = verts_coords{4};
-            if nargin > 1
-                linkIndex = obj.getLinkIndex(varargin{1});
-                x = x_all{linkIndex};
-                y = y_all{linkIndex};
-            end
-            if nargin == 1
-                value = [x_all, y_all];
-            elseif nargin == 2
-                lx = length(x);
-                value = zeros(lx, 2);
-                for i =1:lx
-                    value(i, :) = [x(i), y(i)];
+            cnt = obj.getLinkVerticesCount;
+            filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
+            inpfile = filepath{end};
+            fid = fopen(inpfile); % Opens the file for read access
+            while feof(fid) == 0
+                aline = fgetl(fid);
+                if strcmp(aline, '[VERTICES]')
+                    fgetl(fid);
+                    data = cell(cnt, 3);
+                    for j = 1:cnt
+                        aline = fgetl(fid);
+                        bline = regexp(aline, '\s', 'split');
+                        k = 1;
+                        for i = 1:length(bline)
+                            if ~isempty(bline{i})
+                                data{j, k} = [bline{i}];
+                                k = k + 1;
+                            end
+                        end
+                    end
                 end
-            elseif nargin == 3
-                value = [x(varargin{2}), y(varargin{2})];
             end
+            value = cell(obj.getLinkCount, 2);
+            for i = 1:size(data, 1)
+                linkIndex = obj.getLinkIndex(data{i, 1});
+                if isempty(value{linkIndex, 1})
+                    value{linkIndex, 1} = [];
+                end
+                if isempty(value{linkIndex, 2})
+                    value{linkIndex, 2} = [];
+                end
+                value{linkIndex, 1} = [value{linkIndex, 1}; str2double(data{i, 2})];
+                value{linkIndex, 2} = [value{linkIndex, 2}; str2double(data{i, 3})];
+            end
+           if nargin >= 2
+               linkIndex = obj.getLinkIndex(varargin{1});
+               value = [value{linkIndex, 1}, value{linkIndex, 2}];
+               if nargin == 3
+                   value = value(varargin{2}, :);
+               end
+           end
+           fclose('all');
         end
         function Errcode = deleteNode(obj, idNode, varargin)
             % Deletes nodes. (EPANET Version 2.2)
