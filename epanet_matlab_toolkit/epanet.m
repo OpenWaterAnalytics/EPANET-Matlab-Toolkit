@@ -5855,6 +5855,9 @@ classdef epanet <handle
             %
             % See also setLinkVertices, addLinkVertices, deleteLinkVertices,
             %          getLinkVerticesCount, getNodeCoordinates.
+            
+            % reload the network
+            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
             cnt = obj.getLinkVerticesCount;
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
             inpfile = filepath{end};
