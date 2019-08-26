@@ -8456,6 +8456,7 @@ classdef epanet <handle
         end
         function setReport(obj, value)
             % Issues a report formatting command. Formatting commands are the same as used in the [REPORT] section of the EPANET Input file.
+            % More: https://github.com/OpenWaterAnalytics/EPANET/wiki/%5BREPORT%5D
             %
             % Example 1:
             %   d.setReport('FILE TestReport.txt')
