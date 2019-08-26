@@ -726,7 +726,7 @@ classdef epanet <handle
             obj.NodeTankVolumeCurveIndex = obj.getNodeTankVolumeCurveIndex;
             obj.NodeTankMinimumWaterLevel = obj.getNodeTankMinimumWaterLevel;
             obj.NodeTankMaximumWaterLevel = obj.getNodeTankMaximumWaterLevel;
-            obj.NodeTankMinimumFraction = obj.getNodeTankMinimumFraction;
+            obj.NodeTankMinimumFraction = obj.getNodeTankMixingFraction;
             obj.NodeTankBulkReactionCoeff = obj.getNodeTankBulkReactionCoeff;
             %Get all options
             obj.OptionsMaxTrials = obj.getOptionsMaxTrials;
@@ -3370,23 +3370,23 @@ classdef epanet <handle
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
             value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, varargin);
         end
-        function value = getNodeTankMinimumFraction(obj, varargin)
+        function value = getNodeTankMixingFraction(obj, varargin)
             % Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank.
             %
             % Example 1:
-            %    d.getNodeTankMinimumFraction             % Retrieves the minimum fraction of all tanks
+            %    d.getNodeTankMixingFraction             % Retrieves the mixing fraction of all tanks
             %
             % Example 2:
-            %   d.getNodeTankMinimumFraction(1)           % Retrieves the minimum fraction of the 1st tank
+            %   d.getNodeTankMixingFraction(1)           % Retrieves the mixing fraction of the 1st tank
             %
             % Example 3:
-            %   d.getNodeTankMinimumFraction(1:2)         % Retrieves the minimum fraction of the first 2 tanks
+            %   d.getNodeTankMixingFraction(1:2)         % Retrieves the mixing fraction of the first 2 tanks
             %
             % Example 4:
             %   tankIndex = d.getNodeTankIndex;
-            %   d.getNodeTankMinimumFraction(tankIndex)   % Retrieves the minimum fraction of the tanks given their indices
+            %   d.getNodeTankMixingFraction(tankIndex)   % Retrieves the mixing fraction of the tanks given their indices
             %
-            % See also setNodeTankMinimumFraction, getNodeTankData.
+            % See also setNodeTankMixingFraction, getNodeTankData.
             value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, varargin);
         end
         function value = getNodeTankBulkReactionCoeff(obj, varargin)
@@ -7452,7 +7452,7 @@ classdef epanet <handle
             %   d.getNodeTankInitialLevel
             %
             % See also getNodeTankInitialLevel, setNodeTankMinimumWaterLevel, setNodeTankMaximumWaterLevel,
-            %          setNodeTankMinimumWaterVolume, setNodeTankMinimumFraction, setNodeTankData.
+            %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
             set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, value, varargin)
         end
         function setNodeTankMixingModelType(obj, value, varargin)
@@ -7484,7 +7484,7 @@ classdef epanet <handle
             %   d.setNodeTankMixingModelType(tankIndex, {'MIX2', 'LIFO'})   % Sets the  mixing model type = 'MIX2' and 'LIFO' to the tanks with index 128 and 129 respectively
             %   d.getNodeTankMixingModelType
             %
-            % See also getNodeTankMixingModelType, setNodeTankBulkReactionCoeff, setNodeTankMinimumFraction,
+            % See also getNodeTankMixingModelType, setNodeTankBulkReactionCoeff, setNodeTankMixingFraction,
             %          setNodeTankMinimumWaterVolume, setNodeTankMinimumWaterLevel, setNodeTankData.
             if nargin == 2
                 type = value;
@@ -7569,7 +7569,7 @@ classdef epanet <handle
             %   d.getNodeTankMinimumWaterLevel
             %
             % See also getNodeTankMinimumWaterLevel, setNodeTankInitialLevel, setNodeTankMaximumWaterLevel,
-            %          setNodeTankMinimumWaterVolume, setNodeTankMinimumFraction, setNodeTankData.
+            %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
             set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, value, varargin)
         end
         function setNodeTankMinimumWaterVolume(obj, value, varargin)
@@ -7602,7 +7602,7 @@ classdef epanet <handle
             %   d.getNodeTankMinimumWaterVolume
             %
             % See also getNodeTankMinimumWaterVolume, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
-            %          setNodeTankMaximumWaterLevel, setNodeTankMinimumFraction, setNodeTankData.
+            %          setNodeTankMaximumWaterLevel, setNodeTankMixingFraction, setNodeTankData.
             set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, value, varargin)
         end
         function setNodeTankMaximumWaterLevel(obj, value, varargin)
@@ -7635,7 +7635,7 @@ classdef epanet <handle
             %   d.getNodeTankMaximumWaterLevel
             %
             % See also getNodeTankMaximumWaterLevel, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
-            %          setNodeTankMinimumWaterVolume, setNodeTankMinimumFraction, setNodeTankData.
+            %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
             set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, value, varargin)
         end
        function setNodeTankCanOverFlow(obj, value, varargin)
@@ -7671,36 +7671,36 @@ classdef epanet <handle
             %          setNodeTankMinimumWaterVolume, setNodeTankDiameter, setNodeTankData.
             set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_CANOVERFLOW, value, varargin)
         end
-        function setNodeTankMinimumFraction(obj, value, varargin)
+        function setNodeTankMixingFraction(obj, value, varargin)
             % Sets the tank mixing fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank.
             %
             % The examples are based on d=epanet('BWSN_Network_1.inp');
             %
             % Example 1:
-            %   d.getNodeTankMinimumFraction                     % Retrieves the mixing fraction of all tanks
-            %   d.setNodeTankMinimumFraction(0)                  % Sets the mixing fraction = 0 to every tank
-            %   d.getNodeTankMinimumFraction
+            %   d.getNodeTankMixingFraction                     % Retrieves the mixing fraction of all tanks
+            %   d.setNodeTankMixingFraction(0)                  % Sets the mixing fraction = 0 to every tank
+            %   d.getNodeTankMixingFraction
             %
             % Example 2:
             %   % The input array must have a length equal to the number of tanks
-            %   d.setNodeTankMinimumFraction([1, 0])             % Sets the mixing fraction = 1 and 0 to the 2 tanks
-            %   d.getNodeTankMinimumFraction
+            %   d.setNodeTankMixingFraction([1, 0])             % Sets the mixing fraction = 1 and 0 to the 2 tanks
+            %   d.getNodeTankMixingFraction
             %
             % Example 3:
-            %   d.setNodeTankMinimumFraction(1, 0)               % Sets the mixing fraction = 0 to the 1st tank
-            %   d.getNodeTankMinimumFraction
+            %   d.setNodeTankMixingFraction(1, 0)               % Sets the mixing fraction = 0 to the 1st tank
+            %   d.getNodeTankMixingFraction
             %
             % Example 4:
             %   tankIndex = d.getNodeTankIndex;
-            %   d.setNodeTankMinimumFraction(tankIndex, 1)       % Sets the mixing fraction = 1 to the tanks with index 128 and 129
-            %   d.getNodeTankMinimumFraction
+            %   d.setNodeTankMixingFraction(tankIndex, 1)       % Sets the mixing fraction = 1 to the tanks with index 128 and 129
+            %   d.getNodeTankMixingFraction
             %
             % Example 5:
             %   tankIndex = d.getNodeTankIndex;
-            %   d.setNodeTankMinimumFraction(tankIndex,[1, 0])   % Sets the mixing fraction = 1 and 0 to the tanks with index 128 and 129 respectively
-            %   d.getNodeTankMinimumFraction
+            %   d.setNodeTankMixingFraction(tankIndex,[1, 0])   % Sets the mixing fraction = 1 and 0 to the tanks with index 128 and 129 respectively
+            %   d.getNodeTankMixingFraction
             %
-            % See also getNodeTankMinimumFraction, setNodeTankMixingModelType, setNodeTankMinimumWaterLevel,
+            % See also getNodeTankMixingFraction, setNodeTankMixingModelType, setNodeTankMinimumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankDiameter, setNodeTankData.
             set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, value, varargin)
         end
