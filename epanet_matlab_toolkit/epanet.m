@@ -8470,7 +8470,7 @@ classdef epanet <handle
             % Sets flow units to GPM(Gallons Per Minute).
             %
             % Example:
-            %   d.setFlowUnitsGPM;
+            %   d.setFlowUnitsGPM;   % d.setFlowUnitsGPM('NET1_GPM.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsLPS, setFlowUnitsMGD.
@@ -8480,7 +8480,7 @@ classdef epanet <handle
             % Sets flow units to LPS(Liters Per Second).
             %
             % Example:
-            %   d.setFlowUnitsLPS;
+            %   d.setFlowUnitsLPS;   % d.setFlowUnitsLPS('NET1_LPS.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsGPM, setFlowUnitsMGD.
@@ -8490,7 +8490,7 @@ classdef epanet <handle
             % Sets flow units to MGD(Million Gallons per Day).
             %
             % Example:
-            %   d.setFlowUnitsMGD;
+            %   d.setFlowUnitsMGD;   % d.setFlowUnitsMGD('NET1_MGD.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsGPM, setFlowUnitsLPS.
@@ -8500,7 +8500,7 @@ classdef epanet <handle
             % Sets flow units to IMGD(Imperial Million Gallons per Day).
             %
             % Example:
-            %   d.setFlowUnitsIMGD;
+            %   d.setFlowUnitsIMGD;   % d.setFlowUnitsIMGD('NET1_IMGD.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsMGD, setFlowUnitsCFS.
@@ -8510,7 +8510,7 @@ classdef epanet <handle
             % Sets flow units to CFS(Cubic Feet per Second).
             %
             % Example:
-            %   d.setFlowUnitsCFS;
+            %   d.setFlowUnitsCFS;   % d.setFlowUnitsCFS('NET1_CFS.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsAFD, setFlowUnitsIMGD.
@@ -8520,7 +8520,7 @@ classdef epanet <handle
             % Sets flow units to AFD(Acre-Feet per Day).
             %
             % Example:
-            %   d.setFlowUnitsAFD;
+            %   d.setFlowUnitsAFD;   % d.setFlowUnitsAFD('NET1_AFD.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsCFS, setFlowUnitsIMGD.
@@ -8530,7 +8530,7 @@ classdef epanet <handle
             % Sets flow units to LPM(Liters Per Minute).
             %
             % Example:
-            %   d.setFlowUnitsLPM;
+            %   d.setFlowUnitsLPM;   % d.setFlowUnitsLPM('NET1_LPM.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsAFD, setFlowUnitsMLD.
@@ -8540,7 +8540,7 @@ classdef epanet <handle
             % Sets flow units to MLD(Million Liters per Day).
             %
             % Example:
-            %   d.setFlowUnitsMLD;
+            %   d.setFlowUnitsMLD;   % d.setFlowUnitsMLD('NET1_MLD.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsLPM, setFlowUnitsCMH.
@@ -8550,7 +8550,7 @@ classdef epanet <handle
             % Sets flow units to CMH(Cubic Meters per Hour).
             %
             % Example:
-            %   d.setFlowUnitsCMH;
+            %   d.setFlowUnitsCMH;   % d.setFlowUnitsCMH('NET1_CMH.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsMLD, setFlowUnitsCMD.
@@ -8560,7 +8560,7 @@ classdef epanet <handle
             % Sets flow units to CMD(Cubic Meters per Day).
             %
             % Example:
-            %   d.setFlowUnitsCMD;
+            %   d.setFlowUnitsCMD;   % d.setFlowUnitsCMD('NET1_CMD.inp');
             %   d.getFlowUnits
             %
             % See also setFlowUnitsMLD, setFlowUnitsCMH.
