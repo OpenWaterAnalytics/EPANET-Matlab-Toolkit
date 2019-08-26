@@ -5810,11 +5810,24 @@ classdef epanet <handle
             fclose('all');
             if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
-        function value = getLinkVerticesCount(obj)
+        function value = getLinkVerticesCount(obj, varargin)
             % Retrieves the number of vertices.
             %
             % Example:
-            %   d.getlinkVerticesCount
+            %   d = epanet('NET1.inp');
+            %   linkID_1 = '10';
+            %   x = [20, 25];                         % Two X coordinates selected for a vertex.
+            %   y = [66, 67];                         % Two Y coordinates selected for a vertex.
+            %   d.addLinkVertices(linkID_1, x, y)     % Adds two vertices to the link with ID label = '10'
+            %
+            %   linkID_2='11';
+            %   x = [33, 38, 43, 45, 48];
+            %   y = [74, 76, 76, 73, 74];
+            %   d.addLinkVertices(linkID_2, x, y)     % Adds multiple vertices to the link with ID label = '11'
+            %
+            %   d.getLinkVerticesCount
+            %
+            %   d.getLinkVerticesCount(linkID_2)
             %
             % See also getLinkVertices, getLinkCount, getNodeCount.
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
@@ -5826,11 +5839,19 @@ classdef epanet <handle
                 if strcmp(aline, '[VERTICES]')
                     while true
                         aline = fgetl(fid);
-                        if strfind(aline, '[')
-                            value = value - 2;
+                        if ~isempty(strfind(aline, '['))
+                            if nargin == 1
+                                value = value - 2;
+                            end
                             break
                         end
-                        value = value + 1;
+                        if nargin == 2
+                            if ~isempty(strfind(aline, varargin{1}))
+                                value = value + 1;
+                            end
+                        else
+                            value = value + 1;
+                        end
                     end
                 end
             end
