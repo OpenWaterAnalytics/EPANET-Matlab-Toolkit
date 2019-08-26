@@ -8455,36 +8455,115 @@ classdef epanet <handle
             error(obj.getError(obj.Errcode));
         end
         function setReport(obj, value)
+            % Issues a report formatting command. Formatting commands are the same as used in the [REPORT] section of the EPANET Input file.
+            %
+            % Example 1:
+            %   d.setReport('FILE TestReport.txt')
+            %
+            % Example 2:
+            %   d.setReport('STATUS YES')
+            %
+            % See also setReportFormatReset, setReport.
             [obj.Errcode] = ENsetreport(value, obj.LibEPANET);
         end
         function [Errcode]=setFlowUnitsGPM(obj, varargin)
+            % Sets flow units to GPM(Gallons Per Minute).
+            %
+            % Example:
+            %   d.setFlowUnitsGPM;   % d.setFlowUnitsGPM('NET1_GPM.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsLPS, setFlowUnitsMGD.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_GPM, 1, varargin); % gallons per minute
         end
         function [Errcode]=setFlowUnitsLPS(obj, varargin)
+            % Sets flow units to LPS(Liters Per Second).
+            %
+            % Example:
+            %   d.setFlowUnitsLPS;   % d.setFlowUnitsLPS('NET1_LPS.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsGPM, setFlowUnitsMGD.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_LPS, 1, varargin); % liters per second
         end
         function [Errcode]=setFlowUnitsMGD(obj, varargin)
+            % Sets flow units to MGD(Million Gallons per Day).
+            %
+            % Example:
+            %   d.setFlowUnitsMGD;   % d.setFlowUnitsMGD('NET1_MGD.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsGPM, setFlowUnitsLPS.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_MGD, 1, varargin); % million gallons per day
         end
         function [Errcode]=setFlowUnitsIMGD(obj, varargin)
+            % Sets flow units to IMGD(Imperial Million Gallons per Day).
+            %
+            % Example:
+            %   d.setFlowUnitsIMGD;   % d.setFlowUnitsIMGD('NET1_IMGD.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsMGD, setFlowUnitsCFS.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_IMGD, 1, varargin); % imperial mgd
         end
         function [Errcode]=setFlowUnitsCFS(obj, varargin)
+            % Sets flow units to CFS(Cubic Feet per Second).
+            %
+            % Example:
+            %   d.setFlowUnitsCFS;   % d.setFlowUnitsCFS('NET1_CFS.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsAFD, setFlowUnitsIMGD.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CFS, 1, varargin); % cubic feet per second
         end
         function [Errcode]=setFlowUnitsAFD(obj, varargin)
+            % Sets flow units to AFD(Acre-Feet per Day).
+            %
+            % Example:
+            %   d.setFlowUnitsAFD;   % d.setFlowUnitsAFD('NET1_AFD.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsCFS, setFlowUnitsIMGD.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_AFD, 1, varargin); % acre-feet per day
         end
         function [Errcode]=setFlowUnitsLPM(obj, varargin)
+            % Sets flow units to LPM(Liters Per Minute).
+            %
+            % Example:
+            %   d.setFlowUnitsLPM;   % d.setFlowUnitsLPM('NET1_LPM.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsAFD, setFlowUnitsMLD.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_LPM, 1, varargin); % liters per minute
         end
         function [Errcode]=setFlowUnitsMLD(obj, varargin)
+            % Sets flow units to MLD(Million Liters per Day).
+            %
+            % Example:
+            %   d.setFlowUnitsMLD;   % d.setFlowUnitsMLD('NET1_MLD.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsLPM, setFlowUnitsCMH.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_MLD, 1, varargin); % million liters per day
         end
         function [Errcode]=setFlowUnitsCMH(obj, varargin)
+            % Sets flow units to CMH(Cubic Meters per Hour).
+            %
+            % Example:
+            %   d.setFlowUnitsCMH;   % d.setFlowUnitsCMH('NET1_CMH.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsMLD, setFlowUnitsCMD.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CMH, 1, varargin); % cubic meters per hour
         end
         function [Errcode]=setFlowUnitsCMD(obj, varargin)
+            % Sets flow units to CMD(Cubic Meters per Day).
+            %
+            % Example:
+            %   d.setFlowUnitsCMD;   % d.setFlowUnitsCMD('NET1_CMD.inp');
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsMLD, setFlowUnitsCMH.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CMD, 1, varargin); % cubic meters per day
         end
         function closeNetwork(obj)
