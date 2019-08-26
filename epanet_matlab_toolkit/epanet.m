@@ -17141,6 +17141,7 @@ function value = NodeCoords(obj, varargin)
             value = [vx(1:length(varargin{1})) vy(1:length(varargin{1}))];
         end
     end
+    if obj.Bin, obj.Errcode = reloadNetwork(obj); end
 end
 function atline = checktlines(tline)
     atline='';
