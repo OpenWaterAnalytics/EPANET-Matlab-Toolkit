@@ -225,7 +225,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeTankInitialWaterVolume|Retrieves the tank initial volume|
 |getNodeTankMaximumWaterVolume|Retrieves maximum water volume|
 |getNodeTankMaximumWaterLevel|Retrieves the tank maximum water level|
-|getNodeTankMinimumFraction|Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank|
+|getNodeTankMixingFraction|Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank|
 |getNodeTankMinimumWaterLevel|Retrieves the tank minimum water level|
 |getNodeTankMinimumWaterVolume|Retrieves the tank minimum volume|
 |getNodeTankMixZoneVolume|Retrieves the tank mixing zone volume|
@@ -409,7 +409,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeTankInitialLevel|Sets the values of tanks initial level|
 |setNodeTankMaximumWaterLevel|Sets the values of tanks maximum water level|
 |setNodeTankMinimumWaterLevel|Sets the values of tanks minimum water level|
-|setNodeTankMinimumFraction|Sets the values of tanks mix fraction|
+|setNodeTankMixingFraction|Sets the values of tanks mix fraction|
 |setNodeTankMinimumWaterVolume|Sets the values of tanks minimum water volume|
 |setNodeTankMixingModelType|Sets the values of tanks model|
 |setOptionsAccuracyValue|Sets the value of accurancy|
