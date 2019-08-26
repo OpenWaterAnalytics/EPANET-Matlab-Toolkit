@@ -5696,8 +5696,8 @@ classdef epanet <handle
             %   d.getLinkVertices(linkID_1)           % Retrieves the link's vertices.
             %   d.getLinkVertices(linkID_2)
             %
-            % See also addLinkPipe, addNodeJunction, setNodeCoordinates,
-            %          getLinkVertices, deleteLink, deleteNode.
+            % See also deleteLinkVertices, setLinkVertices, getLinkVertices,
+            %          getLinkVerticesCount, addLinkPipe, addNodeJunction.
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
             inpfile = filepath{end};
             fid = fopen(inpfile); % Opens the file for read access
@@ -5751,7 +5751,7 @@ classdef epanet <handle
             %   d.getLinkVertices(linkID)
             %
             % See also addLinkVertices, getLinkVertices, getLinkVerticesCount,
-            %          addLinkPipe, addNodeJunction, setNodeCoordinates.
+            %          setLinkVertices, addLinkPipe, addNodeJunction.
             cnt = obj.getLinkVerticesCount;
             Errcode = 0;
             if cnt == 0
@@ -5853,8 +5853,8 @@ classdef epanet <handle
             %   first_vertex = 1;
             %   d.getLinkVertices(linkID, first_vertex)   % Retrieves a vertex of a link given it's ID label and the index of the vertex
             %
-            % See also addLinkVertices, getNodeCoordinates, setNodeCoordinates,
-            %          addLinkPipe, deleteLink, deleteNode.
+            % See also setLinkVertices, addLinkVertices, deleteLinkVertices,
+            %          getLinkVerticesCount, getNodeCoordinates.
             cnt = obj.getLinkVerticesCount;
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
             inpfile = filepath{end};
@@ -5897,6 +5897,76 @@ classdef epanet <handle
                end
            end
            fclose('all');
+        end
+        function setLinkVertices(obj, linkID, x, y, varargin)
+            % Sets interior vertex points of network links.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d = epanet('NET1.inp');
+            %   linkID_1 = '10';
+            %   x = [20, 25];                         % Two X coordinates selected for a vertex.
+            %   y = [66, 67];                         % Two Y coordinates selected for a vertex.
+            %   d.addLinkVertices(linkID_1, x, y)     % Adds two vertices to the link with ID label = '10'
+            %
+            %   linkID_2 = '11';
+            %   x = [33, 38, 43, 45, 48];
+            %   y = [74, 76, 76, 73, 74];
+            %   d.addLinkVertices(linkID_2, x, y)     % Adds multiple vertices to the link with ID label = '11'
+            %   
+            %   d.getLinkVertices(linkID_1)           % Retrieves the link's vertices.
+            %   d.getLinkVertices(linkID_2)
+            %
+            %   % Deletes all vertices and adds the new vertices.
+            %   x = [22, 24, 28];
+            %   y = [69, 68, 69];
+            %   d.setLinkVertices(linkID_1, x, y)
+            %   d.getLinkVertices(linkID_1)
+            %
+            %   % Replaces a certain vertex given it's index with a new vertex.
+            %   x  = 39;
+            %   y = 75;
+            %   vertexIndex = 2;
+            %   d.setLinkVertices(linkID_2, x, y, vertexIndex)
+            %   d.getLinkVertices(linkID_2)
+            %
+            % See also addLinkVertices, deleteLinkVertices, getLinkVertices,
+            %          getLinkVerticesCount, addLinkPipe, addNodeJunction.
+            if nargin == 4
+                obj.deleteLinkVertices(linkID);
+                obj.addLinkVertices(linkID, x, y);
+            end
+            if nargin == 5
+                cnt = obj.getLinkVerticesCount;
+                filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
+                inpfile = filepath{end};
+                fid = fopen(inpfile); % Opens the file for read access
+                texta = char;
+                while feof(fid) == 0
+                    aline = fgetl(fid);
+                    texta = [texta, aline, char(10)];
+                    if strcmp(aline, '[VERTICES]')
+                       texta = [texta, fgetl(fid), char(10)];
+                       j = 1;
+                       for i = 1:cnt
+                           bline = fgetl(fid);
+                           if ~isempty(strfind(bline, linkID)) && j == varargin{1}
+                                texta = [texta, linkID, blanks(10), num2str(x), blanks(10), num2str(y), char(10)];
+                           else
+                                texta = [texta, bline, char(10)];
+                           end
+                           if ~isempty(strfind(bline, linkID))
+                                j = j + 1;
+                           end
+                       end
+                    end
+                end
+                fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
+                fprintf(fid, texta);   % Writes the new text in the .inp file
+                fclose('all');
+                if obj.Bin, obj.Errcode = closeOpenNetwork(obj); end
+            end
         end
         function Errcode = deleteNode(obj, idNode, varargin)
             % Deletes nodes. (EPANET Version 2.2)

@@ -388,6 +388,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkTypeValvePRV|Set the link type valve PRV for a specified link|
 |setLinkTypeValvePSV|Set the link type valve PSV for a specified link|
 |setLinkTypeValveTCV|Set the link type valve TCV for a specified link|
+|setLinkVertices|Sets interior vertex points of network links|
 |setLinkWallReactionCoeff|Sets the values of wall reactions|
 |setNodeBaseDemands|Sets the values of demands|
 |setNodeComment|Sets the comment string assigned to the node object|
