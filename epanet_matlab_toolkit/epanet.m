@@ -5039,6 +5039,7 @@ classdef epanet <handle
             % See also solveCompleteQuality.
             obj.solve = 1;
             [obj.Errcode] = ENsolveH(obj.LibEPANET);
+            error(obj.getError(obj.Errcode)); 
         end
         function solveCompleteQuality(obj)
             % Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file.
