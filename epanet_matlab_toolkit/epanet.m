@@ -1451,6 +1451,7 @@ classdef epanet <handle
             %
             % See also getNodeIndex, getLinkCount.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_NODECOUNT, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function value = getNodeTankReservoirCount(obj)
             % Retrieves the number of tanks.
@@ -1460,6 +1461,7 @@ classdef epanet <handle
             %
             % See also getNodeTankIndex, getNodeReservoirIndex.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_TANKCOUNT, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function value = getLinkCount(obj)
             % Retrieves the number of links.
@@ -1469,6 +1471,7 @@ classdef epanet <handle
             %
             % See also getLinkIndex, getNodeCount.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_LINKCOUNT, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function value = getPatternCount(obj)
             % Retrieves the number of patterns.
@@ -1478,6 +1481,7 @@ classdef epanet <handle
             %
             % See also getPatternIndex, getPattern.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_PATCOUNT, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function value = getCurveCount(obj)
             % Retrieves the number of curves.
@@ -1487,6 +1491,7 @@ classdef epanet <handle
             %
             % See also getCurveIndex, getCurvesInfo.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_CURVECOUNT, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function value = getControlRulesCount(obj)
             % Retrieves the number of controls.
@@ -1496,6 +1501,7 @@ classdef epanet <handle
             %
             % See also getControls, getRuleCount.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_CONTROLCOUNT, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function value = getRuleCount(obj)
             % Retrieves the number of rules. (EPANET Version 2.2)
@@ -1505,6 +1511,7 @@ classdef epanet <handle
             %
             % See also getRules, getControlRulesCount.
             [obj.Errcode, value] = ENgetcount(obj.ToolkitConstants.EN_RULECOUNT, obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
         end
         function value = getNodeTankCount(obj)
             % Retrieves the number of Tanks.
@@ -1577,6 +1584,7 @@ classdef epanet <handle
             % Example:
             %   d.getFlowUnits
             [obj.Errcode, flowunitsindex] = ENgetflowunits(obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
             value=obj.TYPEUNITS{flowunitsindex+1};
         end
         function value = getLinkNameID(obj, varargin)
@@ -1599,6 +1607,7 @@ classdef epanet <handle
                 value=cell(1, cnt);
                 for i=1:cnt
                     [obj.Errcode, value{i}]=ENgetlinkid(i, obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
                 end
             else
                 k=1;
@@ -1608,6 +1617,7 @@ classdef epanet <handle
                     [obj.Errcode, value{k}]=ENgetlinkid(i, obj.LibEPANET);
                     if obj.Errcode==204, value=[];  return; end   
                     k=k+1;
+                    error(obj.getError(obj.Errcode));
                 end
             end
         end
@@ -1681,10 +1691,12 @@ classdef epanet <handle
                 value = zeros(1, length(varargin{1}));
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(k)] = ENgetlinkindex(varargin{1}{j}, obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
                     k=k+1;
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = ENgetlinkindex(varargin{1}, obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
             end
         end
         function value = getLinkPipeIndex(obj)
@@ -1745,6 +1757,7 @@ classdef epanet <handle
             value(obj.getLinkCount, 1:2)=[nan nan];
             for i=1:obj.getLinkCount
                 [obj.Errcode, linkFromNode, linkToNode] = ENgetlinknodes(i, obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
                 value(i, :)= [linkFromNode, linkToNode];
             end
         end
@@ -2289,6 +2302,7 @@ classdef epanet <handle
                 value = cell(1, cnt);
                 for i=1:cnt
                     [obj.Errcode, value{i}]=ENgetnodeid(i, obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
@@ -2344,10 +2358,12 @@ classdef epanet <handle
                 value = zeros(1, length(varargin{1}));
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(k)] = ENgetnodeindex(varargin{1}{j}, obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
                     k=k+1;
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = ENgetnodeindex(varargin{1}, obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
             end
         end
         function value = getNodeReservoirIndex(obj)
@@ -2460,6 +2476,7 @@ classdef epanet <handle
             % See also setDemandModel, getNodeBaseDemands, getNodeDemandCategoriesNumber
             %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
             [obj.Errcode, value.DemandModelCode, value.DemandModelPmin, value.DemandModelPreq, value.DemandModelPexp] = ENgetdemandmodel(obj.LibEPANET); 
+            error(obj.getError(obj.Errcode));
             value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
         end
         function categoryIndex = addNodeJunctionDemand(obj, varargin)
@@ -2514,21 +2531,26 @@ classdef epanet <handle
             end
             if isscalar(nodeIndex)
                 [obj.Errcode]=ENadddemand(nodeIndex, baseDemand , demandPattern, demandName, obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
             elseif ~isscalar(nodeIndex)&&  isscalar(baseDemand) && ~iscell(demandPattern) && ~iscell(demandName)
                 for i=1:length(nodeIndex)
                     [obj.Errcode]=ENadddemand(nodeIndex(i), baseDemand , demandPattern, demandName, obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
                 end
             elseif ~isscalar(nodeIndex)&& ~isscalar(baseDemand) && ~iscell(demandPattern) && ~iscell(demandName)
                 for i=1:length(nodeIndex)
                     [obj.Errcode]=ENadddemand(nodeIndex(i), baseDemand(i) , demandPattern, demandName, obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
                 end
             elseif ~isscalar(nodeIndex) &&  ~isscalar(baseDemand) && iscell(demandPattern) && ~iscell(demandName)
                 for i=1:length(nodeIndex)
                     [obj.Errcode]=ENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName, obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
                 end  
             elseif ~isscalar(nodeIndex) &&  ~isscalar(baseDemand) && iscell(demandPattern) && iscell(demandName)
                 for i=1:length(nodeIndex)
                     [obj.Errcode]=ENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName{i}, obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
                 end  
             end
             if ~isscalar(nodeIndex) && ~iscell(demandName)
@@ -2586,18 +2608,21 @@ classdef epanet <handle
                 if isscalar(nodeIndex)
                     numDemand=size(obj.getNodeJunctionDemandIndex);
                     for i=1:numDemand(1)
-                        [Errcode]=ENdeletedemand(nodeIndex, 1, obj.LibEPANET);
+                        [obj.Errcode]=ENdeletedemand(nodeIndex, 1, obj.LibEPANET);
+                        error(obj.getError(obj.Errcode));
                     end
                 elseif ~isscalar(nodeIndex)
                     for j=1:length(nodeIndex)
                         numDemand=size(obj.getNodeJunctionDemandIndex);
                         for i=1:numDemand(1)
-                            [Errcode]=ENdeletedemand(nodeIndex(j), 1, obj.LibEPANET);
+                            [obj.Errcode]=ENdeletedemand(nodeIndex(j), 1, obj.LibEPANET);
+                            error(obj.getError(obj.Errcode));
                         end
                     end
                 end
             elseif nargin==3
-                [Errcode]=ENdeletedemand(nodeIndex, varargin{2}, obj.LibEPANET);
+                [obj.Errcode]=ENdeletedemand(nodeIndex, varargin{2}, obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
             end
         end
         function value = getNodeJunctionDemandName(obj, varargin)
