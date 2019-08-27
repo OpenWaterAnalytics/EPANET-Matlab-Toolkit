@@ -8488,21 +8488,69 @@ classdef epanet <handle
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CMD, 1, varargin); % cubic meters per day
         end
         function closeNetwork(obj)
+            % Closes down the Toolkit system.
+            %
+            % Example:
+            %   d.closeNetwork
+            %
+            % See also loadEPANETFile, closeHydraulicAnalysis, closeQualityAnalysis.
             [obj.Errcode] = ENclose(obj.LibEPANET);
         end
         function closeHydraulicAnalysis(obj)
+            % Closes the hydraulic analysis system, freeing all allocated memory.
+            %
+            % Example:
+            %   d.closeHydraulicAnalysis
+            %
+            % See also openHydraulicAnalysis, saveHydraulicFile, closeQualityAnalysis.
             [obj.Errcode] = ENcloseH(obj.LibEPANET);
         end
         function closeQualityAnalysis(obj)
+            % Closes the water quality analysis system, freeing all allocated memory.
+            %
+            % Example:
+            %   d.closeQualityAnalysis
+            %
+            % See also openQualityAnalysis, initializeQualityAnalysis, closeHydraulicAnalysis.
             [obj.Errcode] = ENcloseQ(obj.LibEPANET);
         end
         function saveHydraulicFile(obj, hydname)
+            % Saves the current contents of the binary hydraulics file to a file.
+            %
+            % Example:
+            %   filename = 'test.hyd'
+            %   d.saveHydraulicFile(filename)
+            %
+            % See also useHydraulicFile, initializeHydraulicAnalysis.
             [obj.Errcode]=ENsavehydfile(hydname, obj.LibEPANET);
         end
         function useHydraulicFile(obj, hydname)
+            % Uses the contents of the specified file as the current binary hydraulics file.
+            %
+            % Example:
+            %   filename = 'test.hyd'
+            %   d.useHydraulicFile(filename)
+            %
+            % See also saveHydraulicFile, initializeHydraulicAnalysis.
             [obj.Errcode]=ENusehydfile(hydname, obj.LibEPANET);
         end
         function initializeHydraulicAnalysis(obj, varargin)
+            % Initializes storage tank levels, link status and settings, and the simulation clock time prior to running a hydraulic analysis.
+            %
+            % Codes:
+            %   1) NOSAVE        = 0,  % Don't save hydraulics; don't re-initialize flows
+            %   2) SAVE          = 1,  % Save hydraulics to file, don't re-initialize flows
+            %   3) INITFLOW      = 10, % Don't save hydraulics; re-initialize flows
+            %   4) SAVE_AND_INIT = 11  % Save hydraulics; re-initialize flows
+            %
+            % Example 1:
+            %   d.initializeHydraulicAnalysis   % Uses the default code i.e. SAVE = 1
+            %
+            % Example 2:
+            %   code = 0;                       % i.e. Don't save
+            %   d.initializeHydraulicAnalysis(code)
+            %
+            % See also saveHydraulicFile, initializeQualityAnalysis.
             code=obj.ToolkitConstants.EN_SAVE;
             if ~isempty(varargin)
                 code=varargin{1};
@@ -8510,6 +8558,20 @@ classdef epanet <handle
             [obj.Errcode] = ENinitH(code, obj.LibEPANET);
         end
         function initializeQualityAnalysis(obj, varargin)
+            % Initializes water quality and the simulation clock time prior to running a water quality analysis.
+            %
+            % Codes:
+            %   1) NOSAVE        = 0,  % Don't save the results to the project's binary output file.
+            %   2) SAVE          = 1,  % Save the results to the project's binary output file.
+            %
+            % Example 1:
+            %   d.initializeQualityAnalysis   % Uses the default code i.e. SAVE = 1
+            %
+            % Example 2:
+            %   code = 0;                     % i.e. Don't save
+            %   d.initializeQualityAnalysis(code)
+            %
+            % See also openQualityAnalysis, initializeHydraulicAnalysis.
             code=obj.ToolkitConstants.EN_SAVE;
             if ~isempty(varargin)
 % obj.ToolkitConstants.EN_SAVE_AND_INIT; obj.ToolkitConstants.EN_NOSAVE;
@@ -8519,15 +8581,39 @@ classdef epanet <handle
             [obj.Errcode] = ENinitQ(code, obj.LibEPANET);
         end
         function tstep = nextHydraulicAnalysisStep(obj)
+            % Determines the length of time until the next hydraulic event occurs in an extended period simulation.
+            %
+            % Example:
+            %   d.nextHydraulicAnalysisStep
+            %
+            % See also nextQualityAnalysisStep, runHydraulicAnalysis.
             [obj.Errcode, tstep] = ENnextH(obj.LibEPANET);
         end
         function tstep = nextQualityAnalysisStep(obj)
+            % Advances the water quality simulation to the start of the next hydraulic time period.
+            %
+            % Example:
+            %   d.nextQualityAnalysisStep
+            %
+            % See also nextHydraulicAnalysisStep, runQualityAnalysis.
             [obj.Errcode, tstep] = ENnextQ(obj.LibEPANET);
         end
         function openHydraulicAnalysis(obj)
+            % Opens the hydraulics analysis system.
+            %
+            % Example:
+            %   d.openHydraulicAnalysis
+            %
+            % See also openQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode] = ENopenH(obj.LibEPANET);
         end
         function openQualityAnalysis(obj)
+            % Opens the water quality analysis system.
+            %
+            % Example:
+            %   d.openQualityAnalysis
+            %
+            % See also openHydraulicAnalysis, initializeQualityAnalysis.
             [obj.Errcode] = ENopenQ(obj.LibEPANET);
         end
         function tstep = runHydraulicAnalysis(obj)
