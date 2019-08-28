@@ -8616,6 +8616,8 @@ classdef epanet <handle
             % Example:
             %   tstep = d.runHydraulicAnalysis
             %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
             % See also runQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode, tstep] = ENrunH(obj.LibEPANET);
         end
@@ -8625,6 +8627,8 @@ classdef epanet <handle
             %
             % Example:
             %   tstep = d.runQualityAnalysis
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also runHydraulicAnalysis, initializeQualityAnalysis.
             [obj.Errcode, tstep] = ENrunQ(obj.LibEPANET);
@@ -8645,6 +8649,8 @@ classdef epanet <handle
             %
             % Example:
             %   tleft = d.stepQualityAnalysisTimeLeft
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also runQualityAnalysis, closeQualityAnalysis.
             [obj.Errcode, tleft] = ENstepQ(obj.LibEPANET);
