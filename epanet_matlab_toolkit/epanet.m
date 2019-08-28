@@ -6066,6 +6066,7 @@ classdef epanet <handle
                 [Errcode] = ENdeletenode(obj.LibEPANET, idNode, condition);
                 error(obj.getError(Errcode));
             end
+            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
         function Errcode = deleteLink(obj, idLink, varargin)
             % Deletes a link.
@@ -6103,6 +6104,7 @@ classdef epanet <handle
             end
             [Errcode] = ENdeletelink(obj.LibEPANET, indexLink, condition);
             error(obj.getError(Errcode));
+            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
         function Errcode = deletePattern(obj, idPat)
             % Deletes a time pattern from a project.
@@ -17331,7 +17333,6 @@ function value = NodeCoords(obj, varargin)
             value = [vx(1:length(varargin{1})) vy(1:length(varargin{1}))];
         end
     end
-    if obj.Bin, obj.Errcode = reloadNetwork(obj); end
 end
 function atline = checktlines(tline)
     atline='';
