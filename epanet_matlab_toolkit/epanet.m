@@ -8740,27 +8740,80 @@ classdef epanet <handle
             [obj.Errcode] = ENopenQ(obj.LibEPANET);
         end
         function tstep = runHydraulicAnalysis(obj)
+            % Runs a single period hydraulic analysis, retrieving the current simulation clock time t.
+            %
+            % Example:
+            %   tstep = d.runHydraulicAnalysis
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also runQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode, tstep] = ENrunH(obj.LibEPANET);
         end
         function tstep = runQualityAnalysis(obj)
+            % Makes available the hydraulic and water quality results that occur at the start of 
+            % the next time period of a water quality analysis, where the start of the period is returned in t.
+            %
+            % Example:
+            %   tstep = d.runQualityAnalysis
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also runHydraulicAnalysis, initializeQualityAnalysis.
             [obj.Errcode, tstep] = ENrunQ(obj.LibEPANET);
         end
         function saveHydraulicsOutputReportingFile(obj)
+            % Transfers results of a hydraulic simulation from the binary Hydraulics file 
+            % to the binary Output file, where results are only reported at uniform reporting intervals.
+            %
+            % Example:
+            %   d.saveHydraulicsOutputReportingFile
+            %
+            % See also saveHydraulicFile, closeHydraulicAnalysis.
             [obj.Errcode] = ENsaveH(obj.LibEPANET);
         end
         function tleft=stepQualityAnalysisTimeLeft(obj)
+            % Advances the water quality simulation one water quality time step. 
+            % The time remaining in the overall simulation is returned in tleft.
+            %
+            % Example:
+            %   tleft = d.stepQualityAnalysisTimeLeft
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also runQualityAnalysis, closeQualityAnalysis.
             [obj.Errcode, tleft] = ENstepQ(obj.LibEPANET);
         end
         function [Errcode] = saveInputFile(obj, inpname)
+            % Writes all current network input data to a file using the format of an EPANET input file.
+            % Returns an error code.
+            %
+            % Example:
+            %   filename = ('test.inp');
+            %   d.saveInputFile(filename)
+            %
+            % See also unload, saveHydraulicFile.
             [Errcode] = ENsaveinpfile('@#', obj.LibEPANET);
             copyfile('@#', inpname);% temporary
             delete('@#');
         end
         function writeLineInReportFile(obj, line)
+            % Writes a line of text to the EPANET report file.
+            %
+            % Example:
+            %   line = 'Status YES';
+            %   d.writeLineInReportFile(line)
+            %
+            % See also writeReport, copyReport.
             [obj.Errcode] = ENwriteline (line, obj.LibEPANET);
         end
         function writeReport(obj)
-            %Writes a formatted text report on simulation results to the Report file
+            % Writes a formatted text report on simulation results to the Report file.
+            %
+            % Example:
+            %   d.writeReport
+            %
+            % See also copyReport, writeLineInReportFile.
             [obj.Errcode]=ENreport(obj.LibEPANET);
         end
         function copyReport(obj, fileName)
@@ -8783,6 +8836,13 @@ classdef epanet <handle
             [obj.Errcode] = ENclearreport (obj.LibEPANET);
         end
         function unload(obj)
+            % Unload library and close the EPANET Toolkit system.
+            %
+            % Example:
+            %   d.unload
+            %
+            % See also epanet, saveInputFile, closeNetwork.
+            
             %ENclose(obj.LibEPANET);
             ENMatlabCleanup(obj.LibEPANET);
             fclose('all');
