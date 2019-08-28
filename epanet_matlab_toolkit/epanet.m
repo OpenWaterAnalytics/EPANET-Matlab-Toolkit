@@ -8502,6 +8502,8 @@ classdef epanet <handle
             % Example:
             %   d.closeHydraulicAnalysis
             %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
             % See also openHydraulicAnalysis, saveHydraulicFile, closeQualityAnalysis.
             [obj.Errcode] = ENcloseH(obj.LibEPANET);
         end
@@ -8510,6 +8512,8 @@ classdef epanet <handle
             %
             % Example:
             %   d.closeQualityAnalysis
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also openQualityAnalysis, initializeQualityAnalysis, closeHydraulicAnalysis.
             [obj.Errcode] = ENcloseQ(obj.LibEPANET);
@@ -8520,6 +8524,8 @@ classdef epanet <handle
             % Example:
             %   filename = 'test.hyd'
             %   d.saveHydraulicFile(filename)
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also useHydraulicFile, initializeHydraulicAnalysis.
             [obj.Errcode]=ENsavehydfile(hydname, obj.LibEPANET);
@@ -8550,6 +8556,8 @@ classdef epanet <handle
             %   code = 0;                       % i.e. Don't save
             %   d.initializeHydraulicAnalysis(code)
             %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
             % See also saveHydraulicFile, initializeQualityAnalysis.
             code=obj.ToolkitConstants.EN_SAVE;
             if ~isempty(varargin)
@@ -8571,6 +8579,8 @@ classdef epanet <handle
             %   code = 0;                     % i.e. Don't save
             %   d.initializeQualityAnalysis(code)
             %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
             % See also openQualityAnalysis, initializeHydraulicAnalysis.
             code=obj.ToolkitConstants.EN_SAVE;
             if ~isempty(varargin)
@@ -8586,6 +8596,8 @@ classdef epanet <handle
             % Example:
             %   d.nextHydraulicAnalysisStep
             %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
             % See also nextQualityAnalysisStep, runHydraulicAnalysis.
             [obj.Errcode, tstep] = ENnextH(obj.LibEPANET);
         end
@@ -8594,6 +8606,8 @@ classdef epanet <handle
             %
             % Example:
             %   d.nextQualityAnalysisStep
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also nextHydraulicAnalysisStep, runQualityAnalysis.
             [obj.Errcode, tstep] = ENnextQ(obj.LibEPANET);
@@ -8604,6 +8618,8 @@ classdef epanet <handle
             % Example:
             %   d.openHydraulicAnalysis
             %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
             % See also openQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode] = ENopenH(obj.LibEPANET);
         end
@@ -8612,6 +8628,8 @@ classdef epanet <handle
             %
             % Example:
             %   d.openQualityAnalysis
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also openHydraulicAnalysis, initializeQualityAnalysis.
             [obj.Errcode] = ENopenQ(obj.LibEPANET);
