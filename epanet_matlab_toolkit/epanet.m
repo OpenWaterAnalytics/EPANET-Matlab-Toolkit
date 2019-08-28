@@ -5753,6 +5753,7 @@ classdef epanet <handle
             fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
             fprintf(fid, texta);   % Writes the new text in the .inp file
             fclose('all');  
+            obj.saveInputFile(obj.BinTempfile);
             if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
         function Errcode = deleteLinkVertices(obj, varargin)
@@ -5834,7 +5835,6 @@ classdef epanet <handle
             fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
             fprintf(fid, texta);   % Writes the new text in the .inp file
             fclose('all');
-            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
         function value = getLinkVerticesCount(obj, varargin)
             % Retrieves the number of vertices.
@@ -5904,7 +5904,8 @@ classdef epanet <handle
             %          getLinkVerticesCount, getNodeCoordinates.
             
             % reload the network
-            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+%             obj.saveInputFile(obj.BinTempfile);
+%             if obj.Bin, obj.Errcode = reloadNetwork(obj); end
             cnt = obj.getLinkVerticesCount;
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
             inpfile = filepath{end};
@@ -6066,7 +6067,6 @@ classdef epanet <handle
                 [Errcode] = ENdeletenode(obj.LibEPANET, idNode, condition);
                 error(obj.getError(Errcode));
             end
-            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
         function Errcode = deleteLink(obj, idLink, varargin)
             % Deletes a link.
@@ -6104,7 +6104,7 @@ classdef epanet <handle
             end
             [Errcode] = ENdeletelink(obj.LibEPANET, indexLink, condition);
             error(obj.getError(Errcode));
-            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+%             if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
         function Errcode = deletePattern(obj, idPat)
             % Deletes a time pattern from a project.
@@ -16241,7 +16241,7 @@ fclose(fid2);
 if obj.Bin, Errcode=reloadNetwork(obj); end
 end
 function Errcode=reloadNetwork(obj)
-    obj.closeNetwork;  %Close input file 
+%     obj.closeNetwork;  %Close input file 
     Errcode=ENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
 end
 function setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
