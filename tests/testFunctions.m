@@ -222,7 +222,7 @@ d.getNodeTankMinimumWaterVolume
 d.getNodeTankVolumeCurveIndex
 d.getNodeTankMinimumWaterLevel
 d.getNodeTankMaximumWaterLevel
-d.getNodeTankMinimumFraction
+d.getNodeTankMixingFraction
 d.getNodeTankBulkReactionCoeff
 d.getNodeTankIndex
 d.getNodeTankNameID
@@ -398,10 +398,10 @@ if d.getNodeTankCount
     d.setNodeTankMaximumWaterLevel(values) 
     d.getNodeTankMaximumWaterLevel
 
-    values = d.getNodeTankMinimumFraction
+    values = d.getNodeTankMixingFraction
     values(end)= 0.5; %takes values 0-1
-    d.setNodeTankMinimumFraction(values) 
-    d.getNodeTankMinimumFraction
+    d.setNodeTankMixingFraction(values) 
+    d.getNodeTankMixingFraction
 
     values = d.getNodeTankBulkReactionCoeff
     values(end)= 1; 
