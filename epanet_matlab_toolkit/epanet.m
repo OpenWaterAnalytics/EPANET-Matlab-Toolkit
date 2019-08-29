@@ -1577,6 +1577,8 @@ classdef epanet <handle
             %   error = 250;
             %   d.getError(error)
             [errmssg , Errcode] = ENgeterror(Errcode, obj.LibEPANET);
+            warning(errmssg);
+            errmssg = '';
         end
         function value = getFlowUnits(obj)
             % Retrieves flow units used to express all flow rates.
@@ -5074,6 +5076,7 @@ classdef epanet <handle
             %
             % See also solveCompleteHydraulics.
             [obj.Errcode] = ENsolveQ(obj.LibEPANET);
+            error(obj.getError(obj.Errcode)); 
         end
         function index = addPattern(obj, varargin)
             % Adds a new time pattern to the network.
