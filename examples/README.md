@@ -1,34 +1,15 @@
 <a href="http://www.kios.ucy.ac.cy"><img src="http://www.kios.ucy.ac.cy/templates/favourite/images/kios_logo_hover.png"/><a>
 
 
-EPANET-MATLAB-Toolkit
+EPANET-MATLAB-Toolkit - Examples
 ==================================
 
 ## Table of Contents
 
-- [How to cite](#how-to-cite)
-- [Example titles](#example-titles)
-- [Example descriptions](#example-descriptions)
+- [Examples](#examples)
+- [Descriptions](#descriptions)
 
-## How to cite 
-
-D.G. Eliades, M. Kyriakou, S. Vrachimis and M.M. Polycarpou, "EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB", in *Proc. 14th International Conference on Computing and Control for the Water Industry (CCWI)*, The Netherlands, Nov 2016, p.8. (doi:10.5281/zenodo.831493)
-
-```
-@INPROCEEDINGS{Eliades2016, 
-author={Eliades, Demetrios G. and Kyriakou, Marios and Vrachimis, Stelios and Polycarpou, Marios M.}, 
-title={EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB}, 
-booktitle={Proc. 14th International Conference on Computing and Control for the Water Industry (CCWI)}, 
-year={2016},
-pages={8},
-address = {The Netherlands},
-month={Nov},
-DOI={10.5281/zenodo.831493}}
-```
-
-&uparrow; [Back to top](#table-of-contents)
-
-## Example titles
+## Examples
 
 - Example 1: <b> [EX1_Plot_network_topology] </b>, Plots the network topology.
 - Example 2: <b> [EX2_Hydraulic_analysis] </b>, Runs the hydraulic analysis of a network.
@@ -59,9 +40,9 @@ DOI={10.5281/zenodo.831493}}
 
 &uparrow; [Back to top](#table-of-contents)
 
-## Example descriptions
+## Descriptions
 
-- Example 1: <b> EX1_Plot_network_topology </b>
+- <b> Example 1:  Plot network topology </b>
 
 Plots the network topology.
 
@@ -87,7 +68,7 @@ This example contains:
  Unload library.
  
  
-- Example 2: <b> EX2_Hydraulic_analysis </b>
+- <b> Example 2: Hydraulic analysis </b>
 
 Runs the hydraulic analysis of a network.
 
