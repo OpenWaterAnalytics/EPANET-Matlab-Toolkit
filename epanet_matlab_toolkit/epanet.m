@@ -5179,7 +5179,7 @@ classdef epanet <handle
                 dmndpat = varargin{4};
             end
             index = ENaddnode(obj, juncID, obj.ToolkitConstants.EN_JUNCTION);
-            obj.setNodeCoordinates(index,[xy(1),xy(2)]);
+            obj.setNodeCoordinates(index, [xy(1),xy(2)]);
             obj.setNodeJunctionData(index, elev, dmnd, dmndpat);
         end
         function index = addNodeReservoir(obj, resID, varargin)
