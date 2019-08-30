@@ -1,12 +1,23 @@
-%% b)External Controls
-% Add controls in hydraulic analysis STEP-BY-STEP
+%% b) External Controls, Adds controls in hydraulic analysis STEP-BY-STEP.
+% This example contains:
+%   Load network.
+%   Delete Controls.
+%   Hydraulic analysis STEP-BY-STEP.
+%   CONTROLS.
+%   Add new controls in live.
+%   Delete controls.
+%   Unload library.
+
+%%
+% Clear
 clear; close('all'); clc;
 start_toolkit;
 
 % Second way
+% Load network.
 d = epanet('Net1.inp');
 
-% Delete Controls
+% Delete Controls.
 d.deleteControls();
 tankID = '2';
 pumpID = '9';
@@ -15,7 +26,7 @@ tankIndex = d.getNodeIndex(tankID);
 pumpIndex = d.getLinkIndex(pumpID);
 tankElevation = d.getNodeElevations(tankIndex);
 
-% Hydraulic analysis STEP-BY-STEP
+% Hydraulic analysis STEP-BY-STEP.
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis(0);
 
@@ -30,7 +41,7 @@ while (tstep>0)
     i = i+1;
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % add new controls in live
+    % Add new controls in live.
     Below = 110;
     Above = 140;
     status = {'OPEN', 'CLOSED'};
@@ -55,10 +66,11 @@ while (tstep>0)
     
     tstep = d.nextHydraulicAnalysisStep;
     
-    % delete controls
+    % Delete controls.
     d.deleteControls();
 end
 d.closeHydraulicAnalysis;
+% Unload library.
 d.unload;
 
 figure;

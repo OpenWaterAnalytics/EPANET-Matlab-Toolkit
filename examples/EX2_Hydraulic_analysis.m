@@ -1,38 +1,40 @@
-%% Hydraulic analysis example
-% This function contains:
-% Load a network
-% Set simulation time duration
-% Hydraulic analysis using ENepanet binary file
-% Hydraulic analysis using epanet2d.exe binary file
-% Hydraulic analysis 
-% Hydraulic analysis step-by-step
+%% Runs the hydraulic analysis of a network.
+% This example contains:
+%   Load a network.
+%   Set simulation time duration.
+%   Hydraulic analysis using ENepanet binary file.
+%   Hydraulic analysis using epanet2d.exe binary file.
+%   Hydraulic analysis.
+%   Hydraulic analysis step-by-step.
+%   Unload library.
 
-%% 
+%%
+% Clear
 clear; close('all'); clc;
 start_toolkit;
 
 %% Run hydraulic analysis of a network
 
-% Load a network
+% Load a network.
 d = epanet('Net1.inp');
 
-% Set simulation time duration
+% Set simulation time duration.
 hrs = 100;
 d.setTimeSimulationDuration(hrs*3600);
 
-% Hydraulic analysis using ENepanet binary file (fastest)
+% Hydraulic analysis using ENepanet binary file (fastest).
 % (This function ignores events)
 hyd_res_1 = d.getComputedTimeSeries
 
-% Hydraulic analysis using epanet2d.exe binary file
+% Hydraulic analysis using epanet2d.exe binary file.
 % (This function ignores events)
 hyd_res_2 = d.getBinComputedAllParameters 
 
-% Hydraulic analysis using the functions ENopenH, ENinit, ENrunH, ENgetnodevalue/&ENgetlinkvalue, ENnextH, ENcloseH
+% Hydraulic analysis using the functions ENopenH, ENinit, ENrunH, ENgetnodevalue/&ENgetlinkvalue, ENnextH, ENcloseH.
 % (This function contains events)
 hyd_res_3 = d.getComputedHydraulicTimeSeries 
 
-% Hydraulic analysis step-by-step using the functions ENopenH, ENinit, ENrunH, ENgetnodevalue/&ENgetlinkvalue, ENnextH, ENcloseH
+% Hydraulic analysis step-by-step using the functions ENopenH, ENinit, ENrunH, ENgetnodevalue/&ENgetlinkvalue, ENnextH, ENcloseH.
 % (This function contains events)
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis;
@@ -48,5 +50,5 @@ while (tstep>0)
 end
 d.closeHydraulicAnalysis;
 
-% Unload library
+% Unload library.
 d.unload

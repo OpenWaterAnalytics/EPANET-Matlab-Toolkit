@@ -1,12 +1,15 @@
-%% Hydraulic and Quality analysis
-% This function contains:
-% Load a network
-% Hydraulic and Quality analysis STEP-BY-STEP
+%% Runs the Hydraulic and Quality analysis of a network.
+% This example contains:
+%   Load a network.
+%   Hydraulic and Quality analysis STEP-BY-STEP.
+%   Display nodes pressures, links flows, nodes actual qualities, links actual qualities.
+%   Unload library.
+
 %% 
 clear; close('all'); clc;
 start_toolkit;
 
-% Load a network
+% Load a network.
 d = epanet('Net1.inp');
 
 % Set time hydraulic and quality steps
@@ -18,7 +21,7 @@ d = epanet('Net1.inp');
 % Hstep = min(Rstep,Hstep)
 % Hstep = min(Qstep,Hstep)
 
-% Hydraulic and Quality analysis STEP-BY-STEP
+% Hydraulic and Quality analysis STEP-BY-STEP.
 d.openHydraulicAnalysis;
 d.openQualityAnalysis;
 d.initializeHydraulicAnalysis(0);
@@ -43,10 +46,11 @@ end
 d.closeQualityAnalysis;
 d.closeHydraulicAnalysis;
 
+% Display nodes pressures, links flows, nodes actual qualities, links actual qualities.
 P
 F
 QN
 QL
 
-% Unload library 
+% Unload library.
 d.unload;

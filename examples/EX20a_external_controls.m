@@ -1,12 +1,22 @@
-%% a) External Controls 
-% Change control status of pump STEP BY STEP
+%% a) External Controls, Changes control status of pump STEP BY STEP.
+% This example contains:
+%   Load network.
+%   Delete Controls.
+%   Hydraulic analysis STEP-BY-STEP.
+%   CONTROLS.
+%   Add new controls in live.
+%   Unload library.
+
+%%
+% Clear
 clear; close('all'); clc;
 start_toolkit;
 
 % Second way
+% Load network.
 d = epanet('Net1.inp');
 
-% Delete Controls
+% Delete Controls.
 d.deleteControls();
 tankID = '2';
 pumpID = '9';
@@ -15,14 +25,14 @@ tankIndex = d.getNodeIndex(tankID);
 pumpIndex = d.getLinkIndex(pumpID);
 tankElevation = d.getNodeElevations(tankIndex);
 
-% Hydraulic analysis STEP-BY-STEP
+% Hydraulic analysis STEP-BY-STEP.
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis(0);
 
 tstep = 1; i = 1;
 T = []; P = []; F = []; S= [];
 
-% CONTROLS
+% CONTROLS.
 Below = 110;
 Above = 140;
 tankHead = [];
@@ -32,7 +42,7 @@ while (tstep>0)
     tankHead(i) = H(tankIndex)-tankElevation;
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % add new controls in live
+    % Add new controls in live.
     % LINK 9 OPEN IF NODE 2 BELOW 110
     if tankHead(i) < Below
         d.setLinkStatus(pumpIndex, 1);
@@ -55,6 +65,8 @@ while (tstep>0)
     tstep = d.nextHydraulicAnalysisStep;
 end
 d.closeHydraulicAnalysis;
+
+% Unload library.
 d.unload;
 
 figure;

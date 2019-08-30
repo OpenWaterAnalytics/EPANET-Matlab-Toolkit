@@ -1,19 +1,27 @@
-%% Add CV pipe with bin Functions addBinJunction
+%% Adds CV pipe and junction in a network with the bin Function addBinJunction.
+% This example contains:
+%   Load a network.
+%   Plot newtork with bin functions.
+%   Add Junction + CV pipe.
+%   Plot normal with new pipe.
+%   Unload library.
+
+%%
 %Clear 
 clear; close('all'); clc;
 start_toolkit;
 
-% Load a network
+% Load a network.
 d = epanet('Net1.inp');
 
 disp('Add CV PIPE with Bin Functions addBinJunction')
 
-% Plot newtork with bin functions
+% Plot newtork with bin functions.
 d.Binplot('nodes','yes');
 % addBinJunction
 % arguments: newNodeID,X,Y,ToNodeID,newElevation,newBaseDemand,newDemandPattern,newPipeID,
 % newLength,newDiameter,newRoughness,Code
-% Add Junction + CV pipe
+% Add Junction + CV pipe.
 newID='J1';
 [x,y]=ginput(1);
 ToNodeID='10'; 
@@ -28,9 +36,9 @@ Code='CVPIPE';%'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV
 errcode=d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,...
 ToNodeID,newLength,newDiameter,newRoughness,Code);
 
-% Plot normal with new pipe
+% Plot normal with new pipe.
 d.plot('links','yes');
 
-% Unload library
+% Unload library.
 d.unload
 

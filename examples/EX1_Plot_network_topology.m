@@ -1,23 +1,24 @@
-%% Plot network topology example.
+%% Plots the network topology.
 % This example contains:
-%   Load a network
-%   Plot network topology
-%   Plot node IDs
-%   Plot links IDs
-%   Plot link indices
-%   Plot node indices
-%   Highlight specific links          
-%   Highlight specific nodes
-%   Plot only links
-%   Plot only nodes
-%   Highlight multiple links with different colors 
-%   Highlight multiple nodes with different colors 
-%   Hide legend
-%   Extent network on figure
-%   Legend Position
-%   Plot at specific axes
-%   Plot for matlab apps (GUIs)
-%   Plot colors
+%   Load a network.
+%   Plot network topology.
+%   Plot node IDs.
+%   Plot links IDs.
+%   Plot link indices.
+%   Plot node indices.
+%   Highlight specific links.
+%   Highlight specific nodes.
+%   Plot only links.
+%   Plot only nodes.
+%   Highlight multiple links with different colors.
+%   Highlight multiple nodes with different colors.
+%   Hide legend.
+%   Extent network on figure.
+%   Legend Position.
+%   Plot at specific axes.
+%   Plot for matlab apps (GUIs).
+%   Plot colors.
+%   Unload library.
 
 %%
 % Clear
