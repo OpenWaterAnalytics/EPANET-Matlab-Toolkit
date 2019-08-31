@@ -634,7 +634,9 @@ classdef epanet <handle
             obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
             obj.closeNetwork;  %ENclose; %Close input file
             %Load temporary file
-            obj.Errcode=ENopen(obj.BinTempfile, [obj.InputFile(1:end-4), '_temp.txt'], [obj.InputFile(1:end-4), '_temp.bin'], obj.LibEPANET);
+            rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
+            binfile = [obj.InputFile(1:end-4), '_temp.bin'];
+            obj.Errcode=ENopen(obj.BinTempfile, rptfile, binfile, obj.LibEPANET);
             if obj.Errcode
                 error(obj.getError(obj.Errcode)); 
             else
@@ -824,8 +826,8 @@ classdef epanet <handle
             open(obj.TempInpFile);
         end
         function Errcode = loadEPANETFile(obj, varargin)
-            %Load epanet file when use bin functions
-            % example: 
+            % Load epanet file when use bin functions.
+            % Example: 
             %   d.loadEPANETFile(d.TempInpFile);
             obj.solve = 0;
             if nargin==2
@@ -834,9 +836,22 @@ classdef epanet <handle
                 [Errcode] = ENopen(varargin{1}, varargin{2}, varargin{3}, obj.LibEPANET); 
             end
         end
+        function Errcode = createBinaryOutputFile(obj, varargin)
+            % Runs a complete EPANET simulation.
+            % Example: 
+            %       obj.createBinary()
+            %       obj.createBinary('test.bin');
+            rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
+            binfile = [obj.InputFile(1:end-4), '_temp.bin'];
+            if nargin == 2
+                binfile = varargin{1};
+            end
+            obj.Errcode = calllib(obj.LibEPANET, 'ENepanet', obj.BinTempfile, rptfile, binfile, lib.pointer);
+            Errcode = reloadNetwork(obj);
+        end
         function [value] = plot(obj, varargin)
-            %Plots network in a new Matlab figure
-            %Arguments:
+            % Plots network in a new Matlab figure
+            % Arguments:
             % 'nodes': yes/no
             % 'links': yes/no
             % 'line' : yes/no
