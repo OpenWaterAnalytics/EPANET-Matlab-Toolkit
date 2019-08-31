@@ -836,11 +836,19 @@ classdef epanet <handle
                 [Errcode] = ENopen(varargin{1}, varargin{2}, varargin{3}, obj.LibEPANET); 
             end
         end
-        function Errcode = createBinaryOutputFile(obj, varargin)
-            % Runs a complete EPANET simulation.
+        function Errcode = createBinaryOutputFile(obj)
+            % Runs a complete hydraulic and water simulation to create
+            % binary file with name: [NETWORK NAME][_temp.bin]
+            % Example:
+            %       obj.createBinaryOutputFile;
+            obj.solveCompleteHydraulics;
+            Errcode = obj.solveCompleteQuality;
+        end
+        function Errcode = createBinaryOutputFileENepanet(obj, varargin)
+            % Runs a complete EPANET simulation using the function ENepanet
             % Example: 
-            %       obj.createBinary()
-            %       obj.createBinary('test.bin');
+            %       obj.createBinaryOutputFileENepanet()
+            %       obj.createBinaryOutputFileENepanet('test.bin');
             rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
             binfile = [obj.InputFile(1:end-4), '_temp.bin'];
             if nargin == 2
@@ -5072,7 +5080,7 @@ classdef epanet <handle
                 value.QualityWaterAgeUnits='hours';
             end 
         end
-        function solveCompleteHydraulics(obj)
+        function Errcode = solveCompleteHydraulics(obj)
             % Runs a complete hydraulic simulation with results for all time periods written to the binary Hydraulics file.
             %
             % Example:
@@ -5080,17 +5088,17 @@ classdef epanet <handle
             %
             % See also solveCompleteQuality.
             obj.solve = 1;
-            [obj.Errcode] = ENsolveH(obj.LibEPANET);
+            [Errcode] = ENsolveH(obj.LibEPANET);
             error(obj.getError(obj.Errcode)); 
         end
-        function solveCompleteQuality(obj)
+        function Errcode = solveCompleteQuality(obj)
             % Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file.
             %
             % Example:
             %   d.solveCompleteQuality
             %
             % See also solveCompleteHydraulics.
-            [obj.Errcode] = ENsolveQ(obj.LibEPANET);
+            [Errcode] = ENsolveQ(obj.LibEPANET);
             error(obj.getError(obj.Errcode)); 
         end
         function index = addPattern(obj, varargin)
