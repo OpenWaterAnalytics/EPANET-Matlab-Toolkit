@@ -8840,7 +8840,15 @@ classdef epanet <handle
             % Writes a formatted text report on simulation results to the Report file.
             %
             % Example:
+            %   d = epanet('Net1.inp');
+            %   d.solveCompleteHydraulics;
+            %   d.solveCompleteQuality;
+            %   d.setReportFormatReset
+            %   d.setReport('FILE TestReport3.txt'); 
+            %   d.setReport('NODES ALL')
+            %   d.setReport('LINKS ALL')
             %   d.writeReport
+            %   open('TestReport3.txt')
             %
             % See also copyReport, writeLineInReportFile.
             [obj.Errcode]=ENreport(obj.LibEPANET);
