@@ -836,25 +836,24 @@ classdef epanet <handle
                 [Errcode] = ENopen(varargin{1}, varargin{2}, varargin{3}, obj.LibEPANET); 
             end
         end
-        function Errcode = runsCompleteSimulation(obj)
+        function Errcode = runsCompleteSimulation(obj, varargin)
             % Runs a complete hydraulic and water simulation to create
-            % binary file with name: [NETWORK NAME][_temp.txt], [NETWORK NAME][_temp.bin]
+            % binary & report files with name: [NETWORK_temp.txt], [NETWORK_temp.bin]
+            % OR you can use argument to runs a complete simulation via ENepanet
             % Example:
             %       d.runsCompleteSimulation;
-            obj.solveCompleteHydraulics;
-            Errcode = obj.solveCompleteQuality;
-            obj.writeReport();
-        end
-        function Errcode = runsCompleteSimulationENepanet(obj, varargin)
-            % Runs a complete EPANET simulation using the function ENepanet
-            % Example: 
-            %       d.runsCompleteSimulationENepanet('results');
-            if nargin == 2
+            %       d.runsCompleteSimulation('results'); % using ENepanet
+            
+            if nargin == 1
+                obj.solveCompleteHydraulics;
+                Errcode = obj.solveCompleteQuality;
+                obj.writeReport();
+            elseif nargin == 2
                 rptfile = [varargin{1}, '.txt'];
                 binfile = [varargin{1}, '.bin'];
+                obj.Errcode = calllib(obj.LibEPANET, 'ENepanet', obj.BinTempfile, rptfile, binfile, lib.pointer);
+                Errcode = reloadNetwork(obj);
             end
-            obj.Errcode = calllib(obj.LibEPANET, 'ENepanet', obj.BinTempfile, rptfile, binfile, lib.pointer);
-            Errcode = reloadNetwork(obj);
         end
         function [value] = plot(obj, varargin)
             % Plots network in a new Matlab figure
