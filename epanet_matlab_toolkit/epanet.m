@@ -843,14 +843,12 @@ classdef epanet <handle
             %       d.runsCompleteSimulation;
             obj.solveCompleteHydraulics;
             Errcode = obj.solveCompleteQuality;
+            obj.writeReport();
         end
         function Errcode = runsCompleteSimulationENepanet(obj, varargin)
             % Runs a complete EPANET simulation using the function ENepanet
             % Example: 
-            %       d.runsCompleteSimulationENepanet()
             %       d.runsCompleteSimulationENepanet('results');
-            rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
-            binfile = [obj.InputFile(1:end-4), '_temp.bin'];
             if nargin == 2
                 rptfile = [varargin{1}, '.txt'];
                 binfile = [varargin{1}, '.bin'];
