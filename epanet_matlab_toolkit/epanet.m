@@ -848,7 +848,7 @@ classdef epanet <handle
             % Runs a complete EPANET simulation using the function ENepanet
             % Example: 
             %       d.runsCompleteSimulationENepanet()
-            %       d.runsCompleteSimulationENepanet('test');
+            %       d.runsCompleteSimulationENepanet('results');
             rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
             binfile = [obj.InputFile(1:end-4), '_temp.bin'];
             if nargin == 2
