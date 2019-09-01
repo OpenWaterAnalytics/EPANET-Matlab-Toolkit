@@ -330,8 +330,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |closeHydraulicAnalysis|Closes the hydraulic analysis system, freeing all allocated memory|
 |closeNetwork|Closes down the Toolkit system|
 |closeQualityAnalysis|Closes the water quality analysis system, freeing all allocated memory|
-|createBinaryOutputFile|Runs a complete hydraulic and water simulation to create binary file with default name net_temp.bin|
-|createBinaryOutputFileENepanet|Runs a complete EPANET simulation to create a binary output file using the function ENepanet|
+|runsCompleteSimulation|Runs a complete hydraulic and water simulation to create binary & report file with default name net_temp.bin|
+|runsCompleteSimulationENepanet|Runs a complete EPANET simulation to create a binary output & report file using the function ENepanet|
 |initializeHydraulicAnalysis|Initializes storage tank levels, link status and settings, and the simulation clock time prior to running a hydraulic analysis|
 |initializeQualityAnalysis|Initializes water quality and the simulation clock time prior to running a water quality analysis|
 |nextHydraulicAnalysisStep|Determines the length of time until the next hydraulic event occurs in an extended period simulation|

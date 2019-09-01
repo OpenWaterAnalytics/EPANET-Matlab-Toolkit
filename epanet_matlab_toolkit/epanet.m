@@ -836,23 +836,24 @@ classdef epanet <handle
                 [Errcode] = ENopen(varargin{1}, varargin{2}, varargin{3}, obj.LibEPANET); 
             end
         end
-        function Errcode = createBinaryOutputFile(obj)
+        function Errcode = runsCompleteSimulation(obj)
             % Runs a complete hydraulic and water simulation to create
-            % binary file with name: [NETWORK NAME][_temp.bin]
+            % binary file with name: [NETWORK NAME][_temp.txt], [NETWORK NAME][_temp.bin]
             % Example:
-            %       obj.createBinaryOutputFile;
+            %       d.runsCompleteSimulation;
             obj.solveCompleteHydraulics;
             Errcode = obj.solveCompleteQuality;
         end
-        function Errcode = createBinaryOutputFileENepanet(obj, varargin)
+        function Errcode = runsCompleteSimulationENepanet(obj, varargin)
             % Runs a complete EPANET simulation using the function ENepanet
             % Example: 
-            %       obj.createBinaryOutputFileENepanet()
-            %       obj.createBinaryOutputFileENepanet('test.bin');
+            %       d.runsCompleteSimulationENepanet()
+            %       d.runsCompleteSimulationENepanet('test');
             rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
             binfile = [obj.InputFile(1:end-4), '_temp.bin'];
             if nargin == 2
-                binfile = varargin{1};
+                rptfile = [varargin{1}, '.txt'];
+                binfile = [varargin{1}, '.bin'];
             end
             obj.Errcode = calllib(obj.LibEPANET, 'ENepanet', obj.BinTempfile, rptfile, binfile, lib.pointer);
             Errcode = reloadNetwork(obj);
