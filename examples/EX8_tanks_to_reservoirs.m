@@ -1,18 +1,27 @@
 %% Replace tanks with reservoirs
-function tanks_to_reservoirs()
+% This example contains:
+%   Choose Network.
+%   Load network and simulate.
+%   Find tank patterns.
+%   Create patterns for new reservoirs from tanks.
+%   Replace tanks with reservoirs.
+%   Unload library.
+
+%%
+function EX8_tanks_to_reservoirs()
 %Clear 
 clear; close('all'); clc;
 start_toolkit;
 
-% Choose Network
+% Choose Network.
 inpname = 'Net1.inp';
 
-% Load network and simulate
+% Load network and simulate.
 d = epanet('Net1.inp');
 res = d.getComputedTimeSeries;
 H = res.Head;
 
-% Find tank patterns:
+% Find tank patterns.
 tank_index = d.getNodeTankIndex;
 if isempty(tank_index)
     disp('No tanks in network. Please Choose other network.');
@@ -20,7 +29,7 @@ if isempty(tank_index)
 end
 tankPat = H(:, tank_index);
 
-% Create patterns for new reservoirs from tanks
+% Create patterns for new reservoirs from tanks.
 tankPatInd=0;
 for i = tank_index
     tankPatInd = tankPatInd +1;
@@ -28,7 +37,7 @@ for i = tank_index
 end
 d.BinUpdateClass;
 
-% Replace tanks with reservoirs
+% Replace tanks with reservoirs.
 i = 1;
 new_id = {};
 for tank_i = tank_index
@@ -48,7 +57,7 @@ d.plot;
 %filename=['new_',inpname];
 %d.saveInputFile(filename);
 
-% Unload library
+% Unload library.
 d.unload
 
 end

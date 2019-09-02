@@ -1,29 +1,39 @@
-%% Defining pattern time for pipe status
+%% Defines pattern time for pipe status.
+% This example contains:
+%   Add paths and load inp file.
+%   Get times.
+%   Get Pipe infos.
+%   Find the max length of link pipe names.
+%   Times.
+%   Create random status for pipes every hour.
+%   Unload library.
+
+%%
 %Clear 
 clear; close('all'); clc;
 start_toolkit;
 tic;
-% Add paths and load inp file
+% Add paths and load inp file.
 d=epanet('Net1.inp');
 
-% Get times
+% Get times.
 hydstep = d.getTimeHydraulicStep;
 duration = d.getTimeSimulationDuration;
 
-% Get Pipe infos
+% Get Pipe infos.
 pipe_count = d.getLinkPipeCount;
 pipeIDs = d.getLinkPipeNameID;
-% Find the max length of link pipe names
+% Find the max length of link pipe names.
 spsmax = max(cellfun('length',pipeIDs));
 
-% Times
+% Times.
 hrs = duration/3600;
 hours = 0:hrs;
 step = 0:hydstep/60:55; %step 30min
 i=1; Time = cell(hrs,1);
 
 for u=1:hrs
-    % Create random status for pipes every hour
+    % Create random status for pipes every hour.
     status_code = round(rand(1,pipe_count));
     status(find(status_code)) = {'Open  '};
     status(find(~status_code)) = {'Closed'};
@@ -44,6 +54,6 @@ plot(d.getComputedHydraulicTimeSeries.Flow);
 title('Change status of pipes every hour');
 xlabel('Time (hours)');
 
-% Unload libs
+% Unload library.
 d.unload;
 toc

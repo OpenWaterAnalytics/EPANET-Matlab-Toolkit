@@ -1,20 +1,30 @@
-%% Compare hydraulics and quality analysis functions
+%% Compares hydraulics and quality analysis functions.
+% This example contains:
+%   Load a network.
+%   Set simulation duration.
+%   Test hydraulics and quality analysis functions.
+%   Step by step hydraulic analysis.
+%   Step by step quality analysis.
+%   Unload library.
+%   Run time d.getComputedTimeSeries.
+
+%%
 %Clear 
 clear; close('all'); clc;
 start_toolkit;
 
-% Load a network
+% Load a network.
 d = epanet('Net1.inp');tic;
 
-% Set simulation duration
+% Set simulation duration.
 hours = 100;
 d.setTimeSimulationDuration(hours*3600);
 
-% Test hydraulics and quality analysis functions
-% Using ENepanet, create and read binary file
+% Test hydraulics and quality analysis functions.
+% Using ENepanet, create and read binary file.
 Results = d.getComputedTimeSeries 
 tocResults = toc;tic;
-% Using the functions(ENopenH, ENinit, ENrunH, ENgetnodevalue/&ENgetlinkvalue, ENnextH, ENcloseH)
+% Using the functions(ENopenH, ENinit, ENrunH, ENgetnodevalue/&ENgetlinkvalue, ENnextH, ENcloseH).
 Hydraulics = d.getComputedHydraulicTimeSeries 
 tocHydraulics = toc;tic;
 % ENopenQ, ENinitQ, ENrunQ, ENgetnodevalue/&ENgetlinkvalue, ENstepQ, ENcloseQ
@@ -24,7 +34,7 @@ tocQuality = toc;tic;
 pipeindex=4;
 nodeindex=6;
 
-% Step by step hydraulic analysis
+% Step by step hydraulic analysis.
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis;
 tstep=1;P=[];T_H=[];D=[];H=[];F=[];
@@ -39,7 +49,7 @@ while (tstep>0)
 end
 d.closeHydraulicAnalysis
 
-% Step by step quality analysis
+% Step by step quality analysis.
 d.openQualityAnalysis
 d.initializeQualityAnalysis
 tleft=1; P=[];T_Q=[];Q=[];  
@@ -51,10 +61,10 @@ while (tleft>0)
 end
 d.closeQualityAnalysis;
 
-% Unload library
+% Unload library.
 d.unload
 
-%Run time d.getComputedTimeSeries
+% Run time d.getComputedTimeSeries.
 fprintf('\nSimulation duration: %d hours\n', hours);
 disp(['Run Time of function d.getComputedTimeSeries: ', num2str(tocResults), '(sec)'])
 disp(['Run Time of function d.getComputedHydraulicTimeSeries: ', num2str(tocHydraulics), '(sec)'])

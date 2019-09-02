@@ -1,22 +1,32 @@
-%% Change status randomly at pipes during simulation
+%% Changes status randomly at pipes during simulation.
+% This example contains:
+%   Load a network.
+%   Get pipe count.
+%   Get pipe indices.
+%   Run step by step hydraulic analysis.
+%   Set status random 0/1 for pipes.
+%   Plot flows.
+%   Unload library.
+
+%%
 %Clear 
 clear; close('all'); clc;
 start_toolkit;
 
-% Load a network
+% Load a network.
 d = epanet('Net1.inp');
 
-% Get pipe count
+% Get pipe count.
 pipe_count = d.getLinkPipeCount;
-% Get pipe indices
+% Get pipe indices.
 pipe_indices = d.getLinkPipeIndex;
 
-% Run step by step hydraulic analysis
+% Run step by step hydraulic analysis.
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis;
 i=1;tstep=1; F=[];
 while (tstep>0)
-    % Set status random 0/1 for pipes
+    % Set status random 0/1 for pipes.
     Status = round(rand(1,pipe_count))';
 
     t=d.runHydraulicAnalysis;
@@ -26,9 +36,9 @@ while (tstep>0)
 end
 d.closeHydraulicAnalysis;
 
-% Plot flows
+% Plot flows.
 plot(F)
 
 
-% Unload library
+% Unload library.
 d.unload

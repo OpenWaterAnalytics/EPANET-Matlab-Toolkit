@@ -1,21 +1,22 @@
 %% Tests the overflow option for tanks.
 % This example contains:
-% Get index of the tank and its inlet/outlet pipe.
-% Set initial & maximum level to 130.
-% Set duration to 1 hr.
-% Solve hydraulics with default of no tank spillage allowed.
-% Check that tank remains full.
-% Check that there is no spillage.
-% Check that inflow link is closed.
-% Turn tank overflow option on.
-% Solve hydraulics again.
-% Check that tank remains full.
-% Check that there is spillage equal to tank inflow
-% (inflow has neg. sign since tank is start node of inflow pipe).
-% Save project to file and then close it.
-% Re-open saved file & run it.
-% Check that tank spillage has same value as before.
-% Clean up.
+%   Get index of the tank and its inlet/outlet pipe.
+%   Set initial & maximum level to 130.
+%   Set duration to 1 hr.
+%   Solve hydraulics with default of no tank spillage allowed.
+%   Check that tank remains full.
+%   Check that there is no spillage.
+%   Check that inflow link is closed.
+%   Turn tank overflow option on.
+%   Solve hydraulics again.
+%   Check that tank remains full.
+%   Check that there is spillage equal to tank inflow
+%   (inflow has neg. sign since tank is start node of inflow pipe).
+%   Save project to file and then close it.
+%   Re-open saved file & run it.
+%   Check that tank spillage has same value as before.
+%   Unload library.
+
 % https://github.com/OpenWaterAnalytics/EPANET/blob/dev/tests/test_overflow.cpp
 
 %%
@@ -81,5 +82,5 @@ d.solveCompleteHydraulics;
 spillage2 = d.getNodeActualDemand(Nindex);
 check_error(abs(spillage - spillage2) < 0.0001)
 
-% Clean up.
+% Unload library.
 d.unload;

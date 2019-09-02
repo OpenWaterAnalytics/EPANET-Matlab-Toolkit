@@ -1,15 +1,16 @@
 %% Tests the Pressure Driven Analysis option.
 % This example contains:
-% Set Demand Multiplier to 10 to cause negative pressures.
-% Run single period analysis.
-% Solve hydraulics with default DDA option which will return with neg. pressure warning code.
-% Check that 4 demand nodes have negative pressures.
-% Switch to PDA with pressure limits of 20 - 100 psi.
-% Solve hydraulics again.
-% Check that 6 nodes had demand reductions totaling 32.66%.
-% Check that Junction 12 had full demand.
-% Check that Junction 21 had a demand deficit of 413.67.
-% Clean up.
+%   Set Demand Multiplier to 10 to cause negative pressures.
+%   Run single period analysis.
+%   Solve hydraulics with default DDA option which will return with neg. pressure warning code.
+%   Check that 4 demand nodes have negative pressures.
+%   Switch to PDA with pressure limits of 20 - 100 psi.
+%   Solve hydraulics again.
+%   Check that 6 nodes had demand reductions totaling 32.66%.
+%   Check that Junction 12 had full demand.
+%   Check that Junction 21 had a demand deficit of 413.67.
+%   Unload library.
+
 % https://github.com/OpenWaterAnalytics/EPANET/blob/a184a3a39a7bf3663943c0504c6c1c2f632f44dd/tests/test_pda.cpp
 
 %%
@@ -58,5 +59,5 @@ junctionIndex_21 = d.getNodeIndex('21');
 demand_deficit_21 = d.getNodeDemandDeficit(junctionIndex_21);
 check_error(abs(demand_deficit_21 - 413.67) < 0.01)
 
-% Clean up.
+% Unload library.
 d.unload;
