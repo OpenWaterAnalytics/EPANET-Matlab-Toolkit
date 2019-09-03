@@ -141,8 +141,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkBulkReactionCoeff|Bulk chemical reaction coefficient|
 |getLinkComment|Retrieves the comment string assigned to the link object|
 |getLinkCount|Retrieves the number of links|
-|getLinkVertices|Retrieves the link vertices|
-|getLinkVerticesCount|Retrieves the number of vertices|
 |getLinkDiameter|Retrieves the value of all link diameters|
 |getLinkEnergy|Current computed pump energy usage (read only)|
 |getLinkFlows|Current computed flow rate (read only)|
@@ -316,11 +314,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addLinkValveFCV|Adds a new FCV valve|
 |addLinkValveTCV|Adds a new TCV valve|
 |addLinkValveGPV|Adds a new GPV valve|
-|addLinkVertices|Adds interior vertex points to network links|
 |addRules|Adds a new rule-based control to a project. (EPANET Version 2.2)|
 |deleteCurve|Deletes a data curve from the project|
 |deleteLink|Deletes a link|
-|deleteLinkVertices|Deletes interior vertex points of network links|
 |deleteNode|Deletes a node|
 |deletePattern|Deletes a time pattern from a project|
 |deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
@@ -389,7 +385,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkTypeValvePRV|Set the link type valve PRV for a specified link|
 |setLinkTypeValvePSV|Set the link type valve PSV for a specified link|
 |setLinkTypeValveTCV|Set the link type valve TCV for a specified link|
-|setLinkVertices|Sets interior vertex points of network links|
 |setLinkWallReactionCoeff|Sets the values of wall reactions|
 |setNodeBaseDemands|Sets the values of demands|
 |setNodeComment|Sets the comment string assigned to the node object|
@@ -577,6 +572,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addBinValvePRV|Adds a new valve PRV to the network|
 |addBinValvePSV|Adds a new valve PSV to the network|
 |addBinValveTCV|Adds a new valve TCV to the network|
+|addBinLinkVertices|Adds interior vertex points to network links|
 |removeBinControlLinkID|Removes a specific control based on link ID|
 |removeBinControlNodeID|Removes a specific control based on node ID|
 |removeBinCurveID|Removes a specific curve based on ID|
@@ -584,6 +580,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |removeBinNodeID|Removes a specific node based on ID|
 |removeBinRulesControlLinkID|Removes a specific rule based on link ID|
 |removeBinRulesControlNodeID|Removes a specific rule based on node ID|
+|deleteBinLinkVertices|Deletes interior vertex points of network links|
 |saveBinInpFile|Writes all current network input data to a file using the format of an EPANET input file|
 |getBinComputedAllParameters|Computes hydraulic and quality time series|
 |getBinComputedAverageBulkReactionRate|Computes the average bulk reaction rate|
@@ -632,6 +629,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getBinSimulationDuration|Retrieves the value of simulation duration|
 |getBinSections|Retrieves some basic sections from inp file|
 |getBinUnits|Retrieves the units used to express all flow rates|
+|getBinLinkVertices|Retrieves the link vertices|
+|getBinLinkVerticesCount|Retrieves the number of vertices|
 |setBinFlowUnitsAFD|Sets flow units to AFD|
 |setBinFlowUnitsCFS|Sets flow units to CFS|
 |setBinFlowUnitsCMD|Sets flow units to CMD|
@@ -691,6 +690,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setBinTimeStatisticsMinimum|Sets the statistic type to Minimum|
 |setBinTimeStatisticsNone|Sets the statistic type to None|
 |setBinTimeStatisticsRange|Sets the statistic type to Range|
+|setBinLinkVertices|Sets interior vertex points of network links|
 
 &uparrow; [Back to top](#table-of-contents)
 

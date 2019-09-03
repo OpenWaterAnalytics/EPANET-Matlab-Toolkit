@@ -5718,7 +5718,7 @@ classdef epanet <handle
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
-        function addLinkVertices(obj, linkID, x, y)
+        function addBinLinkVertices(obj, linkID, x, y)
             % Adds interior vertex points to network links.
             %
             % % The examples are based on d=epanet('NET1.inp');
@@ -5726,28 +5726,28 @@ classdef epanet <handle
             % Example 1:
             %   d = epanet('NET1.inp');
             %   linkID='10';
-            %   x = 28;                             % One X coordinate selected for a vertex.
-            %   y = 68;                             % One Y coordinate selected for a vertex.
-            %   d.addLinkVertices(linkID, x, y)     % Adds one vertex to the link with ID label = '10'
-            %   d.getLinkVertices(linkID)           % Retrieves the link's vertex
+            %   x = 28;                                % One X coordinate selected for a vertex.
+            %   y = 68;                                % One Y coordinate selected for a vertex.
+            %   d.addBinLinkVertices(linkID, x, y)     % Adds one vertex to the link with ID label = '10'
+            %   d.getBinLinkVertices(linkID)           % Retrieves the link's vertex
             %
             % Example 2:
             %   d = epanet('NET1.inp');
             %   linkID_1 = '10';
-            %   x = [20, 25];                         % Two X coordinates selected for a vertex.
-            %   y = [66, 67];                         % Two Y coordinates selected for a vertex.
-            %   d.addLinkVertices(linkID_1, x, y)     % Adds two vertices to the link with ID label = '10'
+            %   x = [20, 25];                          % Two X coordinates selected for a vertex.
+            %   y = [66, 67];                          % Two Y coordinates selected for a vertex.
+            %   d.addBinLinkVertices(linkID_1, x, y)   % Adds two vertices to the link with ID label = '10'
             %
             %   linkID_2='11';
             %   x = [33, 38, 43, 45, 48];
             %   y = [74, 76, 76, 73, 74];
-            %   d.addLinkVertices(linkID_2, x, y)     % Adds multiple vertices to the link with ID label = '11'
+            %   d.addBinLinkVertices(linkID_2, x, y)   % Adds multiple vertices to the link with ID label = '11'
             %   
-            %   d.getLinkVertices(linkID_1)           % Retrieves the link's vertices.
-            %   d.getLinkVertices(linkID_2)
+            %   d.getBinLinkVertices(linkID_1)         % Retrieves the link's vertices.
+            %   d.getBinLinkVertices(linkID_2)
             %
-            % See also deleteLinkVertices, setLinkVertices, getLinkVertices,
-            %          getLinkVerticesCount, addLinkPipe, addNodeJunction.
+            % See also deleteBinLinkVertices, setBinLinkVertices, getBinLinkVertices,
+            %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
             inpfile = filepath{end};
             fid = fopen(inpfile); % Opens the file for read access
@@ -5780,7 +5780,7 @@ classdef epanet <handle
             obj.saveInputFile(obj.BinTempfile);
             if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
-        function Errcode = deleteLinkVertices(obj, varargin)
+        function Errcode = deleteBinLinkVertices(obj, varargin)
             % Deletes interior vertex points of network links.
             %
             % % The example is based on d=epanet('NET1.inp');
@@ -5788,22 +5788,22 @@ classdef epanet <handle
             % Example:
             %   d = epanet('NET1.inp');
             %   linkID = '10';
-            %   x = [20, 25];                               % Two X coordinates selected for a vertex
-            %   y = [66, 67];                               % Two Y coordinates selected for a vertex
-            %   d.addLinkVertices(linkID, x, y)             % Adds two vertices to the link with ID label = '10'
+            %   x = [20, 25];                                  % Two X coordinates selected for a vertex
+            %   y = [66, 67];                                  % Two Y coordinates selected for a vertex
+            %   d.addBinLinkVertices(linkID, x, y)             % Adds two vertices to the link with ID label = '10'
             %   
-            %   d.getLinkVertices(linkID)                   % Retrieves all vertices of a link given it's ID label
+            %   d.getBinLinkVertices(linkID)                   % Retrieves all vertices of a link given it's ID label
             %
-            %   d.deleteLinkVertices                        % Deletes all vertices from all links
-            %   d.deleteLinkVertices(linkID)                % Deletes all vertices from a link given it's ID label
+            %   d.deleteBinLinkVertices                        % Deletes all vertices from all links
+            %   d.deleteBinLinkVertices(linkID)                % Deletes all vertices from a link given it's ID label
             %   vertexIndex = 1;
-            %   d.deleteLinkVertices(linkID, vertexIndex)   % Deletes a certain vertex from a link given the link ID label and the vertex index
+            %   d.deleteBinLinkVertices(linkID, vertexIndex)   % Deletes a certain vertex from a link given the link ID label and the vertex index
             %   
-            %   d.getLinkVertices(linkID)
+            %   d.getBinLinkVertices(linkID)
             %
-            % See also addLinkVertices, getLinkVertices, getLinkVerticesCount,
-            %          setLinkVertices, addLinkPipe, addNodeJunction.
-            cnt = obj.getLinkVerticesCount;
+            % See also addBinLinkVertices, getBinLinkVertices, getBinLinkVerticesCount,
+            %          setBinLinkVertices, addLinkPipe, addNodeJunction.
+            cnt = obj.getBinLinkVerticesCount;
             Errcode = 0;
             if cnt == 0
                 Errcode = 'No vertices found in the network';
@@ -5860,26 +5860,26 @@ classdef epanet <handle
             fprintf(fid, texta);   % Writes the new text in the .inp file
             fclose('all');
         end
-        function value = getLinkVerticesCount(obj, varargin)
+        function value = getBinLinkVerticesCount(obj, varargin)
             % Retrieves the number of vertices.
             %
             % Example:
             %   d = epanet('NET1.inp');
             %   linkID_1 = '10';
-            %   x = [20, 25];                         % Two X coordinates selected for a vertex.
-            %   y = [66, 67];                         % Two Y coordinates selected for a vertex.
-            %   d.addLinkVertices(linkID_1, x, y)     % Adds two vertices to the link with ID label = '10'
+            %   x = [20, 25];                          % Two X coordinates selected for a vertex.
+            %   y = [66, 67];                          % Two Y coordinates selected for a vertex.
+            %   d.addBinLinkVertices(linkID_1, x, y)   % Adds two vertices to the link with ID label = '10'
             %
             %   linkID_2='11';
             %   x = [33, 38, 43, 45, 48];
             %   y = [74, 76, 76, 73, 74];
-            %   d.addLinkVertices(linkID_2, x, y)     % Adds multiple vertices to the link with ID label = '11'
+            %   d.addBinLinkVertices(linkID_2, x, y)   % Adds multiple vertices to the link with ID label = '11'
             %
-            %   d.getLinkVerticesCount
+            %   d.getBinLinkVerticesCount
             %
-            %   d.getLinkVerticesCount(linkID_2)
+            %   d.getBinLinkVerticesCount(linkID_2)
             %
-            % See also getLinkVertices, getLinkCount, getNodeCount.
+            % See also getBinLinkVertices, getLinkCount, getNodeCount.
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
             inpfile = filepath{end};
             fid = fopen(inpfile); % Opens the file for read access
@@ -5907,7 +5907,7 @@ classdef epanet <handle
             end
             fclose('all');
         end
-        function value = getLinkVertices(obj, varargin)
+        function value = getBinLinkVertices(obj, varargin)
             % Retrieves the link vertices.
             %
             % % The example is based on d=epanet('NET1.inp');
@@ -5915,22 +5915,22 @@ classdef epanet <handle
             % Example:
             %   d = epanet('NET1.inp');
             %   linkID = '10';
-            %   x = [20, 25];                             % Two X coordinates selected for a vertex
-            %   y = [66, 67];                             % Two Y coordinates selected for a vertex
-            %   d.addLinkVertices(linkID, x, y)           % Adds two vertices to the link with ID label = '10'
+            %   x = [20, 25];                                % Two X coordinates selected for a vertex
+            %   y = [66, 67];                                % Two Y coordinates selected for a vertex
+            %   d.addBinLinkVertices(linkID, x, y)           % Adds two vertices to the link with ID label = '10'
             %   
-            %   d.getLinkVertices                         % Retrieves all vertices of all links and stores them in cells
-            %   d.getLinkVertices(linkID)                 % Retrieves all vertices of a link given it's ID label
+            %   d.getBinLinkVertices                         % Retrieves all vertices of all links and stores them in cells
+            %   d.getBinLinkVertices(linkID)                 % Retrieves all vertices of a link given it's ID label
             %   first_vertex = 1;
-            %   d.getLinkVertices(linkID, first_vertex)   % Retrieves a vertex of a link given it's ID label and the index of the vertex
+            %   d.getBinLinkVertices(linkID, first_vertex)   % Retrieves a vertex of a link given it's ID label and the index of the vertex
             %
-            % See also setLinkVertices, addLinkVertices, deleteLinkVertices,
-            %          getLinkVerticesCount, getNodeCoordinates.
+            % See also setBinLinkVertices, addBinLinkVertices, deleteBinLinkVertices,
+            %          getBinLinkVerticesCount, getNodeCoordinates.
             
             % reload the network
 %             obj.saveInputFile(obj.BinTempfile);
 %             if obj.Bin, obj.Errcode = reloadNetwork(obj); end
-            cnt = obj.getLinkVerticesCount;
+            cnt = obj.getBinLinkVerticesCount;
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
             inpfile = filepath{end};
             fid = fopen(inpfile); % Opens the file for read access
@@ -5973,7 +5973,7 @@ classdef epanet <handle
            end
            fclose('all');
         end
-        function setLinkVertices(obj, linkID, x, y, varargin)
+        function setBinLinkVertices(obj, linkID, x, y, varargin)
             % Sets interior vertex points of network links.
             %
             % % The example is based on d=epanet('NET1.inp');
@@ -5981,39 +5981,39 @@ classdef epanet <handle
             % Example:
             %   d = epanet('NET1.inp');
             %   linkID_1 = '10';
-            %   x = [20, 25];                         % Two X coordinates selected for a vertex.
-            %   y = [66, 67];                         % Two Y coordinates selected for a vertex.
-            %   d.addLinkVertices(linkID_1, x, y)     % Adds two vertices to the link with ID label = '10'
+            %   x = [20, 25];                          % Two X coordinates selected for a vertex.
+            %   y = [66, 67];                          % Two Y coordinates selected for a vertex.
+            %   d.addBinLinkVertices(linkID_1, x, y)   % Adds two vertices to the link with ID label = '10'
             %
             %   linkID_2 = '11';
             %   x = [33, 38, 43, 45, 48];
             %   y = [74, 76, 76, 73, 74];
-            %   d.addLinkVertices(linkID_2, x, y)     % Adds multiple vertices to the link with ID label = '11'
+            %   d.addBinLinkVertices(linkID_2, x, y)   % Adds multiple vertices to the link with ID label = '11'
             %   
-            %   d.getLinkVertices(linkID_1)           % Retrieves the link's vertices.
-            %   d.getLinkVertices(linkID_2)
+            %   d.getBinLinkVertices(linkID_1)         % Retrieves the link's vertices.
+            %   d.getBinLinkVertices(linkID_2)
             %
             %   % Deletes all vertices and adds the new vertices.
             %   x = [22, 24, 28];
             %   y = [69, 68, 69];
-            %   d.setLinkVertices(linkID_1, x, y)
-            %   d.getLinkVertices(linkID_1)
+            %   d.setBinLinkVertices(linkID_1, x, y)
+            %   d.getBinLinkVertices(linkID_1)
             %
             %   % Replaces a certain vertex given it's index with a new vertex.
             %   x  = 39;
             %   y = 75;
             %   vertexIndex = 2;
-            %   d.setLinkVertices(linkID_2, x, y, vertexIndex)
-            %   d.getLinkVertices(linkID_2)
+            %   d.setBinLinkVertices(linkID_2, x, y, vertexIndex)
+            %   d.getBinLinkVertices(linkID_2)
             %
-            % See also addLinkVertices, deleteLinkVertices, getLinkVertices,
-            %          getLinkVerticesCount, addLinkPipe, addNodeJunction.
+            % See also addBinLinkVertices, deleteBinLinkVertices, getBinLinkVertices,
+            %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
             if nargin == 4
-                obj.deleteLinkVertices(linkID);
-                obj.addLinkVertices(linkID, x, y);
+                obj.deleteBinLinkVertices(linkID);
+                obj.addBinLinkVertices(linkID, x, y);
             end
             if nargin == 5
-                cnt = obj.getLinkVerticesCount;
+                cnt = obj.getBinLinkVerticesCount;
                 filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
                 inpfile = filepath{end};
                 fid = fopen(inpfile); % Opens the file for read access
