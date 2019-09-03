@@ -66,6 +66,7 @@ This example contains:
 - Plot colors.
 - Unload library.
 
+&uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 2 - Hydraulic analysis
@@ -81,6 +82,7 @@ This example contains:
 - Hydraulic analysis step-by-step.
 - Unload library.
  
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 3 - Quality analysis
@@ -101,6 +103,7 @@ This example contains:
 - Plot concentration for specific link and all species.
 - Unload libraries.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 4 - Plot time series
@@ -116,6 +119,7 @@ This example contains:
 - Plot water flow for specific links.
 - Unload library.
  
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 5 - Plot values parameters
@@ -132,6 +136,7 @@ This function contains:
 - Plot pressure values on map.
 - Unload library.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 6 - Load two inp files
@@ -146,6 +151,7 @@ This example contains:
 - Unload libraries.
 - Delete files who created.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 7 - Set pump curves
@@ -161,6 +167,7 @@ This example contains:
 - Computed hydraulics.
 - Unload library.
  
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 8 - Tanks to reservoirs
@@ -175,6 +182,7 @@ This example contains:
 - Replace tanks with reservoirs.
 - Unload library.
  
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 9 - Compare Simulations
@@ -190,6 +198,7 @@ This example contains:
 - Unload library.
 - Run time d.getComputedTimeSeries.
  
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 10 - Close pipes during simulation
@@ -203,6 +212,7 @@ This example contains:
 - Get flows for the specific link index.
 - Unload library.
  
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 11 - Assign a new curve to a pump
@@ -217,6 +227,7 @@ This example contains:
 - Assing new curve index on the specific pump.
 - Unload library.
   
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 12 - Add multiple control patterns
@@ -231,6 +242,7 @@ This example contains:
 - Check pressures at node after valve.
 - Run simulation with executable.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 13a - Add pipe and junction via bin function
@@ -244,6 +256,7 @@ This example contains:
 - Plot normal with new pipe.
 - Unload library.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 13b - Add pipe via bin function
@@ -257,6 +270,7 @@ This example contains:
 - Plot network with changes.
 - Unload library.
  
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 13c - Add pipe via normal function
@@ -270,6 +284,7 @@ This example contains:
 - Plot new network with changes.
 - Unload library.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 14 - Hydraulic and Quality analysis
@@ -282,6 +297,7 @@ This example contains:
 - Display nodes pressures, links flows, nodes actual qualities, links actual qualities.
 - Unload library. 
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
   
 #### Example 15 - Write MSX file
@@ -308,6 +324,7 @@ This example contains:
 - Compute.
 - Unload libraries.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 16 - Creating scenarios
@@ -324,6 +341,7 @@ This example contains:
 - Plot Quality VS Time.
 - Unload library.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 17a - Add controls via bin functions
@@ -340,6 +358,7 @@ This example contains:
 - Add all controls.
 - Unload libraries.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 17b - Add controls via normal functions
@@ -355,6 +374,7 @@ This example contains:
 - Create random status for pipes every hour.
 - Unload library.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 18 - Change status of pipe during simulation
@@ -370,6 +390,7 @@ This example contains:
  Plot flows.
  Unload library.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 19 - Rotate network
@@ -393,6 +414,7 @@ This example contains:
 - Plot rotated network.
 - Save rotated Inp file.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 20a - Change of external controls
@@ -407,6 +429,7 @@ This example contains:
 - Add new controls in live.
 - Unload library.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 20b - Addition of external controls
@@ -422,6 +445,7 @@ This example contains:
 - Delete controls.
 - Unload library.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 21 - Pressure driven analysis
@@ -440,6 +464,7 @@ This example contains:
 - Check that Junction 21 had a demand deficit of 413.67.
 - Unload library.
 
+ &uparrow; [Back to top](#table-of-contents)
  <br />
  
 #### Example 22 - Overflow of tanks
