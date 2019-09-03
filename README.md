@@ -141,8 +141,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkBulkReactionCoeff|Bulk chemical reaction coefficient|
 |getLinkComment|Retrieves the comment string assigned to the link object|
 |getLinkCount|Retrieves the number of links|
-|getLinkVertices|Retrieves the link vertices|
-|getLinkVerticesCount|Retrieves the number of vertices|
+|getBinLinkVertices|Retrieves the link vertices|
+|getBinLinkVerticesCount|Retrieves the number of vertices|
 |getLinkDiameter|Retrieves the value of all link diameters|
 |getLinkEnergy|Current computed pump energy usage (read only)|
 |getLinkFlows|Current computed flow rate (read only)|
@@ -316,11 +316,11 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addLinkValveFCV|Adds a new FCV valve|
 |addLinkValveTCV|Adds a new TCV valve|
 |addLinkValveGPV|Adds a new GPV valve|
-|addLinkVertices|Adds interior vertex points to network links|
+|addBinLinkVertices|Adds interior vertex points to network links|
 |addRules|Adds a new rule-based control to a project. (EPANET Version 2.2)|
 |deleteCurve|Deletes a data curve from the project|
 |deleteLink|Deletes a link|
-|deleteLinkVertices|Deletes interior vertex points of network links|
+|deleteBinLinkVertices|Deletes interior vertex points of network links|
 |deleteNode|Deletes a node|
 |deletePattern|Deletes a time pattern from a project|
 |deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
@@ -389,7 +389,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkTypeValvePRV|Set the link type valve PRV for a specified link|
 |setLinkTypeValvePSV|Set the link type valve PSV for a specified link|
 |setLinkTypeValveTCV|Set the link type valve TCV for a specified link|
-|setLinkVertices|Sets interior vertex points of network links|
+|setBinLinkVertices|Sets interior vertex points of network links|
 |setLinkWallReactionCoeff|Sets the values of wall reactions|
 |setNodeBaseDemands|Sets the values of demands|
 |setNodeComment|Sets the comment string assigned to the node object|
