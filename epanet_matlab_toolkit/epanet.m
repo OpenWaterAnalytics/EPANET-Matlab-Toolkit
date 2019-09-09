@@ -5748,9 +5748,7 @@ classdef epanet <handle
             %
             % See also deleteBinLinkVertices, setBinLinkVertices, getBinLinkVertices,
             %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
-            filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
-            inpfile = filepath{end};
-            fid = fopen(inpfile); % Opens the file for read access
+            fid = fopen(obj.TempInpFile); % Opens the file for read access
             %
             % Creates the string that will be set under the [VERTICES] section
             %
@@ -5774,7 +5772,7 @@ classdef epanet <handle
                 end
             end
             %
-            fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
+            fid = fopen(obj.TempInpFile, 'w');   % Opens file for writing and discard existing contents
             fprintf(fid, texta);   % Writes the new text in the .inp file
             fclose('all');  
             obj.saveInputFile(obj.BinTempfile);
@@ -15260,14 +15258,9 @@ function Errcode = addBinNode(obj, typeCode, nodeID, coords, varargin)
                 end
             end
         end
-        filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
-        inpfile = filepath{end};
-        fid = fopen(inpfile); % Opens the file for read access
-        %
-        %
-        %
+        fid = fopen(obj.BinTempfile); % Opens the file for read access
+        
         % Creates the string that will be set under the [NODE] section
-        %
         if typeCode == 1
             str_junction = nodeID{1};
             for i = 1:length(nodeID)
@@ -15370,11 +15363,12 @@ function Errcode = addBinNode(obj, typeCode, nodeID, coords, varargin)
             end
         end
         %
-        fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
+        fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
         fprintf(fid, texta);   % Writes the new text in the .inp file
         fclose('all');  
         obj.saveInputFile(obj.BinTempfile);
         if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+        node_index = obj.getBinNodeIndex(nodeID{1});
 end
 function Errcode=addNode(obj, typecode, varargin)
     % addNode - Add node in the network. Node type codes consist of the
