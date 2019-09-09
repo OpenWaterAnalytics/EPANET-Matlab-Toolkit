@@ -5748,7 +5748,7 @@ classdef epanet <handle
             %
             % See also deleteBinLinkVertices, setBinLinkVertices, getBinLinkVertices,
             %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
-            fid = fopen(obj.TempInpFile); % Opens the file for read access
+            fid = fopen(obj.BinTempfile); % Opens the file for read access
             %
             % Creates the string that will be set under the [VERTICES] section
             %
@@ -5771,8 +5771,7 @@ classdef epanet <handle
                    texta = [texta, str];
                 end
             end
-            %
-            fid = fopen(obj.TempInpFile, 'w');   % Opens file for writing and discard existing contents
+            fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
             fprintf(fid, texta);   % Writes the new text in the .inp file
             fclose('all');  
             if obj.Bin, obj.Errcode = reloadNetwork(obj); end
