@@ -15227,6 +15227,8 @@ if ~isempty(BinCNameID)
 end
 end
 function Errcode = addBinNode(obj, typeCode, nodeID, coords, varargin)
+        if obj.Bin; obj.saveInputFile(obj.BinTempfile); end
+
         Errcode = 0;
         if ~iscell(nodeID)
             nodeID = {nodeID};
@@ -15255,7 +15257,7 @@ function Errcode = addBinNode(obj, typeCode, nodeID, coords, varargin)
             end
         end
         fid = fopen(obj.BinTempfile); % Opens the file for read access
-        
+
         % Creates the string that will be set under the [NODE] section
         if typeCode == 1
             str_junction = nodeID{1};
@@ -15358,7 +15360,7 @@ function Errcode = addBinNode(obj, typeCode, nodeID, coords, varargin)
                 texta = [texta, str_coords];
             end
         end
-        %
+        fclose('all');  
         fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
         fprintf(fid, texta);   % Writes the new text in the .inp file
         fclose('all');  
@@ -16652,7 +16654,6 @@ if obj.Bin, Errcode=reloadNetwork(obj); end
 end
 function Errcode=reloadNetwork(obj)
 %     obj.closeNetwork;  %Close input file 
-    obj.saveInputFile(obj.BinTempfile);
     Errcode=ENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
 end
 function setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
