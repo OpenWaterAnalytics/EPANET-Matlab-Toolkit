@@ -561,11 +561,14 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addBinCurvePump|Adds a new curve pump to the network|
 |addBinCurveVolume|Adds a new curve volume to the network|
 |addBinJunction|Adds a new junction to the network|
+|addBinNodeJunction|Adds a new junction to the network|
 |addBinPattern|Adds a new time pattern to the network|
 |addBinPipe|Adds a new pipe to the network|
 |addBinPump|Adds a new pump to the network|
 |addBinReservoir|Adds a new reservoir to the network|
+|addBinNodeReservoir|Adds a new reservoir to the network|
 |addBinTank|Adds a new tank to the network|
+|addBinNodeTank|Adds a new tank to the network|
 |addBinValveFCV|Adds a new valve FCV to the network|
 |addBinValveGPV|Adds a new valve GPV to the network|
 |addBinValvePBV|Adds a new valve PBV to the network|
