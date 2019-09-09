@@ -5775,7 +5775,6 @@ classdef epanet <handle
             fid = fopen(obj.TempInpFile, 'w');   % Opens file for writing and discard existing contents
             fprintf(fid, texta);   % Writes the new text in the .inp file
             fclose('all');  
-            obj.saveInputFile(obj.BinTempfile);
             if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
         function Errcode = deleteBinLinkVertices(obj, varargin)
@@ -5926,8 +5925,6 @@ classdef epanet <handle
             %          getBinLinkVerticesCount, getNodeCoordinates.
             
             % reload the network
-%             obj.saveInputFile(obj.BinTempfile);
-%             if obj.Bin, obj.Errcode = reloadNetwork(obj); end
             cnt = obj.getBinLinkVerticesCount;
             filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
             inpfile = filepath{end};
@@ -15366,7 +15363,6 @@ function Errcode = addBinNode(obj, typeCode, nodeID, coords, varargin)
         fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
         fprintf(fid, texta);   % Writes the new text in the .inp file
         fclose('all');  
-        obj.saveInputFile(obj.BinTempfile);
         if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         node_index = obj.getBinNodeIndex(nodeID{1});
 end
@@ -16657,6 +16653,7 @@ if obj.Bin, Errcode=reloadNetwork(obj); end
 end
 function Errcode=reloadNetwork(obj)
 %     obj.closeNetwork;  %Close input file 
+    obj.saveInputFile(obj.BinTempfile);
     Errcode=ENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
 end
 function setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
