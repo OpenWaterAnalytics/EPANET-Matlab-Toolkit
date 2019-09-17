@@ -11092,10 +11092,10 @@ classdef epanet <handle
                 [Errcode]=addLink(obj, typecode, newValveID, fromNode, toNode, newValveDiameter, newValveSetting);
             end
         end
-        function [Errcode] = addBinNodeJunction(obj, nodeID, varargin)
+        function [node_index, link_index] = addBinNodeJunction(obj, nodeID, varargin)
             % Adds a new junction to the network.
             %
-            % Example:
+            % Example 1:
             %   d=epanet('NET1.inp');
             %   nodeID = 'new';
             %   coordinates = [20, 50];
@@ -11108,48 +11108,62 @@ classdef epanet <handle
             % % If properties are not given, the default values are zero.
             %
             % % Adds a new junction with the default coordinates (i.e. [0, 0])
-            %   d.addBinNodeJunction(nodeID)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeJunction(nodeID)
+            %   d.plot;
             %   
             % % Adds a new junction with coordinates [X, Y] = [20, 50].
-            %   d.addBinNodeJunction(nodeID, coordinates)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeJunction(nodeID, coordinates)
+            %   d.plot;
             %   x_value = d.getBinNodeCoordinates{1}(node_index)
             %   y_value = d.getBinNodeCoordinates{2}(node_index)
             %
             % % Adds a new junction with coordinates [X, Y] = [20, 50] and elevation = 500.
-            %   d.addBinNodeJunction(nodeID, coordinates, elevation)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation)
+            %   d.plot;
             %   d.getBinNodesInfo.BinNodeElevations(node_index)
             %
             % % Adds a new junction with coordinates [X, Y] = [20, 50], elevation = 500 and demand = 100.
-            %   d.addBinNodeJunction(nodeID, coordinates, elevation, demand)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand)
+            %   d.plot;
             %   d.getBinNodesInfo.BinNodeBaseDemands(node_index)
             %
             % % Adds a new junction with coordinates [X, Y] = [20, 50], elevation = 500, demand = 100 and pattern ID = '1'.
-            %   d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID)
+            %   d.plot;
             %   d.getBinNodesInfo.BinNodeJunDemandPatternNameID{node_index}
             %
             % % Adds a new junction with coordinates [X, Y] = [20, 50], elevation = 500, demand = 100, pattern ID = '1' and pattern category ID = '1'.
-            %   d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID, patternCategoryID)
-            %   node_index = d.getBinNodeIndex(nodeID)
-            %   d.getBinNodesInfo.BinNodeJunDemandPatternNameID{node_index}
+            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID, patternCategoryID)
+            %   d.plot;
             %
             % % Adds a new junction with coordinates [X, Y] = [20, 50], elevation = 500, demand = 100, pattern ID = '1', pattern category ID = '1' and quality = 0.5.
-            %   d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID, patternCategoryID, quality)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID, patternCategoryID, quality)
+            %   d.plot;
+            %
+            % Example 2:
+            %   d=epanet('NET1.inp');
+            %   nodeID = {'new_1', 'new_2'};
+            %   coordinates = [20, 50; 20, 40];
+            %   elevation = [500, 600];
+            %   demand = [100, 150];
+            %   patternID = {'1', ''};
+            %   patternCategoryID = {'1', ''};
+            %   quality = [0.5, 1];
+            %
+            % % Adds 2 new junctions with coordinates [X, Y] = [20, 50] and [X, Y] = [20, 40], elevation = 500 and 600,
+            % % demand = 100 and 150, pattern ID = '1' and none, pattern category ID = '1' and none, and quality = 0.5 and 1.
+            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID, patternCategoryID, quality)
+            %   d.plot;
             %   d.getBinNodesInfo.BinNodeJunDemandPatternNameID{node_index}
             %
             % See also addBinNodeReservoir, addBinNodeTank, addBinPipe, 
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
-            coords = [0, 0];
-            elev = 0;
-            demand = 0;
-            patternID = {''};
-            category = {''};
-            quality = 0;
+            coords = zeros(length(nodeID), 2);
+            elev = zeros(length(nodeID), 1);
+            demand = zeros(length(nodeID), 1);
+            patternID = repmat({''}, 1, length(nodeID));
+            category = repmat({''}, 1, length(nodeID));
+            quality = zeros(length(nodeID), 1);
             if nargin >= 3
                 coords = varargin{1};
             end
@@ -11174,12 +11188,15 @@ classdef epanet <handle
             if nargin >= 8
                 quality = varargin{6};
             end
-            Errcode = addBinNode(obj, 1, nodeID, coords, elev, demand, patternID, category, quality);
+            node_index = addBinNode(obj, 1, nodeID, coords, elev, demand, patternID, category, quality);
+            if nargin == 9
+                link_index = addBinLink(obj, varargin{7}{:});
+            end
         end
-        function [Errcode] = addBinNodeReservoir(obj, nodeID, varargin)
+        function [node_index, link_index] = addBinNodeReservoir(obj, nodeID, varargin)
             % Adds a new reservoir to the network.
             %
-            % Example:
+            % Example 1:
             %   d=epanet('NET1.inp');
             %   nodeID = 'new';
             %   coordinates = [20, 50];
@@ -11190,34 +11207,45 @@ classdef epanet <handle
             % % If properties are not given, the default values are zero.
             %
             % % Adds a new reservoir with the default coordinates (i.e. [0, 0])
-            %   d.addBinNodeReservoir(nodeID)
-            %   d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeReservoir(nodeID)
+            %   d.plot;
             %   
             % % Adds a new reservoir with coordinates [X, Y] = [20, 50].
-            %   d.addBinNodeReservoir(nodeID, coordinates)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeReservoir(nodeID, coordinates)
+            %   d.plot;
             %   x_value = d.getBinNodeCoordinates{1}(node_index)
             %   y_value = d.getBinNodeCoordinates{2}(node_index)
             %   
             % % Adds a new reservoir with coordinates [X, Y] = [20, 50] and head = 500.
-            %   d.addBinNodeReservoir(nodeID, coordinates, head)
-            %   d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeReservoir(nodeID, coordinates, head)
+            %   d.plot;
             %
             % % Adds a new reservoir with coordinates [X, Y] = [20, 50], head = 800 and pattern ID = '1'.
-            %   d.addBinNodeReservoir(nodeID, coordinates, head, patternID)
-            %   d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeReservoir(nodeID, coordinates, head, patternID)
+            %   d.plot;
             %
             % % Adds a new reservoir with coordinates [X, Y] = [20, 50], head = 800, pattern ID = '1' and quality = 1.
-            %   d.addBinNodeReservoir(nodeID, coordinates, head, patternID, quality)
-            %   node_index = d.getBinNodeIndex(nodeID);
-            %   d.getBinNodesInfo.BinNodeInitialQuality(node_index)
+            %   node_index = d.addBinNodeReservoir(nodeID, coordinates, head, patternID, quality)
+            %   d.plot;
+            %
+            % Example 2:
+            %   d=epanet('NET1.inp');
+            %   nodeID = {'new_1', 'new_2'};
+            %   coordinates = [20, 50; 20, 40];
+            %   head = [800, 900];
+            %   patternID = {'1', '1'};
+            %   quality = [1, 1];
+            %   
+            % % Adds 2 new reservoirs with coordinates [X, Y] = [20, 50] and [20, 40], head = 800 and 900, pattern ID = '1' and '1', and quality = 1 and 1.
+            %   node_index = d.addBinNodeReservoir(nodeID, coordinates, head, patternID, quality)
+            %   d.plot;
             %
             % See also addBinNodeJunction, addBinNodeTank, addBinPipe, 
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
-            coords = [0, 0];
-            head = 0;
-            patternID = {''};
-            quality = 0;
+            coords = zeros(length(nodeID), 2);
+            head = zeros(length(nodeID), 1);
+            patternID = repmat({''}, 1, length(nodeID));
+            quality = zeros(length(nodeID), 1);
             if nargin >= 3
                 coords = varargin{1};
             end
@@ -11233,12 +11261,15 @@ classdef epanet <handle
             if nargin >= 6
                 quality = varargin{4};
             end
-            Errcode = addBinNode(obj, 2, nodeID, coords, head, patternID, quality);
+            node_index = addBinNode(obj, 2, nodeID, coords, head, patternID, quality);
+            if nargin == 7
+                link_index = addBinLink(obj, varargin{5}{:});
+            end
         end
-        function [Errcode] = addBinNodeTank(obj, nodeID, varargin)
+        function [node_index, link_index] = addBinNodeTank(obj, nodeID, varargin)
             % Adds a new tank to the network.
             %
-            % Example:
+            % Example 1:
             %   d=epanet('NET1.inp');
             %   nodeID = 'new';
             %   coordinates = [20, 50];
@@ -11248,56 +11279,78 @@ classdef epanet <handle
             %   min_level = 100;
             %   max_level = 150;
             %   min_volume = 0;
-            %   volume_curve = '1';
+            %   volume_curve = '';
             %   quality = 1;
             %   
             % % If properties are not given, the default values are diameter = 50, initlevel = 10, maxlevel = 20 and the remaining are set to zero.
             %
             % % Adds a new tank with the default coordinates (i.e. [0, 0])
-            %   d.addBinNodeTank(nodeID)
-            %   d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeTank(nodeID)
+            %   d.plot;
             %   
             % % Adds a new tank with coordinates [X, Y] = [20, 50].
-            %   d.addBinNodeTank(nodeID, coordinates)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeTank(nodeID, coordinates)
+            %   d.plot;
             %   x_value = d.getBinNodeCoordinates{1}(node_index)
             %   y_value = d.getBinNodeCoordinates{2}(node_index)
             %   
             % % Adds a new tank with coordinates [X, Y] = [20, 50], elevation = 800 and diameter = 50.
-            %   d.addBinNodeTank(nodeID, coordinates, elev, diameter)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeTank(nodeID, coordinates, elev, diameter)
+            %   d.plot;
             %   d.getBinNodesInfo.BinNodeTankElevation
             %   d.getBinNodesInfo.BinNodeTankDiameter
             %
             % % Adds a new tank with coordinates [X, Y] = [20, 50], elevation = 800, diameter = 50, initial_level = 120, minimum level = 100 and maximum level = 150.
-            %   d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level)
+            %   d.plot;
             %   d.getBinNodesInfo.BinNodeTankInitialLevel
             %   d.getBinNodesInfo.BinNodeTankMinimumWaterLevel
             %   d.getBinNodesInfo.BinNodeTankMaximumWaterLevel
             %
             % % Adds a new tank with coordinates [X, Y] = [20, 50], elevation = 800, diameter = 50, initial_level = 120, 
             % %  minimum level = 100, maximum level = 150, minimum volume = 0 and volume curve = '1'.
-            %   d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level, min_volume, volume_curve)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level, min_volume, volume_curve)
+            %   d.plot;
             %   d.getBinNodesInfo.BinNodeTankMinimumWaterVolume
             %
             % % Adds a new tank with coordinates [X, Y] = [20, 50],  elevation = 800, diameter = 50, initial_level = 120, 
             % %  minimum level = 100, maximum level = 150, minimum volume = 0, volume curve = '1' and quality = 1.
-            %   d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level, min_volume, volume_curve, quality)
-            %   node_index = d.getBinNodeIndex(nodeID)
+            %   node_index = d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level, min_volume, volume_curve, quality)
+            %   d.plot;
+            %
+            % Example 2:
+            %   d=epanet('NET1.inp');
+            %   nodeID = {'new_1', 'new_2'};
+            %   coordinates = [20, 50; 20, 40];
+            %   elev = [800, 900];
+            %   diameter = [50, 60];
+            %   initial_level = [120, 110];
+            %   min_level = [100, 90];
+            %   max_level = [150, 160];
+            %   min_volume = [0, 0];
+            %   volume_curve = {'', ''};
+            %   quality = [1, 0.5];
+            %   
+            % % Adds 2 new tanks with coordinates [X, Y] = [20, 50] and [20, 40],  elevation = 800 and 900, diameter = 50 and 60, initial_level = 120 and 110, 
+            % %  minimum level = 100 and 90, maximum level = 150 and 160, minimum volume = 0 and 0, volume curve = none and quality = 1 and 0.5.
+            %   node_index = d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level, min_volume, volume_curve, quality)
+            %   d.plot;
             %
             % See also addBinNodeJunction, addBinNodeReservoir, addBinPipe, 
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
-            coords = [0, 0];
-            elev = 0;
-            diameter = 50;
-            initlevel = 10;
-            minlevel = 0;
-            maxlevel = 20;
-            minvol = 0;
-            volcurve = {''};
-            quality = 0;
+            coords = zeros(length(nodeID), 2);
+            elev = zeros(length(nodeID), 1);
+            diameter = zeros(length(nodeID), 1);
+            diameter(:) = 50;
+            initlevel = zeros(length(nodeID), 1);
+            initlevel(:) = 10;
+            minlevel = zeros(length(nodeID), 1);
+            minlevel(:) = 0;
+            maxlevel = zeros(length(nodeID), 1);
+            maxlevel(:) = 20;
+            minvol = zeros(length(nodeID), 1);
+            volcurve = repmat({''}, 1, length(nodeID));
+            quality = zeros(length(nodeID), 1);
             if nargin >= 3
                 coords = varargin{1};
             end
@@ -11325,17 +11378,215 @@ classdef epanet <handle
                     volcurve = {volcurve};
                 end
                 for i = 1:length(volcurve)
-                    if ~sum(strcmp(volcurve{i}, obj.getBinCurvesInfo.BinCurveNameID))
-                        warning(['Curve ', volcurve{i}, ' does not exist.'])
-                        Errcode=-1;
-                        return;
+                    if ~isempty(volcurve{i})
+                        if ~sum(strcmp(volcurve{i}, obj.getBinCurvesInfo.BinCurveNameID))
+                            warning(['Curve ', volcurve{i}, ' does not exist.'])
+                            node_index=-1;
+                            return;
+                        end
                     end
                 end
             end
             if nargin >= 11
                 quality = varargin{9};
             end
-            Errcode = addBinNode(obj, 3, nodeID, coords, elev, diameter, initlevel, minlevel, maxlevel, minvol, volcurve, quality);
+            node_index = addBinNode(obj, 3, nodeID, coords, elev, diameter, initlevel, minlevel, maxlevel, minvol, volcurve, quality);
+            if nargin == 12
+                link_index = addBinLink(obj, varargin{10}{:});
+            end
+        end
+        function [link_index] = addBinLinkPipe(obj, linkID, from, to, varargin)
+            % Adds a new pipe to the nework.
+            %
+            % The default values are:
+            %   length = 330;      % Feet
+            %   diameter = 10;     % Inches
+            %   roughness = 0.5;   % Darcy-Weisbach formula(millifeet)
+            %   minorLoss = 0;
+            %   status = 'Open';
+            %
+            % Example 1:
+            %   d=epanet('NET1.inp');
+            %   linkID = 'new_pipe';
+            %   from = '11';
+            %   to = '22';
+            %   length = 6000;     % Feet
+            %   diameter = 20;     % Inches
+            %   roughness = 100;   % Darcy-Weisbach formula(millifeet)
+            %   minorLoss = 0;
+            %   status = 'Open';
+            %
+            % % Adds a new pipe from junction '11' to '22' with the default values.
+            %   link_index = d.addBinLinkPipe(linkID, from, to)
+            %   d.plot;
+            %
+            % % Adds a new pipe from junction '11' to '22' with length = 6000.
+            %   link_index = d.addBinLinkPipe(linkID, from, to, length)
+            %   d.plot;
+            %
+            % % Adds a new pipe from junction '11' to '22' with length = 6000 and diameter = 20.
+            %   link_index = d.addBinLinkPipe(linkID, from, to, length, diameter)
+            %   d.plot;
+            %
+            % % Adds a new pipe from junction '11' to '22' with length = 6000, diameter = 20, roughness = 100, minorLoss = 0 and status = Open.
+            %   link_index = d.addBinLinkPipe(linkID, from, to, length, diameter, roughness, minorLoss, status)
+            %   d.plot;
+            %
+            % Example 2:
+            %   d=epanet('NET1.inp');
+            %   linkID = {'new_pipe_1', 'new_pipe_2'};
+            %   from = {'11', '13'};
+            %   to = {'22', '22'};
+            %   length = [6000, 7000];    % Feet
+            %   diameter = [20, 23];      % Inches
+            %   roughness = [100, 105];   % Darcy-Weisbach formula(millifeet)
+            %   minorLoss = [0, 0.2];
+            %   status = {'Open', 'Closed'};
+            %
+            % % Adds 2 new pipes from junctions '11'and '13' to '22' with length = 6000 and 7000, diameter = 20 and 23, 
+            % % roughness = 100 and 105, minorLoss = 0 and 0.2, and status = Open and Closed.
+            %   link_index = d.addBinLinkPipe(linkID, from, to, length, diameter, roughness, minorLoss, status)
+            %   d.plot;
+            %
+            % See also addBinLinkPump, addBinLinkValve, getBinLinksInfo,
+            %          addBinNodeJunction, addBinNodeReservoir, addBinNodeTank.
+            lengthp = zeros(length(linkID), 1);
+            lengthp(:) = 330;
+            diameter = zeros(length(linkID), 1);
+            diameter(:) = 10;
+            roughness = zeros(length(linkID), 1);
+            roughness(:) = 0.5;
+            minorloss = zeros(length(linkID), 1);
+            minorloss(:) = 0;
+            status = repmat({'Open'}, 1, length(linkID));
+            if nargin >= 5
+                lengthp = varargin{1};
+            end
+            if nargin >= 6
+                diameter = varargin{2};
+            end
+            if nargin >= 7
+                roughness = varargin{3};
+            end
+            if nargin >= 8
+                minorloss = varargin{4};
+            end
+            if nargin >= 9
+                status = varargin{5};
+            end
+            link_index = addBinLink(obj, 'PIPE', linkID, from, to, lengthp, diameter, roughness, minorloss, status);
+        end
+        function [link_index] = addBinLinkPump(obj, linkID, from, to, varargin)
+            % Adds a new pump to the network.
+            %
+            % If no propertie is given, the default value is 'SPEED 1.0'.
+            %
+            % Example 1:
+            %   d=epanet('NET1.inp');
+            %   linkID = 'new_pump';
+            %   from = '11';
+            %   to = '22';
+            %   propertie = 'HEAD 1';
+            %
+            % % Adds a new pump from junction '11' to '22' with the default value of propertie(i.e. 'SPEED 1.0').
+            %   linkIndex = d.addBinLinkPump(linkID, from, to)
+            %   d.plot;
+            %
+            % % Adds a new pump from junction '11' to '22' with propertie = 'HEAD 1'.
+            %   linkIndex = d.addBinLinkPump(linkID, from, to, propertie)
+            %   d.plot;
+            %
+            % Example 2:
+            %   d=epanet('NET1.inp');
+            %   linkID = {'new_pump_1', 'new_pump_2'};
+            %   from = {'11', '13'};
+            %   to = {'22', '22'};
+            %   properties = {'HEAD 1', 'SPEED 1.2'};
+            %
+            % % Adds 2 new pumps from junctions '11' and '13' to '22' with properties 'HEAD 1' and 'SPEED 1.2'.
+            %   linkIndex = d.addBinLinkPump(linkID, from, to, properties)
+            %   d.plot;
+            %
+            % See also addBinLinkPipe, addBinLinkValve, getBinLinksInfo,
+            %          addBinNodeJunction, addBinNodeReservoir, addBinNodeTank.
+            propertie = repmat({'SPEED 1.0'}, 1, length(linkID));
+            if nargin == 5
+                propertie = varargin{1};
+            end
+            link_index = addBinLink(obj, 'PUMP', linkID, from, to, propertie);
+        end
+        function [link_index] = addBinLinkValve(obj, linkID, from, to, varargin)
+            % Adds a new valve to the network.
+            %
+            % % If no properties are given, the default values are:
+            %   type = 'GPV'
+            %   diameter = 10 inches (25.4 cm)
+            %   initial setting = 0
+            %   minor Loss Coefficient = 0
+            %
+            % Example 1:
+            %   d=epanet('NET1.inp');
+            %   linkID = 'new_valve';
+            %   from = '11';
+            %   to = '22';
+            %   type = 'PRV';
+            %   diameter = 6;
+            %   init_setting = 70;
+            %   minorLoss = 0;
+            %
+            % % Adds a new valve form junction '11' to '22' with the default values.
+            %   linkIndex = d.addBinLinkValve(linkID, from, to)
+            %   d.plot;
+            %
+            % % Adds a new valve form junction '11' to '22' with type = 'PRV'.
+            %   linkIndex = d.addBinLinkValve(linkID, from, to, type)
+            %   d.plot;
+            %
+            % % Adds a new valve form junction '11' to '22' with type = 'PRV' and diameter = 6.
+            %   linkIndex = d.addBinLinkValve(linkID, from, to, type, diameter)
+            %   d.plot;
+            %
+            % % Adds a new valve form junction '11' to '22' with type = 'PRV', diameter = 6, initial setting = 70 and minor loss coefficient = 0.
+            %   linkIndex = d.addBinLinkValve(linkID, from, to, type, diameter, init_setting, minorLoss)
+            %   d.plot;
+            %
+            % Example 2:
+            %   d=epanet('NET1.inp');
+            %   linkID = {'new_valve_1', 'new_valve_2'};
+            %   from = {'11', '12'};
+            %   to = {'22', '23'};
+            %   type = {'PRV', 'PRV'};
+            %   diameter = [6, 10];
+            %   init_setting = [70, 55];
+            %   minorLoss = [0, 0];
+            %
+            % % Adds 2 new valves from junctions '11' and '12' to '22' and '23' with types = 'PRV', 
+            % % diameters = 6 and 10, initial settings = 70 and 55 and minor loss coefficients = 0.
+            %   linkIndex = d.addBinLinkValve(linkID, from, to, type, diameter, init_setting, minorLoss)
+            %   d.plot;
+            %
+            % See also addBinLinkPipe, addBinLinkPump, getBinLinksInfo,
+            %          addBinNodeJunction, addBinNodeReservoir, addBinNodeTank.
+            type = repmat({'GPV'}, 1, length(linkID));
+            diameter = zeros(length(linkID), 1);
+            diameter(:) = 10;
+            init_set = zeros(length(linkID), 1);
+            init_set(:) = 0;
+            minorloss = zeros(length(linkID), 1);
+            minorloss(:) = 0;
+            if nargin >= 5
+                type = varargin{1};
+            end
+            if nargin >= 6
+                diameter = varargin{2};
+            end
+            if nargin >= 7
+                init_set = varargin{3};
+            end
+            if nargin >= 8
+                minorloss = varargin{4};
+            end
+            link_index = addBinLink(obj, 'VALVE', linkID, from, to, diameter, type, init_set, minorloss);
         end
         function [Errcode]=addBinReservoir(obj, varargin)
             newID=varargin{1};
@@ -15226,17 +15477,14 @@ if ~isempty(BinCNameID)
     BinCurveCount=length(BinCurveNameID);
 end
 end
-function Errcode = addBinNode(obj, typeCode, nodeID, coords, varargin)
-        if obj.Bin; obj.saveInputFile(obj.BinTempfile); end
-
-        Errcode = 0;
+function node_index = addBinNode(obj, typeCode, nodeID, coords, varargin)
         if ~iscell(nodeID)
             nodeID = {nodeID};
         end
         for i = 1:length(nodeID)
             if sum(strcmp(nodeID{i}, obj.getBinNodeNameID.BinNodeNameID))
                 warning(['Node ', nodeID{i}, ' already exists.'])
-                Errcode=-1;
+                node_index=-1;
                 return;
             end
         end
@@ -15250,77 +15498,30 @@ function Errcode = addBinNode(obj, typeCode, nodeID, coords, varargin)
                 if ~isempty(patternID{i})
                     if ~sum(strcmp(patternID{i}, obj.getBinPatternsInfo.BinPatternNameID))
                         warning(['Pattern ', patternID{i}, ' does not exist.'])
-                        Errcode=-1;
+                        node_index=-1;
                         return;
                     end
                 end
             end
         end
         fid = fopen(obj.BinTempfile); % Opens the file for read access
-
         % Creates the string that will be set under the [NODE] section
         if typeCode == 1
-            str_junction = nodeID{1};
-            for i = 1:length(nodeID)
-                if i>1
-                    str_junction = [str_junction, nodeID{i}];
-                end
-                str_junction = [str_junction, blanks(10), num2str(varargin{1}(i)), blanks(10), num2str(varargin{2}(i)), blanks(10), varargin{3}{i}, char(10)];
-            end
-            %
-            % Creates the string that will be set under the [DEMANDS] section
-            %
-            str_demands = nodeID{1};
-            for i = 1:length(nodeID)
-                if i>1
-                    str_demands = [str_demands, nodeID];
-                end
-                str_demands = [str_demands, blanks(10), num2str(varargin{2}(i)), blanks(10), varargin{3}{i}, blanks(10), varargin{4}{i}, char(10)];
-            end
+            str_junction = str_make(nodeID, varargin{1}, varargin{2}, varargin{3});
+            str_demands = str_make(nodeID, varargin{2}, varargin{3}, varargin{4});
             quality = varargin{5};
         elseif typeCode == 2
-            str_reserv = nodeID{1};
-            for i = 1:length(nodeID)
-                if i>1
-                    str_reserv = [str_reserv, nodeID{i}];
-                end
-                str_reserv = [str_reserv, blanks(10), num2str(varargin{1}(i)), blanks(10), varargin{2}{i}, char(10)];
-            end
+            str_reserv = str_make(nodeID, varargin{1}, varargin{2});
             quality = varargin{3};
         elseif typeCode == 3
-            str_tank = nodeID{1};
-            for i = 1:length(nodeID)
-                if i>1
-                    str_tank = [str_tank, nodeID{i}];
-                end
-                str_tank = [str_tank, blanks(10), num2str(varargin{1}(i)), blanks(10), num2str(varargin{3}(i)), blanks(10), num2str(varargin{4}(i)), blanks(10),...
-                    num2str(varargin{5}(i)), blanks(10), num2str(varargin{2}(i)), blanks(10), num2str(varargin{6}(i)), blanks(10), varargin{7}{i}, char(10)];
-            end
+            str_tank = str_make(nodeID, varargin{1}, varargin{3}, varargin{4}, varargin{5}, varargin{2}, varargin{6}, varargin{7});
             quality = varargin{8};
         end
-        %
         % Creates the string that will be set under the [QUALITY] section
-        %
-        str_qual = nodeID{1};
-        for i = 1:length(nodeID)
-            if i>1
-                str_qual = [str_qual, nodeID];
-            end
-            str_qual = [str_qual, blanks(10), num2str(quality(i)), char(10)];
-        end
-        %
+        str_qual = str_make(nodeID, quality);
         % Creates the string that will be set under the [COORDINATES] section
-        %
-        str_coords = nodeID{1};
-        for i = 1:length(nodeID)
-            if i>1
-                str_coords = [str_coords, nodeID];
-            end
-            str_coords = [str_coords, blanks(10), num2str(coords(i, 1)), blanks(10), num2str(coords(i, 2)), char(10)];
-        end
-        %
+        str_coords = str_make(nodeID, coords(:, 1), coords(:, 2));
         % Creates the entire text that will replace the .inp file
-        %
         texta = char;
         while feof(fid) == 0
             aline = fgetl(fid);
@@ -15365,7 +15566,115 @@ function Errcode = addBinNode(obj, typeCode, nodeID, coords, varargin)
         fprintf(fid, texta);   % Writes the new text in the .inp file
         fclose('all');  
         if obj.Bin, obj.Errcode = reloadNetwork(obj); end
-        node_index = obj.getBinNodeIndex(nodeID{1});
+        node_index = zeros(1, length(nodeID));
+        for i = 1:length(nodeID)
+            node_index(i) = obj.getBinNodeIndex(nodeID{i});
+        end
+end
+function link_index = addBinLink(obj, typeCode, linkID, from, to, varargin)
+        if ~iscell(linkID)
+            linkID = {linkID};
+        end
+        if ~iscell(from)
+            from = {from};
+        end
+        if ~iscell(to)
+            to = {to};
+        end
+        for i = 1:length(linkID)
+            if sum(strcmp(linkID{i}, obj.getBinLinkNameID.BinLinkNameID))
+                warning(['Link ', linkID{i}, ' already exists.'])
+                link_index=-1;
+                return;
+            end
+        end
+        for i = 1:length(linkID)
+            if ~sum(strcmp(from{i}, obj.getBinNodeNameID.BinNodeNameID))
+                warning(['Node ', from{i}, ' does not exist.'])
+                link_index=-1;
+                return;
+            end
+            if ~sum(strcmp(to{i}, obj.getBinNodeNameID.BinNodeNameID))
+                warning(['Node ', to{i}, ' does not exist.'])
+                link_index=-1;
+                return;
+            end
+        end
+        fid = fopen(obj.BinTempfile); % Opens the file for read access
+        % Creates the string that will be set under the [NODE] section
+        if sum(strcmp(typeCode, 'PIPE'))
+            if ~iscell(varargin{5})
+             	varargin{5} = {varargin{5}};
+            end
+            str_pipe = str_make(linkID, from, to, varargin{1}, varargin{2}, varargin{3}, varargin{4}, varargin{5});
+        elseif sum(strcmp(typeCode, 'PUMP'))
+            if ~iscell(varargin{1})
+             	varargin{1} = {varargin{1}};
+            end
+            str_pump = str_make(linkID, from, to, varargin{1});
+        elseif sum(strcmp(typeCode, 'VALVE'))
+            if ~iscell(varargin{2})
+             	varargin{2} = {varargin{2}};
+            end
+            str_valve = str_make(linkID, from, to, varargin{1}, varargin{2}, varargin{3}, varargin{4});
+        end
+        % Creates the entire text that will replace the .inp file
+        texta = char;
+        while feof(fid) == 0
+            aline = fgetl(fid);
+            texta = [texta, aline, char(10)];
+            if sum(strcmp(typeCode, 'PIPE'))
+                if strcmp(aline, '[PIPES]')
+                    for i = 1:obj.getBinLinksInfo.BinLinkPipeCount
+                        aline = fgetl(fid);
+                        texta = [texta, aline, char(10)];
+                    end
+                    texta = [texta, str_pipe];
+                end
+            elseif sum(strcmp(typeCode, 'PUMP'))
+                if strcmp(aline, '[PUMPS]')
+                    for i = 1:obj.getBinLinksInfo.BinLinkPumpCount
+                        aline = fgetl(fid);
+                        texta = [texta, aline, char(10)];
+                    end
+                    texta = [texta, str_pump];
+                end
+            elseif sum(strcmp(typeCode, 'VALVE'))
+                if strcmp(aline, '[VALVES]')
+                    for i = 1:obj.getBinLinksInfo.BinLinkValveCount
+                        aline = fgetl(fid);
+                        texta = [texta, aline, char(10)];
+                    end
+                    texta = [texta, str_valve];
+                end
+            end
+        end
+        fclose('all');  
+        fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
+        fprintf(fid, texta);   % Writes the new text in the .inp file
+        fclose('all');  
+        if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+        link_index = zeros(1, length(linkID));
+        for i = 1:length(linkID)
+            link_index(i) = obj.getBinLinkIndex(linkID{i});
+        end
+end
+function str = str_make(ID, varargin)
+    str = ID{1};
+    for i = 1:length(ID)
+        if i>1
+            str = [str, ID{i}];
+        end
+        for j = 1:(nargin-1)
+            if isnumeric(varargin{j})
+                value =  num2str(varargin{j}(i));
+            else
+                value = varargin{j}{i};
+            end
+            str = [str, blanks(10), value];
+        end
+        str = [str, char(10)];
+    end
 end
 function Errcode=addNode(obj, typecode, varargin)
     % addNode - Add node in the network. Node type codes consist of the
