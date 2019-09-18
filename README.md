@@ -564,7 +564,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addBinNodeJunction|Adds a new junction to the network|
 |addBinPattern|Adds a new time pattern to the network|
 |addBinPipe|Adds a new pipe to the network|
+|addBinLinkPipe|Adds a new pipe to the network|
 |addBinPump|Adds a new pump to the network|
+|addBinLinkPump|Adds a new pump to the network|
 |addBinReservoir|Adds a new reservoir to the network|
 |addBinNodeReservoir|Adds a new reservoir to the network|
 |addBinTank|Adds a new tank to the network|
@@ -575,6 +577,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addBinValvePRV|Adds a new valve PRV to the network|
 |addBinValvePSV|Adds a new valve PSV to the network|
 |addBinValveTCV|Adds a new valve TCV to the network|
+|addBinLinkValve|Adds a new valve to the network|
 |addBinLinkVertices|Adds interior vertex points to network links|
 |removeBinControlLinkID|Removes a specific control based on link ID|
 |removeBinControlNodeID|Removes a specific control based on node ID|
