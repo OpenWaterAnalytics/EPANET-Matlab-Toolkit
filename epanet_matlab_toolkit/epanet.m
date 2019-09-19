@@ -5764,14 +5764,20 @@ classdef epanet <handle
             % Creates the entire text that will replace the .inp file
             %
             texta = char;
-            while feof(fid) == 0
+            while ~feof(fid)
                 aline = fgetl(fid);
                 texta = [texta, aline, char(10)];
                 if strcmp(aline, '[VERTICES]')
-                   texta = [texta, fgetl(fid), char(10)];
+                   fline = fgetl(fid);
+                   while isempty(strfind(fline, '['))   %contains                
+                       texta = [texta, fline, char(10)];
+                       fline = fgetl(fid);
+                   end
                    texta = [texta, str];
+                   break
                 end
             end
+            texta = [texta, '[END]'];
             fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
             fprintf(fid, texta);   % Writes the new text in the .inp file
             fclose('all');  
@@ -5814,7 +5820,7 @@ classdef epanet <handle
             % Creates the entire text that will replace the .inp file
             %
             texta = char;
-            while feof(fid) == 0
+            while ~feof(fid)
                 aline = fgetl(fid);
                 texta = [texta, aline, char(10)];
                 if strcmp(aline, '[VERTICES]')
@@ -5877,7 +5883,7 @@ classdef epanet <handle
             % See also getBinLinkVertices, getLinkCount, getNodeCount.
             fid = fopen(obj.BinTempfile); % Opens the file for read access
             value = 0;
-            while feof(fid) == 0
+            while ~feof(fid)
                 aline = fgetl(fid);
                 if strcmp(aline, '[VERTICES]')
                     while true
@@ -5924,7 +5930,7 @@ classdef epanet <handle
             cnt = obj.getBinLinkVerticesCount;
             linksInfo = obj.getBinLinksInfo;
             fid = fopen(obj.BinTempfile); % Opens the file for read access
-            while feof(fid) == 0
+            while ~feof(fid)
                 aline = fgetl(fid);
                 if strcmp(aline, '[VERTICES]')
                     fgetl(fid);
@@ -6008,7 +6014,7 @@ classdef epanet <handle
                 inpfile = filepath{end};
                 fid = fopen(inpfile); % Opens the file for read access
                 texta = char;
-                while feof(fid) == 0
+                while ~feof(fid)
                     aline = fgetl(fid);
                     texta = [texta, aline, char(10)];
                     if strcmp(aline, '[VERTICES]')
@@ -8810,9 +8816,37 @@ classdef epanet <handle
             %   d.saveInputFile(filename)
             %
             % See also unload, saveHydraulicFile.
-            [Errcode] = ENsaveinpfile('@#', obj.LibEPANET);
-            copyfile('@#', inpname);% temporary
-            delete('@#');
+            if nargin < 3
+                [Errcode] = ENsaveinpfile('@#', obj.LibEPANET);
+                copyfile('@#', inpname);% temporary
+                delete('@#');
+            else
+                [addSectionCoordinates, addSectionRules] = obj.getBinCoordRuleSections(obj.BinTempfile);
+                [Errcode] = ENsaveinpfile(inpname,obj.LibEPANET);
+                [~,info_file] = obj.readInpFile;
+                vertSectionIndex = find(~cellfun(@isempty,regexp(info_file,'VERTICES','match')), 1);
+                len_sec = length(addSectionCoordinates);
+                if isempty(vertSectionIndex)
+                    fid = fopen(obj.BinTempfile); % Opens the file for read access
+                    texta = char;
+                    i = 1; ok = 0;
+                    while (i < len_sec)
+                        aline = fgetl(fid);
+                        if ~ok
+                            texta = [texta, aline, char(10)];
+                        end
+                        if strcmp(aline, '[COORDINATES]') || ok
+                           ok = 1;
+                           texta = [texta, addSectionCoordinates{i+1}, char(10)];
+                           i = i +1;
+                        end
+                    end
+                    texta = [texta, '[END]'];
+                    fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
+                    fprintf(fid, texta);   % Writes the new text in the .inp file
+                    fclose('all'); 
+                end
+            end
         end
         function writeLineInReportFile(obj, line)
             % Writes a line of text to the EPANET report file.
@@ -14693,13 +14727,13 @@ if strcmpi(extend, 'yes')
     set(axesid, 'position', [0 0 1 1], 'units', 'normalized');
 end
 end
-function [info, tline, allines] = readAllFile(inpname)
+function [info_file, tline, allines] = readAllFile(inpname)
     fid = fopen(inpname, 'rt');%or msxname
     allines = textscan(fid, '%s', 'delimiter', '\n');
     [tline]=regexp( fileread(inpname), '\n', 'split');
     for i=1:length(tline)
         str=regexp( tline{i}, '\s', 'split');
-        info{i} = str(~cellfun('isempty', str));
+        info_file{i} = str(~cellfun('isempty', str));
     end
     fclose(fid);
 end
@@ -15521,7 +15555,7 @@ function node_index = addBinNode(obj, typeCode, nodeID, coords, varargin)
     str_coords = str_make(nodeID, coords(:, 1), coords(:, 2));
     % Creates the entire text that will replace the .inp file
     texta = char;
-    while feof(fid) == 0
+    while ~feof(fid)
         aline = fgetl(fid);
         texta = [texta, aline, char(10)];
         if typeCode == 1
@@ -15621,7 +15655,7 @@ function link_index = addBinLink(obj, typeCode, linkID, from, to, varargin)
         end
         % Creates the entire text that will replace the .inp file
         texta = char;
-        while feof(fid) == 0
+        while ~feof(fid)
             aline = fgetl(fid);
             texta = [texta, aline, char(10)];
             if strcmpi(typeCode, 'PIPE')
@@ -16963,9 +16997,10 @@ fclose(fid2);
 if obj.Bin, Errcode=reloadNetwork(obj); end
 end
 function Errcode=reloadNetwork(obj)
-%     obj.closeNetwork;  %Close input file 
+%     lib = [obj.LibEPANETpath, obj.LibEPANET];
+%     unloadlibrary('epanet2');loadlibrary(lib);
+    obj.closeNetwork;
     Errcode=ENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
-%     obj.getError(Errcode);
 end
 function setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
 if isnan(str2double(a{mm+1}))
