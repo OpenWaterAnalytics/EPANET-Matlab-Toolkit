@@ -11158,12 +11158,13 @@ classdef epanet <handle
             %
             % See also addBinNodeReservoir, addBinNodeTank, addBinPipe, 
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
-            coords = zeros(length(nodeID), 2);
-            elev = zeros(length(nodeID), 1);
-            demand = zeros(length(nodeID), 1);
-            patternID = repmat({''}, 1, length(nodeID));
-            category = repmat({''}, 1, length(nodeID));
-            quality = zeros(length(nodeID), 1);
+            cnt = length(nodeID);
+            coords = zeros(cnt, 2);
+            elev = zeros(cnt, 1);
+            demand = zeros(cnt, 1);
+            patternID = repmat({''}, 1, cnt);
+            category = repmat({''}, 1, cnt);
+            quality = zeros(cnt, 1);
             if nargin >= 3
                 coords = varargin{1};
             end
@@ -11586,7 +11587,7 @@ classdef epanet <handle
             if nargin >= 8
                 minorloss = varargin{4};
             end
-            link_index = addBinLink(obj, 'VALVE', linkID, from, to, diameter, type, init_set, minorloss);
+            link_index = addBinLink(obj, 'VALVE', linkID, from, to, type, diameter, init_set, minorloss);
         end
         function [Errcode]=addBinReservoir(obj, varargin)
             newID=varargin{1};
@@ -15478,98 +15479,99 @@ if ~isempty(BinCNameID)
 end
 end
 function node_index = addBinNode(obj, typeCode, nodeID, coords, varargin)
-        if ~iscell(nodeID)
-            nodeID = {nodeID};
+    if ~iscell(nodeID)
+        nodeID = {nodeID};
+    end
+    nodesInfo = obj.getBinNodesInfo;
+    for i = 1:length(nodeID)
+        if ismember(nodeID{i}, nodesInfo.BinNodeNameID)
+            warning(['Node ', nodeID{i}, ' already exists.'])
+            node_index=-1;
+            return;
         end
-        for i = 1:length(nodeID)
-            if sum(strcmp(nodeID{i}, obj.getBinNodeNameID.BinNodeNameID))
-                warning(['Node ', nodeID{i}, ' already exists.'])
-                node_index=-1;
-                return;
-            end
-        end
-        if typeCode == 1 || typeCode == 2
-            if typeCode == 1
-                patternID = varargin{3};
-            else
-                patternID = varargin{2};
-            end
-            for i = 1:length(patternID)
-                if ~isempty(patternID{i})
-                    if ~sum(strcmp(patternID{i}, obj.getBinPatternsInfo.BinPatternNameID))
-                        warning(['Pattern ', patternID{i}, ' does not exist.'])
-                        node_index=-1;
-                        return;
-                    end
-                end
-            end
-        end
-        fid = fopen(obj.BinTempfile); % Opens the file for read access
-        % Creates the string that will be set under the [NODE] section
+    end
+    if typeCode == 1 || typeCode == 2
         if typeCode == 1
-            str_junction = str_make(nodeID, varargin{1}, varargin{2}, varargin{3});
-            str_demands = str_make(nodeID, varargin{2}, varargin{3}, varargin{4});
-            quality = varargin{5};
+            patternID = varargin{3};
+        else
+            patternID = varargin{2};
+        end
+        for i = 1:length(patternID)
+            if ~isempty(patternID{i})
+                if ~ismember(patternID{i}, obj.getBinPatternsInfo.BinPatternNameID)
+                    warning(['Pattern ', patternID{i}, ' does not exist.'])
+                    node_index=-1;
+                    return;
+                end
+            end
+        end
+    end
+    fid = fopen(obj.BinTempfile); % Opens the file for read access
+    % Creates the string that will be set under the [NODE] section
+    if typeCode == 1
+        str_junction = str_make(nodeID, varargin{1}, varargin{2}, varargin{3});
+        str_demands = str_make(nodeID, varargin{2}, varargin{3}, varargin{4});
+        quality = varargin{5};
+    elseif typeCode == 2
+        str_reserv = str_make(nodeID, varargin{1}, varargin{2});
+        quality = varargin{3};
+    elseif typeCode == 3
+        str_tank = str_make(nodeID, varargin{1}, varargin{3}, varargin{4}, varargin{5}, varargin{2}, varargin{6}, varargin{7});
+        quality = varargin{8};
+    end
+    % Creates the string that will be set under the [QUALITY] section
+    str_qual = str_make(nodeID, quality);
+    % Creates the string that will be set under the [COORDINATES] section
+    str_coords = str_make(nodeID, coords(:, 1), coords(:, 2));
+    % Creates the entire text that will replace the .inp file
+    texta = char;
+    while feof(fid) == 0
+        aline = fgetl(fid);
+        texta = [texta, aline, char(10)];
+        if typeCode == 1
+            if strcmp(aline, '[JUNCTIONS]')
+                for i = 1:obj.getBinNodesInfo.BinNodeJunctionCount
+                    aline = fgetl(fid);
+                    texta = [texta, aline, char(10)];
+                end
+                texta = [texta, str_junction];
+            end
+            if strcmp(aline, '[DEMANDS]')
+                texta = [texta, str_demands];
+            end
         elseif typeCode == 2
-            str_reserv = str_make(nodeID, varargin{1}, varargin{2});
-            quality = varargin{3};
+            if strcmp(aline, '[RESERVOIRS]')
+                for i = 1:obj.getBinNodesInfo.BinNodeReservoirCount
+                    aline = fgetl(fid);
+                    texta = [texta, aline, char(10)];
+                end
+                texta = [texta, str_reserv];
+            end
         elseif typeCode == 3
-            str_tank = str_make(nodeID, varargin{1}, varargin{3}, varargin{4}, varargin{5}, varargin{2}, varargin{6}, varargin{7});
-            quality = varargin{8};
-        end
-        % Creates the string that will be set under the [QUALITY] section
-        str_qual = str_make(nodeID, quality);
-        % Creates the string that will be set under the [COORDINATES] section
-        str_coords = str_make(nodeID, coords(:, 1), coords(:, 2));
-        % Creates the entire text that will replace the .inp file
-        texta = char;
-        while feof(fid) == 0
-            aline = fgetl(fid);
-            texta = [texta, aline, char(10)];
-            if typeCode == 1
-                if strcmp(aline, '[JUNCTIONS]')
-                    for i = 1:obj.getBinNodesInfo.BinNodeJunctionCount
-                        aline = fgetl(fid);
-                        texta = [texta, aline, char(10)];
-                    end
-                    texta = [texta, str_junction];
+            if strcmp(aline, '[TANKS]')
+                for i = 1:obj.getBinNodesInfo.BinNodeTankCount
+                    aline = fgetl(fid);
+                    texta = [texta, aline, char(10)];
                 end
-                if strcmp(aline, '[DEMANDS]')
-                    texta = [texta, str_demands];
-                end
-            elseif typeCode == 2
-                if strcmp(aline, '[RESERVOIRS]')
-                    for i = 1:obj.getBinNodesInfo.BinNodeReservoirCount
-                        aline = fgetl(fid);
-                        texta = [texta, aline, char(10)];
-                    end
-                    texta = [texta, str_reserv];
-                end
-            elseif typeCode == 3
-                if strcmp(aline, '[TANKS]')
-                    for i = 1:obj.getBinNodesInfo.BinNodeTankCount
-                        aline = fgetl(fid);
-                        texta = [texta, aline, char(10)];
-                    end
-                    texta = [texta, str_tank];
-                end
-            end
-            if strcmp(aline, '[QUALITY]')
-                texta = [texta, str_qual];
-            end
-            if strcmp(aline, '[COORDINATES]')
-                texta = [texta, str_coords];
+                texta = [texta, str_tank];
             end
         end
-        fclose('all');  
-        fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
-        fprintf(fid, texta);   % Writes the new text in the .inp file
-        fclose('all');  
-        if obj.Bin, obj.Errcode = reloadNetwork(obj); end
-        node_index = zeros(1, length(nodeID));
-        for i = 1:length(nodeID)
-            node_index(i) = obj.getBinNodeIndex(nodeID{i});
+        if strcmp(aline, '[QUALITY]')
+            texta = [texta, str_qual];
         end
+        if strcmp(aline, '[COORDINATES]')
+            texta = [texta, str_coords];
+        end
+    end
+    fclose('all');  
+    fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
+    fprintf(fid, texta);   % Writes the new text in the .inp file
+    fclose('all');  
+    if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+    node_index = zeros(1, length(nodeID));
+    for i = 1:length(nodeID)
+        node_index(i) = obj.getBinNodeIndex(nodeID{i});
+    end
 end
 function link_index = addBinLink(obj, typeCode, linkID, from, to, varargin)
         if ~iscell(linkID)
@@ -15581,20 +15583,23 @@ function link_index = addBinLink(obj, typeCode, linkID, from, to, varargin)
         if ~iscell(to)
             to = {to};
         end
+        LinksInfo = obj.getBinLinksInfo;
         for i = 1:length(linkID)
-            if sum(strcmp(linkID{i}, obj.getBinLinkNameID.BinLinkNameID))
+            if ismember(linkID{i}, LinksInfo.BinLinkNameID)
                 warning(['Link ', linkID{i}, ' already exists.'])
                 link_index=-1;
                 return;
             end
         end
+        
+        BinNodeNameID = obj.getBinNodeNameID.BinNodeNameID;
         for i = 1:length(linkID)
-            if ~sum(strcmp(from{i}, obj.getBinNodeNameID.BinNodeNameID))
+            if ~ismember(from{i}, BinNodeNameID)
                 warning(['Node ', from{i}, ' does not exist.'])
                 link_index=-1;
                 return;
             end
-            if ~sum(strcmp(to{i}, obj.getBinNodeNameID.BinNodeNameID))
+            if ~ismember(to{i}, BinNodeNameID)
                 warning(['Node ', to{i}, ' does not exist.'])
                 link_index=-1;
                 return;
@@ -15602,46 +15607,46 @@ function link_index = addBinLink(obj, typeCode, linkID, from, to, varargin)
         end
         fid = fopen(obj.BinTempfile); % Opens the file for read access
         % Creates the string that will be set under the [NODE] section
-        if sum(strcmp(typeCode, 'PIPE'))
+        if strcmpi(typeCode, 'PIPE')
             if ~iscell(varargin{5})
              	varargin{5} = {varargin{5}};
             end
             str_pipe = str_make(linkID, from, to, varargin{1}, varargin{2}, varargin{3}, varargin{4}, varargin{5});
-        elseif sum(strcmp(typeCode, 'PUMP'))
+        elseif strcmpi(typeCode, 'PUMP')
             if ~iscell(varargin{1})
              	varargin{1} = {varargin{1}};
             end
             str_pump = str_make(linkID, from, to, varargin{1});
-        elseif sum(strcmp(typeCode, 'VALVE'))
-            if ~iscell(varargin{2})
-             	varargin{2} = {varargin{2}};
+        elseif strcmpi(typeCode, 'VALVE')
+            if ~iscell(varargin{1})
+             	varargin{1} = {varargin{1}};
             end
-            str_valve = str_make(linkID, from, to, varargin{1}, varargin{2}, varargin{3}, varargin{4});
+            str_valve = str_make(linkID, from, to, varargin{2}, varargin{1}, varargin{3}, varargin{4});
         end
         % Creates the entire text that will replace the .inp file
         texta = char;
         while feof(fid) == 0
             aline = fgetl(fid);
             texta = [texta, aline, char(10)];
-            if sum(strcmp(typeCode, 'PIPE'))
-                if strcmp(aline, '[PIPES]')
-                    for i = 1:obj.getBinLinksInfo.BinLinkPipeCount
+            if strcmpi(typeCode, 'PIPE')
+                if strcmpi(aline, '[PIPES]')
+                    for i = 1:LinksInfo.BinLinkPipeCount
                         aline = fgetl(fid);
                         texta = [texta, aline, char(10)];
                     end
                     texta = [texta, str_pipe];
                 end
-            elseif sum(strcmp(typeCode, 'PUMP'))
-                if strcmp(aline, '[PUMPS]')
-                    for i = 1:obj.getBinLinksInfo.BinLinkPumpCount
+            elseif strcmpi(typeCode, 'PUMP')
+                if strcmpi(aline, '[PUMPS]')
+                    for i = 1:LinksInfo.BinLinkPumpCount
                         aline = fgetl(fid);
                         texta = [texta, aline, char(10)];
                     end
                     texta = [texta, str_pump];
                 end
-            elseif sum(strcmp(typeCode, 'VALVE'))
+            elseif strcmpi(typeCode, 'VALVE')
                 if strcmp(aline, '[VALVES]')
-                    for i = 1:obj.getBinLinksInfo.BinLinkValveCount
+                    for i = 1:LinksInfo.BinLinkValveCount
                         aline = fgetl(fid);
                         texta = [texta, aline, char(10)];
                     end
@@ -16964,6 +16969,7 @@ end
 function Errcode=reloadNetwork(obj)
 %     obj.closeNetwork;  %Close input file 
     Errcode=ENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
+%     obj.getError(Errcode);
 end
 function setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
 if isnan(str2double(a{mm+1}))
