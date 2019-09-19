@@ -5748,6 +5748,7 @@ classdef epanet <handle
             %
             % See also deleteBinLinkVertices, setBinLinkVertices, getBinLinkVertices,
             %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
+            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile); end
             fid = fopen(obj.BinTempfile); % Opens the file for read access
             %
             % Creates the string that will be set under the [VERTICES] section
