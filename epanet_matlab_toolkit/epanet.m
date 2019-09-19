@@ -5906,7 +5906,7 @@ classdef epanet <handle
             end
             fclose('all');
         end
-        function value = getBinLinkVertices(obj, varargin)
+        function data = getBinLinkVertices(obj, varargin)
             % Retrieves the link vertices.
             %
             % % The example is based on d=epanet('NET1.inp');
@@ -5928,7 +5928,7 @@ classdef epanet <handle
             
             % reload the network
             cnt = obj.getBinLinkVerticesCount;
-            linksInfo = obj.getBinLinksInfo;
+%             linksInfo = obj.getBinLinksInfo;
             fid = fopen(obj.BinTempfile); % Opens the file for read access
             while ~feof(fid)
                 aline = fgetl(fid);
@@ -5948,25 +5948,25 @@ classdef epanet <handle
                     end
                 end
             end
-            value = cell(linksInfo.BinLinkCount, 3);
-            for i = 1:size(data, 1)
-                linkIndex = linksInfo.getBinLinkIndex(data{i, 1});
-                if isempty(value{linkIndex, 1})
-                    value{linkIndex, 1} = [];
-                end
-                if isempty(value{linkIndex, 2})
-                    value{linkIndex, 2} = [];
-                end
-                value{linkIndex, 1} = [value{linkIndex, 1}; str2double(data{i, 2})];
-                value{linkIndex, 2} = [value{linkIndex, 2}; str2double(data{i, 3})];
-            end
-           if nargin >= 2
-               linkIndex = linksInfo.getBinLinkIndex(varargin{1});
-               value = [value{linkIndex, 1}, value{linkIndex, 2}];
-               if nargin == 3
-                   value = value(varargin{2}, :);
-               end
-           end
+%             value = cell(linksInfo.BinLinkCount, 3);
+%             for i = 1:size(data, 1)
+%                 linkIndex = obj.getBinLinkIndex(data{i, 1});
+%                 if isempty(value{linkIndex, 1})
+%                     value{linkIndex, 1} = [];
+%                 end
+%                 if isempty(value{linkIndex, 2})
+%                     value{linkIndex, 2} = [];
+%                 end
+%                 value{linkIndex, 1} = [value{linkIndex, 1}; str2double(data{i, 2})];
+%                 value{linkIndex, 2} = [value{linkIndex, 2}; str2double(data{i, 3})];
+%             end
+%            if nargin >= 2
+%                linkIndex = obj.getBinLinkIndex(varargin{1});
+%                value = [value{linkIndex, 1}, value{linkIndex, 2}];
+%                if nargin == 3
+%                    value = value(varargin{2}, :);
+%                end
+%            end
            fclose('all');
         end
         function setBinLinkVertices(obj, linkID, x, y, varargin)
@@ -12474,16 +12474,14 @@ classdef epanet <handle
             end            
         end
         function value = getBinLinkIndex(obj, varargin)
-            v=obj.getBinLinkNameID;
             if isempty(varargin)
-                value=1:length(v.BinLinkNameID);
+                value = 1:length(obj.getBinLinkNameID.BinLinkNameID);
             else
-                value=find(strcmpi(v.BinLinkNameID, varargin{1}));
+                value = find(strcmp(obj.getBinLinkNameID.BinLinkNameID, varargin{1}));
             end
         end
         function value = getBinPatternIndex(obj, varargin)
-            v=obj.getBinPatternsInfo;
-            value = find(strcmpi(v.BinPatternNameID, varargin{1}));
+            value = find(strcmpi(obj.getBinPatternsInfo.BinPatternNameID, varargin{1}));
         end
         function value = getBinCurvesInfo(obj)
             [value.BinCurveNameID, value.BinCurveXvalue, value.BinCurveYvalue, value.BinCurveAllLines, value.BinCurveTypes, value.BinCurveCount, value.BinCTypes]=CurveInfo(obj);
