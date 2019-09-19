@@ -11082,46 +11082,6 @@ classdef epanet <handle
                end     
                fprintf(f, '\n[END]');
         end
-        function [Errcode]=addBinJunction(obj, varargin)
-            newID=varargin{1};
-            X=varargin{2};
-            Y=varargin{3};
-            newElevation=varargin{4}; 
-            newBaseDemand=varargin{5};
-            newDemandPattern=varargin{6};
-            toNode=varargin{8}; 
-            fromNode=varargin{1};
-            typecode = getTypeLink(varargin{end});                 
-            Errcode=addLinkWarnings(obj, typecode, varargin{7}, toNode); 
-            if Errcode==-1, return; end
-            [Errcode]=addNode(obj, 0, newID, X, Y, newElevation, newBaseDemand, newDemandPattern);
-            if Errcode~=200 && obj.Bin==1
-                return;
-            end
-            if sum(typecode==[0, 1])
-                newPipeID=varargin{7}; 
-                newLength=varargin{9};
-                newDiameter=varargin{10};
-                newRoughness=varargin{11};
-                if typecode
-                    [Errcode]=addBinPipe(obj, newPipeID, fromNode, toNode, newLength, newDiameter, newRoughness);
-                else
-                    [Errcode]=addBinCVPipe(obj, newPipeID, fromNode, toNode, newLength, newDiameter, newRoughness);
-                end
-            elseif typecode==2
-                newPumpID=varargin{7}; 
-                newCurveIDofPump=varargin{9}; 
-                newCurveXvalue=varargin{10}; 
-                newCurveYvalue=varargin{11}; 
-                newCurveType=varargin{12};  % PUMP, EFFICIENCY, VOLUME, HEADLOSS  
-                [Errcode]=addBinPump(obj, newPumpID, fromNode, toNode, newCurveIDofPump, newCurveXvalue, newCurveYvalue, newCurveType);
-            else 
-                newValveID=varargin{7}; 
-                newValveDiameter=varargin{9}; 
-                newValveSetting=varargin{10}; 
-                [Errcode]=addLink(obj, typecode, newValveID, fromNode, toNode, newValveDiameter, newValveSetting);
-            end
-        end
         function [node_index, link_index] = addBinNodeJunction(obj, nodeID, varargin)
             % Adds a new junction to the network.
             %
@@ -11618,86 +11578,6 @@ classdef epanet <handle
                 minorloss = varargin{4};
             end
             link_index = addBinLink(obj, 'VALVE', linkID, from, to, type, diameter, init_set, minorloss);
-        end
-        function [Errcode]=addBinReservoir(obj, varargin)
-            newID=varargin{1};
-            X=varargin{2};
-            Y=varargin{3};
-            newElevation=varargin{4}; 
-            fromNode=varargin{1};
-            toNode=varargin{6};
-            typecode = getTypeLink(varargin{end});
-            Errcode=addLinkWarnings(obj, typecode, varargin{5}, toNode); 
-            if Errcode==-1, return; end            
-            [Errcode]=addNode(obj, 1, newID, X, Y, newElevation);
-            if Errcode, return; end
-            if sum(typecode==[0, 1])
-                newPipeID=varargin{5}; 
-                newLength=varargin{7};
-                newDiameter=varargin{8};
-                newRoughness=varargin{9};
-                if typecode
-                    [Errcode]=addBinPipe(obj, newPipeID, fromNode, toNode, newLength, newDiameter, newRoughness);
-                else
-                    [Errcode]=addBinCVPipe(obj, newPipeID, fromNode, toNode, newLength, newDiameter, newRoughness);
-                end            
-            elseif typecode==2
-                newPumpID=varargin{5}; 
-                newCurveIDofPump=varargin{7}; 
-                newCurveXvalue=varargin{8}; 
-                newCurveYvalue=varargin{9}; 
-                newCurveType=varargin{10};  % PUMP, EFFICIENCY, VOLUME, HEADLOSS  
-                [Errcode]=addBinPump(obj, newPumpID, fromNode, toNode, newCurveIDofPump, newCurveXvalue, newCurveYvalue, newCurveType);
-            else 
-                newValveID=varargin{5}; 
-                newValveDiameter=varargin{7}; 
-                newValveSetting=varargin{8}; 
-                [Errcode]=addLink(obj, typecode, newValveID, fromNode, toNode, newValveDiameter, newValveSetting);
-            end
-        end
-        function [Errcode]=addBinTank(obj, varargin)
-            newID=varargin{1};
-            X=varargin{2};
-            Y=varargin{3};
-            MaxLevel=varargin{4};
-            Diameter=varargin{5};
-            Initlevel=varargin{6};
-            newElevation=varargin{7};
-            initqual=varargin{8};
-            MinLevel=varargin{9};
-            MinVol=varargin{10};
-            fromNode=varargin{1};
-            toNode=varargin{12};
-            typecode = getTypeLink(varargin{end});
-            Errcode=addLinkWarnings(obj, typecode, varargin{11}, toNode); 
-            if Errcode==-1, return; end            
-            [Errcode]=addNode(obj, 2, newID, X, Y, MaxLevel, Diameter, Initlevel, newElevation, initqual, MinLevel, MinVol);
-            if Errcode
-                return;
-            end
-            if sum(typecode==[0, 1])
-                newPipeID=varargin{11}; 
-                newLength=varargin{13};
-                newDiameter=varargin{14};
-                newRoughness=varargin{15};
-                if typecode
-                    [Errcode]=addBinPipe(obj, newPipeID, fromNode, toNode, newLength, newDiameter, newRoughness);
-                else
-                    [Errcode]=addBinCVPipe(obj, newPipeID, fromNode, toNode, newLength, newDiameter, newRoughness);
-                end
-            elseif typecode==2
-                newPumpID=varargin{11}; 
-                newCurveIDofPump=varargin{13}; 
-                newCurveXvalue=varargin{14}; 
-                newCurveYvalue=varargin{15}; 
-                newCurveType=varargin{16};  % PUMP, EFFICIENCY, VOLUME, HEADLOSS  
-                [Errcode]=addBinPump(obj, newPumpID, fromNode, toNode, newCurveIDofPump, newCurveXvalue, newCurveYvalue, newCurveType);
-            else 
-                newValveID=varargin{11}; 
-                newValveDiameter=varargin{13}; 
-                newValveSetting=varargin{14}; 
-                [Errcode]=addLink(obj, typecode, newValveID, fromNode, toNode, newValveDiameter, newValveSetting);
-            end
         end
         function [Errcode]=addBinCVPipe(obj, newLink, fromNode, toNode, newLength, newDiameter, newRoughness)
             [Errcode]=addLink(obj, 0, newLink, fromNode, toNode, newLength, newDiameter, newRoughness);
