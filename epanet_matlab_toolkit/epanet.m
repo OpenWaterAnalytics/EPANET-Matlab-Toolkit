@@ -5748,7 +5748,7 @@ classdef epanet <handle
             %
             % See also deleteBinLinkVertices, setBinLinkVertices, getBinLinkVertices,
             %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
-            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile); end
+            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile, 1); end
             fid = fopen(obj.BinTempfile); % Opens the file for read access
             %
             % Creates the string that will be set under the [VERTICES] section
@@ -5806,9 +5806,7 @@ classdef epanet <handle
                 Errcode = 'No vertices found in the network';
                 error(Errcode)
             end
-            filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
-            inpfile = filepath{end};
-            fid = fopen(inpfile); % Opens the file for read access
+            fid = fopen(obj.BinTempfile); % Opens the file for read access
             %
             % Creates the string that will be set under the [VERTICES] section
             %
@@ -5877,9 +5875,7 @@ classdef epanet <handle
             %   d.getBinLinkVerticesCount(linkID_2)
             %
             % See also getBinLinkVertices, getLinkCount, getNodeCount.
-            filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
-            inpfile = filepath{end};
-            fid = fopen(inpfile); % Opens the file for read access
+            fid = fopen(obj.BinTempfile); % Opens the file for read access
             value = 0;
             while feof(fid) == 0
                 aline = fgetl(fid);
@@ -5926,9 +5922,8 @@ classdef epanet <handle
             
             % reload the network
             cnt = obj.getBinLinkVerticesCount;
-            filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
-            inpfile = filepath{end};
-            fid = fopen(inpfile); % Opens the file for read access
+            linksInfo = obj.getBinLinksInfo;
+            fid = fopen(obj.BinTempfile); % Opens the file for read access
             while feof(fid) == 0
                 aline = fgetl(fid);
                 if strcmp(aline, '[VERTICES]')
@@ -5947,9 +5942,9 @@ classdef epanet <handle
                     end
                 end
             end
-            value = cell(obj.getLinkCount, 2);
+            value = cell(linksInfo.BinLinkCount, 3);
             for i = 1:size(data, 1)
-                linkIndex = obj.getLinkIndex(data{i, 1});
+                linkIndex = linksInfo.getBinLinkIndex(data{i, 1});
                 if isempty(value{linkIndex, 1})
                     value{linkIndex, 1} = [];
                 end
@@ -5960,7 +5955,7 @@ classdef epanet <handle
                 value{linkIndex, 2} = [value{linkIndex, 2}; str2double(data{i, 3})];
             end
            if nargin >= 2
-               linkIndex = obj.getLinkIndex(varargin{1});
+               linkIndex = linksInfo.getBinLinkIndex(varargin{1});
                value = [value{linkIndex, 1}, value{linkIndex, 2}];
                if nargin == 3
                    value = value(varargin{2}, :);
@@ -8806,7 +8801,7 @@ classdef epanet <handle
             % See also runQualityAnalysis, closeQualityAnalysis.
             [obj.Errcode, tleft] = ENstepQ(obj.LibEPANET);
         end
-        function [Errcode] = saveInputFile(obj, inpname)
+        function [Errcode] = saveInputFile(obj, inpname, varargin)
             % Writes all current network input data to a file using the format of an EPANET input file.
             % Returns an error code.
             %
