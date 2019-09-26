@@ -17952,11 +17952,21 @@ function setControlFunction(obj, index, value)
     error(obj.getError(obj.Errcode)); 
 end
 function controlRuleIndex = addControlFunction(obj, value)
-    [controlTypeIndex, linkIndex, controlSettingValue,...
-    nodeIndex, controlLevel] = controlSettings(obj, value);
-    [obj.Errcode, controlRuleIndex] = ENaddcontrol(controlTypeIndex, linkIndex,...
-        controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
-    error(obj.getError(obj.Errcode)); 
+    if isstruct(value)
+        for c=1:length(value)
+            [controlTypeIndex, linkIndex, controlSettingValue,...
+            nodeIndex, controlLevel] = controlSettings(obj, value(c).Control);
+            [obj.Errcode, controlRuleIndex(c)] = ENaddcontrol(controlTypeIndex, linkIndex,...
+            controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
+            error(obj.getError(obj.Errcode)); 
+        end
+    else
+        [controlTypeIndex, linkIndex, controlSettingValue,...
+            nodeIndex, controlLevel] = controlSettings(obj, value);
+        [obj.Errcode, controlRuleIndex] = ENaddcontrol(controlTypeIndex, linkIndex,...
+            controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
+        error(obj.getError(obj.Errcode)); 
+    end
 end
 function [controlTypeIndex, linkIndex,controlSettingValue,...
     nodeIndex, controlLevel] = controlSettings(obj, value)
