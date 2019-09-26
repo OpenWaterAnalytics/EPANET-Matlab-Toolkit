@@ -104,8 +104,8 @@ Keep in mind that some bugs may exist in the `EPANET` libraries, in case you are
 ## Contributors
 
 * Marios Kyriakou, [KIOS Research Center for Intelligent Systems and Networks, University of Cyprus](http://www.kios.ucy.ac.cy/)
-* Demetrios Eliades, [KIOS Research Center for Intelligent Systems and Networks, University of Cyprus](http://www.kios.ucy.ac.cy/c)
-* Stelios Vrachimis, [KIOS Research Center for Intelligent Systems and Networks, University of Cyprus](http://www.kios.ucy.ac.cy/c)
+* Demetrios Eliades, [KIOS Research Center for Intelligent Systems and Networks, University of Cyprus](http://www.kios.ucy.ac.cy/)
+* Stelios Vrachimis, [KIOS Research Center for Intelligent Systems and Networks, University of Cyprus](http://www.kios.ucy.ac.cy/)
 
 The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](http://www.mathworks.com/matlabcentral/fileexchange/25100-epanet-matlab-toolkit) as well as the OpenWaterAnalytics [EPANET-Matlab Wrappers](https://github.com/OpenWaterAnalytics/epanet-matlab)
 
