@@ -5888,14 +5888,17 @@ classdef epanet <handle
                 if strcmp(aline, '[VERTICES]')
                     while true
                         aline = fgetl(fid);
-                        if ~isempty(strfind(aline, '['))
+                        if ~contains(aline, '[')
+                            if strcmpi(aline, '[END]')
+                                break;
+                            end
                             if nargin == 1
                                 value = value - 2;
                             end
                             break
                         end
                         if nargin == 2
-                            if ~isempty(strfind(aline, varargin{1}))
+                            if ~contains(aline, varargin{1})
                                 value = value + 1;
                             end
                         else
@@ -5920,8 +5923,6 @@ classdef epanet <handle
             %   
             %   d.getBinLinkVertices                         % Retrieves all vertices of all links and stores them in cells
             %   d.getBinLinkVertices(linkID)                 % Retrieves all vertices of a link given it's ID label
-            %   first_vertex = 1;
-            %   d.getBinLinkVertices(linkID, first_vertex)   % Retrieves a vertex of a link given it's ID label and the index of the vertex
             %
             % See also setBinLinkVertices, addBinLinkVertices, deleteBinLinkVertices,
             %          getBinLinkVerticesCount, getNodeCoordinates.
@@ -5933,22 +5934,23 @@ classdef epanet <handle
             while ~feof(fid)
                 aline = fgetl(fid);
                 if strcmp(aline, '[VERTICES]')
-                    fgetl(fid);
                     data = cell(cnt, 3);
-                    for j = 1:cnt
+                    j = 1;
+                    while true
                         aline = fgetl(fid);
-                        bline = regexp(aline, '\s', 'split');
-                        k = 1;
-                        for i = 1:length(bline)
-                            if ~isempty(bline{i})
-                                data{j, k} = [bline{i}];
-                                k = k + 1;
-                            end
+                        if contains(aline, '[')
+                            break;
                         end
+                        bline = strsplit(aline); %Matlab version 2018a
+                        data(j, :) = bline;
+                        j = j +1;
                     end
                 end
             end
-%             value = cell(linksInfo.BinLinkCount, 3);
+            if nargin == 2
+                indices = find(contains(data(:,1), varargin{1}));
+                data = data(indices, :);
+            end
 %             for i = 1:size(data, 1)
 %                 linkIndex = obj.getBinLinkIndex(data{i, 1});
 %                 if isempty(value{linkIndex, 1})
@@ -6022,12 +6024,12 @@ classdef epanet <handle
                        j = 1;
                        for i = 1:cnt
                            bline = fgetl(fid);
-                           if ~isempty(strfind(bline, linkID)) && j == varargin{1}
+                           if ~contains(bline, linkID) && j == varargin{1}
                                 texta = [texta, linkID, blanks(10), num2str(x), blanks(10), num2str(y), char(10)];
                            else
                                 texta = [texta, bline, char(10)];
                            end
-                           if ~isempty(strfind(bline, linkID))
+                           if ~contains(bline, linkID)
                                 j = j + 1;
                            end
                        end
@@ -11083,9 +11085,9 @@ classdef epanet <handle
                fprintf(f, '\n[END]');
         end
         function [node_index, link_index] = addBinNodeJunction(obj, nodeID, varargin)
-            % Adds a new junction to the network.
+            % Adds a new junction with a pipe/pump/valve to the network.
             %
-            % Example 1:
+            % Example 1: Add junction with pipe
             %   d=epanet('NET1.inp');
             %   nodeID = 'new';
             %   coordinates = [20, 50];
@@ -11148,6 +11150,7 @@ classdef epanet <handle
             %
             % See also addBinNodeReservoir, addBinNodeTank, addBinPipe, 
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
+            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile, 1); end
             cnt = length(nodeID);
             coords = zeros(cnt, 2);
             elev = zeros(cnt, 1);
@@ -17120,9 +17123,8 @@ function [fid, binfile, rptfile] = runEPANETexe(obj)
     arch = computer('arch');
     [inpfile, rptfile, binfile]= createTempfiles(obj.BinTempfile);
     if strcmp(arch, 'win64') || strcmp(arch, 'win32')
-        [~, lpwd]=system(['cmd /c for %A in ("', obj.LibEPANETpath, '") do @echo %~sA']);
-        libPwd=regexp(lpwd, '\s', 'split');
-        r = sprintf('%s//epanet2.exe %s %s %s', libPwd{1}, inpfile, rptfile, binfile);
+        mmPwd=RTW.transformPaths(obj.LibEPANETpath);
+        r = sprintf('%sepanet2.exe %s %s %s', mmPwd, inpfile, rptfile, binfile);
     end
     if isunix
         r = sprintf('%sepanet2 %s %s %s', obj.LibEPANETpath, obj.BinTempfile, rptfile, binfile);
@@ -17834,14 +17836,13 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
         clear value;
         value=v;
     end
-    warning('off'); try fclose(fid); catch e, end; try delete(binfile); catch e, end
-    try delete(rptfile); catch e, end; warning('on'); 
+    warning('off'); try fclose(fid); catch, end; try delete(binfile); catch, end
+    try delete(rptfile); catch, end; warning('on'); 
 end
 function [inpfile, rptfile, binfile]= createTempfiles(BinTempfile)
     [tmppath, tempfile]=fileparts(BinTempfile);
-    [~, mm]=system(['cmd /c for %A in ("', tmppath, '") do @echo %~sA']);
-    mmPwd=regexp(mm, '\s', 'split');
-    inpfile=[mmPwd{1}, '/', tempfile, '.inp'];
+    mmPwd=RTW.transformPaths(tmppath);
+    inpfile=[mmPwd, '\\', tempfile, '.inp'];
     uuID = char(java.util.UUID.randomUUID);
     rptfile=['@#', uuID, '.txt'];
     binfile=['@#', uuID, '.bin'];
