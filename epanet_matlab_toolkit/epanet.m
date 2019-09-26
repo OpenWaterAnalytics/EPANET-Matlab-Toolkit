@@ -11096,57 +11096,18 @@ classdef epanet <handle
             %   patternID = '1';
             %   patternCategoryID = '1';
             %   quality = 0.5;
-            %   
-            % % If properties are not given, the default values are zero.
+            %   linkID = 'new_pipe';
+            %   from = nodeID;
+            %   to = '22';
+            %   length = 6000;     % Feet
+            %   diameter = 20;     % Inches
+            %   roughness = 100;   % Darcy-Weisbach formula(millifeet)
+            %   minorLoss = 0;
+            %   status = 'Open';
+            % 
+            %   [node_index, link_index] = d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID, patternCategoryID, quality,...
+            %     {'PIPE', linkID, from, to, length, diameter, roughness, minorLoss, status});
             %
-            % % Adds a new junction with the default coordinates (i.e. [0, 0])
-            %   node_index = d.addBinNodeJunction(nodeID)
-            %   d.plot;
-            %   
-            % % Adds a new junction with coordinates [X, Y] = [20, 50].
-            %   node_index = d.addBinNodeJunction(nodeID, coordinates)
-            %   d.plot;
-            %   x_value = d.getBinNodeCoordinates{1}(node_index)
-            %   y_value = d.getBinNodeCoordinates{2}(node_index)
-            %
-            % % Adds a new junction with coordinates [X, Y] = [20, 50] and elevation = 500.
-            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation)
-            %   d.plot;
-            %   d.getBinNodesInfo.BinNodeElevations(node_index)
-            %
-            % % Adds a new junction with coordinates [X, Y] = [20, 50], elevation = 500 and demand = 100.
-            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand)
-            %   d.plot;
-            %   d.getBinNodesInfo.BinNodeBaseDemands(node_index)
-            %
-            % % Adds a new junction with coordinates [X, Y] = [20, 50], elevation = 500, demand = 100 and pattern ID = '1'.
-            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID)
-            %   d.plot;
-            %   d.getBinNodesInfo.BinNodeJunDemandPatternNameID{node_index}
-            %
-            % % Adds a new junction with coordinates [X, Y] = [20, 50], elevation = 500, demand = 100, pattern ID = '1' and pattern category ID = '1'.
-            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID, patternCategoryID)
-            %   d.plot;
-            %
-            % % Adds a new junction with coordinates [X, Y] = [20, 50], elevation = 500, demand = 100, pattern ID = '1', pattern category ID = '1' and quality = 0.5.
-            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID, patternCategoryID, quality)
-            %   d.plot;
-            %
-            % Example 2:
-            %   d=epanet('NET1.inp');
-            %   nodeID = {'new_1', 'new_2'};
-            %   coordinates = [20, 50; 20, 40];
-            %   elevation = [500, 600];
-            %   demand = [100, 150];
-            %   patternID = {'1', ''};
-            %   patternCategoryID = {'1', ''};
-            %   quality = [0.5, 1];
-            %
-            % % Adds 2 new junctions with coordinates [X, Y] = [20, 50] and [X, Y] = [20, 40], elevation = 500 and 600,
-            % % demand = 100 and 150, pattern ID = '1' and none, pattern category ID = '1' and none, and quality = 0.5 and 1.
-            %   node_index = d.addBinNodeJunction(nodeID, coordinates, elevation, demand, patternID, patternCategoryID, quality)
-            %   d.plot;
-            %   d.getBinNodesInfo.BinNodeJunDemandPatternNameID{node_index}
             %
             % See also addBinNodeReservoir, addBinNodeTank, addBinPipe, 
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
@@ -17123,8 +17084,7 @@ function [fid, binfile, rptfile] = runEPANETexe(obj)
     arch = computer('arch');
     [inpfile, rptfile, binfile]= createTempfiles(obj.BinTempfile);
     if strcmp(arch, 'win64') || strcmp(arch, 'win32')
-        mmPwd=RTW.transformPaths(obj.LibEPANETpath);
-        r = sprintf('%sepanet2.exe %s %s %s', mmPwd, inpfile, rptfile, binfile);
+        r = sprintf('"%sepanet2.exe" "%s" %s %s', obj.LibEPANETpath, inpfile, rptfile, binfile);
     end
     if isunix
         r = sprintf('%sepanet2 %s %s %s', obj.LibEPANETpath, obj.BinTempfile, rptfile, binfile);
@@ -17840,9 +17800,7 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
     try delete(rptfile); catch, end; warning('on'); 
 end
 function [inpfile, rptfile, binfile]= createTempfiles(BinTempfile)
-    [tmppath, tempfile]=fileparts(BinTempfile);
-    mmPwd=RTW.transformPaths(tmppath);
-    inpfile=[mmPwd, '\\', tempfile, '.inp'];
+    inpfile=BinTempfile;
     uuID = char(java.util.UUID.randomUUID);
     rptfile=['@#', uuID, '.txt'];
     binfile=['@#', uuID, '.bin'];
