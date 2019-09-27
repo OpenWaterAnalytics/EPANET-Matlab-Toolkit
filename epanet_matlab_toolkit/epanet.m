@@ -5769,7 +5769,7 @@ classdef epanet <handle
                 texta = [texta, aline, char(10)];
                 if strcmp(aline, '[VERTICES]')
                    fline = fgetl(fid);
-                   while isempty(strfind(fline, '['))   %contains                
+                   while contains(fline, '[')   %contains                
                        texta = [texta, fline, char(10)];
                        fline = fgetl(fid);
                    end
@@ -6174,7 +6174,7 @@ classdef epanet <handle
             [Errcode] = ENdeletecurve(obj.LibEPANET, indexCurve);
             error(obj.getError(Errcode));
         end
-        function setControls(obj, index, control)
+        function setControls(obj, index, control, varargin)
             % Sets the parameters of a simple control statement.
             %
             % % The examples are based on d=epanet('Net1.inp');
@@ -6197,7 +6197,27 @@ classdef epanet <handle
             %   d.setControls(controls)                % Sets multiple controls given as cell
             %   d.getControls(1)
             %   d.getControls(2)
+            % Example 4:
+            %  Notes:
+            %       index:     control statement index 
+            %       control:   control type code 
+            %       lindex:    index of link being controlled 
+            %       setting:   value of the control setting 
+            %       nindex:    index of controlling node 
+            %       level:     value of controlling water level or pressure for 
+            %                  level controls or of time of control action 
+            %                  (in seconds) for time-based controls 
             %   
+            % Control type codes consist of the following:  
+            %  EN_LOWLEVEL      0   Control applied when tank level or node pressure drops below specified level 
+            %  EN_HILEVEL       1   Control applied when tank level or node pressure rises above specified level 
+            %  EN_TIMER         2   Control applied at specific time into simulation 
+            %  EN_TIMEOFDAY     3   Control applied at specific time of day 
+            %
+            %   Code example:
+            %       % d.setControls(index, control, lindex, setting, nindex, level)
+            %       d.setControls(1, 0, 13, 0, 11, 30)
+            %
             % See also getControls, getControlRulesCount,
             %          addControls, deleteControls.
             if isstruct(index)
@@ -6205,21 +6225,29 @@ classdef epanet <handle
                     setControlFunction(obj, c, index(c).Control)
                 end
             else
-                if length(index)> 1
-                    tmpC = index;
-                    index = 1:length(index);
-                elseif length(index)== 1
-                    if isnumeric(index) 
-                        tmpC{1} = control;
-                    else
-                        tmpC{1} = index{1};
-                        index = 1;
+                if nargin <= 3
+                    if length(index)> 1
+                        tmpC = index;
+                        index = 1:length(index);
+                    elseif length(index)== 1
+                        if isnumeric(index) 
+                            tmpC{1} = control;
+                        else
+                            tmpC{1} = index{1};
+                            index = 1;
+                        end
                     end
-                end
-                j=1;
-                for i=index
-                    setControlFunction(obj, i, tmpC{j}); 
-                    j=j+1;
+                    j=1;
+                    for i=index
+                        setControlFunction(obj, i, tmpC{j}); 
+                        j=j+1;
+                    end
+                else
+                    linkIndex = varargin{1};
+                    controlSettingValue = varargin{2};
+                    nodeIndex = varargin{3};
+                    controlLevel = varargin{4};
+                    [obj.Errcode] = ENsetcontrol(index, control, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);  
                 end
             end
         end
@@ -6250,9 +6278,23 @@ classdef epanet <handle
             %   index_4 = d.addControls('LINK 12 OPEN AT CLOCKTIME 20:00');
             %   d.getControls(index_4)
             %
+            % Example 5:
+            %   % Adds multiple controls given as cell
+            %   control_1 = 'LINK 9 OPEN IF NODE 2 BELOW 110';
+            %   control_2 = 'LINK 9 CLOSED IF NODE 2 ABOVE 200';
+            %   controls = {control_1, control_2};
+            %   index = d.addControls(controls)                
+            %   d.getControls(index)
+            %
             % See also deleteControls, getControls,
             %          setControls, getControlRulesCount.
-            index = addControlFunction(obj, control); 
+            if iscell(control)
+                for i=1:length(control)
+                    index(i) = addControlFunction(obj, control{i}); 
+                end
+            else
+               index = addControlFunction(obj, control); 
+            end
         end
         function Errcode = deleteControls(varargin)
             % Deletes an existing simple control. (EPANET Version 2.2)
