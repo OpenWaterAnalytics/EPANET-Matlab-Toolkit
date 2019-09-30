@@ -5769,13 +5769,17 @@ classdef epanet <handle
                 texta = [texta, aline, char(10)];
                 if strcmp(aline, '[VERTICES]')
                    fline = fgetl(fid);
-                   while contains(fline, '[')   %contains                
+                   while ~isempty(strfind(fline, '['))   %contains                
                        texta = [texta, fline, char(10)];
                        fline = fgetl(fid);
                    end
                    texta = [texta, str];
                    break
                 end
+            end
+            while isempty(strfind(fline, '[END]'))   %contains                
+                texta = [texta, fline, char(10)];
+                fline = fgetl(fid);
             end
             texta = [texta, '[END]'];
             fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
@@ -5888,7 +5892,7 @@ classdef epanet <handle
                 if strcmp(aline, '[VERTICES]')
                     while true
                         aline = fgetl(fid);
-                        if ~contains(aline, '[')
+                        if ~isempty(strfind(aline, '['))
                             if strcmpi(aline, '[END]')
                                 break;
                             end
@@ -5898,7 +5902,7 @@ classdef epanet <handle
                             break
                         end
                         if nargin == 2
-                            if ~contains(aline, varargin{1})
+                            if ~isempty(strfind(aline, varargin{1}))
                                 value = value + 1;
                             end
                         else
@@ -5934,22 +5938,29 @@ classdef epanet <handle
             while ~feof(fid)
                 aline = fgetl(fid);
                 if strcmp(aline, '[VERTICES]')
-                    data = cell(cnt, 3);
                     j = 1;
                     while true
                         aline = fgetl(fid);
-                        if contains(aline, '[')
+                        if ~isempty(strfind(aline, '['))
                             break;
                         end
-                        bline = strsplit(aline); %Matlab version 2018a
-                        data(j, :) = bline;
+                        bline = strsplit(aline);
+                        bline = bline(~cellfun(@isempty, bline));
+                        if isempty(bline)
+                            continue
+                        end
+                        if strcmp(bline{1}(1), ';')
+                            continue
+                        end
+                        data{j} = bline;
+                        ids{j} = bline{1};
                         j = j +1;
                     end
                 end
             end
             if nargin == 2
-                indices = find(contains(data(:,1), varargin{1}));
-                data = data(indices, :);
+                indices = find(strcmp(ids, varargin{1}));
+                data = data(indices);
             end
 %             for i = 1:size(data, 1)
 %                 linkIndex = obj.getBinLinkIndex(data{i, 1});
@@ -6006,6 +6017,7 @@ classdef epanet <handle
             %
             % See also addBinLinkVertices, deleteBinLinkVertices, getBinLinkVertices,
             %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
+            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile, 1); end
             if nargin == 4
                 obj.deleteBinLinkVertices(linkID);
                 obj.addBinLinkVertices(linkID, x, y);
@@ -6024,12 +6036,12 @@ classdef epanet <handle
                        j = 1;
                        for i = 1:cnt
                            bline = fgetl(fid);
-                           if ~contains(bline, linkID) && j == varargin{1}
+                           if ~isempty(strfind(bline, linkID)) && j == varargin{1}
                                 texta = [texta, linkID, blanks(10), num2str(x), blanks(10), num2str(y), char(10)];
                            else
                                 texta = [texta, bline, char(10)];
                            end
-                           if ~contains(bline, linkID)
+                           if ~isempty(strfind(bline, linkID))
                                 j = j + 1;
                            end
                        end
@@ -8867,8 +8879,8 @@ classdef epanet <handle
             else
                 [addSectionCoordinates, addSectionRules] = obj.getBinCoordRuleSections(obj.BinTempfile);
                 [Errcode] = ENsaveinpfile(inpname,obj.LibEPANET);
-                [~,info_file] = obj.readInpFile;
-                vertSectionIndex = find(~cellfun(@isempty,regexp(info_file,'VERTICES','match')), 1);
+                [~, info_file] = obj.readInpFile;
+                vertSectionIndex = find(~cellfun(@isempty, regexp(info_file,'VERTICES','match')), 1);
                 len_sec = length(addSectionCoordinates);
                 if isempty(vertSectionIndex)
                     fid = fopen(obj.BinTempfile); % Opens the file for read access
@@ -8885,7 +8897,6 @@ classdef epanet <handle
                            i = i +1;
                         end
                     end
-                    texta = [texta, '[END]'];
                     fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
                     fprintf(fid, texta);   % Writes the new text in the .inp file
                     fclose('all'); 
@@ -16207,7 +16218,7 @@ for t = Index:length(info)
     else
         u=1;
         while u < length(a)+1
-            if strcmp(a{u}, type_n);
+            if strcmp(a{u}, type_n)
                 fprintf(fid2, '[CONTROLS]');
                 s=1; break;
             end
