@@ -17158,39 +17158,66 @@ function value = getBinComputedTimeSeries(obj, indParam, varargin)
         fread(fid, 15, 'uint32');
         fread(fid, 808, '*char');
         fread(fid, 4, 'uint32');
-        fread(fid, 32*BinNodeCount+32*BinLinkCount, '*char'); % error NODES*32
+        fread(fid, 32*BinNodeCount+32*BinLinkCount, '*char'); 
         fread(fid, BinLinkCount*3, 'uint32');
-        fread(fid, BinNodeResTankCount*2, 'uint32'); % error
+        fread(fid, BinNodeResTankCount, 'uint32'); 
+        fread(fid, BinNodeResTankCount, 'float'); 
         switch indParam
             case 1
-                value =fread(fid, BinNodeCount, 'float')'; % ElevationEachNode
+                value = fread(fid, BinNodeCount, 'float')'; % ElevationEachNode
             case 2
                 fread(fid, BinNodeCount, 'float');
-                value =fread(fid, BinLinkCount, 'float')'; % LengthEachLink
+                value = fread(fid, BinLinkCount, 'float')'; % LengthEachLink
             case 3
                 fread(fid, BinNodeCount+BinLinkCount, 'float');
-                value =fread(fid, BinLinkCount, 'float')'; % DiameterEachLink
+                value = fread(fid, BinLinkCount, 'float')'; % DiameterEachLink
             case 4
                 fread(fid, BinNodeCount+BinLinkCount*2, 'float');
-                value =fread(fid, BinLinkPumpCount, 'float')'; % PumpIndexListLinks
+                for p=1:BinLinkPumpCount
+                    value(p) = fread(fid, 1, 'float')'; % PumpIndexListLinks
+                    fread(fid, 6, 'float');
+                end
             case 5
-                fread(fid, BinNodeCount+BinLinkCount*2+BinLinkPumpCount, 'float');
-                value =fread(fid, BinLinkPumpCount, 'float')'; % PumpUtilization
+                fread(fid, BinNodeCount+BinLinkCount*2, 'float');
+                for p=1:BinLinkPumpCount
+                    fread(fid, 1, 'float');
+                    value(p) = fread(fid, 1, 'float')';  % BinPumpUtilization
+                    fread(fid, 5, 'float');  
+                end
             case 6
-                fread(fid, BinNodeCount+BinLinkCount*2+BinLinkPumpCount*2, 'float');
-                value =fread(fid, BinLinkPumpCount, 'float')'; % AverageEfficiency
+                fread(fid, BinNodeCount+BinLinkCount*2, 'float');
+                for p=1:BinLinkPumpCount
+                    fread(fid, 2, 'float');
+                    value(p) = fread(fid, 1, 'float')';  % BinAverageEfficiency
+                    fread(fid, 4, 'float');  
+                end
             case 7
-                fread(fid, BinNodeCount+BinLinkCount*2+BinLinkPumpCount*3, 'float');
-                value =fread(fid, BinLinkPumpCount, 'float')'; % AverageKwattsOrMillionGallons
+                fread(fid, BinNodeCount+BinLinkCount*2, 'float');
+                for p=1:BinLinkPumpCount
+                    fread(fid, 3, 'float');
+                    value(p) = fread(fid, 1, 'float')';  % BinAverageKwattsOrMillionGallons
+                    fread(fid, 3, 'float');  
+                end
             case 8
-                fread(fid, BinNodeCount+BinLinkCount*2+BinLinkPumpCount*4, 'float');
-                value =fread(fid, BinLinkPumpCount, 'float')'; % AverageKwatts
+                fread(fid, BinNodeCount+BinLinkCount*2, 'float');
+                for p=1:BinLinkPumpCount
+                    fread(fid, 4, 'float');
+                    value(p) = fread(fid, 1, 'float')';  % BinAverageKwatts
+                    fread(fid, 2, 'float');  
+                end
             case 9
-                fread(fid, BinNodeCount+BinLinkCount*2+BinLinkPumpCount*5, 'float');
-                value =fread(fid, BinLinkPumpCount, 'float')'; % PeakKwatts
+                fread(fid, BinNodeCount+BinLinkCount*2, 'float');
+                for p=1:BinLinkPumpCount
+                    fread(fid, 5, 'float');
+                    value(p) = fread(fid, 1, 'float')';  % BinPeakKwatts
+                    fread(fid, 1, 'float');
+                end
             case 10
-                fread(fid, BinNodeCount+BinLinkCount*2+BinLinkPumpCount*6, 'float');
-                value =fread(fid, BinLinkPumpCount, 'float')'; % AverageCostPerDay
+                fread(fid, BinNodeCount+BinLinkCount*2, 'float');
+                for p=1:BinLinkPumpCount
+                    fread(fid, 6, 'float');
+                    value(p) = fread(fid, 1, 'float')';  % BinAverageCostPerDay
+                end
         end
         if indParam>10
             fread(fid, BinNodeCount+BinLinkCount*2+BinLinkPumpCount*7+1, 'float');
@@ -17274,8 +17301,8 @@ function value = getBinComputedTimeSeries(obj, indParam, varargin)
                 value =fread(fid, 1, 'float')'; % AverageSourceInflowRate
         end
     end
-    warning('off'); try fclose(fid); catch e, end; try delete(binfile); catch e, end
-    try delete(rptfile); catch e, end; warning('on'); 
+    warning('off'); try fclose(fid); catch, end; try delete(binfile); catch, end
+    try delete(rptfile); catch, end; warning('on'); 
 end
 function Errcode=addLinkWarnings(obj, typecode, newLink, toNode)
 % Check if id new already exists
@@ -17788,15 +17815,17 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
         value.BinElevationEachNode=fread(fid, value.BinNumberNodes, 'float')';
         value.BinLengthEachLink=fread(fid, value.BinNumberLinks, 'float')';
         value.BinDiameterEachLink=fread(fid, value.BinNumberLinks, 'float')';
-
-        value.BinPumpIndexListLinks=fread(fid, value.BinNumberPumps, 'float')';
-        value.BinPumpUtilization=fread(fid, value.BinNumberPumps, 'float')';
-        value.BinAverageEfficiency=fread(fid, value.BinNumberPumps, 'float')';
-        value.BinAverageKwattsOrMillionGallons=fread(fid, value.BinNumberPumps, 'float')';
-        value.BinAverageKwatts=fread(fid, value.BinNumberPumps, 'float')';
-        value.BinPeakKwatts=fread(fid, value.BinNumberPumps, 'float')';
-        value.BinAverageCostPerDay=fread(fid, value.BinNumberPumps, 'float')';
-
+    
+        for p=1:value.BinNumberPumps
+            value.BinPumpIndexListLinks(p)=fread(fid, 1, 'float')';
+            value.BinPumpUtilization(p)=fread(fid, 1, 'float')';
+            value.BinAverageEfficiency(p)=fread(fid, 1, 'float')';
+            value.BinAverageKwattsOrMillionGallons(p)=fread(fid, 1, 'float')';
+            value.BinAverageKwatts(p)=fread(fid, 1, 'float')';
+            value.BinPeakKwatts(p)=fread(fid, 1, 'float')';
+            value.BinAverageCostPerDay(p)=fread(fid, 1, 'float')';
+        end
+        
         fread(fid, 1, 'float');
 
         for i=1:value.BinNumberReportingPeriods
