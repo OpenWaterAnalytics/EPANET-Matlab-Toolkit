@@ -103,8 +103,8 @@ d.getNodeTankMinimumWaterLevel(tankInd)
 d.getNodeTankMaximumWaterLevel
 d.getNodeTankMaximumWaterLevel(tankInd)
 
-d.getNodeTankMinimumFraction
-d.getNodeTankMinimumFraction(tankInd)
+d.getNodeTankMixingFraction
+d.getNodeTankMixingFraction(tankInd)
 
 d.getNodeTankBulkReactionCoeff
 d.getNodeTankBulkReactionCoeff(tankInd)
@@ -235,11 +235,11 @@ n=d.getNodeTankMinimumWaterLevel
 d.setNodeTankMinimumWaterLevel(tankInd, n+20);
 d.getNodeTankMinimumWaterLevel
 
-d.getNodeTankMinimumFraction
-d.setNodeTankMinimumFraction(d.getNodeTankMinimumFraction-0.1);
-d.getNodeTankMinimumFraction
-d.setNodeTankMinimumFraction(tankInd, 0.2);
-d.getNodeTankMinimumFraction
+d.getNodeTankMixingFraction
+d.setNodeTankMixingFraction(d.getNodeTankMixingFraction-0.1);
+d.getNodeTankMixingFraction
+d.setNodeTankMixingFraction(tankInd, 0.2);
+d.getNodeTankMixingFraction
 
 d.getNodeTankMinimumWaterVolume
 d.setNodeTankMinimumWaterVolume(d.getNodeTankMinimumWaterVolume+10000);
