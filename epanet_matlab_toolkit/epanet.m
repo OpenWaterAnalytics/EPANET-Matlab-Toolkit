@@ -11164,7 +11164,7 @@ classdef epanet <handle
             %
             % See also addBinNodeReservoir, addBinNodeTank, addBinPipe, 
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
-            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile, 1); end
+            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile); end
             cnt = length(nodeID);
             coords = zeros(cnt, 2);
             elev = zeros(cnt, 1);
