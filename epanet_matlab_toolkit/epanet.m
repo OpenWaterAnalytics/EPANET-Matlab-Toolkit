@@ -8888,36 +8888,37 @@ classdef epanet <handle
             %   d.saveInputFile(filename)
             %
             % See also unload, saveHydraulicFile.
-            if nargin < 3
-                [Errcode] = ENsaveinpfile('@#', obj.LibEPANET);
-                copyfile('@#', inpname);% temporary
-                delete('@#');
-            else
-                [addSectionCoordinates, addSectionRules] = obj.getBinCoordRuleSections(obj.BinTempfile);
-                [Errcode] = ENsaveinpfile(inpname,obj.LibEPANET);
-                [~, info_file] = obj.readInpFile;
-                vertSectionIndex = find(~cellfun(@isempty, regexp(info_file,'VERTICES','match')), 1);
-                len_sec = length(addSectionCoordinates);
-                if isempty(vertSectionIndex)
-                    fid = fopen(obj.BinTempfile); % Opens the file for read access
-                    texta = char;
-                    i = 1; ok = 0;
-                    while (i < len_sec)
-                        aline = fgetl(fid);
-                        if ~ok
-                            texta = [texta, aline, char(10)];
-                        end
-                        if strcmp(aline, '[COORDINATES]') || ok
-                           ok = 1;
-                           texta = [texta, addSectionCoordinates{i+1}, char(10)];
-                           i = i +1;
-                        end
-                    end
-                    fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
-                    fprintf(fid, texta);   % Writes the new text in the .inp file
-                    fclose('all'); 
-                end
-            end
+%             while exist('@#', 'file') ~= 2
+            [Errcode] = ENsaveinpfile('@#', obj.LibEPANET);
+            copyfile('@#', inpname);% temporary
+%             end
+            delete('@#');
+%             else
+%                 [addSectionCoordinates, addSectionRules] = obj.getBinCoordRuleSections(obj.BinTempfile);
+%                 [Errcode] = ENsaveinpfile(inpname,obj.LibEPANET);
+%                 [~, info_file] = obj.readInpFile;
+%                 vertSectionIndex = find(~cellfun(@isempty, regexp(info_file,'VERTICES','match')), 1);
+%                 len_sec = length(addSectionCoordinates);
+%                 if isempty(vertSectionIndex)
+%                     fid = fopen(obj.BinTempfile); % Opens the file for read access
+%                     texta = char;
+%                     i = 1; ok = 0;
+%                     while (i < len_sec)
+%                         aline = fgetl(fid);
+%                         if ~ok
+%                             texta = [texta, aline, char(10)];
+%                         end
+%                         if strcmp(aline, '[COORDINATES]') || ok
+%                            ok = 1;
+%                            texta = [texta, addSectionCoordinates{i+1}, char(10)];
+%                            i = i +1;
+%                         end
+%                     end
+%                     fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
+%                     fprintf(fid, texta);   % Writes the new text in the .inp file
+%                     fclose('all'); 
+%                 end
+%             end
         end
         function writeLineInReportFile(obj, line)
             % Writes a line of text to the EPANET report file.
