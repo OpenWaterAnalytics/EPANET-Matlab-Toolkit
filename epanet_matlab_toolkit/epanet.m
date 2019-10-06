@@ -667,11 +667,13 @@ classdef epanet <handle
             for i=1:length(getFields_node_info)
                 obj.(getFields_node_info{i}) = eval(['ndInfo.', getFields_node_info{i}]);
             end
-            % Get demand model type and parameters
-            demModelInfo = obj.getDemandModel;
-            getFields_demModelInfo = fields(demModelInfo);
-            for i=1:length(getFields_demModelInfo)
-                obj.(getFields_demModelInfo{i}) = eval(['demModelInfo.', getFields_demModelInfo{i}]);
+            if obj.getVersion > 20101
+                % Get demand model type and parameters
+                demModelInfo = obj.getDemandModel;
+                getFields_demModelInfo = fields(demModelInfo);
+                for i=1:length(getFields_demModelInfo)
+                    obj.(getFields_demModelInfo{i}) = eval(['demModelInfo.', getFields_demModelInfo{i}]);
+                end
             end
             %Get all the countable network parameters
             obj.NodeCount = obj.getNodeCount;
@@ -736,9 +738,11 @@ classdef epanet <handle
             obj.OptionsQualityTolerance = obj.getOptionsQualityTolerance;
             obj.OptionsEmitterExponent = obj.getOptionsEmitterExponent;
             obj.OptionsPatternDemandMultiplier = obj.getOptionsPatternDemandMultiplier;
-            obj.OptionsHeadError = obj.getOptionsHeadError;
-            obj.OptionsFlowChange = obj.getOptionsFlowChange;
-            obj.OptionsHeadLossFormula = obj.getOptionsHeadLossFormula;
+            if obj.getVersion > 20101
+                obj.OptionsHeadError = obj.getOptionsHeadError;
+                obj.OptionsFlowChange = obj.getOptionsFlowChange;
+                obj.OptionsHeadLossFormula = obj.getOptionsHeadLossFormula;
+            end
             %Get pattern data
             obj.PatternNameID = obj.getPatternNameID;
             obj.PatternIndex = 1:obj.PatternCount; %obj.getPatternIndex;
@@ -1853,7 +1857,9 @@ classdef epanet <handle
                 [~, value.LinkBulkReactionCoeff(i)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_KBULK, obj.LibEPANET);
                 [~, value.LinkWallReactionCoeff(i)] = ENgetlinkvalue(i, obj.ToolkitConstants.EN_KWALL, obj.LibEPANET);
                 [~, value.NodesConnectingLinksIndex(i, 1), value.NodesConnectingLinksIndex(i, 2)] = ENgetlinknodes(i, obj.LibEPANET);
-                [~, value.LinkTypeIndex(i)] = ENgetlinktype(i, obj.LibEPANET);
+                if obj.getVersion > 20101
+                    [~, value.LinkTypeIndex(i)] = ENgetlinktype(i, obj.LibEPANET);
+                end
             end
         end
         function value = getLinkDiameter(obj, varargin)
@@ -9807,7 +9813,12 @@ classdef epanet <handle
             disp('MSX unloaded');
         end
         function ToolkitConstants = getToolkitConstants(obj)
-            file = [obj.LibEPANETpath, obj.LibEPANET, '_enums.h'];
+            if obj.getVersion <= 20101
+                fparam = '.h'; % error('This version of EMT support version 2.2 of EPANET.')
+            else
+                fparam = '_enums.h';
+            end
+            file = [obj.LibEPANETpath, obj.LibEPANET, fparam];
             if isdeployed
                 file=[file(1:end-1), 'txt'];%epanet2.h-->epanet2.txt
             end
