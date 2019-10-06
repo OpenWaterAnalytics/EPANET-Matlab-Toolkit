@@ -17162,7 +17162,7 @@ function [fid, binfile, rptfile] = runEPANETexe(obj)
     arch = computer('arch');
     [inpfile, rptfile, binfile]= createTempfiles(obj.BinTempfile);
     if strcmp(arch, 'win64') || strcmp(arch, 'win32')
-        r = sprintf('"%sepanet2.exe" "%s" %s %s', obj.LibEPANETpath, inpfile, rptfile, binfile);
+        r = sprintf('"%sepanet2.exe" "%s" %s %s & exit', obj.LibEPANETpath, inpfile, rptfile, binfile);
     end
     if isunix
         r = sprintf('%sepanet2 %s %s %s', obj.LibEPANETpath, obj.BinTempfile, rptfile, binfile);
