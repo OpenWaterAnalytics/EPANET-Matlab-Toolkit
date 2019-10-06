@@ -5024,7 +5024,7 @@ classdef epanet <handle
             fid = fopen(binfile, 'r');
             value = readEpanetBin(fid, binfile, rptfile, 0);  
             fclose('all');
-            obj.Errcode = reloadNetwork(obj);
+            obj.Errcode = ENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement.
@@ -16917,9 +16917,7 @@ fclose(fid2);
 if obj.Bin, Errcode=reloadNetwork(obj); end
 end
 function Errcode=reloadNetwork(obj)
-%     lib = [obj.LibEPANETpath, obj.LibEPANET];
-%     unloadlibrary('epanet2');loadlibrary(lib);
-%     obj.closeNetwork;
+    obj.closeNetwork;
     Errcode=ENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
 end
 function setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
