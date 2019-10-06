@@ -851,7 +851,7 @@ classdef epanet <handle
             elseif nargin == 2
                 rptfile = [varargin{1}, '.txt'];
                 binfile = [varargin{1}, '.bin'];
-                obj.Errcode = calllib(obj.LibEPANET, 'ENepanet', obj.BinTempfile, rptfile, binfile, lib.pointer);
+                obj.Errcode = ENepanet(obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
                 Errcode = reloadNetwork(obj);
             end
         end
@@ -5009,6 +5009,16 @@ classdef epanet <handle
             files=dir('@#*');
             if ~isempty(files); delete('@#*'); end
             warning on; 
+        end
+        function value = getComputedTimeSeries_ENepanet(obj)
+            uuID = char(java.util.UUID.randomUUID);
+            rptfile=['@#', uuID, '.txt'];
+            binfile=['@#', uuID, '.bin'];
+            obj.Errcode = ENepanet(obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
+            fid = fopen(binfile, 'r');
+            value = readEpanetBin(fid, binfile, rptfile, 0);  
+            fclose('all');
+            obj.Errcode = reloadNetwork(obj);
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement.
@@ -13415,6 +13425,9 @@ function [Errcode] = ENopen(inpname, repname, binname, LibEPANET) %DE
        [~, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
        disp(errmsg);
     end
+end
+function [Errcode] = ENepanet(LibEPANET, tempfile, rptfile, binfile)            
+[Errcode] = calllib(LibEPANET, 'ENepanet', tempfile, rptfile, binfile, lib.pointer);
 end
 function [Errcode] = ENopenH(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENopenH');

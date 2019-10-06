@@ -121,7 +121,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getError| Returns the description of an error code| 
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
-|getComputedTimeSeries|Computed Hydraulic & Quality Time Series via ENepanet binary file|
+|getComputedTimeSeries|Computed Hydraulic & Quality Time Series using the bimary file who created from executable|
+|getComputedTimeSeries_ENepanet|Computed Hydraulic & Quality Time Series via ENepanet binary file|
 |getConnectivityMatrix|Return connectivity matrix of the network|
 |getCounts|Retrieves the number of network components|
 |getControlRulesCount|Retrieves the number of control rules|
