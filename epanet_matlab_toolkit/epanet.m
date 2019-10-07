@@ -4867,8 +4867,10 @@ classdef epanet <handle
                 if find(strcmpi(varargin, 'demand'))
                     value.Demand(k, :) = obj.getNodeActualDemand;
                 end
-                if find(strcmpi(varargin, 'demanddeficit'))
-                    value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
+                if obj.getVersion > 20101
+                    if find(strcmpi(varargin, 'demanddeficit'))
+                        value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
+                    end
                 end
                 if find(strcmpi(varargin, 'demandSensingNodes'))
                     value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
@@ -4897,11 +4899,15 @@ classdef epanet <handle
                 if find(strcmpi(varargin, 'energy'))
                     value.Energy(k, :) = obj.getLinkEnergy;
                 end
-                if find(strcmpi(varargin, 'efficiency'))
-                    value.Efficiency(k, :) = [zeros(1, obj.getLinkPipeCount) obj.getLinkPumpEfficiency zeros(1, obj.getLinkValveCount)];
+                if obj.getVersion > 20101
+                    if find(strcmpi(varargin, 'efficiency'))
+                        value.Efficiency(k, :) = [zeros(1, obj.getLinkPipeCount) obj.getLinkPumpEfficiency zeros(1, obj.getLinkValveCount)];
+                    end
                 end
-                if find(strcmpi(varargin, 'state'))
-                    value.State(k, :) = obj.getLinkState;
+                if obj.getVersion > 20101
+                    if find(strcmpi(varargin, 'state'))
+                        value.State(k, :) = obj.getLinkState;
+                    end
                 end
                 tstep = obj.nextHydraulicAnalysisStep;
                 k = k+1;
@@ -5018,6 +5024,7 @@ classdef epanet <handle
             warning on; 
         end
         function value = getComputedTimeSeries_ENepanet(obj)
+            obj.saveInputFile(obj.TempInpFile);
             uuID = char(java.util.UUID.randomUUID);
             rptfile=['@#', uuID, '.txt'];
             binfile=['@#', uuID, '.bin'];
@@ -5025,7 +5032,9 @@ classdef epanet <handle
             fid = fopen(binfile, 'r');
             value = readEpanetBin(fid, binfile, rptfile, 0);  
             fclose('all');
-            obj.Errcode = ENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
+            files=dir('@#*');
+            if ~isempty(files); delete('@#*'); end
+            obj.Errcode = ENopen(obj.BinTempfile, [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement.
