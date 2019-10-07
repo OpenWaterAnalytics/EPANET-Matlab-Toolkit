@@ -5028,13 +5028,13 @@ classdef epanet <handle
             uuID = char(java.util.UUID.randomUUID);
             rptfile=['@#', uuID, '.txt'];
             binfile=['@#', uuID, '.bin'];
-            obj.Errcode = ENepanet(obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
+            obj.Errcode = ENepanet(obj.LibEPANET, obj.TempInpFile, rptfile, binfile);
             fid = fopen(binfile, 'r');
             value = readEpanetBin(fid, binfile, rptfile, 0);  
             fclose('all');
             files=dir('@#*');
             if ~isempty(files); delete('@#*'); end
-            obj.Errcode = ENopen(obj.BinTempfile, [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
+            obj.Errcode = ENopen(obj.TempInpFile, [obj.TempInpFile(1:end-4), '.txt'], [obj.TempInpFile(1:end-4), '.bin'], obj.LibEPANET);
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement.
