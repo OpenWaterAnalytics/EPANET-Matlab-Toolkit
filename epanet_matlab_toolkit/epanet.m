@@ -5024,7 +5024,7 @@ classdef epanet <handle
             warning on; 
         end
         function value = getComputedTimeSeries_ENepanet(obj)
-            obj.saveInputFile(obj.TempInpFile);
+%             obj.saveInputFile(obj.TempInpFile);
             uuID = char(java.util.UUID.randomUUID);
             rptfile=['@#', uuID, '.txt'];
             binfile=['@#', uuID, '.bin'];
@@ -8901,7 +8901,6 @@ classdef epanet <handle
 %             while exist('@#', 'file') ~= 2
             [Errcode] = ENsaveinpfile('@#', obj.LibEPANET);
             copyfile('@#', inpname);% temporary
-%             end
             delete('@#');
 %             else
 %                 [addSectionCoordinates, addSectionRules] = obj.getBinCoordRuleSections(obj.BinTempfile);
