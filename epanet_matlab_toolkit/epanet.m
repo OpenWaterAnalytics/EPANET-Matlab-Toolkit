@@ -4791,6 +4791,7 @@ classdef epanet <handle
             %
             % See also getComputedQualityTimeSeries, getComputedTimeSeries.
             obj.openHydraulicAnalysis;
+            obj.solve = 1;
             obj.initializeHydraulicAnalysis
             totalsteps=obj.getTimeSimulationDuration/obj.getTimeHydraulicStep;
             initnodematrix = zeros(totalsteps, obj.getNodeCount);
