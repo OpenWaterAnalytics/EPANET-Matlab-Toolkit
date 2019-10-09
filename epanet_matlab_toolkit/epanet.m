@@ -516,7 +516,7 @@ classdef epanet <handle
         end
         function set_node_demand_pattern(obj, fun, propertie, value, extra)
             chckfunctions=libfunctions(obj.LibEPANET);
-            if sum(strcmp(chckfunctions, fun))
+            if sum(strcmp(chckfunctions, fun)) && ~ismember(value, obj.getNodeReservoirIndex)
                 categ = 1;
                 if length(extra) == 2
                     indices = value;
@@ -2797,15 +2797,23 @@ classdef epanet <handle
             %   d.getNodeDemandPatternIndex{1}
             %
             % See also getNodeBaseDemands, getNodeDemandCategoriesNumber,
-            %          getNodeDemandPatternNameID.
+            %          getNodeDemandPatternNameID,
+            %          setNodeDemandPatternIndex.
             numdemands = obj.getNodeDemandCategoriesNumber;
             value = cell(1, max(numdemands));
             val = zeros(max(numdemands), obj.getNodeCount);
             for i=obj.getNodeIndex
                 v=1;
                 for u=1:numdemands(i)
-                    [obj.Errcode, val(v, i)] = ENgetdemandpattern(i, u, obj.LibEPANET);v=v+1;
+                    [obj.Errcode, val(v, i)] = ENgetdemandpattern(i, u, obj.LibEPANET);
+                    v = v+1;
                 end             
+            end
+            for i=obj.getNodeReservoirIndex
+                if ismember(i, obj.getNodeReservoirIndex)
+                    [obj.Errcode, val(v, i)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET);
+                    v = v+1;
+                end
             end
             for i=1:size(val, 1)
                 value{i} = val(i, :);
