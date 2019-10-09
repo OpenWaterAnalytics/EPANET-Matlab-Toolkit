@@ -2035,7 +2035,7 @@ classdef epanet <handle
         function value = getLinkVelocity(obj, varargin)
             % Retrieves the current computed flow velocity (read only).
             %
-            % Using step-by-step hydraulic analysis,
+            % Using step-by-step hydraulic analysis
             %
             % Example 1:
             %   d.getLinkVelocity      % Retrieves the current computed flow velocity for all links
@@ -16926,7 +16926,7 @@ fclose(fid2);
 if obj.Bin, Errcode=reloadNetwork(obj); end
 end
 function Errcode=reloadNetwork(obj)
-    obj.closeNetwork;
+%     obj.closeNetwork;
     Errcode=ENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET);
 end
 function setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
