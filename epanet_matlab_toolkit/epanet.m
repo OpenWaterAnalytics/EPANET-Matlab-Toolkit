@@ -516,7 +516,7 @@ classdef epanet <handle
         end
         function set_node_demand_pattern(obj, fun, propertie, value, extra)
             chckfunctions=libfunctions(obj.LibEPANET);
-            if sum(strcmp(chckfunctions, fun)) && ~ismember(value, obj.getNodeReservoirIndex)
+            if sum(strcmp(chckfunctions, fun)) && ~sum(ismember(value, obj.getNodeReservoirIndex))
                 categ = 1;
                 if length(extra) == 2
                     indices = value;
