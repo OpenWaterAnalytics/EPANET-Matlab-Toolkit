@@ -36,6 +36,7 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 20b:](#example-20b---addition-of-external-controls) Addition of external Controls. ``EX20b_external_controls``
 - [Example 21:](#example-21---pressure-driven-analysis) Pressure driven analysis. ``EX21_Pressure_driven_analysis_option``
 - [Example 22:](#example-22---overflow-of-tanks) Overflow of tanks. ``EX22_Overflow_option_for_tanks``
+- [Example 23:](#example-23---overflow-of-tanks) Change connection of the links. ``EX23_Change_connection_links``
 
 &uparrow; [Back to top](#table-of-contents)
 
@@ -490,3 +491,14 @@ This example contains:
 - Unload library.
  
  &uparrow; [Back to top](#table-of-contents)
+
+#### Example 23 - Change connection of links
+
+- This example contains:
+- Load network.
+- Get all link node indices.
+- Set link node indices for specific link index.
+- Unload library.
+
+ &uparrow; [Back to top](#table-of-contents)
+
