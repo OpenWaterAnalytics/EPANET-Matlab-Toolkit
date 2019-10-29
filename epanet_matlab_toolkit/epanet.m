@@ -1774,18 +1774,30 @@ classdef epanet <handle
             % See also getLinkNodesIndex, getNodesConnectingLinksID.
             value = obj.getLinkNodesIndex;
         end
-        function value = getLinkNodesIndex(obj)
+        function value = getLinkNodesIndex(obj, varargin)
             % Retrieves the indexes of the from/to nodes of all links.
             %
-            % Example:
+            % Example 1:
             %   d.getLinkNodesIndex
             %
+            % Example 2:
+            %   d.getLinkNodesIndex(2)  % Link index
+            %
             % See also getNodesConnectingLinksID.
-            value(obj.getLinkCount, 1:2)=[nan nan];
-            for i=1:obj.getLinkCount
+            if nargin == 2
+                cntL = varargin{1};
+                indices = cntL;
+            else
+                cntL = obj.getLinkCount;
+                indices = 1:cntL;
+                value(cntL, 1:2)=[nan nan];
+            end
+            j=1;
+            for i=indices
                 [obj.Errcode, linkFromNode, linkToNode] = ENgetlinknodes(i, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
-                value(i, :)= [linkFromNode, linkToNode];
+                value(j, :)= [linkFromNode, linkToNode];
+                j = j +1;
             end
         end
         function value = getNodesConnectingLinksID(obj)
