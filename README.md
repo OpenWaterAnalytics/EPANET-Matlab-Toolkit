@@ -177,11 +177,12 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkSettings|Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves|
 |getLinkStatus|Current link status (see @ref EN_LinkStatusType)|
 |getLinkType|Retrieves the link-type for all links|
-|getLinkTypeIndex|Retrieves the link-type code for all links.|
+|getLinkTypeIndex|Retrieves the link-type code for all links|
 |getLinkValveCount|Retrieves the number of valves|
 |getLinkValveIndex|Retrieves the indices of valves|
 |getLinkValveNameID|Retrieves the valve IDs|
 |getLinkVelocity|Current computed flow velocity (read only)|
+|getLinkVerticesCount|Retrieves the number of internal vertex points assigned to a link|
 |getLinkWallReactionCoeff|Pipe wall chemical reaction coefficient|
 |getNodeActualDemand|Retrieves the computed value of all actual demands|
 |getNodeActualDemandSensingNodes|Retrieves the computed demand values at some sensing nodes|

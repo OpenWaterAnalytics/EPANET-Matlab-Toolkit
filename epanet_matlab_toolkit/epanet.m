@@ -5959,6 +5959,31 @@ classdef epanet <handle
             end
             fclose('all');
         end
+        function value = getLinkVerticesCount(obj, varargin)
+            % Retrieves the number of internal vertex points assigned to a link.
+            %
+            % Example:
+            %   d = epanet('anytown.inp');
+            %   d.getLinkVerticesCount
+            %
+            %   d.getBinLinkVerticesCount
+            %   link_id = '10';
+            %   d.getLinkVerticesCount(link_id)
+            %
+            % See also getBinLinkVertices, getLinkCount, getNodeCount.
+            if nargin == 2 
+                if ischar(varargin{1})
+                    varargin{1} = obj.getLinkIndex(varargin{1});                    
+                end
+            end
+            indices = getLinkIndices(obj, varargin);
+            j=1;
+            for i=indices
+                [obj.Errcode, value(j)] = ENgetvertexcount(i, obj.LibEPANET);
+                j = j +1;
+                error(obj.getError(obj.Errcode));
+            end
+        end
         function data = getBinLinkVertices(obj, varargin)
             % Retrieves the link vertices.
             %
@@ -13677,6 +13702,9 @@ end
 function [Errcode] = ENsetcoord(index, x, y, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENsetcoord', index, x, y);
+end
+function [Errcode, count] = ENgetvertexcount(index, LibEPANET)
+[Errcode, count]=calllib(LibEPANET, 'ENgetvertexcount', index, 0);
 end
 function [Errcode] = ENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
 % EPANET Version 2.2
