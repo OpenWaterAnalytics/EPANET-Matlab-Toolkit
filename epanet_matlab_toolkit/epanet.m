@@ -5970,7 +5970,8 @@ classdef epanet <handle
             %   link_id = '10';
             %   d.getLinkVerticesCount(link_id)
             %
-            % See also getBinLinkVertices, getLinkCount, getNodeCount.
+            % See also getLinkVertices, setLinkVertices, getBinLinkVertices,
+            %          getBinLinkVerticesCount.
             if nargin == 2 
                 if ischar(varargin{1})
                     varargin{1} = obj.getLinkIndex(varargin{1});                    
@@ -5983,6 +5984,61 @@ classdef epanet <handle
                 j = j +1;
                 error(obj.getError(obj.Errcode));
             end
+        end
+        function data = getLinkVertices(obj, varargin)
+            % Retrieves the coordinate's of a vertex point assigned to a link.
+            %
+            % % The example is based on d=epanet('Net1.inp');
+            %
+            % Example:
+            %   d = epanet('Net1.inp');
+            %   linkID = '10';
+            %   x = [22, 24, 28];
+            %   y = [69, 68, 69];
+            %   d.setLinkVertices(linkID, x, y)
+            %   linkID = '112';
+            %   x = [10, 24, 18];
+            %   y = [49, 58, 60];
+            %   d.setLinkVertices(linkID, x, y)
+            %   d.getLinkVertices{1}
+            %   d.getLinkVertices{2}
+            %   
+            % See also getLinkVertices, getLinkVerticesCount, getBinLinkVertices,
+            %          getBinLinkVerticesCount.
+            data = {};
+            if nargin == 2 
+                if ischar(varargin{1})
+                    indices = obj.getLinkIndex(varargin{1});                    
+                end
+            else
+                indices = obj.getLinkIndex;
+            end
+            j=1;
+            for l=indices
+                for i=1:obj.getLinkVerticesCount(l)
+                    [obj.Errcode, data{j}.x(i), data{j}.y(i)]=ENgetvertex(l, i, obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
+                end
+                j = j +1;
+            end
+        end
+        function setLinkVertices(obj, linkID, x, y, varargin)
+            % Assigns a set of internal vertex points to a link.
+            %
+            % % The example is based on d=epanet('Net1.inp');
+            %
+            % Example:
+            %   d = epanet('Net1.inp');
+            %   linkID = '10';
+            %   x = [22, 24, 28];
+            %   y = [69, 68, 69];
+            %   d.setLinkVertices(linkID, x, y)
+            % See also getLinkVertices, getLinkVerticesCount, getBinLinkVertices,
+            %          getBinLinkVerticesCount.
+            index = obj.getLinkIndex(linkID);
+            [obj.Errcode]=ENsetvertices(index, x, y, size(x, 2), obj.LibEPANET);
+            error(obj.getError(obj.Errcode));
+        
         end
         function data = getBinLinkVertices(obj, varargin)
             % Retrieves the link vertices.
@@ -13702,6 +13758,14 @@ end
 function [Errcode] = ENsetcoord(index, x, y, LibEPANET)
 % EPANET Version 2.1
 [Errcode]=calllib(LibEPANET, 'ENsetcoord', index, x, y);
+end
+function [Errcode, x, y] = ENgetvertex(index, vertex, LibEPANET)
+% EPANET Version 2.2
+[Errcode, x, y]=calllib(LibEPANET, 'ENgetvertex', index, vertex, 0, 0);
+end
+function [Errcode] = ENsetvertices(index, vertex, x, y, LibEPANET)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENsetvertices', index, vertex, x, y);
 end
 function [Errcode, count] = ENgetvertexcount(index, LibEPANET)
 [Errcode, count]=calllib(LibEPANET, 'ENgetvertexcount', index, 0);

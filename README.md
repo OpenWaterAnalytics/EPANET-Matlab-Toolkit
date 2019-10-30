@@ -182,6 +182,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkValveIndex|Retrieves the indices of valves|
 |getLinkValveNameID|Retrieves the valve IDs|
 |getLinkVelocity|Current computed flow velocity (read only)|
+|getLinkVertices|Retrieves the coordinate's of a vertex point assigned to a link.|
 |getLinkVerticesCount|Retrieves the number of internal vertex points assigned to a link|
 |getLinkWallReactionCoeff|Pipe wall chemical reaction coefficient|
 |getNodeActualDemand|Retrieves the computed value of all actual demands|
@@ -842,5 +843,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENdeletecontrol|Deletes an existing simple control|
 |ENdeleterule|Deletes an existing rule-based control|
 |ENsetjuncdata|Sets a group of properties for a junction node|
+|ENgetvertex|Retrieves the coordinate's of a vertex point assigned to a link|
+|ENgetvertexcount|Retrieves the number of internal vertex points assigned to a link|
+|ENsetvertices|Assigns a set of internal vertex points to a link|
 
 &uparrow; [Back to top](#table-of-contents)
