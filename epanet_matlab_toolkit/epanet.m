@@ -5764,201 +5764,6 @@ classdef epanet <handle
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = ENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end 
-        function addBinLinkVertices(obj, linkID, x, y)
-            % Adds interior vertex points to network links.
-            %
-            % % The examples are based on d=epanet('NET1.inp');
-            %
-            % Example 1:
-            %   d = epanet('NET1.inp');
-            %   linkID='10';
-            %   x = 28;                                % One X coordinate selected for a vertex.
-            %   y = 68;                                % One Y coordinate selected for a vertex.
-            %   d.addBinLinkVertices(linkID, x, y)     % Adds one vertex to the link with ID label = '10'
-            %   d.getBinLinkVertices(linkID)           % Retrieves the link's vertex
-            %
-            % Example 2:
-            %   d = epanet('NET1.inp');
-            %   linkID_1 = '10';
-            %   x = [20, 25];                          % Two X coordinates selected for a vertex.
-            %   y = [66, 67];                          % Two Y coordinates selected for a vertex.
-            %   d.addBinLinkVertices(linkID_1, x, y)   % Adds two vertices to the link with ID label = '10'
-            %
-            %   linkID_2='11';
-            %   x = [33, 38, 43, 45, 48];
-            %   y = [74, 76, 76, 73, 74];
-            %   d.addBinLinkVertices(linkID_2, x, y)   % Adds multiple vertices to the link with ID label = '11'
-            %   
-            %   d.getBinLinkVertices(linkID_1)         % Retrieves the link's vertices.
-            %   d.getBinLinkVertices(linkID_2)
-            %
-            % See also deleteBinLinkVertices, setBinLinkVertices, getBinLinkVertices,
-            %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
-            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile); end
-            fid = fopen(obj.BinTempfile); % Opens the file for read access
-            %
-            % Creates the string that will be set under the [VERTICES] section
-            %
-            str = linkID;
-            for i=1:length(x)
-                if i>1
-                    str = [str, linkID];
-                end
-                str = [str, blanks(10), num2str(x(i)), blanks(10) num2str(y(i)), char(10)];
-            end
-            %
-            % Creates the entire text that will replace the .inp file
-            %
-            texta = char;
-            while ~feof(fid)
-                aline = fgetl(fid);
-                texta = [texta, aline, char(10)];
-                if strcmp(aline, '[VERTICES]')
-                   fline = fgetl(fid);
-                   while ~isempty(strfind(fline, '['))   %contains                
-                       texta = [texta, fline, char(10)];
-                       fline = fgetl(fid);
-                   end
-                   texta = [texta, str];
-                   break
-                end
-            end
-            while isempty(strfind(fline, '[END]'))   %contains                
-                texta = [texta, fline, char(10)];
-                fline = fgetl(fid);
-            end
-            texta = [texta, '[END]'];
-            fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
-            fprintf(fid, texta);   % Writes the new text in the .inp file
-            fclose('all');  
-            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
-        end
-        function Errcode = deleteBinLinkVertices(obj, varargin)
-            % Deletes interior vertex points of network links.
-            %
-            % % The example is based on d=epanet('NET1.inp');
-            %
-            % Example:
-            %   d = epanet('NET1.inp');
-            %   linkID = '10';
-            %   x = [20, 25];                                  % Two X coordinates selected for a vertex
-            %   y = [66, 67];                                  % Two Y coordinates selected for a vertex
-            %   d.addBinLinkVertices(linkID, x, y)             % Adds two vertices to the link with ID label = '10'
-            %   
-            %   d.getBinLinkVertices(linkID)                   % Retrieves all vertices of a link given it's ID label
-            %
-            %   d.deleteBinLinkVertices                        % Deletes all vertices from all links
-            %   d.deleteBinLinkVertices(linkID)                % Deletes all vertices from a link given it's ID label
-            %   vertexIndex = 1;
-            %   d.deleteBinLinkVertices(linkID, vertexIndex)   % Deletes a certain vertex from a link given the link ID label and the vertex index
-            %   
-            %   d.getBinLinkVertices(linkID)
-            %
-            % See also addBinLinkVertices, getBinLinkVertices, getBinLinkVerticesCount,
-            %          setBinLinkVertices, addLinkPipe, addNodeJunction.
-            cnt = obj.getBinLinkVerticesCount;
-            Errcode = 0;
-            if cnt == 0
-                Errcode = 'No vertices found in the network';
-                error(Errcode)
-            end
-            fid = fopen(obj.BinTempfile); % Opens the file for read access
-            %
-            % Creates the string that will be set under the [VERTICES] section
-            %
-            %
-            % Creates the entire text that will replace the .inp file
-            %
-            texta = char;
-            while ~feof(fid)
-                aline = fgetl(fid);
-                texta = [texta, aline, char(10)];
-                if strcmp(aline, '[VERTICES]')
-                   texta = [texta, fgetl(fid), char(10)];
-                   % If no input arguments given, deletes all vertices
-                   if nargin == 1
-                       for i = 1:cnt
-                           fgetl(fid);
-                       end
-                   % If one input is given(i.e. link ID), deletes all vertices of this link
-                   elseif nargin == 2
-                       linkID = varargin{1};
-                       for i = 1:cnt
-                           aline = fgetl(fid);
-                           if isempty(strfind(aline, linkID))
-                                texta = [texta, aline, char(10)];
-                           end
-                       end
-                   % If 2 inputs are given(i.e. link ID & integer), deletes the certain vertex of that link
-                   elseif nargin == 3
-                       linkID = varargin{1};
-                       j = 1;
-                       for i = 1:cnt
-                           aline = fgetl(fid);
-                           if isempty(strfind(aline, linkID))
-                                texta = [texta, aline, char(10)];
-                           else
-                               if j ~= varargin{2}
-                                   texta = [texta, aline, char(10)];
-                               end
-                               j = j + 1;
-                           end
-                       end
-                   end
-                end
-            end
-            fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
-            fprintf(fid, texta);   % Writes the new text in the .inp file
-            fclose('all');
-        end
-        function value = getBinLinkVerticesCount(obj, varargin)
-            % Retrieves the number of vertices.
-            %
-            % Example:
-            %   d = epanet('NET1.inp');
-            %   linkID_1 = '10';
-            %   x = [20, 25];                          % Two X coordinates selected for a vertex.
-            %   y = [66, 67];                          % Two Y coordinates selected for a vertex.
-            %   d.addBinLinkVertices(linkID_1, x, y)   % Adds two vertices to the link with ID label = '10'
-            %
-            %   linkID_2='11';
-            %   x = [33, 38, 43, 45, 48];
-            %   y = [74, 76, 76, 73, 74];
-            %   d.addBinLinkVertices(linkID_2, x, y)   % Adds multiple vertices to the link with ID label = '11'
-            %
-            %   d.getBinLinkVerticesCount
-            %
-            %   d.getBinLinkVerticesCount(linkID_2)
-            %
-            % See also getBinLinkVertices, getLinkCount, getNodeCount.
-            fid = fopen(obj.BinTempfile); % Opens the file for read access
-            value = 0;
-            while ~feof(fid)
-                aline = fgetl(fid);
-                if strcmp(aline, '[VERTICES]')
-                    while true
-                        aline = fgetl(fid);
-                        if ~isempty(strfind(aline, '['))
-                            if strcmpi(aline, '[END]')
-                                break;
-                            end
-                            if nargin == 1
-                                value = value - 2;
-                            end
-                            break
-                        end
-                        if nargin == 2
-                            if ~isempty(strfind(aline, varargin{1}))
-                                value = value + 1;
-                            end
-                        else
-                            value = value + 1;
-                        end
-                    end
-                end
-            end
-            fclose('all');
-        end
         function value = getLinkVerticesCount(obj, varargin)
             % Retrieves the number of internal vertex points assigned to a link.
             %
@@ -6039,146 +5844,6 @@ classdef epanet <handle
             [obj.Errcode]=ENsetvertices(index, x, y, size(x, 2), obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         
-        end
-        function data = getBinLinkVertices(obj, varargin)
-            % Retrieves the link vertices.
-            %
-            % % The example is based on d=epanet('NET1.inp');
-            %
-            % Example:
-            %   d = epanet('NET1.inp');
-            %   linkID = '10';
-            %   x = [20, 25];                                % Two X coordinates selected for a vertex
-            %   y = [66, 67];                                % Two Y coordinates selected for a vertex
-            %   d.addBinLinkVertices(linkID, x, y)           % Adds two vertices to the link with ID label = '10'
-            %   
-            %   d.getBinLinkVertices                         % Retrieves all vertices of all links and stores them in cells
-            %   d.getBinLinkVertices(linkID)                 % Retrieves all vertices of a link given it's ID label
-            %
-            % See also setBinLinkVertices, addBinLinkVertices, deleteBinLinkVertices,
-            %          getBinLinkVerticesCount, getNodeCoordinates.
-            
-            % reload the network
-            cnt = obj.getBinLinkVerticesCount;
-%             linksInfo = obj.getBinLinksInfo;
-            fid = fopen(obj.BinTempfile); % Opens the file for read access
-            while ~feof(fid)
-                aline = fgetl(fid);
-                if strcmp(aline, '[VERTICES]')
-                    j = 1;
-                    while true
-                        aline = fgetl(fid);
-                        if ~isempty(strfind(aline, '['))
-                            break;
-                        end
-                        bline = strsplit(aline);
-                        bline = bline(~cellfun(@isempty, bline));
-                        if isempty(bline)
-                            continue
-                        end
-                        if strcmp(bline{1}(1), ';')
-                            continue
-                        end
-                        data{j} = bline;
-                        ids{j} = bline{1};
-                        j = j +1;
-                    end
-                end
-            end
-            if nargin == 2
-                indices = find(strcmp(ids, varargin{1}));
-                data = data(indices);
-            end
-%             for i = 1:size(data, 1)
-%                 linkIndex = obj.getBinLinkIndex(data{i, 1});
-%                 if isempty(value{linkIndex, 1})
-%                     value{linkIndex, 1} = [];
-%                 end
-%                 if isempty(value{linkIndex, 2})
-%                     value{linkIndex, 2} = [];
-%                 end
-%                 value{linkIndex, 1} = [value{linkIndex, 1}; str2double(data{i, 2})];
-%                 value{linkIndex, 2} = [value{linkIndex, 2}; str2double(data{i, 3})];
-%             end
-%            if nargin >= 2
-%                linkIndex = obj.getBinLinkIndex(varargin{1});
-%                value = [value{linkIndex, 1}, value{linkIndex, 2}];
-%                if nargin == 3
-%                    value = value(varargin{2}, :);
-%                end
-%            end
-           fclose('all');
-        end
-        function setBinLinkVertices(obj, linkID, x, y, varargin)
-            % Sets interior vertex points of network links.
-            %
-            % % The example is based on d=epanet('NET1.inp');
-            %
-            % Example:
-            %   d = epanet('NET1.inp');
-            %   linkID_1 = '10';
-            %   x = [20, 25];                          % Two X coordinates selected for a vertex.
-            %   y = [66, 67];                          % Two Y coordinates selected for a vertex.
-            %   d.addBinLinkVertices(linkID_1, x, y)   % Adds two vertices to the link with ID label = '10'
-            %
-            %   linkID_2 = '11';
-            %   x = [33, 38, 43, 45, 48];
-            %   y = [74, 76, 76, 73, 74];
-            %   d.addBinLinkVertices(linkID_2, x, y)   % Adds multiple vertices to the link with ID label = '11'
-            %   
-            %   d.getBinLinkVertices(linkID_1)         % Retrieves the link's vertices.
-            %   d.getBinLinkVertices(linkID_2)
-            %
-            %   % Deletes all vertices and adds the new vertices.
-            %   x = [22, 24, 28];
-            %   y = [69, 68, 69];
-            %   d.setBinLinkVertices(linkID_1, x, y)
-            %   d.getBinLinkVertices(linkID_1)
-            %
-            %   % Replaces a certain vertex given it's index with a new vertex.
-            %   x  = 39;
-            %   y = 75;
-            %   vertexIndex = 2;
-            %   d.setBinLinkVertices(linkID_2, x, y, vertexIndex)
-            %   d.getBinLinkVertices(linkID_2)
-            %
-            % See also addBinLinkVertices, deleteBinLinkVertices, getBinLinkVertices,
-            %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
-            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile, 1); end
-            if nargin == 4
-                obj.deleteBinLinkVertices(linkID);
-                obj.addBinLinkVertices(linkID, x, y);
-            end
-            if nargin == 5
-                cnt = obj.getBinLinkVerticesCount;
-                filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
-                inpfile = filepath{end};
-                fid = fopen(inpfile); % Opens the file for read access
-                texta = char;
-                while ~feof(fid)
-                    aline = fgetl(fid);
-                    texta = [texta, aline, char(10)];
-                    if strcmp(aline, '[VERTICES]')
-                       texta = [texta, fgetl(fid), char(10)];
-                       j = 1;
-                       for i = 1:cnt
-                           bline = fgetl(fid);
-                           if ~isempty(strfind(bline, linkID)) && j == varargin{1}
-                                texta = [texta, linkID, blanks(10), num2str(x), blanks(10), num2str(y), char(10)];
-                           else
-                                texta = [texta, bline, char(10)];
-                           end
-                           if ~isempty(strfind(bline, linkID))
-                                j = j + 1;
-                           end
-                       end
-                    end
-                end
-                fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
-                fprintf(fid, texta);   % Writes the new text in the .inp file
-                fclose('all');
-                if obj.Bin, obj.Errcode = reloadNetwork(obj); end
-            end
         end
         function Errcode = deleteNode(obj, idNode, varargin)
             % Deletes nodes. (EPANET Version 2.2)
@@ -12965,6 +12630,319 @@ classdef epanet <handle
                     value.BinNodeTankNameID{p}=atline{1};
                     p=p+1;
                 end
+            end
+        end
+        function addBinLinkVertices(obj, linkID, x, y)
+            % Adds interior vertex points to network links.
+            %
+            % % The examples are based on d=epanet('NET1.inp');
+            %
+            % Example 1:
+            %   d = epanet('NET1.inp');
+            %   linkID='10';
+            %   x = 28;                                % One X coordinate selected for a vertex.
+            %   y = 68;                                % One Y coordinate selected for a vertex.
+            %   d.addBinLinkVertices(linkID, x, y)     % Adds one vertex to the link with ID label = '10'
+            %   d.getBinLinkVertices(linkID)           % Retrieves the link's vertex
+            %
+            % Example 2:
+            %   d = epanet('NET1.inp');
+            %   linkID_1 = '10';
+            %   x = [20, 25];                          % Two X coordinates selected for a vertex.
+            %   y = [66, 67];                          % Two Y coordinates selected for a vertex.
+            %   d.addBinLinkVertices(linkID_1, x, y)   % Adds two vertices to the link with ID label = '10'
+            %
+            %   linkID_2='11';
+            %   x = [33, 38, 43, 45, 48];
+            %   y = [74, 76, 76, 73, 74];
+            %   d.addBinLinkVertices(linkID_2, x, y)   % Adds multiple vertices to the link with ID label = '11'
+            %   
+            %   d.getBinLinkVertices(linkID_1)         % Retrieves the link's vertices.
+            %   d.getBinLinkVertices(linkID_2)
+            %
+            % See also deleteBinLinkVertices, setBinLinkVertices, getBinLinkVertices,
+            %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
+            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile); end
+            fid = fopen(obj.BinTempfile); % Opens the file for read access
+            %
+            % Creates the string that will be set under the [VERTICES] section
+            %
+            str = linkID;
+            for i=1:length(x)
+                if i>1
+                    str = [str, linkID];
+                end
+                str = [str, blanks(10), num2str(x(i)), blanks(10) num2str(y(i)), char(10)];
+            end
+            %
+            % Creates the entire text that will replace the .inp file
+            %
+            texta = char;
+            while ~feof(fid)
+                aline = fgetl(fid);
+                texta = [texta, aline, char(10)];
+                if strcmp(aline, '[VERTICES]')
+                   fline = fgetl(fid);
+                   while ~isempty(strfind(fline, '['))   %contains                
+                       texta = [texta, fline, char(10)];
+                       fline = fgetl(fid);
+                   end
+                   texta = [texta, str];
+                   break
+                end
+            end
+            while isempty(strfind(fline, '[END]'))   %contains                
+                texta = [texta, fline, char(10)];
+                fline = fgetl(fid);
+            end
+            texta = [texta, '[END]'];
+            fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
+            fprintf(fid, texta);   % Writes the new text in the .inp file
+            fclose('all');  
+            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+        end
+        function Errcode = deleteBinLinkVertices(obj, varargin)
+            % Deletes interior vertex points of network links.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d = epanet('NET1.inp');
+            %   linkID = '10';
+            %   x = [20, 25];                                  % Two X coordinates selected for a vertex
+            %   y = [66, 67];                                  % Two Y coordinates selected for a vertex
+            %   d.addBinLinkVertices(linkID, x, y)             % Adds two vertices to the link with ID label = '10'
+            %   
+            %   d.getBinLinkVertices(linkID)                   % Retrieves all vertices of a link given it's ID label
+            %
+            %   d.deleteBinLinkVertices                        % Deletes all vertices from all links
+            %   d.deleteBinLinkVertices(linkID)                % Deletes all vertices from a link given it's ID label
+            %   vertexIndex = 1;
+            %   d.deleteBinLinkVertices(linkID, vertexIndex)   % Deletes a certain vertex from a link given the link ID label and the vertex index
+            %   
+            %   d.getBinLinkVertices(linkID)
+            %
+            % See also addBinLinkVertices, getBinLinkVertices, getBinLinkVerticesCount,
+            %          setBinLinkVertices, addLinkPipe, addNodeJunction.
+            cnt = obj.getBinLinkVerticesCount;
+            Errcode = 0;
+            if cnt == 0
+                Errcode = 'No vertices found in the network';
+                error(Errcode)
+            end
+            fid = fopen(obj.BinTempfile); % Opens the file for read access
+            %
+            % Creates the string that will be set under the [VERTICES] section
+            % Creates the entire text that will replace the .inp file
+            %
+            texta = char;
+            while ~feof(fid)
+                aline = fgetl(fid);
+                texta = [texta, aline, char(10)];
+                if strcmp(aline, '[VERTICES]')
+                   texta = [texta, fgetl(fid), char(10)];
+                   % If no input arguments given, deletes all vertices
+                   if nargin == 1
+                       for i = 1:cnt
+                           fgetl(fid);
+                       end
+                   % If one input is given(i.e. link ID), deletes all vertices of this link
+                   elseif nargin == 2
+                       linkID = varargin{1};
+                       for i = 1:cnt
+                           aline = fgetl(fid);
+                           if isempty(strfind(aline, linkID))
+                                texta = [texta, aline, char(10)];
+                           end
+                       end
+                   % If 2 inputs are given(i.e. link ID & integer), deletes the certain vertex of that link
+                   elseif nargin == 3
+                       linkID = varargin{1};
+                       j = 1;
+                       for i = 1:cnt
+                           aline = fgetl(fid);
+                           if isempty(strfind(aline, linkID))
+                                texta = [texta, aline, char(10)];
+                           else
+                               if j ~= varargin{2}
+                                   texta = [texta, aline, char(10)];
+                               end
+                               j = j + 1;
+                           end
+                       end
+                   end
+                end
+            end
+            fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
+            fprintf(fid, texta);   % Writes the new text in the .inp file
+            fclose('all');
+        end
+        function value = getBinLinkVerticesCount(obj, varargin)
+            % Retrieves the number of vertices.
+            %
+            % Example:
+            %   d = epanet('NET1.inp');
+            %   linkID_1 = '10';
+            %   x = [20, 25];                          % Two X coordinates selected for a vertex.
+            %   y = [66, 67];                          % Two Y coordinates selected for a vertex.
+            %   d.addBinLinkVertices(linkID_1, x, y)   % Adds two vertices to the link with ID label = '10'
+            %
+            %   linkID_2='11';
+            %   x = [33, 38, 43, 45, 48];
+            %   y = [74, 76, 76, 73, 74];
+            %   d.addBinLinkVertices(linkID_2, x, y)   % Adds multiple vertices to the link with ID label = '11'
+            %
+            %   d.getBinLinkVerticesCount
+            %
+            %   d.getBinLinkVerticesCount(linkID_2)
+            %
+            % See also getBinLinkVertices, getLinkCount, getNodeCount.
+            fid = fopen(obj.BinTempfile); % Opens the file for read access
+            value = 0;
+            while ~feof(fid)
+                aline = fgetl(fid);
+                if strcmp(aline, '[VERTICES]')
+                    while true
+                        aline = fgetl(fid);
+                        if ~isempty(strfind(aline, '['))
+                            if strcmpi(aline, '[END]')
+                                break;
+                            end
+                            if nargin == 1
+                                value = value - 2;
+                            end
+                            break
+                        end
+                        if nargin == 2
+                            if ~isempty(strfind(aline, varargin{1}))
+                                value = value + 1;
+                            end
+                        else
+                            value = value + 1;
+                        end
+                    end
+                end
+            end
+            fclose('all');
+        end
+        function data = getBinLinkVertices(obj, varargin)
+            % Retrieves the link vertices.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d = epanet('NET1.inp');
+            %   linkID = '10';
+            %   x = [20, 25];                                % Two X coordinates selected for a vertex
+            %   y = [66, 67];                                % Two Y coordinates selected for a vertex
+            %   d.addBinLinkVertices(linkID, x, y)           % Adds two vertices to the link with ID label = '10'
+            %   
+            %   d.getBinLinkVertices                         % Retrieves all vertices of all links and stores them in cells
+            %   d.getBinLinkVertices(linkID)                 % Retrieves all vertices of a link given it's ID label
+            %
+            % See also setBinLinkVertices, addBinLinkVertices, deleteBinLinkVertices,
+            %          getBinLinkVerticesCount, getNodeCoordinates.
+            
+            % reload the network
+            fid = fopen(obj.BinTempfile); % Opens the file for read access
+            while ~feof(fid)
+                aline = fgetl(fid);
+                if strcmp(aline, '[VERTICES]')
+                    j = 1;
+                    while true
+                        aline = fgetl(fid);
+                        if ~isempty(strfind(aline, '['))
+                            break;
+                        end
+                        bline = strsplit(aline);
+                        bline = bline(~cellfun(@isempty, bline));
+                        if isempty(bline)
+                            continue
+                        end
+                        if strcmp(bline{1}(1), ';')
+                            continue
+                        end
+                        data{j} = bline;
+                        ids{j} = bline{1};
+                        j = j +1;
+                    end
+                end
+            end
+            if nargin == 2
+                indices = find(strcmp(ids, varargin{1}));
+                data = data(indices);
+            end
+           fclose('all');
+        end
+        function setBinLinkVertices(obj, linkID, x, y, varargin)
+            % Sets interior vertex points of network links.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   d = epanet('NET1.inp');
+            %   linkID_1 = '10';
+            %   x = [20, 25];                          % Two X coordinates selected for a vertex.
+            %   y = [66, 67];                          % Two Y coordinates selected for a vertex.
+            %   d.addBinLinkVertices(linkID_1, x, y)   % Adds two vertices to the link with ID label = '10'
+            %
+            %   linkID_2 = '11';
+            %   x = [33, 38, 43, 45, 48];
+            %   y = [74, 76, 76, 73, 74];
+            %   d.addBinLinkVertices(linkID_2, x, y)   % Adds multiple vertices to the link with ID label = '11'
+            %   
+            %   d.getBinLinkVertices(linkID_1)         % Retrieves the link's vertices.
+            %   d.getBinLinkVertices(linkID_2)
+            %
+            %   % Deletes all vertices and adds the new vertices.
+            %   x = [22, 24, 28];
+            %   y = [69, 68, 69];
+            %   d.setBinLinkVertices(linkID_1, x, y)
+            %   d.getBinLinkVertices(linkID_1)
+            %
+            %   % Replaces a certain vertex given it's index with a new vertex.
+            %   x  = 39;
+            %   y = 75;
+            %   vertexIndex = 2;
+            %   d.setBinLinkVertices(linkID_2, x, y, vertexIndex)
+            %   d.getBinLinkVertices(linkID_2)
+            %
+            % See also addBinLinkVertices, deleteBinLinkVertices, getBinLinkVertices,
+            %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
+            if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile, 1); end
+            if nargin == 4
+                obj.deleteBinLinkVertices(linkID);
+                obj.addBinLinkVertices(linkID, x, y);
+            end
+            if nargin == 5
+                cnt = obj.getBinLinkVerticesCount;
+                filepath = regexp(obj.TempInpFile, '\\', 'split');   % Finds the .inp file
+                inpfile = filepath{end};
+                fid = fopen(inpfile); % Opens the file for read access
+                texta = char;
+                while ~feof(fid)
+                    aline = fgetl(fid);
+                    texta = [texta, aline, char(10)];
+                    if strcmp(aline, '[VERTICES]')
+                       texta = [texta, fgetl(fid), char(10)];
+                       j = 1;
+                       for i = 1:cnt
+                           bline = fgetl(fid);
+                           if ~isempty(strfind(bline, linkID)) && j == varargin{1}
+                                texta = [texta, linkID, blanks(10), num2str(x), blanks(10), num2str(y), char(10)];
+                           else
+                                texta = [texta, bline, char(10)];
+                           end
+                           if ~isempty(strfind(bline, linkID))
+                                j = j + 1;
+                           end
+                       end
+                    end
+                end
+                fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
+                fprintf(fid, texta);   % Writes the new text in the .inp file
+                fclose('all');
+                if obj.Bin, obj.Errcode = reloadNetwork(obj); end
             end
         end
         function value = getBinLinkNameID(obj)
