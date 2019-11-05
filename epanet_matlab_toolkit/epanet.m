@@ -5820,6 +5820,9 @@ classdef epanet <handle
             end
             j=1;
             for l=indices
+                if obj.getLinkVerticesCount(l) == 0
+                     data{j} = [];
+                end
                 for i=1:obj.getLinkVerticesCount(l)
                     [obj.Errcode, data{j}.x(i), data{j}.y(i)]=ENgetvertex(l, i, obj.LibEPANET);
                     error(obj.getError(obj.Errcode));
@@ -12573,11 +12576,38 @@ classdef epanet <handle
             end
         end
         function value = getBinNodeCoordinates(obj)
-            value = NodeCoords(obj, 'Bin');
+            value = BinNodeCoords(obj);
         end
         function value = getNodeCoordinates(obj, varargin)
-            if ~isempty(varargin), value = NodeCoords(obj, varargin{1});
-            else value = NodeCoords(obj); end
+           cnt = obj.getLinkCount;
+            vertices = obj.getLinkVertices;
+            for i=1:cnt
+                if ~isempty(vertices{i})
+                    vertx{i} = vertices{i}.x;
+                    verty{i} = vertices{i}.y;
+                else
+                    vertx{i} = [];
+                    verty{i} = [];
+                end
+            end
+
+            try
+                indices = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, vx(j), vy(j)]=ENgetcoord(i, obj.LibEPANET); j=j+1;
+                    error(obj.getError(obj.Errcode)); 
+                end
+            catch
+            end
+            if isempty(varargin) 
+                value{1} = vx;
+                value{2} = vy;
+                value{3} = vertx;
+                value{4} = verty;
+            else
+                ind_var = 1:length(varargin{1});
+                value = [vx(ind_var) vy(ind_var)];
+            end
         end
         function value = getBinNodeNameID(obj)
             % Open epanet input file
@@ -18041,16 +18071,12 @@ function fid = writenewTemp(Tempfile)
     fid=fopen(Tempfile, 'w');
     while fid==-1, fid=fopen(Tempfile, 'w'); end
 end
-function value = NodeCoords(obj, varargin)
-        if strcmpi(varargin, 'Bin')
-            BinNodeName = obj.getBinNodeNameID;
-            BinLinkName = obj.getBinLinkNameID;
-            linkcount =  length(BinLinkName.BinLinkNameID);
-            nodecount = length(BinNodeName.BinNodeNameID);
-        else
-            nodecount=obj.getNodeCount;
-            linkcount=obj.getLinkCount;
-        end
+function value = BinNodeCoords(obj)
+        BinNodeName = obj.getBinNodeNameID;
+        BinLinkName = obj.getBinLinkNameID;
+        linkcount =  length(BinLinkName.BinLinkNameID);
+        nodecount = length(BinNodeName.BinNodeNameID);
+        
         vx = NaN(nodecount, 1);
         vy = NaN(nodecount, 1);
         vertx = cell(linkcount, 1);
@@ -18058,32 +18084,40 @@ function value = NodeCoords(obj, varargin)
         nvert = zeros(linkcount, 1);
         % Open epanet input file
         [~, info] = obj.readInpFile;
+        
         sect = 0;
         IndexC = strfind(info,'[COORDINATES]');
         Index = find(not(cellfun('isempty',IndexC)));
         for h=Index:length(info)
             tline = info{h};
-            if ~ischar(tline),   break,   end
+            if ~ischar(tline)
+                break; 
+            end
             % Get first token in the line
             tok = strtok(tline);
             % Skip blank Clines and comments
-            if isempty(tok), continue, end
-            if (tok(1) == ';'), continue, end
+            if isempty(tok)
+                continue; 
+            end
+            if (tok(1) == ';')
+                continue;
+            end
             if (tok(1) == '[')
                 
                 % [COORDINATES] section
                 if strcmpi(tok(1:5), '[COOR')
-                    if strcmpi(varargin, 'Bin');
-                        sect = 17; continue;
-                    end
+                    sect = 17; 
+                    continue;
                 % [VERTICES] section
                 elseif strcmpi(tok(1:5), '[VERT')
-                    sect = 18; continue;
+                    sect = 18; 
+                    continue;
                 % [END]
                 elseif strcmpi(tok(1:4), '[END')
                     break;
                 else
-                    sect = 0; continue;
+                    sect = 0; 
+                    continue;
                 end
             end
             if sect==0
@@ -18094,44 +18128,28 @@ function value = NodeCoords(obj, varargin)
                 A = textscan(tline, '%s %f %f');
                 mm = strcmp(A{1}, BinNodeName.BinNodeNameID);
                 index=strfind(mm, 1);
-                if isempty(index), continue; end
+                if isempty(index)
+                    continue;
+                end
                 vx(index) = A{2};
                 vy(index) = A{3};
 
             % Vertices
             elseif sect==18
                 A = textscan(tline, '%s %f %f');
-                if strcmpi(varargin, 'Bin');
-                    index =  find(strcmp(BinLinkName.BinLinkNameID, A{1}));
-                    if isempty(index), continue; end
-                else
-                    [~, index] = ENgetlinkindex(char(A{1}), obj.LibEPANET);
-                    if index==0, continue; end
+                index =  find(strcmp(BinLinkName.BinLinkNameID, A{1}));
+                if isempty(index)
+                    continue; 
                 end
                 nvert(index) = nvert(index) + 1;
                 vertx{index}(nvert(index)) = A{2};
                 verty{index}(nvert(index)) = A{3};
             end
         end
-    try
-        if strcmpi(varargin, 'Bin'), varargin={}; end
-        indices = getNodeIndices(obj, varargin);j=1;
-        for i=indices
-            [obj.Errcode, vx(j), vy(j)]=ENgetcoord(i, obj.LibEPANET); j=j+1;
-        end
-    catch
-    end
-    if isempty(varargin) 
-        value{1} = vx;
-        value{2} = vy;
-        value{3} = vertx;
-        value{4} = verty;
-    else
-        if ~strcmpi(varargin, 'Bin')
-            error(obj.getError(obj.Errcode)); 
-            value = [vx(1:length(varargin{1})) vy(1:length(varargin{1}))];
-        end
-    end
+    value{1} = vx;
+    value{2} = vy;
+    value{3} = vertx;
+    value{4} = verty;
 end
 function atline = checktlines(tline)
     atline='';
