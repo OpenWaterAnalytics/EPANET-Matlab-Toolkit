@@ -541,6 +541,13 @@ classdef epanet <handle
                 elseif length(extra) == 1
                     indices = value;
                     value = extra{1};
+                elseif length(extra) == 2
+                    % for reservoirs
+                    indices = value;
+                    if extra{1} > 1
+                        return
+                    end
+                    value = extra{2};
                 end
                 j = 1;
                 for i = indices
@@ -2824,7 +2831,6 @@ classdef epanet <handle
             for i=obj.getNodeReservoirIndex
                 if ismember(i, obj.getNodeReservoirIndex)
                     [obj.Errcode, val(v, i)] = ENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET);
-                    v = v+1;
                 end
             end
             for i=1:size(val, 1)
