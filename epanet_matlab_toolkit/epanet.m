@@ -515,8 +515,7 @@ classdef epanet <handle
             end
         end
         function set_node_demand_pattern(obj, fun, propertie, value, extra)
-            chckfunctions=libfunctions(obj.LibEPANET);
-            if sum(strcmp(chckfunctions, fun)) && ~sum(ismember(value, obj.getNodeReservoirIndex))
+            if sum(strcmp(obj.libFunctions, fun)) && ~sum(ismember(value, obj.getNodeReservoirIndex))
                 categ = 1;
                 if length(extra) == 2
                     indices = value;
@@ -4843,8 +4842,10 @@ classdef epanet <handle
             if find(strcmpi(varargin, 'demand'))
                 value.Demand = initnodematrix;
             end
-            if find(strcmpi(varargin, 'demanddeficit'))
-                value.DemandDeficit = initnodematrix;
+            if obj.getVersion > 20101
+                if find(strcmpi(varargin, 'demanddeficit'))
+                    value.DemandDeficit = initnodematrix;
+                end
             end
             if find(strcmpi(varargin, 'demandSensingNodes'))
                 value.DemandSensingNodes = zeros(totalsteps, length(varargin{sensingnodes}));
@@ -4874,8 +4875,10 @@ classdef epanet <handle
             if find(strcmpi(varargin, 'energy'))
                 value.Energy = initlinkmatrix;
             end
-            if find(strcmpi(varargin, 'efficiency'))
-                value.Efficiency = initlinkmatrix;
+            if obj.getVersion > 20101
+                if find(strcmpi(varargin, 'efficiency'))
+                    value.Efficiency = initlinkmatrix;
+                end
             end
             if find(strcmpi(varargin, 'state'))
                 value.State = initlinkmatrix;
@@ -12582,34 +12585,60 @@ classdef epanet <handle
             end
         end
         function value = getBinNodeCoordinates(obj)
-            value = BinNodeCoords(obj);
+            value = BinNodeCoords(obj, 0);
         end
         function value = getNodeCoordinates(obj, varargin)
-           cnt = obj.getLinkCount;
-            vertices = obj.getLinkVertices;
-            for i=1:cnt
-                if ~isempty(vertices{i})
-                    vertx{i} = vertices{i}.x;
-                    verty{i} = vertices{i}.y;
-                else
-                    vertx{i} = [];
-                    verty{i} = [];
+            cnt = obj.getLinkCount;
+            
+            vert_function = 0;
+            coord_function = 0;
+            if sum(strcmp(obj.libFunctions, 'ENgetvertexcount'))
+                vertices = obj.getLinkVertices;
+                for i=1:cnt
+                    if ~isempty(vertices{i})
+                        vertx{i} = vertices{i}.x;
+                        verty{i} = vertices{i}.y;
+                    else
+                        vertx{i} = [];
+                        verty{i} = [];
+                    end
                 end
+                vert_function = 1;
             end
-
-            try
-                indices = getNodeIndices(obj, varargin);j=1;
-                for i=indices
-                    [obj.Errcode, vx(j), vy(j)]=ENgetcoord(i, obj.LibEPANET); j=j+1;
-                    error(obj.getError(obj.Errcode)); 
+            if sum(strcmp(obj.libFunctions, 'ENgetcoord'))
+                try
+                    indices = getNodeIndices(obj, varargin);j=1;
+                    for i=indices
+                        [obj.Errcode, vx(j), vy(j)]=ENgetcoord(i, obj.LibEPANET); j=j+1;
+                        error(obj.getError(obj.Errcode)); 
+                    end
+                catch
                 end
-            catch
+                coord_function = 1;
             end
+            n1_value = [];
+            n2_value = [];
+            if coord_function == 0
+                n1_value = BinNodeCoords(obj, 0);
+            elseif vert_function == 0
+                n2_value = BinNodeCoords(obj, 1);
+            end
+                
             if isempty(varargin) 
-                value{1} = vx;
-                value{2} = vy;
-                value{3} = vertx;
-                value{4} = verty;
+                if isempty(n1_value)
+                    value{1} = vx;
+                    value{2} = vy;
+                else
+                    value{3} = n1_value{3};
+                    value{4} = n1_value{4};
+                end
+                if isempty(n2_value)
+                    value{3} = vertx;
+                    value{4} = verty;
+                else
+                    value{3} = n2_value{3};
+                    value{4} = n2_value{4};
+                end
             else
                 ind_var = 1:length(varargin{1});
                 value = [vx(ind_var) vy(ind_var)];
@@ -14504,8 +14533,7 @@ elseif bin==0
     v.nodenameid=obj.getNodeNameID;
     v.linknameid=obj.getLinkNameID;
     v.nodesconnlinks=obj.getNodesConnectingLinksID;
-    chckfunctions=libfunctions(obj.LibEPANET);
-    if sum(strcmp(chckfunctions, 'ENgetcoord'))
+    if sum(strcmp(obj.libFunctions, 'ENgetcoord'))
         v.nodecoords=obj.getNodeCoordinates;
     else
         v.nodecoords=obj.getBinNodeCoordinates;
@@ -17295,12 +17323,12 @@ function [fid, binfile, rptfile] = runEPANETexe(obj)
     arch = computer('arch');
     [inpfile, rptfile, binfile]= createTempfiles(obj.BinTempfile);
     if strcmp(arch, 'win64') || strcmp(arch, 'win32')
-        r = sprintf('"%sepanet2.exe" "%s" %s %s & exit', obj.LibEPANETpath, inpfile, rptfile, binfile);
+        r = sprintf('"%s%s.exe" "%s" %s %s & exit', obj.LibEPANETpath, obj.LibEPANET, inpfile, rptfile, binfile);
     end
     if isunix
-        r = sprintf('%sepanet2 %s %s %s', obj.LibEPANETpath, obj.BinTempfile, rptfile, binfile);
+        r = sprintf('%s%s %s %s %s', obj.LibEPANETpath, obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
     elseif ismac
-        r = sprintf('%runepanet %s %s %s', obj.LibEPANETpath, obj.BinTempfile, rptfile, binfile);
+        r = sprintf('%s%s %s %s %s', obj.LibEPANETpath, obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
     end
     if obj.getCMDCODE, [~, ~]=system(r); else system(r); end
     fid = fopen(binfile, 'r');
@@ -18077,60 +18105,61 @@ function fid = writenewTemp(Tempfile)
     fid=fopen(Tempfile, 'w');
     while fid==-1, fid=fopen(Tempfile, 'w'); end
 end
-function value = BinNodeCoords(obj)
-        BinNodeName = obj.getBinNodeNameID;
-        BinLinkName = obj.getBinLinkNameID;
-        linkcount =  length(BinLinkName.BinLinkNameID);
-        nodecount = length(BinNodeName.BinNodeNameID);
-        
-        vx = NaN(nodecount, 1);
-        vy = NaN(nodecount, 1);
-        vertx = cell(linkcount, 1);
-        verty = cell(linkcount, 1);
-        nvert = zeros(linkcount, 1);
-        % Open epanet input file
-        [~, info] = obj.readInpFile;
-        
-        sect = 0;
-        IndexC = strfind(info,'[COORDINATES]');
-        Index = find(not(cellfun('isempty',IndexC)));
-        for h=Index:length(info)
-            tline = info{h};
-            if ~ischar(tline)
-                break; 
-            end
-            % Get first token in the line
-            tok = strtok(tline);
-            % Skip blank Clines and comments
-            if isempty(tok)
-                continue; 
-            end
-            if (tok(1) == ';')
-                continue;
-            end
-            if (tok(1) == '[')
-                
-                % [COORDINATES] section
-                if strcmpi(tok(1:5), '[COOR')
-                    sect = 17; 
-                    continue;
-                % [VERTICES] section
-                elseif strcmpi(tok(1:5), '[VERT')
-                    sect = 18; 
-                    continue;
-                % [END]
-                elseif strcmpi(tok(1:4), '[END')
-                    break;
-                else
-                    sect = 0; 
-                    continue;
-                end
-            end
-            if sect==0
-                continue;
+function value = BinNodeCoords(obj, vertices)
+    BinNodeName = obj.getBinNodeNameID;
+    BinLinkName = obj.getBinLinkNameID;
+    linkcount =  length(BinLinkName.BinLinkNameID);
+    nodecount = length(BinNodeName.BinNodeNameID);
 
-            % Coordinates
-            elseif sect==17
+    vx = NaN(nodecount, 1);
+    vy = NaN(nodecount, 1);
+    vertx = cell(linkcount, 1);
+    verty = cell(linkcount, 1);
+    nvert = zeros(linkcount, 1);
+    % Open epanet input file
+    [~, info] = obj.readInpFile;
+
+    sect = 0;
+    IndexC = strfind(info,'[COORDINATES]');
+    Index = find(not(cellfun('isempty',IndexC)));
+    for h=Index:length(info)
+        tline = info{h};
+        if ~ischar(tline)
+            break; 
+        end
+        % Get first token in the line
+        tok = strtok(tline);
+        % Skip blank Clines and comments
+        if isempty(tok)
+            continue; 
+        end
+        if (tok(1) == ';')
+            continue;
+        end
+        if (tok(1) == '[')
+
+            % [COORDINATES] section
+            if strcmpi(tok(1:5), '[COOR')
+                sect = 17; 
+                continue;
+            % [VERTICES] section
+            elseif strcmpi(tok(1:5), '[VERT')
+                sect = 18; 
+                continue;
+            % [END]
+            elseif strcmpi(tok(1:4), '[END')
+                break;
+            else
+                sect = 0; 
+                continue;
+            end
+        end
+        if sect==0
+            continue;
+
+        % Coordinates
+        elseif sect==17
+            if ~vertices
                 A = textscan(tline, '%s %f %f');
                 mm = strcmp(A{1}, BinNodeName.BinNodeNameID);
                 index=strfind(mm, 1);
@@ -18139,19 +18168,20 @@ function value = BinNodeCoords(obj)
                 end
                 vx(index) = A{2};
                 vy(index) = A{3};
-
-            % Vertices
-            elseif sect==18
-                A = textscan(tline, '%s %f %f');
-                index =  find(strcmp(BinLinkName.BinLinkNameID, A{1}));
-                if isempty(index)
-                    continue; 
-                end
-                nvert(index) = nvert(index) + 1;
-                vertx{index}(nvert(index)) = A{2};
-                verty{index}(nvert(index)) = A{3};
             end
+
+        % Vertices
+        elseif sect==18
+            A = textscan(tline, '%s %f %f');
+            index =  find(strcmp(BinLinkName.BinLinkNameID, A{1}));
+            if isempty(index)
+                continue; 
+            end
+            nvert(index) = nvert(index) + 1;
+            vertx{index}(nvert(index)) = A{2};
+            verty{index}(nvert(index)) = A{3};
         end
+    end
     value{1} = vx;
     value{2} = vy;
     value{3} = vertx;
