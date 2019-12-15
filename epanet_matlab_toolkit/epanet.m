@@ -8833,15 +8833,19 @@ classdef epanet <handle
         function value = getMSXSpeciesCount(obj)
             % Species, Constants, Parameters, Patterns
             [obj.Errcode, value] = MSXgetcount(3, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXConstantsCount(obj)
             [obj.Errcode, value] = MSXgetcount(6, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXParametersCount(obj)
             [obj.Errcode, value] = MSXgetcount(5, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXPatternsCount(obj)
             [obj.Errcode, value] = MSXgetcount(7, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXSpeciesNameID(obj, varargin)
             if isempty(varargin)
@@ -8850,6 +8854,7 @@ classdef epanet <handle
                 for i=1:spcnt
                     [obj.Errcode, len] = MSXgetIDlen(3, i, obj.MSXLibEPANET);
                     [obj.Errcode, value{i}]=MSXgetID(3, i, len, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             else
                 k=1;
@@ -8857,6 +8862,7 @@ classdef epanet <handle
                 for i=varargin{1}
                     [obj.Errcode, len] = MSXgetIDlen(3, i, obj.MSXLibEPANET);
                     [obj.Errcode, value{k}]=MSXgetID(3, i, len, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     k=k+1;
                 end
             end
@@ -8867,6 +8873,7 @@ classdef epanet <handle
             if msxSpCnt
                 for i=1:msxSpCnt
                     [obj.Errcode, value{i}, ~, ~, ~] = MSXgetspecies(i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -8885,6 +8892,7 @@ classdef epanet <handle
             if msxSpCnt
                 for i=1:msxSpCnt
                     [obj.Errcode, ~, ~, value, ~] = MSXgetspecies(i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -8894,6 +8902,7 @@ classdef epanet <handle
             if msxSpCnt
                 for i=1:msxSpCnt
                     [obj.Errcode, ~, ~, ~, value] = MSXgetspecies(i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -8904,9 +8913,11 @@ classdef epanet <handle
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(j)] = MSXgetindex(3, varargin{1}{j}, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = MSXgetindex(obj.MSXLibEPANET, 3, varargin{1});
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function value = getMSXConstantsNameID(obj)
@@ -8914,6 +8925,7 @@ classdef epanet <handle
             if obj.getMSXConstantsCount
                 for i=1:obj.getMSXConstantsCount
                     [obj.Errcode, len] = MSXgetIDlen(6, i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{i}] = MSXgetID(6, i, len, obj.MSXLibEPANET);
                 end
             end
@@ -8923,6 +8935,7 @@ classdef epanet <handle
             if obj.getMSXConstantsCount
                 for i=1:obj.getMSXConstantsCount
                     [obj.Errcode, value(i)] = MSXgetconstant(i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -8933,9 +8946,11 @@ classdef epanet <handle
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(j)] = MSXgetindex(6, varargin{1}{j}, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = MSXgetindex(obj.MSXLibEPANET, 6, varargin{1});
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function value = getMSXParametersNameID(obj, varargin)
@@ -8943,12 +8958,14 @@ classdef epanet <handle
                 if ~obj.getMSXParametersCount, value={};return; end
                 for i=1:obj.getMSXParametersCount
                     [obj.Errcode, len] = MSXgetIDlen(5, i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{i}]=MSXgetID(5, i, len, obj.MSXLibEPANET);
                 end
             else
                 k=1;
                 for i=varargin{1}
                     [obj.Errcode, len] = MSXgetIDlen(5, i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{k}]=MSXgetID(5, i, len, obj.MSXLibEPANET);
                     k=k+1;
                 end
@@ -8961,9 +8978,11 @@ classdef epanet <handle
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(j)] = MSXgetindex(5, varargin{1}{j}, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = MSXgetindex(5, varargin{1}, obj.MSXLibEPANET);
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function value = getMSXParametersTanksValue(obj)
@@ -8973,6 +8992,7 @@ classdef epanet <handle
             for i=1:length(obj.NodeTankIndex)
                 for j=1:obj.MSXParametersCount
                     [obj.Errcode, value{obj.NodeTankIndex(i)}(j)] = MSXgetparameter(0, obj.NodeTankIndex(i), j, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -8981,6 +9001,7 @@ classdef epanet <handle
             for i=1:obj.getLinkPipeCount
                 for j=1:obj.getMSXParametersCount
                     [obj.Errcode, value{i}(j)] = MSXgetparameter(1, i, j, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -8989,12 +9010,14 @@ classdef epanet <handle
                 if ~obj.getMSXPatternsCount, value={};return; end
                 for i=1:obj.getMSXPatternsCount
                     [obj.Errcode, len] = MSXgetIDlen(7, i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{i}]=MSXgetID(7, i, len, obj.MSXLibEPANET);
                 end
             else
                 k=1;
                 for i=varargin{1}
                     [obj.Errcode, len] = MSXgetIDlen(7, i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{k}]=MSXgetID(7, i, len, obj.MSXLibEPANET);
                     k=k+1;
                 end
@@ -9007,9 +9030,11 @@ classdef epanet <handle
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(j)] = MSXgetindex(obj.MSXLibEPANET, 7, varargin{1}{j});
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = MSXgetindex(obj.MSXLibEPANET, 7, varargin{1});
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function value = getMSXPatternsLengths(obj, varargin)
@@ -9018,18 +9043,22 @@ classdef epanet <handle
                 if obj.getMSXPatternsCount
                     for i=obj.getMSXPatternsIndex
                         [obj.Errcode, value(i)]=MSXgetpatternlen(i, obj.MSXLibEPANET);
+                        if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     end
                 end
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(j)] = MSXgetpatternlen(obj.getMSXPatternsIndex(varargin{1}{j}), obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = MSXgetpatternlen(obj.getMSXPatternsIndex(varargin{1}), obj.MSXLibEPANET);
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             elseif isa(varargin{1}, 'numeric')
                 k=1;
                 for i=varargin{1}
                     [obj.Errcode, value(k)]=MSXgetpatternlen(i, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     k=k+1;
                 end
             end
@@ -9039,6 +9068,7 @@ classdef epanet <handle
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, value{i}(j)] = MSXgetinitqual(0, i, j, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -9047,6 +9077,7 @@ classdef epanet <handle
             for i=1:obj.getLinkCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, value{i}(j)] = MSXgetinitqual(1, i, j, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -9054,6 +9085,7 @@ classdef epanet <handle
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, obj.MSXSourceType{i}{j}, obj.MSXSourceLevel{i}(j), obj.MSXSourcePatternIndex{i}(j)] = MSXgetsource(i, j, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     obj.MSXSourceTypeCode{i}(j)=find(strcmp(obj.MSXTYPESOURCE, obj.MSXSourceType{i}{j}))-2;
                 end
             end
@@ -9072,6 +9104,7 @@ classdef epanet <handle
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, value{i}{j}, ~, ~] = MSXgetsource(i, j, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -9079,6 +9112,7 @@ classdef epanet <handle
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, ~, value{i}(j), ~] = MSXgetsource(i, j, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -9086,6 +9120,7 @@ classdef epanet <handle
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, ~, ~, value{i}(j)] = MSXgetsource(i, j, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -9096,6 +9131,7 @@ classdef epanet <handle
                 tmplength=obj.getMSXPatternsLengths(i);
                 for j=1:tmplength
                     [obj.Errcode, value(i, j)] = MSXgetpatternvalue(i, j, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
                 if tmplength<tmpmaxlen
                     for j=(tmplength+1):tmpmaxlen
@@ -9105,11 +9141,14 @@ classdef epanet <handle
                 
             end
         end
-        function value = getMSXPatternValue(obj, patternIndex, patternStep) %Mass flow rate per minute of a chemical source
+        function value = getMSXPatternValue(obj, patternIndex, patternStep) 
+            % Mass flow rate per minute of a chemical source
             [obj.Errcode, value] = MSXgetpatternvalue(patternIndex, patternStep, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXSpeciesConcentration(obj, type, index, species)
             [obj.Errcode, value] = MSXgetqual(type, index, species, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXComputedQualitySpecie(obj, specie)
             % Return the quality nodes for specific specie
@@ -9381,15 +9420,21 @@ classdef epanet <handle
         end
         function value = getMSXError(obj, Errcode)
             [obj.Errcode, value] = MSXgeterror(Errcode, obj.MSXLibEPANET);
+            if Errcode == 519
+                error('Please check the MSX file. Maybe node/link ids do not exist in the input file.');
+            end 
         end
         function solveMSXCompleteHydraulics(obj, varargin)
             [obj.Errcode] = MSXsolveH(obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function solveMSXCompleteQuality(obj, varargin)
             [obj.Errcode] = MSXsolveQ(obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function writeMSXReport(obj, varargin)
             [obj.Errcode]=MSXreport(obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function [status, result] = writeMSXReportExe(obj, varargin)
             if isempty(varargin)
@@ -9436,6 +9481,7 @@ classdef epanet <handle
         function setMSXConstantsValue(obj, value)
             for i=1:length(value)
                 [obj.Errcode] = MSXsetconstant(i, value(i), obj.MSXLibEPANET);
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function setMSXParametersTanksValue(obj, NodeTankIndex, paramindex, value)
@@ -9444,16 +9490,19 @@ classdef epanet <handle
                 return;
             end
             [obj.Errcode] = MSXsetparameter(0, NodeTankIndex, paramindex, value, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXParametersPipesValue(obj, pipeIndex, value)
             for i=1:length(value)
                 [obj.Errcode] = MSXsetparameter(1, pipeIndex, i, value(i), obj.MSXLibEPANET);
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function setMSXNodeInitqualValue(obj, value)
             for i=1:length(value)
                 for j=1:size(value{1}, 2)
                     [obj.Errcode] = MSXsetinitqual(0, i, j, value{i}(j), obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -9461,6 +9510,7 @@ classdef epanet <handle
             for i=1:length(value)
                 for j=1:size(value{1}, 2)
                     [obj.Errcode] = MSXsetinitqual(1, i, j, value{i}(j), obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -9470,15 +9520,18 @@ classdef epanet <handle
             end
             nfactors=length(patternVector);
             [obj.Errcode] = MSXsetpattern(pat, patternVector, nfactors, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXPatternMatrix(obj, patternMatrix)
             nfactors=size(patternMatrix, 2);
             for i=1:size(patternMatrix, 1)
                 [obj.Errcode] = MSXsetpattern(i, patternMatrix(i, :), nfactors, obj.MSXLibEPANET);
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function setMSXPatternValue(obj, index, patternTimeStep, patternFactor)
             [obj.Errcode] = MSXsetpatternvalue(index, patternTimeStep, patternFactor, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXTimeStep(obj, timestep)
             setMSXOptions(obj, 'timestep', timestep);
@@ -9536,18 +9589,23 @@ classdef epanet <handle
         end        
         function saveMSXQualityFile(obj, outfname)
             [obj.Errcode]=MSXsaveoutfile(outfname, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function useMSXHydraulicFile(obj, hydname)
             [obj.Errcode]=MSXusehydfile(hydname, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function initializeMSXQualityAnalysis(obj, flag)
             [obj.Errcode] = MSXinit(flag, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function [t, tleft]= stepMSXQualityAnalysisTimeLeft(obj)
             [obj.Errcode, t, tleft] = MSXstep(obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function saveMSXFile(obj, msxname)
             [obj.Errcode] = MSXsavemsxfile(msxname, obj.MSXLibEPANET);
+            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function msx = writeMSXFile(obj, msx)
             % Checkout example: /examples/EX15_write_msx_file.m
@@ -13974,6 +14032,7 @@ end
 obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
 obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
 obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
+
 obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
 obj.MSXConstantsCount = obj.getMSXConstantsCount;
 obj.MSXParametersCount = obj.getMSXParametersCount;
@@ -14002,6 +14061,7 @@ obj.MSXSourceLevel = obj.getMSXSourceLevel;
 obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
 obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
 obj.MSXPattern = obj.getMSXPattern;
+
 end
 function [Errcode] = MSXopen(obj, varargin)
 [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
