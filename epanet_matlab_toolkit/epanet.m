@@ -11066,7 +11066,13 @@ classdef epanet <handle
             end
             node_index = addBinNode(obj, 1, nodeID, coords, elev, demand, patternID, category, quality);
             if nargin == 9
-                link_index = addBinLink(obj, varargin{7}{:});
+                if strcmp(varargin{7}{1}, 'PIPE')
+                    link_index = addBinLinkPipe(obj, varargin{7}{2:end});
+                elseif strcmp(varargin{7}{1}, 'PUMP')
+                    link_index = addBinLinkPump(obj, varargin{7}{2:end});
+                else
+                    link_index = addBinLinkValve(obj, varargin{7}{2:end});
+                end
             end
         end
         function [node_index, link_index] = addBinNodeReservoir(obj, nodeID, varargin)
@@ -11139,8 +11145,14 @@ classdef epanet <handle
             end
             node_index = addBinNode(obj, 2, nodeID, coords, head, patternID, quality);
             if nargin == 7
-                link_index = addBinLink(obj, varargin{5}{:});
-            end
+                if strcmp(varargin{5}{1}, 'PIPE')
+                    link_index = addBinLinkPipe(obj, varargin{5}{2:end});
+                elseif strcmp(varargin{5}{1}, 'PUMP')
+                    link_index = addBinLinkPump(obj, varargin{5}{2:end});
+                else
+                    link_index = addBinLinkValve(obj, varargin{5}{2:end});
+                end
+             end
         end
         function [node_index, link_index] = addBinNodeTank(obj, nodeID, varargin)
             % Adds a new tank to the network.
@@ -11268,7 +11280,13 @@ classdef epanet <handle
             end
             node_index = addBinNode(obj, 3, nodeID, coords, elev, diameter, initlevel, minlevel, maxlevel, minvol, volcurve, quality);
             if nargin == 12
-                link_index = addBinLink(obj, varargin{10}{:});
+                if strcmp(varargin{10}{1}, 'PIPE')
+                    link_index = addBinLinkPipe(obj, varargin{10}{2:end});
+                elseif strcmp(varargin{10}{1}, 'PUMP')
+                    link_index = addBinLinkPump(obj, varargin{10}{2:end});
+                else
+                    link_index = addBinLinkValve(obj, varargin{10}{2:end});
+                end
             end
         end
         function [link_index] = addBinLinkPipe(obj, linkID, from, to, varargin)
@@ -15672,7 +15690,7 @@ function node_index = addBinNode(obj, typeCode, nodeID, coords, varargin)
         end
         for i = 1:length(patternID)
             if ~isempty(patternID{i})
-                if ~ismember(patternID{i}, obj.getBinPatternsInfo.BinPatternNameID)
+                if ~ismember(num2str(patternID{i}), obj.getBinPatternsInfo.BinPatternNameID)
                     warning(['Pattern ', patternID{i}, ' does not exist.'])
                     node_index=-1;
                     return;
@@ -15701,20 +15719,24 @@ function node_index = addBinNode(obj, typeCode, nodeID, coords, varargin)
     texta = char;
     while ~feof(fid)
         aline = fgetl(fid);
+        section_checker = regexp(aline,'\s','split','once');
+        if length(section_checker)>1
+            section_checker = section_checker{1};
+        end
         texta = [texta, aline, char(10)];
         if typeCode == 1
-            if strcmp(aline, '[JUNCTIONS]')
+            if strcmp(section_checker, '[JUNCTIONS]')
                 for i = 1:obj.getBinNodesInfo.BinNodeJunctionCount
                     aline = fgetl(fid);
                     texta = [texta, aline, char(10)];
                 end
                 texta = [texta, str_junction];
             end
-            if strcmp(aline, '[DEMANDS]')
+            if strcmp(section_checker, '[DEMANDS]')
                 texta = [texta, str_demands];
             end
         elseif typeCode == 2
-            if strcmp(aline, '[RESERVOIRS]')
+            if strcmp(section_checker, '[RESERVOIRS]')
                 for i = 1:obj.getBinNodesInfo.BinNodeReservoirCount
                     aline = fgetl(fid);
                     texta = [texta, aline, char(10)];
@@ -15722,7 +15744,7 @@ function node_index = addBinNode(obj, typeCode, nodeID, coords, varargin)
                 texta = [texta, str_reserv];
             end
         elseif typeCode == 3
-            if strcmp(aline, '[TANKS]')
+            if strcmp(section_checker, '[TANKS]')
                 for i = 1:obj.getBinNodesInfo.BinNodeTankCount
                     aline = fgetl(fid);
                     texta = [texta, aline, char(10)];
@@ -15730,10 +15752,10 @@ function node_index = addBinNode(obj, typeCode, nodeID, coords, varargin)
                 texta = [texta, str_tank];
             end
         end
-        if strcmp(aline, '[QUALITY]')
+        if strcmp(section_checker, '[QUALITY]')
             texta = [texta, str_qual];
         end
-        if strcmp(aline, '[COORDINATES]')
+        if strcmp(section_checker, '[COORDINATES]')
             texta = [texta, str_coords];
         end
     end
@@ -15801,9 +15823,13 @@ function link_index = addBinLink(obj, typeCode, linkID, from, to, varargin)
         texta = char;
         while ~feof(fid)
             aline = fgetl(fid);
+            section_checker = regexp(aline,'\s','split','once');
+            if length(section_checker)>1
+                section_checker = section_checker{1};
+            end
             texta = [texta, aline, char(10)];
             if strcmpi(typeCode, 'PIPE')
-                if strcmpi(aline, '[PIPES]')
+                if strcmpi(section_checker, '[PIPES]')
                     for i = 1:LinksInfo.BinLinkPipeCount
                         aline = fgetl(fid);
                         texta = [texta, aline, char(10)];
@@ -15811,7 +15837,7 @@ function link_index = addBinLink(obj, typeCode, linkID, from, to, varargin)
                     texta = [texta, str_pipe];
                 end
             elseif strcmpi(typeCode, 'PUMP')
-                if strcmpi(aline, '[PUMPS]')
+                if strcmpi(section_checker, '[PUMPS]')
                     for i = 1:LinksInfo.BinLinkPumpCount
                         aline = fgetl(fid);
                         texta = [texta, aline, char(10)];
@@ -15819,7 +15845,7 @@ function link_index = addBinLink(obj, typeCode, linkID, from, to, varargin)
                     texta = [texta, str_pump];
                 end
             elseif strcmpi(typeCode, 'VALVE')
-                if strcmp(aline, '[VALVES]')
+                if strcmp(section_checker, '[VALVES]')
                     for i = 1:LinksInfo.BinLinkValveCount
                         aline = fgetl(fid);
                         texta = [texta, aline, char(10)];
