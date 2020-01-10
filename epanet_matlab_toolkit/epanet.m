@@ -9641,7 +9641,7 @@ classdef epanet <handle
                 if isfield(msx, upper(section))
                     species_all = eval(['msx.', sp_field]);
                     for i=1:length(species_all)
-                        fprintf(f, species_all{i});
+                        fprintf(f, char(species_all{i}));
                         fprintf(f, '\n');
                     end
                 end
