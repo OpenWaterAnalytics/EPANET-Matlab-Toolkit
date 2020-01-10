@@ -1,4 +1,4 @@
-%% Replace tanks with reservoirs
+%% Replace tanks with reservoirs using bin functions
 % This example contains:
 %   Choose Network.
 %   Load network and simulate.
@@ -108,11 +108,12 @@ function d = replace_tanks_with_reservoirs(d, tank_index, new_id)
     newDiameter=linkDiameters(1); 
     newRoughness=linkRoughness(1);
     Code=linkType{1};
-    d.addBinReservoir(new_id,X,Y,newElevation,newPipeID,...
-    ToNodeID,newLength,newDiameter,newRoughness,Code);
+    
+    node_index = d.addBinNodeReservoir(new_id, [X,Y], newElevation, '',0, ... 
+    {Code, {newPipeID}, new_id, ToNodeID, newLength, newDiameter, newRoughness});
 
     for i=2:length(pipes_conn_on_tanks)
-        d.addBinPipe(linkID{i},new_id,toNodeID{i},linklengths(i),linkDiameters(i),linkRoughness(i));
+        d.addBinLinkPipe(linkID{i},new_id,toNodeID{i},linklengths(i),linkDiameters(i),linkRoughness(i));
     end
     
     d.setLinkStatus(status);

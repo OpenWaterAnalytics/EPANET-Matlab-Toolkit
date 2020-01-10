@@ -4,7 +4,7 @@
 %   Get from and to nodes for add cv pipe.
 %   Plot network.
 %   Plot network with changes.
-%   Unload library.
+%   Not needed to unload library because not used in this example.
 
 %%
 %Clear 
@@ -20,10 +20,9 @@ toNode = d.getBinNodeNameID.BinNodeNameID{6};
 
 % Plot network.
 d.Binplot();
-errcode = d.addBinCVPipe('CV-P1',fromNode,toNode,1000,10,100);
+errcode = d.addBinCVPipe('CV-P1', fromNode, toNode, 1000, 10, 100);
 
 % Plot network with changes.
 d.Binplot('links','yes');
 
-% Unload library.
-d.unload
+% Not needed to unload library because not used in this example.
