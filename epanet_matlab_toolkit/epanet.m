@@ -16651,7 +16651,7 @@ if ~sum(strcmp('headloss', variables))
     nheadl=1;
 end
 nodes = obj.getBinNodeNameID;
-links = obj.getBinLinkNameID;
+links = obj.getBinLinksInfo;
 controls = obj.getBinControlsInfo;
 curves = obj.getBinCurvesInfo;
 rules=obj.getBinRulesControlsInfo;
@@ -16942,8 +16942,8 @@ for t = 1:length(info)
             elseif (sect==9) && (nn==0)
                 mm=1;
                 if mm < length(a)+1
-                    if pp<length(char(nodes.BinNodeJunctionNameID))+1
-                        if strcmp(a{mm}, nodes.BinNodeJunctionNameID{pp})
+                    if pp<length(char(links.BinLinkInitialStatus))+1
+                        if strcmp(a{mm}, links.BinLinkNameID{pp})
                             pp=pp+1;
                             fprintf(fid2, '%s%s', char(a{mm}), sps);
                             if length(a)==2
