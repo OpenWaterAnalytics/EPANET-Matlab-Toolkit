@@ -35,8 +35,8 @@ check_error(abs(deficient_nodes) == 4)
 
 % Switch to PDA with pressure limits of 20 - 100 psi.
 type = 'PDA';
-pmin = 20;
-preq = 100;
+pmin = 0;
+preq = 0.1;
 pexp = 0.5;
 d.setDemandModel(type, pmin, preq, pexp);
 
