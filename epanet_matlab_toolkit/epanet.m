@@ -578,10 +578,10 @@ classdef epanet <handle
                 obj.LibEPANETpath = [pwdepanet, '/glnx/'];
                 obj.LibEPANET = 'libepanet';
             end
-%             if ismac
-%                 obj.LibEPANETpath = [pwdepanet, '/mac/'];
-%                 obj.LibEPANET = 'libepanet';
-%             end
+            if ismac
+                obj.LibEPANETpath = [pwdepanet, '/mac/'];
+                obj.LibEPANET = 'libepanet';
+            end
             if ~isdeployed
                 obj.InputFile=which(varargin{1}); % Get name of INP file
             else
