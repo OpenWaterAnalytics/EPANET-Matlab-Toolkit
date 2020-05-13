@@ -6214,6 +6214,30 @@ classdef epanet <handle
                 error(obj.getError(obj.Errcode));
             end
         end
+        function setNodesConnectingLinksID(obj, linkIndex, startNodeID, endNodeID)
+            % Sets the IDs of a link's start- and end-nodes. (EPANET Version 2.2)
+            %
+            % Example 1:
+            %   d.getNodesConnectingLinksID   % Retrieves the ids of the from/to nodes of all links
+            %   linkIndex = 2;
+            %   startNodeID = '11';
+            %   endNodeID = '22';
+            %   d.setNodesConnectingLinksID(linkIndex, startNodeID, endNodeID)
+            %   d.getNodesConnectingLinksID
+            %
+            % Example 2:
+            %   linkIndex = [2, 3];
+            %   startNodeID = {'12', '13'};
+            %   endNodeID = {'21', '22'};
+            %   d.setNodesConnectingLinksID(linkIndex, startNodeID, endNodeID)
+            %   d.getNodesConnectingLinksID
+            %
+            % See also getLinkNodesIndex, getNodesConnectingLinksID, setLinkLength,
+            %          setLinkNameID, setLinkComment.
+            startNode = obj.getNodeIndex(startNodeID);
+            endNode = obj.getNodeIndex(endNodeID);
+            obj.setLinkNodesIndex(linkIndex, startNode, endNode)          
+        end
         function setLinkDiameter(obj, value, varargin)
             % Sets the values of diameters.
             %
