@@ -6067,7 +6067,7 @@ classdef epanet <handle
                 end
             end
         end
-        function index = addControls(obj, control)
+        function index = addControls(obj, control, varargin)
             % Adds a new simple control. (EPANET Version 2.2)
             %
             % % The examples are based on d=epanet('Net1.inp');
@@ -6083,8 +6083,10 @@ classdef epanet <handle
             %   d.getControls(index)
             %
             % Example 3:
-            %   % Pump 9 speed is set to 1.5 at 16 hours into the simulation
+            %   % Pump 9 speed is set to 1.5 at 16 hours or 57600 seconds into the simulation
             %   index = d.addControls('LINK 9 1.5 AT TIME 16:00');
+            %   d.getControls(index)
+            %   index = d.addControls('LINK 9 1.5 AT TIME 57600'); %in seconds
             %   d.getControls(index)
             %
             % Example 4:
@@ -6102,6 +6104,26 @@ classdef epanet <handle
             %   index = d.addControls(controls)                
             %   d.getControls(index)
             %
+            % Example 6:
+            % Notes:
+            %    index:	    return index of the new control.
+            %	 type:  	the type of control to add (see EN_ControlType).
+            %    linkIndex:	the index of a link to control (starting from 1).
+            %    setting:	control setting applied to the link.
+            %    nodeIndex:	index of the node used to control the link (0 for EN_TIMER and EN_TIMEOFDAY controls).
+            %    level:	    action level (tank level, junction pressure, or time in seconds) that triggers the control.
+            %
+            % Control type codes consist of the following:  
+            % EN_LOWLEVEL      0   Control applied when tank level or node pressure drops below specified level 
+            % EN_HILEVEL       1   Control applied when tank level or node pressure rises above specified level 
+            % EN_TIMER         2   Control applied at specific time into simulation 
+            % EN_TIMEOFDAY     3   Control applied at specific time of day 
+            %
+            % Code example:
+            % % index = d.addControls(type, linkIndex, setting, nodeIndex, level)
+            % index = d.addControls(0, 13, 0, 11, 100)
+            % d.getControls(index)
+            %
             % See also deleteControls, getControls,
             %          setControls, getControlRulesCount.
             if iscell(control)
@@ -6109,7 +6131,16 @@ classdef epanet <handle
                     index(i) = addControlFunction(obj, control{i}); 
                 end
             else
-               index = addControlFunction(obj, control); 
+                if nargin <= 3
+                   index = addControlFunction(obj, control); 
+                else
+                    linkIndex = varargin{1};
+                    controlSettingValue = varargin{2};
+                    nodeIndex = varargin{3};
+                    controlLevel = varargin{4};
+                    [obj.Errcode, index] = ENaddcontrol(control, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);  
+                    error(obj.getError(obj.Errcode));
+                end
             end
         end
         function Errcode = deleteControls(varargin)
@@ -18367,12 +18398,14 @@ function [controlTypeIndex, linkIndex,controlSettingValue,...
                 %LINK linkID status AT CLOCKTIME clocktime AM/PM 
                 nodeIndex = 0;
                 controlTypeIndex = 3; 
-                [~, ~, ~, H, MN, S] = datevec(splitControl{6});
-                controlLevel = H*3600+MN*60+S;
             else
                 %LINK linkID status AT TIME time
                 nodeIndex = 0;
                 controlTypeIndex = 2; 
+            end
+            if isempty(strfind(splitControl{6}, ':'))
+                controlLevel = str2double(splitControl{6});
+            else
                 [~, ~, ~, H, MN, S] = datevec(splitControl{6});
                 controlLevel = H*3600+MN*60+S;
             end
