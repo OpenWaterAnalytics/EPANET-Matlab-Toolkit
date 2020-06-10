@@ -7300,7 +7300,7 @@ classdef epanet <handle
                 error(obj.getError(obj.Errcode)); 
             end
         end
-        function value = setNodeNameID(obj, value, varargin)
+        function setNodeNameID(obj, value, varargin)
             % Sets the ID name for nodes.
             %
             % Example 1:
