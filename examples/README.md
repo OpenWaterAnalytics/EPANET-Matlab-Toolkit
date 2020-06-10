@@ -38,6 +38,7 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 22:](#example-22---overflow-of-tanks) Overflow of tanks. ``EX22_Overflow_option_for_tanks``
 - [Example 23:](#example-23---change-connection-of-links) Change connection of the links. ``EX23_Change_connection_links``
 - [Example 24:](#example-24---delete-all-patterns) Delete all patterns. ``EX24_delete_all_patterns``
+- [Example 25:](#example-25---set-node-name-ids) Set node name IDs. ``EX25_set_node_name_ids``
 
 &uparrow; [Back to top](#table-of-contents)
 
@@ -509,6 +510,17 @@ This example contains:
 - Load network.
 - Delete all patterns.
 - Save new file without patterns.
+- Unload library.
+
+ &uparrow; [Back to top](#table-of-contents)
+
+#### Example 25 - Set node name IDs
+
+- This example contains:
+- Load network.
+- Get node name ids.
+- Set new node name ids.
+- Get new node name ids.
 - Unload library.
 
  &uparrow; [Back to top](#table-of-contents)
