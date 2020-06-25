@@ -35,6 +35,9 @@ headCurve = d.getLinkPumpHeadCurveIndex;
 
 % Set new head curve values.
 d.setCurve(headCurve,[2000 250]); 
+%pumpIndex = d.getLinkPumpIndex
+%d.getCurveIndex
+%d.setLinkPumpHeadCurveIndex(pumpIndex, headCurve)
 
 % Computed hydraulics.
 Results = d.getComputedTimeSeries;  
