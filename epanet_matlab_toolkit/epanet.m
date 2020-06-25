@@ -57,6 +57,7 @@ classdef epanet <handle
         ControlTypes;                % Set of control types
         ControlTypesIndex;           % Index of the control types
         CurveCount;                  % Number of curves
+        CurveIndex;                  % Index of curves
         CurvesInfo;                  % Curves info
         DemandModelCode;             % Demand model code DDA - 0, PDA - 1
         DemandModelPmin;             % Demand model Pmin - Pressure below which there is no demand
@@ -96,6 +97,7 @@ classdef epanet <handle
         LinkPumpNameID;              % Name ID of pumps
         LinkPumpPatternIndex;        % Index of pump pattern
         LinkPumpPatternNameID;       % ID of pump pattern
+        LinkPumpPower;               % Power value
         LinkPumpPowerUnits;          % Units of power
         LinkPumpType;                % Pump type e.g constant horsepower, power function, user-defined custom curv
         LinkPumpTypeCode;            % Pump index/code
@@ -687,6 +689,7 @@ classdef epanet <handle
             obj.LinkCount = obj.getLinkCount;
             obj.PatternCount = obj.getPatternCount;
             obj.CurveCount = obj.getCurveCount;
+            obj.CurveIndex = obj.getCurveIndex;
             obj.ControlRulesCount = obj.getControlRulesCount;
             obj.NodeJunctionCount = obj.NodeCount-obj.NodeTankReservoirCount; %obj.getNodeJunctionCount;
             % Get type of the parameters
@@ -797,6 +800,7 @@ classdef epanet <handle
                 obj.LinkPumpPatternIndex = obj.getLinkPumpPatternIndex;
                 obj.LinkPumpTypeCode = obj.getLinkPumpTypeCode;
                 obj.LinkPumpType = obj.getLinkPumpType;
+                obj.LinkPumpPower = obj.getLinkPumpPower;
                 obj.CurvesInfo = obj.getCurvesInfo; 
             catch
             end
