@@ -7375,7 +7375,10 @@ classdef epanet <handle
             %          setNodeTankMinimumWaterLevel, setNodeTankDiameter.
             if ischar(volcurve)
                 volcurve={volcurve};
+            else
+                volcurve={''};
             end
+            
             if ~ismember(index, obj.getNodeTankIndex)
                 tankIndices = obj.getNodeTankIndex;
                 index = tankIndices(index);
