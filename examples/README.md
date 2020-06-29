@@ -9,6 +9,7 @@ EPANET-MATLAB-Toolkit - Examples
 - [Examples](#examples)
 
 ## Examples
+- [Example 0:](./EX0_CCWI2016_contamination_simulation.m) Arsenite contamination simulator based on EPANET andEPANET-MSX using the EPANET-MATLAB Toolkit.
 - [Example 1:](./EX1_Plot_network_topology.m) Plot network topology. 
 - [Example 2:](./EX2_Hydraulic_analysis.m) Hydraulic analysis. 
 - [Example 3:](./EX3_Quality_analysis.m) Quality analysis. 
