@@ -9726,7 +9726,11 @@ classdef epanet <handle
             else
                 fparam = '_enums.h';
             end
-            file = [obj.LibEPANETpath, obj.LibEPANET, fparam];
+            if isunix
+                file = [obj.LibEPANETpath, 'epanet2', fparam];
+            else
+                file = [obj.LibEPANETpath, obj.LibEPANET, fparam];
+            end
             if isdeployed
 %                 file=[file(1:end-1), 'txt'];%epanet2.h-->epanet2.txt
                   file = 'epanet2_enums.txt';%epanet2_enums.h-->epanet2_enums.txt
