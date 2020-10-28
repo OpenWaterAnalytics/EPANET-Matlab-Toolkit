@@ -82,7 +82,6 @@ classdef epanet <handle
         LinkInitialStatus;           % Initial status of links
         LinkLength;                  % Length of links
         LinkLengthsUnits;            % Units of length
-        LinkLengthUnits;             % Units of length
         LinkMinorLossCoeff;          % Minor loss coefficient of links
         LinkMinorLossCoeffUnits;     % Minor loss coefficient units
         LinkNameID;                  % Name ID of links
@@ -18417,8 +18416,8 @@ function [controlTypeIndex, linkIndex,controlSettingValue,...
             if isempty(strfind(splitControl{6}, ':'))
                 controlLevel = str2double(splitControl{6});
             else
-                [~, ~, ~, H, MN, S] = datevec(splitControl{6});
-                controlLevel = H*3600+MN*60+S;
+                [~, ~, days, H, MN, S] = datevec(splitControl{6});
+                controlLevel = (24*(days-1)+H)*3600+MN*60+S;
             end
         otherwise
     end
