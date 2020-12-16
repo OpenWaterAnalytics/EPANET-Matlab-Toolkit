@@ -8036,9 +8036,12 @@ classdef epanet <handle
             % Sets the extra trials allowed if hydraulics don't converge. (EPANET Version 2.2)
             %
             % Example:
-            %   d.setOptionsExtraTrials(10)
+            %   d.setOptionsExtraTrials(10);
             %   d.getOptionsExtraTrials
-            %
+            %   
+            %   % Set UNBALANCED to STOP
+            %   d.setOptionsExtraTrials(-1);
+            % 
             % See also getOptionsExtraTrials, setOptionsMaxTrials, setOptionsMaximumCheck.
             [obj.Errcode] = ENsetoption(obj.ToolkitConstants.EN_UNBALANCED, value, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end
