@@ -8816,7 +8816,7 @@ classdef epanet <handle
             %   node_index = 3;
             %   result_index = d.getNodeResultIndex(node_index)
             %
-            % See also getComputedHydraulicTimeSeries, getLinkResultIndex
+            % See also getComputedHydraulicTimeSeries, deleteNode, getLinkResultIndex
             [obj.Errcode, resultindex] = ENgetresultindex(obj.LibEPANET, obj.ToolkitConstants.EN_NODE, node_index);
         end
         function resultindex = getLinkResultIndex(obj, link_index)
@@ -8827,7 +8827,7 @@ classdef epanet <handle
             %   link_index = 3;
             %   result_index = d.getLinkResultIndex(link_index)
             %
-            % See also getComputedHydraulicTimeSeries, getNodeResultIndex
+            % See also getComputedHydraulicTimeSeries, deleteNode, getNodeResultIndex
             [obj.Errcode, resultindex] = ENgetresultindex(obj.LibEPANET, obj.ToolkitConstants.EN_LINK, link_index);
         end
         function clearReport(obj)
