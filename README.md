@@ -333,6 +333,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |closeNetwork|Closes down the Toolkit system|
 |closeQualityAnalysis|Closes the water quality analysis system, freeing all allocated memory|
 |runsCompleteSimulation|Runs a complete hydraulic and water simulation to create binary & report files with default name net_temp.bin or you can use argument to run via ENepanet|
+|initializeEPANET|Initializes an EPANET project that isn't opened with an input file|
 |initializeHydraulicAnalysis|Initializes storage tank levels, link status and settings, and the simulation clock time prior to running a hydraulic analysis|
 |initializeQualityAnalysis|Initializes water quality and the simulation clock time prior to running a water quality analysis|
 |nextHydraulicAnalysisStep|Determines the length of time until the next hydraulic event occurs in an extended period simulation|
@@ -851,5 +852,6 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENgetvertexcount|Retrieves the number of internal vertex points assigned to a link|
 |ENsetvertices|Assigns a set of internal vertex points to a link|
 |ENgetresultindex|Retrieves the order in which a node's or link's results were saved to an output file|
+|ENinit|Initializes an EPANET project that isn't opened with an input file|
 
 &uparrow; [Back to top](#table-of-contents)

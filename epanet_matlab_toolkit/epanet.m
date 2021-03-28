@@ -631,11 +631,19 @@ classdef epanet <handle
             disp([' (EMT version {', obj.classversion,'}).'])
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
+                
             %For the getComputedQualityTimeSeries
             obj.solve = 0;
             %Open the file
             obj.Errcode=ENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
             error(obj.getError(obj.Errcode)); 
+            
+            if obj.Errcode
+                % initializes an EPANET project that isn't opened with an input file     
+                obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
+                warning('Initializes the EPANET project!');
+            end
+            
             %Save the temporary input file
             obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
             obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
@@ -684,6 +692,9 @@ classdef epanet <handle
             end
             %Get all the countable network parameters
             obj.NodeCount = obj.getNodeCount;
+            if ~obj.NodeCount
+                return;
+            end
             obj.NodeTankReservoirCount = obj.getNodeTankReservoirCount;
             obj.LinkCount = obj.getLinkCount;
             obj.PatternCount = obj.getPatternCount;
@@ -715,7 +726,7 @@ classdef epanet <handle
             obj.LinkValveNameID = obj.LinkNameID(obj.LinkValveIndex);
             %Get all the node data
             obj.NodeNameID = obj.getNodeNameID;
-            tmp(:, 1)=obj.NodeNameID(obj.NodesConnectingLinksIndex(:, 1)');
+            tmp(:, 1) = obj.NodeNameID(obj.NodesConnectingLinksIndex(:, 1)');
             tmp(:, 2) = obj.NodeNameID(obj.NodesConnectingLinksIndex(:, 2)');
             obj.NodesConnectingLinksID=tmp;
             obj.NodeIndex = 1:obj.NodeCount; %obj.getNodeIndex;
@@ -7337,7 +7348,7 @@ classdef epanet <handle
             % Sets a group of properties for a tank. (EPANET Version 2.2)
             %
             % Properties:
-	    % 1) Tank index
+	        % 1) Tank index
             % 2) Elevation
             % 3) Initial water Level
             % 4) Minimum Water Level
@@ -8591,6 +8602,15 @@ classdef epanet <handle
             %
             % See also saveHydraulicFile, initializeHydraulicAnalysis.
             [obj.Errcode]=ENusehydfile(hydname, obj.LibEPANET);
+        end
+        function initializeEPANET(obj, unitsType, headLossType)
+            % Initializes an EPANET project that isn't opened with an input file
+            %
+            % Example:
+            %   d.initializeEPANET(d.ToolkitConstants.EN_GPM, d.ToolkitConstants.EN_HW)
+            %
+            % See also initializeHydraulicAnalysis.
+            [obj.Errcode]=ENinit(obj.LibEPANET, unitsType, headLossType);
         end
         function initializeHydraulicAnalysis(obj, varargin)
             % Initializes storage tank levels, link status and settings, and the simulation clock time prior to running a hydraulic analysis.
@@ -12756,7 +12776,10 @@ classdef epanet <handle
         end
         function value = getNodeCoordinates(obj, varargin)
             cnt = obj.getLinkCount;
-            
+            if ~cnt
+                warning('Not enough network coordinates.');
+                return;
+            end
             vert_function = 0;
             coord_function = 0;
             if sum(strcmp(obj.libFunctions, 'ENgetvertexcount'))
@@ -13705,6 +13728,10 @@ function [Errcode, LibEPANET] = ENgetversion(LibEPANET)
 if Errcode
     ENgeterror(Errcode, LibEPANET);
 end
+end
+function [Errcode] = ENinit(LibEPANET, unitsType, headLossType)
+% EPANET Version 2.2
+[Errcode]=calllib(LibEPANET, 'ENinit', '', '', unitsType, headLossType);
 end
 function [Errcode] = ENinitH(flag, LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENinitH', flag);
@@ -14705,6 +14732,10 @@ elseif bin==0
     % get info EN functions
     v.nodenameid=obj.getNodeNameID;
     v.linknameid=obj.getLinkNameID;
+    if isempty(v.nodenameid) || isempty(v.linknameid)
+        warning('Not enough network nodes/links.');
+        return;
+    end
     v.nodesconnlinks=obj.getNodesConnectingLinksID;
     if sum(strcmp(obj.libFunctions, 'ENgetcoord'))
         v.nodecoords=obj.getNodeCoordinates;
