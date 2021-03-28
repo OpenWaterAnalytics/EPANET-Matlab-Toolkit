@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0-beta.2'; % 14/05/2020
+        classversion='v2.2.0-beta.5'; % 28/03/2021
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
@@ -8808,6 +8808,28 @@ classdef epanet <handle
             % See also writeReport, writeLineInReportFile, clearReport.
             [obj.Errcode] = ENcopyreport (fileName, obj.LibEPANET);
         end
+        function resultindex = getNodeResultIndex(obj, node_index)
+            % Retrieves the order in which a node's results
+            % were saved to an output file. (EPANET Version 2.2)
+            %
+            % Example:
+            %   node_index = 3;
+            %   result_index = d.getNodeResultIndex(node_index)
+            %
+            % See also getComputedHydraulicTimeSeries, getLinkResultIndex
+            [obj.Errcode, resultindex] = ENgetresultindex(obj.LibEPANET, obj.ToolkitConstants.EN_NODE, node_index);
+        end
+        function resultindex = getLinkResultIndex(obj, link_index)
+            % Retrieves the order in which a link's results
+            % were saved to an output file. (EPANET Version 2.2)
+            %
+            % Example:
+            %   link_index = 3;
+            %   result_index = d.getLinkResultIndex(link_index)
+            %
+            % See also getComputedHydraulicTimeSeries, getNodeResultIndex
+            [obj.Errcode, resultindex] = ENgetresultindex(obj.LibEPANET, obj.ToolkitConstants.EN_LINK, link_index);
+        end
         function clearReport(obj)
             % Clears the contents of a project's report file. (EPANET Version 2.2)
             %
@@ -8815,7 +8837,7 @@ classdef epanet <handle
             %   d.clearReport
             %
             % See also writeReport, writeLineInReportFile, copyReport.
-            [obj.Errcode] = ENclearreport (obj.LibEPANET);
+            [obj.Errcode] = ENclearreport(obj.LibEPANET);
         end
         function unload(obj)
             % Unload library and close the EPANET Toolkit system.
@@ -13755,6 +13777,10 @@ end
 function [Errcode] = ENclearreport(LibEPANET)
 % EPANET Version 2.2
 [Errcode]=calllib(LibEPANET, 'ENclearreport');
+end
+function [Errcode, value] = ENgetresultindex(LibEPANET, objecttype, index)
+% EPANET Version 2.2
+[Errcode, value]=calllib(LibEPANET, 'ENgetresultindex', objecttype, index, int32(0));
 end
 function [Errcode] = ENresetreport(LibEPANET)
 [Errcode]=calllib(LibEPANET, 'ENresetreport');

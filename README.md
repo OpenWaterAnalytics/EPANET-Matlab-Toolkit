@@ -173,6 +173,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkPumpTypeCode|Retrieves the type code of a pump for specific link index|
 |getLinkPumpState|Current computed pump state (read only) (see @ref EN_PumpStateType)|
 |getLinkPumpSwitches|Calculates the number of pump switches|
+|getLinkResultIndex|Retrieves the order in which a link's results were saved to an output file. (EPANET Version 2.2)|
 |getLinkRoughnessCoeff|Retrieves the value of all link roughness|
 |getLinkSettings|Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves|
 |getLinkStatus|Current link status (see @ref EN_LinkStatusType)|
@@ -214,6 +215,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeReservoirCount|Retrieves the number of reservoirs|
 |getNodeReservoirIndex|Retrieves the indices of reservoirs|
 |getNodeReservoirNameID|Retrieves the reservoirs IDs|
+|getNodeResultIndex|Retrieves the order in which a node's results were saved to an output file. (EPANET Version 2.2)|
 |getNodeSourcePatternIndex|Retrieves the value of all node source pattern index|
 |getNodeSourceQuality|Retrieves the value of all nodes source quality|
 |getNodeSourceType|Retrieves the value of all node source type|
