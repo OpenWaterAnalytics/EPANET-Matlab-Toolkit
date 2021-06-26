@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0-beta.8.1'; % 26/06/2021
+        classversion='v2.2.0-beta.8.2'; % 27/06/2021
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
@@ -5094,7 +5094,7 @@ classdef epanet <handle
             warning on; 
         end
         function value = getComputedTimeSeries_ENepanet(obj)
-%             obj.saveInputFile(obj.TempInpFile);
+            obj.saveInputFile(obj.TempInpFile);
             uuID = char(java.util.UUID.randomUUID);
             rptfile=['@#', uuID, '.txt'];
             binfile=['@#', uuID, '.bin'];
