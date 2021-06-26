@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0-beta.7'; % 26/06/2021
+        classversion='v2.2.0-beta.8'; % 26/06/2021
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
@@ -410,6 +410,23 @@ classdef epanet <handle
         TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
         TYPEHEADLOSS={'HW', 'DW', 'CM'}; % Constants of headloss types: HW: Hazen-Williams, DW: Darcy-Weisbach, CM: Chezy-Manning
         TYPESTATUS = {'CLOSED', 'OPEN'}; % Link status
+        TYPEPUMPSTATE = {'XHEAD', '', 'CLOSED', 'OPEN', '', 'XFLOW'}; % Link PUMP status
+    %   d.TYPEPUMPSTATE(res.State + 1)
+    %   EN_PUMP_XHEAD   = 0,  //!< Pump closed - cannot supply head
+    %   EN_PUMP_CLOSED  = 2,  //!< Pump closed
+    %   EN_PUMP_OPEN    = 3,  //!< Pump open
+    %   EN_PUMP_XFLOW   = 5   //!< Pump open - cannot supply flow
+        TYPEBINSTATUS = {'CLOSED (MAX. HEAD EXCEEDED)', 'TEMPORARILY CLOSED', 'CLOSED',...
+            'OPEN', 'ACTIVE(PARTIALY OPEN)', 'OPEN (MAX. FLOW EXCEEDED',...
+            'OPEN (PRESSURE SETTING NOT MET)'};
+    %   0 = closed (max. head exceeded)
+    %   1 = temporarily closed
+    %   2 = closed
+    %   3 = open
+    %   4 = active (partially open)
+    %   5 = open (max. flow exceeded)
+    %   6 = open (flow setting not met)
+    %   7 = open (pressure setting not met)
         DEMANDMODEL = {'DDA', 'PDA'}; % Demand model types. DDA #0 Demand driven analysis, PDA #1 Pressure driven analysis.
         MSXTYPEAREAUNITS={'FT2', 'M2', 'CM2'}; % sets the units used to express pipe wall surface area
         MSXTYPERATEUNITS={'SEC', 'MIN', 'HR', 'DAY'}; % is the units in which all reaction rate terms are expressed
@@ -2117,7 +2134,7 @@ classdef epanet <handle
         end
         function value = getLinkPumpState(obj, varargin)
             % Retrieves the current computed pump state (read only) (see @ref EN_PumpStateType). (EPANET Version 2.2)
-            % 
+            % same as status: open, active, closed
             % Using step-by-step hydraulic analysis,
             %
             % Example 1:
@@ -4837,9 +4854,9 @@ classdef epanet <handle
             initlinkmatrix = zeros(totalsteps, obj.getLinkCount);
             if size(varargin, 2)==0
                 varargin = {'time', 'pressure', 'demand', 'demanddeficit', 'head', 'tankvolume', 'flow', 'velocity', 'headloss', 'status', 'setting', 'energy', 'efficiency', 'state'};
-                if ~sum(strcmpi(fields(obj.ToolkitConstants), 'EN_EFFICIENCY'))
-                    varargin{end} = {''};
-                end
+%                 if ~sum(strcmpi(fields(obj.ToolkitConstants), 'EN_EFFICIENCY'))
+%                     varargin{end} = {''};
+%                 end
             else
                 for i = 1:length(varargin)
                     if isnumeric(varargin{i})
@@ -4895,7 +4912,7 @@ classdef epanet <handle
                 end
             end
             if find(strcmpi(varargin, 'state'))
-                value.State = initlinkmatrix;
+                value.State = zeros(totalsteps, obj.getLinkPumpCount);
             end
             clear initlinkmatrix initnodematrix;
             k = 1;tstep = 1;
@@ -4935,6 +4952,7 @@ classdef epanet <handle
                 end
                 if find(strcmpi(varargin, 'status'))
                     value.Status(k, :) = obj.getLinkStatus;
+                    value.StatusStr(k, :) = obj.TYPESTATUS(value.Status(k, :) + 1);
                 end
                 if find(strcmpi(varargin, 'setting'))
                     value.Setting(k, :) = obj.getLinkSettings;
@@ -4949,7 +4967,8 @@ classdef epanet <handle
                 end
                 if obj.getVersion > 20101
                     if find(strcmpi(varargin, 'state'))
-                        value.State(k, :) = obj.getLinkState;
+                        value.State(k, :) = obj.getLinkPumpState;
+                        value.StateStr(k, :) = obj.TYPEPUMPSTATE(value.State(k, :) + 1);
                     end
                 end
                 tstep = obj.nextHydraulicAnalysisStep;
@@ -5058,7 +5077,8 @@ classdef epanet <handle
         function value = getComputedTimeSeries(obj)
             obj.saveInputFile(obj.TempInpFile);
             [fid,binfile,rptfile] = runEPANETexe(obj);
-            value = readEpanetBin(fid, binfile, rptfile, 0);            
+            value = readEpanetBin(fid, binfile, rptfile, 0); 
+            value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
             % Remove report bin, files @#
             warning off;
             fclose('all');
@@ -5074,6 +5094,7 @@ classdef epanet <handle
             obj.Errcode = ENepanet(obj.LibEPANET, obj.TempInpFile, rptfile, binfile);
             fid = fopen(binfile, 'r');
             value = readEpanetBin(fid, binfile, rptfile, 0);  
+            value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
             fclose('all');
             files=dir('@#*');
             if ~isempty(files); delete('@#*'); end
@@ -5376,7 +5397,12 @@ classdef epanet <handle
             end
             index = ENaddnode(obj, tankID, obj.ToolkitConstants.EN_TANK);
             obj.setNodeCoordinates(index,[xy(1),xy(2)]);
-%                  minvol = (pi * (diam/2)^2) *minlvl;
+            if diam == 0 && strcmp(obj.getNodeType(index), 'TANK')
+                 minvol = (pi * (diam/2)^2) *minlvl;
+                 if minvol == 0
+                     return;
+                 end
+            end
             obj.setNodeTankData(index, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
         end
         function index = addLinkPipeCV(obj, cvpipeID, fromNode, toNode, varargin)
@@ -18272,7 +18298,7 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
                     'Flow', 'Velocity', 'HeadLoss', 'Status', 'Setting', ...
                     'ReactionRate', 'FrictionFactor', 'LinkQuality'};
         for i=1:length(fields_param)
-        v.(fields_new{i}) = eval(['value.', fields_param{i}]);
+            v.(fields_new{i}) = eval(['value.', fields_param{i}]);
         end
         clear value;
         value=v;
