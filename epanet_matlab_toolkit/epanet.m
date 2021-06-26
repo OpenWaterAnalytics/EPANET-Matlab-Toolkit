@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0-beta.8'; % 26/06/2021
+        classversion='v2.2.0-beta.8.1'; % 26/06/2021
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
@@ -577,6 +577,13 @@ classdef epanet <handle
             obj.NodeTankMixingModelCode = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MIXMODEL, varargin);
             obj.NodeTankMixingModelType = obj.TYPEMIXMODEL(obj.NodeTankMixingModelCode + 1);
             value={obj.NodeTankMixingModelCode obj.NodeTankMixingModelType};
+        end
+        function index = check_if_numeric(obj, id)
+            if isnumeric(id)
+                index = id;
+            else
+                index = obj.getLinkIndex(id);
+            end
         end
     end
     methods
@@ -6428,7 +6435,8 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PIPE, condition, obj.LibEPANET);
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = ENsetlinktype(index, obj.ToolkitConstants.EN_PIPE, condition, obj.LibEPANET);
             error(obj.getError(obj.Errcode)); 
         end
         function index = setLinkTypePipeCV(obj, id, varargin)
@@ -6456,7 +6464,8 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_CVPIPE, condition, obj.LibEPANET);
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = ENsetlinktype(index, obj.ToolkitConstants.EN_CVPIPE, condition, obj.LibEPANET);
             error(obj.getError(obj.Errcode)); 
         end
         function index = setLinkTypePump(obj, id, varargin)
@@ -6484,7 +6493,8 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PUMP, condition, obj.LibEPANET);
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = ENsetlinktype(index, obj.ToolkitConstants.EN_PUMP, condition, obj.LibEPANET);
             error(obj.getError(obj.Errcode)); 
         end
         function index = setLinkTypeValveFCV(obj, id, varargin)
@@ -6513,7 +6523,8 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_FCV, condition, obj.LibEPANET);
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = ENsetlinktype(index, obj.ToolkitConstants.EN_FCV, condition, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
         function index = setLinkTypeValveGPV(obj, id, varargin)
@@ -6541,7 +6552,8 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_GPV, condition, obj.LibEPANET);
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = ENsetlinktype(index, obj.ToolkitConstants.EN_GPV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePBV(obj, id, varargin)
@@ -6569,7 +6581,8 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PBV, condition, obj.LibEPANET);
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = ENsetlinktype(index, obj.ToolkitConstants.EN_PBV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePRV(obj, id, varargin)
@@ -6597,7 +6610,8 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PRV, condition, obj.LibEPANET);
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = ENsetlinktype(index, obj.ToolkitConstants.EN_PRV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValvePSV(obj, id, varargin)
@@ -6625,7 +6639,8 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_PSV, condition, obj.LibEPANET);
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = ENsetlinktype(index, obj.ToolkitConstants.EN_PSV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function index = setLinkTypeValveTCV(obj, id, varargin)
@@ -6653,7 +6668,8 @@ classdef epanet <handle
             if nargin == 3      
                 condition = varargin{1};
             end
-            [obj.Errcode, index] = ENsetlinktype(obj.getLinkIndex(id), obj.ToolkitConstants.EN_TCV, condition, obj.LibEPANET);
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = ENsetlinktype(index, obj.ToolkitConstants.EN_TCV, condition, obj.LibEPANET);
             if obj.Errcode, error(obj.getError(obj.Errcode)), return; end 
         end
         function setLinkLength(obj, value, varargin)
