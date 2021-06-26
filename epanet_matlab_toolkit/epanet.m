@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0-beta.6'; % 24/06/2021
+        classversion='v2.2.0-beta.7'; % 26/06/2021
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
@@ -5376,9 +5376,8 @@ classdef epanet <handle
             end
             index = ENaddnode(obj, tankID, obj.ToolkitConstants.EN_TANK);
             obj.setNodeCoordinates(index,[xy(1),xy(2)]);
-            if intlvl ~= 0 % https://github.com/OpenWaterAnalytics/EPANET/blob/45c62f665677eacba5e57952cbd66215f303239f/src/epanet.c#L2637
-                obj.setNodeTankData(index, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
-            end
+%                  minvol = (pi * (diam/2)^2) *minlvl;
+            obj.setNodeTankData(index, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
         end
         function index = addLinkPipeCV(obj, cvpipeID, fromNode, toNode, varargin)
             % Adds a new control valve pipe.
