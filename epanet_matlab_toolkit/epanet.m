@@ -629,9 +629,13 @@ classdef epanet <handle
             obj.Bin=1;
             [~, inp]=fileparts(obj.InputFile);
             if isempty(inp)
-                error(['File "', varargin{1}, '" is not a valid.']);
+                if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                    % skip
+                else
+                    error(['File "', varargin{1}, '" is not a valid.']);
+                end
             end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile')% e.g. d = epanet('Net1.inp', 'epanet2');
+            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
                 if isempty(pwdDLL)
                     pwdDLL = pwd;
@@ -647,7 +651,11 @@ classdef epanet <handle
             end
             if ~isdeployed
                 if ~exist(obj.InputFile, 'file')
-                    error(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);
+                    if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                        % skip
+                    else
+                        error(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);
+                    end
                 end
             end
             %Load EPANET Library
@@ -659,10 +667,14 @@ classdef epanet <handle
             %For the getComputedQualityTimeSeries
             obj.solve = 0;
             %Open the file
-            obj.Errcode=ENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
-            error(obj.getError(obj.Errcode)); 
-            
-            if obj.Errcode
+            if ~isempty(obj.InputFile)
+                if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                    warning(['Network name "', inp ,'.inp" already exists.'])
+                end
+                obj.Errcode=ENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
+                error(obj.getError(obj.Errcode)); 
+            else
+                obj.InputFile = varargin{1};
                 % initializes an EPANET project that isn't opened with an input file     
                 obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
                 warning('Initializes the EPANET project!');
@@ -8307,6 +8319,7 @@ classdef epanet <handle
             %
             % See also getTimeStartTime, setTimeReportingStart, setTimePatternStart.
             [obj.Errcode] = ENsettimeparam(obj.ToolkitConstants.EN_STARTTIME, value, obj.LibEPANET);
+            error(obj.getError(obj.Errcode)); 
         end
         function value = setPatternComment(obj, value, varargin)
             % Sets the comment string assigned to the pattern object.
@@ -8804,6 +8817,9 @@ classdef epanet <handle
             %
             % See also unload, saveHydraulicFile.
 %             while exist('@#', 'file') ~= 2
+            if nargin == 1
+                inpname = obj.TempInpFile;
+            end
             [Errcode] = ENsaveinpfile('@#', obj.LibEPANET);
             copyfile('@#', inpname);% temporary
             delete('@#');
