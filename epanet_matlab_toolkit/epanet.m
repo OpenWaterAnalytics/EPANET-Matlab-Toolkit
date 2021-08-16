@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0-beta.8.2'; % 27/06/2021
+        classversion='v2.2.0-beta.9'; % 16/08/2021
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
@@ -533,7 +533,7 @@ classdef epanet <handle
             end
         end
         function set_node_demand_pattern(obj, fun, propertie, value, extra)
-            if sum(strcmp(obj.libFunctions, fun))
+            if sum(strcmp(obj.libFunctions, fun)) && value < obj.NodeJunctionCount
                 categ = 1;
                 if length(extra) == 2
                     indices = value;
