@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0-beta.9'; % 16/08/2021
+        classversion='v2.2.0-gamma.1'; % 16/08/2021
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2

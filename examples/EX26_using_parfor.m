@@ -27,6 +27,7 @@ parfor i = 1:number_scenarios
     H{i} = d.getComputedHydraulicTimeSeries;
     d.closeNetwork;
 end
+d.unload;
 toc
 
 
