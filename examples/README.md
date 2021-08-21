@@ -42,6 +42,7 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 23:](./EX23_Change_connection_links.m) Change connection of the links.
 - [Example 24:](./EX24_delete_all_patterns.m) Delete all patterns.
 - [Example 25:](./EX25_set_node_name_ids.m) Set node name IDs.
+- [Example 26:](./EX26_using_parfor.m) Using parfor in EMT.
 
 &uparrow; [Back to top](#table-of-contents)
 

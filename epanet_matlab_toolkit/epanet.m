@@ -5095,8 +5095,8 @@ classdef epanet <handle
         end
         function value = getComputedTimeSeries(obj)
             obj.saveInputFile(obj.TempInpFile);
-            [fid,binfile,rptfile] = runEPANETexe(obj);
-            value = readEpanetBin(fid, binfile, rptfile, 0); 
+            [fid,binfile, ~] = runEPANETexe(obj);
+            value = readEpanetBin(fid, binfile, 0); 
             value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
             % Remove report bin, files @#
             warning off;
@@ -5108,11 +5108,11 @@ classdef epanet <handle
         function value = getComputedTimeSeries_ENepanet(obj)
             obj.saveInputFile(obj.TempInpFile);
             uuID = char(java.util.UUID.randomUUID);
-            rptfile=['@#', uuID, '.txt'];
+            rptfile=[obj.TempInpFile(1:end-4), '.txt'];
             binfile=['@#', uuID, '.bin'];
             obj.Errcode = ENepanet(obj.LibEPANET, obj.TempInpFile, rptfile, binfile);
             fid = fopen(binfile, 'r');
-            value = readEpanetBin(fid, binfile, rptfile, 0);  
+            value = readEpanetBin(fid, binfile, 0);  
             value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
             fclose('all');
             files=dir('@#*');
@@ -12547,7 +12547,7 @@ classdef epanet <handle
         end
         function value = getBinComputedAllParameters(obj, varargin)
             [fid, binfile, rptfile] = runEPANETexe(obj);
-            value = readEpanetBin(fid, binfile, rptfile);
+            value = readEpanetBin(fid, binfile);
             
             % Remove report bin, files @#
             warning off;
@@ -18236,7 +18236,7 @@ end
 %         end        
 %     end
 % end
-function value = readEpanetBin(fid, binfile, rptfile, varargin)
+function value = readEpanetBin(fid, binfile, varargin)
     value=[]; 
     if fid~=-1
         data = fread(fid, 'int32');
@@ -18336,7 +18336,7 @@ function value = readEpanetBin(fid, binfile, rptfile, varargin)
         value=v;
     end
     warning('off'); try fclose(fid); catch, end; try delete(binfile); catch, end
-    try delete(rptfile); catch, end; warning('on'); 
+    warning('on'); 
 end
 function [inpfile, rptfile, binfile]= createTempfiles(BinTempfile)
     inpfile=BinTempfile;
