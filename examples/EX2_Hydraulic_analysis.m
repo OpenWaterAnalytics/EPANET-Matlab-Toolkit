@@ -45,6 +45,10 @@ time_4 = toc;
 
 % Hydraulic analysis step-by-step using the functions ENopenH, ENinit, ENrunH, ENgetnodevalue/&ENgetlinkvalue, ENnextH, ENcloseH.
 % (This function contains events)
+etstep = 3600;
+d.setTimeReportingStep(etstep);
+d.setTimeHydraulicStep(etstep);
+d.setTimeQualityStep(etstep);
 tic;
 d.openHydraulicAnalysis;
 d.initializeHydraulicAnalysis;
