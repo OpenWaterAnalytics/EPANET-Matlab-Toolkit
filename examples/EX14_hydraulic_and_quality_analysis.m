@@ -11,12 +11,17 @@ start_toolkit;
 
 % Load a network.
 d = epanet('Net1.inp');
+d.setQualityType('Chlorine', 'mg/L');
+initialQuality = 0.6;
+nodeIndex = d.getNodeReservoirIndex;
+nodeIndex = [nodeIndex d.getNodeTankIndex];
+d.setNodeInitialQuality(nodeIndex, initialQuality * ones(length(nodeIndex),1))
 
 % Set time hydraulic and quality steps
-% etstep = 300;
-% d.setTimeReportingStep(etstep);
-% d.setTimeHydraulicStep(etstep);
-% d.setTimeQualityStep(etstep);
+etstep = 3600;
+d.setTimeReportingStep(etstep);
+d.setTimeHydraulicStep(etstep);
+d.setTimeQualityStep(etstep);
 % Hstep = min(Pstep,Hstep)
 % Hstep = min(Rstep,Hstep)
 % Hstep = min(Qstep,Hstep)
