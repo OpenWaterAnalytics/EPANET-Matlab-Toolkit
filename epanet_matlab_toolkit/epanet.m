@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0-gamma.1'; % 16/08/2021
+        classversion='v2.2.0-gamma.2'; % 25/08/2021
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
@@ -533,44 +533,33 @@ classdef epanet <handle
             end
         end
         function set_node_demand_pattern(obj, fun, propertie, value, extra)
-            if sum(strcmp(obj.libFunctions, fun)) && value < obj.NodeJunctionCount
-                categ = 1;
-                if length(extra) == 2
-                    indices = value;
-                    categ = extra{1};
-                    param = extra{2};
-                elseif length(extra) == 1
-                    indices = value;
-                    param = extra{1};
-                elseif isempty(extra)
-                    [indices, ~] = getNodeJunctionIndices(obj,[]);
-                    param = value;
-                    if iscell(value)
-                        param = value{1};
-                    end
+            
+            categ = 1;
+            if length(extra) == 2
+                indices = value;
+                categ = extra{1};
+%                 if extra{1} > 1
+%                     return
+%                 end
+                param = extra{2};
+            elseif length(extra) == 1
+                indices = value;
+                param = extra{1};
+            elseif isempty(extra)
+                indices = getNodeJunctionIndices(obj,[]);
+                param = value;
+                if iscell(value)
+                    param = value{1};
                 end
-                for i = 1:length(indices)
-                    [obj.Errcode] = eval([fun, '(indices(i), categ, param(i), obj.LibEPANET)']);
+            end
+            j = 1;
+            for i = indices
+                if ~ismember(i, obj.getNodeReservoirIndex) && sum(strcmp(obj.libFunctions, fun))
+                    [obj.Errcode] = eval([fun, '(indices(i), categ, param(j), obj.LibEPANET)']);
+                else
+                    [obj.Errcode] = ENsetnodevalue(i, propertie, param(j), obj.LibEPANET);
                 end
-            else
-                if isempty(extra)
-                    indices = getNodeJunctionIndices(obj, []);
-                elseif length(extra) == 1
-                    indices = value;
-                    value = extra{1};
-                elseif length(extra) == 2
-                    % for reservoirs
-                    indices = value;
-                    if extra{1} > 1
-                        return
-                    end
-                    value = extra{2};
-                end
-                j = 1;
-                for i = indices
-                    [obj.Errcode] = ENsetnodevalue(i, propertie, value(j), obj.LibEPANET);
-                    j=j+1;
-                end
+                j=j+1;
             end
         end
         function value = get_node_tank_mixining_model(obj, varargin)
