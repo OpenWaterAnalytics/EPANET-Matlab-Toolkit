@@ -106,11 +106,16 @@ d.getMSXSpeciesUnits
 d.getMSXSpeciesATOL  
 d.getMSXSpeciesRTOL
 d.getMSXSpeciesIndex
-d.getMSXSpeciesIndex('AS5') 
+
+if sum(strcmp('AS5', d.getMSXSpeciesNameID))
+    d.getMSXSpeciesIndex('AS5')
+end
 d.getMSXConstantsNameID
 d.getMSXConstantsValue
 d.getMSXConstantsIndex
-d.getMSXConstantsIndex('K2')
+if sum(strcmp('K2', d.getMSXConstantsNameID))
+    d.getMSXConstantsIndex('K2')
+end
 d.getMSXParametersNameID
 d.getMSXParametersIndex
 d.getMSXParametersTanksValue
@@ -124,8 +129,10 @@ d.getMSXSources
 d.getMSXSourceType
 d.getMSXSourceLevel
 d.getMSXSourcePatternIndex
-d.getMSXPattern %Mass flow rate per minute of a chemical source
-d.getMSXPatternValue(1,2) %Mass flow rate per minute of a chemical source
+patterns = d.getMSXPattern %Mass flow rate per minute of a chemical source
+if patterns
+    d.getMSXPatternValue(1,2) %Mass flow rate per minute of a chemical source
+end
 % % d.getMSXSpeciesConcentration
 disp('Press any key to continue...')
 pause
@@ -142,6 +149,9 @@ pause
 
 %% Print Errors MSX
 for e=[0,200,501:524]
+    if e == 519
+        continue
+    end
     disp(d.getMSXError(e))
     % 0 bug, no error
     % 200 bug, cannot read EPANET-MSX file
@@ -188,9 +198,11 @@ pause
 
 
 %% GET, SET CONSTANTS
-d.getMSXConstantsValue     
-value = [2 10 8];%index[1 2 3]
-d.setMSXConstantsValue(value);
+constants = d.getMSXConstantsValue  
+if constants
+    value = [2 10 8];%index[1 2 3]
+    d.setMSXConstantsValue(value);
+end
 d.getMSXConstantsNameID
 d.getMSXConstantsValue
 d.getMSXConstantsIndex

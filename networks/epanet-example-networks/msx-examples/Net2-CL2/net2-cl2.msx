@@ -1,0 +1,49 @@
+[TITLE]
+NET2 Chlorine Example
+
+
+[OPTIONS]
+AREA_UNITS  FT2
+RATE_UNITS  DAY
+SOLVER      EUL
+TIMESTEP    300
+RTOL        0.001
+ATOL        0.001
+
+
+[SPECIES]
+BULK        CL2    MG  0.01 0.001
+
+
+[COEFFICIENTS]
+PARAMETER   Kb     0.3
+PARAMETER   Kw     1.0
+
+
+[TERMS]
+Kf     1.5826e-4 * RE^0.88 / D
+
+[PIPE]
+RATE        CL2    -Kb*CL2 - (4/D)*Kw*Kf/(Kw+Kf)*CL2
+
+
+[TANK]
+RATE        CL2    -Kb*CL2
+
+
+[SOURCES]
+;CONC/MASS/FLOW/SETPOINT   <nodeID>      <specieID>     <strength>     (<tseriesID>)
+CONC                          1             CL2           0.8
+
+
+[QUALITY]
+GLOBAL          CL2   0.5
+NODE      26    CL2   0.1
+
+[PARAMETERS]
+;PIPE        <pipeID>      <paramID>     <value>
+;TANK        <tankID>      <paramID>     <value>
+
+[REPORT]
+NODES  2  20  23  26
+SPECIE CL2 YES

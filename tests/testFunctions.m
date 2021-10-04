@@ -46,12 +46,12 @@ if nF==1
     d.getCurveNameID        % returns all curve IDs
     d.getCurveNameID(1)     % returns specific curve ID
     d.addCurve('NewCur1')   % add new curve with ID
-    indexCurve=d.addCurve('NewCur2', [1800 200; 1500 400]); % add new curve with points
+    indexCurve=d.addCurve('NewCur2', [1500 400; 1800 200]); % add new curve with points
     d.getCurveNameID
     d.getCurveValue(indexCurve)     % returns all points for specific curve index
     d.getCurveValue(indexCurve,2)   % returns specific point for specific curve index
 
-    d.setCurve(3,[1900 300; 1400 200]) % Change an existing curve 
+    d.setCurve(3,[1400 200; 1900 300]) % Change an existing curve 
     d.getCurveValue(indexCurve) 
 
     d.getCurvesInfo
@@ -64,9 +64,9 @@ if nF==1
     d.getCurveIndex('NewCur1')
 
     pointindex=2
-    tmppoints=d.getCurveValue(indexCurve,pointindex)
-    d.setCurveValue(indexCurve,pointindex,tmppoints+100)
-    d.getCurveValue(indexCurve,pointindex)
+    tmppoints=d.getCurveValue(indexCurve, pointindex)
+    d.setCurveValue(indexCurve, pointindex, tmppoints+100)
+    d.getCurveValue(indexCurve, pointindex)
 
 
     bd1=d.getNodeBaseDemands % get an array of the base demands (some nodes may have multiple base demands for different patterns)
@@ -215,7 +215,6 @@ d.getNodeActualQuality
 d.getNodeMassFlowRate
 d.getNodeActualQualitySensingNodes([1 2 34 25 5]) 
 
-d.getNodeTankMixiningModel
 d.getNodeTankMixingModelCode
 d.getNodeTankMixingModelType
 
@@ -223,7 +222,7 @@ d.getNodeTankMinimumWaterVolume
 d.getNodeTankVolumeCurveIndex
 d.getNodeTankMinimumWaterLevel
 d.getNodeTankMaximumWaterLevel
-d.getNodeTankMinimumFraction
+d.getNodeTankMixingFraction
 d.getNodeTankBulkReactionCoeff
 d.getNodeTankIndex
 d.getNodeTankNameID
@@ -358,7 +357,7 @@ d.getNodeInitialQuality
 
 if d.getNodeTankCount
     values = d.getNodeTankInitialLevel
-    values(end)=100; 
+    values(end)= values(end) + 10; 
     d.setNodeTankInitialLevel(values)  
     d.getNodeTankInitialLevel
 
@@ -399,10 +398,10 @@ if d.getNodeTankCount
     d.setNodeTankMaximumWaterLevel(values) 
     d.getNodeTankMaximumWaterLevel
 
-    values = d.getNodeTankMinimumFraction
+    values = d.getNodeTankMixingFraction
     values(end)= 0.5; %takes values 0-1
-    d.setNodeTankMinimumFraction(values) 
-    d.getNodeTankMinimumFraction
+    d.setNodeTankMixingFraction(values) 
+    d.getNodeTankMixingFraction
 
     values = d.getNodeTankBulkReactionCoeff
     values(end)= 1; 
