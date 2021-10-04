@@ -1,0 +1,35 @@
+[TITLE]
+AsIII-AsV-Chlorine reaction kinetic model
+for Morehead, KY WDS
+
+[OPTIONS]
+RATE_UNITS  MIN
+SOLVER      EUL
+TIMESTEP    300
+RTOL        1.E-3
+ATOL        1.E-3
+
+[SPECIES]
+; Type   Name      Units   RTol   ATol
+BULK    Chlorine  MG      1.E-3  1.E-3
+BULK    AsIII     MG      1.E-3  1.E-3
+BULK    AsV       MG      1.E-3  1.E-3
+
+[COEFFICIENTS]
+CONSTANT KB         6.94444E-4  ;1/24/60=Free chlorine bulk decay rate == 1/day
+CONSTANT K2         69.4        ;100000/24/60= Arsenite oxidation velocity;
+CONSTANT MWChlorine 70.9        ;mg/mmol free chlorine as Cl2
+CONSTANT MWAsIII    74.92       ;mg/mmol arsenite as As
+CONSTANT MWAsV      74.92       ;mg/mmol arsenate as As
+
+[PIPE]
+RATE Chlorine -KB*Chlorine - K2*Chlorine*AsIII/MWAsIII
+RATE AsIII    -K2*Chlorine*AsIII/MWChlorine
+RATE AsV       K2*MWAsV*Chlorine*AsIII/MWChlorine/MWAsIII
+
+[SOURCES]
+SETPOINT    RESERVOIR-129	Chlorine	0.7	CL2PAT
+
+[PATTERNS]
+CL2PAT    1  
+AS3PAT    1

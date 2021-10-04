@@ -1,0 +1,3 @@
+A minimum residual chlorine concentration of 0.3 mg=L at all nodes was set as the water quality constraint. The range of the possible dosing rate of chlorine at the reservoir was 0.5¨C2.5 mg=L in increments of 0.1 mg=L, and the chlorine decay rate was assumed to be 1.0 /day.
+
+For the calculation of NPV value of chlorine cost, the unit cost of chlorine is $0.2/kg, the interest rate is 6% per year, and the project life is considered to be 50 years.

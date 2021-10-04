@@ -1,0 +1,6 @@
+Fosspoly
+No. of Pipes: 58
+No. of Nodes: 36
+No. of Reservoirs: 1
+No. of Tanks: 0
+Total system demand (average daily demand summed over all nodes): 2.93E+3 m3

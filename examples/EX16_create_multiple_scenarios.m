@@ -1,16 +1,27 @@
-% Create scenarios based on node count of inp file EPANET 
+% Creates scenarios based on node count of inp file EPANET.
+% This example contains:
+%   Load a network.
+%   Create scenario parameters.
+%   Create Multiple Scenarios.
+%   Set quality type.
+%   Run Scenarios.
+%   Get computed quality time series.
+%   Plot Quality VS Time.
+%   Unload library.
+
 % For more check out the S-PLACE Toolkit (Sensor placement Toolkit)
 % https://github.com/KIOS-Research/splace-toolkit
 
 %% 
 function CN = EX16_create_multiple_scenarios()
+    % Clear
     clear; close('all'); clc;
     start_toolkit;
 
-    % Load a network
+    % Load a network.
     d = epanet('Net1.inp');
 
-    % Create scenario parameters
+    % Create scenario parameters.
     %TIMES
     PatternTimeStep=d.TimePatternStep;
     SimulationTime=48; %e.g.48 in Hours
@@ -22,13 +33,13 @@ function CN = EX16_create_multiple_scenarios()
     %Uncertainty
     qunc=0.05;
 
-    % Create Multiple Scenarios
-    % Set qual type
+    % Create Multiple Scenarios.
+    % Set quality type.
     d.setQualityType('chem','mg/L')
 
     d.setTimeSimulationDuration(SimulationTime*3600);
 
-    % Run Scenarios
+    % Run Scenarios.
     disp(['Number of Scenarios = NodeCount: ', num2str(d.getNodeCount)])
 
     for n = 1:d.getNodeCount
@@ -77,12 +88,13 @@ function CN = EX16_create_multiple_scenarios()
             d.setNodeSourceQuality(tmp2)
         end
         
-        % Get computed quality time series
+        % Get computed quality time series.
         res = d.getComputedQualityTimeSeries;
         CN{n}= res.NodeQuality;
         %CL{n}= res.Linkuality;
     end
     
+    % Plot Quality VS Time.
     for i= 1:11
         figure;
         plot(CN{i})
@@ -90,6 +102,8 @@ function CN = EX16_create_multiple_scenarios()
         xlabel('Time (hrs)')
         ylabel('Quality (mg/L)')
     end
+    
+    % Unload library.
     d.unload;
 
 end

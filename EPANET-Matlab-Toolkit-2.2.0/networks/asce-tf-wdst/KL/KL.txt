@@ -1,0 +1,6 @@
+KL
+No. of Pipes: 1274
+No. of Nodes: 935
+No. of Reservoirs: 1
+No. of Tanks: 0
+Total system demand (average daily demand summed over all nodes): 2.91E+4 m3

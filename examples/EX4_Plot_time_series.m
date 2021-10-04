@@ -1,13 +1,15 @@
-%% Visualise/plot time series example
+%% Visualises/plots time series for node pressures, water velocity and water flow.
 % This example contains:
-% Load a network
-% Hydraulic analysis using ENepanet binary file
-% Change time-stamps from seconds to hours
-% Plot node pressures for specific nodes 
-% Plot water velocity for specific links
-% Plot water flow for specific links
+%   Load a network.
+%   Hydraulic analysis using ENepanet binary file.
+%   Change time-stamps from seconds to hours.
+%   Plot node pressures for specific nodes.
+%   Plot water velocity for specific links.
+%   Plot water flow for specific links.
+%   Unload library.
 
 %%
+% Clear
 clear; close('all'); clc;
 start_toolkit;
 
@@ -53,5 +55,5 @@ for i=link_indices
     ylabel(['Flow (', d.LinkFlowUnits,')'])
 end
 
-% Unload library
+% Unload library.
 d.unload

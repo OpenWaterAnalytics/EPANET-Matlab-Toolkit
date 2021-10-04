@@ -1,0 +1,222 @@
+[TITLE]
+Anytown network model
+
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern         
+ 20              	20          	500         	                	;
+ 30              	50          	200         	                	;
+ 40              	50          	200         	                	;
+ 50              	50          	200         	                	;
+ 55              	80          	0           	                	;
+ 60              	50          	500         	                	;
+ 70              	50          	500         	                	;
+ 75              	80          	0           	                	;
+ 80              	50          	500         	                	;
+ 90              	50          	1000        	                	;
+ 100             	50          	500         	                	;
+ 110             	50          	500         	                	;
+ 115             	80          	0           	                	;
+ 120             	120         	200         	                	;
+ 130             	120         	200         	                	;
+ 140             	80          	200         	                	;
+ 150             	120         	200         	                	;
+ 160             	120         	800         	                	;
+ 170             	120         	200         	                	;
+
+[RESERVOIRS]
+;ID              	Head        	Pattern         
+ 10              	10          	                	;
+ 65              	215         	                	;
+ 165             	215         	                	;
+
+[TANKS]
+;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
+
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ 2               	20              	70              	12000       	16          	70          	0           	OPEN  	;
+ 4               	20              	30              	12000       	12          	120         	0           	OPEN  	;
+ 6               	20              	110             	12000       	12          	70          	0           	OPEN  	;
+ 8               	70              	30              	9000        	12          	70          	0           	OPEN  	;
+ 10              	70              	100             	600         	12          	70          	0           	OPEN  	;
+ 12              	70              	90              	600         	10          	70          	0           	OPEN  	;
+ 14              	70              	60              	600         	12          	70          	0           	OPEN  	;
+ 16              	90              	60              	600         	10          	70          	0           	OPEN  	;
+ 18              	60              	80              	600         	12          	70          	0           	OPEN  	;
+ 20              	90              	80              	600         	10          	70          	0           	OPEN  	;
+ 22              	90              	150             	600         	10          	70          	0           	OPEN  	;
+ 24              	90              	100             	600         	10          	70          	0           	OPEN  	;
+ 26              	100             	150             	600         	12          	70          	0           	OPEN  	;
+ 28              	150             	80              	600         	10          	70          	0           	OPEN  	;
+ 30              	60              	30              	600         	10          	120         	0           	OPEN  	;
+ 32              	30              	40              	600         	10          	120         	0           	OPEN  	;
+ 34              	30              	50              	600         	10          	120         	0           	OPEN  	;
+ 36              	40              	50              	600         	10          	120         	0           	OPEN  	;
+ 38              	50              	80              	600         	10          	120         	0           	OPEN  	;
+ 40              	80              	140             	600         	10          	120         	0           	OPEN  	;
+ 42              	150             	140             	600         	8           	120         	0           	OPEN  	;
+ 44              	150             	160             	600         	8           	120         	0           	OPEN  	;
+ 46              	100             	160             	600         	8           	120         	0           	OPEN  	;
+ 48              	100             	110             	600         	8           	70          	0           	OPEN  	;
+ 50              	110             	160             	600         	10          	120         	0           	OPEN  	;
+ 52              	110             	120             	600         	8           	120         	0           	OPEN  	;
+ 54              	120             	160             	600         	12          	130         	0           	OPEN  	;
+ 56              	120             	130             	600         	8           	120         	0           	OPEN  	;
+ 58              	130             	160             	600         	10          	120         	0           	OPEN  	;
+ 60              	130             	170             	600         	8           	120         	0           	OPEN  	;
+ 62              	160             	140             	600         	8           	120         	0           	OPEN  	;
+ 64              	170             	140             	12000       	8           	120         	0           	OPEN  	;
+ 66              	50              	140             	12000       	8           	120         	0           	OPEN  	;
+ 68              	140             	115             	6000        	12          	130         	0           	OPEN  	;
+ 70              	140             	75              	6000        	12          	130         	0           	OPEN  	;
+ 72              	115             	75              	6000        	12          	130         	0           	OPEN  	;
+ 74              	50              	55              	6000        	12          	130         	0           	OPEN  	;
+ 76              	55              	75              	6000        	12          	130         	0           	OPEN  	;
+ 78              	60              	65              	100         	12          	120         	0           	OPEN  	;
+ 80              	165             	160             	100         	12          	120         	0           	OPEN  	;
+
+[PUMPS]
+;ID              	Node1           	Node2           	Parameters
+ 82              	10              	20              	HEAD 1	;
+
+[VALVES]
+;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss   
+
+[TAGS]
+
+[DEMANDS]
+;Junction        	Demand      	Pattern         	Category
+
+[STATUS]
+;ID              	Status/Setting
+
+[PATTERNS]
+;ID              	Multipliers
+;Demand Pattern
+ 1               	0.7         	0.6         	1.2         	1.3         	1.2         	1.1         
+ 1               	1           	0.9         
+
+[CURVES]
+;ID              	X-Value     	Y-Value
+;PUMP: PUMP:  Pump Curve for Pump 9
+ 1               	0           	300         
+ 1               	2000        	292         
+ 1               	4000        	270         
+ 1               	6000        	230         
+ 1               	8000        	181         
+;EFFICIENCY: ID Flow efficiency
+ E1              	0           	0           
+ E1              	2000        	50          
+ E1              	4000        	65          
+ E1              	6000        	55          
+ E1              	8000        	40          
+
+[CONTROLS]
+
+[RULES]
+
+[ENERGY]
+ Global Efficiency  	65
+ Global Price       	0.0
+ Demand Charge      	0.0
+ Pump 	82              	Efficiency	E1
+
+[EMITTERS]
+;Junction        	Coefficient
+
+[QUALITY]
+;Node            	InitQual
+
+[SOURCES]
+;Node            	Type        	Quality     	Pattern
+
+[REACTIONS]
+;Type     	Pipe/Tank       	Coefficient
+
+
+[REACTIONS]
+ Order Bulk            	1
+ Order Tank            	1
+ Order Wall            	1
+ Global Bulk           	0
+ Global Wall           	0
+ Limiting Potential    	0
+ Roughness Correlation 	0
+
+[MIXING]
+;Tank            	Model
+
+[TIMES]
+ Duration           	24:00 
+ Hydraulic Timestep 	3:00 
+ Quality Timestep   	0:05 
+ Pattern Timestep   	3:00 
+ Pattern Start      	0:00 
+ Report Timestep    	3:00 
+ Report Start       	0:00 
+ Start ClockTime    	12 am
+ Statistic          	NONE
+
+[REPORT]
+ Status             	Yes
+ Summary            	No
+ Page               	0
+
+[OPTIONS]
+ Units              	GPM
+ Headloss           	H-W
+ Specific Gravity   	1.0
+ Viscosity          	1.0
+ Trials             	40
+ Accuracy           	0.001
+ CHECKFREQ          	2
+ MAXCHECK           	10
+ DAMPLIMIT          	0
+ Unbalanced         	Continue 10
+ Pattern            	1
+ Demand Multiplier  	1.0
+ Emitter Exponent   	0.5
+ Quality            	Chlorine mg/L
+ Diffusivity        	1.0
+ Tolerance          	0.01
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ 20              	6391.60         	4257.81         
+ 30              	6723.63         	6181.64         
+ 40              	5327.15         	7500.00         
+ 50              	3959.96         	7050.78         
+ 55              	3081.05         	7431.64         
+ 60              	5366.21         	6044.92         
+ 70              	5473.63         	4931.64         
+ 75              	2270.51         	7089.84         
+ 80              	4340.82         	6230.47         
+ 90              	4838.87         	5410.16         
+ 100             	4428.71         	4765.63         
+ 110             	4125.98         	3945.31         
+ 115             	1655.27         	6787.11         
+ 120             	3413.09         	3281.25         
+ 130             	2055.66         	3896.48         
+ 140             	2124.02         	6015.63         
+ 150             	3891.60         	5566.41         
+ 160             	2895.51         	4765.63         
+ 170             	825.20          	5126.95         
+ 10              	7241.21         	3750.00         
+ 65              	5297.85         	6367.19         
+ 165             	2377.93         	4892.58         
+
+[VERTICES]
+;Link            	X-Coord         	Y-Coord
+ 62              	2133.79         	6064.45         
+ 80              	2807.62         	4755.86         
+
+[LABELS]
+;X-Coord           Y-Coord          Label & Anchor Node
+
+[BACKDROP]
+ DIMENSIONS     	0.00            	0.00            	10000.00        	10000.00        
+ UNITS          	None
+ FILE           	
+ OFFSET         	0.00            	0.00            
+
+[END]

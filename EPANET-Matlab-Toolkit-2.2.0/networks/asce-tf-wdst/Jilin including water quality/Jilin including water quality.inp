@@ -1,0 +1,233 @@
+[TITLE]
+
+
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern         
+ 1               	25          	24.510000   	                	;
+ 2               	25          	34.730000   	                	;
+ 3               	25          	58.810000   	                	;
+ 4               	25          	77.970000   	                	;
+ 5               	25          	17.120000   	                	;
+ 6               	25          	31.010000   	                	;
+ 7               	25          	30.670000   	                	;
+ 8               	25          	25.580000   	                	;
+ 9               	25          	15.470000   	                	;
+ 10              	25          	30.890000   	                	;
+ 11              	25          	34.590000   	                	;
+ 12              	25          	96.220000   	                	;
+ 13              	25          	29.690000   	                	;
+ 14              	25          	38.230000   	                	;
+ 15              	25          	98.640000   	                	;
+ 16              	25          	68.230000   	                	;
+ 17              	25          	34.760000   	                	;
+ 18              	25          	86.730000   	                	;
+ 19              	25          	47.110000   	                	;
+ 20              	25          	72.680000   	                	;
+ 21              	25          	92.700000   	                	;
+ 22              	25          	57.360000   	                	;
+ 23              	25          	4.640000    	                	;
+ 24              	25          	18.260000   	                	;
+ 25              	25          	47.860000   	                	;
+ 26              	25          	0.000000    	                	;
+ 27              	25          	105.320000  	                	;
+
+[RESERVOIRS]
+;ID              	Head        	Pattern         
+ 28              	50          	                	;
+
+[TANKS]
+;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
+
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ 1               	3               	2               	478.0000    	150        	130.0000    	0.0000      	Open  	;
+ 2               	3               	1               	830.0000    	150        	130.0000    	0.0000      	Open  	;
+ 3               	4               	3               	1030.0000   	250        	130.0000    	0.0000      	Open  	;
+ 4               	25              	11              	679.0000    	150         	130.0000    	0.0000      	Open  	;
+ 5               	6               	17              	830.0000    	150        	130.0000    	0.0000      	Open  	;
+ 6               	26              	6               	508.0000    	200        	130.0000    	0.0000      	Open  	;
+ 7               	26              	4               	1416.0000   	300        	130.0000    	0.0000      	Open  	;
+ 8               	2               	8               	593.0000    	150        	130.0000    	0.0000      	Open  	;
+ 9               	3               	9               	553.0000    	150        	130.0000    	0.0000      	Open  	;
+ 10              	8               	7               	505.0000    	150        	130.0000    	0.0000      	Open  	;
+ 11              	9               	8               	454.0000    	150        	130.0000    	0.0000      	Open  	;
+ 12              	17              	11              	1095.0000   	150         	130.0000    	0.0000      	Open  	;
+ 13              	9               	10              	392.0000    	150        	130.0000    	0.0000      	Open  	;
+ 14              	12              	10              	1124.0000   	150        	130.0000    	0.0000      	Open  	;
+ 15              	15              	16              	1025.0000   	200        	130.0000    	0.0000      	Open  	;
+ 16              	12              	15              	1125.0000   	450        	130.0000    	0.0000      	Open  	;
+ 17              	14              	15              	1003.0000   	150        	130.0000    	0.0000      	Open  	;
+ 18              	13              	14              	954.0000    	200        	130.0000    	0.0000      	Open  	;
+ 19              	13              	12              	1200.0000   	500        	130.0000    	0.0000      	Open  	;
+ 20              	26              	13              	435.0000    	400        	130.0000    	0.0000      	Open  	;
+ 21              	20              	19              	543.0000    	300        	130.0000    	0.0000      	Open  	;
+ 22              	27              	20              	740.0000    	250        	130.0000    	0.0000      	Open  	;
+ 23              	21              	20              	988.0000    	400        	130.0000    	0.0000      	Open  	;
+ 24              	15              	21              	1859.0000   	400        	130.0000    	0.0000      	Open  	;
+ 25              	22              	21              	405.0000    	150        	130.0000    	0.0000      	Open  	;
+ 26              	19              	18              	467.0000    	300        	130.0000    	0.0000      	Open  	;
+ 27              	6               	23              	543.0000    	150        	130.0000    	0.0000      	Open  	;
+ 28              	23              	24              	721.0000    	150        	130.0000    	0.0000      	Open  	;
+ 29              	24              	25              	882.0000    	150        	130.0000    	0.0000      	Open  	;
+ 30              	6               	25              	966.0000    	150        	130.0000    	0.0000      	Open  	;
+ 31              	25              	5               	635.0000    	150         	130.0000    	0.0000      	Open  	;
+ 32              	26              	28              	2013.0000   	700        	130.0000    	0.0000      	Open  	;
+ 33              	22              	14              	1000        	150        	130.0000    	0           	Open  	;
+ 34              	27              	16              	1000        	150        	130.0000    	0           	Open  	;
+
+[PUMPS]
+;ID              	Node1           	Node2           	Parameters
+
+[VALVES]
+;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss   
+
+[TAGS]
+
+[DEMANDS]
+;Junction        	Demand      	Pattern         	Category
+
+[STATUS]
+;ID              	Status/Setting
+
+[PATTERNS]
+;ID              	Multipliers
+;
+ 1               	0.51        	0.53        	0.55        	0.6         	0.65        	0.7         
+ 1               	0.9         	1.0         	0.7         	0.6         	0.65        	0.7         
+ 1               	0.75        	0.6         	0.65        	0.7         	0.8         	1.0         
+ 1               	1.2         	1.1         	1.05        	0.9         	0.8         	0.6         
+
+[CURVES]
+;ID              	X-Value     	Y-Value
+;PUMP: 
+
+[CONTROLS]
+
+
+
+
+
+
+
+
+[RULES]
+
+
+
+
+
+
+
+
+
+
+
+[ENERGY]
+ Global Efficiency  	75.0000
+ Global Price       	0
+ Demand Charge      	0.0000
+
+[EMITTERS]
+;Junction        	Coefficient
+
+[QUALITY]
+;Node            	InitQual
+ 28              	2.5
+
+[SOURCES]
+;Node            	Type        	Quality     	Pattern
+
+[REACTIONS]
+;Type     	Pipe/Tank       	Coefficient
+
+
+[REACTIONS]
+ Order Bulk            	1.00
+ Order Tank            	1.00
+ Order Wall            	1
+ Global Bulk           	-1
+ Global Wall           	0.000000
+ Limiting Potential    	0
+ Roughness Correlation 	0
+
+[MIXING]
+;Tank            	Model
+
+[TIMES]
+ Duration           	96
+ Hydraulic Timestep 	1:00 
+ Quality Timestep   	0:05 
+ Pattern Timestep   	1:00 
+ Pattern Start      	0:00 
+ Report Timestep    	1:00 
+ Report Start       	0:00 
+ Start ClockTime    	0:00:00
+ Statistic          	NONE
+
+[REPORT]
+ Status             	No
+ Summary            	No
+ Page               	0
+
+[OPTIONS]
+ Units              	LPS
+ Headloss           	H-W
+ Specific Gravity   	1.000000
+ Viscosity          	1.000000
+ Trials             	40
+ Accuracy           	0.00100000
+ CHECKFREQ          	2
+ MAXCHECK           	10
+ DAMPLIMIT          	0.00000000
+ Unbalanced         	Continue 10
+ Pattern            	1
+ Demand Multiplier  	0.3
+ Emitter Exponent   	0.5000
+ Quality            	Chlorine mg/L
+ Diffusivity        	1.000000
+ Tolerance          	0.01000000
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ 1               	332.11          	317.58          
+ 2               	291.57          	292.63          
+ 3               	290.22          	316.73          
+ 4               	290.06          	368.75          
+ 5               	346.87          	502.89          
+ 6               	295.89          	442.30          
+ 7               	259.77          	266.66          
+ 8               	261.60          	292.09          
+ 9               	262.36          	315.02          
+ 10              	242.59          	313.78          
+ 11              	354.56          	454.97          
+ 12              	249.72          	368.97          
+ 13              	250.02          	429.56          
+ 14              	203.54          	435.76          
+ 15              	196.24          	386.70          
+ 16              	187.69          	336.72          
+ 17              	322.45          	410.33          
+ 18              	59.45           	322.65          
+ 19              	82.54           	319.91          
+ 20              	88.54           	346.64          
+ 21              	105.55          	393.56          
+ 22              	115.69          	411.30          
+ 23              	281.16          	465.16          
+ 24              	289.69          	499.27          
+ 25              	328.15          	476.82          
+ 26              	270.87          	436.51          
+ 27              	124.22          	337.66          
+ 28              	211.02          	530.70          
+
+[VERTICES]
+;Link            	X-Coord         	Y-Coord
+
+[LABELS]
+;X-Coord           Y-Coord          Label & Anchor Node
+
+[BACKDROP]
+ DIMENSIONS     	0.00            	0.00            	10000.00        	10000.00        
+ UNITS          	None
+ FILE           	
+ OFFSET         	0.00            	0.00            
+
+[END]

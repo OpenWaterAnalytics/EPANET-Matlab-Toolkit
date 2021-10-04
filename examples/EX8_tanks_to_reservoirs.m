@@ -1,18 +1,27 @@
-%% Replace tanks with reservoirs
-function tanks_to_reservoirs()
+%% Replace tanks with reservoirs using bin functions
+% This example contains:
+%   Choose Network.
+%   Load network and simulate.
+%   Find tank patterns.
+%   Create patterns for new reservoirs from tanks.
+%   Replace tanks with reservoirs.
+%   Unload library.
+
+%%
+function EX8_tanks_to_reservoirs()
 %Clear 
 clear; close('all'); clc;
 start_toolkit;
 
-% Choose Network
+% Choose Network.
 inpname = 'Net1.inp';
 
-% Load network and simulate
+% Load network and simulate.
 d = epanet('Net1.inp');
 res = d.getComputedTimeSeries;
 H = res.Head;
 
-% Find tank patterns:
+% Find tank patterns.
 tank_index = d.getNodeTankIndex;
 if isempty(tank_index)
     disp('No tanks in network. Please Choose other network.');
@@ -20,7 +29,7 @@ if isempty(tank_index)
 end
 tankPat = H(:, tank_index);
 
-% Create patterns for new reservoirs from tanks
+% Create patterns for new reservoirs from tanks.
 tankPatInd=0;
 for i = tank_index
     tankPatInd = tankPatInd +1;
@@ -28,7 +37,7 @@ for i = tank_index
 end
 d.BinUpdateClass;
 
-% Replace tanks with reservoirs
+% Replace tanks with reservoirs.
 i = 1;
 new_id = {};
 for tank_i = tank_index
@@ -48,7 +57,7 @@ d.plot;
 %filename=['new_',inpname];
 %d.saveInputFile(filename);
 
-% Unload library
+% Unload library.
 d.unload
 
 end
@@ -99,11 +108,12 @@ function d = replace_tanks_with_reservoirs(d, tank_index, new_id)
     newDiameter=linkDiameters(1); 
     newRoughness=linkRoughness(1);
     Code=linkType{1};
-    d.addBinReservoir(new_id,X,Y,newElevation,newPipeID,...
-    ToNodeID,newLength,newDiameter,newRoughness,Code);
+    
+    node_index = d.addBinNodeReservoir(new_id, [X,Y], newElevation, '',0, ... 
+    {Code, {newPipeID}, new_id, ToNodeID, newLength, newDiameter, newRoughness});
 
     for i=2:length(pipes_conn_on_tanks)
-        d.addBinPipe(linkID{i},new_id,toNodeID{i},linklengths(i),linkDiameters(i),linkRoughness(i));
+        d.addBinLinkPipe(linkID{i},new_id,toNodeID{i},linklengths(i),linkDiameters(i),linkRoughness(i));
     end
     
     d.setLinkStatus(status);

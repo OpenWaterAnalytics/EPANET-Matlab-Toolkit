@@ -1,0 +1,6 @@
+Balerma
+No. of Pipes: 454
+No. of Nodes: 443
+No. of Reservoirs: 4
+No. of Tanks: 0
+Total system demand (average daily demand summed over all nodes): 9.54E+4 m3

@@ -1,0 +1,7 @@
+Jilin
+No. of Pipes: 34
+No. of Nodes: 27
+No. of Reservoirs: 1
+No. of Tanks: 0
+Total system demand (average daily demand summed over all nodes): 2.52E+4 m3
+
