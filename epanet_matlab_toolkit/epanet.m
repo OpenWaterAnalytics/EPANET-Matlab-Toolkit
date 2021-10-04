@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0-gamma.2'; % 25/08/2021
+        classversion='v2.2.0-gamma.3'; % 04/10/2021
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE','LINK','SYSTEM' % EPANET Version 2.2
@@ -538,9 +538,6 @@ classdef epanet <handle
             if length(extra) == 2
                 indices = value;
                 categ = extra{1};
-%                 if extra{1} > 1
-%                     return
-%                 end
                 param = extra{2};
             elseif length(extra) == 1
                 indices = value;
@@ -548,18 +545,27 @@ classdef epanet <handle
             elseif isempty(extra)
                 indices = getNodeJunctionIndices(obj,[]);
                 param = value;
-                if iscell(value)
-                    param = value{1};
+                if iscell(param)
+                    categ = length(param);
                 end
             end
-            j = 1;
-            for i = indices
-                if ~ismember(i, obj.getNodeReservoirIndex) && sum(strcmp(obj.libFunctions, fun))
-                    [obj.Errcode] = eval([fun, '(indices(i), categ, param(j), obj.LibEPANET)']);
-                else
-                    [obj.Errcode] = ENsetnodevalue(i, propertie, param(j), obj.LibEPANET);
+            for c=1:categ
+                if isempty(extra) && iscell(value)
+                    param = value{c};
                 end
-                j=j+1;
+                j = 1;
+                for i = indices
+                    if ~ismember(i, obj.getNodeReservoirIndex) && sum(strcmp(obj.libFunctions, fun))
+                        if c > obj.getNodeDemandCategoriesNumber(i)
+                            obj.addNodeJunctionDemand(i, param(j));
+                        else
+                            [obj.Errcode] = eval([fun, '(i, c, param(j), obj.LibEPANET)']);
+                        end
+                    else
+                        [obj.Errcode] = ENsetnodevalue(i, propertie, param(j), obj.LibEPANET);
+                    end
+                    j=j+1;
+                end
             end
         end
         function value = get_node_tank_mixining_model(obj, varargin)
