@@ -580,7 +580,8 @@ classdef epanet <handle
                 index = obj.getLinkIndex(id);
             end
         end
- 
+    end
+    methods(Static)
         function [Errcode] = ENwriteline(line, LibEPANET)
             [Errcode]=calllib(LibEPANET, 'ENwriteline', line);
         end
@@ -5237,7 +5238,7 @@ classdef epanet <handle
             %
             % See also getPattern, setPattern, setPatternNameID
             %          setPatternValue, setPatternComment.
-            [obj.Errcode] = ENaddpattern(varargin{1}, obj.LibEPANET);
+            [obj.Errcode] = obj.ENaddpattern(varargin{1}, obj.LibEPANET);
             index = getPatternIndex(obj, varargin{1});
             if nargin==2
                 setPattern(obj, index, ones(1, max(obj.getPatternLengths)));
@@ -8621,7 +8622,7 @@ classdef epanet <handle
             %   d.closeNetwork
             %
             % See also loadEPANETFile, closeHydraulicAnalysis, closeQualityAnalysis.
-            [obj.Errcode] = ENclose(obj.LibEPANET);
+            [obj.Errcode] = obj.ENclose(obj.LibEPANET);
         end
         function closeHydraulicAnalysis(obj)
             % Closes the hydraulic analysis system, freeing all allocated memory.
@@ -8632,7 +8633,7 @@ classdef epanet <handle
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also openHydraulicAnalysis, saveHydraulicFile, closeQualityAnalysis.
-            [obj.Errcode] = ENcloseH(obj.LibEPANET);
+            [obj.Errcode] = obj.ENcloseH(obj.LibEPANET);
         end
         function closeQualityAnalysis(obj)
             % Closes the water quality analysis system, freeing all allocated memory.
@@ -8866,7 +8867,7 @@ classdef epanet <handle
             %   d.writeLineInReportFile(line)
             %
             % See also writeReport, copyReport.
-            [obj.Errcode] = ENwriteline (line, obj.LibEPANET);
+            [obj.Errcode] = obj.ENwriteline(line, obj.LibEPANET);
         end
         function writeReport(obj)
             % Writes a formatted text report on simulation results to the Report file.
