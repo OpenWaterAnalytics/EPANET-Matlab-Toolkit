@@ -580,6 +580,19 @@ classdef epanet <handle
                 index = obj.getLinkIndex(id);
             end
         end
+ 
+        function [Errcode] = ENwriteline(line, LibEPANET)
+            [Errcode]=calllib(LibEPANET, 'ENwriteline', line);
+        end
+        function [Errcode] = ENaddpattern(patid, LibEPANET)
+            Errcode=calllib(LibEPANET, 'ENaddpattern', patid);
+        end
+        function [Errcode] = ENclose(LibEPANET)
+            [Errcode]=calllib(LibEPANET, 'ENclose');
+        end
+        function [Errcode] = ENcloseH(LibEPANET)
+            [Errcode]=calllib(LibEPANET, 'ENcloseH');
+        end
     end
     methods
         function obj = epanet(varargin)
@@ -13640,18 +13653,7 @@ classdef epanet <handle
         end
     end
 end
-function [Errcode] = ENwriteline (line, LibEPANET)
-[Errcode]=calllib(LibEPANET, 'ENwriteline', line);
-end
-function [Errcode] = ENaddpattern(patid, LibEPANET)
-Errcode=calllib(LibEPANET, 'ENaddpattern', patid);
-end
-function [Errcode] = ENclose(LibEPANET)
-[Errcode]=calllib(LibEPANET, 'ENclose');
-end
-function [Errcode] = ENcloseH(LibEPANET)
-[Errcode]=calllib(LibEPANET, 'ENcloseH');
-end
+
 function [Errcode, value] = ENgetnodevalue(index, paramcode, LibEPANET)
 value=single(0);
 index=int32(index);
