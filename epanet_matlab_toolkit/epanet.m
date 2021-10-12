@@ -628,7 +628,8 @@ classdef epanet <handle
             e=0; errmsg='';
             if Errcode[e, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
             if e, [e, errmsg] = calllib(LibEPANET, 'ENgeterror', e, char(32*ones(1, 79)), 79); end
-        end end
+        end
+        end
         function [Errcode, flowunitsindex] = ENgetflowunits(LibEPANET)
             [Errcode, flowunitsindex]=calllib(LibEPANET, 'ENgetflowunits', 0);
         end
