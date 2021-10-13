@@ -514,7 +514,7 @@ classdef epanet <handle
                 value = zeros(1, length(indices));
                 j = 1;
                 for i=indices
-                    [obj.Errcode, value(j)] = eval([fun, '(i, propertie, obj.LibEPANET)']);
+                    [obj.Errcode, value(j)] = eval(['obj.',fun, '(i, propertie, obj.LibEPANET)']);
                     j=j+1;
                 end
             else
@@ -599,14 +599,6 @@ classdef epanet <handle
             %epanet20100
             [Errcode, value]=calllib(LibEPANET, 'ENgetbasedemand', index, numdemands, 0);
         end
-        function [Errcode, value] = ENgetnodevalue(index, paramcode, LibEPANET)
-            value=single(0);
-            index=int32(index);
-            paramcode=int32(paramcode);
-            [Errcode, value]=calllib(LibEPANET, 'ENgetnodevalue', index, paramcode, value);
-            if Errcode==240, value=NaN; end
-            value = double(value);
-        end
         function [Errcode] = ENsetlinkid(index, newid, LibEPANET)
             % EPANET Version 2.2
             [Errcode]=calllib(LibEPANET, 'ENsetlinkid', index, newid);
@@ -640,7 +632,7 @@ classdef epanet <handle
             e=0; errmsg='';
             if Errcode[e, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
             if e, [e, errmsg] = calllib(LibEPANET, 'ENgeterror', e, char(32*ones(1, 79)), 79); end
-        end
+            end
         end
         function [Errcode, flowunitsindex] = ENgetflowunits(LibEPANET)
             [Errcode, flowunitsindex]=calllib(LibEPANET, 'ENgetflowunits', 0);
@@ -1118,6 +1110,15 @@ classdef epanet <handle
           % end
         function [Errcode] = ENsetflowunits(LibEPANET, code)
           [Errcode]=calllib(LibEPANET, 'ENsetflowunits', code);
+        end
+
+        function [Errcode, value] = ENgetnodevalue(index, paramcode, LibEPANET)
+            value=single(0);
+            index=int32(index);
+            paramcode=int32(paramcode);
+            [Errcode, value]=calllib(LibEPANET, 'ENgetnodevalue', index, paramcode, value);
+            if Errcode==240, value=NaN; end
+            value = double(value);
         end
 
     end
@@ -14180,6 +14181,7 @@ classdef epanet <handle
         end
     end
 end
+
 
 function [obj] = MSXMatlabSetup(obj, msxname, varargin)
   arch = computer('arch');
