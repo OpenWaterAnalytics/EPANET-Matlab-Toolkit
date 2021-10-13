@@ -580,6 +580,7 @@ classdef epanet <handle
                 index = obj.getLinkIndex(id);
             end
         end
+
     end
     methods(Static)
         function [Errcode] = ENwriteline(line, LibEPANET)
@@ -2322,7 +2323,7 @@ classdef epanet <handle
             end
             j=1;
             for i=1:length(index)
-                [Errcode, value{j}] = obj.obj.ENgetruleID(index(i), obj.LibEPANET);
+                [Errcode, value{j}] = obj.ENgetruleID(index(i), obj.LibEPANET);
                 error(obj.getError(Errcode));
                 j=j+1;
             end
@@ -4849,7 +4850,7 @@ classdef epanet <handle
                 id={id};
             end
             for i=1:length(index)
-                [obj.Errcode] = obj.obj.ENsetpatternid(index(i), id{i}, obj.LibEPANET);
+                [obj.Errcode] = obj.ENsetpatternid(index(i), id{i}, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
             end
         end
@@ -4902,7 +4903,7 @@ classdef epanet <handle
                 id ={id};
             end
             for i=1:length(index)
-                [obj.Errcode] = obj.obj.ENsetcurveid(index(i), id{i}, obj.LibEPANET);
+                [obj.Errcode] = obj.ENsetcurveid(index(i), id{i}, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
             end
         end
@@ -6089,7 +6090,7 @@ classdef epanet <handle
             %   d.getPattern
             %
             % See also getPattern, setPattern, setPatternNameID
-            %          setPatternValue, setPatternComment.
+                %          setPatternValue, setPatternComment.
             [obj.Errcode] = obj.ENaddpattern(varargin{1}, obj.LibEPANET);
             index = getPatternIndex(obj, varargin{1});
             if nargin==2
