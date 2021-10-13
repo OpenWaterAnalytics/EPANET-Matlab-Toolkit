@@ -595,7 +595,7 @@ classdef epanet <handle
             [Errcode]=calllib(LibEPANET, 'ENcloseH');
         end
         function [Errcode, value] = ENgetbasedemand(index, numdemands, LibEPANET)
-            %epanet20100
+            % EPANET 20100
             [Errcode, value]=calllib(LibEPANET, 'ENgetbasedemand', index, numdemands, 0);
         end
         function [Errcode] = ENsetlinkid(index, newid, LibEPANET)
@@ -603,11 +603,11 @@ classdef epanet <handle
             [Errcode]=calllib(LibEPANET, 'ENsetlinkid', index, newid);
         end
         function [Errcode, value] = ENgetnumdemands(index, LibEPANET)
-            %epanet20100
+            % EPANET 20100
             [Errcode, value]=calllib(LibEPANET, 'ENgetnumdemands', index, 0);
         end
         function [Errcode, value] = ENgetdemandpattern(index, numdemands, LibEPANET)
-            %epanet20100
+            % EPANET 20100
             [Errcode, value]=calllib(LibEPANET, 'ENgetdemandpattern', index, numdemands, 0);
         end
         function [Errcode] = ENcloseQ(LibEPANET)
@@ -618,7 +618,7 @@ classdef epanet <handle
             [Errcode, ~, demandIndex]=calllib(LibEPANET, 'ENgetdemandindex', nodeindex, demandName, 0);
         end
         function [Errcode, value] = ENgetstatistic(code, LibEPANET)
-            %epanet20100
+            % EPANET 20100
             [Errcode, value]=calllib(LibEPANET, ' ENgetstatistic', code, 0);
         end
         function [Errcode, ctype, lindex, setting, nindex, level] = ENgetcontrol(cindex, LibEPANET)
