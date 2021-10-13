@@ -580,7 +580,6 @@ classdef epanet <handle
                 index = obj.getLinkIndex(id);
             end
         end
-
     end
     methods(Static)
         function [Errcode] = ENwriteline(line, LibEPANET)
@@ -6090,7 +6089,7 @@ classdef epanet <handle
             %   d.getPattern
             %
             % See also getPattern, setPattern, setPatternNameID
-                %          setPatternValue, setPatternComment.
+            %          setPatternValue, setPatternComment.
             [obj.Errcode] = obj.ENaddpattern(varargin{1}, obj.LibEPANET);
             index = getPatternIndex(obj, varargin{1});
             if nargin==2
