@@ -962,14 +962,14 @@ classdef epanet <handle
                 %       'BestOutside'        least unused space outside plot
             % 'uifigure': app.UIFigure
             % Example:
-            %   d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},
+            %   d.plot('nodes','yes','links','yes','highlightnode',{'10','11'},...
 %             'highlightlink',{'10'},'fontsize',8);
             %   d.plot('line','no');
             %   d.plot('point','no','linksindex','yes');
             %   d.plot('linksindex','yes','fontsize',8);
             %   d.plot('nodesindex','yes','fontsize',14);
             %   f=figure()
-            %   d.plot('axes', h) % d.plot('axes', handles.axes) #gui
+            %   d.plot('axes', f) % d.plot('axes', handles.axes) #gui
             %   d.plot('legend','hide')
             %   d.plot('legendposition','northwest')
             %   d = epanet('Net1.inp');
