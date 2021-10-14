@@ -684,11 +684,11 @@ classdef epanet <handle
             id=char(32*ones(1, 31));
             [Errcode, id]=calllib(LibEPANET, 'ENgetcurveid', index, id);
         end
-        function [Errcode] = obj.ENsetcurveid(index, id, LibEPANET)
+        function [Errcode] = ENsetcurveid(index, id, LibEPANET)
             % EPANET Version 2.2
             [Errcode,~]=calllib(LibEPANET, 'ENsetcurveid', index,id);
         end
-        function [Errcode] = obj.ENsetpatternid(index, id, LibEPANET)
+        function [Errcode] = ENsetpatternid(index, id, LibEPANET)
             % EPANET Version 2.2
             [Errcode,~]=calllib(LibEPANET, 'ENsetpatternid', index,id);
         end
@@ -868,7 +868,7 @@ classdef epanet <handle
             % EPANET Version 2.2
             [Errcode]=calllib(LibEPANET, 'ENsetpremisevalue', ruleIndex, premiseIndex, value);
         end
-        function [Errcode, id] = obj.ENgetruleID(index, LibEPANET)
+        function [Errcode, id] = ENgetruleID(index, LibEPANET)
             % EPANET Version 2.2
             [Errcode, id]=calllib(LibEPANET, 'obj.ENgetruleID', index,'');
         end
