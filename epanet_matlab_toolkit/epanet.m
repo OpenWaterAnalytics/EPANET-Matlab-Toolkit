@@ -16037,7 +16037,7 @@ classdef epanet <handle
                end
                fprintf(f, '\n[END]');
         end
-        function [node_index, link_index] = obj.addBinNodeJunction(obj, nodeID, varargin)
+        function [node_index, link_index] = addBinNodeJunction(obj, nodeID, varargin)
             % Adds a new junction with a pipe/pump/valve to the network.
             %
             % Example 1: Add junction with pipe
@@ -16107,7 +16107,7 @@ classdef epanet <handle
                 end
             end
         end
-        function [node_index, link_index] = obj.addBinNodeReservoir(obj, nodeID, varargin)
+        function [node_index, link_index] = addBinNodeReservoir(obj, nodeID, varargin)
             % Adds a new reservoir to the network.
             %
             % Example 1:
@@ -16186,7 +16186,7 @@ classdef epanet <handle
                 end
              end
         end
-        function [node_index, link_index] = obj.addBinNodeTank(obj, nodeID, varargin)
+        function [node_index, link_index] = addBinNodeTank(obj, nodeID, varargin)
             % Adds a new tank to the network.
             %
             % Example 1:
@@ -16321,7 +16321,7 @@ classdef epanet <handle
                 end
             end
         end
-        function [link_index] = obj.addBinLinkPipe(obj, linkID, from, to, varargin)
+        function [link_index] = addBinLinkPipe(obj, linkID, from, to, varargin)
             % Adds a new pipe to the nework.
             %
             % The default values are:
@@ -16402,7 +16402,7 @@ classdef epanet <handle
             end
             link_index = obj.addBinLink(obj, 'PIPE', linkID, from, to, lengthp, diameter, roughness, minorloss, status);
         end
-        function [link_index] = obj.addBinLinkPump(obj, linkID, from, to, varargin)
+        function [link_index] = addBinLinkPump(obj, linkID, from, to, varargin)
             % Adds a new pump to the network.
             %
             % If no propertie is given, the default value is 'SPEED 1.0'.
@@ -16441,7 +16441,7 @@ classdef epanet <handle
             end
             link_index = obj.addBinLink(obj, 'PUMP', linkID, from, to, propertie);
         end
-        function [link_index] = obj.addBinLinkValve(obj, linkID, from, to, varargin)
+        function [link_index] = addBinLinkValve(obj, linkID, from, to, varargin)
             % Adds a new valve to the network.
             %
             % % If no properties are given, the default values are:
@@ -17809,7 +17809,7 @@ classdef epanet <handle
                 end
             end
         end
-        function obj.addBinLinkVertices(obj, linkID, x, y)
+        function addBinLinkVertices(obj, linkID, x, y)
             % Adds interior vertex points to network links.
             %
             % % The examples are based on d=epanet('NET1.inp');
