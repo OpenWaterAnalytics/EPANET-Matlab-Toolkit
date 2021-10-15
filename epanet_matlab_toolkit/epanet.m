@@ -9515,7 +9515,7 @@ classdef epanet <handle
                 value(i, nodesIndOk) = 1;
             end
         end
-        function valueIndex = obj.addCurve(obj, varargin)
+        function valueIndex = addCurve(obj, varargin)
             % Adds a new curve appended to the end of the existing curves. (EPANET Version 2.1)
             % Returns the new curve's index.
             %
