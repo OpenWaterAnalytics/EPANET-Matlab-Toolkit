@@ -7439,7 +7439,7 @@ classdef epanet <handle
             error(obj.getError(obj.Errcode));
             value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
         end
-        function categoryIndex = obj.addNodeJunctionDemand(obj, varargin)
+        function categoryIndex = addNodeJunctionDemand(obj, varargin)
             % Adds a new demand to a junction given the junction index, base demand, demand time pattern and demand category name. (EPANET Version 2.2)
             % Returns the values of the new demand category index.
             % A blank string can be used for demand time pattern and demand name category to indicate
@@ -10100,7 +10100,7 @@ classdef epanet <handle
                 setPattern(obj, index, varargin{2});
             end
         end
-        function index = obj.addNodeJunction(obj, juncID, varargin)
+        function index = addNodeJunction(obj, juncID, varargin)
             % Adds a new junction.
             % Returns the index of the new junction.
             %
@@ -10175,7 +10175,7 @@ classdef epanet <handle
             obj.setNodeCoordinates(index, [xy(1),xy(2)]);
             obj.setNodeJunctionData(index, elev, dmnd, dmndpat);
         end
-        function index = obj.addNodeReservoir(obj, resID, varargin)
+        function index = addNodeReservoir(obj, resID, varargin)
             % Adds a new reservoir.
             % Returns the index of the new reservoir.
             %
@@ -10201,7 +10201,7 @@ classdef epanet <handle
             index = obj.ENaddnode(obj, resID, obj.ToolkitConstants.EN_RESERVOIR);
             obj.setNodeCoordinates(index,[xy(1),xy(2)]);
         end
-        function index = obj.addNodeTank(obj, tankID, varargin)
+        function index = addNodeTank(obj, tankID, varargin)
             % Adds a new tank.
             % Returns the index of the new tank.
             %
@@ -10287,7 +10287,7 @@ classdef epanet <handle
             end
             obj.setNodeTankData(index, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
         end
-        function index = obj.addLinkPipeCV(obj, cvpipeID, fromNode, toNode, varargin)
+        function index = addLinkPipeCV(obj, cvpipeID, fromNode, toNode, varargin)
             % Adds a new control valve pipe.
             % Returns the index of the new control valve pipe.
             %
@@ -10363,7 +10363,7 @@ classdef epanet <handle
                 obj.setLinkMinorLossCoeff(index, varargin{4});
             end
         end
-        function index = obj.addLinkPipe(obj, pipeID, fromNode, toNode, varargin)
+        function index = addLinkPipe(obj, pipeID, fromNode, toNode, varargin)
             % Adds a new pipe.
             % Returns the index of the new pipe.
             %
@@ -10439,7 +10439,7 @@ classdef epanet <handle
                 obj.setLinkMinorLossCoeff(index, varargin{4});
             end
         end
-        function index = obj.addLinkPump(obj, pumpID, fromNode, toNode, varargin)
+        function index = addLinkPump(obj, pumpID, fromNode, toNode, varargin)
             % Adds a new pump.
             % Returns the index of the new pump.
             %
@@ -10513,7 +10513,7 @@ classdef epanet <handle
                 obj.setLinkPumpPatternIndex(index, varargin{4});
             end
         end
-        function index = obj.addLinkValve(obj, vID, fromNode, toNode, varargin)
+        function index = addLinkValve(obj, vID, fromNode, toNode, varargin)
             % Adds a new valve.
             % Returns the index of the new valve.
             %
@@ -10594,7 +10594,7 @@ classdef epanet <handle
                 obj.setLinkMinorLossCoeff(index, varargin{4});
             end
         end
-        function index = obj.addLinkValvePRV(obj, vID, fromNode, toNode)
+        function index = addLinkValvePRV(obj, vID, fromNode, toNode)
             % Adds a new PRV valve.
             % Returns the index of the new PRV valve.
             %
@@ -10611,7 +10611,7 @@ classdef epanet <handle
             %          obj.addLinkValvePSV, deleteLink, setLinkTypeValveFCV.
             index = obj.ENaddlink(obj, vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode);
         end
-        function index = obj.addLinkValvePSV(obj, vID, fromNode, toNode)
+        function index = addLinkValvePSV(obj, vID, fromNode, toNode)
             % Adds a new PSV valve.
             % Returns the index of the new PSV valve.
             %
@@ -10628,7 +10628,7 @@ classdef epanet <handle
             %          obj.addLinkValvePRV, deleteLink, setLinkTypeValveGPV.
             index = obj.ENaddlink(obj, vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode);
         end
-        function index = obj.addLinkValvePBV(obj, vID, fromNode, toNode)
+        function index = addLinkValvePBV(obj, vID, fromNode, toNode)
             % Adds a new PBV valve.
             % Returns the index of the new PBV valve.
             %
@@ -10645,7 +10645,7 @@ classdef epanet <handle
             %          obj.addLinkValvePRV, deleteLink, setLinkTypeValvePRV.
             index = obj.ENaddlink(obj, vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode);
         end
-        function index = obj.addLinkValveFCV(obj, vID, fromNode, toNode)
+        function index = addLinkValveFCV(obj, vID, fromNode, toNode)
             % Adds a new FCV valve.
             % Returns the index of the new FCV valve.
             %
@@ -10662,7 +10662,7 @@ classdef epanet <handle
             %          obj.addLinkValvePRV, deleteLink, setLinkTypeValveTCV.
             index = obj.ENaddlink(obj, vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode);
         end
-        function index = obj.addLinkValveTCV(obj, vID, fromNode, toNode)
+        function index = addLinkValveTCV(obj, vID, fromNode, toNode)
             % Adds a new TCV valve.
             % Returns the index of the new TCV valve.
             %
@@ -10679,7 +10679,7 @@ classdef epanet <handle
             %          obj.addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = obj.ENaddlink(obj, vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode);
         end
-        function index = obj.addLinkValveGPV(obj, vID, fromNode, toNode)
+        function index = addLinkValveGPV(obj, vID, fromNode, toNode)
             % Adds a new GPV valve.
             % Returns the index of the new GPV valve.
             %
