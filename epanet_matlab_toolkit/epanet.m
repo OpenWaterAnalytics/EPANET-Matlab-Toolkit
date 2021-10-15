@@ -464,7 +464,7 @@ classdef epanet <handle
             end
         end
         function value = get_link_info(obj, constant, varargin)
-            [indices, value] = getLinkIndices(obj, varargin);
+            [indices, value] = obj.getLinkIndices(obj, varargin);
             j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetlinkvalue(i, constant, obj.LibEPANET);
@@ -543,7 +543,7 @@ classdef epanet <handle
                 indices = value;
                 param = extra{1};
             elseif isempty(extra)
-                indices = getNodeJunctionIndices(obj,[]);
+                indices = obj.getNodeJunctionIndices(obj,[]);
                 param = value;
                 if iscell(param)
                     categ = length(param);
@@ -4577,9 +4577,39 @@ classdef epanet <handle
             end
         end
 
-
-
-
+        function indices = getIndices(cnt, varargin)
+            if isempty(varargin{1})
+                indices=1:cnt;
+            elseif isempty(varargin{1}{1})
+                indices=1:cnt;
+            else
+                indices=varargin{1}{1};
+            end
+        end
+        function indices = getControlIndices(obj, varargin)
+            indices =obj.getIndices(obj.getControlRulesCount, varargin{1});
+        end
+        function [indices, value] = getNodeIndices(obj, varargin)
+            indices =obj.getIndices(obj.getNodeCount, varargin{1});
+            value = zeros(1, length(indices));
+        end
+        function [indices, value] = getLinkIndices(obj, varargin)
+            indices =obj.getIndices(obj.getLinkCount, varargin{1});
+            value = zeros(1, length(indices));
+        end
+        function [indices, value] = getNodeJunctionIndices(obj, varargin)
+            % EPANET Version 2.2
+            indices =obj.getIndices(obj.getNodeJunctionCount, varargin{1});
+            value = zeros(1, length(indices));
+        end
+        function [indices, value] = getCurveIndices(obj, varargin)
+            indices =obj.getIndices(obj.getCurveCount, varargin{1});
+            value = zeros(1, length(indices));
+        end
+        function [indices, value] = getPatternIndices(obj, varargin)
+            indices =obj.getIndices(obj.getPatternCount, varargin{1});
+            value = zeros(1, length(indices));
+        end
 
     end
     methods(Static)
@@ -5862,7 +5892,7 @@ classdef epanet <handle
             %
             % See also setControls, addControls, deleteControls,
             %          getRules, setRules, addRules, deleteRules.
-            indices = getControlIndices(obj, varargin);j=1;
+            indices = obj.getControlIndices(obj, varargin);j=1;
             value=struct();
             obj.ControlTypes={};
             for i=indices
@@ -6762,7 +6792,7 @@ classdef epanet <handle
             %
             % See also getLinkType, getLinksInfo, getLinkDiameter,
             %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
+            [indices, value] = obj.getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetlinktype(i, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -7359,7 +7389,7 @@ classdef epanet <handle
             %
             % See also getNodeNameID, getNodeIndex,
             %          getNodeTypeIndex, getNodesInfo.
-            indices = getNodeIndices(obj, varargin);
+            indices = obj.getNodeIndices(obj, varargin);
             value=obj.TYPENODE(obj.getNodeTypeIndex(indices)+1);
         end
         function value = getNodeTypeIndex(obj, varargin)
@@ -7378,7 +7408,7 @@ classdef epanet <handle
             %
             % See also getNodeNameID, getNodeIndex,
             %          getNodeType, getNodesInfo.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodetype(i, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -7420,7 +7450,7 @@ classdef epanet <handle
             %
             % See also setNodeElevations, getNodesInfo, getNodeNameID,
             %          getNodeType,getNodeEmitterCoeff, getNodeInitialQuality.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -7593,7 +7623,7 @@ classdef epanet <handle
             %
             % See also setNodeJunctionDemandName, getNodeBaseDemands,
             %          getNodeDemandCategoriesNumber, getNodeDemandPatternNameID.
-            [indices, ~] = getNodeJunctionIndices(obj, varargin);
+            [indices, ~] = obj.getNodeJunctionIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
             value = cell(1, max(numdemands));
             cnt = length(indices);
@@ -7653,7 +7683,7 @@ classdef epanet <handle
             %
             % See also getNodeComment, getNodesInfo,
             %          setNodeNameID, setNodeCoordinates.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getNodeIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = obj.ENsetcomment(obj.ToolkitConstants.EN_NODE, indices, value, obj.LibEPANET);
@@ -7686,7 +7716,7 @@ classdef epanet <handle
             %
             % See also setNodeBaseDemands, getNodeDemandCategoriesNumber,
             %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
-            [indices, ~] = getNodeIndices(obj, varargin);
+            [indices, ~] = obj.getNodeIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
             value = cell(1, max(numdemands));
             cnt = length(indices);
@@ -7713,7 +7743,7 @@ classdef epanet <handle
             %
             % See also getNodeBaseDemands, getNodeDemandPatternIndex,
             %          getNodeDemandPatternNameID.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnumdemands(i, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -7765,7 +7795,7 @@ classdef epanet <handle
             else
                 numdemands = obj.getNodeDemandCategoriesNumber;
             end
-            indices = getNodeIndices(obj, varargin);
+            indices = obj.getNodeIndices(obj, varargin);
             value = cell(1, max(numdemands));
             val = cell(max(numdemands), obj.getNodeCount);
             for i=indices
@@ -7834,7 +7864,7 @@ classdef epanet <handle
                 end
             elseif nargin==1
 				demandName = obj.getNodeJunctionDemandName;
-				[indices, ~] = getNodeJunctionIndices(obj, varargin);
+				[indices, ~] = obj.getNodeJunctionIndices(obj, varargin);
                 value = zeros(length(demandName),length(indices));
                 for i=1:length(demandName)
                     for j=1:length(demandName{i})
@@ -7869,7 +7899,7 @@ classdef epanet <handle
             %
             % See also getNodeBaseDemands, getNodeDemandCategoriesNumber,
             %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -7886,7 +7916,7 @@ classdef epanet <handle
             %   d.getNodeEmitterCoeff(1)   % Retrieves the value of the first node emmitter coefficient
             %
             % See also setNodeEmitterCoeff, getNodesInfo, getNodeElevations.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -7903,7 +7933,7 @@ classdef epanet <handle
             %   d.getNodeInitialQuality(1)   % Retrieves the value of the first node initial quality
             %
             % See also setNodeInitialQuality, getNodesInfo, getNodeSourceQuality.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -7921,7 +7951,7 @@ classdef epanet <handle
             %
             % See also setNodeSourceQuality, getNodeInitialQuality, getNodeSourcePatternIndex,
             %          getNodeSourceTypeIndex, getNodeSourceType.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, obj.LibEPANET);
                 if isnan(value(j)), value(j)=0; end
@@ -7940,7 +7970,7 @@ classdef epanet <handle
             %
             % See also setNodeSourcePatternIndex, getNodeSourceQuality,
             %          getNodeSourceTypeIndex, getNodeSourceType.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, obj.LibEPANET);
                 if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end
@@ -7957,7 +7987,7 @@ classdef epanet <handle
             %   d.getNodeSourceTypeIndex(1)   % Retrieves the value of the first node source type index
             %
             % See also getNodeSourceQuality, getNodeSourcePatternIndex, getNodeSourceType.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET);
                 if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end
@@ -7975,7 +8005,7 @@ classdef epanet <handle
             %
             % See also setNodeSourceType, getNodeSourceQuality,
             %          getNodeSourcePatternIndex, getNodeSourceTypeIndex.
-            [indices, ~] = getNodeIndices(obj,varargin);j=1;
+            [indices, ~] = obj.getNodeIndices(obj,varargin);j=1;
             value = cell(1, length(indices));
             for i=indices
                 [obj.Errcode, temp] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET);
@@ -8014,7 +8044,7 @@ classdef epanet <handle
             %
             % See also getNodeActualDemandSensingNodes, getNodeHydaulicHead, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -8049,7 +8079,7 @@ classdef epanet <handle
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_HEAD, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -8110,7 +8140,7 @@ classdef epanet <handle
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodeHydaulicHead
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -8130,7 +8160,7 @@ classdef epanet <handle
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeHydaulicHead, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -8150,7 +8180,7 @@ classdef epanet <handle
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeHydaulicHead, getNodeActualQuality, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET);
                 j=j+1;
@@ -8469,7 +8499,7 @@ classdef epanet <handle
             %
             % See also setDemandModel, getComputedHydraulicTimeSeries,
             %          getNodeActualDemand, getNodeActualDemandSensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
+            [indices, value] = obj.getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetnodevalue(i, obj.ToolkitConstants.EN_DEMANDDEFICIT, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -8988,7 +9018,7 @@ classdef epanet <handle
             %   d.getCurveTypeIndex(1:2)   % Retrieves the curve-type index for the first 2 curves
             %
             % See also getCurveType, getCurvesInfo.
-            [indices, value] = getCurveIndices(obj, varargin);j=1;
+            [indices, value] = obj.getCurveIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] =obj.ENgetcurvetype(i, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -9008,7 +9038,7 @@ classdef epanet <handle
             %   d.getCurveType(1:2)   % Retrieves the curve-type for the first 2 curves
             %
             % See also getCurveTypeIndex, getCurvesInfo.
-            indices = getCurveIndices(obj, varargin);
+            indices = obj.getCurveIndices(obj, varargin);
             value=obj.TYPECURVE(obj.getCurveTypeIndex(indices)+1);
         end
         function value = getCurveComment(obj, varargin)
@@ -9081,7 +9111,7 @@ classdef epanet <handle
             %   d.getCurveComment(curveIndex)
             %
             % See also getCurveComment, getCurveIndex, getCurvesInfo.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getCurveIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getCurveIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = obj.ENsetcomment(obj.ToolkitConstants.EN_CURVE, indices, value, obj.LibEPANET);
@@ -9515,31 +9545,31 @@ classdef epanet <handle
                 value(i, nodesIndOk) = 1;
             end
         end
-        function valueIndex = addCurve(obj, varargin)
-            % Adds a new curve appended to the end of the existing curves. (EPANET Version 2.1)
-            % Returns the new curve's index.
-            %
-            % Example:
-            %   new_curve_ID = 'NewCurve';                        % ID selected without a space in between the letters
-            %   x_y_1 = [0, 730];
-            %   x_y_2 = [1000, 500];
-            %   x_y_3 = [1350, 260];
-            %   values = [x_y_1; x_y_2; x_y_3];                   % X and Y values selected
-            %   curve_index = d.obj.addCurve(new_curve_ID, values);   % New curve added
-            %   d.getCurvesInfo                                   % Retrieves all the info of curves
-            %
-            % See also getCurvesInfo, getCurveType, setCurve,
-            %          setCurveValue, setCurveNameID, setCurveComment.
-            valueIndex = 0;
-            if (4>nargin && nargin>1)
-                [obj.Errcode] = obj.ENaddcurve(varargin{1}, obj.LibEPANET);
-                error(obj.getError(obj.Errcode));
-                valueIndex = getCurveIndex(obj, varargin{1});
-                if nargin==3
-                    setCurve(obj, valueIndex, varargin{2});
-                end
-            end
-        end
+%         function valueIndex = addCurve(obj, varargin)
+%             % Adds a new curve appended to the end of the existing curves. (EPANET Version 2.1)
+%             % Returns the new curve's index.
+%             %
+%             % Example:
+%             %   new_curve_ID = 'NewCurve';                        % ID selected without a space in between the letters
+%             %   x_y_1 = [0, 730];
+%             %   x_y_2 = [1000, 500];
+%             %   x_y_3 = [1350, 260];
+%             %   values = [x_y_1; x_y_2; x_y_3];                   % X and Y values selected
+%             %   curve_index = d.obj.addCurve(new_curve_ID, values);   % New curve added
+%             %   d.getCurvesInfo                                   % Retrieves all the info of curves
+%             %
+%             % See also getCurvesInfo, getCurveType, setCurve,
+%             %          setCurveValue, setCurveNameID, setCurveComment.
+%             valueIndex = 0;
+%             if (4>nargin && nargin>1)
+%                 [obj.Errcode] = obj.ENaddcurve(varargin{1}, obj.LibEPANET);
+%                 error(obj.getError(obj.Errcode));
+%                 valueIndex = getCurveIndex(obj, varargin{1});
+%                 if nargin==3
+%                     setCurve(obj, valueIndex, varargin{2});
+%                 end
+%             end
+%         end
         function value = getCurveValue(obj, varargin)
             % Retrieves the X, Y values of points of curves. (EPANET Version 2.1)
             %
@@ -10714,7 +10744,7 @@ classdef epanet <handle
                     varargin{1} = obj.getLinkIndex(varargin{1});
                 end
             end
-            indices = getLinkIndices(obj, varargin);
+            indices = obj.getLinkIndices(obj, varargin);
             j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.ENgetvertexcount(i, obj.LibEPANET);
@@ -11216,7 +11246,7 @@ classdef epanet <handle
             %
             % See also setLinkPipeData, setLinkLength,
             %          setLinkBulkReactionCoeff, setLinkTypePipe.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, value(j), obj.LibEPANET); j=j+1;
@@ -11273,7 +11303,7 @@ classdef epanet <handle
             %   d.getLinkComment(linkIndex)
             %
             % See also getLinkComment, setLinkNameID, setLinkPipeData.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = obj.ENsetcomment(obj.ToolkitConstants.EN_LINK, indices, value, obj.LibEPANET);
@@ -11565,7 +11595,7 @@ classdef epanet <handle
             %
             % See also getLinkLength, setLinkDiameter, setLinkMinorLossCoeff,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_LENGTH, value(j), obj.LibEPANET); j=j+1;
@@ -11589,7 +11619,7 @@ classdef epanet <handle
             %
             % See also getLinkNameID, setLinkComment, setLinkDiameter,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = ENsetlinkid(indices, value, obj.LibEPANET);
@@ -11619,7 +11649,7 @@ classdef epanet <handle
             %
             % See also getLinkRoughnessCoeff, setLinkDiameter, setLinkMinorLossCoeff,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_ROUGHNESS, value(j), obj.LibEPANET); j=j+1;
@@ -11644,7 +11674,7 @@ classdef epanet <handle
             %
             % See also getLinkMinorLossCoeff, setLinkDiameter, setLinkRoughnessCoeff,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_MINORLOSS, value(j), obj.LibEPANET); j=j+1;
@@ -11671,7 +11701,7 @@ classdef epanet <handle
             %
             % See also getLinkInitialStatus, setLinkInitialSetting, setLinkDiameter,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_INITSTATUS, value(j), obj.LibEPANET); j=j+1;
@@ -11696,7 +11726,7 @@ classdef epanet <handle
             %
             % See also getLinkInitialSetting, setLinkInitialStatus, setLinkRoughnessCoeff,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_INITSETTING, value(j), obj.LibEPANET); j=j+1;
@@ -11721,7 +11751,7 @@ classdef epanet <handle
             %
             % See also getLinkBulkReactionCoeff, setLinkRoughnessCoeff,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_KBULK, value(j), obj.LibEPANET); j=j+1;
@@ -11746,7 +11776,7 @@ classdef epanet <handle
             %
             % See also getLinkWallReactionCoeff, setLinkBulkReactionCoeff,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_KWALL, value(j), obj.LibEPANET); j=j+1;
@@ -11773,7 +11803,7 @@ classdef epanet <handle
             %
             % See also getLinkStatus, setLinkInitialStatus, setLinkDiameter,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_STATUS, value(j), obj.LibEPANET); j=j+1;
@@ -11798,7 +11828,7 @@ classdef epanet <handle
             %
             % See also getLinkSettings, setLinkStatus, setLinkRoughnessCoeff,
             %          setLinkPipeData, obj.addLink, deleteLink.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getLinkIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getLinkIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetlinkvalue(i, obj.ToolkitConstants.EN_SETTING, value(j), obj.LibEPANET); j=j+1;
@@ -12016,7 +12046,7 @@ classdef epanet <handle
 	    %
             % See also setLinkPumpPatternIndex, getLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetheadcurveindex(obj.LibEPANET, i, value(j)); j=j+1;
@@ -12041,7 +12071,7 @@ classdef epanet <handle
             %
             % See also getNodeElevations, setNodeCoordinates, setNodeBaseDemands,
             %          setNodeJunctionData, obj.addNodeJunction, deleteNode.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, value(j), obj.LibEPANET); j=j+1;
@@ -12120,7 +12150,7 @@ classdef epanet <handle
             %
             % See also getNodeCoordinates, setNodeElevations, plot,
             %          obj.addNodeJunction, obj.addNodeTank, deleteNode.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getNodeIndices(obj, varargin); end
             if ~isempty(varargin)
                 for i=indices
                     [obj.Errcode] = obj.ENsetcoord(i, value(1), value(2), obj.LibEPANET);
@@ -12201,7 +12231,7 @@ classdef epanet <handle
             %   d.getNodeEmitterCoeff(nodeIndex)
             %
             % See also getNodeEmitterCoeff, setNodeBaseDemands, setNodeJunctionData.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, value(j), obj.LibEPANET); j=j+1;
@@ -12225,7 +12255,7 @@ classdef epanet <handle
             %   d.getNodeInitialQuality(nodeIndex)
             %
             % See also getNodeInitialQuality, getNodeActualQuality, setNodeJunctionData.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, value(j), obj.LibEPANET); j=j+1;
@@ -12653,7 +12683,7 @@ classdef epanet <handle
             %   d.getNodeSourceQuality(nodeIndex)
             %
             % See also getNodeSourceQuality, setNodeSourcePatternIndex, setNodeSourceType.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, value(j), obj.LibEPANET); j=j+1;
@@ -12678,7 +12708,7 @@ classdef epanet <handle
             %   d.getNodeSourcePatternIndex(nodeIndex)
             %
             % See also getNodeSourcePatternIndex, setNodeSourceQuality, setNodeSourceType.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getNodeIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
                 [obj.Errcode] = obj.ENsetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, value(j), obj.LibEPANET); j=j+1;
@@ -13205,7 +13235,7 @@ classdef epanet <handle
             %   d.getPatternComment
             %
             % See also getPatternComment, setPatternNameID, setPattern.
-            if nargin==3, indices = value; value=varargin{1}; else indices = getPatternIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getPatternIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = obj.ENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, indices, value, obj.LibEPANET);
@@ -17719,7 +17749,7 @@ classdef epanet <handle
             end
             if sum(strcmp(obj.libFunctions, 'ENgetcoord'))
                 try
-                    indices = getNodeIndices(obj, varargin);j=1;
+                    indices = obj.getNodeIndices(obj, varargin);j=1;
                     for i=indices
                         [obj.Errcode, vx(j), vy(j)]=obj.ENgetcoord(i, obj.LibEPANET); j=j+1;
                         error(obj.getError(obj.Errcode));
@@ -18508,38 +18538,4 @@ classdef epanet <handle
         end
     end
 
-end
-
-function indices = getIndices(cnt, varargin)
-    if isempty(varargin{1})
-        indices=1:cnt;
-    elseif isempty(varargin{1}{1})
-        indices=1:cnt;
-    else
-        indices=varargin{1}{1};
-    end
-end
-function indices = getControlIndices(obj, varargin)
-    indices =getIndices(obj.getControlRulesCount, varargin{1});
-end
-function [indices, value] = getNodeIndices(obj, varargin)
-    indices =getIndices(obj.getNodeCount, varargin{1});
-    value = zeros(1, length(indices));
-end
-function [indices, value] = getLinkIndices(obj, varargin)
-    indices =getIndices(obj.getLinkCount, varargin{1});
-    value = zeros(1, length(indices));
-end
-function [indices, value] = getNodeJunctionIndices(obj, varargin)
-    % EPANET Version 2.2
-    indices =getIndices(obj.getNodeJunctionCount, varargin{1});
-    value = zeros(1, length(indices));
-end
-function [indices, value] = getCurveIndices(obj, varargin)
-    indices =getIndices(obj.getCurveCount, varargin{1});
-    value = zeros(1, length(indices));
-end
-function [indices, value] = getPatternIndices(obj, varargin)
-    indices =getIndices(obj.getPatternCount, varargin{1});
-    value = zeros(1, length(indices));
 end
