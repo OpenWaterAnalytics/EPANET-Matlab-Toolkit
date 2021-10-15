@@ -7736,7 +7736,7 @@ classdef epanet <handle
             for i=obj.getNodeIndex
                 v=1;
                 for u=1:numdemands(i)
-                    [obj.Errcode, val(v, i)] = ENgetdemandpattern(i, u, obj.LibEPANET);
+                    [obj.Errcode, val(v, i)] = obj.ENgetdemandpattern(i, u, obj.LibEPANET);
                     v = v+1;
                 end
             end
@@ -18520,26 +18520,26 @@ function indices = getIndices(cnt, varargin)
     end
 end
 function indices = getControlIndices(obj, varargin)
-    indices = obj.getIndices(obj.getControlRulesCount, varargin{1});
+    indices =getIndices(obj.getControlRulesCount, varargin{1});
 end
 function [indices, value] = getNodeIndices(obj, varargin)
-    indices = obj.getIndices(obj.getNodeCount, varargin{1});
+    indices =getIndices(obj.getNodeCount, varargin{1});
     value = zeros(1, length(indices));
 end
 function [indices, value] = getLinkIndices(obj, varargin)
-    indices = obj.getIndices(obj.getLinkCount, varargin{1});
+    indices =getIndices(obj.getLinkCount, varargin{1});
     value = zeros(1, length(indices));
 end
 function [indices, value] = getNodeJunctionIndices(obj, varargin)
     % EPANET Version 2.2
-    indices = obj.getIndices(obj.getNodeJunctionCount, varargin{1});
+    indices =getIndices(obj.getNodeJunctionCount, varargin{1});
     value = zeros(1, length(indices));
 end
 function [indices, value] = getCurveIndices(obj, varargin)
-    indices = obj.getIndices(obj.getCurveCount, varargin{1});
+    indices =getIndices(obj.getCurveCount, varargin{1});
     value = zeros(1, length(indices));
 end
 function [indices, value] = getPatternIndices(obj, varargin)
-    indices = obj.getIndices(obj.getPatternCount, varargin{1});
+    indices =getIndices(obj.getPatternCount, varargin{1});
     value = zeros(1, length(indices));
 end
