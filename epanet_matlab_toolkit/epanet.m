@@ -4580,6 +4580,8 @@ classdef epanet <handle
         function indices = getIndices(cnt, varargin)
             if isempty(varargin{1})
                 indices=1:cnt;
+            elseif isnumeric(varargin{1})
+                indices=varargin{1};
             elseif isempty(varargin{1}{1})
                 indices=1:cnt;
             else
@@ -5892,7 +5894,7 @@ classdef epanet <handle
             %
             % See also setControls, addControls, deleteControls,
             %          getRules, setRules, addRules, deleteRules.
-            indices = obj.getControlIndices(obj, varargin);j=1;
+            indices = obj.getControlIndices(varargin);j=1;
             value=struct();
             obj.ControlTypes={};
             for i=indices
