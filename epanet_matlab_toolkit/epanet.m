@@ -3961,7 +3961,7 @@ classdef epanet <handle
             warning('on');
         end
         function [inpfile, rptfile, binfile]= createTempfiles(BinTempfile)
-            inpfile=inTempfile;
+            inpfile= BinTempfile;
             uuID = char(java.util.UUID.randomUUID);
             rptfile=['@#', uuID, '.txt'];
             binfile=['@#', uuID, '.bin'];
@@ -13845,7 +13845,7 @@ classdef epanet <handle
             end
         end
         function value = getMSXEquationsTerms(obj)
-            [value, ~, ~] = getEquations(obj.MSXFile);
+            [value, ~, ~] = obj.getEquations(obj.MSXFile);
         end
         function value = getMSXEquationsPipes(obj)
             [~, value, ~] = obj.getEquations(obj.MSXFile);
@@ -17450,7 +17450,7 @@ classdef epanet <handle
             warning on;
         end
         function [info, tline, allines] = readInpFile(obj, varargin)
-            [info, tline, allines] = obj.readAllFile(obj.BinTempfile);
+            [info, tline, allines] = readAllFile(obj.BinTempfile);
         end
         function value = getBinNodesInfo(obj)
             valueL = obj.getBinLinksInfo;
