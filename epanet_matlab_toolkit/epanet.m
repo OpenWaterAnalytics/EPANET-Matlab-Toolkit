@@ -543,7 +543,7 @@ classdef epanet <handle
                 indices = value;
                 param = extra{1};
             elseif isempty(extra)
-                indices = obj.getNodeJunctionIndices(obj,[]);
+                indices = getNodeJunctionIndices(obj,[]);
                 param = value;
                 if iscell(param)
                     categ = length(param);
@@ -2592,7 +2592,7 @@ classdef epanet <handle
                                     end
                                     if length(a)>2
                                         mm=2;
-                                        setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                        obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                     end
                                 end
                             else
@@ -2728,7 +2728,7 @@ classdef epanet <handle
                                         if strcmpi(prv, 'PRV') || strcmpi(psv, 'PSV') || strcmpi(pbv, 'PBV') %|| strcmpi(tcv, 'TCV')
                                             fprintf(fid2, '%s%s', num2str(str2double(a{mm+3})*0.3048), sps);
                                         elseif strcmpi(fcv, 'FCV')
-                                            setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                            obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                         end
                                     elseif changes==2
                                         fprintf(fid2, '%.6f%s', str2double(a{mm+1})*0.03937007874, sps);
@@ -2736,7 +2736,7 @@ classdef epanet <handle
                                         if strcmpi(prv, 'PRV') || strcmpi(psv, 'PSV') || strcmpi(pbv, 'PBV') %|| strcmpi(tcv, 'TCV')
                                             fprintf(fid2, '%s%s', num2str(str2double(a{mm+3})/0.3048), sps);
                                         elseif strcmpi(fcv, 'FCV')
-                                            setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                            obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                         end
                                     end
                                     for mm=(mm+4):length(a)
@@ -2756,7 +2756,7 @@ classdef epanet <handle
                                     if strcmp(a{mm}, nodes.BinNodeJunctionNameID{pp})
                                         pp=pp+1;
                                         fprintf(fid2, '%s%s', char(a{mm}), sps);
-                                        setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                        obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                         if length(a)>2
                                             fprintf(fid2, '%s%s', char(a{mm+2}), sps);
                                         end
@@ -2773,7 +2773,7 @@ classdef epanet <handle
                             if mm < length(a)+1
                                 if sum(strcmp(a{mm}, nodes.BinNodeJunctionNameID))
                                     fprintf(fid2, '%s%s', char(a{mm}), sps);
-                                    setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                    obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                 end
                             end
                             break;
@@ -2813,7 +2813,7 @@ classdef epanet <handle
                                         end
                                         pp=pp+1;
                                         fprintf(fid2, '%s%s', char(a{mm}), sps);
-                                        setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm);
+                                        obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm);
                                         if changes==1
                                             fprintf(fid2, '%.6f%s', str2double(a{mm+2})*0.3048, sps);
                                         elseif changes==2
@@ -2829,7 +2829,7 @@ classdef epanet <handle
                                         end
                                         pp=pp+1;
                                         fprintf(fid2, '%s%s', char(a{mm}), sps);
-                                        setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                        obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                         fprintf(fid2, '%s%s', char(a{mm+2}), sps);
                                     elseif curves.BintypeCurve(ww)==2
                                         gg=regexp(c, '\w*VOLUME*\w', 'match');
@@ -2860,7 +2860,7 @@ classdef epanet <handle
                                             fprintf(fid2, '%s%s', char(a{mm+1}), sps);
                                         end
                                         mm=mm+1;
-                                        setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                        obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                     end
                                     ww=ww+1;
                                 end
@@ -2894,13 +2894,13 @@ classdef epanet <handle
                                         if ~strcmp(obj.BinLinkType(index), 'TCV') && ~strcmp(obj.BinLinkType(index), 'GPV')
                                             if changes==1
                                                 if strcmp(obj.BinLinkType(index), 'FCV')
-                                                    setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                                    obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                                 else
                                                     fprintf(fid2, '%.6f%s', str2double(a{mm+1})*0.3048, sps);
                                                 end
                                             elseif changes==2
                                                 if strcmp(obj.BinLinkType(index), 'FCV')
-                                                    setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                                    obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                                 else
                                                     fprintf(fid2, '%.6f%s', str2double(a{mm+1})*3.281, sps);
                                                 end
@@ -2950,7 +2950,7 @@ classdef epanet <handle
                                     for mm=mm:(mm+4)
                                         fprintf(fid2, '%s%s', char(a{mm}), sps);
                                     end
-                                    setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
+                                    obj.setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
                                 elseif strcmpi(regexp(cell2mat(a), '\s*PRESSURE*', 'match'), 'HEAD')
                                     for mm=mm:(mm+4)
                                         fprintf(fid2, '%s%s', char(a{mm}), sps);
@@ -3260,7 +3260,7 @@ classdef epanet <handle
             fid = fopen(binfile, 'r');
         end
         function value = getBinComputedTimeSeries(obj, indParam, varargin)
-            [fid, binfile, rptfile] = obj.runEPANETexe(obj);
+            [fid, binfile, rptfile] = runEPANETexe(obj);
             value=[];
             if fid~=-1
                 data = fread(fid, 'int32');
@@ -3961,7 +3961,7 @@ classdef epanet <handle
             warning('on');
         end
         function [inpfile, rptfile, binfile]= createTempfiles(BinTempfile)
-            inpfile=BinTempfile;
+            inpfile=inTempfile;
             uuID = char(java.util.UUID.randomUUID);
             rptfile=['@#', uuID, '.txt'];
             binfile=['@#', uuID, '.bin'];
@@ -4097,7 +4097,7 @@ classdef epanet <handle
         function setControlFunction(obj, index, value)
             controlRuleIndex = index;
             [controlTypeIndex, linkIndex,controlSettingValue,...
-            nodeIndex, controlLevel] = obj.controlSettings(obj, value);
+            nodeIndex, controlLevel] = obj.controlSettings( value);
             [obj.Errcode] = obj.ENsetcontrol(controlRuleIndex, ...
                 controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
@@ -4106,21 +4106,21 @@ classdef epanet <handle
             if isstruct(value)
                 for c=1:length(value)
                     [controlTypeIndex, linkIndex, controlSettingValue,...
-                    nodeIndex, controlLevel] = obj.controlSettings(obj, value(c).Control);
+                    nodeIndex, controlLevel] = obj.controlSettings( value(c).Control);
                     [obj.Errcode, controlRuleIndex(c)] = obj.ENaddcontrol(controlTypeIndex, linkIndex,...
                     controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
                     error(obj.getError(obj.Errcode));
                 end
             else
                 [controlTypeIndex, linkIndex, controlSettingValue,...
-                    nodeIndex, controlLevel] = obj.controlSettings(obj, value);
+                    nodeIndex, controlLevel] = obj.controlSettings( value);
                 [obj.Errcode, controlRuleIndex] = obj.ENaddcontrol(controlTypeIndex, linkIndex,...
                     controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
             end
         end
         function [controlTypeIndex, linkIndex,controlSettingValue,...
-            nodeIndex, controlLevel] = controlSettings(obj, value)
+            nodeIndex, controlLevel] = controlSettings(obj,value)
             splitControl = strsplit(value);
             controlSettingValue = find(strcmpi(obj.TYPESTATUS, splitControl(3)))-1;
             if isempty(controlSettingValue)
@@ -4163,7 +4163,6 @@ classdef epanet <handle
                 otherwise
             end
         end
-
         function indices = getIndices(obj, cnt, varargin)
             if isempty(varargin{1})
                 indices=1:cnt;
@@ -4196,6 +4195,420 @@ classdef epanet <handle
         function [indices, value] = getPatternIndices(obj, varargin)
             indices =obj.getIndices(obj.getPatternCount, varargin{1});
             value = zeros(1, length(indices));
+        end
+        function [axesid] = plotnet(varargin)
+            % Initiality
+            highlightnode=0;
+            highlightlink=0;
+            highlightnodeindex=[];
+            highlightlinkindex=[];
+            legendIndices=[];
+            l=zeros(1, 6);
+            Node=char('no');
+            Link=char('no');
+            NodeInd=0;
+            LinkInd=0;
+            fontsize=10;
+            selectColorNode={''};
+            selectColorLink={''};
+            axesid=0;
+            lline='yes';
+            npoint='yes';
+            extend='no';
+            legendposition = 'northeast';
+            slegend = 'show';
+            for i=1:(nargin/2)
+                argument =lower(varargin{2*(i-1)+1});
+                switch argument
+                    case 'nodes' % Nodes
+                        if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
+                            warning('Invalid argument.');
+                            return
+                        end
+                        Node=varargin{2*i};
+                    case 'links' % Nodes
+                        if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
+                            warning('Invalid argument.');
+                            return
+                        end
+                        Link=varargin{2*i};
+                    case 'nodesindex' % Nodes
+                        if ~strcmpi(varargin{2*i}, 'yes')
+                            warning('Invalid argument.');
+                            return
+                        end
+                        NodeInd=varargin{2*i};
+                    case 'linksindex' % Links
+                        if ~strcmpi(varargin{2*i}, 'yes')
+                            warning('Invalid argument.');
+                            return
+                        end
+                        LinkInd=varargin{2*i};
+                    case 'highlightnode' % Highlight Node
+                        highlightnode=varargin{2*i};
+                    case 'highlightlink' % Highlight Link
+                        highlightlink=varargin{2*i};
+                    case 'fontsize' % font size
+                        fontsize=varargin{2*i};
+                    case 'colornode' % color
+                        selectColorNode=varargin{2*i};
+                    case 'colorlink' % color
+                        selectColorLink=varargin{2*i};
+                    case 'point' % color
+                        if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
+                            warning('Invalid argument.');
+                            return
+                        end
+                        npoint=varargin{2*i};
+                    case 'line' % remove line
+                        if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
+                            warning('Invalid argument.');
+                            return
+                        end
+                        lline=varargin{2*i};
+                    case 'axes' % axes id
+                        try
+                            axesid=axes('Parent', varargin{2*i});
+                        catch
+                            axesid=varargin{2*i};
+                        end
+                    case 'uifigure' % figure
+                        fig=varargin{2*i};
+                    case 'bin'
+                        bin=varargin{2*i};
+                    case 'extend' % extend option
+                        extend=varargin{2*i};
+                    case 'legendposition' % extend option
+                        legendposition=varargin{2*i};
+                    case 'legend'
+                        slegend=varargin{2*i};
+                    otherwise
+                        error('Invalid property founobj.');
+                end
+            end
+
+            if axesid==0
+               drawnow;
+               fig=figure;
+               axesid=axes('Parent', fig);
+            end
+
+            if cellfun('isempty', selectColorNode)==1
+                init={'r'};
+                for i=1:length(highlightnode)
+                    selectColorNode=[init selectColorNode];
+                end
+            end
+            if cellfun('isempty', selectColorLink)==1
+                init={'r'};
+                for i=1:length(highlightlink)
+                    selectColorLink=[init selectColorLink];
+                end
+            end
+
+            % get info BIN function
+            if bin==1
+                b=obj.getBinLinksInfo;
+                v.linknameid=b.BinLinkNameID;
+                v.linkcount=b.BinLinkCount;
+                v.linkfromnode=b.BinLinkFromNode;
+                v.linktonode=b.BinLinkToNode;
+                v.linkindex=b.BinLinkIndex;
+                v.pumpindex=b.BinLinkPumpIndex;
+                v.valveindex=b.BinLinkValveIndex;
+                v.nodesconnlinks = [v.linkfromnode;v.linktonode]';
+                b=obj.getBinNodesInfo;
+                v.nodenameid=b.BinNodeNameID;
+                v.nodecoords=obj.getBinNodeCoordinates;
+                v.nodecount=b.BinNodeCount;
+                v.nodeindex=b.BinNodeIndex;
+                v.resindex=b.BinNodeReservoirIndex;
+                v.tankindex=b.BinNodeTankIndex;
+            elseif bin==0
+                % get info EN functions
+                v.nodenameid=obj.getNodeNameID;
+                v.linknameid=obj.getLinkNameID;
+                if isempty(v.nodenameid) || isempty(v.linknameid)
+                    warning('Not enough network nodes/links.');
+                    return;
+                end
+                v.nodesconnlinks=obj.getNodesConnectingLinksID;
+                if sum(strcmp(obj.libFunctions, 'ENgetcoord'))
+                    v.nodecoords=obj.getNodeCoordinates;
+                else
+                    v.nodecoords=obj.getBinNodeCoordinates;
+                end
+                v.pumpindex=obj.getLinkPumpIndex;
+                v.valveindex=obj.getLinkValveIndex;
+                v.resindex=obj.getNodeReservoirIndex;
+                v.tankindex=obj.getNodeTankIndex;
+                v.linkcount=obj.getLinkCount;
+                v.nodecount=obj.getNodeCount;
+                v.linkindex=obj.getLinkIndex;
+                v.nodeindex=obj.getNodeIndex;
+            end
+
+            if isnan(v.nodecoords{1}(2))
+               warning('Do not exist coordinates.'); close(g);
+               return
+            end
+            % Get node names and x, y coordiantes
+            if isa(highlightnode, 'cell')
+                for i=1:length(highlightnode)
+                    n = strcmp(v.nodenameid, highlightnode{i});
+                    if sum(n)==0
+                        warning('Undefined node with id "%s" in function call therefore the index is zero.', char(highlightnode{i}));
+                    else
+                        highlightnodeindex(i) = strfind(n, 1);
+                    end
+                end
+            end
+
+            if isa(highlightlink, 'cell')
+                for i=1:length(highlightlink)
+                    n = strcmp(v.linknameid, highlightlink{i});
+                    if sum(n)==0
+                        warning('Undefined link with id "%s" in function call therefore the index is zero.', char(highlightlink{i}));
+                    else
+                        highlightlinkindex(i) = strfind(n, 1);
+                    end
+                end
+            end
+
+            if (strcmpi(lline, 'yes'))
+                hold(axesid, 'on')
+                for i=1:v.linkcount
+                    FromNode=strfind(strcmp(v.nodesconnlinks(i, 1), v.nodenameid), 1);
+                    ToNode=strfind(strcmp(v.nodesconnlinks(i, 2), v.nodenameid), 1);
+
+                    if FromNode
+                        x1 = double(v.nodecoords{1}(FromNode));
+                        y1 = double(v.nodecoords{2}(FromNode));
+                    end
+                    if ToNode
+                        x2 = double(v.nodecoords{1}(ToNode));
+                        y2 = double(v.nodecoords{2}(ToNode));
+                    end
+
+                    hh=strfind(highlightlinkindex, i);
+
+                    if length(hh) && ~isempty(selectColorLink)
+                        line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', [.5 .5 .5], 'Parent', axesid);
+                    end
+                    if ~length(hh)
+                        h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Parent', axesid);
+                        if ~l(1), legendIndices = [legendIndices 1]; l(1)=1; end
+                    end
+
+                    % Plot Pumps
+                    if sum(strfind(v.pumpindex, i))
+                        colornode = 'm';
+                        if length(hh) && isempty(selectColorLink)
+                            colornode = 'r';
+                        end
+                        h(:, 2)=plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 2, 'MarkerEdgeColor', 'm', ...
+                            'MarkerFaceColor', 'm', ...
+                            'MarkerSize', 5, 'Parent', axesid);
+                        if ~l(2), legendIndices = [legendIndices 2]; l(2)=1; end
+                        plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                            'MarkerFaceColor', colornode, ...
+                            'MarkerSize', 5, 'Parent', axesid);
+                    end
+
+                    % Plot Valves
+                    if sum(strfind(v.valveindex, i))
+                        colornode = 'k';
+                        if length(hh) && isempty(selectColorLink)
+                            colornode = 'r';
+                        end
+                        h(:, 3)=plot((x1+x2)/2, (y1+y2)/2, 'k*', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                            'MarkerFaceColor', colornode, 'MarkerSize', 7, 'Parent', axesid);
+                        if ~l(3), legendIndices = [legendIndices 3]; l(3)=1; end
+                    end
+
+                    if length(hh) && isempty(selectColorLink)
+                        line([x1, x2], [y1, y2], 'LineWidth', 1, 'Color', 'r', 'Parent', axesid);
+                        text((x1+x2)/2, (y1+y2)/2, v.linknameid(i), 'Fontsize', fontsize, 'Parent', axesid);
+                    elseif length(hh) && ~isempty(selectColorLink)
+                        try tt=length(selectColorLink{hh}); catch; tt=2; end
+                       if tt>1
+                            if length(selectColorLink(hh))==1
+                                nm{1}=selectColorLink(hh);
+                            else
+                                nm=selectColorLink(hh);
+                            end
+                            if iscell(nm{1})
+                                line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', nm{1}{1}, 'Parent', axesid);
+                            else
+                                line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', nm{1}, 'Parent', axesid);
+                            end
+                        else
+                            line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', char(selectColorLink(hh)), 'Parent', axesid);
+                        end
+                    end
+                    % Show Link id
+                    if (strcmpi(Link, 'yes')) %&& ~length(hh))
+                        text((x1+x2)/2, (y1+y2)/2, v.linknameid(i), 'Fontsize', fontsize, 'Parent', axesid);
+                    end
+                    % Show Link Index
+                    if (strcmpi(LinkInd, 'yes')) %&& ~length(hh))
+                        text((x1+x2)/2, (y1+y2)/2, num2str(v.linkindex(i)), 'Fontsize', fontsize, 'Parent', axesid);
+                    end
+                end
+            end
+
+            if (strcmpi(npoint, 'yes'))
+                % Coordinates for node FROM
+                hold(axesid, 'on')
+                for i=1:v.nodecount
+                    [x] = double(v.nodecoords{1}(i));
+                    [y] = double(v.nodecoords{2}(i));
+
+                    hh=strfind(highlightnodeindex, i);
+                    if ~length(hh)
+                        h(:, 4)=plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', 'b', ...
+                        'MarkerFaceColor', 'b', ...
+                        'MarkerSize', 5, 'Parent', axesid);
+                        if ~l(4), legendIndices = [legendIndices 4]; l(4)=1; end
+                    end
+
+                    % Plot Reservoirs
+                    if sum(strfind(v.resindex, i))
+                        colornode = 'g';
+                        if length(hh) && isempty(selectColorNode)
+                            colornode = 'r';
+                        end
+                        h(:, 5)=plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', 'g', ...
+                            'MarkerFaceColor', 'g', ...
+                            'MarkerSize', 13, 'Parent', axesid);
+                        if ~l(5), legendIndices = [legendIndices 5]; l(5)=1; end
+                        plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                            'MarkerFaceColor', colornode, ...
+                            'MarkerSize', 13, 'Parent', axesid);
+                    end
+                    % Plot Tanks
+                    if sum(strfind(v.tankindex, i))
+                        colornode='c';
+                        if length(hh) && isempty(selectColorNode)
+                            colornode='r';
+                        elseif length(hh) && ~isempty(selectColorNode)
+                            colornode= 'c';
+                        end
+                        h(:, 6)=plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', 'c', ...
+                            'MarkerFaceColor', 'c', ...
+                            'MarkerSize', 16, 'Parent', axesid);
+                        if ~l(6), legendIndices = [legendIndices 6]; l(6)=1; end
+
+                        plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                            'MarkerFaceColor', colornode, ...
+                            'MarkerSize', 16, 'Parent', axesid);
+                    end
+
+                    if length(hh) && isempty(selectColorNode)
+                        plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', 'r', ...
+                            'MarkerFaceColor', 'r', ...
+                            'MarkerSize', 5, 'Parent', axesid);
+                        text(x, y, v.nodenameid(i), 'Fontsize', fontsize, 'Parent', axesid)%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
+                    elseif length(hh) && ~isempty(selectColorNode)
+                        try tt=length(selectColorNode{hh}); catch, tt=2; end
+                       if tt>1
+                            if length(selectColorNode(hh))==1
+                                nm{1}=selectColorNode(hh);
+                                nmplot=nm{1}{1};
+                            else
+                                nm=selectColorNode(hh);
+                                nmplot=nm{1};
+                            end
+                            if iscell(nm{1})
+                                plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, 'MarkerSize', 5, 'Parent', axesid);
+                            else
+                                plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, 'MarkerSize', 5, 'Parent', axesid);
+                            end
+                            if sum(find(i==v.resindex))
+                               plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
+                               'MarkerFaceColor', nmplot, ...
+                               'MarkerSize', 13, 'Parent', axesid);
+                            end
+                            if sum(find(i==v.tankindex))
+                               plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
+                               'MarkerFaceColor', nmplot, ...
+                               'MarkerSize', 16, 'Parent', axesid);
+                            end
+                       else
+                            nmplot=char(selectColorNode(hh));
+                            plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, ...
+                                'MarkerSize', 5, 'Parent', axesid);
+                            if sum(find(i==v.resindex))
+                               plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
+                               'MarkerFaceColor', nmplot, ...
+                               'MarkerSize', 13, 'Parent', axesid);
+                            end
+                            if sum(find(i==v.tankindex))
+                               plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
+                               'MarkerFaceColor', nmplot, ...
+                               'MarkerSize', 16, 'Parent', axesid);
+                            end
+                       end
+                    end
+                    % Show Node id
+                    if (strcmpi(Node, 'yes')) %&& ~length(hh))
+                        text(x, y, v.nodenameid(i), 'Fontsize', fontsize, 'Parent', axesid);%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
+                    end
+                    % Show Node index
+                    if (strcmpi(NodeInd, 'yes')) %&& ~length(hh))
+                        text(x, y, num2str(v.nodeindex(i)), 'Fontsize', fontsize, 'Parent', axesid);%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
+                    end
+                end
+            end
+
+            % Legend Plots
+            if strcmpi(slegend, 'show')
+                if isempty(highlightnodeindex) || isempty(highlightnodeindex)
+                    legendString={'Pipes', 'Pumps', 'Valves', ...
+                        'Junctions', 'Reservoirs', 'Tanks'};
+                    legendIndices=sort(legendIndices, 'descend');
+                    if exist('h','var')
+                        try
+                            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
+                        catch
+                            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
+                        end
+                    end
+                end
+            elseif strcmpi(slegend, 'hide')
+                %skip
+            else
+                error('Invalid property founobj(legend: "hide", "show")')
+            end
+
+            % Axis OFF and se Background
+            [xmax, ~]=max(v.nodecoords{1});
+            [xmin, ~]=min(v.nodecoords{1});
+            [ymax, ~]=max(v.nodecoords{2});
+            [ymin, ~]=min(v.nodecoords{2});
+
+            if ~isnan(ymax)
+                if ymax==ymin
+                    xlim(axesid, [xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
+                    ylim(axesid, [ymin-.1, ymax+.1]);
+                elseif xmax==xmin
+                    xlim(axesid, [xmin-.1, xmax+.1]);
+                    ylim(axesid, [ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
+                else
+                    xlim(axesid, [xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
+                    ylim(axesid, [ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
+                end
+            else
+                warning('Undefined coordinates.');
+            end
+            axis(axesid, 'off');
+            try
+                whitebg(fig, 'w');
+            catch
+            end
+            if strcmpi(extend, 'yes')
+                set(axesid, 'position', [0 0 1 1], 'units', 'normalized');
+            end
         end
 
     end
@@ -4311,7 +4724,7 @@ classdef epanet <handle
         end
         function [Errcode, type] =ENgetcurvetype(index, LibEPANET)
             % EPANET Version 2.2
-            [Errcode, type]=calllib(LibEPANET,ENgetcurvetype', index, 0);
+            [Errcode, type]=calllib(LibEPANET,'ENgetcurvetype', index, 0);
         end
         function [Errcode, index] = ENgetpatternindex(id, LibEPANET)
                 [Errcode, ~, index]=calllib(LibEPANET, 'ENgetpatternindex', id, 0);
@@ -5461,7 +5874,7 @@ classdef epanet <handle
             %   linkSet2=d.getLinkNameID([5,6,7,8]);
             %   colorLinkSet2=repmat({'g'},1,length(linkSet2));
             %   d.plot('highlightlink',[linkSet1 linkSet2],'colorlink',[colorLinkSet1 colorLinkSet2])
-            [value] = plotnet(obj,'bin', 0, varargin{:});
+            [value] = obj.plotnet('bin', 0, varargin{:});
         end
         function value = getControls(obj, varargin)
             % Retrieves the parameters of all control statements.
@@ -7210,7 +7623,7 @@ classdef epanet <handle
             %
             % See also setNodeJunctionDemandName, getNodeBaseDemands,
             %          getNodeDemandCategoriesNumber, getNodeDemandPatternNameID.
-            [indices, ~] = obj.getNodeJunctionIndices(obj, varargin);
+            [indices, ~] = getNodeJunctionIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
             value = cell(1, max(numdemands));
             cnt = length(indices);
@@ -7451,7 +7864,7 @@ classdef epanet <handle
                 end
             elseif nargin==1
 				demandName = obj.getNodeJunctionDemandName;
-				[indices, ~] = obj.getNodeJunctionIndices(obj, varargin);
+				[indices, ~] = getNodeJunctionIndices(obj, varargin);
                 value = zeros(length(demandName),length(indices));
                 for i=1:length(demandName)
                     for j=1:length(demandName{i})
@@ -8605,7 +9018,7 @@ classdef epanet <handle
             %   d.getCurveTypeIndex(1:2)   % Retrieves the curve-type index for the first 2 curves
             %
             % See also getCurveType, getCurvesInfo.
-            [indices, value] = obj.getCurveIndices(obj, varargin);j=1;
+            [indices, value] = getCurveIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] =obj.ENgetcurvetype(i, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
@@ -8625,7 +9038,7 @@ classdef epanet <handle
             %   d.getCurveType(1:2)   % Retrieves the curve-type for the first 2 curves
             %
             % See also getCurveTypeIndex, getCurvesInfo.
-            indices = obj.getCurveIndices(obj, varargin);
+            indices = getCurveIndices(obj, varargin);
             value=obj.TYPECURVE(obj.getCurveTypeIndex(indices)+1);
         end
         function value = getCurveComment(obj, varargin)
@@ -8698,7 +9111,7 @@ classdef epanet <handle
             %   d.getCurveComment(curveIndex)
             %
             % See also getCurveComment, getCurveIndex, getCurvesInfo.
-            if nargin==3, indices = value; value=varargin{1}; else indices = obj.getCurveIndices(obj, varargin); end
+            if nargin==3, indices = value; value=varargin{1}; else indices = getCurveIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = obj.ENsetcomment(obj.ToolkitConstants.EN_CURVE, indices, value, obj.LibEPANET);
@@ -9575,7 +9988,7 @@ classdef epanet <handle
         end
         function value = getComputedTimeSeries(obj)
             obj.saveInputFile(obj.TempInpFile);
-            [fid,binfile, ~] = obj.runEPANETexe(obj);
+            [fid,binfile, ~] = runEPANETexe(obj);
             value = obj.readEpanetBin(fid, binfile, 0);
             value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
             % Remove report bin, files @#
@@ -9930,7 +10343,7 @@ classdef epanet <handle
             %   fromNode = '10';
             %   toNode = '21';
             %   d.getLinkPipeCount                     % Retrieves the number of pipes
-            %   cvPipeIndex = d.obj.addLinkPipeCV(cvPipeID, fromNode, toNode);
+            %   cvPipeIndex = d.addLinkPipeCV(cvPipeID, fromNode, toNode);
             %   d.getLinkPipeCount
             %   d.plot;                                % Plots the network in a new MATLAB figure
             %
@@ -9941,7 +10354,7 @@ classdef epanet <handle
             %   toNode = '22';
             %   length = 600;
             %   d.getLinkPipeCount
-            %   cvPipeIndex = d.obj.addLinkPipeCV(cvPipeID, fromNode, toNode, length);
+            %   cvPipeIndex = d.addLinkPipeCV(cvPipeID, fromNode, toNode, length);
             %   d.getLinkPipeCount
             %   d.getLinkLength(cvPipeIndex)           % Retrieves the new link's length
             %   d.plot;
@@ -10578,7 +10991,7 @@ classdef epanet <handle
             %          addControls, deleteControls.
             if isstruct(index)
                 for c=1:length(index)
-                    obj.setControlFunction(obj, c, index(c).Control)
+                    obj.setControlFunction(c, index(c).Control)
                 end
             else
                 if nargin <= 3
@@ -10595,7 +11008,7 @@ classdef epanet <handle
                     end
                     j=1;
                     for i=index
-                        obj.setControlFunction(obj, i, tmpC{j});
+                        obj.setControlFunction( i, tmpC{j});
                         j=j+1;
                     end
                 else
@@ -10668,11 +11081,11 @@ classdef epanet <handle
             %          setControls, getControlRulesCount.
             if iscell(control)
                 for i=1:length(control)
-                    index(i) = obj.addControlFunction(obj, control{i});
+                    index(i) = obj.addControlFunction( control{i});
                 end
             else
                 if nargin <= 3
-                   index = obj.addControlFunction(obj, control);
+                   index = obj.addControlFunction(control);
                 else
                     linkIndex = varargin{1};
                     controlSettingValue = varargin{2};
@@ -14087,7 +14500,7 @@ classdef epanet <handle
             else
                 rptfile=varargin{1};
             end
-            [status, result] = obj.runMSX(obj, rptfile);
+            [status, result] = obj.runMSX(rptfile);
         end
         %       function value = getMSXComputedResultsBinary(obj)
         %           uuID = char(java.util.UUID.randomUUID);
@@ -14102,7 +14515,7 @@ classdef epanet <handle
         %           uuID = char(java.util.UUID.randomUUID);
         %           rptfile=['@#', uuID, '.txt'];
         %           binfile=['@#', uuID, '.bin'];
-        %           obj.runMSX(obj, rptfile, binfile);
+        %           obj.runMSX(rptfile, binfile);
         %           value = readMSXBinaryFile(binfile);
         %       end
         function index = addMSXPattern(obj, varargin)
@@ -14179,58 +14592,58 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXTimeStep(obj, timestep)
-            obj.setMSXOptions(obj, 'timestep', timestep);
+            obj.setMSXOptions('timestep', timestep);
         end
         function setMSXAreaUnitsFT2(obj)
-            obj.setMSXOptions(obj, 'areaunits', 'FT2');
+            obj.setMSXOptions('areaunits', 'FT2');
         end
         function setMSXAreaUnitsM2(obj)
-            obj.setMSXOptions(obj, 'areaunits', 'M2');
+            obj.setMSXOptions('areaunits', 'M2');
         end
         function setMSXAreaUnitsCM2(obj)
-            obj.setMSXOptions(obj, 'areaunits', 'CM2');
+            obj.setMSXOptions('areaunits', 'CM2');
         end
         function setMSXRateUnitsSEC(obj)
-            obj.setMSXOptions(obj, 'rateunits', 'SEC');
+            obj.setMSXOptions('rateunits', 'SEC');
         end
         function setMSXRateUnitsMIN(obj)
-            obj.setMSXOptions(obj, 'rateunits', 'MIN');
+            obj.setMSXOptions('rateunits', 'MIN');
         end
         function setMSXRateUnitsHR(obj)
-            obj.setMSXOptions(obj, 'rateunits', 'HR');
+            obj.setMSXOptions('rateunits', 'HR');
         end
         function setMSXRateUnitsDAY(obj)
-            obj.setMSXOptions(obj, 'rateunits', 'DAY');
+            obj.setMSXOptions('rateunits', 'DAY');
         end
         function setMSXSolverEUL(obj)
-            obj.setMSXOptions(obj, 'solver', 'EUL');
+            obj.setMSXOptions('solver', 'EUL');
         end
         function setMSXSolverRK5(obj)
-            obj.setMSXOptions(obj, 'solver', 'RK5');
+            obj.setMSXOptions('solver', 'RK5');
         end
         function setMSXSolverROS2(obj)
-            obj.setMSXOptions(obj, 'solver', 'ROS2');
+            obj.setMSXOptions('solver', 'ROS2');
         end
         function setMSXCouplingFULL(obj)
-            obj.setMSXOptions(obj, 'coupling', 'FULL');
+            obj.setMSXOptions('coupling', 'FULL');
         end
         function setMSXCouplingNONE(obj)
-            obj.setMSXOptions(obj, 'coupling', 'NONE');
+            obj.setMSXOptions('coupling', 'NONE');
         end
         function setMSXCompilerNONE(obj)
-            obj.setMSXOptions(obj, 'compiler', 'NONE');
+            obj.setMSXOptions('compiler', 'NONE');
         end
         function setMSXCompilerVC(obj)
-            obj.setMSXOptions(obj, 'compiler', 'VC');
+            obj.setMSXOptions('compiler', 'VC');
         end
         function setMSXCompilerGC(obj)
-            obj.setMSXOptions(obj, 'compiler', 'GC');
+            obj.setMSXOptions('compiler', 'GC');
         end
         function setMSXAtol(obj, atol)
-            obj.setMSXOptions(obj, 'atol', atol);
+            obj.setMSXOptions('atol', atol);
         end
         function setMSXRtol(obj, rtol)
-            obj.setMSXOptions(obj, 'rtol', rtol);
+            obj.setMSXOptions('rtol', rtol);
         end
         function saveMSXQualityFile(obj, outfname)
             [obj.Errcode]=obj.MSXsaveoutfile(outfname, obj.MSXLibEPANET);
@@ -14840,10 +15253,10 @@ classdef epanet <handle
                             r=atline{end};
                         end
                     end
-                    obj = obj.getTimes(obj, r, atline, obj);
+                    obj = obj.getTimes(r, atline, obj);
                     % Options
                 elseif sect==17
-                    obj = obj.getOptionsValues(obj, obj, atline);
+                    obj = obj.getOptionsValues(obj, atline);
                     % Coordinates
                 elseif sect==18
                     A = textscan(tline, '%s %f %f');
@@ -16939,10 +17352,10 @@ classdef epanet <handle
             % d.Binplot('point', 'no', 'linksindex', 'yes');
             % d.Binplot('linksindex', 'yes', 'fontsize', 8);
             % d.Binplot('nodesindex', 'yes', 'fontsize', 14);
-            [value] = plotnet(obj,'bin', 1, varargin{:});
+            [value] = obj.plotnet('bin', 1, varargin{:});
         end
         function value = getBinNumberReportingPeriods(obj, varargin)
-            value = obj.getBinComputedTimeSeries(obj, 27);
+            value = getBinComputedTimeSeries(obj, 27);
         end
         function value = getBinSimulationDuration(obj, varargin)
             value = obj.getBinComputedTimeSeries(obj, 28);
@@ -17026,7 +17439,7 @@ classdef epanet <handle
             value = obj.getBinComputedTimeSeries(obj, 26);
         end
         function value = getBinComputedAllParameters(obj, varargin)
-            [fid, binfile, rptfile] = obj.runEPANETexe(obj);
+            [fid, binfile, rptfile] = runEPANETexe(obj);
             value = obj.readEpanetBin(fid, binfile);
 
             % Remove report bin, files @#
@@ -17311,7 +17724,7 @@ classdef epanet <handle
             end
         end
         function value = getBinNodeCoordinates(obj)
-            value = obj.BinNodeCoords(obj, 0);
+            value = obj.BinNodeCoords(0);
         end
         function value = getNodeCoordinates(obj, varargin)
             cnt = obj.getLinkCount;
@@ -17348,9 +17761,9 @@ classdef epanet <handle
             n1_value = [];
             n2_value = [];
             if coord_function == 0
-                n1_value = obj.BinNodeCoords(obj, 0);
+                n1_value = obj.BinNodeCoords( 0);
             elseif vert_function == 0
-                n2_value = obj.BinNodeCoords(obj, 1);
+                n2_value = obj.BinNodeCoords( 1);
             end
 
             if isempty(varargin)
@@ -18002,7 +18415,7 @@ classdef epanet <handle
                 elseif sect==1
                     clear atline;
                     atline = obj.checktlines(tline);
-                    value = obj.getOptionsValues(obj, value, atline);
+                    value = obj.getOptionsValues(value, atline);
                 end
             end
             % US Customary - SI metric
@@ -18111,7 +18524,7 @@ classdef epanet <handle
                             r=atline{end};
                         end
                     end
-                    value = obj.getTimes(obj, r, atline, value);
+                    value = obj.getTimes( r, atline, value);
                 end
             end
         end
@@ -18125,420 +18538,4 @@ classdef epanet <handle
         end
     end
 
-end
-
-
-function [axesid] = plotnet(varargin)
-    % Initiality
-    highlightnode=0;
-    highlightlink=0;
-    highlightnodeindex=[];
-    highlightlinkindex=[];
-    legendIndices=[];
-    l=zeros(1, 6);
-    Node=char('no');
-    Link=char('no');
-    NodeInd=0;
-    LinkInd=0;
-    fontsize=10;
-    selectColorNode={''};
-    selectColorLink={''};
-    axesid=0;
-    lline='yes';
-    npoint='yes';
-    extend='no';
-    legendposition = 'northeast';
-    slegend = 'show';
-    for i=1:(nargin/2)
-        argument =lower(varargin{2*(i-1)+1});
-        switch argument
-            case 'nodes' % Nodes
-                if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
-                    warning('Invalid argument.');
-                    return
-                end
-                Node=varargin{2*i};
-            case 'links' % Nodes
-                if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
-                    warning('Invalid argument.');
-                    return
-                end
-                Link=varargin{2*i};
-            case 'nodesindex' % Nodes
-                if ~strcmpi(varargin{2*i}, 'yes')
-                    warning('Invalid argument.');
-                    return
-                end
-                NodeInd=varargin{2*i};
-            case 'linksindex' % Links
-                if ~strcmpi(varargin{2*i}, 'yes')
-                    warning('Invalid argument.');
-                    return
-                end
-                LinkInd=varargin{2*i};
-            case 'highlightnode' % Highlight Node
-                highlightnode=varargin{2*i};
-            case 'highlightlink' % Highlight Link
-                highlightlink=varargin{2*i};
-            case 'fontsize' % font size
-                fontsize=varargin{2*i};
-            case 'colornode' % color
-                selectColorNode=varargin{2*i};
-            case 'colorlink' % color
-                selectColorLink=varargin{2*i};
-            case 'point' % color
-                if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
-                    warning('Invalid argument.');
-                    return
-                end
-                npoint=varargin{2*i};
-            case 'line' % remove line
-                if ~strcmpi(varargin{2*i}, 'yes') && ~strcmpi(varargin{2*i}, 'no')
-                    warning('Invalid argument.');
-                    return
-                end
-                lline=varargin{2*i};
-            case 'axes' % axes id
-                try
-                    axesid=axes('Parent', varargin{2*i});
-                catch
-                    axesid=varargin{2*i};
-                end
-            case 'uifigure' % figure
-                fig=varargin{2*i};
-            case 'bin'
-                bin=varargin{2*i};
-            case 'extend' % extend option
-                extend=varargin{2*i};
-            case 'legendposition' % extend option
-                legendposition=varargin{2*i};
-            case 'legend'
-                slegend=varargin{2*i};
-            otherwise
-                error('Invalid property founobj.');
-        end
-    end
-
-    if axesid==0
-       drawnow;
-       fig=figure;
-       axesid=axes('Parent', fig);
-    end
-
-    if cellfun('isempty', selectColorNode)==1
-        init={'r'};
-        for i=1:length(highlightnode)
-            selectColorNode=[init selectColorNode];
-        end
-    end
-    if cellfun('isempty', selectColorLink)==1
-        init={'r'};
-        for i=1:length(highlightlink)
-            selectColorLink=[init selectColorLink];
-        end
-    end
-
-    % get info BIN function
-    if bin==1
-        b=obj.getBinLinksInfo;
-        v.linknameid=b.BinLinkNameID;
-        v.linkcount=b.BinLinkCount;
-        v.linkfromnode=b.BinLinkFromNode;
-        v.linktonode=b.BinLinkToNode;
-        v.linkindex=b.BinLinkIndex;
-        v.pumpindex=b.BinLinkPumpIndex;
-        v.valveindex=b.BinLinkValveIndex;
-        v.nodesconnlinks = [v.linkfromnode;v.linktonode]';
-        b=obj.getBinNodesInfo;
-        v.nodenameid=b.BinNodeNameID;
-        v.nodecoords=obj.getBinNodeCoordinates;
-        v.nodecount=b.BinNodeCount;
-        v.nodeindex=b.BinNodeIndex;
-        v.resindex=b.BinNodeReservoirIndex;
-        v.tankindex=b.BinNodeTankIndex;
-    elseif bin==0
-        % get info EN functions
-        v.nodenameid=obj.getNodeNameID;
-        v.linknameid=obj.getLinkNameID;
-        if isempty(v.nodenameid) || isempty(v.linknameid)
-            warning('Not enough network nodes/links.');
-            return;
-        end
-        v.nodesconnlinks=obj.getNodesConnectingLinksID;
-        if sum(strcmp(obj.libFunctions, 'ENgetcoord'))
-            v.nodecoords=obj.getNodeCoordinates;
-        else
-            v.nodecoords=obj.getBinNodeCoordinates;
-        end
-        v.pumpindex=obj.getLinkPumpIndex;
-        v.valveindex=obj.getLinkValveIndex;
-        v.resindex=obj.getNodeReservoirIndex;
-        v.tankindex=obj.getNodeTankIndex;
-        v.linkcount=obj.getLinkCount;
-        v.nodecount=obj.getNodeCount;
-        v.linkindex=obj.getLinkIndex;
-        v.nodeindex=obj.getNodeIndex;
-    end
-
-    if isnan(v.nodecoords{1}(2))
-       warning('Do not exist coordinates.'); close(g);
-       return
-    end
-    % Get node names and x, y coordiantes
-    if isa(highlightnode, 'cell')
-        for i=1:length(highlightnode)
-            n = strcmp(v.nodenameid, highlightnode{i});
-            if sum(n)==0
-                warning('Undefined node with id "%s" in function call therefore the index is zero.', char(highlightnode{i}));
-            else
-                highlightnodeindex(i) = strfind(n, 1);
-            end
-        end
-    end
-
-    if isa(highlightlink, 'cell')
-        for i=1:length(highlightlink)
-            n = strcmp(v.linknameid, highlightlink{i});
-            if sum(n)==0
-                warning('Undefined link with id "%s" in function call therefore the index is zero.', char(highlightlink{i}));
-            else
-                highlightlinkindex(i) = strfind(n, 1);
-            end
-        end
-    end
-
-    if (strcmpi(lline, 'yes'))
-        hold(axesid, 'on')
-        for i=1:v.linkcount
-            FromNode=strfind(strcmp(v.nodesconnlinks(i, 1), v.nodenameid), 1);
-            ToNode=strfind(strcmp(v.nodesconnlinks(i, 2), v.nodenameid), 1);
-
-            if FromNode
-                x1 = double(v.nodecoords{1}(FromNode));
-                y1 = double(v.nodecoords{2}(FromNode));
-            end
-            if ToNode
-                x2 = double(v.nodecoords{1}(ToNode));
-                y2 = double(v.nodecoords{2}(ToNode));
-            end
-
-            hh=strfind(highlightlinkindex, i);
-
-            if length(hh) && ~isempty(selectColorLink)
-                line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', [.5 .5 .5], 'Parent', axesid);
-            end
-            if ~length(hh)
-                h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Parent', axesid);
-                if ~l(1), legendIndices = [legendIndices 1]; l(1)=1; end
-            end
-
-            % Plot Pumps
-            if sum(strfind(v.pumpindex, i))
-                colornode = 'm';
-                if length(hh) && isempty(selectColorLink)
-                    colornode = 'r';
-                end
-                h(:, 2)=plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 2, 'MarkerEdgeColor', 'm', ...
-                    'MarkerFaceColor', 'm', ...
-                    'MarkerSize', 5, 'Parent', axesid);
-                if ~l(2), legendIndices = [legendIndices 2]; l(2)=1; end
-                plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
-                    'MarkerFaceColor', colornode, ...
-                    'MarkerSize', 5, 'Parent', axesid);
-            end
-
-            % Plot Valves
-            if sum(strfind(v.valveindex, i))
-                colornode = 'k';
-                if length(hh) && isempty(selectColorLink)
-                    colornode = 'r';
-                end
-                h(:, 3)=plot((x1+x2)/2, (y1+y2)/2, 'k*', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
-                    'MarkerFaceColor', colornode, 'MarkerSize', 7, 'Parent', axesid);
-                if ~l(3), legendIndices = [legendIndices 3]; l(3)=1; end
-            end
-
-            if length(hh) && isempty(selectColorLink)
-                line([x1, x2], [y1, y2], 'LineWidth', 1, 'Color', 'r', 'Parent', axesid);
-                text((x1+x2)/2, (y1+y2)/2, v.linknameid(i), 'Fontsize', fontsize, 'Parent', axesid);
-            elseif length(hh) && ~isempty(selectColorLink)
-                try tt=length(selectColorLink{hh}); catch; tt=2; end
-               if tt>1
-                    if length(selectColorLink(hh))==1
-                        nm{1}=selectColorLink(hh);
-                    else
-                        nm=selectColorLink(hh);
-                    end
-                    if iscell(nm{1})
-                        line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', nm{1}{1}, 'Parent', axesid);
-                    else
-                        line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', nm{1}, 'Parent', axesid);
-                    end
-                else
-                    line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', char(selectColorLink(hh)), 'Parent', axesid);
-                end
-            end
-            % Show Link id
-            if (strcmpi(Link, 'yes')) %&& ~length(hh))
-                text((x1+x2)/2, (y1+y2)/2, v.linknameid(i), 'Fontsize', fontsize, 'Parent', axesid);
-            end
-            % Show Link Index
-            if (strcmpi(LinkInd, 'yes')) %&& ~length(hh))
-                text((x1+x2)/2, (y1+y2)/2, num2str(v.linkindex(i)), 'Fontsize', fontsize, 'Parent', axesid);
-            end
-        end
-    end
-
-    if (strcmpi(npoint, 'yes'))
-        % Coordinates for node FROM
-        hold(axesid, 'on')
-        for i=1:v.nodecount
-            [x] = double(v.nodecoords{1}(i));
-            [y] = double(v.nodecoords{2}(i));
-
-            hh=strfind(highlightnodeindex, i);
-            if ~length(hh)
-                h(:, 4)=plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', 'b', ...
-                'MarkerFaceColor', 'b', ...
-                'MarkerSize', 5, 'Parent', axesid);
-                if ~l(4), legendIndices = [legendIndices 4]; l(4)=1; end
-            end
-
-            % Plot Reservoirs
-            if sum(strfind(v.resindex, i))
-                colornode = 'g';
-                if length(hh) && isempty(selectColorNode)
-                    colornode = 'r';
-                end
-                h(:, 5)=plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', 'g', ...
-                    'MarkerFaceColor', 'g', ...
-                    'MarkerSize', 13, 'Parent', axesid);
-                if ~l(5), legendIndices = [legendIndices 5]; l(5)=1; end
-                plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
-                    'MarkerFaceColor', colornode, ...
-                    'MarkerSize', 13, 'Parent', axesid);
-            end
-            % Plot Tanks
-            if sum(strfind(v.tankindex, i))
-                colornode='c';
-                if length(hh) && isempty(selectColorNode)
-                    colornode='r';
-                elseif length(hh) && ~isempty(selectColorNode)
-                    colornode= 'c';
-                end
-                h(:, 6)=plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', 'c', ...
-                    'MarkerFaceColor', 'c', ...
-                    'MarkerSize', 16, 'Parent', axesid);
-                if ~l(6), legendIndices = [legendIndices 6]; l(6)=1; end
-
-                plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
-                    'MarkerFaceColor', colornode, ...
-                    'MarkerSize', 16, 'Parent', axesid);
-            end
-
-            if length(hh) && isempty(selectColorNode)
-                plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', 'r', ...
-                    'MarkerFaceColor', 'r', ...
-                    'MarkerSize', 5, 'Parent', axesid);
-                text(x, y, v.nodenameid(i), 'Fontsize', fontsize, 'Parent', axesid)%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
-            elseif length(hh) && ~isempty(selectColorNode)
-                try tt=length(selectColorNode{hh}); catch, tt=2; end
-               if tt>1
-                    if length(selectColorNode(hh))==1
-                        nm{1}=selectColorNode(hh);
-                        nmplot=nm{1}{1};
-                    else
-                        nm=selectColorNode(hh);
-                        nmplot=nm{1};
-                    end
-                    if iscell(nm{1})
-                        plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, 'MarkerSize', 5, 'Parent', axesid);
-                    else
-                        plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, 'MarkerSize', 5, 'Parent', axesid);
-                    end
-                    if sum(find(i==v.resindex))
-                       plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
-                       'MarkerFaceColor', nmplot, ...
-                       'MarkerSize', 13, 'Parent', axesid);
-                    end
-                    if sum(find(i==v.tankindex))
-                       plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
-                       'MarkerFaceColor', nmplot, ...
-                       'MarkerSize', 16, 'Parent', axesid);
-                    end
-               else
-                    nmplot=char(selectColorNode(hh));
-                    plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, ...
-                        'MarkerSize', 5, 'Parent', axesid);
-                    if sum(find(i==v.resindex))
-                       plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
-                       'MarkerFaceColor', nmplot, ...
-                       'MarkerSize', 13, 'Parent', axesid);
-                    end
-                    if sum(find(i==v.tankindex))
-                       plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, ...
-                       'MarkerFaceColor', nmplot, ...
-                       'MarkerSize', 16, 'Parent', axesid);
-                    end
-               end
-            end
-            % Show Node id
-            if (strcmpi(Node, 'yes')) %&& ~length(hh))
-                text(x, y, v.nodenameid(i), 'Fontsize', fontsize, 'Parent', axesid);%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
-            end
-            % Show Node index
-            if (strcmpi(NodeInd, 'yes')) %&& ~length(hh))
-                text(x, y, num2str(v.nodeindex(i)), 'Fontsize', fontsize, 'Parent', axesid);%'BackgroundColor', [.7 .9 .7], 'Margin', margin/4);
-            end
-        end
-    end
-
-    % Legend Plots
-    if strcmpi(slegend, 'show')
-        if isempty(highlightnodeindex) || isempty(highlightnodeindex)
-            legendString={'Pipes', 'Pumps', 'Valves', ...
-                'Junctions', 'Reservoirs', 'Tanks'};
-            legendIndices=sort(legendIndices, 'descend');
-            if exist('h','var')
-                try
-                    legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
-                catch
-                    legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
-                end
-            end
-        end
-    elseif strcmpi(slegend, 'hide')
-        %skip
-    else
-        error('Invalid property founobj(legend: "hide", "show")')
-    end
-
-    % Axis OFF and se Background
-    [xmax, ~]=max(v.nodecoords{1});
-    [xmin, ~]=min(v.nodecoords{1});
-    [ymax, ~]=max(v.nodecoords{2});
-    [ymin, ~]=min(v.nodecoords{2});
-
-    if ~isnan(ymax)
-        if ymax==ymin
-            xlim(axesid, [xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
-            ylim(axesid, [ymin-.1, ymax+.1]);
-        elseif xmax==xmin
-            xlim(axesid, [xmin-.1, xmax+.1]);
-            ylim(axesid, [ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
-        else
-            xlim(axesid, [xmin-((xmax-xmin)*.1), xmax+((xmax-xmin)*.1)]);
-            ylim(axesid, [ymin-(ymax-ymin)*.1, ymax+(ymax-ymin)*.1]);
-        end
-    else
-        warning('Undefined coordinates.');
-    end
-    axis(axesid, 'off');
-    try
-        whitebg(fig, 'w');
-    catch
-    end
-    if strcmpi(extend, 'yes')
-        set(axesid, 'position', [0 0 1 1], 'units', 'normalized');
-    end
 end
