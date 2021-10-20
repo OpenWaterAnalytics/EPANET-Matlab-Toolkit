@@ -483,7 +483,7 @@ classdef epanet <handle
             if isempty(varargin{1})
                 j=1;
                 for i=1:count
-                    [obj.Errcode] = eval([fun, '(indices(i), propertie, value(j), obj.LibEPANET)']);
+                    [obj.Errcode] = eval(['obj.',fun, '(indices(i), propertie, value(j), obj.LibEPANET)']);
                     error(obj.getError(obj.Errcode));
                     if ~isscalar(value)
                         j=j+1;
@@ -496,7 +496,7 @@ classdef epanet <handle
                 end
                 j=1;
                 for i=1:length(value)
-                    [obj.Errcode] = eval([fun, '(value(i), propertie, varargin{1}(j), obj.LibEPANET)']);
+                    [obj.Errcode] = eval(['obj.',fun, '(value(i), propertie, varargin{1}(j), obj.LibEPANET)']);
                     error(obj.getError(obj.Errcode));
                     if ~isscalar(varargin{1})
                         j=j+1;
@@ -525,7 +525,7 @@ classdef epanet <handle
                 value = zeros(1, length(varargin{1}));
                 j = 1;
                 for i=1:length(varargin{1})
-                    [obj.Errcode, value(j)] = eval([fun, '(varargin{1}(i), propertie, obj.LibEPANET)']);
+                    [obj.Errcode, value(j)] = eval(['obj.',fun, '(varargin{1}(i), propertie, obj.LibEPANET)']);
                     if ~isscalar(varargin{1})
                         j=j+1;
                     end
@@ -556,10 +556,10 @@ classdef epanet <handle
                 j = 1;
                 for i = indices
                     if ~ismember(i, obj.getNodeReservoirIndex) && sum(strcmp(obj.libFunctions, fun))
-                        if c > getNodeDemandCategoriesNumber(i)
-                            addNodeJunctionDemand(i, param(j));
+                        if c > obj.getNodeDemandCategoriesNumber(i)
+                            addNodeJunctionDemand(obj,i, param(j));
                         else
-                            [obj.Errcode] = eval([fun, '(i, c, param(j), obj.LibEPANET)']);
+                            [obj.Errcode] = eval(['obj.',fun, '(i, c, param(j), obj.LibEPANET)']);
                         end
                     else
                         [obj.Errcode] = obj.ENsetnodevalue(i, propertie, param(j), obj.LibEPANET);
@@ -4196,7 +4196,7 @@ classdef epanet <handle
             indices =obj.getIndices(obj.getPatternCount, varargin{1});
             value = zeros(1, length(indices));
         end
-        function [axesid] = plotnet(varargin)
+        function [axesid] = plotnet(obj,varargin)
             % Initiality
             highlightnode=0;
             highlightlink=0;
@@ -4650,7 +4650,7 @@ classdef epanet <handle
         end
         function [Errcode, value] = ENgetstatistic(code, LibEPANET)
             % EPANET 20100
-            [Errcode, value]=calllib(LibEPANET, ' ENgetstatistic', code, 0);
+            [Errcode, value]=calllib(LibEPANET, 'ENgetstatistic', code, 0);
         end
         function [Errcode, ctype, lindex, setting, nindex, level] = ENgetcontrol(cindex, LibEPANET)
             [Errcode, ctype, lindex, setting, nindex, level]=calllib(LibEPANET, 'ENgetcontrol', cindex, 0, 0, 0, 0, 0);
@@ -9500,7 +9500,7 @@ classdef epanet <handle
             %          getCurveValue, getCurveNameID, getCurveComment.
             value = struct();
             for i=1:obj.getCurveCount
-                [obj.Errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = ENgetcurve(obj, i, obj.LibEPANET);
+                [obj.Errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = obj.ENgetcurve(obj, i, obj.LibEPANET);
             end
         end
         function value = getCounts(obj)
@@ -10529,7 +10529,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, obj.addLinkPipe,
             %          addNodeJunction, deleteLink, setLinkInitialStatus.
-            index = obj.ENaddlink(pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode);
+            index = obj.ENaddlink(obj,pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode);
             if nargin >= 5
                 obj.setLinkInitialStatus(index, varargin{1});
             end
@@ -12126,7 +12126,7 @@ classdef epanet <handle
             %
             % See also getNodeBaseDemands, setNodeJunctionDemandName,
             %          setNodeDemandPatternIndex, addNodeJunction, deleteNode.
-            set_node_demand_pattern(obj, 'ENsetbasedemand', obj.ToolkitConstants.EN_BASEDEMAND, value, varargin)
+            obj.set_node_demand_pattern('ENsetbasedemand', obj.ToolkitConstants.EN_BASEDEMAND, value, varargin)
         end
         function setNodeCoordinates(obj, value, varargin)
             % Sets node coordinates.
@@ -12212,7 +12212,7 @@ classdef epanet <handle
             %
             % See also getNodeDemandPatternIndex, getNodeDemandCategoriesNumber
             %          setNodeBaseDemands, addPattern, deletePattern.
-            set_node_demand_pattern(obj, 'ENsetdemandpattern', obj.ToolkitConstants.EN_PATTERN, value, varargin)
+            obj.set_node_demand_pattern('ENsetdemandpattern', obj.ToolkitConstants.EN_PATTERN, value, varargin)
         end
         function setNodeEmitterCoeff(obj, value, varargin)
             % Sets the values of emitter coefficient for nodes.
@@ -13845,7 +13845,7 @@ classdef epanet <handle
             end
         end
         function value = getMSXEquationsTerms(obj)
-            [value, ~, ~] = obj.getEquations(obj.MSXFile);
+            [value, ~, ~] = getEquations(obj.MSXFile);
         end
         function value = getMSXEquationsPipes(obj)
             [~, value, ~] = obj.getEquations(obj.MSXFile);
