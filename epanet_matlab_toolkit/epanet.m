@@ -569,7 +569,7 @@ classdef epanet <handle
             end
         end
         function value = get_node_tank_mixining_model(obj, varargin)
-            obj.NodeTankMixingModelCode = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MIXMODEL, varargin);
+            obj.NodeTankMixingModelCode = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MIXMODEL, varargin);
             obj.NodeTankMixingModelType = obj.TYPEMIXMODEL(obj.NodeTankMixingModelCode + 1);
             value={obj.NodeTankMixingModelCode obj.NodeTankMixingModelType};
         end
@@ -7164,7 +7164,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpHCurve, getLinkPumpECurve,getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, varargin);
+            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, varargin);
         end
         function value = getLinkPumpECurve(obj, varargin)
             % Retrieves the pump efficiency v. flow curve index. (EPANET Version 2.2)
@@ -7184,7 +7184,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpECurve, getLinkPumpHCurve, getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, varargin);
+            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, varargin);
         end
         function value = getLinkPumpECost(obj, varargin)
             % Retrieves the pump average energy price. (EPANET Version 2.2)
@@ -7204,7 +7204,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpECost, getLinkPumpPower, getLinkPumpHCurve,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, varargin);
+            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, varargin);
         end
         function value = getLinkPumpEPat(obj, varargin)
             % Retrieves the pump energy price time pattern index. (EPANET Version 2.2)
@@ -7224,7 +7224,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpEPat, getLinkPumpHCurve, getLinkPumpECurve,
             %          getLinkPumpECost, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, varargin);
+            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, varargin);
         end
         function value = getLinkPumpPatternIndex(obj, varargin)
             % Retrieves the pump speed time pattern index. (EPANET Version 2.1)
@@ -7244,7 +7244,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpPatternIndex, getLinkPumpPower, getLinkPumpHCurve,
             %          getLinkPumpECost, getLinkPumpEPat,  getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'ENgetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, varargin);
+            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, varargin);
         end
         function value = getLinkPumpPatternNameID(obj, varargin)
             % Retrieves pump pattern name ID. (EPANET Version 2.1)
@@ -8028,7 +8028,7 @@ classdef epanet <handle
             %
             % See also setNodeTankInitialLevel, getNodeTankInitialWaterVolume, getNodeTankVolume,
             %          getNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, varargin);
         end
         function value = getNodeActualDemand(obj, varargin)
             % Retrieves the computed value of all node actual demands.
@@ -8218,7 +8218,7 @@ classdef epanet <handle
             %
             % See also getNodeTankInitialLevel,  getNodeTankVolume,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_INITVOLUME, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_INITVOLUME, varargin);
         end
         function value = getNodeTankMixingModelCode(obj, varargin)
             % Retrieves the tank mixing model code.
@@ -8289,7 +8289,7 @@ classdef epanet <handle
             %   d.getNodeTankMixZoneVolume(tankIndex)   % Retrieves the mixing zone volume of the tanks given their indices
             %
             % See also getNodeTankMixingModelCode, getNodeTankMixingModelType.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MIXZONEVOL, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MIXZONEVOL, varargin);
         end
         function value = getNodeTankDiameter(obj, varargin)
             % Retrieves the tank diameters.
@@ -8309,7 +8309,7 @@ classdef epanet <handle
             %
             % See also setNodeTankDiameter, getNodeTankBulkReactionCoeff, getNodeTankInitialLevel,
             %          getNodeTankMixingModelType, getNodeTankVolume, getNodeTankNameID.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_TANKDIAM, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKDIAM, varargin);
         end
         function value = getNodeTankMinimumWaterVolume(obj, varargin)
             % Retrieves the tank minimum water volume.
@@ -8329,7 +8329,7 @@ classdef epanet <handle
             %
             % See also setNodeTankMinimumWaterVolume, getNodeTankMaximumWaterVolume, getNodeTankInitialWaterVolume,
             %          getNodeTankInitialLevel,  getNodeTankVolume, getNodeTankMixZoneVolume.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, varargin);
         end
         function value = getNodeTankVolumeCurveIndex(obj, varargin)
             % Retrieves the tank volume curve index.
@@ -8349,7 +8349,7 @@ classdef epanet <handle
             %
             % See also getNodeTankVolume, getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume,
             %          getNodeTankInitialWaterVolume, getNodeTankMixZoneVolume.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_VOLCURVE, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_VOLCURVE, varargin);
         end
         function value = getNodeTankMinimumWaterLevel(obj, varargin)
             % Retrieves the tank minimum water level.
@@ -8369,7 +8369,7 @@ classdef epanet <handle
             %
             % See also setNodeTankMinimumWaterLevel, getNodeTankMaximumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, varargin);
         end
         function value = getNodeTankMaximumWaterLevel(obj, varargin)
             % Retrieves the tank maximum water level.
@@ -8389,7 +8389,7 @@ classdef epanet <handle
             %
             % See also setNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, varargin);
         end
         function value = getNodeTankMixingFraction(obj, varargin)
             % Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank.
@@ -8408,7 +8408,7 @@ classdef epanet <handle
             %   d.getNodeTankMixingFraction(tankIndex)   % Retrieves the mixing fraction of the tanks given their indices
             %
             % See also setNodeTankMixingFraction, getNodeTankData.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, varargin);
         end
         function value = getNodeTankBulkReactionCoeff(obj, varargin)
             % Retrieves the tank bulk rate coefficient.
@@ -8427,7 +8427,7 @@ classdef epanet <handle
             %   d.getNodeTankBulkReactionCoeff(tankIndex)   % Retrieves the bulk rate coefficient of the tanks given their indices
             %
             % See also setNodeTankBulkReactionCoeff, getNodeTankData.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, varargin);
         end
         function value = getNodeTankVolume(obj, varargin)
             % Retrieves the tank volume. (EPANET Version 2.1)
@@ -8446,7 +8446,7 @@ classdef epanet <handle
             %   d.getNodeTankVolume(tankIndex)   % Retrieves the volume of the tanks given their indices
             %
             % See also getNodeTankData.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_TANKVOLUME, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKVOLUME, varargin);
         end
         function value = getNodeTankMaximumWaterVolume(obj, varargin)
             % Retrieves the tank maximum water volume. (EPANET Version 2.1)
@@ -8465,7 +8465,7 @@ classdef epanet <handle
             %   d.getNodeTankMaximumWaterVolume(tankIndex)   % Retrieves the maximum water volume of the tanks given their indices
             %
             % See also getNodeTankMinimumWaterVolume, getNodeTankData.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_MAXVOLUME, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MAXVOLUME, varargin);
         end
         function value = getNodeTankCanOverFlow(obj, varargin)
             % Retrieves the tank can overflow (= 1) or not (= 0). (EPANET Version 2.2)
@@ -8484,7 +8484,7 @@ classdef epanet <handle
             %   d.getNodeTankCanOverFlow(tankIndex)   % Retrieves the can overflow of the tanks given their indices
             %
             % See also setNodeTankCanOverFlow, getNodeTankData.
-            value = get_node_link(obj, 'tank', 'ENgetnodevalue', obj.ToolkitConstants.EN_CANOVERFLOW, varargin);
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_CANOVERFLOW, varargin);
         end
         function value = getNodeDemandDeficit(obj, varargin)
             % Retrieves the amount that full demand is reduced under PDA. (EPANET Version 2.2)
@@ -11865,7 +11865,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpPower, setLinkPumpHCurve, setLinkPumpECurve,
             %          setLinkPumpECost, setLinkPumpEPat.
-            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_POWER, value, varargin)
+            set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_POWER, value, varargin)
         end
         function setLinkPumpHCurve(obj, value, varargin)
             % Sets the pump head v. flow curve index. (EPANET Version 2.2)
@@ -11898,7 +11898,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpHCurve, setLinkPumpPower, setLinkPumpECurve,
             %          setLinkPumpECost, setLinkPumpEPat.
-            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, value, varargin)
+            set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, value, varargin)
         end
         function setLinkPumpECurve(obj, value, varargin)
             % Sets the pump efficiency v. flow curve index. (EPANET Version 2.2)
@@ -11931,7 +11931,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpECurve, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECost, setLinkPumpEPat.
-            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, value, varargin)
+            set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, value, varargin)
         end
         function setLinkPumpECost(obj, value, varargin)
             % Sets the pump average energy price. (EPANET Version 2.2)
@@ -11964,7 +11964,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpECost, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpEPat.
-            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, value, varargin)
+            set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, value, varargin)
         end
         function setLinkPumpEPat(obj, value, varargin)
             % Sets the pump energy price time pattern index. (EPANET Version 2.2)
@@ -11997,7 +11997,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpEPat, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
-            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, value, varargin)
+            set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, value, varargin)
         end
         function setLinkPumpPatternIndex(obj, value, varargin)
             % Sets the pump speed time pattern index. (EPANET Version 2.2)
@@ -12035,7 +12035,7 @@ classdef epanet <handle
 	    %
             % See also getLinkPumpPatternIndex, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
-            set_Node_Link(obj, 'pump', 'ENsetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, value, varargin)
+            set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, value, varargin)
         end
         function value = setLinkPumpHeadCurveIndex(obj, value, varargin)
 	    % Example 1:
@@ -12125,7 +12125,7 @@ classdef epanet <handle
             %
             % See also getNodeBaseDemands, setNodeJunctionDemandName,
             %          setNodeDemandPatternIndex, addNodeJunction, deleteNode.
-            obj.set_node_demand_pattern('ENsetbasedemand', obj.ToolkitConstants.EN_BASEDEMAND, value, varargin)
+            obj.set_node_demand_pattern('apiENsetbasedemand', obj.ToolkitConstants.EN_BASEDEMAND, value, varargin)
         end
         function setNodeCoordinates(obj, value, varargin)
             % Sets node coordinates.
@@ -12211,7 +12211,7 @@ classdef epanet <handle
             %
             % See also getNodeDemandPatternIndex, getNodeDemandCategoriesNumber
             %          setNodeBaseDemands, addPattern, deletePattern.
-            obj.set_node_demand_pattern('ENsetdemandpattern', obj.ToolkitConstants.EN_PATTERN, value, varargin)
+            obj.set_node_demand_pattern('apiENsetdemandpattern', obj.ToolkitConstants.EN_PATTERN, value, varargin)
         end
         function setNodeEmitterCoeff(obj, value, varargin)
             % Sets the values of emitter coefficient for nodes.
@@ -12380,7 +12380,7 @@ classdef epanet <handle
             %
             % See also getNodeTankInitialLevel, setNodeTankMinimumWaterLevel, setNodeTankMaximumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
-            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, value, varargin)
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, value, varargin)
         end
         function setNodeTankMixingModelType(obj, value, varargin)
             % Sets the mixing model type value for tanks.
@@ -12431,7 +12431,7 @@ classdef epanet <handle
             elseif nargin == 3
                 varargin{1} = code;
             end
-            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MIXMODEL, value, varargin)
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_MIXMODEL, value, varargin)
         end
         function setNodeTankDiameter(obj, value, varargin)
             % Sets the diameter value for tanks.
@@ -12464,7 +12464,7 @@ classdef epanet <handle
             %
             % See also getNodeTankDiameter, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
             %          setNodeTankBulkReactionCoeff, setNodeTankCanOverFlow, setNodeTankData.
-            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_TANKDIAM, value, varargin)
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANKDIAM, value, varargin)
         end
         function setNodeTankMinimumWaterLevel(obj, value, varargin)
             % Sets the minimum water level value for tanks.
@@ -12497,7 +12497,7 @@ classdef epanet <handle
             %
             % See also getNodeTankMinimumWaterLevel, setNodeTankInitialLevel, setNodeTankMaximumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
-            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, value, varargin)
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, value, varargin)
         end
         function setNodeTankMinimumWaterVolume(obj, value, varargin)
             % Sets the minimum water volume value for tanks.
@@ -12530,7 +12530,7 @@ classdef epanet <handle
             %
             % See also getNodeTankMinimumWaterVolume, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
             %          setNodeTankMaximumWaterLevel, setNodeTankMixingFraction, setNodeTankData.
-            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, value, varargin)
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, value, varargin)
         end
         function setNodeTankMaximumWaterLevel(obj, value, varargin)
             % Sets the maximum water level value for tanks.
@@ -12563,7 +12563,7 @@ classdef epanet <handle
             %
             % See also getNodeTankMaximumWaterLevel, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
-            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, value, varargin)
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, value, varargin)
         end
        function setNodeTankCanOverFlow(obj, value, varargin)
             % Sets the tank can-overflow (= 1) or not (= 0). (EPANET Version 2.2)
@@ -12596,7 +12596,7 @@ classdef epanet <handle
             %
             % See also getNodeTankCanOverFlow, setNodeTankBulkReactionCoeff, setNodeTankMinimumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankDiameter, setNodeTankData.
-            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_CANOVERFLOW, value, varargin)
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_CANOVERFLOW, value, varargin)
         end
         function setNodeTankMixingFraction(obj, value, varargin)
             % Sets the tank mixing fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank.
@@ -12629,7 +12629,7 @@ classdef epanet <handle
             %
             % See also getNodeTankMixingFraction, setNodeTankMixingModelType, setNodeTankMinimumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankDiameter, setNodeTankData.
-            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, value, varargin)
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, value, varargin)
         end
         function setNodeTankBulkReactionCoeff(obj, value, varargin)
             % Sets the tank bulk reaction coefficient.
@@ -12662,7 +12662,7 @@ classdef epanet <handle
             %
             % See also getNodeTankBulkReactionCoeff, setNodeTankInitialLevel, setNodeTankMixingModelType,
             %          setNodeTankCanOverFlow, setNodeTankDiameter, setNodeTankData.
-            set_Node_Link(obj, 'tank', 'ENsetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, value, varargin)
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, value, varargin)
         end
         function setNodeSourceQuality(obj, value, varargin)
             % Sets the values of quality source strength.
