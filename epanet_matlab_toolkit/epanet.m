@@ -11331,7 +11331,7 @@ classdef epanet <handle
             parameter=varargin{1};
             zz=obj.BinNodeCount-obj.BinCountInitialQualitylines+1;
             sections={'[QUALITY]', '[SOURCES]'};
-            [Errcode]=setBinParam2(parameter, sections, zz);
+            [Errcode]=setBinParam2(obj,parameter, sections, zz);
         end
         function [Errcode]=setBinLinkReactionCoeff(obj, varargin)
             wall=[];Errcode=0;
@@ -11433,25 +11433,25 @@ classdef epanet <handle
                 chemunits='mg/L';
             end
             parameter=['Quality', blanks(5), chemname, blanks(5), chemunits];
-            [Errcode]= setBinParam(indexParameter, parameter, sections);
+            [Errcode]= setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinQualityChem(obj, varargin)
             sections={'[OPTIONS]', '[REPORT]'};
             indexParameter=1;
             parameter='Quality            	chem   mg/L';
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinQualityNone(obj, varargin)
             sections={'[OPTIONS]', '[COORDINATES]'};
             indexParameter=1;
             parameter='Quality            	None';
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinQualityAge(obj, varargin)
             sections={'[OPTIONS]', '[COORDINATES]'};
             indexParameter=1;
             parameter='Quality            	Age';
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinQualityTrace(obj, varargin)
             sections={'[OPTIONS]', '[COORDINATES]'};
@@ -11467,125 +11467,125 @@ classdef epanet <handle
             parameter=varargin{1};
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=1;
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeHydraulicStep(obj, varargin)
             parameter=varargin{1};
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=2;
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeQualityStep(obj, varargin)
             parameter=varargin{1};
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=3;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam( obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimePatternStep(obj, varargin)
             parameter=varargin{1};
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=4;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimePatternStart(obj, varargin)
             parameter=varargin{1};
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=5;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeReportingStep(obj, varargin)
             parameter=varargin{1};
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=6;
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeReportingStart(obj, varargin)
             parameter=varargin{1};
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=7;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam( obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeStatisticsNone(obj, varargin)
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=8;
             parameter='None';
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeStatisticsAverage(obj, varargin)
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=8;
             parameter='AVERAGE';
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam( obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeStatisticsMinimum(obj, varargin)
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=8;
             parameter='MINIMUM';
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeStatisticsMaximum(obj, varargin)
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=8;
             parameter='MAXIMUM';
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeStatisticsRange(obj, varargin)
             sections={'[TIMES]', '[REPORT]'};
             indexParameter=8;
             parameter='RANGE';
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeTankElevation(obj, varargin)
             parameter=varargin{1};
             sections={'[TANKS]', '[PIPES]'};
             indexParameter=2;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeTankInitialLevel(obj, varargin)
             parameter=varargin{1};
             sections={'[TANKS]', '[PIPES]'};
             indexParameter=3;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeTankMinimumWaterLevel(obj, varargin)
             parameter=varargin{1};
             sections={'[TANKS]', '[PIPES]'};
             indexParameter=4;
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeTankMaximumWaterLevel(obj, varargin)
             parameter=varargin{1};
             sections={'[TANKS]', '[PIPES]'};
             indexParameter=5;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeTankDiameter(obj, varargin)
             parameter=varargin{1};
             sections={'[TANKS]', '[PIPES]'};
             indexParameter=6;
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeTankMinimumWaterVolume(obj, varargin)
             parameter=varargin{1};
             sections={'[TANKS]', '[PIPES]'};
             indexParameter=7;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [value] = getBinLimitingPotential(obj)
             [~, value] = limitingPotential('get');
         end
         function [Errcode]=setBinLimitingPotential(obj, newlimiting)
-            Errcode = limitingPotential('', newlimiting);
+            Errcode = limitingPotential(obj,'', newlimiting);
         end
         function [Errcode]=setBinLinkGlobalWallReactionCoeff(obj, varargin)
             parameter=varargin{1};
             sections={'[REACTIONS]', '[MIXING]'};
-            [Errcode]=setBinParam( 3, parameter, sections);
+            [Errcode]=setBinParam( obj,3, parameter, sections);
         end
         function [Errcode]=setBinLinkGlobalBulkReactionCoeff(obj, varargin)
             parameter=varargin{1};
             sections={'[REACTIONS]', '[MIXING]'};
-            [Errcode]=setBinParam( 1, parameter, sections);
+            [Errcode]=setBinParam(obj, 1, parameter, sections);
         end
         function BinClose(obj)
             fclose all;
@@ -11729,31 +11729,31 @@ classdef epanet <handle
             parameter=varargin{1};
             sections={'[RESERVOIRS]', '[TANKS]'};
             indexParameter=3;
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeReservoirElevation(obj, varargin)
             parameter=varargin{1};
             sections={'[RESERVOIRS]', '[TANKS]'};
             indexParameter=2;
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeJunctionElevation(obj, varargin)
             parameter=varargin{1};
             sections={'[JUNCTIONS]', '[RESERVOIRS]', '[DEMANDS]', '[STATUS]', '[EMITTERS]'};
             indexParameter=2;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam( obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeJunctionsBaseDemands(obj, varargin)
             parameter=varargin{1};
             sections={'[JUNCTIONS]', '[RESERVOIRS]', '[DEMANDS]', '[STATUS]', '[EMITTERS]'};
             indexParameter=3;
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam( obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinNodeJunDemandPatternNameID(obj, varargin)
             parameter=varargin{1};
             sections={'[JUNCTIONS]', '[RESERVOIRS]', '[DEMANDS]', '[STATUS]', '[EMITTERS]'};
             indexParameter=4;
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinPattern(obj, varargin)
             idpattern=varargin{1};
@@ -11786,7 +11786,7 @@ classdef epanet <handle
                         end
                     end
                 end
-                ErrcsetBinParam2( values, sections, zz, newidpattern);
+               Errcode =setBinParam2(obj, values, sections, zz, newidpattern);
             else
                 warning('Invalid argument found.');Errcode=-1;
                 return;
@@ -11795,7 +11795,7 @@ classdef epanet <handle
         function [Errcode]=setBinNodeSourceQuality(obj, varargin)
             sections={'[SOURCES]', '[MIXING]'};
             values=varargin{1};
-            [Errcode]=setBinParam( 11, values, sections);
+            [Errcode]=setBinParam(obj, 11, values, sections);
         end
         function saveBinInpFile(obj, varargin)
             if ~isempty(varargin)
@@ -12676,7 +12676,7 @@ classdef epanet <handle
                 return;
            end
            sections={'[PIPES]', '[PUMPS]'};
-           [Errcode]=setBinParam(indexParameter, parameter, sections);
+           [Errcode]=setBinParam(obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinLinkPumpStatus(obj, varargin)
             if sum(strcmpi(varargin{1}, 'closed')+strcmpi(varargin{1}, 'open'))==obj.BinLinkPumpCount
@@ -13272,11 +13272,11 @@ classdef epanet <handle
         end
         function value = getBinNodeSourceInfo(obj, varargin)
             sections = {'[SOURCES]' '[MIXING]'};
-            value = getBinParam(sections);
+            value = getBinParam(obj,sections);
         end
         function value = getBinPatternsInfo(obj, varargin)
             sections = {'[PATTERNS]' '[CURVES]'};
-            value = getBinParam( sections);
+            value = getBinParam(obj,sections);
         end
         function value = getBinNodeIndex(obj, varargin)
             v=obj.getBinNodeNameID;
@@ -15030,7 +15030,7 @@ end
                  mm=[sprintf('%.20f', mins) '       min'];
              end
          end
-         function [Errcod] = setBinParam2(obj, parameter, sections, zz, varargin)
+         function [Errcode] = setBinParam2(obj, parameter, sections, zz, varargin)
              Errcode=0;
              if strcmp(sections{1}, '[STATUS]')
                  value =obj.getBinLinksInfo;
@@ -15349,7 +15349,7 @@ end
                  Errcode=reloadNetwork(obj);
              end
          end
-         function [BinCurveNameID, BinCurveXvalue, BinCurveYvalue, BinCurveAllLines, BinCurveTypes, BinCurveCount, BinCType] = CurveInfo(obj)
+         function [BinCurveNameID, BinCurveXvalue, BinCurveYvalue, BinCurveAllLines, BinCurveTypes, BinCurveCount, BinCTypes] = CurveInfo(obj)
              BinCurveTypes=[];Bintypecode=0;BinCNameID={};BinCurveNameID={};BinCurveCount=0;
              BinCurveXvalue=[];BinCurveYvalue=[];BinCurveAllLines={};sect=0;i=1;u=1;BinCTypes=[];
              cc=1;uu=1;gg=1;
