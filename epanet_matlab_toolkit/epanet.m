@@ -1861,7 +1861,7 @@ classdef epanet <handle
             %
             % See also setControls, addControls, deleteControls,
             %          getRules, setRules, addRules, deleteRules.
-            indices = getControlIndices(varargin);j=1;
+            indices = getControlIndices(obj,varargin);j=1;
             value=struct();
             obj.ControlTypes={};
             for i=indices
@@ -10560,58 +10560,58 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXTimeStep(obj, timestep)
-            setMSXOptions('timestep', timestep);
+            setMSXOptions(obj,'timestep', timestep);
         end
         function setMSXAreaUnitsFT2(obj)
-            setMSXOptions('areaunits', 'FT2');
+            setMSXOptions(obj,'areaunits', 'FT2');
         end
         function setMSXAreaUnitsM2(obj)
-            setMSXOptions('areaunits', 'M2');
+            setMSXOptions(obj,'areaunits', 'M2');
         end
         function setMSXAreaUnitsCM2(obj)
-            setMSXOptions('areaunits', 'CM2');
+            setMSXOptions(obj,'areaunits', 'CM2');
         end
         function setMSXRateUnitsSEC(obj)
-            setMSXOptions('rateunits', 'SEC');
+            setMSXOptions(obj,'rateunits', 'SEC');
         end
         function setMSXRateUnitsMIN(obj)
-            setMSXOptions('rateunits', 'MIN');
+            setMSXOptions(obj,'rateunits', 'MIN');
         end
         function setMSXRateUnitsHR(obj)
-            setMSXOptions('rateunits', 'HR');
+            setMSXOptions(obj,'rateunits', 'HR');
         end
         function setMSXRateUnitsDAY(obj)
-            setMSXOptions('rateunits', 'DAY');
+            setMSXOptions(obj,'rateunits', 'DAY');
         end
         function setMSXSolverEUL(obj)
-            setMSXOptions('solver', 'EUL');
+            setMSXOptions(obj,'solver', 'EUL');
         end
         function setMSXSolverRK5(obj)
-            setMSXOptions('solver', 'RK5');
+            setMSXOptions(obj,'solver', 'RK5');
         end
         function setMSXSolverROS2(obj)
-            setMSXOptions('solver', 'ROS2');
+            setMSXOptions(obj,'solver', 'ROS2');
         end
         function setMSXCouplingFULL(obj)
-            setMSXOptions('coupling', 'FULL');
+            setMSXOptions(obj,'coupling', 'FULL');
         end
         function setMSXCouplingNONE(obj)
-            setMSXOptions('coupling', 'NONE');
+            setMSXOptions(obj,'coupling', 'NONE');
         end
         function setMSXCompilerNONE(obj)
-            setMSXOptions('compiler', 'NONE');
+            setMSXOptions(obj,'compiler', 'NONE');
         end
         function setMSXCompilerVC(obj)
-            setMSXOptions('compiler', 'VC');
+            setMSXOptions(obj,'compiler', 'VC');
         end
         function setMSXCompilerGC(obj)
-            setMSXOptions('compiler', 'GC');
+            setMSXOptions(obj,'compiler', 'GC');
         end
         function setMSXAtol(obj, atol)
-            setMSXOptions('atol', atol);
+            setMSXOptions(obj,'atol', atol);
         end
         function setMSXRtol(obj, rtol)
-            setMSXOptions('rtol', rtol);
+            setMSXOptions(obj,'rtol', rtol);
         end
         function saveMSXQualityFile(obj, outfname)
             [obj.Errcode]=obj.MSXsaveoutfile(outfname, obj.MSXLibEPANET);
@@ -10680,7 +10680,7 @@ classdef epanet <handle
         end
         function unloadMSX(obj)
             obj.MSXclose(obj);
-            MSXMatlabCleanup(obj);
+            obj.MSXMatlabCleanup(obj);
             fclose('all');
             disp('MSX unloaded');
         end
@@ -11221,10 +11221,10 @@ classdef epanet <handle
                             r=atline{end};
                         end
                     end
-                    obj = getTimes(r, atline, obj);
+                    obj = getTimes(obj,r, atline, obj);
                     % Options
                 elseif sect==17
-                    obj = getOptionsValues(obj, atline);
+                    obj = getOptionsValues(obj,obj, atline);
                     % Coordinates
                 elseif sect==18
                     A = textscan(tline, '%s %f %f');
@@ -12635,37 +12635,37 @@ classdef epanet <handle
             Errcode = obj.setFlowUnits('CMD', 0, varargin); %cubic meters per day
         end
         function [Errcode]=setBinHeadlossHW(obj)
-            [Errcode]=Options('', 'H-W');  %Hazen-Wiliams
+            [Errcode]=Options(obj,'', 'H-W');  %Hazen-Wiliams
         end
         function [Errcode]=setBinHeadlossDW(obj)
-            [Errcode]=Options( '', 'D-W');  %Darcy-Weisbach
+            [Errcode]=Options(obj, '', 'D-W');  %Darcy-Weisbach
         end
         function [Errcode]=setBinHeadlossCM(obj)
-            [Errcode]=Options( '', 'C-M');  %Chezy-Manning
+            [Errcode]=Options(obj,'', 'C-M');  %Chezy-Manning
         end
         function [Errcode]=setBinLinkPipeLengths(obj, varargin)
             parameter=varargin{1};
             indexParameter=4;
             sections={'[PIPES]', '[PUMPS]'};
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinLinkPipeDiameters(obj, varargin)
             parameter=varargin{1};
             indexParameter=5;
             sections={'[PIPES]', '[PUMPS]'};
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam( obj,indexParameter, parameter, sections);
         end
         function [Errcode]=setBinLinkPipeRoughness(obj, varargin)
             parameter=varargin{1};
             indexParameter=6;
             sections={'[PIPES]', '[PUMPS]'};
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinLinkPipeMinorLoss(obj, varargin)
             parameter=varargin{1};
             indexParameter=7;
             sections={'[PIPES]', '[PUMPS]'};
-            [Errcode]=setBinParam( indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinLinkPipeStatus(obj, varargin)
            indexParameter=8;
@@ -13297,7 +13297,7 @@ classdef epanet <handle
             value = find(strcmpi(obj.getBinPatternsInfo.BinPatternNameID, varargin{1}));
         end
         function value = getBinCurvesInfo(obj)
-            [value.BinCurveNameID, value.BinCurveXvalue, value.BinCurveYvalue, value.BinCurveAllLines, value.BinCurveTypes, value.BinCurveCount, value.BinCTypes]=CurveInfo;
+            [value.BinCurveNameID, value.BinCurveXvalue, value.BinCurveYvalue, value.BinCurveAllLines, value.BinCurveTypes, value.BinCurveCount, value.BinCTypes]=CurveInfo(obj);
         end
         function [value] = Binplot(obj, varargin)
             %Plots network in a new Matlab figure
@@ -13692,7 +13692,7 @@ classdef epanet <handle
             end
         end
         function value = getBinNodeCoordinates(obj)
-            value = BinNodeCoords(0);
+            value = BinNodeCoords(obj, 0);
         end
         function value = getNodeCoordinates(obj, varargin)
             cnt = obj.getLinkCount;
@@ -13729,9 +13729,9 @@ classdef epanet <handle
             n1_value = [];
             n2_value = [];
             if coord_function == 0
-                n1_value = BinNodeCoords( 0);
+                n1_value = BinNodeCoords(obj,0);
             elseif vert_function == 0
-                n2_value = BinNodeCoords( 1);
+                n2_value = BinNodeCoords(obj,1);
             end
 
             if isempty(varargin)
@@ -14189,7 +14189,7 @@ classdef epanet <handle
                 % Skip blank Clines and comments
                 if isempty(tok), continue, end
                 if (tok(1) == ';'), continue, end
-                [value, cont, sect, i, t, q, d] = getLV(obj,tok, value, sect, tline, i, t, q, d);
+                [value, cont, sect, i, t, q, d] = getLV(tok, value, sect, tline, i, t, q, d);
                 if cont==0
                     break;
                 end
@@ -14383,7 +14383,7 @@ classdef epanet <handle
                 elseif sect==1
                     clear atline;
                     atline = checktlines(tline);
-                    value = getOptionsValues(value, atline);
+                    value = getOptionsValues(obj,value, atline);
                 end
             end
             % US Customary - SI metric
@@ -14492,7 +14492,7 @@ classdef epanet <handle
                             r=atline{end};
                         end
                     end
-                    value = getTimes( r, atline, value);
+                    value = getTimes(obj,r, atline, value);
                 end
             end
         end
@@ -16385,7 +16385,7 @@ end
              % MLD million liters per day
              % CMH cubic meters per hour
              % CMD cubic meters per day
-             value=getBinOptionsInfo;Errcode=0;
+             value=obj.getBinOptionsInfo;Errcode=0;
              previousFlowUnits=value.BinLinkFlowUnits;
              US_Customary=0;
              SI_Metric=0;
