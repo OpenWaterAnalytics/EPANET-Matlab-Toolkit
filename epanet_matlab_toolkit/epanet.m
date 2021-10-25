@@ -1028,7 +1028,7 @@ classdef epanet <handle
           [Errcode, ~, ~, ~, index]=calllib(obj.LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
           error(obj.getError(Errcode));
         end
-        function [Errcode] = ENdeletenode(LibEPANET, indexNode, condition)
+        function [Errcode] = apiENdeletenode(LibEPANET, indexNode, condition)
           % dev-net-builder
           [Errcode]=calllib(LibEPANET, 'ENdeletenode', indexNode, condition);
         end
@@ -6820,11 +6820,11 @@ classdef epanet <handle
             if iscell(idNode)
                 for j = 1:length(idNode)
                     indexNode = obj.getNodeIndex(idNode(j));
-                    [Errcode] = obj.ENdeletenode(obj.LibEPANET, indexNode, condition);
+                    [Errcode] = obj.apiENdeletenode(obj.LibEPANET, indexNode, condition);
                     error(obj.getError(Errcode));
                 end
             else
-                [Errcode] = obj.ENdeletenode(obj.LibEPANET, idNode, condition);
+                [Errcode] = obj.apiENdeletenode(obj.LibEPANET, idNode, condition);
                 error(obj.getError(Errcode));
             end
         end
