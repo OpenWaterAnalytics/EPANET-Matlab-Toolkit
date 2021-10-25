@@ -10110,7 +10110,7 @@ classdef epanet <handle
         function value = getMSXSources(obj)
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
-                    [obj.Errcode, obj.MSXSourceType{i}{j}, obj.MSXsourceLevel{i}(j), obj.MSXSourcePatternIndex{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
+                    [obj.Errcode, obj.MSXSourceType{i}{j}, obj.MSXSourceLevel{i}(j), obj.MSXSourcePatternIndex{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     obj.MSXSourceTypeCode{i}(j)=find(strcmp(obj.MSXTYPESOURCE, obj.MSXSourceType{i}{j}))-2;
                 end
@@ -10119,7 +10119,7 @@ classdef epanet <handle
            % value={obj.MSXSourceType, obj.MSXSourceTypeCode, obj.MSXsourceLevel, obj.MSXSourcePatternIndex, SnodeID};
             value.MSXSourceType=obj.MSXSourceType;
             value.MSXSourceTypeCode=obj.MSXSourceTypeCode;
-            value.MSXsourceLevel=obj.MSXsourceLevel;
+            value.MSXsourceLevel=obj.MSXSourceLevel;
             value.MSXSourcePatternIndex=obj.MSXSourcePatternIndex;
             value.apiMSXSourceNodeNameID=SnodeID;
         end
@@ -10679,8 +10679,8 @@ classdef epanet <handle
             fclose(f);
         end
         function unloadMSX(obj)
-            obj.MSXclose(obj);
-            obj.MSXMatlabCleanup(obj);
+            obj.apiMSXclose(obj);
+            obj.apiMSXMatlabCleanup(obj);
             fclose('all');
             disp('MSX unloaded');
         end
