@@ -309,10 +309,10 @@ errcode=d.setBinNodeTankParameters('elevation',tankElevation,'initlevel',tankIni
     tankMixModel=d.getNodeTankMixingModelType
     tankMixModel{end}='2Comp'; % Constants for mixing models: 'MIX1','2Comp', 'FIFO','LIFO' (2Comp=MIX2)
 
-    tankMixFraction=d.getNodeTankMinimumFraction
+    tankMixFraction=d.getNodeTankMixingFraction
     tankMixFraction(end)=2;
     errcode=d.setBinNodeTankParameters('mixmodel',tankMixModel,'mixfraction',tankMixFraction); % Bug on mixfraction
-    d.getNodeTankMinimumFraction
+    d.getNodeTankMixingFraction
     d.getNodeTankMixingModelType
     disp('Press any key to continue...')
     pause
@@ -361,7 +361,7 @@ newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
 Code='PIPE';
-errcode=d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,...
+errcode=d.addBinNodeJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,...
 ToNodeID,newLength,newDiameter,newRoughness,Code);
 
 % [errcode]=addBinPipe(newLink,fromNode,toNode,newLength,newDiameter,newRoughness)

@@ -12094,7 +12094,7 @@ classdef epanet <handle
             if nargin >= 8
                 quality = varargin{6};
             end
-            node_index = addBinNode( 1, nodeID, coords, elev, demand, patternID, category, quality);
+            node_index = addBinNode(obj,1, nodeID, coords, elev, demand, patternID, category, quality);
             if nargin == 9
                 if strcmp(varargin{7}{1}, 'PIPE')
                     link_index = addBinLinkPipe(varargin{7}{2:end});
@@ -12173,7 +12173,7 @@ classdef epanet <handle
             if nargin >= 6
                 quality = varargin{4};
             end
-            node_index = addBinNode( 2, nodeID, coords, head, patternID, quality);
+            node_index = addBinNode(obj,2, nodeID, coords, head, patternID, quality);
             if nargin == 7
                 if strcmp(varargin{5}{1}, 'PIPE')
                     link_index = addBinLinkPipe(obj, varargin{5}{2:end});
@@ -12308,7 +12308,7 @@ classdef epanet <handle
             if nargin >= 11
                 quality = varargin{9};
             end
-            node_index = addBinNode( 3, nodeID, coords, elev, diameter, initlevel, minlevel, maxlevel, minvol, volcurve, quality);
+            node_index = addBinNode(obj,3, nodeID, coords, elev, diameter, initlevel, minlevel, maxlevel, minvol, volcurve, quality);
             if nargin == 12
                 if strcmp(varargin{10}{1}, 'PIPE')
                     link_index = addBinLinkPipe(obj, varargin{10}{2:end});
@@ -15862,7 +15862,7 @@ end
                  vdiameter=varargin{1};
                  vsetting=varargin{2};
              end
-             [Errcode]=addLinkWarnings(typecode, newLink, toNode);
+             [Errcode]=addLinkWarnings(obj,typecode, newLink, toNode);
              crvs = obj.getBinCurvesInfo;
              % Open and read inpname
              % Read all file and save in variable info
