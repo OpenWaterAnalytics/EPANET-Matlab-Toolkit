@@ -1469,10 +1469,12 @@ classdef epanet <handle
                 obj.LibEPANETpath = [pwdepanet, '/mac/'];
                 obj.LibEPANET = 'libepanet';
             end
-            if ~isdeployed
-                obj.InputFile=which(varargin{1}); % Get name of INP file
-            else
-                obj.InputFile=varargin{1};
+            if nargin>0
+                if ~isdeployed 
+                    obj.InputFile=which(varargin{1}); % Get name of INP file
+                else
+                    obj.InputFile=varargin{1};
+                end
             end
             % Bin functions
             if nargin>1
@@ -1488,108 +1490,121 @@ classdef epanet <handle
                     return;
                 end
             end
-            obj.Bin=1;
-            [~, inp]=fileparts(obj.InputFile);
-            if isempty(inp)
-                if nargin==2 && strcmpi(varargin{2}, 'CREATE')
-                    % skip
-                else
-                    error(['File "', varargin{1}, '" is not a valid.']);
-                end
-            end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
-                [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-                if isempty(pwdDLL)
-                    pwdDLL = pwd;
-                end
-                obj.LibEPANETpath = [pwdDLL, '\'];
-                try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
-                catch
-                   obj.Errcode=-1;
-                   error(['File "', obj.LibEPANET, '" is not a valid win application.']);
-                end
-            elseif ~isunix
-                obj.LibEPANET = 'epanet2';
-            end
-            if ~isdeployed
-                if ~exist(obj.InputFile, 'file')
+            if nargin>0
+                obj.Bin=1;
+                [~, inp]=fileparts(obj.InputFile);
+                % nargin>0
+                if isempty(inp)
                     if nargin==2 && strcmpi(varargin{2}, 'CREATE')
                         % skip
                     else
-                        error(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);
+                        error(['File "', varargin{1}, '" is not a valid.']);
                     end
                 end
             end
+                if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
+                    [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+                    if isempty(pwdDLL)
+                        pwdDLL = pwd;
+                    end
+                    obj.LibEPANETpath = [pwdDLL, '\'];
+                    try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
+                    catch
+                       obj.Errcode=-1;
+                       error(['File "', obj.LibEPANET, '" is not a valid win application.']);
+                    end
+                elseif ~isunix
+                    obj.LibEPANET = 'epanet2';
+                end
+                if nargin>0
+                    if ~isdeployed
+                        if ~exist(obj.InputFile, 'file')
+                            if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                                % skip
+                            else
+                                error(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);
+                            end
+                        end
+                    end
+                end
             %Load EPANET Library
             obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
             disp([' (EMT version {', obj.classversion,'}).'])
+           
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
 
             %For the getComputedQualityTimeSeries
             obj.solve = 0;
             %Open the file
-            if ~isempty(obj.InputFile)
-                if nargin==2 && strcmpi(varargin{2}, 'CREATE')
-                    warning(['Network name "', inp ,'.inp" already exists.'])
+            if nargin>0
+                if ~isempty(obj.InputFile)
+                    if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                        warning(['Network name "', inp ,'.inp" already exists.'])
+                    end
+                    obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
+                else
+                    obj.InputFile = varargin{1};
+                    % initializes an EPANET project that isn't opened with an input file
+                    obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
+                    warning('Initializes the EPANET project!');
                 end
-                obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
-                error(obj.getError(obj.Errcode));
-            else
-                obj.InputFile = varargin{1};
-                % initializes an EPANET project that isn't opened with an input file
-                obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
-                warning('Initializes the EPANET project!');
-            end
-
-            %Save the temporary input file
-            obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
-            obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
-            obj.closeNetwork;  %apiENclose; %Close input file
-            %Load temporary file
-            rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
-            binfile = [obj.InputFile(1:end-4), '_temp.bin'];
-            obj.Errcode=obj.apiENopen(obj.BinTempfile, rptfile, binfile, obj.LibEPANET);
-            if obj.Errcode
-                error(obj.getError(obj.Errcode));
-            else
-                disp(['Loading File "', varargin{1}, '"...']);
-            end
-            % Hide messages at command window from bin computed
-            obj.CMDCODE=1;
-
-            % Using new variable for temp file
-            obj.TempInpFile = obj.BinTempfile;
-            % Load file only, return
-            if nargin==2
-                if strcmpi(varargin{2}, 'LOADFILE')
-                    obj.libFunctions = libfunctions(obj.LibEPANET);
-                    disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
-                    return;
+            
+                %Save the temporary input file
+                obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
+                obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
+                obj.closeNetwork;  %apiENclose; %Close input file
+                %Load temporary file
+                rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
+                binfile = [obj.InputFile(1:end-4), '_temp.bin'];
+                obj.Errcode=obj.apiENopen(obj.BinTempfile, rptfile, binfile, obj.LibEPANET);
+                if obj.Errcode
+                    error(obj.getError(obj.Errcode));
+                else
+                    disp(['Loading File "', varargin{1}, '"...']);
                 end
-            end
-            % Get some link data
-            lnkInfo = obj.getLinksInfo;
-            getFields_link_info = fields(lnkInfo);
-            for i=1:length(getFields_link_info)
-                obj.(getFields_link_info{i}) = eval(['lnkInfo.', getFields_link_info{i}]);
-            end
-            % Get some node data
-            ndInfo = obj.getNodesInfo;
-            getFields_node_info = fields(ndInfo);
-            for i=1:length(getFields_node_info)
-                obj.(getFields_node_info{i}) = eval(['ndInfo.', getFields_node_info{i}]);
-            end
-            if obj.getVersion > 20101
-                % Get demand model type and parameters
-                demModelInfo = obj.getDemandModel;
-                getFields_demModelInfo = fields(demModelInfo);
-                for i=1:length(getFields_demModelInfo)
-                    obj.(getFields_demModelInfo{i}) = eval(['demModelInfo.', getFields_demModelInfo{i}]);
+                % Hide messages at command window from bin computed
+                obj.CMDCODE=1;
+
+                % Using new variable for temp file
+                obj.TempInpFile = obj.BinTempfile;
+                % Load file only, return
+                if nargin==2
+                    if strcmpi(varargin{2}, 'LOADFILE')
+                        obj.libFunctions = libfunctions(obj.LibEPANET);
+                        disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
+                        return;
+                    end
+                end
+            
+                % Get some link data
+                lnkInfo = obj.getLinksInfo;
+                getFields_link_info = fields(lnkInfo);
+                for i=1:length(getFields_link_info)
+                    obj.(getFields_link_info{i}) = eval(['lnkInfo.', getFields_link_info{i}]);
+                end
+                % Get some node data
+                    ndInfo = obj.getNodesInfo;
+                getFields_node_info = fields(ndInfo);
+                for i=1:length(getFields_node_info)
+                    obj.(getFields_node_info{i}) = eval(['ndInfo.', getFields_node_info{i}]);
+                end
+                if obj.getVersion > 20101
+                    % Get demand model type and parameters
+                    demModelInfo = obj.getDemandModel;
+                    getFields_demModelInfo = fields(demModelInfo);
+                    for i=1:length(getFields_demModelInfo)
+                        obj.(getFields_demModelInfo{i}) = eval(['demModelInfo.', getFields_demModelInfo{i}]);
+                    end
                 end
             end
             %Get all the countable network parameters
-            obj.NodeCount = obj.getNodeCount;
+            if nargin == 0
+                return;
+            else
+                obj.NodeCount = obj.getNodeCount;
+            end
             if ~obj.NodeCount
                 return;
             end
@@ -6694,6 +6709,49 @@ classdef epanet <handle
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
+        end
+        function [leftPipeIndex,rightPipeIndex] = splitPipe(obj,pipeID,newPipeID,newNodeID)
+            %SPLITPIPE
+            % splits a pipe (pipeID) in half, creating two new pipes (pipeID and newPipeID) and adds a 
+            % junction/node (newNodeID) in between. 
+            % 
+            % Example 1:
+            %   Splites pipe with ID '11' to pipes '11' and '11a' and creates the
+            %   node '11a' in the link of the two new pipes
+            %   d = epanet('Net1.inp');
+            %   pipeID = '11';
+            %   newPipeID= '11a';
+            %   newNodeID= '11a';
+            %   d.splitPipe(pipeID,newPipeID,newNodeID)
+            %   d.getLinkIndex
+            %   d.getNodesConnectingLinksID
+
+
+            % Find the coordinates of the Nodes connected 
+            % with the link/pipe
+            pipeIndex  = obj.getLinkIndex(pipeID);
+            nodesIndex = obj.getLinkNodesIndex(pipeIndex);
+            leftNodeIndex   = nodesIndex(1);
+            rightNodeIndex  = nodesIndex(2); 
+            coordNode1 = obj.getNodeCoordinates(leftNodeIndex);
+            coordNode2 = obj.getNodeCoordinates(rightNodeIndex);
+            % Calculate mid position of the link/pipe
+            midX = (coordNode1(1)+coordNode2(1))/2;
+            midY = (coordNode1(2)+coordNode2(2))/2;
+            % Add the new node between the link/pipe
+            obj.addNodeJunction(newNodeID,[midX,midY]);     
+            % Delete the link/pipe that is splitted
+            obj.deleteLink(pipeID)
+            % Add two new pipes
+            %d.addLinkPipe(pipeID, fromNode, toNode);
+            % Add the Left Pipe
+            leftNodeID = obj.getNodeNameID(leftNodeIndex);
+            leftPipeIndex = obj.addLinkPipe(pipeID,leftNodeID{1},newNodeID);
+            obj.setNodesConnectingLinksID(leftPipeIndex, leftNodeID{1}, newNodeID);
+            %Add the Right Pipe
+            rightNodeID = obj.getNodeNameID(rightNodeIndex);
+            rightPipeIndex  = obj.addLinkPipe(newPipeID,newNodeID,rightNodeID{1});
+            obj.setNodesConnectingLinksID(rightPipeIndex,newNodeID,rightNodeID{1});
         end
         function value = getLinkVerticesCount(obj, varargin)
             % Retrieves the number of internal vertex points assigned to a link.
@@ -12558,18 +12616,18 @@ classdef epanet <handle
         function [Errcode]=addBinValveGPV(obj, newLink, fromNode, toNode, diameter, setting)
             [Errcode]=addLink(obj, 8, newLink, fromNode, toNode, diameter, setting); % General Purpose Valve
         end
-        function [Errcode]=addBinCurvePump(obj, newCurveID, varargin)
+        function [Errcode]=addBinCurvePump(newCurveID, varargin)
             CurveX=varargin{1};
             CurveY=varargin{2};
             [Errcode]= addBinCurve(newCurveID, CurveX, CurveY, 0);  %ID Flow-OptionsHeadloss
         end
-        function [Errcode]=addBinCurveEfficiency(obj, newCurveID, CurveX, CurveY)
+        function [Errcode]=addBinCurveEfficiency(newCurveID, CurveX, CurveY)
             [Errcode]= addBinCurve(newCurveID, CurveX, CurveY, 1);  %ID Flow-Efficiency
         end
-        function [Errcode]=addBinCurveVolume(obj, newCurveID, CurveX, CurveY)
+        function [Errcode]=addBinCurveVolume(newCurveID, CurveX, CurveY)
             [Errcode]= addBinCurve(newCurveID, CurveX, CurveY, 2);  %ID Heigh-Volume
         end
-        function [Errcode]=addBinCurveHeadloss(obj, newCurveID, CurveX, CurveY)
+        function [Errcode]=addBinCurveHeadloss(newCurveID, CurveX, CurveY)
             [Errcode]= addBinCurve(newCurveID, CurveX, CurveY, 3);  %ID Flow-OptionsHeadloss
         end
         function [Errcode]=addBinControl(obj, x, status, y_t_c, param, z, varargin)
