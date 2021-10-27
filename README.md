@@ -401,6 +401,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeElevations|Sets the values of elevations|
 |setNodeEmitterCoeff|Sets the values of emitter coeff.|
 |setNodeInitialQuality|Sets the values of initial qualities|
+|setNodeJunctionData|Sets a group of properties for a junction node. (EPANET Version 2.2)|
 |setNodeJunctionDemandName|Assigns a name to a node's demand category|
 |setNodeNameID|Sets the ID name for nodes|
 |setNodeSourcePatternIndex|Sets the values of source pattern indices|
