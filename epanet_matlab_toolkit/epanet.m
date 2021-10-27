@@ -6710,10 +6710,13 @@ classdef epanet <handle
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
         end
-        function [leftPipeIndex,rightPipeIndex] = splitPipe(obj,pipeID,newPipeID,newNodeID)
+        function [leftPipeIndex,rightPipeIndex] = splitPipes(obj,pipeID,newPipeID,newNodeID)
             %SPLITPIPE
             % splits a pipe (pipeID) in half, creating two new pipes (pipeID and newPipeID) and adds a 
-            % junction/node (newNodeID) in between. 
+            % junction/node (newNodeID) in between. The two new pipes have the same
+            % properties as the one which is splitted. The new node's properties
+            % are the same with the nodes on the left and right and New Node Elevation and Initial
+            % quality is the average of the two.
             % 
             % Example 1:
             %   Splites pipe with ID '11' to pipes '11' and '11a' and creates the
@@ -6738,20 +6741,62 @@ classdef epanet <handle
             % Calculate mid position of the link/pipe
             midX = (coordNode1(1)+coordNode2(1))/2;
             midY = (coordNode1(2)+coordNode2(2))/2;
-            % Add the new node between the link/pipe
-            obj.addNodeJunction(newNodeID,[midX,midY]);     
+            % Add the new node between the link/pipe and add the same properties
+            % as the left node (the elevation is the average of left-right nodes)
+            obj.addNodeJunction(newNodeID,[midX,midY]); 
+            newNodeIndex = obj.getNodeIndex(newNodeID);
+            midElev = (obj.getNodeElevations(leftNodeIndex)+obj.getNodeElevations(rightNodeIndex))/2;
+            obj.setNodeElevations(newNodeIndex,midElev);
+            obj.setNodeDemandPatternIndex(newNodeIndex,obj.getNodeDemandPatternIndex{1}(leftNodeIndex));
+            obj.setNodeEmitterCoeff(newNodeIndex,obj.getNodeEmitterCoeff(leftNodeIndex));
+            midInitQual = (obj.getNodeInitialQuality(leftNodeIndex)+obj.getNodeInitialQuality(rightNodeIndex))/2;
+            obj.setNodeInitialQuality(newNodeIndex,midInitQual);
+            obj.setNodeSourceQuality(newNodeIndex,obj.getNodeSourceQuality(leftNodeIndex));
+            obj.setNodeSourcePatternIndex(newNodeIndex,obj.getNodeSourcePatternIndex(leftNodeIndex));
+            if (~isnan(obj.getNodeSourceTypeIndex(leftNodeIndex)))
+                obj.setNodeSourceType(newNodeIndex,obj.getNodeSourceTypeIndex(leftNodeIndex));
+            end
+            % Access link properties
+            linkProp = obj.getLinksInfo;
+            linkDia  = linkProp.LinkDiameter(pipeIndex);
+            linkLength = linkProp.LinkLength(pipeIndex);
+            linkRoughnessCoeff = linkProp.LinkRoughnessCoeff(pipeIndex);
+            linkMinorLossCoeff = linkProp.LinkMinorLossCoeff(pipeIndex);
+            linkInitialStatus = linkProp.LinkInitialStatus(pipeIndex);
+            linkInitialSetting = linkProp.LinkInitialSetting(pipeIndex);
+            linkBulkReactionCoeff = linkProp.LinkBulkReactionCoeff(pipeIndex);
+            linkWallReactionCoeff = linkProp.LinkWallReactionCoeff(pipeIndex);
             % Delete the link/pipe that is splitted
             obj.deleteLink(pipeID)
             % Add two new pipes
             %d.addLinkPipe(pipeID, fromNode, toNode);
-            % Add the Left Pipe
+            % Add the Left Pipe and add the same properties as the deleted link 
             leftNodeID = obj.getNodeNameID(leftNodeIndex);
             leftPipeIndex = obj.addLinkPipe(pipeID,leftNodeID{1},newNodeID);
             obj.setNodesConnectingLinksID(leftPipeIndex, leftNodeID{1}, newNodeID);
+            obj.setLinkDiameter(leftPipeIndex,linkDia);
+            obj.setLinkLength(leftPipeIndex,linkLength);
+            obj.setLinkRoughnessCoeff(leftPipeIndex,linkRoughnessCoeff);
+            obj.setLinkMinorLossCoeff(leftPipeIndex,linkMinorLossCoeff);
+            obj.setLinkInitialStatus(leftPipeIndex,linkInitialStatus);
+            obj.setLinkInitialSetting(leftPipeIndex,linkInitialSetting);
+            obj.setLinkBulkReactionCoeff(leftPipeIndex,linkBulkReactionCoeff);
+            obj.setLinkWallReactionCoeff(leftPipeIndex,linkWallReactionCoeff);
+            obj.setLinkTypePipe(leftPipeIndex);
             %Add the Right Pipe
             rightNodeID = obj.getNodeNameID(rightNodeIndex);
             rightPipeIndex  = obj.addLinkPipe(newPipeID,newNodeID,rightNodeID{1});
             obj.setNodesConnectingLinksID(rightPipeIndex,newNodeID,rightNodeID{1});
+            obj.setNodesConnectingLinksID(rightPipeIndex, leftNodeID{1}, newNodeID);
+            obj.setLinkDiameter(rightPipeIndex,linkDia);
+            obj.setLinkLength(rightPipeIndex,linkLength);
+            obj.setLinkRoughnessCoeff(rightPipeIndex,linkRoughnessCoeff);
+            obj.setLinkMinorLossCoeff(rightPipeIndex,linkMinorLossCoeff);
+            obj.setLinkInitialStatus(rightPipeIndex,linkInitialStatus);
+            obj.setLinkInitialSetting(rightPipeIndex,linkInitialSetting);
+            obj.setLinkBulkReactionCoeff(rightPipeIndex,linkBulkReactionCoeff);
+            obj.setLinkWallReactionCoeff(rightPipeIndex,linkWallReactionCoeff);
+            obj.setLinkTypePipe(rightPipeIndex);
         end
         function value = getLinkVerticesCount(obj, varargin)
             % Retrieves the number of internal vertex points assigned to a link.
