@@ -467,6 +467,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setTitle|Sets the title lines of the project|
 |solveCompleteHydraulics|Runs a complete hydraulic simulation with results for all time periods written to the binary Hydraulics file|
 |solveCompleteQuality|Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file|
+|splitPipe|S plits a pipe, creating two new pipes and adds a junction in between them|
 |stepQualityAnalysisTimeLeft|Advances the water quality simulation one water quality time step. The time remaining in the overall simulation is returned in tleft|
 |useHydraulicFile|Uses the contents of the specified file as the current binary hydraulics file|
 |writeLineInReportFile|Writes a line of text to the EPANET report file|
