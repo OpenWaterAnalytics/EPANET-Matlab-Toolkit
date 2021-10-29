@@ -1498,31 +1498,31 @@ classdef epanet <handle
                     end
                 end
             end
-                if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
-                    [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-                    if isempty(pwdDLL)
-                        pwdDLL = pwd;
-                    end
-                    obj.LibEPANETpath = [pwdDLL, '\'];
-                    try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
-                    catch
-                       obj.Errcode=-1;
-                       error(['File "', obj.LibEPANET, '" is not a valid win application.']);
-                    end
-                elseif ~isunix
-                    obj.LibEPANET = 'epanet2';
+            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
+                [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+                if isempty(pwdDLL)
+                    pwdDLL = pwd;
                 end
-                if nargin>0
-                    if ~isdeployed
-                        if ~exist(obj.InputFile, 'file')
-                            if nargin==2 && strcmpi(varargin{2}, 'CREATE')
-                                % skip
-                            else
-                                error(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);
-                            end
+                obj.LibEPANETpath = [pwdDLL, '\'];
+                try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
+                catch
+                   obj.Errcode=-1;
+                   error(['File "', obj.LibEPANET, '" is not a valid win application.']);
+                end
+            elseif ~isunix
+                obj.LibEPANET = 'epanet2';
+            end
+            if nargin>0
+                if ~isdeployed
+                    if ~exist(obj.InputFile, 'file')
+                        if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                            % skip
+                        else
+                            error(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);
                         end
                     end
                 end
+            end
             %Load EPANET Library
             obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
             disp([' (EMT version {', obj.classversion, '}).'])
@@ -1533,20 +1533,20 @@ classdef epanet <handle
             %For the getComputedQualityTimeSeries
             obj.solve = 0;
             %Open the file
-            if nargin>0
-                if ~isempty(obj.InputFile)
-                    if nargin==2 && strcmpi(varargin{2}, 'CREATE')
-                        warning(['Network name "', inp , '.inp" already exists.'])
-                    end
-                    obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
-                    error(obj.getError(obj.Errcode));
-                else
-                    obj.InputFile = varargin{1};
-                    % initializes an EPANET project that isn't opened with an input file
-                    obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
-                    warning('Initializes the EPANET project!');
+           
+            if ~isempty(obj.InputFile)
+                if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                    warning(['Network name "', inp , '.inp" already exists.'])
                 end
-
+                obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
+%               else
+%                 obj.InputFile = varargin{1};
+%                 % initializes an EPANET project that isn't opened with an input file
+%                 obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
+%                 warning('Initializes the EPANET project!');
+            end
+            if nargin>0
                 %Save the temporary input file
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
                 obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
