@@ -452,7 +452,7 @@ classdef epanet <handle
                 obj.saveBinInpFile(varargin);
 
             elseif typecode
-                [Errcode] = obj.apiENsetflowunits(obj.LibEPANET, unitcode);
+                [Errcode] = obj.apiENsetflowunits(unitcode, obj.LibEPANET);
                 if nargin==4
                     if isempty(varargin{1})
                         return
@@ -713,7 +713,7 @@ classdef epanet <handle
         function [Errcode, LibEPANET] = apiENgetversion(LibEPANET)
             [Errcode, LibEPANET]=calllib(LibEPANET, 'ENgetversion', 0);
         end
-        function [Errcode] = apiENinit(LibEPANET, unitsType, headLossType)
+        function [Errcode] = apiENinit(unitsType, headLossType, LibEPANET)
             % EPANET Version 2.2
             [Errcode]=calllib(LibEPANET, 'ENinit', '', '', unitsType, headLossType);
         end
@@ -769,7 +769,7 @@ classdef epanet <handle
                disp(errmsg);
             end
         end
-        function [Errcode] = apiENepanet(LibEPANET, tempfile, rptfile, binfile)
+        function [Errcode] = apiENepanet(tempfile, rptfile, binfile, LibEPANET)
             [Errcode] = calllib(LibEPANET, 'ENepanet', tempfile, rptfile, binfile, lib.pointer);
         end
         function [Errcode] = apiENopenH(LibEPANET)
@@ -789,7 +789,7 @@ classdef epanet <handle
             % EPANET Version 2.2
             [Errcode]=calllib(LibEPANET, 'ENclearreport');
         end
-        function [Errcode, value] = apiENgetresultindex(LibEPANET, objecttype, index)
+        function [Errcode, value] = apiENgetresultindex(objecttype, index, LibEPANET)
             % EPANET Version 2.2
             [Errcode, value]=calllib(LibEPANET, 'ENgetresultindex', objecttype, index, int32(0));
         end
@@ -1019,20 +1019,19 @@ classdef epanet <handle
           % dev-net-builder
           [Errcode, ~, index]=calllib(LibEPANET, 'ENaddnode', nodeid, nodetype, 0);
         end
-        function [index, Errcode] = apiENaddlink(obj, linkid, linktype, fromnode, tonode)
+        function [index, Errcode] = apiENaddlink(linkid, linktype, fromnode, tonode, LibEPANET)
           % dev-net-builder
-          [Errcode, ~, ~, ~, index]=calllib(obj.LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
-          error(obj.getError(Errcode));
+          [Errcode, ~, ~, ~, index]=calllib(LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
         end
-        function [Errcode] = apiENdeletenode(LibEPANET, indexNode, condition)
+        function [Errcode] = apiENdeletenode(indexNode, condition, LibEPANET)
           % dev-net-builder
           [Errcode]=calllib(LibEPANET, 'ENdeletenode', indexNode, condition);
         end
-        function [Errcode] = apiENdeletelink(LibEPANET, indexLink, condition)
+        function [Errcode] = apiENdeletelink(indexLink, condition, LibEPANET)
           % dev-net-builder
           [Errcode]=calllib(LibEPANET, 'ENdeletelink', indexLink, condition);
         end
-        function [Errcode] = apiENsetheadcurveindex(LibEPANET, pumpindex, curveindex)
+        function [Errcode] = apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET)
           % dev-net-builder
           [Errcode]=calllib(LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
         end
@@ -1079,15 +1078,15 @@ classdef epanet <handle
           comment = char(32*ones(1, 79));
           [Errcode, comment]=calllib(LibEPANET, 'ENgetcomment', object, index, comment);
         end
-        function [Errcode] = apiENdeletepattern(LibEPANET, indexPat)
+        function [Errcode] = apiENdeletepattern(indexPat, LibEPANET)
           % EPANET Version 2.2
           [Errcode]=calllib(LibEPANET, 'ENdeletepattern', indexPat);
         end
-        function [Errcode] = apiENdeletecurve(LibEPANET, indexCurve)
+        function [Errcode] = apiENdeletecurve(indexCurve, LibEPANET)
           % EPANET Version 2.2
           [Errcode]=calllib(LibEPANET, 'ENdeletecurve', indexCurve);
         end
-        function [Errcode] = apiENsetjuncdata(LibEPANET, index, elev, dmnd, dmndpat)
+        function [Errcode] = apiENsetjuncdata(index, elev, dmnd, dmndpat, LibEPANET)
           %   @brief Sets a group of properties for a junction node.
           %   @param index a junction node's index (starting from 1).
           %   @param elev the value of the junction's elevation.
@@ -1103,7 +1102,7 @@ classdef epanet <handle
           %         obj.apiENgeterror(Errcode, LibEPANET);
           %     end
           % end
-        function [Errcode] = apiENsetflowunits(LibEPANET, code)
+        function [Errcode] = apiENsetflowunits(code, LibEPANET)
           [Errcode]=calllib(LibEPANET, 'ENsetflowunits', code);
         end
         function [Errcode, value] = apiENgetnodevalue(index, paramcode, LibEPANET)
@@ -1115,82 +1114,82 @@ classdef epanet <handle
             value = double(value);
         end
         function [obj] = apiMSXMatlabSetup(obj, msxname, varargin)
-          arch = computer('arch');
-          pwdepanet = fileparts(which(mfilename));
-          if strcmp(arch, 'win64')
-              obj.MSXLibEPANETPath = [pwdepanet, '\64bit\'];
-          elseif strcmp(arch, 'win32')
-              obj.MSXLibEPANETPath = [pwdepanet, '\32bit\'];
-          end
-          if isunix
-              obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
-          end
-          if ~isempty(varargin)
-              if varargin{1}{1}~=1
-                  if nargin==3
-                      obj.MSXLibEPANETPath=char(varargin{1});
-                      obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
-                      if isempty(varargin{1})
-                          obj.MSXLibEPANETPath='';
-                      end
-                  end
-              end
-          end
-          obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-          if ~libisloaded(obj.MSXLibEPANET)
-              loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
-          end
+            arch = computer('arch');
+            pwdepanet = fileparts(which(mfilename));
+            if strcmp(arch, 'win64')
+                obj.MSXLibEPANETPath = [pwdepanet, '\64bit\'];
+            elseif strcmp(arch, 'win32')
+                obj.MSXLibEPANETPath = [pwdepanet, '\32bit\'];
+            end
+            if isunix
+                obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
+            end
+            if ~isempty(varargin)
+                if varargin{1}{1}~=1
+                    if nargin==3
+                        obj.MSXLibEPANETPath=char(varargin{1});
+                        obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
+                        if isempty(varargin{1})
+                            obj.MSXLibEPANETPath='';
+                        end
+                    end
+                end
+            end
+            obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+            if ~libisloaded(obj.MSXLibEPANET)
+                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+            end
 
-          obj.MSXFile = which(char(msxname));
-          %Save the temporary msx file
-          mm=0;
-          if ~isempty(varargin)
-              if varargin{1}{1}==1
-                  mm=1; %for set (write) msx functions
-              end
-          end
-          if mm==1
-              if ~iscell(varargin{1})
-                  obj.MSXTempFile=obj.MSXFile;
-              end
-          else
-              obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
-              copyfile(obj.MSXFile, obj.MSXTempFile);
-          end
-          %Open the file
-          [obj.Errcode] = obj.apiMSXopen(obj);
-          obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
-          obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
-          obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
+            obj.MSXFile = which(char(msxname));
+            %Save the temporary msx file
+            mm=0;
+            if ~isempty(varargin)
+                if varargin{1}{1}==1
+                    mm=1; %for set (write) msx functions
+                end
+            end
+            if mm==1
+                if ~iscell(varargin{1})
+                    obj.MSXTempFile=obj.MSXFile;
+                end
+            else
+                obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
+                copyfile(obj.MSXFile, obj.MSXTempFile);
+            end
+            %Open the file
+            [obj.Errcode] = obj.apiMSXopen(obj);
+            obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
+            obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
+            obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
 
-          obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
-          obj.MSXConstantsCount = obj.getMSXConstantsCount;
-          obj.MSXParametersCount = obj.getMSXParametersCount;
-          obj.MSXPatternsCount = obj.getMSXPatternsCount;
-          obj.MSXSpeciesIndex = obj.getMSXSpeciesIndex;
-          obj.MSXSpeciesNameID = obj.getMSXSpeciesNameID;
-          obj.MSXSpeciesType = obj.getMSXSpeciesType;
-          obj.MSXSpeciesUnits = obj.getMSXSpeciesUnits;
-          obj.MSXSpeciesATOL = obj.getMSXSpeciesATOL;
-          obj.MSXSpeciesRTOL = obj.getMSXSpeciesRTOL;
-          obj.MSXConstantsNameID = obj.getMSXConstantsNameID;
-          obj.MSXConstantsValue  = obj.getMSXConstantsValue;
-          obj.MSXConstantsIndex = obj.getMSXConstantsIndex;
-          obj.MSXParametersNameID = obj.getMSXParametersNameID;
-          obj.MSXParametersIndex = obj.getMSXParametersIndex;
-          obj.MSXParametersTanksValue = obj.getMSXParametersTanksValue;
-          obj.MSXParametersPipesValue = obj.getMSXParametersPipesValue;
-          obj.MSXPatternsNameID = obj.getMSXPatternsNameID;
-          obj.MSXPatternsIndex = obj.getMSXPatternsIndex;
-          obj.MSXPatternsLengths = obj.getMSXPatternsLengths;
-          obj.MSXNodeInitqualValue = obj.getMSXNodeInitqualValue;
-          obj.MSXLinkInitqualValue = obj.getMSXLinkInitqualValue;
-          obj.MSXSources = obj.getMSXSources;
-          obj.MSXSourceType = obj.getMSXSourceType;
-          obj.MSXSourceLevel = obj.getMSXSourceLevel;
-          obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
-          obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
-          obj.MSXPattern = obj.getMSXPattern;
+            obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
+            obj.MSXConstantsCount = obj.getMSXConstantsCount;
+            obj.MSXParametersCount = obj.getMSXParametersCount;
+            obj.MSXPatternsCount = obj.getMSXPatternsCount;
+            obj.MSXSpeciesIndex = obj.getMSXSpeciesIndex;
+            obj.MSXSpeciesNameID = obj.getMSXSpeciesNameID;
+            obj.MSXSpeciesType = obj.getMSXSpeciesType;
+            obj.MSXSpeciesUnits = obj.getMSXSpeciesUnits;
+            obj.MSXSpeciesATOL = obj.getMSXSpeciesATOL;
+            obj.MSXSpeciesRTOL = obj.getMSXSpeciesRTOL;
+            obj.MSXConstantsNameID = obj.getMSXConstantsNameID;
+            obj.MSXConstantsValue  = obj.getMSXConstantsValue;
+            obj.MSXConstantsIndex = obj.getMSXConstantsIndex;
+            obj.MSXParametersNameID = obj.getMSXParametersNameID;
+            obj.MSXParametersIndex = obj.getMSXParametersIndex;
+            obj.MSXParametersTanksValue = obj.getMSXParametersTanksValue;
+            obj.MSXParametersPipesValue = obj.getMSXParametersPipesValue;
+            obj.MSXPatternsNameID = obj.getMSXPatternsNameID;
+            obj.MSXPatternsIndex = obj.getMSXPatternsIndex;
+            obj.MSXPatternsLengths = obj.getMSXPatternsLengths;
+            obj.MSXNodeInitqualValue = obj.getMSXNodeInitqualValue;
+            obj.MSXLinkInitqualValue = obj.getMSXLinkInitqualValue;
+            obj.MSXSources = obj.getMSXSources;
+            obj.MSXSourceType = obj.getMSXSourceType;
+            obj.MSXSourceLevel = obj.getMSXSourceLevel;
+            obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
+            obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
+            obj.MSXPattern = obj.getMSXPattern;
         end
         function [Errcode] = apiMSXopen(obj, varargin)
             [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
@@ -1248,26 +1247,26 @@ classdef epanet <handle
                   obj.apiMSXerror(Errcode, MSXLibEPANET);
               end
               end
-              function [Errcode, len] = apiMSXgetIDlen(type, index, MSXLibEPANET)
+        function [Errcode, len] = apiMSXgetIDlen(type, index, MSXLibEPANET)
               len=0;
               [Errcode, len]=calllib(MSXLibEPANET, 'MSXgetIDlen', type, index, len);
               if Errcode
                   obj.apiMSXerror(Errcode, MSXLibEPANET);
               end
-          end
-          function [Errcode, type, units, atol, rtol] = apiMSXgetspecies(index, MSXLibEPANET)
-          type=0; rtol=0; atol=0;
-          units=char(32*ones(1, 16));
-          [Errcode, type, units, atol, rtol]=calllib(MSXLibEPANET, 'MSXgetspecies', index, type, units, atol, rtol);
-          switch type
-              case 0
-                  type='BULK';   % for a bulk water species
-              case 1
-                  type='WALL';   % for a pipe wall surface species
-          end
-          if Errcode
-              obj.apiMSXerror(Errcode, MSXLibEPANET);
-          end
+        end
+        function [Errcode, type, units, atol, rtol] = apiMSXgetspecies(index, MSXLibEPANET)
+            type=0; rtol=0; atol=0;
+            units=char(32*ones(1, 16));
+            [Errcode, type, units, atol, rtol]=calllib(MSXLibEPANET, 'MSXgetspecies', index, type, units, atol, rtol);
+            switch type
+                case 0
+                    type='BULK';   % for a bulk water species
+                case 1
+                    type='WALL';   % for a pipe wall surface species
+            end
+            if Errcode
+                obj.apiMSXerror(Errcode, MSXLibEPANET);
+            end
         end
         function [Errcode, value] = apiMSXgetconstant(index, MSXLibEPANET)
             value=0;
@@ -1533,18 +1532,18 @@ classdef epanet <handle
             %For the getComputedQualityTimeSeries
             obj.solve = 0;
             %Open the file
-           
+
             if ~isempty(obj.InputFile)
                 if nargin==2 && strcmpi(varargin{2}, 'CREATE')
                     warning(['Network name "', inp , '.inp" already exists.'])
                 end
                 obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
-%               else
-%                 obj.InputFile = varargin{1};
-%                 % initializes an EPANET project that isn't opened with an input file
-%                 obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
-%                 warning('Initializes the EPANET project!');
+            %               else
+            %                 obj.InputFile = varargin{1};
+            %                 % initializes an EPANET project that isn't opened with an input file
+            %                 obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
+            %                 warning('Initializes the EPANET project!');
             end
             if nargin>0
                 %Save the temporary input file
@@ -1784,7 +1783,7 @@ classdef epanet <handle
             elseif nargin == 2
                 rptfile = [varargin{1}, '.txt'];
                 binfile = [varargin{1}, '.bin'];
-                obj.Errcode = obj.apiENepanet(obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
+                obj.Errcode = obj.apiENepanet(obj.BinTempfile, rptfile, binfile, obj.LibEPANET);
                 Errcode = reloadNetwork(obj);
             end
         end
@@ -5998,7 +5997,7 @@ classdef epanet <handle
             uuID = char(java.util.UUID.randomUUID);
             rptfile=[obj.TempInpFile(1:end-4), '.txt'];
             binfile=['@#', uuID, '.bin'];
-            obj.Errcode = obj.apiENepanet(obj.LibEPANET, obj.TempInpFile, rptfile, binfile);
+            obj.Errcode = obj.apiENepanet(obj.TempInpFile, rptfile, binfile, obj.LibEPANET);
             fid = fopen(binfile, 'r');
             value = readEpanetBin(fid, binfile, 0);
             value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
@@ -6377,7 +6376,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addNodeJunction, deleteLink, setLinkDiameter.
-            index = obj.apiENaddlink(obj, cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode);
+            index = obj.apiENaddlink(cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode, obj.LibEPANET);
             if nargin >= 5
                 obj.setLinkLength(index, varargin{1});
             end
@@ -6453,7 +6452,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipeCV,
             %          addNodeJunction, deleteLink, setLinkDiameter.
-            index = obj.apiENaddlink(obj, pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode);
+            index = obj.apiENaddlink(pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode, obj.LibEPANET);
             if nargin >= 5
                 obj.setLinkLength(index, varargin{1});
             end
@@ -6527,7 +6526,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addNodeJunction, deleteLink, setLinkInitialStatus.
-            index = obj.apiENaddlink(obj, pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode);
+            index = obj.apiENaddlink(pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode, obj.LibEPANET);
             if nargin >= 5
                 obj.setLinkInitialStatus(index, varargin{1});
             end
@@ -6611,7 +6610,7 @@ classdef epanet <handle
             else
                 vtype = obj.ToolkitConstants.EN_GPV;
             end
-            index = obj.apiENaddlink(obj, vID, vtype, fromNode, toNode);
+            index = obj.apiENaddlink(vID, vtype, fromNode, toNode, obj.LibEPANET);
             if nargin >= 6
                 obj.setLinkDiameter(index, varargin{2});
             end
@@ -6637,7 +6636,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePSV, deleteLink, setLinkTypeValveFCV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValvePSV(obj, vID, fromNode, toNode)
             % Adds a new PSV valve.
@@ -6654,7 +6653,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveGPV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValvePBV(obj, vID, fromNode, toNode)
             % Adds a new PBV valve.
@@ -6671,7 +6670,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValvePRV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValveFCV(obj, vID, fromNode, toNode)
             % Adds a new FCV valve.
@@ -6688,7 +6687,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveTCV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValveTCV(obj, vID, fromNode, toNode)
             % Adds a new TCV valve.
@@ -6705,7 +6704,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValveGPV(obj, vID, fromNode, toNode)
             % Adds a new GPV valve.
@@ -6722,7 +6721,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode, obj.LibEPANET);
         end
         function [leftPipeIndex,rightPipeIndex] = splitPipe(obj,pipeID,newPipeID,newNodeID)
             %SPLITPIPE
@@ -6959,11 +6958,11 @@ classdef epanet <handle
             if iscell(idNode)
                 for j = 1:length(idNode)
                     indexNode = obj.getNodeIndex(idNode(j));
-                    [Errcode] = obj.apiENdeletenode(obj.LibEPANET, indexNode, condition);
+                    [Errcode] = obj.apiENdeletenode(indexNode, condition, obj.LibEPANET);
                     error(obj.getError(Errcode));
                 end
             else
-                [Errcode] = obj.apiENdeletenode(obj.LibEPANET, idNode, condition);
+                [Errcode] = obj.apiENdeletenode(idNode, condition, obj.LibEPANET);
                 error(obj.getError(Errcode));
             end
         end
@@ -7001,7 +7000,7 @@ classdef epanet <handle
             else
                 indexLink = idLink;
             end
-            [Errcode] = obj.apiENdeletelink(obj.LibEPANET, indexLink, condition);
+            [Errcode] = obj.apiENdeletelink(indexLink, condition, obj.LibEPANET);
             error(obj.getError(Errcode));
             %if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
@@ -7025,7 +7024,7 @@ classdef epanet <handle
             else
                 indexPat = idPat;
             end
-            [Errcode] = obj.apiENdeletepattern(obj.LibEPANET, indexPat);
+            [Errcode] = obj.apiENdeletepattern(indexPat, obj.LibEPANET);
             error(obj.getError(Errcode));
         end
         function Errcode = deleteCurve(obj, idCurve)
@@ -7048,7 +7047,7 @@ classdef epanet <handle
             else
                 indexCurve = idCurve;
             end
-            [Errcode] = obj.apiENdeletecurve(obj.LibEPANET, indexCurve);
+            [Errcode] = obj.apiENdeletecurve(indexCurve, obj.LibEPANET);
             error(obj.getError(Errcode));
         end
         function setControls(obj, index, control, varargin)
@@ -8156,7 +8155,7 @@ classdef epanet <handle
             if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
-                [obj.Errcode] = obj.apiENsetheadcurveindex(obj.LibEPANET, i, value(j)); j=j+1;
+                [obj.Errcode] = obj.apiENsetheadcurveindex(i, value(j),obj.LibEPANET); j=j+1;
                 error(obj.getError(obj.Errcode));
             end
         end
@@ -8908,7 +8907,7 @@ classdef epanet <handle
             %
             % See also setNodeTankData, getNodeElevations, getNodeBaseDemands,
             %          getNodeDemandPatternNameID, addPattern, setNodeJunctionDemandName.
-            [obj.Errcode] = obj.apiENsetjuncdata(obj.LibEPANET, index, elev, dmnd, dmndpat);
+            [obj.Errcode] = obj.apiENsetjuncdata(index, elev, dmnd, dmndpat, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
         function setTitle(obj, varargin)
@@ -9666,7 +9665,7 @@ classdef epanet <handle
             %   d.initializeEPANET(d.ToolkitConstants.EN_GPM, d.ToolkitConstants.EN_HW)
             %
             % See also initializeHydraulicAnalysis.
-            [obj.Errcode]=obj.apiENinit(obj.LibEPANET, unitsType, headLossType);
+            [obj.Errcode]=obj.apiENinit(unitsType, headLossType, obj.LibEPANET);
         end
         function initializeHydraulicAnalysis(obj, varargin)
             % Initializes storage tank levels, link status and settings, and the simulation clock time prior to running a hydraulic analysis.
@@ -9896,7 +9895,7 @@ classdef epanet <handle
             %   result_index = d.getNodeResultIndex(node_index)
             %
             % See also getComputedHydraulicTimeSeries, deleteNode, getLinkResultIndex
-            [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.LibEPANET, obj.ToolkitConstants.EN_NODE, node_index);
+            [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_NODE, node_index,obj.LibEPANET);
         end
         function resultindex = getLinkResultIndex(obj, link_index)
             % Retrieves the order in which a link's results
@@ -9907,7 +9906,7 @@ classdef epanet <handle
             %   result_index = d.getLinkResultIndex(link_index)
             %
             % See also getComputedHydraulicTimeSeries, deleteNode, getNodeResultIndex
-            [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.LibEPANET, obj.ToolkitConstants.EN_LINK, link_index);
+            [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_LINK, link_index,obj.LibEPANET);
         end
         function clearReport(obj)
             % Clears the contents of a project's report file. (EPANET Version 2.2)
@@ -17322,7 +17321,7 @@ function [fid, binfile, rptfile] = runEPANETexe(obj)
      elseif ismac
          r = sprintf('%s%s %s %s %s', obj.LibEPANETpath, obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
      end
-     if obj.getCMDCODE, [~, ~]=system(r); else system(r); end
+     if obj.getCMDCODE, [~, ~]=system(r); else, system(r); end
      fid = fopen(binfile, 'r');
  end
 function value = getBinComputedTimeSeries(obj, indParam, varargin)
