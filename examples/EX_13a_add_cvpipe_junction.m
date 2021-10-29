@@ -25,7 +25,7 @@ newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
 Code='CVPIPE';%'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'
-errcode=d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,...
+errcode=d.addBinNodeJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,...
 ToNodeID,newLength,newDiameter,newRoughness,Code);
 
 % Plot normal with new pipe
