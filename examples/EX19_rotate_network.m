@@ -28,7 +28,7 @@ d = epanet('Net1.inp');
 d.plot
 
 % Rotate degrees theta.
-theta = pi/2; %90 degrees
+theta = pi/3; %60 degrees
 
 % Define the x- and y-data for the original line we would like to rotate.
 x = d.getNodeCoordinates{1}';
@@ -47,9 +47,10 @@ center = repmat([x_center; y_center], 1, length(x));
 % theta = pi/3;       % pi/3 radians = 60 degrees
 R = [cos(theta) -sin(theta); sin(theta) cos(theta)];
 % Do the rotation:
-s = v - center;     % Shift points in the plane so that the center of rotation is at the origin.
-so = R*s;           % Apply the rotation about the origin.
-vo = so + center;   % Shift again so the origin goes back to the desired center of rotation.
+v = [v(1:11,1),v(12:22,1)];
+s = v - center';     % Shift points in the plane so that the center of rotation is at the origin.
+so = R*s';           % Apply the rotation about the origin.
+vo = so + center;    % Shift again so the origin goes back to the desired center of rotation.
 % this can be done in one line as:
 % vo = R*(v - center) + center
 % Pick out the vectors of rotated x- and y-data.
