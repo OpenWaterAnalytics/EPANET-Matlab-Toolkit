@@ -14671,7 +14671,8 @@ classdef epanet <handle
             obj.CMDCODE = value;
         end
         function appShiftNetwork(obj, xDisp, yDisp)
-            % Shifts each the network
+            % Shifts the network by xDisp in the x-direction and
+            % by yDisp in the y-direction
             %
             %Example 1:
             %  Shift the network by 1000 feet in the x-axis
@@ -14682,7 +14683,7 @@ classdef epanet <handle
             %  d.appShiftNetwork(1000,-1000)
             %  d.getNodeCoordinates{1} % new x coordinates
             %  d.getNodeCoordinates{2} % new y coordinates
-           
+
             % Acces the x and y coordinates
             xCoord = obj.getNodeCoordinates{1};
             yCoord = obj.getNodeCoordinates{2};
@@ -14693,8 +14694,8 @@ classdef epanet <handle
             for i=1:obj.NodeCount
               obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
             end
-            for i=1:obj.LinkCount	
-                if (obj.getLinkVerticesCount(i)~= 0) 
+            for i=1:obj.LinkCount
+                if (obj.getLinkVerticesCount(i)~= 0)
                     newX = []; newY = [];
                     for j=1:obj.getLinkVerticesCount(i)
                     newX(j) = obj.getLinkVertices{i}.x(j) + xDisp;
@@ -14705,7 +14706,7 @@ classdef epanet <handle
                 end
             end
         end
-        
+
     end
 end
 

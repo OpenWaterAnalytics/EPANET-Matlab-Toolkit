@@ -118,6 +118,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |epanet| Load Input file and open the EPANET Toolkit system|
 |unload|Unload library and close the EPANET Toolkit system|
 |loadEPANETFile| Open the EPANET Toolkit system|
+|appShiftNetwor|Shifts the network|
 |getError| Returns the description of an error code| 
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
@@ -419,6 +420,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeTankMixingFraction|Sets the values of tanks mix fraction|
 |setNodeTankMinimumWaterVolume|Sets the values of tanks minimum water volume|
 |setNodeTankMixingModelType|Sets the values of tanks model|
+|setNodeTypeReservoir|Transforms a Tank to RESERVOIR|
 |setOptionsAccuracyValue|Sets the value of accurancy|
 |setOptionsGlobalEffic|Sets the value of global pump efficiency(percent) (EPANET Version 2.2)|
 |setOptionsGlobalPrice|Sets the value of global energy price per KWH (EPANET Version 2.2)|
