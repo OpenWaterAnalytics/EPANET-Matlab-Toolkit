@@ -14694,15 +14694,19 @@ classdef epanet <handle
             for i=1:obj.NodeCount
               obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
             end
-            for i=1:obj.LinkCount
-                if (obj.getLinkVerticesCount(i)~= 0)
-                    newX = []; newY = [];
-                    for j=1:obj.getLinkVerticesCount(i)
-                    newX(j) = obj.getLinkVertices{i}.x(j) + xDisp;
-                    newY(j) = obj.getLinkVertices{i}.y(j) + yDisp;
+            if (sum(obj.getLinkVerticesCount)~= 0)
+                newX = []; newY = [];
+                for i=1:obj.LinkCount
+                    if (obj.getLinkVerticesCount(i)~= 0)
+                        
+                        for j=1:obj.getLinkVerticesCount(i)
+                        newX(j) = obj.getLinkVertices{i}.x(j) + xDisp;
+                        newY(j) = obj.getLinkVertices{i}.y(j) + yDisp;
+                        end
+                        LinkID = obj.getLinkNameID(i);
+                        obj.setLinkVertices(LinkID,newX,newY);
+                        newX = []; newY = [];
                     end
-                    LinkID = obj.getLinkNameID(i);
-                    obj.setLinkVertices(LinkID,newX,newY);
                 end
             end
         end
