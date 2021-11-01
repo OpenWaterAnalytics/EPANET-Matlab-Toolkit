@@ -892,7 +892,7 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsettankdata(index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve, LibEPANET)
             % EPANET Version 2.2
-            [Errcode]=calllib(LibEPANET, 'ENsettankdata', index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve );
+            [Errcode]=calllib(LibEPANET, 'ENsettankdata', index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve);
         end
         function [Errcode] = apiENsetoption(optioncode, value, LibEPANET)
             [Errcode]=calllib(LibEPANET, 'ENsetoption', optioncode, value);
@@ -1235,9 +1235,9 @@ classdef epanet <handle
                 varargin{2}=varargin{3};
             end
             [Errcode, ~, index]=calllib(MSXLibEPANET, 'MSXgetindex', varargin{1}, varargin{2}, index);
-%             if Errcode
-%                 obj.apiMSXerror(Errcode, MSXLibEPANET);
-%             end
+        %             if Errcode
+        %                 obj.apiMSXerror(Errcode, MSXLibEPANET);
+        %             end
         end
         function [Errcode, id] = apiMSXgetID(type, index, len, MSXLibEPANET)
               id=char(32*ones(1, len+1));
@@ -8771,6 +8771,34 @@ classdef epanet <handle
             %          setNodeTankCanOverFlow, setNodeTankDiameter, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, value, varargin)
         end
+        function setNodeTypeReservoir(obj, tankIndex)
+            % Transforms a Tank to RESERVOIR
+            %
+            % Example 1:
+            %   d = epanet('Net1.inp');
+            %   d.setNodeTypeReservoir(11)
+            %   d.getNodeType
+            %   d.plot
+
+            if (obj.getNodeTypeIndex(tankIndex) ~= 2)
+              error('The current node is not a tank')
+            end
+
+            tankData = obj.getNodeTankData(tankIndex);
+            elev = tankData.Elevation;
+            intlvl = tankData.Initial_Level;
+            minlvl = tankData.Minimum_Water_Level;
+            maxlvl = tankData.Maximum_Water_Level;
+            minvol = tankData.Minimum_Water_Volume;
+            volcurve = tankData.Volume_Curve_Index;
+            if ischar(volcurve)
+              volcurve={volcurve};
+            else
+              volcurve= '';
+            end
+            obj.apiENsettankdata(tankIndex, elev, intlvl, minlvl, maxlvl, 0, minvol, volcurve, obj.LibEPANET)
+
+        end
         function setNodeSourceQuality(obj, value, varargin)
             % Sets the values of quality source strength.
             %
@@ -14642,8 +14670,43 @@ classdef epanet <handle
             if code~=0 && code~=1,  value = obj.CMDCODE; end
             obj.CMDCODE = value;
         end
+        function appShiftNetwork(obj, xDisp, yDisp)
+            % Shifts each the network
+            %
+            %Example 1:
+            %  Shift the network by 1000 feet in the x-axis
+            %  and -1000 feet in the y-axis
+            %  d = epanet('Net1.inp');
+            %  d.getNodeCoordinates{1} % old x coordinates
+            %  d.getNodeCoordinates{2} % old y coordinates
+            %  d.appShiftNetwork(1000,-1000)
+            %  d.getNodeCoordinates{1} % new x coordinates
+            %  d.getNodeCoordinates{2} % new y coordinates
+           
+            % Acces the x and y coordinates
+            xCoord = obj.getNodeCoordinates{1};
+            yCoord = obj.getNodeCoordinates{2};
+            % Update coordinates
+            newxCoord = xCoord + xDisp;
+            newyCoord = yCoord + yDisp;
+            % Set the new coordinates
+            for i=1:obj.NodeCount
+              obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
+            end
+            for i=1:obj.LinkCount	
+                if (obj.getLinkVerticesCount(i)~= 0) 
+                    newX = []; newY = [];
+                    for j=1:obj.getLinkVerticesCount(i)
+                    newX(j) = obj.getLinkVertices{i}.x(j) + xDisp;
+                    newY(j) = obj.getLinkVertices{i}.y(j) + yDisp;
+                    end
+                    LinkID = obj.getLinkNameID(i);
+                    obj.setLinkVertices(LinkID,newX,newY);
+                end
+            end
+        end
+        
     end
-
 end
 
 function value = get_MSX_Options(msxname, param, getall)
