@@ -1228,16 +1228,16 @@ classdef epanet <handle
               obj.apiMSXerror(Errcode, MSXLibEPANET);
           end
         end
-        function [Errcode, index] = apiMSXgetindex(MSXLibEPANET, varargin)
+        function [Errcode, index] = apiMSXgetindex(MSXLibEPANET,varargin)
             index =0;
             if ~isnumeric(varargin{1})
                 varargin{1}=varargin{2};
                 varargin{2}=varargin{3};
             end
             [Errcode, ~, index]=calllib(MSXLibEPANET, 'MSXgetindex', varargin{1}, varargin{2}, index);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
+%             if Errcode
+%                 obj.apiMSXerror(Errcode, MSXLibEPANET);
+%             end
         end
         function [Errcode, id] = apiMSXgetID(type, index, len, MSXLibEPANET)
               id=char(32*ones(1, len+1));
