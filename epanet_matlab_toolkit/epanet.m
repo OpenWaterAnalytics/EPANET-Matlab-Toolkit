@@ -988,9 +988,9 @@ classdef epanet <handle
           % EPANET Version 2.2
           [Errcode, x, y]=calllib(LibEPANET, 'ENgetvertex', index, vertex, 0, 0);
         end
-        function [Errcode] = apiENsetvertices(index, vertex, x, y, LibEPANET)
+        function [Errcode] = apiENsetvertices(index, x, y, vertex, LibEPANET)
           % EPANET Version 2.2
-          [Errcode]=calllib(LibEPANET, 'ENsetvertices', index, vertex, x, y);
+          [Errcode]=calllib(LibEPANET, 'ENsetvertices', index, x, y, vertex);
         end
         function [Errcode, count] = apiENgetvertexcount(index, LibEPANET)
           [Errcode, count]=calllib(LibEPANET, 'ENgetvertexcount', index, 0);
@@ -14695,17 +14695,16 @@ classdef epanet <handle
               obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
             end
             if (sum(obj.getLinkVerticesCount)~= 0)
-                newX = []; newY = [];
+                
                 for i=1:obj.LinkCount
+                    newX = []; newY = [];
                     if (obj.getLinkVerticesCount(i)~= 0)
+                        newX = obj.getLinkVertices{i}.x + xDisp;
+                        newY = obj.getLinkVertices{i}.y + yDisp;
                         
-                        for j=1:obj.getLinkVerticesCount(i)
-                        newX(j) = obj.getLinkVertices{i}.x(j) + xDisp;
-                        newY(j) = obj.getLinkVertices{i}.y(j) + yDisp;
-                        end
                         LinkID = obj.getLinkNameID(i);
                         obj.setLinkVertices(LinkID,newX,newY);
-                        newX = []; newY = [];
+                        
                     end
                 end
             end
