@@ -16,39 +16,39 @@ d.apiENinit(d.ToolkitConstants.EN_GPM, d.ToolkitConstants.EN_HW, d.LibEPANET);
 
 % Add the first junction node to the project with
 % an elevation of 700 ft and a demand of 0
-[index, errcode]  = d.apiENaddnode('J1', d.ToolkitConstants.EN_JUNCTION, d.LibEPANET);
+[index, ~]  = d.apiENaddnode('J1', d.ToolkitConstants.EN_JUNCTION, d.LibEPANET);
 d.apiENsetjuncdata(index, 700, 0, '', d.LibEPANET);
 d.apiENsetcoord(index, 0, 0, d.LibEPANET);
 
 % Add the remaining two junctions with elevations of
 % 710 ft and demands of 250 and 500 gpm, respectively
-[index, errcode]  = d.apiENaddnode('J2', d.ToolkitConstants.EN_JUNCTION, d.LibEPANET);
+[index, ~]  = d.apiENaddnode('J2', d.ToolkitConstants.EN_JUNCTION, d.LibEPANET);
 d.apiENsetjuncdata(index, 710, 250, '', d.LibEPANET);
 d.apiENsetcoord(index, 0, -100, d.LibEPANET);
-[index, errcode]  = d.apiENaddnode('J3', d.ToolkitConstants.EN_JUNCTION, d.LibEPANET);
+[index, ~]  = d.apiENaddnode('J3', d.ToolkitConstants.EN_JUNCTION, d.LibEPANET);
 d.apiENsetjuncdata(index, 710, 500, '', d.LibEPANET);
 d.apiENsetcoord(index, 100, 0, d.LibEPANET);
 
 % Add the reservoir at an elevation of 650 ft
-[index, errcode]  = d.apiENaddnode('R1', d.ToolkitConstants.EN_RESERVOIR, d.LibEPANET);
+[index, ~]  = d.apiENaddnode('R1', d.ToolkitConstants.EN_RESERVOIR, d.LibEPANET);
 d.apiENsetnodevalue(index, d.ToolkitConstants.EN_ELEVATION, 650, d.LibEPANET);
 d.apiENsetcoord(index, -100, 0, d.LibEPANET);
 %  
 % Add the tank node at elevation of 850 ft, initial water level
 % at 120 ft, minimum level at 100 ft, maximum level at 150 ft
 % and a diameter of 50.5 ft
-[index, errcode]  = d.apiENaddnode('T1', d.ToolkitConstants.EN_TANK, d.LibEPANET);
+[index, ~]  = d.apiENaddnode('T1', d.ToolkitConstants.EN_TANK, d.LibEPANET);
 d.apiENsettankdata(index, 850, 120, 100, 150, 50.5, 0, '', d.LibEPANET);
 d.apiENsetcoord(index, 0, 60, d.LibEPANET); 
 % Add the pipes to the project, setting their length,
 % diameter, and roughness values
-[index, errcode] = d.apiENaddlink('P1', d.ToolkitConstants.EN_PIPE, 'J1', 'J2', d.LibEPANET);
+[index, ~] = d.apiENaddlink('P1', d.ToolkitConstants.EN_PIPE, 'J1', 'J2', d.LibEPANET);
 d.apiENsetpipedata(index, 10560, 12, 100, 0, d.LibEPANET);
-[index, errcode] = d.apiENaddlink('P2', d.ToolkitConstants.EN_PIPE, 'J1', 'T1', d.LibEPANET);
+[index, ~] = d.apiENaddlink('P2', d.ToolkitConstants.EN_PIPE, 'J1', 'T1', d.LibEPANET);
 d.apiENsetpipedata(index, 5280, 14, 100, 0, d.LibEPANET);
-[index, errcode]= d.apiENaddlink('P3', d.ToolkitConstants.EN_PIPE, 'J1', 'J3', d.LibEPANET);
+[index, ~]= d.apiENaddlink('P3', d.ToolkitConstants.EN_PIPE, 'J1', 'J3', d.LibEPANET);
 d.apiENsetpipedata(index, 5280, 14, 100, 0, d.LibEPANET);
-[index, errcode] = d.apiENaddlink('P4', d.ToolkitConstants.EN_PIPE, 'J2', 'J3', d.LibEPANET);
+[index, ~] = d.apiENaddlink('P4', d.ToolkitConstants.EN_PIPE, 'J2', 'J3', d.LibEPANET);
 d.apiENsetpipedata(index, 5280, 14, 100, 0, d.LibEPANET);
   
 % Add a pump to the project

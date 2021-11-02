@@ -14690,7 +14690,7 @@ classdef epanet <handle
             %  d = epanet('ky10.inp');
             %  d.appShiftNetwork(1000,-1000)
             %  d.plot 
-
+            %
             % Acces the x and y coordinates
             xCoord = obj.getNodeCoordinates{1};
             yCoord = obj.getNodeCoordinates{2};
@@ -14701,54 +14701,20 @@ classdef epanet <handle
             for i=1:obj.NodeCount
               obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
             end
-            if (sum(obj.getLinkVerticesCount)~= 0)
+            if (sum(obj.getLinkVerticesCount)~= 0)  
+                xVertCoord = obj.getNodeCoordinates{3};
+                yVertCoord = obj.getNodeCoordinates{4};
                 for i=1:obj.LinkCount
                     if (obj.getLinkVerticesCount(i)~= 0)
-                        newX = obj.NodeCoordinates{3}{i} + xDisp;
-                        newY = obj.NodeCoordinates{4}{i} + yDisp;
+                        newX = xVertCoord{i} + xDisp;
+                        newY = yVertCoord{i} + yDisp;
                         LinkID = obj.getLinkNameID(i);
                         obj.setLinkVertices(LinkID,newX,newY);   
                     end
                 end
             end
-        end
-%         function appShiftNetwork_slow(obj, xDisp, yDisp)
-%             % Shifts the network by xDisp in the x-direction and
-%             % by yDisp in the y-direction
-%             %
-%             %Example 1:
-%             %  Shift the network by 1000 feet in the x-axis
-%             %  and -1000 feet in the y-axis
-%             %  d = epanet('Net1.inp');
-%             %  d.getNodeCoordinates{1} % old x coordinates
-%             %  d.getNodeCoordinates{2} % old y coordinates
-%             %  d.appShiftNetwork_slow(1000,-1000)
-%             %  d.getNodeCoordinates{1} % new x coordinates
-%             %  d.getNodeCoordinates{2} % new y coordinates
-%             %
-% 
-% 
-%             % Acces the x and y coordinates
-%             xCoord = obj.getNodeCoordinates{1};
-%             yCoord = obj.getNodeCoordinates{2};
-%             % Update coordinates
-%             newxCoord = xCoord + xDisp;
-%             newyCoord = yCoord + yDisp;
-%             % Set the new coordinates
-%             for i=1:obj.NodeCount
-%               obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
-%             end
-%             if (sum(obj.getLinkVerticesCount)~= 0)
-%                 for i=1:obj.LinkCount
-%                     if (obj.getLinkVerticesCount(i)~= 0)
-%                         newX = obj.getLinkVertices{i}.x + xDisp;
-%                         newY = obj.getLinkVertices{i}.y + yDisp;
-%                         LinkID = obj.getLinkNameID(i);
-%                         obj.setLinkVertices(LinkID,newX,newY);   
-%                     end
-%                 end
-%             end
-%         end           
+        end    
+        
     end
 end
 
