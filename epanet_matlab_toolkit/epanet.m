@@ -14691,7 +14691,7 @@ classdef epanet <handle
             %  d.appShiftNetwork(1000,-1000)
             %  d.plot 
             %
-            % Acces the x and y coordinates
+            % Access the x and y coordinates
             xCoord = obj.getNodeCoordinates{1};
             yCoord = obj.getNodeCoordinates{2};
             % Update coordinates
@@ -14714,7 +14714,78 @@ classdef epanet <handle
                 end
             end
         end    
-        
+        function appRotateNetwork(obj, theta, indexRot)
+            % Rotates the network by theta degrees counter-clockwise,
+            % using as pivot the indexRot
+            % theta: angle in degrees to rotate the network counter-clockwise
+            % indexRot: index of the node/point to be rotated. If  it's not
+            % provided then the first index node is used as pivot.
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %Example 1:
+            %  Rotate the network by 60 degrees counter-clockwise around
+            %  the index 1 node. 
+            %  d = epanet('Net1.inp');
+            %  d.plot 
+            %  d.appRotateNetwork(60)
+            %  d.plot    
+            %
+            %Example 2:
+            %  Rotate the network by 150 degrees counter-clockwise around
+            %  the reservoir with index 921 . 
+            %  d = epanet('ky10.inp');
+            %  d.plot 
+            %  d.appRotateNetwork(60,921)
+            %  d.plot    
+            %
+            % Access the x and y coordinates
+            xCoord = obj.getNodeCoordinates{1};
+            yCoord = obj.getNodeCoordinates{2};
+            % Pick center of rotation point
+            % If IndexRot is not provided, pick the first x,y coordinate
+            if (nargin<3)
+                x_center = xCoord(1);
+                y_center = yCoord(1);
+            else
+                x_center = xCoord(indexRot);
+                y_center = yCoord(indexRot);
+            end
+            % Create a matrix which will be used later in calculations.
+            center = repmat([x_center; y_center], 1, length(xCoord));
+            % Define the rotation matrix.
+            R = [cosd(theta) -sind(theta); sind(theta) cosd(theta)];
+            % Do the rotation:
+            v = [xCoord',yCoord'];
+            s = v - center';     % Shift points in the plane so that the center of rotation is at the origin.
+            so = R*s';           % Apply the rotation about the origin.
+            vo = so + center;    % Shift again so the origin goes back to the desired center of rotation.
+            newxCoord = vo(1,:);
+            newyCoord = vo(2,:);
+            % Set the new coordinates
+            for i=1:obj.NodeCount
+              obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
+            end
+            
+            if (sum(obj.getLinkVerticesCount)~= 0)  
+                xVertCoord = obj.getNodeCoordinates{3};
+                yVertCoord = obj.getNodeCoordinates{4};
+                for i=1:obj.LinkCount
+                    if (obj.getLinkVerticesCount(i)~= 0)
+                        v = [xVertCoord{i}',yVertCoord{i}'];
+                        % Shift points in the plane so that the center of rotation is at the origin.
+                        s = v - center(:,1:length(xVertCoord{i}))'; 
+                        % Apply the rotation about the origin.
+                        so = R*s'; 
+                        % Shift again so the origin goes back to the desired center of rotation.
+                        vo_vert = so + center(:,1:length(xVertCoord{i}));    
+                        newxVertCoord = vo_vert(1,:);
+                        newvyVertCoord = vo_vert(2,:);
+                        LinkID = obj.getLinkNameID(i);
+                        obj.setLinkVertices(LinkID,newxVertCoord,newvyVertCoord);   
+                    end
+                end
+            end
+         end    
+
     end
 end
 

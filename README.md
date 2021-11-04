@@ -119,6 +119,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |unload|Unload library and close the EPANET Toolkit system|
 |loadEPANETFile| Open the EPANET Toolkit system|
 |appShiftNetwor|Shifts the network in x and y directions|
+|appRotateNetwork|Rotates the network by theta degrees counter-clockwise using as pivot a specific node|
 |getError| Returns the description of an error code| 
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
