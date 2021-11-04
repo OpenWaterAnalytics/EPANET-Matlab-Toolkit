@@ -7,11 +7,10 @@ EPANET-MATLAB-Toolkit - Examples
 ## Table of Contents
 
 - [Examples](#examples)
+- [Toolkit Examples](#toolkit-examples)
+- [Toolkit api Examples](#toolkit-api-examples)
 
 ## Examples
-- [Toolkit Example 2:](./Toolkit_EX2_Hydrant_rating_curve.m) Hydrant rating curve
-- [Toolkit Example 3:](./Toolkit_EX3_Minimum_chlorine_residual.m) Minimum chlorine residual.
-- [Toolkit Example 4:](./Toolkit_EX4_Network_Building.m) Network building.
 - [Example 0:](./EX0_CCWI2016_contamination_simulation.m) Arsenite contamination simulator based on EPANET andEPANET-MSX using the EPANET-MATLAB Toolkit.
 - [Example 1:](./EX1_Plot_network_topology.m) Plot network topology. 
 - [Example 2:](./EX2_Hydraulic_analysis.m) Hydraulic analysis. 
@@ -44,6 +43,13 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 25:](./EX25_set_node_name_ids.m) Set node name IDs.
 - [Example 26:](./EX26_using_parfor.m) Using parfor in EMT.
 
+## Toolkit Examples
+- [Toolkit Example 2:](./Toolkit_EX2_Hydrant_rating_curve.m) Hydrant rating curve
+- [Toolkit Example 3:](./Toolkit_EX3_Minimum_chlorine_residual.m) Minimum chlorine residual.
+- [Toolkit Example 4:](./Toolkit_EX4_Network_Building.m) Network building.
+## Toolkit api Examples
+- [Toolkit api Example 27:](./EX_27_using_EN_functions.m) Create a network using only EN functions
+  
 &uparrow; [Back to top](#table-of-contents)
 
 
