@@ -1596,6 +1596,12 @@ classdef epanet <handle
             end
             %Get all the countable network parameters
             if nargin == 0
+                obj.libFunctions = libfunctions(obj.LibEPANET);
+                if sum(strcmp(obj.libFunctions, 'ENgetqualinfo'))
+                    n = obj.getQualityInfo;
+                    obj.QualityChemUnits = n.QualityChemUnits;
+                    obj.QualityChemName= n.QualityChemName;
+                end
                 return;
             else
                 obj.NodeCount = obj.getNodeCount;
