@@ -14734,7 +14734,7 @@ classdef epanet <handle
             %  the reservoir with index 921 . 
             %  d = epanet('ky10.inp');
             %  d.plot 
-            %  d.appRotateNetwork(60,921)
+            %  d.appRotateNetwork(150,921)
             %  d.plot    
             %
             % Access the x and y coordinates
