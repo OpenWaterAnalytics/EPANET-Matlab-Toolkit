@@ -1202,18 +1202,12 @@ classdef epanet <handle
                 if Errcode
                     obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
                 else
-                    [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
-                    if Errcode
-                        obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
-                    end
+                    [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);  
                 end
             end
         end
         function [Errcode] = apiMSXclose(obj)
             [Errcode] = calllib(obj.MSXLibEPANET, 'MSXclose');
-            if Errcode
-                obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
-            end
         end
         function [e] = apiMSXerror(Errcode, MSXLibEPANET)
             len=80;
@@ -1224,9 +1218,6 @@ classdef epanet <handle
         function [Errcode, count] = apiMSXgetcount(code, MSXLibEPANET)
           count=0;
           [Errcode, count] = calllib(MSXLibEPANET, 'MSXgetcount', code, count);
-          if Errcode
-              obj.apiMSXerror(Errcode, MSXLibEPANET);
-          end
         end
         function [Errcode, index] = apiMSXgetindex(MSXLibEPANET,varargin)
             index =0;
@@ -1235,24 +1226,15 @@ classdef epanet <handle
                 varargin{2}=varargin{3};
             end
             [Errcode, ~, index]=calllib(MSXLibEPANET, 'MSXgetindex', varargin{1}, varargin{2}, index);
-        %             if Errcode
-        %                 obj.apiMSXerror(Errcode, MSXLibEPANET);
-        %             end
         end
         function [Errcode, id] = apiMSXgetID(type, index, len, MSXLibEPANET)
               id=char(32*ones(1, len+1));
               [Errcode, id]=calllib(MSXLibEPANET, 'MSXgetID', type, index, id, len);
               id=id(1:len);
-              if Errcode
-                  obj.apiMSXerror(Errcode, MSXLibEPANET);
-              end
               end
         function [Errcode, len] = apiMSXgetIDlen(type, index, MSXLibEPANET)
               len=0;
               [Errcode, len]=calllib(MSXLibEPANET, 'MSXgetIDlen', type, index, len);
-              if Errcode
-                  obj.apiMSXerror(Errcode, MSXLibEPANET);
-              end
         end
         function [Errcode, type, units, atol, rtol] = apiMSXgetspecies(index, MSXLibEPANET)
             type=0; rtol=0; atol=0;
@@ -1264,44 +1246,26 @@ classdef epanet <handle
                 case 1
                     type='WALL';   % for a pipe wall surface species
             end
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, value] = apiMSXgetconstant(index, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetconstant', index, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, value] = apiMSXgetparameter(type, index, param, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetparameter', type, index, param, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, patlen] = apiMSXgetpatternlen(patindex, MSXLibEPANET)
             patlen=0;
             [Errcode, patlen]=calllib(MSXLibEPANET, 'MSXgetpatternlen', patindex, patlen);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, value] = apiMSXgetpatternvalue(patindex, period, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetpatternvalue', patindex, period, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, value] = apiMSXgetinitqual(obj, index, species, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetinitqual', obj, index, species, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, type, level, pat] = apiMSXgetsource(node, species, MSXLibEPANET)
             type=0;
@@ -1320,9 +1284,6 @@ classdef epanet <handle
                 case 3
                     type='FLOWPACED'; % for a flow paced source
             end
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function apiMSXMatlabCleanup(obj)
             % Unload library
@@ -1335,69 +1296,36 @@ classdef epanet <handle
         end
         function [Errcode] = apiMSXsaveoutfile(outfname, MSXLibEPANET)
             [Errcode] = calllib(MSXLibEPANET, 'MSXsaveoutfile', outfname);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsavemsxfile(msxname, MSXLibEPANET)
             [Errcode] = calllib(MSXLibEPANET, 'MSXsavemsxfile', msxname);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetconstant(index, value, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetconstant', index, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetparameter(type, index, param, value, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetparameter', type, index, param, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetinitqual(type, index, species, value, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetinitqual', type, index, species, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetpattern', index, factors, nfactors);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetpatternvalue(pat, period, value, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetpatternvalue', pat, period, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
             end
         function [Errcode] = apiMSXsolveQ(MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsolveQ');
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsolveH(MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsolveH');
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXaddpattern(patid, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXaddpattern', patid);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXusehydfile(hydfname, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXusehydfile', hydfname);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, t, tleft] = apiMSXstep(MSXLibEPANET)
             t=int32(0);
@@ -1405,21 +1333,12 @@ classdef epanet <handle
             [Errcode, t, tleft]=calllib(MSXLibEPANET, 'MSXstep', t, tleft);
             t = double(t);
             tleft = double(tleft);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXinit(flag, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXinit', flag);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXreport(MSXLibEPANET)
             [Errcode] = calllib(MSXLibEPANET, 'MSXreport');
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [e, errmsg] = apiMSXgeterror(Errcode, MSXLibEPANET)
             errmsg = char(32*ones(1, 80));
@@ -1431,15 +1350,9 @@ classdef epanet <handle
         function [Errcode, value] = apiMSXgetqual(type, index, species, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetqual', type, index, species, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetsource(node, species, type, level, pat, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetsource', node, species, type, level, pat);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
     end
 
@@ -14691,11 +14604,11 @@ classdef epanet <handle
             %  d.getNodeCoordinates{2} % new y coordinates
             %
             %Example 2:
-            %  Shift the network,along with the vertices by 1000 feet in 
+            %  Shift the network,along with the vertices by 1000 feet in
             %  the x-axis and -1000 feet in the y-axis
             %  d = epanet('ky10.inp');
             %  d.appShiftNetwork(1000,-1000)
-            %  d.plot 
+            %  d.plot
             %
             % Access the x and y coordinates
             xCoord = obj.getNodeCoordinates{1};
@@ -14707,7 +14620,7 @@ classdef epanet <handle
             for i=1:obj.NodeCount
               obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
             end
-            if (sum(obj.getLinkVerticesCount)~= 0)  
+            if (sum(obj.getLinkVerticesCount)~= 0)
                 xVertCoord = obj.getNodeCoordinates{3};
                 yVertCoord = obj.getNodeCoordinates{4};
                 for i=1:obj.LinkCount
@@ -14715,11 +14628,11 @@ classdef epanet <handle
                         newX = xVertCoord{i} + xDisp;
                         newY = yVertCoord{i} + yDisp;
                         LinkID = obj.getLinkNameID(i);
-                        obj.setLinkVertices(LinkID,newX,newY);   
+                        obj.setLinkVertices(LinkID,newX,newY);
                     end
                 end
             end
-        end    
+        end
         function appRotateNetwork(obj, theta, indexRot)
             % Rotates the network by theta degrees counter-clockwise,
             % using as pivot the indexRot
@@ -14729,19 +14642,19 @@ classdef epanet <handle
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %Example 1:
             %  Rotate the network by 60 degrees counter-clockwise around
-            %  the index 1 node. 
+            %  the index 1 node.
             %  d = epanet('Net1.inp');
-            %  d.plot 
+            %  d.plot
             %  d.appRotateNetwork(60)
-            %  d.plot    
+            %  d.plot
             %
             %Example 2:
             %  Rotate the network by 150 degrees counter-clockwise around
-            %  the reservoir with index 921 . 
+            %  the reservoir with index 921 .
             %  d = epanet('ky10.inp');
-            %  d.plot 
+            %  d.plot
             %  d.appRotateNetwork(150,921)
-            %  d.plot    
+            %  d.plot
             %
             % Access the x and y coordinates
             xCoord = obj.getNodeCoordinates{1};
@@ -14770,27 +14683,27 @@ classdef epanet <handle
             for i=1:obj.NodeCount
               obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
             end
-            
-            if (sum(obj.getLinkVerticesCount)~= 0)  
+
+            if (sum(obj.getLinkVerticesCount)~= 0)
                 xVertCoord = obj.getNodeCoordinates{3};
                 yVertCoord = obj.getNodeCoordinates{4};
                 for i=1:obj.LinkCount
                     if (obj.getLinkVerticesCount(i)~= 0)
                         v = [xVertCoord{i}',yVertCoord{i}'];
                         % Shift points in the plane so that the center of rotation is at the origin.
-                        s = v - center(:,1:length(xVertCoord{i}))'; 
+                        s = v - center(:,1:length(xVertCoord{i}))';
                         % Apply the rotation about the origin.
-                        so = R*s'; 
+                        so = R*s';
                         % Shift again so the origin goes back to the desired center of rotation.
-                        vo_vert = so + center(:,1:length(xVertCoord{i}));    
+                        vo_vert = so + center(:,1:length(xVertCoord{i}));
                         newxVertCoord = vo_vert(1,:);
                         newvyVertCoord = vo_vert(2,:);
                         LinkID = obj.getLinkNameID(i);
-                        obj.setLinkVertices(LinkID,newxVertCoord,newvyVertCoord);   
+                        obj.setLinkVertices(LinkID,newxVertCoord,newvyVertCoord);
                     end
                 end
             end
-         end    
+         end
 
     end
 end
