@@ -1202,7 +1202,7 @@ classdef epanet <handle
                 if Errcode
                     obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
                 else
-                    [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);  
+                    [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
                 end
             end
         end
@@ -1219,11 +1219,14 @@ classdef epanet <handle
           count=0;
           [Errcode, count] = calllib(MSXLibEPANET, 'MSXgetcount', code, count);
         end
-        function [Errcode, index] = apiMSXgetindex(MSXLibEPANET,varargin)
+        function [Errcode, index] = apiMSXgetindex(varargin)
             index =0;
             if ~isnumeric(varargin{1})
                 varargin{1}=varargin{2};
                 varargin{2}=varargin{3};
+                MSXLibEPANET=varargin{4};
+            else
+                MSXLibEPANET=varargin{3};
             end
             [Errcode, ~, index]=calllib(MSXLibEPANET, 'MSXgetindex', varargin{1}, varargin{2}, index);
         end
@@ -10027,7 +10030,7 @@ classdef epanet <handle
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(obj.MSXLibEPANET, 3, varargin{1});
+                [obj.Errcode, value] = obj.apiMSXgetindex(3, varargin{1}, obj.MSXLibEPANET);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -10060,7 +10063,7 @@ classdef epanet <handle
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(obj.MSXLibEPANET, 6, varargin{1});
+                [obj.Errcode, value] = obj.apiMSXgetindex(6, varargin{1}, obj.MSXLibEPANET);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -10140,11 +10143,11 @@ classdef epanet <handle
                 if isempty(value), value=[]; end
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
-                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(obj.MSXLibEPANET, 7, varargin{1}{j});
+                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(7, varargin{1}{j}, obj.MSXLibEPANET);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(obj.MSXLibEPANET, 7, varargin{1});
+                [obj.Errcode, value] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -10575,10 +10578,10 @@ classdef epanet <handle
             index=-1;
             if nargin==2
                 [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
-                [obj.Errcode, index] = obj.apiMSXgetindex(obj.MSXLibEPANET, 7, varargin{1});
+                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
             elseif nargin==3
                 [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
-                [obj.Errcode, index] = obj.apiMSXgetindex(obj.MSXLibEPANET, 7, varargin{1});
+                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
                 setMSXPattern(obj, index, varargin{2});
             end
         end
