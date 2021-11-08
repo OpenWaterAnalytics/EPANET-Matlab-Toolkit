@@ -2526,7 +2526,8 @@ classdef epanet <handle
             %   d.getLinkPumpNameID{1:2}   % Retrieves the ID of the first 2 pumps
             %
             % See also getLinkNameID, getLinkPipeNameID, getNodeNameID.
-            value=obj.getLinkNameID(obj.getLinkPumpIndex);
+            value = obj.getLinkNameID(obj.getLinkPumpIndex);
+            error(obj.getError(obj.Errcode));
         end
         function value = getLinkValveNameID(obj)
             % Retrieves the valve ID.
@@ -2542,6 +2543,7 @@ classdef epanet <handle
             %
             % See also getLinkNameID, getLinkPumpNameID, getNodeNameID.
             value=obj.getLinkNameID(obj.getLinkValveIndex);
+            error(obj.getError(obj.Errcode));
         end
         function value = getLinkIndex(obj, varargin)
             % Retrieves the indices of all links, or the indices of an ID set of links.
