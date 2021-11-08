@@ -18,30 +18,30 @@ d.initializeEPANET(d.ToolkitConstants.EN_GPM, d.ToolkitConstants.EN_HW);
 %  an elevation of 700 ft and a demand of 0
 index = d.addNodeJunction('J1');
 d.setNodeJunctionData(index, 700, 0, '');
-d.setNodeCoordinates(index, [10 20])
+d.setNodeCoordinates(index, [0 0])
 
 % Add the remaining two junctions with elevations of
 % 710 ft and demands of 250 and 500 gpm, respectively
 index = d.addNodeJunction('J2');
 d.setNodeJunctionData(index, 710, 250, '');
-d.setNodeCoordinates(index, [20 30])
+d.setNodeCoordinates(index, [0 -100])
 
 index = d.addNodeJunction('J3');
 d.setNodeJunctionData(index, 710, 500, '');
-d.setNodeCoordinates(index, [30 30])
+d.setNodeCoordinates(index, [100 0])
 
 % Add the reservoir at an elevation of 650 ft
 index = d.addNodeReservoir('R1');
 d.setNodeElevations(index, 650);
-d.setNodeCoordinates(index, [10 25])
+d.setNodeCoordinates(index, [-80 0])
 
 % Add the tank node at elevation of 850 ft, initial water level
 % at 120 ft, minimum level at 100 ft, maximum level at 150 ft
 % and a diameter of 50.5 ft
-% index = d.addNodeTank('T1'); % bug check
-% d.setNodeTankData(index, 850, 120, 100, 150, 50.5, 0, '');
- 
-% Add the pipes to the project, setting their length,
+index = d.addNodeTank('T1'); % bug check
+d.setNodeTankData(index, 850, 120, 100, 150, 50.5, 0, '');
+d.setNodeCoordinates(index, [0 50])
+% Add the pipes to the project, setting their length,   
 % diameter, and roughness values
 
 index = d.addLinkPipe('P1', 'J1', 'J2');

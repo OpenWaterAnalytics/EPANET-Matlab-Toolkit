@@ -42,7 +42,7 @@ classdef epanet <handle
     %   http://ec.europa.eu/idabc/eupl
     %
     %   Unless required by applicable law or agreed to in writing, software
-    %   distributed under the Licence is distributed on an "AS IS" basis, 
+    %   distributed under the Licence is distributed on an "AS IS" basis,
     %   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
     %   implied. See the Licence for the specific language governing
     %   permissions and limitations under the Licence.
@@ -452,7 +452,7 @@ classdef epanet <handle
                 obj.saveBinInpFile(varargin);
 
             elseif typecode
-                [Errcode] = obj.apiENsetflowunits(obj.LibEPANET, unitcode);
+                [Errcode] = obj.apiENsetflowunits(unitcode, obj.LibEPANET);
                 if nargin==4
                     if isempty(varargin{1})
                         return
@@ -713,7 +713,7 @@ classdef epanet <handle
         function [Errcode, LibEPANET] = apiENgetversion(LibEPANET)
             [Errcode, LibEPANET]=calllib(LibEPANET, 'ENgetversion', 0);
         end
-        function [Errcode] = apiENinit(LibEPANET, unitsType, headLossType)
+        function [Errcode] = apiENinit(unitsType, headLossType, LibEPANET)
             % EPANET Version 2.2
             [Errcode]=calllib(LibEPANET, 'ENinit', '', '', unitsType, headLossType);
         end
@@ -769,7 +769,7 @@ classdef epanet <handle
                disp(errmsg);
             end
         end
-        function [Errcode] = apiENepanet(LibEPANET, tempfile, rptfile, binfile)
+        function [Errcode] = apiENepanet(tempfile, rptfile, binfile, LibEPANET)
             [Errcode] = calllib(LibEPANET, 'ENepanet', tempfile, rptfile, binfile, lib.pointer);
         end
         function [Errcode] = apiENopenH(LibEPANET)
@@ -789,7 +789,7 @@ classdef epanet <handle
             % EPANET Version 2.2
             [Errcode]=calllib(LibEPANET, 'ENclearreport');
         end
-        function [Errcode, value] = apiENgetresultindex(LibEPANET, objecttype, index)
+        function [Errcode, value] = apiENgetresultindex(objecttype, index, LibEPANET)
             % EPANET Version 2.2
             [Errcode, value]=calllib(LibEPANET, 'ENgetresultindex', objecttype, index, int32(0));
         end
@@ -892,7 +892,7 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsettankdata(index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve, LibEPANET)
             % EPANET Version 2.2
-            [Errcode]=calllib(LibEPANET, 'ENsettankdata', index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve );
+            [Errcode]=calllib(LibEPANET, 'ENsettankdata', index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve);
         end
         function [Errcode] = apiENsetoption(optioncode, value, LibEPANET)
             [Errcode]=calllib(LibEPANET, 'ENsetoption', optioncode, value);
@@ -988,9 +988,9 @@ classdef epanet <handle
           % EPANET Version 2.2
           [Errcode, x, y]=calllib(LibEPANET, 'ENgetvertex', index, vertex, 0, 0);
         end
-        function [Errcode] = apiENsetvertices(index, vertex, x, y, LibEPANET)
+        function [Errcode] = apiENsetvertices(index, x, y, vertex, LibEPANET)
           % EPANET Version 2.2
-          [Errcode]=calllib(LibEPANET, 'ENsetvertices', index, vertex, x, y);
+          [Errcode]=calllib(LibEPANET, 'ENsetvertices', index, x, y, vertex);
         end
         function [Errcode, count] = apiENgetvertexcount(index, LibEPANET)
           [Errcode, count]=calllib(LibEPANET, 'ENgetvertexcount', index, 0);
@@ -1019,20 +1019,19 @@ classdef epanet <handle
           % dev-net-builder
           [Errcode, ~, index]=calllib(LibEPANET, 'ENaddnode', nodeid, nodetype, 0);
         end
-        function [index, Errcode] = apiENaddlink(obj, linkid, linktype, fromnode, tonode)
+        function [index, Errcode] = apiENaddlink(linkid, linktype, fromnode, tonode, LibEPANET)
           % dev-net-builder
-          [Errcode, ~, ~, ~, index]=calllib(obj.LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
-          error(obj.getError(Errcode));
+          [Errcode, ~, ~, ~, index]=calllib(LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
         end
-        function [Errcode] = apiENdeletenode(LibEPANET, indexNode, condition)
+        function [Errcode] = apiENdeletenode(indexNode, condition, LibEPANET)
           % dev-net-builder
           [Errcode]=calllib(LibEPANET, 'ENdeletenode', indexNode, condition);
         end
-        function [Errcode] = apiENdeletelink(LibEPANET, indexLink, condition)
+        function [Errcode] = apiENdeletelink(indexLink, condition, LibEPANET)
           % dev-net-builder
           [Errcode]=calllib(LibEPANET, 'ENdeletelink', indexLink, condition);
         end
-        function [Errcode] = apiENsetheadcurveindex(LibEPANET, pumpindex, curveindex)
+        function [Errcode] = apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET)
           % dev-net-builder
           [Errcode]=calllib(LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
         end
@@ -1079,15 +1078,15 @@ classdef epanet <handle
           comment = char(32*ones(1, 79));
           [Errcode, comment]=calllib(LibEPANET, 'ENgetcomment', object, index, comment);
         end
-        function [Errcode] = apiENdeletepattern(LibEPANET, indexPat)
+        function [Errcode] = apiENdeletepattern(indexPat, LibEPANET)
           % EPANET Version 2.2
           [Errcode]=calllib(LibEPANET, 'ENdeletepattern', indexPat);
         end
-        function [Errcode] = apiENdeletecurve(LibEPANET, indexCurve)
+        function [Errcode] = apiENdeletecurve(indexCurve, LibEPANET)
           % EPANET Version 2.2
           [Errcode]=calllib(LibEPANET, 'ENdeletecurve', indexCurve);
         end
-        function [Errcode] = apiENsetjuncdata(LibEPANET, index, elev, dmnd, dmndpat)
+        function [Errcode] = apiENsetjuncdata(index, elev, dmnd, dmndpat, LibEPANET)
           %   @brief Sets a group of properties for a junction node.
           %   @param index a junction node's index (starting from 1).
           %   @param elev the value of the junction's elevation.
@@ -1103,7 +1102,7 @@ classdef epanet <handle
           %         obj.apiENgeterror(Errcode, LibEPANET);
           %     end
           % end
-        function [Errcode] = apiENsetflowunits(LibEPANET, code)
+        function [Errcode] = apiENsetflowunits(code, LibEPANET)
           [Errcode]=calllib(LibEPANET, 'ENsetflowunits', code);
         end
         function [Errcode, value] = apiENgetnodevalue(index, paramcode, LibEPANET)
@@ -1115,82 +1114,82 @@ classdef epanet <handle
             value = double(value);
         end
         function [obj] = apiMSXMatlabSetup(obj, msxname, varargin)
-          arch = computer('arch');
-          pwdepanet = fileparts(which(mfilename));
-          if strcmp(arch, 'win64')
-              obj.MSXLibEPANETPath = [pwdepanet, '\64bit\'];
-          elseif strcmp(arch, 'win32')
-              obj.MSXLibEPANETPath = [pwdepanet, '\32bit\'];
-          end
-          if isunix
-              obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
-          end
-          if ~isempty(varargin)
-              if varargin{1}{1}~=1
-                  if nargin==3
-                      obj.MSXLibEPANETPath=char(varargin{1});
-                      obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
-                      if isempty(varargin{1})
-                          obj.MSXLibEPANETPath='';
-                      end
-                  end
-              end
-          end
-          obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-          if ~libisloaded(obj.MSXLibEPANET)
-              loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
-          end
+            arch = computer('arch');
+            pwdepanet = fileparts(which(mfilename));
+            if strcmp(arch, 'win64')
+                obj.MSXLibEPANETPath = [pwdepanet, '\64bit\'];
+            elseif strcmp(arch, 'win32')
+                obj.MSXLibEPANETPath = [pwdepanet, '\32bit\'];
+            end
+            if isunix
+                obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
+            end
+            if ~isempty(varargin)
+                if varargin{1}{1}~=1
+                    if nargin==3
+                        obj.MSXLibEPANETPath=char(varargin{1});
+                        obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
+                        if isempty(varargin{1})
+                            obj.MSXLibEPANETPath='';
+                        end
+                    end
+                end
+            end
+            obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+            if ~libisloaded(obj.MSXLibEPANET)
+                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+            end
 
-          obj.MSXFile = which(char(msxname));
-          %Save the temporary msx file
-          mm=0;
-          if ~isempty(varargin)
-              if varargin{1}{1}==1
-                  mm=1; %for set (write) msx functions
-              end
-          end
-          if mm==1
-              if ~iscell(varargin{1})
-                  obj.MSXTempFile=obj.MSXFile;
-              end
-          else
-              obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
-              copyfile(obj.MSXFile, obj.MSXTempFile);
-          end
-          %Open the file
-          [obj.Errcode] = obj.apiMSXopen(obj);
-          obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
-          obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
-          obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
+            obj.MSXFile = which(char(msxname));
+            %Save the temporary msx file
+            mm=0;
+            if ~isempty(varargin)
+                if varargin{1}{1}==1
+                    mm=1; %for set (write) msx functions
+                end
+            end
+            if mm==1
+                if ~iscell(varargin{1})
+                    obj.MSXTempFile=obj.MSXFile;
+                end
+            else
+                obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
+                copyfile(obj.MSXFile, obj.MSXTempFile);
+            end
+            %Open the file
+            [obj.Errcode] = obj.apiMSXopen(obj);
+            obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
+            obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
+            obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
 
-          obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
-          obj.MSXConstantsCount = obj.getMSXConstantsCount;
-          obj.MSXParametersCount = obj.getMSXParametersCount;
-          obj.MSXPatternsCount = obj.getMSXPatternsCount;
-          obj.MSXSpeciesIndex = obj.getMSXSpeciesIndex;
-          obj.MSXSpeciesNameID = obj.getMSXSpeciesNameID;
-          obj.MSXSpeciesType = obj.getMSXSpeciesType;
-          obj.MSXSpeciesUnits = obj.getMSXSpeciesUnits;
-          obj.MSXSpeciesATOL = obj.getMSXSpeciesATOL;
-          obj.MSXSpeciesRTOL = obj.getMSXSpeciesRTOL;
-          obj.MSXConstantsNameID = obj.getMSXConstantsNameID;
-          obj.MSXConstantsValue  = obj.getMSXConstantsValue;  
-          obj.MSXConstantsIndex = obj.getMSXConstantsIndex;
-          obj.MSXParametersNameID = obj.getMSXParametersNameID;
-          obj.MSXParametersIndex = obj.getMSXParametersIndex;
-          obj.MSXParametersTanksValue = obj.getMSXParametersTanksValue;
-          obj.MSXParametersPipesValue = obj.getMSXParametersPipesValue;
-          obj.MSXPatternsNameID = obj.getMSXPatternsNameID;
-          obj.MSXPatternsIndex = obj.getMSXPatternsIndex;
-          obj.MSXPatternsLengths = obj.getMSXPatternsLengths;
-          obj.MSXNodeInitqualValue = obj.getMSXNodeInitqualValue;
-          obj.MSXLinkInitqualValue = obj.getMSXLinkInitqualValue;
-          obj.MSXSources = obj.getMSXSources;
-          obj.MSXSourceType = obj.getMSXSourceType;
-          obj.MSXSourceLevel = obj.getMSXSourceLevel;
-          obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
-          obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
-          obj.MSXPattern = obj.getMSXPattern;
+            obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
+            obj.MSXConstantsCount = obj.getMSXConstantsCount;
+            obj.MSXParametersCount = obj.getMSXParametersCount;
+            obj.MSXPatternsCount = obj.getMSXPatternsCount;
+            obj.MSXSpeciesIndex = obj.getMSXSpeciesIndex;
+            obj.MSXSpeciesNameID = obj.getMSXSpeciesNameID;
+            obj.MSXSpeciesType = obj.getMSXSpeciesType;
+            obj.MSXSpeciesUnits = obj.getMSXSpeciesUnits;
+            obj.MSXSpeciesATOL = obj.getMSXSpeciesATOL;
+            obj.MSXSpeciesRTOL = obj.getMSXSpeciesRTOL;
+            obj.MSXConstantsNameID = obj.getMSXConstantsNameID;
+            obj.MSXConstantsValue  = obj.getMSXConstantsValue;
+            obj.MSXConstantsIndex = obj.getMSXConstantsIndex;
+            obj.MSXParametersNameID = obj.getMSXParametersNameID;
+            obj.MSXParametersIndex = obj.getMSXParametersIndex;
+            obj.MSXParametersTanksValue = obj.getMSXParametersTanksValue;
+            obj.MSXParametersPipesValue = obj.getMSXParametersPipesValue;
+            obj.MSXPatternsNameID = obj.getMSXPatternsNameID;
+            obj.MSXPatternsIndex = obj.getMSXPatternsIndex;
+            obj.MSXPatternsLengths = obj.getMSXPatternsLengths;
+            obj.MSXNodeInitqualValue = obj.getMSXNodeInitqualValue;
+            obj.MSXLinkInitqualValue = obj.getMSXLinkInitqualValue;
+            obj.MSXSources = obj.getMSXSources;
+            obj.MSXSourceType = obj.getMSXSourceType;
+            obj.MSXSourceLevel = obj.getMSXSourceLevel;
+            obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
+            obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
+            obj.MSXPattern = obj.getMSXPattern;
         end
         function [Errcode] = apiMSXopen(obj, varargin)
             [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
@@ -1204,17 +1203,11 @@ classdef epanet <handle
                     obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
                 else
                     [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
-                    if Errcode
-                        obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
-                    end
                 end
             end
         end
         function [Errcode] = apiMSXclose(obj)
             [Errcode] = calllib(obj.MSXLibEPANET, 'MSXclose');
-            if Errcode
-                obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
-            end
         end
         function [e] = apiMSXerror(Errcode, MSXLibEPANET)
             len=80;
@@ -1225,84 +1218,57 @@ classdef epanet <handle
         function [Errcode, count] = apiMSXgetcount(code, MSXLibEPANET)
           count=0;
           [Errcode, count] = calllib(MSXLibEPANET, 'MSXgetcount', code, count);
-          if Errcode
-              obj.apiMSXerror(Errcode, MSXLibEPANET);
-          end
         end
-        function [Errcode, index] = apiMSXgetindex(MSXLibEPANET, varargin)
+        function [Errcode, index] = apiMSXgetindex(varargin)
             index =0;
             if ~isnumeric(varargin{1})
                 varargin{1}=varargin{2};
                 varargin{2}=varargin{3};
+                MSXLibEPANET=varargin{4};
+            else
+                MSXLibEPANET=varargin{3};
             end
             [Errcode, ~, index]=calllib(MSXLibEPANET, 'MSXgetindex', varargin{1}, varargin{2}, index);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, id] = apiMSXgetID(type, index, len, MSXLibEPANET)
               id=char(32*ones(1, len+1));
               [Errcode, id]=calllib(MSXLibEPANET, 'MSXgetID', type, index, id, len);
               id=id(1:len);
-              if Errcode
-                  obj.apiMSXerror(Errcode, MSXLibEPANET);
               end
-              end
-              function [Errcode, len] = apiMSXgetIDlen(type, index, MSXLibEPANET)
+        function [Errcode, len] = apiMSXgetIDlen(type, index, MSXLibEPANET)
               len=0;
               [Errcode, len]=calllib(MSXLibEPANET, 'MSXgetIDlen', type, index, len);
-              if Errcode
-                  obj.apiMSXerror(Errcode, MSXLibEPANET);
-              end
-          end
-          function [Errcode, type, units, atol, rtol] = apiMSXgetspecies(index, MSXLibEPANET)
-          type=0; rtol=0; atol=0;
-          units=char(32*ones(1, 16));
-          [Errcode, type, units, atol, rtol]=calllib(MSXLibEPANET, 'MSXgetspecies', index, type, units, atol, rtol);
-          switch type
-              case 0
-                  type='BULK';   % for a bulk water species
-              case 1
-                  type='WALL';   % for a pipe wall surface species
-          end
-          if Errcode
-              obj.apiMSXerror(Errcode, MSXLibEPANET);
-          end
+        end
+        function [Errcode, type, units, atol, rtol] = apiMSXgetspecies(index, MSXLibEPANET)
+            type=0; rtol=0; atol=0;
+            units=char(32*ones(1, 16));
+            [Errcode, type, units, atol, rtol]=calllib(MSXLibEPANET, 'MSXgetspecies', index, type, units, atol, rtol);
+            switch type
+                case 0
+                    type='BULK';   % for a bulk water species
+                case 1
+                    type='WALL';   % for a pipe wall surface species
+            end
         end
         function [Errcode, value] = apiMSXgetconstant(index, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetconstant', index, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, value] = apiMSXgetparameter(type, index, param, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetparameter', type, index, param, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, patlen] = apiMSXgetpatternlen(patindex, MSXLibEPANET)
             patlen=0;
             [Errcode, patlen]=calllib(MSXLibEPANET, 'MSXgetpatternlen', patindex, patlen);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, value] = apiMSXgetpatternvalue(patindex, period, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetpatternvalue', patindex, period, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, value] = apiMSXgetinitqual(obj, index, species, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetinitqual', obj, index, species, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, type, level, pat] = apiMSXgetsource(node, species, MSXLibEPANET)
             type=0;
@@ -1321,9 +1287,6 @@ classdef epanet <handle
                 case 3
                     type='FLOWPACED'; % for a flow paced source
             end
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function apiMSXMatlabCleanup(obj)
             % Unload library
@@ -1336,69 +1299,36 @@ classdef epanet <handle
         end
         function [Errcode] = apiMSXsaveoutfile(outfname, MSXLibEPANET)
             [Errcode] = calllib(MSXLibEPANET, 'MSXsaveoutfile', outfname);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsavemsxfile(msxname, MSXLibEPANET)
             [Errcode] = calllib(MSXLibEPANET, 'MSXsavemsxfile', msxname);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetconstant(index, value, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetconstant', index, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetparameter(type, index, param, value, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetparameter', type, index, param, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetinitqual(type, index, species, value, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetinitqual', type, index, species, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetpattern', index, factors, nfactors);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetpatternvalue(pat, period, value, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetpatternvalue', pat, period, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
             end
         function [Errcode] = apiMSXsolveQ(MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsolveQ');
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsolveH(MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsolveH');
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXaddpattern(patid, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXaddpattern', patid);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXusehydfile(hydfname, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXusehydfile', hydfname);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode, t, tleft] = apiMSXstep(MSXLibEPANET)
             t=int32(0);
@@ -1406,21 +1336,12 @@ classdef epanet <handle
             [Errcode, t, tleft]=calllib(MSXLibEPANET, 'MSXstep', t, tleft);
             t = double(t);
             tleft = double(tleft);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXinit(flag, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXinit', flag);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXreport(MSXLibEPANET)
             [Errcode] = calllib(MSXLibEPANET, 'MSXreport');
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [e, errmsg] = apiMSXgeterror(Errcode, MSXLibEPANET)
             errmsg = char(32*ones(1, 80));
@@ -1432,15 +1353,9 @@ classdef epanet <handle
         function [Errcode, value] = apiMSXgetqual(type, index, species, MSXLibEPANET)
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetqual', type, index, species, value);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
         function [Errcode] = apiMSXsetsource(node, species, type, level, pat, MSXLibEPANET)
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetsource', node, species, type, level, pat);
-            if Errcode
-                obj.apiMSXerror(Errcode, MSXLibEPANET);
-            end
         end
     end
 
@@ -1466,7 +1381,7 @@ classdef epanet <handle
                 obj.LibEPANET = 'libepanet';
             end
             if nargin>0
-                if ~isdeployed 
+                if ~isdeployed
                     obj.InputFile=which(varargin{1}); % Get name of INP file
                 else
                     obj.InputFile=varargin{1};
@@ -1498,55 +1413,55 @@ classdef epanet <handle
                     end
                 end
             end
-                if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
-                    [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-                    if isempty(pwdDLL)
-                        pwdDLL = pwd;
-                    end
-                    obj.LibEPANETpath = [pwdDLL, '\'];
-                    try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
-                    catch
-                       obj.Errcode=-1;
-                       error(['File "', obj.LibEPANET, '" is not a valid win application.']);
-                    end
-                elseif ~isunix
-                    obj.LibEPANET = 'epanet2';
+            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
+                [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+                if isempty(pwdDLL)
+                    pwdDLL = pwd;
                 end
-                if nargin>0
-                    if ~isdeployed
-                        if ~exist(obj.InputFile, 'file')
-                            if nargin==2 && strcmpi(varargin{2}, 'CREATE')
-                                % skip
-                            else
-                                error(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);
-                            end
+                obj.LibEPANETpath = [pwdDLL, '\'];
+                try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
+                catch
+                   obj.Errcode=-1;
+                   error(['File "', obj.LibEPANET, '" is not a valid win application.']);
+                end
+            elseif ~isunix
+                obj.LibEPANET = 'epanet2';
+            end
+            if nargin>0
+                if ~isdeployed
+                    if ~exist(obj.InputFile, 'file')
+                        if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                            % skip
+                        else
+                            error(['File "', varargin{1}, '" does not exist in folder. (e.g. addpath(genpath(pwd));)']);
                         end
                     end
                 end
+            end
             %Load EPANET Library
             obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
             disp([' (EMT version {', obj.classversion, '}).'])
-            
+
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
-                
+
             %For the getComputedQualityTimeSeries
             obj.solve = 0;
             %Open the file
-            if nargin>0
-                if ~isempty(obj.InputFile)
-                    if nargin==2 && strcmpi(varargin{2}, 'CREATE')
-                        warning(['Network name "', inp , '.inp" already exists.'])
-                    end
-                    obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
-                    error(obj.getError(obj.Errcode));
-                else
-                    obj.InputFile = varargin{1};
-                    % initializes an EPANET project that isn't opened with an input file
-                    obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
-                    warning('Initializes the EPANET project!');
+
+            if ~isempty(obj.InputFile)
+                if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                    warning(['Network name "', inp , '.inp" already exists.'])
                 end
-            
+                obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
+                error(obj.getError(obj.Errcode));
+            %               else
+            %                 obj.InputFile = varargin{1};
+            %                 % initializes an EPANET project that isn't opened with an input file
+            %                 obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
+            %                 warning('Initializes the EPANET project!');
+            end
+            if nargin>0
                 %Save the temporary input file
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
                 obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
@@ -1573,7 +1488,7 @@ classdef epanet <handle
                         return;
                     end
                 end
-            
+
                 % Get some link data
                 lnkInfo = obj.getLinksInfo;
                 getFields_link_info = fields(lnkInfo);
@@ -1597,6 +1512,12 @@ classdef epanet <handle
             end
             %Get all the countable network parameters
             if nargin == 0
+                obj.libFunctions = libfunctions(obj.LibEPANET);
+                if sum(strcmp(obj.libFunctions, 'ENgetqualinfo'))
+                    n = obj.getQualityInfo;
+                    obj.QualityChemUnits = n.QualityChemUnits;
+                    obj.QualityChemName= n.QualityChemName;
+                end
                 return;
             else
                 obj.NodeCount = obj.getNodeCount;
@@ -1784,7 +1705,7 @@ classdef epanet <handle
             elseif nargin == 2
                 rptfile = [varargin{1}, '.txt'];
                 binfile = [varargin{1}, '.bin'];
-                obj.Errcode = obj.apiENepanet(obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
+                obj.Errcode = obj.apiENepanet(obj.BinTempfile, rptfile, binfile, obj.LibEPANET);
                 Errcode = reloadNetwork(obj);
             end
         end
@@ -1870,7 +1791,7 @@ classdef epanet <handle
             %   d.getControls(1).Value     % Retrieves the value of the node associated with the 1st control
             %   d.getControls(1).Control   % Retrieves the 1st control statement
             %
-            % See also setControls, addControls, deleteControls, 
+            % See also setControls, addControls, deleteControls,
             %          getRules, setRules, addRules, deleteRules.
             indices = getControlIndices(obj, varargin);j=1;
             value=struct();
@@ -1935,7 +1856,7 @@ classdef epanet <handle
             %   rule_first_Else_Actions = d.getRules(1).Else_Actions   % Retrieves all the else actions of the 1st rule - based control
             %   rule_first_Rule = d.getRules(1).Rule                   % Retrieves the 1st rule - based control
             %
-            % See also getRuleInfo, getRuleID, getRuleCount, 
+            % See also getRuleInfo, getRuleID, getRuleCount,
             %          setRules, deleteRules, addRules.
             value = struct();
             if nargin==1
@@ -2049,7 +1970,7 @@ classdef epanet <handle
             %   d.getRuleCount
             %   d.getRules(1).Rule
             %
-            % See also deleteRules, setRules, getRules, getRuleInfo, 
+            % See also deleteRules, setRules, getRules, getRuleInfo,
             %          setRuleThenAction, setRuleElseAction, setRulePriority.
 
             %rule_new = split(rule, '\n ');
@@ -2075,7 +1996,7 @@ classdef epanet <handle
             %   d.setRules(ruleIndex, rule_new)   % Sets rule - based control
             %   d.getRules(1).Rule
             %
-            % See also setRulePremise, setRuleThenAction, setRuleElseAction, 
+            % See also setRulePremise, setRuleThenAction, setRuleElseAction,
             %          getRules, addRules, deleteRules.
             rule_new = regexp(rule, '\\n ', 'split');
             i = 1;
@@ -2117,7 +2038,7 @@ classdef epanet <handle
             %   d.setRuleThenAction(ruleIndex, actionIndex, then_action)
             %   rule = d.getRules(1)
             %
-            % See also setRules, setRuleElseAction, setRulePriority, 
+            % See also setRules, setRuleElseAction, setRulePriority,
             %          getRuleInfo, getRules, addRules, deleteRules.
             then_new = regexp(then_action, '\s', 'split');
             if strcmp(then_new{4}, 'STATUS')
@@ -2149,7 +2070,7 @@ classdef epanet <handle
             %   d.setRuleElseAction(ruleIndex, actionIndex, else_action)   % Sets the new else - action in the 1st rule - based control, in the 1st else - action.
             %   rule = d.getRules(1)
             %
-            % See also setRules, setRuleThenAction, setRulePriority, 
+            % See also setRules, setRuleThenAction, setRulePriority,
             %          getRuleInfo, getRules, addRules, deleteRules.
             else_new = regexp(else_action, '\s', 'split');
             if strcmp(else_new{4}, 'STATUS')
@@ -2175,7 +2096,7 @@ classdef epanet <handle
             %   d.setRulePriority(ruleIndex, priority)   % Sets the 1st rule - based control priority = 2
             %   d.getRules(1).Rule
             %
-            % See also setRules, setRuleThenAction, setRuleElseAction, 
+            % See also setRules, setRuleThenAction, setRuleElseAction,
             %          getRuleInfo, getRules, addRules, deleteRules.
             [obj.Errcode] = obj.apiENsetrulepriority(ruleIndex, priority, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
@@ -2201,7 +2122,7 @@ classdef epanet <handle
             %   d.setRulePremise(1, 1, premise)                      % Sets the 1st premise of the 1st rule - based control
             %   d.getRules(1).Premises
             %
-            % See also setRulePremiseObejctNameID, setRulePremiseStatus, setRulePremiseValue, 
+            % See also setRulePremiseObejctNameID, setRulePremiseStatus, setRulePremiseValue,
             %          setRules, getRules, addRules, deleteRules.
 
             %  premise_new = split(premise, ' ');
@@ -2254,7 +2175,7 @@ classdef epanet <handle
             %   d.setRulePremiseObejctNameID(ruleIndex, premiseIndex, objNameID)   % Sets the node's ID = 'TANK-131' to the 1st premise of the 1st rule - based control
             %   d.getRules(1).Premises
             %
-            % See also setRulePremise, setRulePremiseStatus, setRulePremiseValue, 
+            % See also setRulePremise, setRulePremiseStatus, setRulePremiseValue,
             %          setRules, getRules, addRules, deleteRules.
             [obj.Errcode, ~, object, objIndex, ~, ~, ~, ~] =  obj.apiENgetpremise(ruleIndex, premiseIndex, obj.LibEPANET);
             if object == obj.ToolkitConstants.EN_R_NODE
@@ -2280,7 +2201,7 @@ classdef epanet <handle
             %   d.setRulePremiseStatus(ruleIndex, premiseIndex, status)   % Sets the status = 'OPEN' to the 1st premise of the 1st rule - based control
             %   d.getRules(1).Premises
             %
-            % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseValue, 
+            % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseValue,
             %          setRules, getRules, addRules, deleteRules.
             if strcmp(status, 'OPEN')
                 status_code = obj.ToolkitConstants.EN_R_IS_OPEN;
@@ -2305,7 +2226,7 @@ classdef epanet <handle
             %   d.setRulePremiseValue(ruleIndex, premiseIndex, value)   % Sets the value = 20 to the 1st premise of the 1st rule - based control
             %   d.getRules(1).Premises
             %
-            % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseStatus, 
+            % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseStatus,
             %          setRules, getRules, addRules, deleteRules.
             [obj.Errcode] = obj.apiENsetpremisevalue(ruleIndex, premiseIndex, value, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
@@ -2756,7 +2677,7 @@ classdef epanet <handle
             % Example 2:
             %    d.getLinkType(1)   % Retrieves the link-type code for the first link
             %
-            % See also getLinkTypeIndex, getLinksInfo, getLinkDiameter, 
+            % See also getLinkTypeIndex, getLinksInfo, getLinkDiameter,
             %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             if ~isempty(varargin), varargin=varargin{1}; end
             value=obj.TYPELINK(obj.getLinkTypeIndex(varargin)+1);
@@ -2770,7 +2691,7 @@ classdef epanet <handle
             % Example 2:
             %    d.getLinkTypeIndex(1)   % Retrieves the link-type index for the first link
             %
-            % See also getLinkType, getLinksInfo, getLinkDiameter, 
+            % See also getLinkType, getLinksInfo, getLinkDiameter,
             %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
@@ -2785,7 +2706,7 @@ classdef epanet <handle
             % Example:
             %    d.getLinksInfo
             %
-            % See also getLinkType, getLinkTypeIndex, getLinkDiameter, 
+            % See also getLinkType, getLinkTypeIndex, getLinkDiameter,
             %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = struct();
             for i=1:obj.getLinkCount
@@ -2813,7 +2734,7 @@ classdef epanet <handle
             % Example 2:
             %    d.getLinkDiameter(1)   % Retrieves the value of the first link diameter
             %
-            % See also getLinkType, getLinksInfo, getLinkLength, 
+            % See also getLinkType, getLinksInfo, getLinkLength,
             %          getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_DIAMETER, varargin{:});
         end
@@ -2827,9 +2748,23 @@ classdef epanet <handle
             % Example 2:
             %    d.getLinkLength(1)   % Retrieves the value of the first link length
             %
-            % See also getLinkType, getLinksInfo, getLinkDiameter, 
+            % See also getLinkType, getLinksInfo, getLinkDiameter,
             %          getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_LENGTH, varargin{:});
+        end
+        function value = getLinkQuality(obj, varargin)
+            % Retrieves the value of link quality.
+            % Pipe quality
+            %
+            % Example 1:
+            %    d.getLinQuaity       % Retrieves the value of all link lengths
+            %
+            % Example 2:
+            %    d.getLinkQuality(1)   % Retrieves the value of the first link length
+            %
+            % See also getLinkType, getLinksInfo, getLinkDiameter,
+            %          getLinkRoughnessCoeff, getLinkMinorLossCoeff.
+            value = get_link_info(obj, obj.ToolkitConstants.EN_QUALITY, varargin{:});
         end
         function value = getLinkRoughnessCoeff(obj, varargin)
             % Retrieves the value of all link roughness coefficients.
@@ -2841,7 +2776,7 @@ classdef epanet <handle
             % Example 2:
             %    d.getLinkRoughnessCoeff(1)   % Retrieves the value of the first link roughness coefficient
             %
-            % See also getLinkType, getLinksInfo, getLinkDiameter, 
+            % See also getLinkType, getLinksInfo, getLinkDiameter,
             %          getLinkLength, getLinkMinorLossCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_ROUGHNESS, varargin{:});
         end
@@ -2855,7 +2790,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkMinorLossCoeff(1)   % Retrieves the value of the first link minor loss coefficient
             %
-            % See also getLinkType, getLinksInfo, getLinkDiameter, 
+            % See also getLinkType, getLinksInfo, getLinkDiameter,
             %          getLinkLength, getLinkRoughnessCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_MINORLOSS, varargin{:});
         end
@@ -2869,7 +2804,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkInitialStatus(1)   % Retrieves the value of the first link initial status
             %
-            % See also getLinkType, getLinksInfo, getLinkInitialSetting, 
+            % See also getLinkType, getLinksInfo, getLinkInitialSetting,
             %          getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSTATUS, varargin{:});
         end
@@ -2882,7 +2817,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkInitialSetting(1)   % Retrieves the value of the first link initial setting
             %
-            % See also getLinkType, getLinksInfo, getLinkInitialStatus, 
+            % See also getLinkType, getLinksInfo, getLinkInitialStatus,
             %          getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSETTING, varargin{:});
         end
@@ -2895,8 +2830,8 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkBulkReactionCoeff(1)   % Retrieves the value of the first link bulk chemical reaction coefficient
             %
-            % See also getLinkType, getLinksInfo, getLinkRoughnessCoeff, 
-            %          getLinkMinorLossCoeff, getLinkInitialStatus, 
+            % See also getLinkType, getLinksInfo, getLinkRoughnessCoeff,
+            %          getLinkMinorLossCoeff, getLinkInitialStatus,
             %          getLinkInitialSetting, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_KBULK, varargin{:});
         end
@@ -2909,8 +2844,8 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkWallReactionCoeff(1)   % Retrieves the value of the first pipe wall chemical reaction coefficient
             %
-            % See also getLinkType, getLinksInfo, getLinkRoughnessCoeff, 
-            %          getLinkMinorLossCoeff, getLinkInitialStatus, 
+            % See also getLinkType, getLinksInfo, getLinkRoughnessCoeff,
+            %          getLinkMinorLossCoeff, getLinkInitialStatus,
             %          getLinkInitialSetting, getLinkBulkReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_KWALL, varargin{:});
         end
@@ -2967,8 +2902,8 @@ classdef epanet <handle
             %    d.closeQualityAnalysis;
             %    d.closeHydraulicAnalysis;
             %
-            % See also getLinkVelocity, getLinkHeadloss, getLinkStatus, 
-            %          getLinkPumpState, getLinkSettings, getLinkEnergy, 
+            % See also getLinkVelocity, getLinkHeadloss, getLinkStatus,
+            %          getLinkPumpState, getLinkSettings, getLinkEnergy,
             %          getLinkActualQuality, getLinkPumpEfficiency.
 
             value = get_link_info(obj, obj.ToolkitConstants.EN_FLOW, varargin{:});
@@ -2986,14 +2921,14 @@ classdef epanet <handle
             %
             % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
-            % See also getLinkFlows, getLinkHeadloss, getLinkStatus, 
+            % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
             value = get_link_info(obj, obj.ToolkitConstants.EN_VELOCITY, varargin{:});
         end
         function value = getLinkHeadloss(obj, varargin)
             % Retrieves the current computed head loss (read only).
             %
-            % Using step-by-step hydraulic analysis, 
+            % Using step-by-step hydraulic analysis,
             %
             % Example 1:
             %   d.getLinkHeadloss      % Retrieves the current computed head loss for all links
@@ -3003,14 +2938,14 @@ classdef epanet <handle
             %
             % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
-            % See also getLinkFlows, getLinkVelocity, getLinkStatus, 
+            % See also getLinkFlows, getLinkVelocity, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
             value = get_link_info(obj, obj.ToolkitConstants.EN_HEADLOSS, varargin{:});
         end
         function value = getLinkStatus(obj, varargin)
             % Retrieves the current link status (see @ref EN_LinkStatusType) (0 = closed, 1 = open).
             %
-            % Using step-by-step hydraulic analysis, 
+            % Using step-by-step hydraulic analysis,
             %
             % Example 1:
             %   d.getLinkStatus      % Retrieves the current link status for all links
@@ -3020,14 +2955,14 @@ classdef epanet <handle
             %
             % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
-            % See also getLinkFlows, getLinkVelocity, getLinkHeadloss, 
+            % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkPumpState, getLinkSettings.
             value = get_link_info(obj, obj.ToolkitConstants.EN_STATUS, varargin{:});
         end
         function value = getLinkPumpState(obj, varargin)
             % Retrieves the current computed pump state (read only) (see @ref EN_PumpStateType). (EPANET Version 2.2)
             % same as status: open, active, closed
-            % Using step-by-step hydraulic analysis, 
+            % Using step-by-step hydraulic analysis,
             %
             % Example 1:
             %   d.getLinkPumpState      % Retrieves the current computed pump state for all links
@@ -3037,7 +2972,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
-            % See also getLinkFlows, getLinkHeadloss, getLinkStatus, 
+            % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
             %          getLinkSettings, getLinkEnergy, getLinkPumpEfficiency.
             value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_STATE, varargin);
         end
@@ -3045,7 +2980,7 @@ classdef epanet <handle
             % Retrieves the current computed value of all link roughness for pipes
             % or actual speed for pumps or actual setting for valves.
             %
-            % Using step-by-step hydraulic analysis, 
+            % Using step-by-step hydraulic analysis,
             %
             % Example 1:
             %   d.getLinkSettings      % Retrieves the current values of settings for all links
@@ -3055,14 +2990,14 @@ classdef epanet <handle
             %
             % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
-            % See also getLinkFlows, getLinkVelocity, getLinkHeadloss, 
+            % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkEnergy.
             value = get_link_info(obj, obj.ToolkitConstants.EN_SETTING, varargin{:});
         end
         function value = getLinkEnergy(obj, varargin)
             % Retrieves the current computed pump energy usage (read only).
             %
-            % Using step-by-step hydraulic analysis, 
+            % Using step-by-step hydraulic analysis,
             %
             % Example 1:
             %   d.getLinkEnergy      % Retrieves the current computed pump energy usage for all links
@@ -3072,7 +3007,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
-            % See also getLinkFlows, getLinkVelocity, getLinkHeadloss, 
+            % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkPumpEfficiency.
             value = get_link_info(obj, obj.ToolkitConstants.EN_ENERGY, varargin{:});
         end
@@ -3088,7 +3023,7 @@ classdef epanet <handle
             % Example 3:
             %   check examples/EX14_hydraulic_and_quality_analysis.m
             %
-            % See also getLinkFlows, getLinkStatus, getLinkPumpState, 
+            % See also getLinkFlows, getLinkStatus, getLinkPumpState,
             %          getLinkSettings, getLinkPumpEfficiency.
             value = get_link_info(obj, obj.ToolkitConstants.EN_LINKQUAL, varargin{:});
         end
@@ -3103,7 +3038,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
-            % See also getLinkFlows, getLinkStatus, getLinkPumpState, 
+            % See also getLinkFlows, getLinkStatus, getLinkPumpState,
             %          getLinkSettings, getLinkEnergy, getLinkActualQuality.
             value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_EFFIC, varargin);
         end
@@ -3123,7 +3058,7 @@ classdef epanet <handle
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.getLinkPumpPower(pumpIndex)   % Retrieves the constant power rating of the pumps given their indices
             %
-            % See also getLinkPumpHCurve, getLinkPumpECurve, getLinkPumpECost, 
+            % See also getLinkPumpHCurve, getLinkPumpECurve, getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_POWER, varargin);
         end
@@ -3143,7 +3078,7 @@ classdef epanet <handle
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.getLinkPumpHCurve(pumpIndex)   % Retrieves the head v. flow curve index of the pumps given their indices
             %
-            % See also setLinkPumpHCurve, getLinkPumpECurve, getLinkPumpECost, 
+            % See also setLinkPumpHCurve, getLinkPumpECurve, getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, varargin);
         end
@@ -3163,7 +3098,7 @@ classdef epanet <handle
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.getLinkPumpECurve(pumpIndex)   % Retrieves the efficiency v. flow curve index of the pumps given their indices
             %
-            % See also setLinkPumpECurve, getLinkPumpHCurve, getLinkPumpECost, 
+            % See also setLinkPumpECurve, getLinkPumpHCurve, getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, varargin);
         end
@@ -3183,7 +3118,7 @@ classdef epanet <handle
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.getLinkPumpECost(pumpIndex)   % Retrieves the average energy price of the pumps given their indices
             %
-            % See also setLinkPumpECost, getLinkPumpPower, getLinkPumpHCurve, 
+            % See also setLinkPumpECost, getLinkPumpPower, getLinkPumpHCurve,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, varargin);
         end
@@ -3203,7 +3138,7 @@ classdef epanet <handle
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.getLinkPumpEPat(pumpIndex)   % Retrieves the energy price time pattern index of the pumps given their indices
             %
-            % See also setLinkPumpEPat, getLinkPumpHCurve, getLinkPumpECurve, 
+            % See also setLinkPumpEPat, getLinkPumpHCurve, getLinkPumpECurve,
             %          getLinkPumpECost, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, varargin);
         end
@@ -3223,7 +3158,7 @@ classdef epanet <handle
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.getLinkPumpPatternIndex(pumpIndex)   % Retrieves the speed time pattern index of the pumps given their indices
             %
-            % See also setLinkPumpPatternIndex, getLinkPumpPower, getLinkPumpHCurve, 
+            % See also setLinkPumpPatternIndex, getLinkPumpPower, getLinkPumpHCurve,
             %          getLinkPumpECost, getLinkPumpEPat,  getLinkPumpPatternNameID.
             value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, varargin);
         end
@@ -3243,7 +3178,7 @@ classdef epanet <handle
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.getLinkPumpPatternNameID(pumpIndex)   % Retrieves the pattern name ID of the pumps given their indices
             %
-            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve, 
+            % See also getLinkPumpPower, getLinkPumpHCurve, getLinkPumpECurve,
             %          getLinkPumpECost, getLinkPumpEPat, getLinkPumpPatternIndex.
             if isempty(varargin)
                 patindices = obj.getLinkPumpPatternIndex;
@@ -3265,7 +3200,7 @@ classdef epanet <handle
             %   junctionIndex = d.getNodeJunctionIndex;
             %   d.getNodeNameID(junctionIndex)   % Retrieves the ID labels of all junctions give their indices
             %
-            % See also getNodeReservoirNameID, getNodeJunctionNameID, 
+            % See also getNodeReservoirNameID, getNodeJunctionNameID,
             %          getNodeIndex, getNodeType, getNodesInfo.
             if isempty(varargin)
                 cnt = obj.getNodeCount;
@@ -3291,7 +3226,7 @@ classdef epanet <handle
             % Example :
             %   d.getNodeReservoirNameID
             %
-            % See also getNodeNameID, getNodeJunctionNameID, getNodeIndex, 
+            % See also getNodeNameID, getNodeJunctionNameID, getNodeIndex,
             %          getNodeReservoirIndex, getNodeType, getNodesInfo.
             %
             value=obj.getNodeNameID(obj.getNodeReservoirIndex);
@@ -3302,7 +3237,7 @@ classdef epanet <handle
             % Example:
             %   d.getNodeJunctionNameID
             %
-            % See also getNodeNameID, getNodeReservoirNameID, getNodeIndex, 
+            % See also getNodeNameID, getNodeReservoirNameID, getNodeIndex,
             %          getNodeJunctionIndex, getNodeType, getNodesInfo.
             value=obj.getNodeNameID(obj.getNodeJunctionIndex);
         end
@@ -3316,7 +3251,7 @@ classdef epanet <handle
             %   nameID = d.getNodeNameID(1)
             %   d.getNodeIndex(nameID)   % Retrieves the node index given the ID label of the 1st node
             %
-            % See also getNodeNameID, getNodeReservoirIndex, getNodeJunctionIndex, 
+            % See also getNodeNameID, getNodeReservoirIndex, getNodeJunctionIndex,
             %          getNodeType, getNodeTypeIndex, getNodesInfo.
             value = [];
             if isempty(varargin)
@@ -3342,7 +3277,7 @@ classdef epanet <handle
             % Example:
             %   d.getNodeReservoirIndex
             %
-            % See also getNodeNameID, getNodeIndex, getNodeJunctionIndex, 
+            % See also getNodeNameID, getNodeIndex, getNodeJunctionIndex,
             %          getNodeType, getNodeTypeIndex, getNodesInfo.
             tmpNodeTypes=obj.getNodeType;
             value = find(strcmp(tmpNodeTypes, 'RESERVOIR'));
@@ -3353,7 +3288,7 @@ classdef epanet <handle
             % Example:
             %   d.getNodeJunctionIndex
             %
-            % See also getNodeNameID, getNodeIndex, getNodeReservoirIndex, 
+            % See also getNodeNameID, getNodeIndex, getNodeReservoirIndex,
             %          getNodeType, getNodeTypeIndex, getNodesInfo.
             tmpNodeTypes=obj.getNodeType;
             value = find(strcmp(tmpNodeTypes, 'JUNCTION'));
@@ -3367,7 +3302,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getNodeType(1)   % Retrieves the node-type code for the first node
             %
-            % See also getNodeNameID, getNodeIndex, 
+            % See also getNodeNameID, getNodeIndex,
             %          getNodeTypeIndex, getNodesInfo.
             indices = getNodeIndices(obj, varargin);
             value=obj.TYPENODE(obj.getNodeTypeIndex(indices)+1);
@@ -3386,7 +3321,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getNodeTypeIndex(1)   % Retrieves the node-type code index for the first node
             %
-            % See also getNodeNameID, getNodeIndex, 
+            % See also getNodeNameID, getNodeIndex,
             %          getNodeType, getNodesInfo.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -3396,13 +3331,13 @@ classdef epanet <handle
             end
         end
         function value = getNodesInfo(obj)
-            % Retrieves nodes info (elevations, demand patterns, emmitter coeff, initial quality, 
+            % Retrieves nodes info (elevations, demand patterns, emmitter coeff, initial quality,
             % source quality, source pattern index, source type index, node type index).
             %
             % Example:
             %   d.getNodesInfo
             %
-            % See also getNodeElevations, getNodeDemandPatternIndex, getNodeEmitterCoeff, 
+            % See also getNodeElevations, getNodeDemandPatternIndex, getNodeEmitterCoeff,
             %          getNodeInitialQuality, NodeTypeIndex.
             value = struct();
             for i=1:obj.getNodeCount
@@ -3428,7 +3363,7 @@ classdef epanet <handle
             % Example 3:
             %   d.getNodeElevations(5:7)   % Retrieves the value of the 5th to 7th node elevations
             %
-            % See also setNodeElevations, getNodesInfo, getNodeNameID, 
+            % See also setNodeElevations, getNodesInfo, getNodeNameID,
             %          getNodeType, getNodeEmitterCoeff, getNodeInitialQuality.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -3485,7 +3420,7 @@ classdef epanet <handle
             %   d.getNodeJunctionDemandIndex     % Retrieves the indices of all demands for all nodes.
             %   d.getNodeJunctionDemandName{2}   % Retrieves the demand category names of the 2nd demand index for all nodes.
             %
-            % See also deleteNodeJunctionDemand, getNodeJunctionDemandIndex, getNodeJunctionDemandName, 
+            % See also deleteNodeJunctionDemand, getNodeJunctionDemandIndex, getNodeJunctionDemandName,
             %          setNodeJunctionDemandName, getNodeBaseDemands.
             nodeIndex = varargin{1};
             baseDemand = varargin{2};
@@ -3571,7 +3506,7 @@ classdef epanet <handle
             %   d.deleteNodeJunctionDemand(1:3)                                         % Deletes all the demands of the first 3 nodes
             %   d.getNodeJunctionDemandIndex(nodeIndex)                                 % Retrieves the indices of all demands for the first 3 nodes
             %
-            % See also addNodeJunctionDemand, getNodeJunctionDemandIndex, getNodeJunctionDemandName, 
+            % See also addNodeJunctionDemand, getNodeJunctionDemandIndex, getNodeJunctionDemandName,
             %          setNodeJunctionDemandName, getNodeBaseDemands.
             nodeIndex = varargin{1};
             if nargin==2
@@ -3601,7 +3536,7 @@ classdef epanet <handle
             % Example:
             %   model = d.getNodeJunctionDemandName()
             %
-            % See also setNodeJunctionDemandName, getNodeBaseDemands, 
+            % See also setNodeJunctionDemandName, getNodeBaseDemands,
             %          getNodeDemandCategoriesNumber, getNodeDemandPatternNameID.
             [indices, ~] = getNodeJunctionIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
@@ -3631,7 +3566,7 @@ classdef epanet <handle
             % Example 3:
             %   d.getNodeComment(1:5)   % Retrieves the comment string assigned to the 1st to 5th node object
             %
-            % See also setNodeComment, getNodesInfo, 
+            % See also setNodeComment, getNodesInfo,
             %          getNodeNameID, getNodeType.
             if isempty(varargin)
                 cnt = obj.getNodeCount;
@@ -3661,7 +3596,7 @@ classdef epanet <handle
             %   d.setNodeComment(1:2, {'This is a node', 'Test comm'});   % Sets a comment to the 1st and 2nd node
             %   d.getNodeComment(1:2)
             %
-            % See also getNodeComment, getNodesInfo, 
+            % See also getNodeComment, getNodesInfo,
             %          setNodeNameID, setNodeCoordinates.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
@@ -3694,7 +3629,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getNodeBaseDemands(2)   % Get node base demand with categories for specific node index
             %
-            % See also setNodeBaseDemands, getNodeDemandCategoriesNumber, 
+            % See also setNodeBaseDemands, getNodeDemandCategoriesNumber,
             %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
             [indices, ~] = getNodeIndices(obj, varargin);
             numdemands = obj.getNodeDemandCategoriesNumber(indices);
@@ -3721,7 +3656,7 @@ classdef epanet <handle
             % Example 2:
             %	d.getNodeDemandCategoriesNumber(1)   % Retrieves the value of the first node base demand categorie number
             %
-            % See also getNodeBaseDemands, getNodeDemandPatternIndex, 
+            % See also getNodeBaseDemands, getNodeDemandPatternIndex,
             %          getNodeDemandPatternNameID.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -3737,8 +3672,8 @@ classdef epanet <handle
             %   d.getNodeDemandPatternIndex
             %   d.getNodeDemandPatternIndex{1}
             %
-            % See also getNodeBaseDemands, getNodeDemandCategoriesNumber, 
-            %          getNodeDemandPatternNameID, 
+            % See also getNodeBaseDemands, getNodeDemandCategoriesNumber,
+            %          getNodeDemandPatternNameID,
             %          setNodeDemandPatternIndex.
             numdemands = obj.getNodeDemandCategoriesNumber;
             value = cell(1, max(numdemands));
@@ -3766,7 +3701,7 @@ classdef epanet <handle
             %   d.getNodeDemandPatternNameID
             %   d.getNodeDemandPatternNameID{1}
             %
-            % See also getNodeBaseDemands, getNodeDemandCategoriesNumber, 
+            % See also getNodeBaseDemands, getNodeDemandCategoriesNumber,
             %          getNodeDemandPatternIndex.
             v = obj.getNodeDemandPatternIndex;
             m = obj.getPatternNameID;
@@ -3811,7 +3746,7 @@ classdef epanet <handle
             %   d.addNodeJunctionDemand([1, 2], [100, 110], {'1', '1'}, {'new demand1', 'new demand2'});
             %   d.getNodeJunctionDemandIndex([1, 2], {'new demand1', 'new demand2'})
             %
-            % See also getNodeJunctionDemandName, getNodeJunctionIndex, getNodeJunctionNameID, 
+            % See also getNodeJunctionDemandName, getNodeJunctionIndex, getNodeJunctionNameID,
             %          addNodeJunctionDemand, deleteNodeJunctionDemand, getNodeJunctionCount.
             if nargin==3
                 nodeIndex = varargin{1};
@@ -3877,7 +3812,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getNodePatternIndex(1)   % Retrieves the value of the first node demand pattern index
             %
-            % See also getNodeBaseDemands, getNodeDemandCategoriesNumber, 
+            % See also getNodeBaseDemands, getNodeDemandCategoriesNumber,
             %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -3929,7 +3864,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getNodeSourceQuality(1)   % Retrieves the value of the first node source quality
             %
-            % See also setNodeSourceQuality, getNodeInitialQuality, getNodeSourcePatternIndex, 
+            % See also setNodeSourceQuality, getNodeInitialQuality, getNodeSourcePatternIndex,
             %          getNodeSourceTypeIndex, getNodeSourceType.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -3948,7 +3883,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getNodeSourcePatternIndex(1)   % Retrieves the value of the first node source pattern index
             %
-            % See also setNodeSourcePatternIndex, getNodeSourceQuality, 
+            % See also setNodeSourcePatternIndex, getNodeSourceQuality,
             %          getNodeSourceTypeIndex, getNodeSourceType.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -3983,7 +3918,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getNodeSourceType(1)   % Retrieves the value of the first node source type
             %
-            % See also setNodeSourceType, getNodeSourceQuality, 
+            % See also setNodeSourceType, getNodeSourceQuality,
             %          getNodeSourcePatternIndex, getNodeSourceTypeIndex.
             [indices, ~] = getNodeIndices(obj, varargin);j=1;
             value = cell(1, length(indices));
@@ -4007,7 +3942,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getNodeTankInitialLevel(11)   % Retrieves the value of the eleventh node(tank) water level
             %
-            % See also setNodeTankInitialLevel, getNodeTankInitialWaterVolume, getNodeTankVolume, 
+            % See also setNodeTankInitialLevel, getNodeTankInitialWaterVolume, getNodeTankVolume,
             %          getNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel.
             value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, varargin);
         end
@@ -4022,7 +3957,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
-            % See also getNodeActualDemandSensingNodes, getNodeHydaulicHead, getNodePressure, 
+            % See also getNodeActualDemandSensingNodes, getNodeHydaulicHead, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -4039,7 +3974,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
-            % See also getNodeActualDemand, getNodeHydaulicHead, getNodePressure, 
+            % See also getNodeActualDemand, getNodeHydaulicHead, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             value=zeros(1, length(varargin{1}));v=1;
             for i=varargin{1}
@@ -4057,7 +3992,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
-            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure, 
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -4138,7 +4073,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
-            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure, 
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeHydaulicHead, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -4158,7 +4093,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
-            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure, 
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeHydaulicHead, getNodeActualQuality, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -4174,7 +4109,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
-            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure, 
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeHydaulicHead, getNodeActualQuality, getNodeMassFlowRate.
             value=zeros(1, length(varargin{1}));v=1;
             for i=varargin{1}
@@ -4197,7 +4132,7 @@ classdef epanet <handle
             %   tankIndex = d.getNodeTankIndex;
             %   d.getNodeTankInitialWaterVolume(tankIndex)   % Retrieves the initial water volume of the tanks given their indices
             %
-            % See also getNodeTankInitialLevel,  getNodeTankVolume, 
+            % See also getNodeTankInitialLevel,  getNodeTankVolume,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume.
             value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_INITVOLUME, varargin);
         end
@@ -4288,7 +4223,7 @@ classdef epanet <handle
             %   tankIndex = d.getNodeTankIndex;
             %   d.getNodeTankDiameter(tankIndex)   % Retrieves the diameters of the tanks given their indices
             %
-            % See also setNodeTankDiameter, getNodeTankBulkReactionCoeff, getNodeTankInitialLevel, 
+            % See also setNodeTankDiameter, getNodeTankBulkReactionCoeff, getNodeTankInitialLevel,
             %          getNodeTankMixingModelType, getNodeTankVolume, getNodeTankNameID.
             value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKDIAM, varargin);
         end
@@ -4308,7 +4243,7 @@ classdef epanet <handle
             %   tankIndex = d.getNodeTankIndex;
             %   d.getNodeTankMinimumWaterVolume(tankIndex)   % Retrieves the minimum water volume of the tanks given their indices
             %
-            % See also setNodeTankMinimumWaterVolume, getNodeTankMaximumWaterVolume, getNodeTankInitialWaterVolume, 
+            % See also setNodeTankMinimumWaterVolume, getNodeTankMaximumWaterVolume, getNodeTankInitialWaterVolume,
             %          getNodeTankInitialLevel,  getNodeTankVolume, getNodeTankMixZoneVolume.
             value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, varargin);
         end
@@ -4328,7 +4263,7 @@ classdef epanet <handle
             %   tankIndex = d.getNodeTankIndex;
             %   d.getNodeTankVolumeCurveIndex(tankIndex)   % Retrieves the volume curve index of the tanks given their indices
             %
-            % See also getNodeTankVolume, getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, 
+            % See also getNodeTankVolume, getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume,
             %          getNodeTankInitialWaterVolume, getNodeTankMixZoneVolume.
             value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_VOLCURVE, varargin);
         end
@@ -4348,7 +4283,7 @@ classdef epanet <handle
             %   tankIndex = d.getNodeTankIndex;
             %   d.getNodeTankMinimumWaterLevel(tankIndex)   % Retrieves the minimum water level of the tanks given their indices
             %
-            % See also setNodeTankMinimumWaterLevel, getNodeTankMaximumWaterLevel, getNodeTankInitialLevel, 
+            % See also setNodeTankMinimumWaterLevel, getNodeTankMaximumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
             value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, varargin);
         end
@@ -4368,7 +4303,7 @@ classdef epanet <handle
             %   tankIndex = d.getNodeTankIndex;
             %   d.getNodeTankMaximumWaterLevel(tankIndex)   % Retrieves the maximum water level of the tanks given their indices
             %
-            % See also setNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel, getNodeTankInitialLevel, 
+            % See also setNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
             value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, varargin);
         end
@@ -4477,7 +4412,7 @@ classdef epanet <handle
             %   d.getComputedHydraulicTimeSeries        % Computes hydraulic simulation and retrieve all time-series
             %   d.getNodeDemandDeficit                  % Retrieves the amount that full demand is reduced under PDA
             %
-            % See also setDemandModel, getComputedHydraulicTimeSeries, 
+            % See also setDemandModel, getComputedHydraulicTimeSeries,
             %          getNodeActualDemand, getNodeActualDemandSensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -4534,7 +4469,7 @@ classdef epanet <handle
             %   tankElevation = d.getNodeTankData.Elevation;   % Retrieves the elevations of all tanks.
             %   disp(tankElevation)
             %
-            % See also setNodeTankData, getNodeElevations, getNodeTankInitialLevel, 
+            % See also setNodeTankData, getNodeElevations, getNodeTankInitialLevel,
             %          getNodeTankMinimumWaterLevel, getNodeTankDiameter.
             tankData = struct();
             if nargin == 1
@@ -4855,7 +4790,7 @@ classdef epanet <handle
             %   d.setPatternNameID([1, 2], {'Pattern1', 'Pattern2'})   % Sets to the 1st and 2nd time pattern the new name IDs 'Pattern1' and 'Pattern2' respectively
             %   d.getPatternNameID
             %
-            % See also getPatternNameID, getPatternIndex, getPatternLengths, 
+            % See also getPatternNameID, getPatternIndex, getPatternLengths,
             %          setPatternComment, setPattern.
             if ischar(id)
                 id={id};
@@ -4908,7 +4843,7 @@ classdef epanet <handle
             %   d.setCurveNameID([1, 2], {'Curve1', 'Curve2'})   % Sets to the 1st and 2nd curve the new name IDs 'Curve1' and 'Curve2' respectively
             %   d.getCurveNameID
             %
-            % See also getCurveNameID, getCurveIndex, getCurveLengths, 
+            % See also getCurveNameID, getCurveIndex, getCurveLengths,
             %          setCurve, setCurveComment, getCurveComment.
             if ischar(id)
                 id ={id};
@@ -5033,7 +4968,7 @@ classdef epanet <handle
             % Example 3:
             %   d.getCurveComment(1:2)   % Retrieves the comment string assigned to the first 2 curves
             %
-            % See also getCurveNameID, getCurveType, getCurvesInfo, 
+            % See also getCurveNameID, getCurveType, getCurvesInfo,
             if isempty(varargin)
                 cnt = obj.getCurveCount;
                 value = cell(1, cnt);
@@ -5476,7 +5411,7 @@ classdef epanet <handle
             %   d.getCurvesInfo.CurveYvalue      % Retrieves the Y values of points of all curves
             %   d.getCurvesInfo.CurveYvalue{1}   % Retrieves the Y values of points of the 1st curve
             %
-            % See also setCurve, getCurveType, getCurveLengths, 
+            % See also setCurve, getCurveType, getCurveLengths,
             %          getCurveValue, getCurveNameID, getCurveComment.
             value = struct();
             for i=1:obj.getCurveCount
@@ -5485,7 +5420,7 @@ classdef epanet <handle
         end
         function value = getCounts(obj)
             % Retrieves the number of network components.
-            % Nodes, Links, Junctions, Reservoirs, Tanks, Pipes, Pumps, 
+            % Nodes, Links, Junctions, Reservoirs, Tanks, Pipes, Pumps,
             % Valves, Curves, SimpleControls, RuleBasedControls, Patterns.
             %
             % Example:
@@ -5493,7 +5428,7 @@ classdef epanet <handle
             %   d.getCounts.Nodes            % Retrieves the number of nodes
             %   d.getCounts.SimpleControls   % Retrieves the number of simple controls
             %
-            % See also getNodeCount, getNodeJunctionCount, 
+            % See also getNodeCount, getNodeJunctionCount,
             %          getLinkCount, getControlRulesCount.
             value.Nodes = obj.getNodeCount;
             value.Links = obj.getLinkCount;
@@ -5538,7 +5473,7 @@ classdef epanet <handle
            %   curve_index = d.addCurve(new_curve_ID, values);   % New curve added
            %   d.getCurvesInfo                                   % Retrieves all the info of curves
            %
-           % See also getCurvesInfo, getCurveType, setCurve, 
+           % See also getCurvesInfo, getCurveType, setCurve,
            %          setCurveValue, setCurveNameID, setCurveComment.
            valueIndex = 0;
            if (4>nargin && nargin>1)
@@ -5649,7 +5584,7 @@ classdef epanet <handle
             % Example:
             %   d.getPatternAverageValue
             %
-            % See also getPattern, setPattern, 
+            % See also getPattern, setPattern,
             %          getPatternValue, getPatternLengths.
             value = zeros(1, obj.getPatternCount);
             for i=obj.getPatternIndex
@@ -5984,7 +5919,7 @@ classdef epanet <handle
             uuID = char(java.util.UUID.randomUUID);
             rptfile=[obj.TempInpFile(1:end-4), '.txt'];
             binfile=['@#', uuID, '.bin'];
-            obj.Errcode = obj.apiENepanet(obj.LibEPANET, obj.TempInpFile, rptfile, binfile);
+            obj.Errcode = obj.apiENepanet(obj.TempInpFile, rptfile, binfile, obj.LibEPANET);
             fid = fopen(binfile, 'r');
             value = readEpanetBin(fid, binfile, 0);
             value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
@@ -6164,7 +6099,7 @@ classdef epanet <handle
             %   d.getNodeDemandPatternNameID{1}(junctionIndex)
             %   d.plot;
             %
-            % See also plot, setLinkNodesIndex, addNodeReservoir, 
+            % See also plot, setLinkNodesIndex, addNodeReservoir,
             %          setNodeComment, deleteNode, setNodeBaseDemands.
             xy = [0 0];
             elev = 0;
@@ -6204,7 +6139,7 @@ classdef epanet <handle
             %   reservoirIndex = d.addNodeReservoir(reservoirID, reservoirCoords);
             %   d.plot
             %
-            % See also plot, setLinkNodesIndex, addNodeJunction, 
+            % See also plot, setLinkNodesIndex, addNodeJunction,
             %          obj.addLinkPipe, deleteNode, setNodeBaseDemands.
             xy = [0 0];
             if nargin == 3
@@ -6240,7 +6175,7 @@ classdef epanet <handle
             %   d.plot;
             %
             % Example 4:
-            %   % Adds a new tank with coordinates [X, Y] = [20, 30], elevation = 100, initial level = 130, minimum water level = 110, 
+            %   % Adds a new tank with coordinates [X, Y] = [20, 30], elevation = 100, initial level = 130, minimum water level = 110,
             %   % maximum water level = 160, diameter = 60, minimum water volume = 200000, volume curve ID = '';.
             %   tankID = 'newTank_4';
             %   tankCoords = [20 30];
@@ -6256,7 +6191,7 @@ classdef epanet <handle
             %   d.getNodeTankData(tankIndex)
             %   d.plot;
             %
-            % See also plot, setLinkNodesIndex, addNodeJunction, 
+            % See also plot, setLinkNodesIndex, addNodeJunction,
             %          obj.addLinkPipe, deleteNode, setNodeBaseDemands.
             xy = [0 0];
             elev = 0;
@@ -6361,9 +6296,9 @@ classdef epanet <handle
             %   d.getLinkMinorLossCoeff(cvPipeIndex)   % Retrieves the new link's minor loss coefficient
             %   d.plot;
             %
-            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addNodeJunction, deleteLink, setLinkDiameter.
-            index = obj.apiENaddlink(obj, cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode);
+            index = obj.apiENaddlink(cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode, obj.LibEPANET);
             if nargin >= 5
                 obj.setLinkLength(index, varargin{1});
             end
@@ -6437,9 +6372,9 @@ classdef epanet <handle
             %   d.getLinkMinorLossCoeff(pipeIndex)   % Retrieves the new link's minor loss coefficient
             %   d.plot;
             %
-            % See also plot, setLinkNodesIndex, addLinkPipeCV, 
+            % See also plot, setLinkNodesIndex, addLinkPipeCV,
             %          addNodeJunction, deleteLink, setLinkDiameter.
-            index = obj.apiENaddlink(obj, pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode);
+            index = obj.apiENaddlink(pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode, obj.LibEPANET);
             if nargin >= 5
                 obj.setLinkLength(index, varargin{1});
             end
@@ -6511,9 +6446,9 @@ classdef epanet <handle
             %   d.getLinkPumpPatternIndex(pumpIndex)   % Retrieves the new pump's pattern index
             %   d.plot;
             %
-            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addNodeJunction, deleteLink, setLinkInitialStatus.
-            index = obj.apiENaddlink(obj, pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode);
+            index = obj.apiENaddlink(pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode, obj.LibEPANET);
             if nargin >= 5
                 obj.setLinkInitialStatus(index, varargin{1});
             end
@@ -6590,14 +6525,14 @@ classdef epanet <handle
             %   d.getLinkMinorLossCoeff(valveIndex)   % Retrieves the new valve's minor loss coefficient
             %   d.plot;
             %
-            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addNodeJunction, deleteLink, setLinkDiameter.
             if nargin >= 5
                 vtype = eval(['obj.ToolkitConstants.EN_', varargin{1}]);
             else
                 vtype = obj.ToolkitConstants.EN_GPV;
             end
-            index = obj.apiENaddlink(obj, vID, vtype, fromNode, toNode);
+            index = obj.apiENaddlink(vID, vtype, fromNode, toNode, obj.LibEPANET);
             if nargin >= 6
                 obj.setLinkDiameter(index, varargin{2});
             end
@@ -6621,9 +6556,9 @@ classdef epanet <handle
             %   valveIndex = d.addLinkValvePRV(valveID, fromNode, toNode);
             %   d.plot
             %
-            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePSV, deleteLink, setLinkTypeValveFCV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValvePSV(obj, vID, fromNode, toNode)
             % Adds a new PSV valve.
@@ -6638,9 +6573,9 @@ classdef epanet <handle
             %   valveIndex = d.addLinkValvePSV(valveID, fromNode, toNode);
             %   d.plot
             %
-            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveGPV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValvePBV(obj, vID, fromNode, toNode)
             % Adds a new PBV valve.
@@ -6655,9 +6590,9 @@ classdef epanet <handle
             %   valveIndex = d.addLinkValvePBV(valveID, fromNode, toNode);
             %   d.plot
             %
-            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValvePRV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValveFCV(obj, vID, fromNode, toNode)
             % Adds a new FCV valve.
@@ -6672,9 +6607,9 @@ classdef epanet <handle
             %   valveIndex = d.addLinkValveFCV(valveID, fromNode, toNode);
             %   d.plot
             %
-            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveTCV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValveTCV(obj, vID, fromNode, toNode)
             % Adds a new TCV valve.
@@ -6689,9 +6624,9 @@ classdef epanet <handle
             %   valveIndex = d.addLinkValveTCV(valveID, fromNode, toNode);
             %   d.plot
             %
-            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode, obj.LibEPANET);
         end
         function index = addLinkValveGPV(obj, vID, fromNode, toNode)
             % Adds a new GPV valve.
@@ -6706,55 +6641,83 @@ classdef epanet <handle
             %   valveIndex = d.addLinkValveGPV(valveID, fromNode, toNode);
             %   d.plot
             %
-            % See also plot, setLinkNodesIndex, addLinkPipe, 
+            % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
-            index = obj.apiENaddlink(obj, vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode, obj.LibEPANET);
         end
-        function [leftPipeIndex, rightPipeIndex] = splitPipes(obj, pipeID, newPipeID, newNodeID)
+        function [leftPipeIndex,rightPipeIndex] = splitPipe(obj,pipeID,newPipeID,newNodeID)
             %SPLITPIPE
-            % splits a pipe (pipeID) in half, creating two new pipes (pipeID and newPipeID) and adds a 
-            % junction/node (newNodeID) in between. The two new pipes have the same
-            % properties as the one which is splitted. The new node's properties
-            % are the same with the nodes on the left and right and New Node Elevation and Initial
-            % quality is the average of the two.
-            % 
+            % splits a pipe (pipeID), creating two new pipes (pipeID and newPipeID) and adds a
+            % junction/node (newNodeID) in between. If the pipe is linear
+            % the pipe is splitted in half, otherwisw the middle point of
+            % the vertice array elemnts is taken as the split point.
+            % The two new pipes have the same properties as the one which is splitted.
+            % The new node's properties are the same with the nodes on the left and right
+            % and New Node Elevation and Initial quality is the average of the two.
+            %
             % Example 1:
-            %   Splites pipe with ID '11' to pipes '11' and '11a' and creates the
+            %   Splits pipe with ID '11' to pipes '11' and '11a' and creates the
             %   node '11a' in the link of the two new pipes
             %   d = epanet('Net1.inp');
             %   pipeID = '11';
             %   newPipeID= '11a';
-            %   newNodeID= '11a';
-            %   d.splitPipe(pipeID, newPipeID, newNodeID)
+            %   newNodeID= '11node';
+            %   d.splitPipe(pipeID,newPipeID,newNodeID)
             %   d.getLinkIndex
             %   d.getNodesConnectingLinksID
+            %   d.plot('links', 'yes', 'highlightlink',{pipeID}, 'fontsize',8);
+            %
+            % Example 2:
+            %   Splits pipe with ID 'P-837' to pipes 'P-837' and 'P-837a' and creates the
+            %   node 'P-837node' in the link of the two new pipes, using
+            %   vertices
+            %   d = epanet('ky10.inp');
+            %   pipeID = 'P-837';
+            %   newPipeID= 'P-837a';
+            %   newNodeID= 'P-837node';
+            %   d.splitPipe(pipeID,newPipeID,newNodeID)
+            %   d.plot('links', 'yes', 'highlightlink',{pipeID}, 'fontsize',8);
+            %   The new left pipe can be noticed at the top left of the
+            %   plot in red colour
 
 
-            % Find the coordinates of the Nodes connected 
+            % Find the coordinates of the Nodes connected
             % with the link/pipe
             pipeIndex  = obj.getLinkIndex(pipeID);
             nodesIndex = obj.getLinkNodesIndex(pipeIndex);
             leftNodeIndex   = nodesIndex(1);
-            rightNodeIndex  = nodesIndex(2); 
+            rightNodeIndex  = nodesIndex(2);
             coordNode1 = obj.getNodeCoordinates(leftNodeIndex);
             coordNode2 = obj.getNodeCoordinates(rightNodeIndex);
-            % Calculate mid position of the link/pipe
-            midX = (coordNode1(1)+coordNode2(1))/2;
-            midY = (coordNode1(2)+coordNode2(2))/2;
+            if (coordNode1(1) == 0 && coordNode1(2) == 0 ...
+                || coordNode2(1) == 0 && coordNode2 == 0 )
+                error('Some nodes have zero values for coordinates')
+            end
+            if (isempty(obj.getLinkVertices{pipeIndex}))
+                % Calculate mid position of the link/pipe based on nodes
+                midX = (coordNode1(1)+coordNode2(1))/2;
+                midY = (coordNode1(2)+coordNode2(2))/2;
+            else
+                % Calculate mid position based on vertices
+                % pick midpoint of vertices
+                xVert = obj.getLinkVertices{pipeIndex}.x;
+                xMidPos  = floor(length(xVert)/2);
+                midX = obj.getLinkVertices{pipeIndex}.x(xMidPos);
+                midY = obj.getLinkVertices{pipeIndex}.y(xMidPos);
+            end
             % Add the new node between the link/pipe and add the same properties
             % as the left node (the elevation is the average of left-right nodes)
-            obj.addNodeJunction(newNodeID, [midX, midY]); 
+            obj.addNodeJunction(newNodeID,[midX,midY]);
             newNodeIndex = obj.getNodeIndex(newNodeID);
             midElev = (obj.getNodeElevations(leftNodeIndex)+obj.getNodeElevations(rightNodeIndex))/2;
-            obj.setNodeElevations(newNodeIndex, midElev);
-            obj.setNodeDemandPatternIndex(newNodeIndex, obj.getNodeDemandPatternIndex{1}(leftNodeIndex));
-            obj.setNodeEmitterCoeff(newNodeIndex, obj.getNodeEmitterCoeff(leftNodeIndex));
+            obj.setNodeJunctionData(newNodeIndex, midElev,0,'');
+            obj.setNodeEmitterCoeff(newNodeIndex,obj.getNodeEmitterCoeff(leftNodeIndex));
             midInitQual = (obj.getNodeInitialQuality(leftNodeIndex)+obj.getNodeInitialQuality(rightNodeIndex))/2;
-            obj.setNodeInitialQuality(newNodeIndex, midInitQual);
-            obj.setNodeSourceQuality(newNodeIndex, obj.getNodeSourceQuality(leftNodeIndex));
-            obj.setNodeSourcePatternIndex(newNodeIndex, obj.getNodeSourcePatternIndex(leftNodeIndex));
+            obj.setNodeInitialQuality(newNodeIndex,midInitQual);
+            obj.setNodeSourceQuality(newNodeIndex,obj.getNodeSourceQuality(leftNodeIndex));
+            obj.setNodeSourcePatternIndex(newNodeIndex,obj.getNodeSourcePatternIndex(leftNodeIndex));
             if (~isnan(obj.getNodeSourceTypeIndex(leftNodeIndex)))
-                obj.setNodeSourceType(newNodeIndex, obj.getNodeSourceTypeIndex(leftNodeIndex));
+                obj.setNodeSourceType(newNodeIndex,obj.getNodeSourceTypeIndex(leftNodeIndex));
             end
             % Access link properties
             linkProp = obj.getLinksInfo;
@@ -6767,37 +6730,31 @@ classdef epanet <handle
             linkBulkReactionCoeff = linkProp.LinkBulkReactionCoeff(pipeIndex);
             linkWallReactionCoeff = linkProp.LinkWallReactionCoeff(pipeIndex);
             % Delete the link/pipe that is splitted
-            obj.deleteLink(pipeID)
+            obj.deleteLink(pipeID);
             % Add two new pipes
             %d.addLinkPipe(pipeID, fromNode, toNode);
-            % Add the Left Pipe and add the same properties as the deleted link 
+            % Add the Left Pipe and add the same properties as the deleted link
             leftNodeID = obj.getNodeNameID(leftNodeIndex);
-            leftPipeIndex = obj.addLinkPipe(pipeID, leftNodeID{1}, newNodeID);
+            leftPipeIndex = obj.addLinkPipe(pipeID,leftNodeID{1},newNodeID);
             obj.setNodesConnectingLinksID(leftPipeIndex, leftNodeID{1}, newNodeID);
-            obj.setLinkDiameter(leftPipeIndex, linkDia);
-            obj.setLinkLength(leftPipeIndex, linkLength);
-            obj.setLinkRoughnessCoeff(leftPipeIndex, linkRoughnessCoeff);
-            obj.setLinkMinorLossCoeff(leftPipeIndex, linkMinorLossCoeff);
-            obj.setLinkInitialStatus(leftPipeIndex, linkInitialStatus);
-            obj.setLinkInitialSetting(leftPipeIndex, linkInitialSetting);
-            obj.setLinkBulkReactionCoeff(leftPipeIndex, linkBulkReactionCoeff);
-            obj.setLinkWallReactionCoeff(leftPipeIndex, linkWallReactionCoeff);
+            obj.setLinkPipeData(leftPipeIndex, linkLength, linkDia, linkRoughnessCoeff, linkMinorLossCoeff)
+            obj.setLinkInitialStatus(leftPipeIndex,linkInitialStatus);
+            obj.setLinkInitialSetting(leftPipeIndex,linkInitialSetting);
+            obj.setLinkBulkReactionCoeff(leftPipeIndex,linkBulkReactionCoeff);
+            obj.setLinkWallReactionCoeff(leftPipeIndex,linkWallReactionCoeff);
             obj.setLinkTypePipe(leftPipeIndex);
-            %Add the Right Pipe
+            %Add the Right Pipe and add the same properties as the deleted link
             rightNodeID = obj.getNodeNameID(rightNodeIndex);
-            rightPipeIndex  = obj.addLinkPipe(newPipeID, newNodeID, rightNodeID{1});
-            obj.setNodesConnectingLinksID(rightPipeIndex, newNodeID, rightNodeID{1});
-            obj.setNodesConnectingLinksID(rightPipeIndex, leftNodeID{1}, newNodeID);
-            obj.setLinkDiameter(rightPipeIndex, linkDia);
-            obj.setLinkLength(rightPipeIndex, linkLength);
-            obj.setLinkRoughnessCoeff(rightPipeIndex, linkRoughnessCoeff);
-            obj.setLinkMinorLossCoeff(rightPipeIndex, linkMinorLossCoeff);
-            obj.setLinkInitialStatus(rightPipeIndex, linkInitialStatus);
-            obj.setLinkInitialSetting(rightPipeIndex, linkInitialSetting);
-            obj.setLinkBulkReactionCoeff(rightPipeIndex, linkBulkReactionCoeff);
-            obj.setLinkWallReactionCoeff(rightPipeIndex, linkWallReactionCoeff);
+            rightPipeIndex  = obj.addLinkPipe(newPipeID,newNodeID,rightNodeID{1});
+            obj.setNodesConnectingLinksID(rightPipeIndex,newNodeID,rightNodeID{1});
+            obj.setLinkPipeData(rightPipeIndex, linkLength, linkDia, linkRoughnessCoeff, linkMinorLossCoeff)
+            obj.setLinkInitialStatus(rightPipeIndex,linkInitialStatus);
+            obj.setLinkInitialSetting(rightPipeIndex,linkInitialSetting);
+            obj.setLinkBulkReactionCoeff(rightPipeIndex,linkBulkReactionCoeff);
+            obj.setLinkWallReactionCoeff(rightPipeIndex,linkWallReactionCoeff);
             obj.setLinkTypePipe(rightPipeIndex);
         end
+
         function value = getLinkVerticesCount(obj, varargin)
             % Retrieves the number of internal vertex points assigned to a link.
             %
@@ -6809,7 +6766,7 @@ classdef epanet <handle
             %   link_id = '10';
             %   d.getLinkVerticesCount(link_id)
             %
-            % See also getLinkVertices, setLinkVertices, getBinLinkVertices, 
+            % See also getLinkVertices, setLinkVertices, getBinLinkVertices,
             %          getBinLinkVerticesCount.
             if nargin == 2
                 if ischar(varargin{1})
@@ -6842,7 +6799,7 @@ classdef epanet <handle
             %   d.getLinkVertices{1}
             %   d.getLinkVertices{2}
             %
-            % See also getLinkVertices, getLinkVerticesCount, getBinLinkVertices, 
+            % See also getLinkVertices, getLinkVerticesCount, getBinLinkVertices,
             %          getBinLinkVerticesCount.
             data = {};
             if nargin == 2
@@ -6875,7 +6832,7 @@ classdef epanet <handle
             %   x = [22, 24, 28];
             %   y = [69, 68, 69];
             %   d.setLinkVertices(linkID, x, y)
-            % See also getLinkVertices, getLinkVerticesCount, getBinLinkVertices, 
+            % See also getLinkVertices, getLinkVerticesCount, getBinLinkVertices,
             %          getBinLinkVerticesCount.
             index = obj.getLinkIndex(linkID);
             [obj.Errcode]=obj.apiENsetvertices(index, x, y, size(x, 2), obj.LibEPANET);
@@ -6911,7 +6868,7 @@ classdef epanet <handle
             %   d.deleteNode(idNodes)             % Deletes 2 nodes given their IDs
             %   d.getNodeCount
             %
-            % See also addNodeJunction, deleteLink, deleteRules, 
+            % See also addNodeJunction, deleteLink, deleteRules,
             %          setNodeCoordinates, setNodeJunctionData.
             condition = 0;
             if nargin == 3
@@ -6923,11 +6880,11 @@ classdef epanet <handle
             if iscell(idNode)
                 for j = 1:length(idNode)
                     indexNode = obj.getNodeIndex(idNode(j));
-                    [Errcode] = obj.apiENdeletenode(obj.LibEPANET, indexNode, condition);
+                    [Errcode] = obj.apiENdeletenode(indexNode, condition, obj.LibEPANET);
                     error(obj.getError(Errcode));
                 end
             else
-                [Errcode] = obj.apiENdeletenode(obj.LibEPANET, idNode, condition);
+                [Errcode] = obj.apiENdeletenode(idNode, condition, obj.LibEPANET);
                 error(obj.getError(Errcode));
             end
         end
@@ -6954,7 +6911,7 @@ classdef epanet <handle
             %   d.deleteLink(indexLink)             % Deletes the 1st link given it's index
             %   d.getLinkNameID
             %
-            % See also addLinkPipe, deleteNode, deleteRules, 
+            % See also addLinkPipe, deleteNode, deleteRules,
             %          setNodeCoordinates, setLinkPipeData.
             condition = 0;
             if nargin == 3
@@ -6965,7 +6922,7 @@ classdef epanet <handle
             else
                 indexLink = idLink;
             end
-            [Errcode] = obj.apiENdeletelink(obj.LibEPANET, indexLink, condition);
+            [Errcode] = obj.apiENdeletelink(indexLink, condition, obj.LibEPANET);
             error(obj.getError(Errcode));
             %if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
@@ -6982,14 +6939,14 @@ classdef epanet <handle
             %   d.deletePattern(index)           % Deletes the 1st pattern given it's index
             %   d.getPatternNameID
             %
-            % See also addPattern, setPattern, setPatternNameID, 
+            % See also addPattern, setPattern, setPatternNameID,
             %          setPatternValue, setPatternComment.
             if ischar(idPat) || iscell(idPat)
                 indexPat = obj.getPatternIndex(idPat);
             else
                 indexPat = idPat;
             end
-            [Errcode] = obj.apiENdeletepattern(obj.LibEPANET, indexPat);
+            [Errcode] = obj.apiENdeletepattern(indexPat, obj.LibEPANET);
             error(obj.getError(Errcode));
         end
         function Errcode = deleteCurve(obj, idCurve)
@@ -7005,14 +6962,14 @@ classdef epanet <handle
             %   d.deleteCurve(index)             % Deletes a curve given it's index
             %   d.getCurveNameID
             %
-            % See also obj.addCurve, setCurve, setCurveNameID, 
+            % See also obj.addCurve, setCurve, setCurveNameID,
             %          setCurveValue, setCurveComment.
             if ischar(idCurve) || iscell(idCurve)
                 indexCurve = obj.getCurveIndex(idCurve);
             else
                 indexCurve = idCurve;
             end
-            [Errcode] = obj.apiENdeletecurve(obj.LibEPANET, indexCurve);
+            [Errcode] = obj.apiENdeletecurve(indexCurve, obj.LibEPANET);
             error(obj.getError(Errcode));
         end
         function setControls(obj, index, control, varargin)
@@ -7059,7 +7016,7 @@ classdef epanet <handle
             %       % d.setControls(index, control, lindex, setting, nindex, level)
             %       d.setControls(1, 0, 13, 0, 11, 30)
             %
-            % See also getControls, getControlRulesCount, 
+            % See also getControls, getControlRulesCount,
             %          addControls, deleteControls.
             if isstruct(index)
                 for c=1:length(index)
@@ -7149,15 +7106,15 @@ classdef epanet <handle
             % index = d.addControls(0, 13, 0, 11, 100)
             % d.getControls(index)
             %
-            % See also deleteControls, getControls, 
+            % See also deleteControls, getControls,
             %          setControls, getControlRulesCount.
             if iscell(control)
                 for i=1:length(control)
-                    index(i) = obj.addControlFunction( control{i});
+                    index(i) = addControlFunction( obj,control{i});
                 end
             else
                 if nargin <= 3
-                   index = obj.addControlFunction(control);
+                   index = addControlFunction(obj,control);
                 else
                     linkIndex = varargin{1};
                     controlSettingValue = varargin{2};
@@ -7190,7 +7147,7 @@ classdef epanet <handle
             %   d.deleteControls([index_3, index_4]);                         % Deletes the 3rd and 4th simple controls
             %   d.getControls
             %
-            % See also addControls, setControls, 
+            % See also addControls, setControls,
             %          getControls, getControlRulesCount.
             obj = varargin{1};
             if nargin==1
@@ -7235,7 +7192,7 @@ classdef epanet <handle
             %   d.setLinkPipeData(pipeIndex, length, diameter, RoughnessCoeff, MinorLossCoeff)
             %   d.getLinksInfo
             %
-            % See also getLinksInfo, setLinkComment, setLinkDiameter, 
+            % See also getLinksInfo, setLinkComment, setLinkDiameter,
             %          setLinkLength, setLinkStatus, setNodeTankData.
             for i=1:length(Index)
                 [obj.Errcode] = obj.apiENsetpipedata(Index(i), Length(i), Diameter(i), RoughnessCoeff(i), MinorLossCoeff(i), obj.LibEPANET);
@@ -7263,7 +7220,7 @@ classdef epanet <handle
             %   d.setLinkNodesIndex(linkIndex, startNode, endNode)
             %   d.getLinkNodesIndex
             %
-            % See also getLinkNodesIndex, setLinkDiameter, setLinkLength, 
+            % See also getLinkNodesIndex, setLinkDiameter, setLinkLength,
             %          setLinkNameID, setLinkComment.
             for i=1:length(linkIndex)
                 [obj.Errcode] = obj.apiENsetlinknodes(linkIndex(i), startNode(i), endNode(i), obj.LibEPANET);
@@ -7288,7 +7245,7 @@ classdef epanet <handle
             %   d.setNodesConnectingLinksID(linkIndex, startNodeID, endNodeID)
             %   d.getNodesConnectingLinksID
             %
-            % See also getLinkNodesIndex, getNodesConnectingLinksID, setLinkLength, 
+            % See also getLinkNodesIndex, getNodesConnectingLinksID, setLinkLength,
             %          setLinkNameID, setLinkComment.
             startNode = obj.getNodeIndex(startNodeID);
             endNode = obj.getNodeIndex(endNodeID);
@@ -7316,7 +7273,7 @@ classdef epanet <handle
             %   d.setLinkDiameter(diameters)                 % Sets the diameters of all the links
             %   d.getLinkDiameter
             %
-            % See also setLinkPipeData, setLinkLength, 
+            % See also setLinkPipeData, setLinkLength,
             %          setLinkBulkReactionCoeff, setLinkTypePipe.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7406,7 +7363,7 @@ classdef epanet <handle
             %   index = d.setLinkTypePipe(linkid, condition)   % Changes the 1st pump to pipe given it's ID and a condition (if possible)
             %   d.getLinkType(index)
             %
-            % See also getLinkType, getLinkPumpNameID, setLinkTypePipeCV, 
+            % See also getLinkType, getLinkPumpNameID, setLinkTypePipeCV,
             %          setLinkTypePump, setLinkTypeValveFCV.
             condition = 0; % default
             if nargin == 3
@@ -7435,7 +7392,7 @@ classdef epanet <handle
             %   index = d.setLinkTypePipeCV(linkid, condition);   % Changes the 1st pipe to cvpipe given it's ID and a condition (if possible)
             %   d.getLinkType(index)
             %
-            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe, 
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
             %          setLinkTypePump, setLinkTypeValveFCV.
             condition = 0; % default
             if nargin == 3
@@ -7464,7 +7421,7 @@ classdef epanet <handle
             %   index = d.setLinkTypePump(linkid, condition);   % Changes the 1st pipe to pump given it's ID and a condition (if possible)
             %   d.getLinkType(index)
             %
-            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe, 
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
             %          setLinkTypePipeCV, setLinkTypeValveFCV.
             condition = 0; % default
             if nargin == 3
@@ -7493,7 +7450,7 @@ classdef epanet <handle
             %   index = d.setLinkTypeValveFCV(linkid, condition);   % Changes the 1st pipe to valve FCV given it's ID and a condition (if possible)
             %   d.getLinkType(index)
             %
-            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe, 
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
             %          setLinkTypePump, setLinkTypeValveGPV.
             condition = 0; % default
             if nargin == 3
@@ -7522,7 +7479,7 @@ classdef epanet <handle
             %   index = d.setLinkTypeValveGPV(linkid, condition);   % Changes the 1st pipe to valve GPV given it's ID and a condition (if possible)
             %   d.getLinkType(index)
             %
-            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe, 
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
             %          setLinkTypePump, setLinkTypeValveFCV.
             condition = 0; % default
             if nargin == 3
@@ -7551,7 +7508,7 @@ classdef epanet <handle
             %   index = d.setLinkTypeValvePBV(linkid, condition);   % Changes the 1st pipe to valve PBV given it's ID and a condition (if possible)
             %   d.getLinkType(index)
             %
-            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe, 
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
             %          setLinkTypePump, setLinkTypeValvePRV.
             condition = 0; % default
             if nargin == 3
@@ -7580,7 +7537,7 @@ classdef epanet <handle
             %   index = d.setLinkTypeValvePRV(linkid, condition);   % Changes the 1st pipe to valve PRV given it's ID and a condition (if possible)
             %   d.getLinkType(index)
             %
-            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe, 
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
             %          setLinkTypePump, setLinkTypeValvePSV.
             condition = 0; % default
             if nargin == 3
@@ -7609,7 +7566,7 @@ classdef epanet <handle
             %   index = d.setLinkTypeValvePSV(linkid, condition);   % Changes the 1st pipe to valve PSV given it's ID and a condition (if possible)
             %   d.getLinkType(index)
             %
-            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe, 
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
             %          setLinkTypePump, setLinkTypeValvePBV.
             condition = 0; % default
             if nargin == 3
@@ -7638,7 +7595,7 @@ classdef epanet <handle
             %   index = d.setLinkTypeValveTCV(linkid, condition);   % Changes the 1st pipe to valve TCV given it's ID and a condition (if possible)
             %   d.getLinkType(index)
             %
-            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe, 
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
             %          setLinkTypePump, setLinkTypeValveGPV.
             condition = 0; % default
             if nargin == 3
@@ -7664,7 +7621,7 @@ classdef epanet <handle
             %   d.setLinkLength(lengths_new);               % Sets the new lengths of all links
             %   d.getLinkLength
             %
-            % See also getLinkLength, setLinkDiameter, setLinkMinorLossCoeff, 
+            % See also getLinkLength, setLinkDiameter, setLinkMinorLossCoeff,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7688,7 +7645,7 @@ classdef epanet <handle
             %   d.setLinkNameID(IDs);                  % Sets the ID names of all links
             %   d.getLinkNameID
             %
-            % See also getLinkNameID, setLinkComment, setLinkDiameter, 
+            % See also getLinkNameID, setLinkComment, setLinkDiameter,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7718,7 +7675,7 @@ classdef epanet <handle
             %   d.setLinkRoughnessCoeff(coeffs_new);          % Sets the roughness coefficient of all links
             %   d.getLinkRoughnessCoeff
             %
-            % See also getLinkRoughnessCoeff, setLinkDiameter, setLinkMinorLossCoeff, 
+            % See also getLinkRoughnessCoeff, setLinkDiameter, setLinkMinorLossCoeff,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7743,7 +7700,7 @@ classdef epanet <handle
             %   d.setLinkMinorLossCoeff(coeffs_new);          % Sets the minor loss coefficient of all links
             %   d.getLinkMinorLossCoeff
             %
-            % See also getLinkMinorLossCoeff, setLinkDiameter, setLinkRoughnessCoeff, 
+            % See also getLinkMinorLossCoeff, setLinkDiameter, setLinkRoughnessCoeff,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7770,7 +7727,7 @@ classdef epanet <handle
             %   d.setLinkInitialStatus(statuses_new);         % Sets the initial status of all links
             %   d.getLinkInitialStatus
             %
-            % See also getLinkInitialStatus, setLinkInitialSetting, setLinkDiameter, 
+            % See also getLinkInitialStatus, setLinkInitialSetting, setLinkDiameter,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7795,7 +7752,7 @@ classdef epanet <handle
             %   d.setLinkInitialSetting(settings_new);          % Sets the initial setting of all links
             %   d.getLinkInitialSetting
             %
-            % See also getLinkInitialSetting, setLinkInitialStatus, setLinkRoughnessCoeff, 
+            % See also getLinkInitialSetting, setLinkInitialStatus, setLinkRoughnessCoeff,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7820,7 +7777,7 @@ classdef epanet <handle
             %   d.setLinkBulkReactionCoeff(coeffs_new);          % Sets the bulk chemical reaction coefficient of all links
             %   d.getLinkBulkReactionCoeff
             %
-            % See also getLinkBulkReactionCoeff, setLinkRoughnessCoeff, 
+            % See also getLinkBulkReactionCoeff, setLinkRoughnessCoeff,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7845,7 +7802,7 @@ classdef epanet <handle
             %   d.setLinkWallReactionCoeff(coeffs_new);          % Sets the wall chemical reaction coefficient of all links
             %   d.getLinkWallReactionCoeff
             %
-            % See also getLinkWallReactionCoeff, setLinkBulkReactionCoeff, 
+            % See also getLinkWallReactionCoeff, setLinkBulkReactionCoeff,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7872,7 +7829,7 @@ classdef epanet <handle
             %   d.setLinkStatus(statuses_new);         % Sets the current status of all links
             %   d.getLinkStatus
             %
-            % See also getLinkStatus, setLinkInitialStatus, setLinkDiameter, 
+            % See also getLinkStatus, setLinkInitialStatus, setLinkDiameter,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7897,7 +7854,7 @@ classdef epanet <handle
             %   d.setLinkSettings(settings_new);          % Sets the current setting of all links
             %   d.getLinkSettings
             %
-            % See also getLinkSettings, setLinkStatus, setLinkRoughnessCoeff, 
+            % See also getLinkSettings, setLinkStatus, setLinkRoughnessCoeff,
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
@@ -7935,7 +7892,7 @@ classdef epanet <handle
             %   d.setLinkPumpPower(pumpIndex, [10, 15])   % Sets the pump power = 10 and 15 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpPower
             %
-            % See also getLinkPumpPower, setLinkPumpHCurve, setLinkPumpECurve, 
+            % See also getLinkPumpPower, setLinkPumpHCurve, setLinkPumpECurve,
             %          setLinkPumpECost, setLinkPumpEPat.
             set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_POWER, value, varargin)
         end
@@ -7968,7 +7925,7 @@ classdef epanet <handle
             %   d.setLinkPumpHCurve(pumpIndex, [1, 2])   % Sets the pump head v. flow curve index = 1 and 2 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpHCurve
             %
-            % See also getLinkPumpHCurve, setLinkPumpPower, setLinkPumpECurve, 
+            % See also getLinkPumpHCurve, setLinkPumpPower, setLinkPumpECurve,
             %          setLinkPumpECost, setLinkPumpEPat.
             set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, value, varargin)
         end
@@ -8001,7 +7958,7 @@ classdef epanet <handle
             %   d.setLinkPumpECurve(pumpIndex, [1, 2])   % Sets the pump efficiency v. flow curve index = 1 and 2 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpECurve
             %
-            % See also getLinkPumpECurve, setLinkPumpPower, setLinkPumpHCurve, 
+            % See also getLinkPumpECurve, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECost, setLinkPumpEPat.
             set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, value, varargin)
         end
@@ -8034,7 +7991,7 @@ classdef epanet <handle
             %   d.setLinkPumpECost(pumpIndex, [0.10, 0.12])   % Sets the pump average energy price = 0.10 and 0.12 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpECost
             %
-            % See also getLinkPumpECost, setLinkPumpPower, setLinkPumpHCurve, 
+            % See also getLinkPumpECost, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpEPat.
             set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, value, varargin)
         end
@@ -8067,7 +8024,7 @@ classdef epanet <handle
             %   d.setLinkPumpEPat(pumpIndex, [1, 2])   % Sets the pump energy price time pattern index = 1 and 2 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpEPat
             %
-            % See also getLinkPumpEPat, setLinkPumpPower, setLinkPumpHCurve, 
+            % See also getLinkPumpEPat, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
             set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, value, varargin)
         end
@@ -8105,7 +8062,7 @@ classdef epanet <handle
             %   pumpIndex = d.getLinkPumpIndex;
 	    %   d.setLinkPumpPatternIndex(pumpIndex, 0)
 	    %
-            % See also getLinkPumpPatternIndex, setLinkPumpPower, setLinkPumpHCurve, 
+            % See also getLinkPumpPatternIndex, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
             set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, value, varargin)
         end
@@ -8115,12 +8072,12 @@ classdef epanet <handle
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpHeadCurveIndex(pumpIndex, 0)
 	    %
-            % See also setLinkPumpPatternIndex, getLinkPumpPower, setLinkPumpHCurve, 
+            % See also setLinkPumpPatternIndex, getLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
-                [obj.Errcode] = obj.apiENsetheadcurveindex(obj.LibEPANET, i, value(j)); j=j+1;
+                [obj.Errcode] = obj.apiENsetheadcurveindex(i, value(j),obj.LibEPANET); j=j+1;
                 error(obj.getError(obj.Errcode));
             end
         end
@@ -8140,7 +8097,7 @@ classdef epanet <handle
             %   d.setNodeElevations(elevs_new);          % Sets the elevations of all nodes
             %   d.getNodeElevations
             %
-            % See also getNodeElevations, setNodeCoordinates, setNodeBaseDemands, 
+            % See also getNodeElevations, setNodeCoordinates, setNodeBaseDemands,
             %          setNodeJunctionData, addNodeJunction, deleteNode.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
@@ -8195,7 +8152,7 @@ classdef epanet <handle
             %   d.setNodeBaseDemands(nodeIndex, categoryIndex, demands)   % Sets the demands of the 1st category of the first 5 nodes
             %   d.getNodeBaseDemands{categoryIndex}(nodeIndex)
             %
-            % See also getNodeBaseDemands, setNodeJunctionDemandName, 
+            % See also getNodeBaseDemands, setNodeJunctionDemandName,
             %          setNodeDemandPatternIndex, addNodeJunction, deleteNode.
             obj.set_node_demand_pattern('apiENsetbasedemand', obj.ToolkitConstants.EN_BASEDEMAND, value, varargin)
         end
@@ -8219,7 +8176,7 @@ classdef epanet <handle
             %   d.getNodeCoordinates{1}
             %   d.getNodeCoordinates{2}
             %
-            % See also getNodeCoordinates, setNodeElevations, plot, 
+            % See also getNodeCoordinates, setNodeElevations, plot,
             %          addNodeJunction, addNodeTank, deleteNode.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             if ~isempty(varargin)
@@ -8404,7 +8361,7 @@ classdef epanet <handle
             %   d.setNodeTankData(tankIndex, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
             %   d.getNodeTankData
             %
-            % See also getNodeTankData, setNodeTankInitialLevel, 
+            % See also getNodeTankData, setNodeTankInitialLevel,
             %          setNodeTankMinimumWaterLevel, setNodeTankDiameter.
             if ischar(volcurve)
                 volcurve={volcurve};
@@ -8450,7 +8407,7 @@ classdef epanet <handle
             %   d.setNodeTankInitialLevel(tankIndex, [10, 15])   % Sets the initial level = 10 and 15 to the tanks with index 128 and 129 respectively
             %   d.getNodeTankInitialLevel
             %
-            % See also getNodeTankInitialLevel, setNodeTankMinimumWaterLevel, setNodeTankMaximumWaterLevel, 
+            % See also getNodeTankInitialLevel, setNodeTankMinimumWaterLevel, setNodeTankMaximumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, value, varargin)
         end
@@ -8483,7 +8440,7 @@ classdef epanet <handle
             %   d.setNodeTankMixingModelType(tankIndex, {'MIX2', 'LIFO'})   % Sets the  mixing model type = 'MIX2' and 'LIFO' to the tanks with index 128 and 129 respectively
             %   d.getNodeTankMixingModelType
             %
-            % See also getNodeTankMixingModelType, setNodeTankBulkReactionCoeff, setNodeTankMixingFraction, 
+            % See also getNodeTankMixingModelType, setNodeTankBulkReactionCoeff, setNodeTankMixingFraction,
             %          setNodeTankMinimumWaterVolume, setNodeTankMinimumWaterLevel, setNodeTankData.
             if nargin == 2
                 type = value;
@@ -8534,7 +8491,7 @@ classdef epanet <handle
             %   d.setNodeTankDiameter(tankIndex, [100, 120])   % Sets the diameter = 100 and 120 to the tanks with index 128 and 129 respectively
             %   d.getNodeTankDiameter
             %
-            % See also getNodeTankDiameter, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel, 
+            % See also getNodeTankDiameter, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
             %          setNodeTankBulkReactionCoeff, setNodeTankCanOverFlow, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANKDIAM, value, varargin)
         end
@@ -8567,7 +8524,7 @@ classdef epanet <handle
             %   d.setNodeTankMinimumWaterLevel(tankIndex, [5, 15])   % Sets the minimum water level = 5 and 15 to the tanks with index 128 and 129 respectively
             %   d.getNodeTankMinimumWaterLevel
             %
-            % See also getNodeTankMinimumWaterLevel, setNodeTankInitialLevel, setNodeTankMaximumWaterLevel, 
+            % See also getNodeTankMinimumWaterLevel, setNodeTankInitialLevel, setNodeTankMaximumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, value, varargin)
         end
@@ -8600,7 +8557,7 @@ classdef epanet <handle
             %   d.setNodeTankMinimumWaterVolume(tankIndex, [1000, 2000])   % Sets the minimum water volume = 1000 and 2000 to the tanks with index 128 and 129 respectively
             %   d.getNodeTankMinimumWaterVolume
             %
-            % See also getNodeTankMinimumWaterVolume, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel, 
+            % See also getNodeTankMinimumWaterVolume, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
             %          setNodeTankMaximumWaterLevel, setNodeTankMixingFraction, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, value, varargin)
         end
@@ -8633,7 +8590,7 @@ classdef epanet <handle
             %   d.setNodeTankMaximumWaterLevel(tankIndex, [35, 45])   % Sets the maximum water level = 35 and 45 to the tanks with index 128 and 129 respectively
             %   d.getNodeTankMaximumWaterLevel
             %
-            % See also getNodeTankMaximumWaterLevel, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel, 
+            % See also getNodeTankMaximumWaterLevel, setNodeTankInitialLevel, setNodeTankMinimumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, value, varargin)
         end
@@ -8666,7 +8623,7 @@ classdef epanet <handle
             %   d.setNodeTankCanOverFlow(tankIndex, [0, 1])   % Sets the can-overflow = 0 and 1 to the tanks with index 128 and 129 respectively
             %   d.getNodeTankCanOverFlow
             %
-            % See also getNodeTankCanOverFlow, setNodeTankBulkReactionCoeff, setNodeTankMinimumWaterLevel, 
+            % See also getNodeTankCanOverFlow, setNodeTankBulkReactionCoeff, setNodeTankMinimumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankDiameter, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_CANOVERFLOW, value, varargin)
         end
@@ -8699,7 +8656,7 @@ classdef epanet <handle
             %   d.setNodeTankMixingFraction(tankIndex, [1, 0])   % Sets the mixing fraction = 1 and 0 to the tanks with index 128 and 129 respectively
             %   d.getNodeTankMixingFraction
             %
-            % See also getNodeTankMixingFraction, setNodeTankMixingModelType, setNodeTankMinimumWaterLevel, 
+            % See also getNodeTankMixingFraction, setNodeTankMixingModelType, setNodeTankMinimumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankDiameter, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, value, varargin)
         end
@@ -8732,9 +8689,23 @@ classdef epanet <handle
             %   d.setNodeTankBulkReactionCoeff(tankIndex, [-0.5, 0])   % Sets the bulk reaction coefficient = -0.5 and 0 to the tanks with index 128 and 129 respectively
             %   d.getNodeTankBulkReactionCoeff
             %
-            % See also getNodeTankBulkReactionCoeff, setNodeTankInitialLevel, setNodeTankMixingModelType, 
+            % See also getNodeTankBulkReactionCoeff, setNodeTankInitialLevel, setNodeTankMixingModelType,
             %          setNodeTankCanOverFlow, setNodeTankDiameter, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, value, varargin)
+        end
+        function setNodeTypeReservoir(obj, tankIndex)
+            % Transforms a Tank to RESERVOIR
+            %
+            % Example 1:
+            %   d = epanet('Net1.inp');
+            %   d.setNodeTypeReservoir(11)
+            %   d.getNodeType
+            %   d.plot
+            if (obj.getNodeTypeIndex(tankIndex) ~= 2)
+              error('The current node is not a tank')
+            end      
+            elev = obj.getNodeElevations(tankIndex);
+            obj.apiENsettankdata(tankIndex, elev, 0, 0, 0, 0, 0, '', obj.LibEPANET);
         end
         function setNodeSourceQuality(obj, value, varargin)
             % Sets the values of quality source strength.
@@ -8826,7 +8797,7 @@ classdef epanet <handle
             %   d.setDemandModel(type, pmin, preq, pexp);   % Sets the demand model
             %   d.getDemandModel
             %
-            % See also getDemandModel, setNodeBaseDemands, setNodeJunctionDemandName, 
+            % See also getDemandModel, setNodeBaseDemands, setNodeJunctionDemandName,
             %          addNodeJunctionDemand, deleteNodeJunctionDemand.
             model_type=find(strcmpi(obj.DEMANDMODEL, code)==1)-1;
             if isempty(model_type)
@@ -8845,7 +8816,7 @@ classdef epanet <handle
             %   d.setNodeJunctionDemandName(nodeIndex, demandIndex, demandName);   % Sets a new name of the 1st node, 1st demand category
             %   d.getNodeJunctionDemandName{demandIndex}{nodeIndex}
             %
-            % See also getNodeJunctionDemandName, setNodeBaseDemands, setDemandModel, 
+            % See also getNodeJunctionDemandName, setNodeBaseDemands, setDemandModel,
             %          addNodeJunctionDemand, deleteNodeJunctionDemand.
             [obj.Errcode] = obj.apiENsetdemandname(nodeIndex, demandIndex, demandName, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
@@ -8870,9 +8841,9 @@ classdef epanet <handle
             %   d.getNodeBaseDemands(junctionIndex)                          % Retrieves the primary base demand of the 1st junction
             %   d.getNodeDemandPatternNameID{1}(junctionIndex)               % Retrieves the demand pattern ID (primary base demand is the first category)
             %
-            % See also setNodeTankData, getNodeElevations, getNodeBaseDemands, 
+            % See also setNodeTankData, getNodeElevations, getNodeBaseDemands,
             %          getNodeDemandPatternNameID, addPattern, setNodeJunctionDemandName.
-            [obj.Errcode] = obj.apiENsetjuncdata(obj.LibEPANET, index, elev, dmnd, dmndpat);
+            [obj.Errcode] = obj.apiENsetjuncdata(index, elev, dmnd, dmndpat, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
         end
         function setTitle(obj, varargin)
@@ -9331,7 +9302,7 @@ classdef epanet <handle
             %   d.setPattern(patternIndex, patternMult)   % Sets the multiplier factors for the new time pattern
             %   d.getPattern                              % Retrieves the multiplier factor for all patterns and all times
             %
-            % See also getPattern, setPatternValue, setPatternMatrix, 
+            % See also getPattern, setPatternValue, setPatternMatrix,
             %          setPatternNameID, addPattern, deletePattern.
             nfactors=length(patternVector);
             [obj.Errcode] = obj.apiENsetpattern(index, patternVector, nfactors, obj.LibEPANET);
@@ -9351,7 +9322,7 @@ classdef epanet <handle
             %   d.setPatternMatrix(patternMult)               % Sets all of the multiplier factors for all the time patterns given a matrix
             %   d.getPattern                                  % Retrieves the multiplier factor for all patterns and all times
             %
-            % See also getPattern, setPattern, setPatternValue, 
+            % See also getPattern, setPattern, setPatternValue,
             %          setPatternNameID, addPattern, deletePattern.
             nfactors=size(patternMatrix, 2);
             for i=1:size(patternMatrix, 1)
@@ -9370,7 +9341,7 @@ classdef epanet <handle
             %   d.setPatternValue(patternIndex, patternTimeStep, patternFactor)   % Sets the multiplier factor = 5 to the 2nd time period of the new time pattern
             %   d.getPattern                                                      % Retrieves the multiplier factor for all patterns and all times
             %
-            % See also getPattern, setPattern, setPatternMatrix, 
+            % See also getPattern, setPattern, setPatternMatrix,
             %          setPatternNameID, addPattern, deletePattern.
             [obj.Errcode] = obj.apiENsetpatternvalue(index, patternTimeStep, patternFactor, obj.LibEPANET);
             error(obj.getError(obj.Errcode));
@@ -9630,7 +9601,7 @@ classdef epanet <handle
             %   d.initializeEPANET(d.ToolkitConstants.EN_GPM, d.ToolkitConstants.EN_HW)
             %
             % See also initializeHydraulicAnalysis.
-            [obj.Errcode]=obj.apiENinit(obj.LibEPANET, unitsType, headLossType);
+            [obj.Errcode]=obj.apiENinit(unitsType, headLossType, obj.LibEPANET);
         end
         function initializeHydraulicAnalysis(obj, varargin)
             % Initializes storage tank levels, link status and settings, and the simulation clock time prior to running a hydraulic analysis.
@@ -9860,7 +9831,7 @@ classdef epanet <handle
             %   result_index = d.getNodeResultIndex(node_index)
             %
             % See also getComputedHydraulicTimeSeries, deleteNode, getLinkResultIndex
-            [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.LibEPANET, obj.ToolkitConstants.EN_NODE, node_index);
+            [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_NODE, node_index,obj.LibEPANET);
         end
         function resultindex = getLinkResultIndex(obj, link_index)
             % Retrieves the order in which a link's results
@@ -9871,7 +9842,7 @@ classdef epanet <handle
             %   result_index = d.getLinkResultIndex(link_index)
             %
             % See also getComputedHydraulicTimeSeries, deleteNode, getNodeResultIndex
-            [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.LibEPANET, obj.ToolkitConstants.EN_LINK, link_index);
+            [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_LINK, link_index,obj.LibEPANET);
         end
         function clearReport(obj)
             % Clears the contents of a project's report file. (EPANET Version 2.2)
@@ -10045,7 +10016,7 @@ classdef epanet <handle
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(obj.MSXLibEPANET, 3, varargin{1});
+                [obj.Errcode, value] = obj.apiMSXgetindex(3, varargin{1}, obj.MSXLibEPANET);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -10078,7 +10049,7 @@ classdef epanet <handle
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(obj.MSXLibEPANET, 6, varargin{1});
+                [obj.Errcode, value] = obj.apiMSXgetindex(6, varargin{1}, obj.MSXLibEPANET);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -10158,11 +10129,11 @@ classdef epanet <handle
                 if isempty(value), value=[]; end
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
-                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(obj.MSXLibEPANET, 7, varargin{1}{j});
+                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(7, varargin{1}{j}, obj.MSXLibEPANET);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(obj.MSXLibEPANET, 7, varargin{1});
+                [obj.Errcode, value] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -10593,10 +10564,10 @@ classdef epanet <handle
             index=-1;
             if nargin==2
                 [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
-                [obj.Errcode, index] = obj.apiMSXgetindex(obj.MSXLibEPANET, 7, varargin{1});
+                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
             elseif nargin==3
                 [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
-                [obj.Errcode, index] = obj.apiMSXgetindex(obj.MSXLibEPANET, 7, varargin{1});
+                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
                 setMSXPattern(obj, index, varargin{2});
             end
         end
@@ -10795,8 +10766,11 @@ classdef epanet <handle
             end
             if isunix
                 file = [obj.LibEPANETpath, 'epanet2', fparam];
-            else
+            else  
                 file = [obj.LibEPANETpath, obj.LibEPANET, fparam];
+                if ~isfile(file) 
+                 file = [obj.LibEPANETpath, 'epanet2', fparam]; 
+                end
             end
             if isdeployed
             %file=[file(1:end-1), 'txt'];%epanet2.h-->epanet2.txt
@@ -12163,7 +12137,7 @@ classdef epanet <handle
             %     {'PIPE', linkID, from, to, length, diameter, roughness, minorLoss, status});
             %
             %
-            % See also addBinNodeReservoir, addBinNodeTank, addBinPipe, 
+            % See also addBinNodeReservoir, addBinNodeTank, addBinPipe,
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
             if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile); end
             cnt = length(nodeID);
@@ -12200,7 +12174,7 @@ classdef epanet <handle
             node_index = addBinNode(obj, 1, nodeID, coords, elev, demand, patternID, category, quality);
             if nargin == 9
                 if strcmp(varargin{7}{1}, 'PIPE')
-                    link_index = addBinLinkPipe(varargin{7}{2:end});
+                    link_index = addBinLinkPipe(obj,varargin{7}{2:end});
                 elseif strcmp(varargin{7}{1}, 'PUMP')
                     link_index = addBinLinkPump(obj, varargin{7}{2:end});
                 else
@@ -12255,7 +12229,7 @@ classdef epanet <handle
             %   node_index = d.addBinNodeReservoir(nodeID, coordinates, head, patternID, quality)
             %   d.plot;
             %
-            % See also addBinNodeJunction, addBinNodeTank, addBinPipe, 
+            % See also addBinNodeJunction, addBinNodeTank, addBinPipe,
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
             coords = zeros(length(nodeID), 2);
             head = zeros(length(nodeID), 1);
@@ -12328,13 +12302,13 @@ classdef epanet <handle
             %   d.getBinNodesInfo.BinNodeTankMinimumWaterLevel
             %   d.getBinNodesInfo.BinNodeTankMaximumWaterLevel
             %
-            % % Adds a new tank with coordinates [X, Y] = [20, 50], elevation = 800, diameter = 50, initial_level = 120, 
+            % % Adds a new tank with coordinates [X, Y] = [20, 50], elevation = 800, diameter = 50, initial_level = 120,
             % %  minimum level = 100, maximum level = 150, minimum volume = 0 and volume curve = '1'.
             %   node_index = d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level, min_volume, volume_curve)
             %   d.plot;
             %   d.getBinNodesInfo.BinNodeTankMinimumWaterVolume
             %
-            % % Adds a new tank with coordinates [X, Y] = [20, 50],  elevation = 800, diameter = 50, initial_level = 120, 
+            % % Adds a new tank with coordinates [X, Y] = [20, 50],  elevation = 800, diameter = 50, initial_level = 120,
             % %  minimum level = 100, maximum level = 150, minimum volume = 0, volume curve = '1' and quality = 1.
             %   node_index = d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level, min_volume, volume_curve, quality)
             %   d.plot;
@@ -12352,12 +12326,12 @@ classdef epanet <handle
             %   volume_curve = {'', ''};
             %   quality = [1, 0.5];
             %
-            % % Adds 2 new tanks with coordinates [X, Y] = [20, 50] and [20, 40],  elevation = 800 and 900, diameter = 50 and 60, initial_level = 120 and 110, 
+            % % Adds 2 new tanks with coordinates [X, Y] = [20, 50] and [20, 40],  elevation = 800 and 900, diameter = 50 and 60, initial_level = 120 and 110,
             % %  minimum level = 100 and 90, maximum level = 150 and 160, minimum volume = 0 and 0, volume curve = none and quality = 1 and 0.5.
             %   node_index = d.addBinNodeTank(nodeID, coordinates, elev, diameter, initial_level, min_level, max_level, min_volume, volume_curve, quality)
             %   d.plot;
             %
-            % See also addBinNodeJunction, addBinNodeReservoir, addBinPipe, 
+            % See also addBinNodeJunction, addBinNodeReservoir, addBinPipe,
             %          addBinPump, getBinNodeIndex, getBinNodesInfo.
             coords = zeros(length(nodeID), 2);
             elev = zeros(length(nodeID), 1);
@@ -12470,12 +12444,12 @@ classdef epanet <handle
             %   minorLoss = [0, 0.2];
             %   status = {'Open', 'Closed'};
             %
-            % % Adds 2 new pipes from junctions '11'and '13' to '22' with length = 6000 and 7000, diameter = 20 and 23, 
+            % % Adds 2 new pipes from junctions '11'and '13' to '22' with length = 6000 and 7000, diameter = 20 and 23,
             % % roughness = 100 and 105, minorLoss = 0 and 0.2, and status = Open and Closed.
             %   link_index = d.addBinLinkPipe(linkID, from, to, length, diameter, roughness, minorLoss, status)
             %   d.plot;
             %
-            % See also addBinLinkPump, addBinLinkValve, getBinLinksInfo, 
+            % See also addBinLinkPump, addBinLinkValve, getBinLinksInfo,
             %          addBinNodeJunction, addBinNodeReservoir, addBinNodeTank.
             lengthp = zeros(length(linkID), 1);
             lengthp(:) = 330;
@@ -12534,7 +12508,7 @@ classdef epanet <handle
             %   linkIndex = d.addBinLinkPump(linkID, from, to, properties)
             %   d.plot;
             %
-            % See also addBinLinkPipe, addBinLinkValve, getBinLinksInfo, 
+            % See also addBinLinkPipe, addBinLinkValve, getBinLinksInfo,
             %          addBinNodeJunction, addBinNodeReservoir, obj.addBinNodeTank.
             propertie = repmat({'SPEED 1.0'}, 1, length(linkID));
             if nargin == 5
@@ -12587,12 +12561,12 @@ classdef epanet <handle
             %   init_setting = [70, 55];
             %   minorLoss = [0, 0];
             %
-            % % Adds 2 new valves from junctions '11' and '12' to '22' and '23' with types = 'PRV', 
+            % % Adds 2 new valves from junctions '11' and '12' to '22' and '23' with types = 'PRV',
             % % diameters = 6 and 10, initial settings = 70 and 55 and minor loss coefficients = 0.
             %   linkIndex = d.addBinLinkValve(linkID, from, to, type, diameter, init_setting, minorLoss)
             %   d.plot;
             %
-            % See also addBinLinkPipe, addBinLinkPump, getBinLinksInfo, 
+            % See also addBinLinkPipe, addBinLinkPump, getBinLinksInfo,
             %          addBinNodeJunction, addBinNodeReservoir, obj.addBinNodeTank.
             type = repmat({'GPV'}, 1, length(linkID));
             diameter = zeros(length(linkID), 1);
@@ -13938,7 +13912,7 @@ classdef epanet <handle
             %   d.getBinLinkVertices(linkID_1)         % Retrieves the link's vertices.
             %   d.getBinLinkVertices(linkID_2)
             %
-            % See also deleteBinLinkVertices, setBinLinkVertices, getBinLinkVertices, 
+            % See also deleteBinLinkVertices, setBinLinkVertices, getBinLinkVertices,
             %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
             if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile); end
             fid = fopen(obj.BinTempfile); % Opens the file for read access
@@ -14000,7 +13974,7 @@ classdef epanet <handle
             %
             %   d.getBinLinkVertices(linkID)
             %
-            % See also addBinLinkVertices, getBinLinkVertices, getBinLinkVerticesCount, 
+            % See also addBinLinkVertices, getBinLinkVertices, getBinLinkVerticesCount,
             %          setBinLinkVertices, addLinkPipe, addNodeJunction.
             cnt = obj.getBinLinkVerticesCount;
             Errcode = 0;
@@ -14118,7 +14092,7 @@ classdef epanet <handle
             %   d.getBinLinkVertices                         % Retrieves all vertices of all links and stores them in cells
             %   d.getBinLinkVertices(linkID)                 % Retrieves all vertices of a link given it's ID label
             %
-            % See also setBinLinkVertices, addBinLinkVertices, deleteBinLinkVertices, 
+            % See also setBinLinkVertices, addBinLinkVertices, deleteBinLinkVertices,
             %          getBinLinkVerticesCount, getNodeCoordinates.
 
             % reload the network
@@ -14185,7 +14159,7 @@ classdef epanet <handle
             %   d.setBinLinkVertices(linkID_2, x, y, vertexIndex)
             %   d.getBinLinkVertices(linkID_2)
             %
-            % See also addBinLinkVertices, deleteBinLinkVertices, getBinLinkVertices, 
+            % See also addBinLinkVertices, deleteBinLinkVertices, getBinLinkVertices,
             %          getBinLinkVerticesCount, addLinkPipe, addNodeJunction.
             if obj.Bin, obj.Errcode = obj.saveInputFile(obj.BinTempfile, 1); end
             if nargin == 4
@@ -14607,8 +14581,123 @@ classdef epanet <handle
             if code~=0 && code~=1,  value = obj.CMDCODE; end
             obj.CMDCODE = value;
         end
-    end
+        function appShiftNetwork(obj, xDisp, yDisp)
+            % Shifts the network by xDisp in the x-direction and
+            % by yDisp in the y-direction
+            %
+            %Example 1:
+            %  Shift the network by 1000 feet in the x-axis
+            %  and -1000 feet in the y-axis
+            %  d = epanet('Net1.inp');
+            %  d.getNodeCoordinates{1} % old x coordinates
+            %  d.getNodeCoordinates{2} % old y coordinates
+            %  d.appShiftNetwork(1000,-1000)
+            %  d.getNodeCoordinates{1} % new x coordinates
+            %  d.getNodeCoordinates{2} % new y coordinates
+            %
+            %Example 2:
+            %  Shift the network,along with the vertices by 1000 feet in
+            %  the x-axis and -1000 feet in the y-axis
+            %  d = epanet('ky10.inp');
+            %  d.appShiftNetwork(1000,-1000)
+            %  d.plot
+            %
+            % Access the x and y coordinates
+            xCoord = obj.getNodeCoordinates{1};
+            yCoord = obj.getNodeCoordinates{2};
+            % Update coordinates
+            newxCoord = xCoord + xDisp;
+            newyCoord = yCoord + yDisp;
+            % Set the new coordinates
+            for i=1:obj.NodeCount
+              obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
+            end
+            if (sum(obj.getLinkVerticesCount)~= 0)
+                xVertCoord = obj.getNodeCoordinates{3};
+                yVertCoord = obj.getNodeCoordinates{4};
+                for i=1:obj.LinkCount
+                    if (obj.getLinkVerticesCount(i)~= 0)
+                        newX = xVertCoord{i} + xDisp;
+                        newY = yVertCoord{i} + yDisp;
+                        LinkID = obj.getLinkNameID(i);
+                        obj.setLinkVertices(LinkID,newX,newY);
+                    end
+                end
+            end
+        end
+        function appRotateNetwork(obj, theta, indexRot)
+            % Rotates the network by theta degrees counter-clockwise,
+            % using as pivot the indexRot
+            % theta: angle in degrees to rotate the network counter-clockwise
+            % indexRot: index of the node/point to be rotated. If  it's not
+            % provided then the first index node is used as pivot.
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %Example 1:
+            %  Rotate the network by 60 degrees counter-clockwise around
+            %  the index 1 node.
+            %  d = epanet('Net1.inp');
+            %  d.plot
+            %  d.appRotateNetwork(60)
+            %  d.plot
+            %
+            %Example 2:
+            %  Rotate the network by 150 degrees counter-clockwise around
+            %  the reservoir with index 921 .
+            %  d = epanet('ky10.inp');
+            %  d.plot
+            %  d.appRotateNetwork(150,921)
+            %  d.plot
+            %
+            % Access the x and y coordinates
+            xCoord = obj.getNodeCoordinates{1};
+            yCoord = obj.getNodeCoordinates{2};
+            % Pick center of rotation point
+            % If IndexRot is not provided, pick the first x,y coordinate
+            if (nargin<3)
+                x_center = xCoord(1);
+                y_center = yCoord(1);
+            else
+                x_center = xCoord(indexRot);
+                y_center = yCoord(indexRot);
+            end
+            % Create a matrix which will be used later in calculations.
+            center = repmat([x_center; y_center], 1, length(xCoord));
+            % Define the rotation matrix.
+            R = [cosd(theta) -sind(theta); sind(theta) cosd(theta)];
+            % Do the rotation:
+            v = [xCoord',yCoord'];
+            s = v - center';     % Shift points in the plane so that the center of rotation is at the origin.
+            so = R*s';           % Apply the rotation about the origin.
+            vo = so + center;    % Shift again so the origin goes back to the desired center of rotation.
+            newxCoord = vo(1,:);
+            newyCoord = vo(2,:);
+            % Set the new coordinates
+            for i=1:obj.NodeCount
+              obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
+            end
 
+            if (sum(obj.getLinkVerticesCount)~= 0)
+                xVertCoord = obj.getNodeCoordinates{3};
+                yVertCoord = obj.getNodeCoordinates{4};
+                for i=1:obj.LinkCount
+                    if (obj.getLinkVerticesCount(i)~= 0)
+                        v = [xVertCoord{i}',yVertCoord{i}'];
+                        % Shift points in the plane so that the center of rotation is at the origin.
+                        s = v - center(:,1:length(xVertCoord{i}))';
+                        % Apply the rotation about the origin.
+                        so = R*s';
+                        % Shift again so the origin goes back to the desired center of rotation.
+                        vo_vert = so + center(:,1:length(xVertCoord{i}));
+                        newxVertCoord = vo_vert(1,:);
+                        newvyVertCoord = vo_vert(2,:);
+                        LinkID = obj.getLinkNameID(i);
+                        obj.setLinkVertices(LinkID,newxVertCoord,newvyVertCoord);
+                    end
+                end
+            end
+         end
+
+    end
 end
 
 function value = get_MSX_Options(msxname, param, getall)
@@ -15939,7 +16028,7 @@ function Errcode=addLink(obj, typecode, newLink, fromNode, toNode, varargin)
      % FCV Flow Control Valve 6
      % TCV Throttle Control Valve 7
      % GPV General Purpose Valve 8
-     % Initial PIPE plength, value for length of new pipe pdiameter, 
+     % Initial PIPE plength, value for length of new pipe pdiameter,
      % value for diameter of new pipe proughness,  value for roughness of new pipe
      if typecode==1, status='Open';end
      if ~typecode
@@ -17286,7 +17375,7 @@ function [fid, binfile, rptfile] = runEPANETexe(obj)
      elseif ismac
          r = sprintf('%s%s %s %s %s', obj.LibEPANETpath, obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
      end
-     if obj.getCMDCODE, [~, ~]=system(r); else system(r); end
+     if obj.getCMDCODE, [~, ~]=system(r); else, system(r); end
      fid = fopen(binfile, 'r');
  end
 function value = getBinComputedTimeSeries(obj, indParam, varargin)
@@ -18127,7 +18216,7 @@ function atline = checktlines(tline)
 function setControlFunction(obj, index, value)
      controlRuleIndex = index;
      [controlTypeIndex, linkIndex, controlSettingValue, ...
-     nodeIndex, controlLevel] = obj.controlSettings( value);
+     nodeIndex, controlLevel] = obj.controlSettings(obj, value);
      [obj.Errcode] = obj.apiENsetcontrol(controlRuleIndex, ...
          controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
      error(obj.getError(obj.Errcode));
@@ -18136,14 +18225,14 @@ function controlRuleIndex = addControlFunction(obj, value)
      if isstruct(value)
          for c=1:length(value)
              [controlTypeIndex, linkIndex, controlSettingValue, ...
-             nodeIndex, controlLevel] = obj.controlSettings( value(c).Control);
+             nodeIndex, controlLevel] = obj.controlSettings(obj, value(c).Control);
              [obj.Errcode, controlRuleIndex(c)] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
              controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
              error(obj.getError(obj.Errcode));
          end
      else
          [controlTypeIndex, linkIndex, controlSettingValue, ...
-             nodeIndex, controlLevel] = obj.controlSettings( value);
+             nodeIndex, controlLevel] = controlSettings(obj, value);
          [obj.Errcode, controlRuleIndex] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
              controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
          error(obj.getError(obj.Errcode));

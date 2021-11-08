@@ -118,6 +118,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |epanet| Load Input file and open the EPANET Toolkit system|
 |unload|Unload library and close the EPANET Toolkit system|
 |loadEPANETFile| Open the EPANET Toolkit system|
+|appShiftNetwor|Shifts the network in x and y directions|
+|appRotateNetwork|Rotates the network by theta degrees counter-clockwise using as pivot a specific node|
 |getError| Returns the description of an error code| 
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
@@ -173,6 +175,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkPumpTypeCode|Retrieves the type code of a pump for specific link index|
 |getLinkPumpState|Current computed pump state (read only) (see @ref EN_PumpStateType)|
 |getLinkPumpSwitches|Calculates the number of pump switches|
+|getLinkQuality|Retrieves the value of link quality|
 |getLinkResultIndex|Retrieves the order in which a link's results were saved to an output file. (EPANET Version 2.2)|
 |getLinkRoughnessCoeff|Retrieves the value of all link roughness|
 |getLinkSettings|Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves|
@@ -401,6 +404,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeElevations|Sets the values of elevations|
 |setNodeEmitterCoeff|Sets the values of emitter coeff.|
 |setNodeInitialQuality|Sets the values of initial qualities|
+|setNodeJunctionData|Sets a group of properties for a junction node. (EPANET Version 2.2)|
 |setNodeJunctionDemandName|Assigns a name to a node's demand category|
 |setNodeNameID|Sets the ID name for nodes|
 |setNodeSourcePatternIndex|Sets the values of source pattern indices|
@@ -417,6 +421,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeTankMixingFraction|Sets the values of tanks mix fraction|
 |setNodeTankMinimumWaterVolume|Sets the values of tanks minimum water volume|
 |setNodeTankMixingModelType|Sets the values of tanks model|
+|setNodeTypeReservoir|Transforms a Tank to RESERVOIR|
 |setOptionsAccuracyValue|Sets the value of accurancy|
 |setOptionsGlobalEffic|Sets the value of global pump efficiency(percent) (EPANET Version 2.2)|
 |setOptionsGlobalPrice|Sets the value of global energy price per KWH (EPANET Version 2.2)|
@@ -466,6 +471,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setTitle|Sets the title lines of the project|
 |solveCompleteHydraulics|Runs a complete hydraulic simulation with results for all time periods written to the binary Hydraulics file|
 |solveCompleteQuality|Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file|
+|splitPipe|Splits a pipe, creating two new pipes and adds a junction in between them|
 |stepQualityAnalysisTimeLeft|Advances the water quality simulation one water quality time step. The time remaining in the overall simulation is returned in tleft|
 |useHydraulicFile|Uses the contents of the specified file as the current binary hydraulics file|
 |writeLineInReportFile|Writes a line of text to the EPANET report file|
