@@ -20,7 +20,7 @@ if strcmpi(arch,'win64')
 elseif strcmpi(arch,'win32')
     LibEPANETpath = [pwdepanet,'/32bit/'];
 end        
-temp_lib_folder = [LibEPANETpath,'temp_lib/'];
+temp_lib_folder = [LibEPANETpath,''];
 mkdir(temp_lib_folder)
 epanet2_tmp = [temp_lib_folder,'epanet2tmp.dll'];
 dll_pathLib = [LibEPANETpath, 'epanet2.dll'];
@@ -56,4 +56,4 @@ d2.unload;
 % Delete files who created.
 delete(epanet2_tmp);
 delete([temp_lib_folder,'epanet2tmp.h']);
-rmdir(temp_lib_folder);
+% rmdir(temp_lib_folder);

@@ -10780,8 +10780,11 @@ classdef epanet <handle
             end
             if isunix
                 file = [obj.LibEPANETpath, 'epanet2', fparam];
-            else
+            else  
                 file = [obj.LibEPANETpath, obj.LibEPANET, fparam];
+                if ~isfile(file) 
+                 file = [obj.LibEPANETpath, 'epanet2', fparam]; 
+                end
             end
             if isdeployed
             %file=[file(1:end-1), 'txt'];%epanet2.h-->epanet2.txt
