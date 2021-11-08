@@ -8701,25 +8701,11 @@ classdef epanet <handle
             %   d.setNodeTypeReservoir(11)
             %   d.getNodeType
             %   d.plot
-
             if (obj.getNodeTypeIndex(tankIndex) ~= 2)
               error('The current node is not a tank')
-            end
-
-            tankData = obj.getNodeTankData(tankIndex);
-            elev = tankData.Elevation;
-            intlvl = tankData.Initial_Level;
-            minlvl = tankData.Minimum_Water_Level;
-            maxlvl = tankData.Maximum_Water_Level;
-            minvol = tankData.Minimum_Water_Volume;
-            volcurve = tankData.Volume_Curve_Index;
-            if ischar(volcurve)
-              volcurve={volcurve};
-            else
-              volcurve= '';
-            end
-            obj.apiENsettankdata(tankIndex, elev, intlvl, minlvl, maxlvl, 0, minvol, volcurve, obj.LibEPANET)
-
+            end      
+            elev = obj.getNodeElevations(tankIndex);
+            obj.apiENsettankdata(tankIndex, elev, 0, 0, 0, 0, 0, '', obj.LibEPANET);
         end
         function setNodeSourceQuality(obj, value, varargin)
             % Sets the values of quality source strength.
