@@ -1384,13 +1384,13 @@ classdef epanet <handle
                 if ~isdeployed
                     obj.InputFile=which(varargin{1}); % Get name of INP file
                 else
-                    obj.InputFile=varargin{1};
+                    obj.InputFile=varargin{1};  
                 end
             end
             % Bin functions
             if nargin>1
                 if strcmpi(varargin{2}, 'BIN')
-                    obj.LibEPANET = '';
+                    obj.LibEPANET = 'epanet2';
                     obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
                     copyfile(obj.InputFile, obj.BinTempfile);
                     obj.InputFile=obj.BinTempfile;
@@ -1413,12 +1413,12 @@ classdef epanet <handle
                     end
                 end
             end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
+            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2'); 
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
                 if isempty(pwdDLL)
                     pwdDLL = pwd;
                 end
-                obj.LibEPANETpath = [pwdDLL, '\'];
+                obj.LibEPANETpath = [pwdDLL, '/'];
                 try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
                 catch
                    obj.Errcode=-1;
@@ -1485,6 +1485,7 @@ classdef epanet <handle
                     if strcmpi(varargin{2}, 'LOADFILE')
                         obj.libFunctions = libfunctions(obj.LibEPANET);
                         disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
+                        obj.LibEPANET = 'epanet2';
                         return;
                     end
                 end
@@ -8705,7 +8706,7 @@ classdef epanet <handle
             %   d.plot
             if (obj.getNodeTypeIndex(tankIndex) ~= 2)
               error('The current node is not a tank')
-            end      
+            end
             elev = obj.getNodeElevations(tankIndex);
             obj.apiENsettankdata(tankIndex, elev, 0, 0, 0, 0, 0, '', obj.LibEPANET);
         end
@@ -10768,10 +10769,10 @@ classdef epanet <handle
             end
             if isunix
                 file = [obj.LibEPANETpath, 'epanet2', fparam];
-            else  
+            else
                 file = [obj.LibEPANETpath, obj.LibEPANET, fparam];
-                if ~isfile(file) 
-                 file = [obj.LibEPANETpath, 'epanet2', fparam]; 
+                if ~isfile(file)
+                 file = [obj.LibEPANETpath, 'epanet2', fparam];
                 end
             end
             if isdeployed
@@ -13486,7 +13487,7 @@ classdef epanet <handle
             value = getBinComputedTimeSeries(obj, 26);
         end
         function value = getBinComputedAllParameters(obj, varargin)
-            [fid, binfile, rptfile] = runEPANETexe(obj);
+            [fid, binfile, ~] = runEPANETexe(obj);
             value = readEpanetBin(fid, binfile);
 
             % Remove report bin, files @#
