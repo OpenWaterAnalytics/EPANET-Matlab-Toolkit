@@ -583,144 +583,182 @@ classdef epanet <handle
     end
     methods (Static)
         function [Errcode] = apiENwriteline(line, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENwriteline', line);
         end
         function [Errcode] = apiENaddpattern(patid, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             Errcode=calllib(LibEPANET, 'ENaddpattern', patid);
         end
         function [Errcode] = apiENclose(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
             [Errcode]=calllib(LibEPANET, 'ENclose');
         end
         function [Errcode] = apiENcloseH(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENcloseH');
         end
         function [Errcode, value] = apiENgetbasedemand(index, numdemands, LibEPANET)
             % EPANET 20100
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetbasedemand', index, numdemands, 0);
         end
         function [Errcode] = apiENsetlinkid(index, newid, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             [Errcode]=calllib(LibEPANET, 'ENsetlinkid', index, newid);
         end
         function [Errcode, value] = apiENgetnumdemands(index, LibEPANET)
             % EPANET 20100
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetnumdemands', index, 0);
         end
         function [Errcode, value] = apiENgetdemandpattern(index, numdemands, LibEPANET)
             % EPANET 20100
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetdemandpattern', index, numdemands, 0);
         end
         function [Errcode] = apiENcloseQ(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode]=calllib(LibEPANET, 'ENcloseQ');
         end
         function [Errcode, demandIndex] = apiENgetdemandindex(nodeindex, demandName, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
             [Errcode, ~, demandIndex]=calllib(LibEPANET, 'ENgetdemandindex', nodeindex, demandName, 0);
         end
         function [Errcode, value] = apiENgetstatistic(code, LibEPANET)
             % EPANET 20100
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetstatistic', code, 0);
         end
         function [Errcode, ctype, lindex, setting, nindex, level] = apiENgetcontrol(cindex, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___controls.html
             [Errcode, ctype, lindex, setting, nindex, level]=calllib(LibEPANET, 'ENgetcontrol', cindex, 0, 0, 0, 0, 0);
         end
         function [Errcode, count] = apiENgetcount(countcode, LibEPANET)
             [Errcode, count]=calllib(LibEPANET, 'ENgetcount', countcode, 0);
         end
         function [errmsg, e] = apiENgeterror(Errcode, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             e=0; errmsg='';
             if Errcode [e, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
             if e, [e, errmsg] = calllib(LibEPANET, 'ENgeterror', e, char(32*ones(1, 79)), 79); end
             end
         end
         function [Errcode, flowunitsindex] = apiENgetflowunits(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
             [Errcode, flowunitsindex]=calllib(LibEPANET, 'ENgetflowunits', 0);
         end
         function [Errcode, id] = apiENgetlinkid(index, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             id=char(32*ones(1, 31));
             [Errcode, id]=calllib(LibEPANET, 'ENgetlinkid', index, id);
         end
         function [Errcode, index] = apiENgetlinkindex(id, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             [Errcode, ~, index]=calllib(LibEPANET, 'ENgetlinkindex', id, 0);
         end
         function [Errcode, from, to] = apiENgetlinknodes(index, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             [Errcode, from, to]=calllib(LibEPANET, 'ENgetlinknodes', index, 0, 0);
             from = double(from);
             to = double(to);
         end
         function [Errcode, typecode] = apiENgetlinktype(index, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             [Errcode, typecode]=calllib(LibEPANET, 'ENgetlinktype', index, 0);
             typecode = double(typecode);
             if ~isnumeric(typecode), typecode = getTypeLink(typecode); end
         end
         function [Errcode, value] = apiENgetlinkvalue(index, paramcode, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetlinkvalue', index, paramcode, 0);
             value = double(value);
         end
         function [Errcode, id] = apiENgetnodeid(index, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             id=char(32*ones(1, 31));
             [Errcode, id]=calllib(LibEPANET, 'ENgetnodeid', index, id);
         end
         function [Errcode] = apiENsetnodeid(index, newid, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             [Errcode]=calllib(LibEPANET, 'ENsetnodeid', index, newid);
         end
         function [Errcode, index] = apiENgetnodeindex(id, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             [Errcode, ~, index]=calllib(LibEPANET, 'ENgetnodeindex', id, 0);
         end
         function [Errcode, type] =apiENgetnodetype(index, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             [Errcode, type]=calllib(LibEPANET, 'ENgetnodetype', index, 0);
         end
         function [Errcode, value] = apiENgetoption(optioncode, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetoption', optioncode, 0);
         end
         function [Errcode, id] = apiENgetpatternid(index, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             id=char(32*ones(1, 31));
             [Errcode, id]=calllib(LibEPANET, 'ENgetpatternid', index, id);
         end
         function [Errcode, id] = apiENgetcurveid(index, LibEPANET)
             % EPANET Version dev2.1
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             id=char(32*ones(1, 31));
             [Errcode, id]=calllib(LibEPANET, 'ENgetcurveid', index, id);
         end
         function [Errcode] = apiENsetcurveid(index, id, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             [Errcode, ~]=calllib(LibEPANET, 'ENsetcurveid', index, id);
         end
         function [Errcode] = apiENsetpatternid(index, id, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             [Errcode, ~]=calllib(LibEPANET, 'ENsetpatternid', index, id);
         end
         function [Errcode, type] =apiENgetcurvetype(index, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             [Errcode, type]=calllib(LibEPANET, 'ENgetcurvetype', index, 0);
         end
         function [Errcode, index] = apiENgetpatternindex(id, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             [Errcode, ~, index]=calllib(LibEPANET, 'ENgetpatternindex', id, 0);
         end
         function [Errcode, len] = apiENgetpatternlen(index, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             [Errcode, len]=calllib(LibEPANET, 'ENgetpatternlen', index, 0);
         end
         function [Errcode, value] = apiENgetpatternvalue(index, period, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetpatternvalue', index, period, 0);
         end
         function [Errcode, qualcode, tracenode] = apiENgetqualtype(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
             [Errcode, qualcode, tracenode]=calllib(LibEPANET, 'ENgetqualtype', 0, 0);
         end
         function [Errcode, timevalue] = apiENgettimeparam(paramcode, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
             [Errcode, timevalue]=calllib(LibEPANET, 'ENgettimeparam', paramcode, 0);
         end
         function [Errcode, LibEPANET] = apiENgetversion(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode, LibEPANET]=calllib(LibEPANET, 'ENgetversion', 0);
         end
         function [Errcode] = apiENinit(unitsType, headLossType, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
             [Errcode]=calllib(LibEPANET, 'ENinit', '', '', unitsType, headLossType);
         end
         function [Errcode] = apiENinitH(flag, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENinitH', flag);
         end
         function [Errcode] = apiENinitQ(saveflag, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode]=calllib(LibEPANET, 'ENinitQ', saveflag);
         end
         function apiENMatlabCleanup(LibEPANET)
@@ -756,13 +794,16 @@ classdef epanet <handle
             end
         end
         function [Errcode, tstep] = apiENnextH(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode, tstep]=calllib(LibEPANET, 'ENnextH', int32(0));
         end
         function [Errcode, tstep] = apiENnextQ(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode, tstep]=calllib(LibEPANET, 'ENnextQ', int32(0));
             tstep = double(tstep);
         end
         function [Errcode] = apiENopen(inpname, repname, binname, LibEPANET) %DE
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
             Errcode=calllib(LibEPANET, 'ENopen', inpname, repname, binname);
             if Errcode && Errcode~=200
                  [~, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
@@ -773,170 +814,216 @@ classdef epanet <handle
             [Errcode] = calllib(LibEPANET, 'ENepanet', tempfile, rptfile, binfile, lib.pointer);
         end
         function [Errcode] = apiENopenH(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENopenH');
         end
         function [Errcode] = apiENopenQ(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode]=calllib(LibEPANET, 'ENopenQ');
         end
         function [Errcode] = apiENreport(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENreport');
         end
         function [Errcode] = apiENcopyreport(filename, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENcopyreport', filename);
         end
         function [Errcode] = apiENclearreport(LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENclearreport');
         end
         function [Errcode, value] = apiENgetresultindex(objecttype, index, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetresultindex', objecttype, index, int32(0));
         end
         function [Errcode] = apiENresetreport(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENresetreport');
         end
         function [Errcode, t] = apiENrunH(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode, t]=calllib(LibEPANET, 'ENrunH', int32(0));
             t = double(t);
         end
         function [Errcode, t] = apiENrunQ(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             t=int32(0);
             [Errcode, t]=calllib(LibEPANET, 'ENrunQ', t);
         end
         function [Errcode] = apiENsaveH(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENsaveH');
         end
         function [Errcode] = apiENsaveHydfile(fname, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENsavehydfile', fname);
         end
         function [Errcode] = apiENsaveinpfile(inpname, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
             Errcode=calllib(LibEPANET, 'ENsaveinpfile', inpname);
         end
         function [Errcode] = apiENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___controls.html
             [Errcode]=calllib(LibEPANET, 'ENsetcontrol', cindex, ctype, lindex, setting, nindex, level);
         end
         function [Errcode] = apiENaddrule(rule, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode, ~]=calllib(LibEPANET, 'ENaddrule', rule);
         end
         function [Errcode] = apiENdeleterule(index, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode]=calllib(LibEPANET, 'ENdeleterule', index);
         end
         function [Errcode, logop, object, objIndex, variable, relop, status, value] = apiENgetpremise(ruleIndex, premiseIndex, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode, logop, object, objIndex, variable, relop, status, value]=calllib(LibEPANET, 'ENgetpremise', ruleIndex, premiseIndex, 0, 0, 0, 0, 0, 0, 0);
         end
         function [Errcode, linkIndex, status, setting] = apiENgetthenaction(ruleIndex, actionIndex, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode, linkIndex, status, setting]=calllib(LibEPANET, 'ENgetthenaction', ruleIndex, actionIndex, 0, 0, 0);
         end
         function [Errcode] = apiENsetthenaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode]=calllib(LibEPANET, 'ENsetthenaction', ruleIndex, actionIndex, linkIndex, status, setting);
         end
         function [Errcode, linkIndex, status, setting] = apiENgetelseaction(ruleIndex, actionIndex, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode, linkIndex, status, setting]=calllib(LibEPANET, 'ENgetelseaction', ruleIndex, actionIndex, 0, 0, 0);
         end
         function [Errcode] =  apiENsetelseaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode]=calllib(LibEPANET, 'ENsetelseaction', ruleIndex, actionIndex, linkIndex, status, setting);
         end
         function [Errcode] = apiENsetrulepriority(ruleIndex, priority, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode]=calllib(LibEPANET, 'ENsetrulepriority', ruleIndex, priority);
         end
         function [Errcode] = apiENsetpremise(ruleIndex, premiseIndex, logop, object, objIndex, variable, relop, status, value, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode]=calllib(LibEPANET, 'ENsetpremise', ruleIndex, premiseIndex, logop, object, objIndex, variable, relop, status, value);
         end
         function [Errcode] = apiENsetpremiseindex(ruleIndex, premiseIndex, objIndex, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode]=calllib(LibEPANET, 'ENsetpremiseindex', ruleIndex, premiseIndex, objIndex);
         end
         function [Errcode] =  apiENsetpremisestatus(ruleIndex, premiseIndex, status, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode]=calllib(LibEPANET, 'ENsetpremisestatus', ruleIndex, premiseIndex, status);
         end
         function [Errcode] = apiENsetpremisevalue(ruleIndex, premiseIndex, value, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode]=calllib(LibEPANET, 'ENsetpremisevalue', ruleIndex, premiseIndex, value);
         end
         function [Errcode, id] = apiENgetruleID(index, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode, id]=calllib(LibEPANET, 'ENgetruleID', index, '');
         end
         function [Errcode, nPremises, nThenActions, nElseActions, priority] = apiENgetrule(index, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             [Errcode, nPremises, nThenActions, nElseActions, priority]=calllib(LibEPANET, 'ENgetrule', index, 0, 0, 0, 0);
         end
         function [Errcode, index] = apiENsetlinknodes(index, startnode, endnode, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             [Errcode]=calllib(LibEPANET, 'ENsetlinknodes', index, startnode, endnode);
         end
         function [Errcode] = apiENsetlinkvalue(index, paramcode, value, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             [Errcode]=calllib(LibEPANET, 'ENsetlinkvalue', index, paramcode, value);
         end
         function [Errcode, index] = apiENsetpipedata(index, length, diam, rough, mloss, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             [Errcode]=calllib(LibEPANET, 'ENsetpipedata', index, length, diam, rough, mloss);
         end
         function [Errcode, index] = apiENsetlinktype(id, paramcode, actionCode, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             [Errcode, index]=calllib(LibEPANET, 'ENsetlinktype', id, paramcode, actionCode);
         end
         function [Errcode] = apiENsetnodevalue(index, paramcode, value, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             [Errcode]=calllib(LibEPANET, 'ENsetnodevalue', index, paramcode, value);
         end
         function [Errcode] = apiENsettankdata(index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve, LibEPANET)
             % EPANET Version 2.2
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             [Errcode]=calllib(LibEPANET, 'ENsettankdata', index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve);
         end
         function [Errcode] = apiENsetoption(optioncode, value, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
             [Errcode]=calllib(LibEPANET, 'ENsetoption', optioncode, value);
         end
         function [Errcode] = apiENsetpattern(index, factors, nfactors, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             [Errcode]=calllib(LibEPANET, 'ENsetpattern', index, factors, nfactors);
         end
         function [Errcode] = apiENsetpatternvalue(index, period, value, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             [Errcode]=calllib(LibEPANET, 'ENsetpatternvalue', index, period, value);
         end
         function [Errcode] = apiENsetqualtype(qualcode, chemname, chemunits, tracenode, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
             [Errcode]=calllib(LibEPANET, 'ENsetqualtype', qualcode, chemname, chemunits, tracenode);
         end
         function [Errcode] = apiENsetreport(command, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENsetreport', command);
         end
         function [Errcode] = apiENsetstatusreport(statuslevel, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENsetstatusreport', statuslevel);
         end
         function [Errcode] = apiENsettimeparam(paramcode, timevalue, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
             paramcode=int32(paramcode);
             timevalue=int32(timevalue);
             [Errcode]=calllib(LibEPANET, 'ENsettimeparam', paramcode, timevalue);
         end
         function [Errcode] = apiENsolveH(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENsolveH');
         end
         function [Errcode] = apiENsolveQ(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode]=calllib(LibEPANET, 'ENsolveQ');
         end
         function [Errcode, tleft] = apiENstepQ(LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             tleft=int32(0);
             [Errcode, tleft]=calllib(LibEPANET, 'ENstepQ', tleft);
             tleft=double(tleft);
         end
         function [Errcode] = apiENusehydfile(hydfname, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENusehydfile', hydfname);
         end
         function [Errcode] = apiENsetcurve(index, x, y, nfactors, LibEPANET)
             % EPANET Version 2.1
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             [Errcode]=calllib(LibEPANET, 'ENsetcurve', index, x, y, nfactors);
         end
         function [Errcode, x, y] = apiENgetcurvevalue(index, period, LibEPANET)
             % EPANET Version 2.1
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             [Errcode, x, y]=calllib(LibEPANET, 'ENgetcurvevalue', index, period, 0, 0);
         end
         function [Errcode, x, y] = apiENsetcurvevalue(index, pnt, x, y, LibEPANET)
@@ -946,14 +1033,17 @@ classdef epanet <handle
             % x      = curve x value
             % y      = curve y value
             % sets x, y point for a specific point and curve
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             [Errcode]=calllib(LibEPANET, 'ENsetcurvevalue', index, pnt, x, y);
         end
         function [Errcode, index] = apiENgetcurveindex(id, LibEPANET)
           % EPANET Version 2.1
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
           [Errcode, ~, index]=calllib(LibEPANET, 'ENgetcurveindex', id, 0);
         end
         function [Errcode] = apiENaddcurve(cid, LibEPANET)
           % EPANET Version 2.1
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
           [Errcode]=calllib(LibEPANET, 'ENaddcurve', cid);
         end
         function [Errcode, ids, nvalue, xvalue, yvalue] = apiENgetcurve(obj, value, LibEPANET)
@@ -961,111 +1051,138 @@ classdef epanet <handle
         end
         function [Errcode, len] = apiENgetcurvelen(index, LibEPANET)
           % EPANET Version 2.1
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
           [Errcode, len]=calllib(LibEPANET, 'ENgetcurvelen', index, 0);
         end
         function [Errcode, value] = apiENgetheadcurveindex(pumpindex, LibEPANET)
           % EPANET Version 2.1
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
           [Errcode, value]=calllib(LibEPANET, 'ENgetheadcurveindex', pumpindex, 0);
         end
         function [Errcode, value] = apiENgetpumptype(pumpindex, LibEPANET)
           % EPANET Version 2.1
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
           [Errcode, value]=calllib(LibEPANET, 'ENgetpumptype', pumpindex, 0);
         end
         function [Errcode, value] = apiENgetaveragepatternvalue(index, LibEPANET)
           % return  average pattern value
           % EPANET Version 2.1
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
           [Errcode, value]=calllib(LibEPANET, 'ENgetaveragepatternvalue', index, 0);
         end
         function [Errcode, x, y] = apiENgetcoord(index, LibEPANET)
           % EPANET Version 2.1
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
           [Errcode, x, y]=calllib(LibEPANET, 'ENgetcoord', index, 0, 0);
         end
         function [Errcode] = apiENsetcoord(index, x, y, LibEPANET)
           % EPANET Version 2.1
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
           [Errcode]=calllib(LibEPANET, 'ENsetcoord', index, x, y);
         end
         function [Errcode, x, y] = apiENgetvertex(index, vertex, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
           [Errcode, x, y]=calllib(LibEPANET, 'ENgetvertex', index, vertex, 0, 0);
         end
         function [Errcode] = apiENsetvertices(index, x, y, vertex, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
           [Errcode]=calllib(LibEPANET, 'ENsetvertices', index, x, y, vertex);
         end
         function [Errcode, count] = apiENgetvertexcount(index, LibEPANET)
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
           [Errcode, count]=calllib(LibEPANET, 'ENgetvertexcount', index, 0);
         end
         function [Errcode] = apiENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
           [Errcode, ~, ~]=calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand , demandPattern, demandName);
         end
         function [Errcode] = apiENdeletedemand(nodeIndex, demandIndex, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
           [Errcode]=calllib(LibEPANET, 'ENdeletedemand', nodeIndex, demandIndex);
         end
         function [Errcode] = apiENsetbasedemand(index, demandIdx, value, LibEPANET)
           % EPANET Version 2.1
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
           [Errcode]=calllib(LibEPANET, 'ENsetbasedemand', index, demandIdx, value);
         end
         function [Errcode] = apiENsetdemandpattern(index, demandIdx, patInd, LibEPANET)
           % New version
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
           [Errcode]=calllib(LibEPANET, 'ENsetdemandpattern', index, demandIdx, patInd);
         end
         function [Errcode, qualcode, chemname, chemunits, tracenode] = apiENgetqualinfo(LibEPANET)
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
           chm=char(32*ones(1, 31));
           [Errcode, qualcode, chemname, chemunits, tracenode]=calllib(LibEPANET, 'ENgetqualinfo', 0, chm, chm, 0);
         end
         function [index, Errcode] = apiENaddnode(nodeid, nodetype, LibEPANET)
           % dev-net-builder
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
           [Errcode, ~, index]=calllib(LibEPANET, 'ENaddnode', nodeid, nodetype, 0);
         end
         function [index, Errcode] = apiENaddlink(linkid, linktype, fromnode, tonode, LibEPANET)
           % dev-net-builder
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
           [Errcode, ~, ~, ~, index]=calllib(LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
         end
         function [Errcode] = apiENdeletenode(indexNode, condition, LibEPANET)
           % dev-net-builder
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
           [Errcode]=calllib(LibEPANET, 'ENdeletenode', indexNode, condition);
         end
         function [Errcode] = apiENdeletelink(indexLink, condition, LibEPANET)
           % dev-net-builder
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
           [Errcode]=calllib(LibEPANET, 'ENdeletelink', indexLink, condition);
         end
         function [Errcode] = apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET)
           % dev-net-builder
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
           [Errcode]=calllib(LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
         end
         function [Errcode, cindex] = apiENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___controls.html
           [Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
         end
         function [Errcode] = apiENdeletecontrol(index, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___controls.html
           [Errcode]=calllib(LibEPANET, 'ENdeletecontrol', index);
         end
         function [Errcode, type, pmin, preq, pexp] = apiENgetdemandmodel(LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
           [Errcode, type, pmin, preq, pexp]=calllib(LibEPANET, 'ENgetdemandmodel', 0, 0, 0, 0);
         end
         function [Errcode] = apiENsetdemandmodel(type, pmin, preq, pexp, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
           [Errcode]=calllib(LibEPANET, 'ENsetdemandmodel', type, pmin, preq, pexp);
         end
         function [Errcode] = apiENsetdemandname(node_index, demand_index, demand_name, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
           [Errcode]=calllib(LibEPANET, 'ENsetdemandname', node_index, demand_index, demand_name);
         end
         function [Errcode, demand_name] = apiENgetdemandname(node_index, demand_index, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
           demand_name = char(32*ones(1, 31));
           [Errcode, demand_name]=calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
         end
         function [Errcode, line1, line2, line3] = apiENgettitle(LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
           c = char(32*ones(1, 79));
           [Errcode, line1, line2, line3]=calllib(LibEPANET, 'ENgettitle', c, c, c);
         end
         function [Errcode] = apiENsettitle(line1, line2, line3, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
           [Errcode]=calllib(LibEPANET, 'ENsettitle', line1, line2, line3);
         end
         function [Errcode] = apiENsetcomment(object, index, comment, LibEPANET)
@@ -1080,13 +1197,16 @@ classdef epanet <handle
         end
         function [Errcode] = apiENdeletepattern(indexPat, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
           [Errcode]=calllib(LibEPANET, 'ENdeletepattern', indexPat);
         end
         function [Errcode] = apiENdeletecurve(indexCurve, LibEPANET)
           % EPANET Version 2.2
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
           [Errcode]=calllib(LibEPANET, 'ENdeletecurve', indexCurve);
         end
         function [Errcode] = apiENsetjuncdata(index, elev, dmnd, dmndpat, LibEPANET)
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
           %   @brief Sets a group of properties for a junction node.
           %   @param index a junction node's index (starting from 1).
           %   @param elev the value of the junction's elevation.
@@ -1103,9 +1223,11 @@ classdef epanet <handle
           %     end
           % end
         function [Errcode] = apiENsetflowunits(code, LibEPANET)
+          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
           [Errcode]=calllib(LibEPANET, 'ENsetflowunits', code);
         end
         function [Errcode, value] = apiENgetnodevalue(index, paramcode, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             value=single(0);
             index=int32(index);
             paramcode=int32(paramcode);
@@ -1384,7 +1506,7 @@ classdef epanet <handle
                 if ~isdeployed
                     obj.InputFile=which(varargin{1}); % Get name of INP file
                 else
-                    obj.InputFile=varargin{1};  
+                    obj.InputFile=varargin{1};
                 end
             end
             % Bin functions
@@ -1413,7 +1535,7 @@ classdef epanet <handle
                     end
                 end
             end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2'); 
+            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
                 [~, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
 %                 if isempty(pwdDLL)
 %                     pwdDLL = pwd;
