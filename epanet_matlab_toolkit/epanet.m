@@ -10030,6 +10030,7 @@ classdef epanet <handle
                     [obj.Errcode, len] = obj.apiMSXgetIDlen(6, i, obj.MSXLibEPANET);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{i}] = obj.apiMSXgetID(6, i, len, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
         end
@@ -10063,6 +10064,7 @@ classdef epanet <handle
                     [obj.Errcode, len] = obj.apiMSXgetIDlen(5, i, obj.MSXLibEPANET);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{i}]=obj.apiMSXgetID(5, i, len, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             else
                 k=1;
@@ -10070,6 +10072,7 @@ classdef epanet <handle
                     [obj.Errcode, len] = obj.apiMSXgetIDlen(5, i, obj.MSXLibEPANET);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{k}]=obj.apiMSXgetID(5, i, len, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     k=k+1;
                 end
             end
@@ -10115,6 +10118,7 @@ classdef epanet <handle
                     [obj.Errcode, len] = obj.apiMSXgetIDlen(7, i, obj.MSXLibEPANET);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{i}]=obj.apiMSXgetID(7, i, len, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             else
                 k=1;
@@ -10122,6 +10126,7 @@ classdef epanet <handle
                     [obj.Errcode, len] = obj.apiMSXgetIDlen(7, i, obj.MSXLibEPANET);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     [obj.Errcode, value{k}]=obj.apiMSXgetID(7, i, len, obj.MSXLibEPANET);
+                    if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     k=k+1;
                 end
             end
@@ -10567,11 +10572,15 @@ classdef epanet <handle
             index=-1;
             if nargin==2
                 [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             elseif nargin==3
                 [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
                 setMSXPattern(obj, index, varargin{2});
+                if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function setMSXSources(obj, nodeID, speciesID, sourcetype, concentration, patID)
