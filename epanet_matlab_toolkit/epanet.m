@@ -1414,11 +1414,11 @@ classdef epanet <handle
                 end
             end
             if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2'); 
-                [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-                if isempty(pwdDLL)
-                    pwdDLL = pwd;
-                end
-                obj.LibEPANETpath = [pwdDLL, '/'];
+                [~, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+%                 if isempty(pwdDLL)
+%                     pwdDLL = pwd;
+%                 end
+%                 obj.LibEPANETpath = [pwdDLL, '/'];
                 try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
                 catch
                    obj.Errcode=-1;
