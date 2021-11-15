@@ -1388,9 +1388,9 @@ classdef epanet <handle
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetpatternvalue', patindex, period, value);
         end
-        function [Errcode, value] = apiMSXgetinitqual(obj, index, species, MSXLibEPANET)
+        function [Errcode, value] = apiMSXgetinitqual(type, index, species, MSXLibEPANET)
             value=0;
-            [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetinitqual', obj, index, species, value);
+            [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetinitqual', type, index, species, value);
         end
         function [Errcode, type, level, pat] = apiMSXgetsource(node, species, MSXLibEPANET)
             type=0;
@@ -12307,6 +12307,7 @@ classdef epanet <handle
             end
             node_index = addBinNode(obj, 1, nodeID, coords, elev, demand, patternID, category, quality);
             if nargin == 9
+                
                 if strcmp(varargin{7}{1}, 'PIPE')
                     link_index = addBinLinkPipe(obj,varargin{7}{2:end});
                 elseif strcmp(varargin{7}{1}, 'PUMP')
