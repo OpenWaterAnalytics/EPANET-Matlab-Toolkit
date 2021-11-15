@@ -164,7 +164,7 @@ classdef epanet <handle
         OptionsMaxTrials;            % Maximum number of trials (40 is default)
         OptionsPattern;              % *** Not implemented *** % but get with BinOptionsPattern
         OptionsPatternDemandMultiplier; % Multiply demand values (1 is default)
-        OptionsQualityTolerance;     % Tolerance for water quality (0.01 is default)
+        OptionsQualityTolerance;     % Tolerance for water  (0.01 is default)
         OptionsSpecificGravity;      % *** Not implemented *** % but get with BinOptionsSpecificGravity
         OptionsUnbalanced;           % *** Not implemented *** % but get with BinOptionsUnbalanced
         OptionsViscosity;            % *** Not implemented *** % but get with BinOptionsViscosity
@@ -2882,10 +2882,10 @@ classdef epanet <handle
             % Pipe quality
             %
             % Example 1:
-            %    d.getLinQuaity       % Retrieves the value of all link lengths
+            %    d.getLinQuality       % Retrieves the value of all link quality   
             %
             % Example 2:
-            %    d.getLinkQuality(1)   % Retrieves the value of the first link length
+            %    d.getLinkQuality(1)   % Retrieves the value of the first link quality 
             %
             % See also getLinkType, getLinksInfo, getLinkDiameter,
             %          getLinkRoughnessCoeff, getLinkMinorLossCoeff.

@@ -56,14 +56,14 @@ figure
 plot(value.Time/3600,value.Quality{1})
 title('Quality vs Time Link 1')
 xlabel('Time (hrs)')
-ylabel('Quality')
+ylabel('Quantity')
 % Plot quality over time (in hrs) for link 36 
 figure
 plot(value.Time/3600,value.Quality{36})
 title('Quality vs Time Link 1')
 xlabel('Time (hrs)')
-ylabel('Quality')
-% Unload MSX
+ylabel('Quantity')
+% Unload MSX library.
 d.apiMSXclose(d);
 d.apiMSXMatlabCleanup(d);
 fclose('all');
