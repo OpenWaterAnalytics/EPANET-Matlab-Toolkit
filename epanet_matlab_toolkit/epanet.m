@@ -580,6 +580,47 @@ classdef epanet <handle
                 index = obj.getLinkIndex(id);
             end
         end
+        function index = change_node_type(obj, id, type)
+            % Get node coordinates and info
+            oldIndex   = obj.getNodeIndex(id);
+            nodeCoords = obj.getNodeCoordinates(oldIndex);
+            if (nodeCoords(1) == 0 && nodeCoords(2) == 0)
+                error('Node has zero value for coordinates')
+            end
+            % Get the elevation
+            elev = obj.getNodeElevations(oldIndex);
+            % Get the connected links 
+            connMat = obj.getConnectivityMatrix;
+            linkTypeMat = obj.getLinkType;
+            count = 0;
+            % Get data of nameID and type for connected links
+            for i = 1:length(connMat(oldIndex,:))
+                if connMat(oldIndex,i) == 1
+                    count = count + 1;
+                    linkMat{count} = obj.NodeNameID{i};
+                    typeMat(count) = linkTypeMat(i);
+                end
+            end
+            obj.getNodesConnectingLinksID
+            % Delete the node to be replaced
+            obj.deleteNode(oldIndex);
+            % Create a new node according to the type
+            if type == 1
+                % Add new reservoir with previous nodes coordinates and elevation
+                index = obj.addNodeReservoir(obj, nodeCoords);
+            else
+                % Add new tank with previous nodes coordinates and elevation
+                index = obj.addNodeTank(id, nodeCoords, elev);
+            end
+            % Add the deleted links with the newIndex
+            count = 1;
+            for  i = linkMat
+                newlinkID = [id,i{1}];
+                lType = ['EN_' , typeMat{count}];
+                obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET);
+                count = count + 1;
+            end
+        end
     end
     methods (Static)
         function [Errcode] = apiENwriteline(line, LibEPANET)
@@ -1097,7 +1138,7 @@ classdef epanet <handle
         function [Errcode] = apiENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
           % EPANET Version 2.2
           % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
-          [Errcode, ~, ~]=calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand , demandPattern, demandName);
+          [Errcode, ~, ~]=calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand, demandPattern, demandName);
         end
         function [Errcode] = apiENdeletedemand(nodeIndex, demandIndex, LibEPANET)
           % EPANET Version 2.2
@@ -2882,10 +2923,10 @@ classdef epanet <handle
             % Pipe quality
             %
             % Example 1:
-            %    d.getLinQuality       % Retrieves the value of all link quality   
+            %    d.getLinQuality       % Retrieves the value of all link quality
             %
             % Example 2:
-            %    d.getLinkQuality(1)   % Retrieves the value of the first link quality 
+            %    d.getLinkQuality(1)   % Retrieves the value of the first link quality
             %
             % See also getLinkType, getLinksInfo, getLinkDiameter,
             %          getLinkRoughnessCoeff, getLinkMinorLossCoeff.
@@ -6259,7 +6300,7 @@ classdef epanet <handle
             %
             % Example 2:
             %   % Adds a new reservoir with coordinates [X, Y] = [20, 30].
-            %   reservoirID = 'newReservoir_2';
+            %   reservoirID = 'newReservoir_2'; 
             %   reservoirCoords = [20 30];
             %   reservoirIndex = d.addNodeReservoir(reservoirID, reservoirCoords);
             %   d.plot
@@ -8823,7 +8864,7 @@ classdef epanet <handle
             %
             % Example 1:
             %   d = epanet('Net1.inp');
-            %   d.setNodeTypeReservoir(11)
+            %   d.setTankTypeReservoir(11)
             %   d.getNodeType
             %   d.plot
             if (obj.getNodeTypeIndex(tankIndex) ~= 2)
@@ -8831,7 +8872,13 @@ classdef epanet <handle
             end
             elev = obj.getNodeElevations(tankIndex);
             obj.apiENsettankdata(tankIndex, elev, 0, 0, 0, 0, 0, '', obj.LibEPANET);
+            obj.change_node_type(id, 2)
         end
+        
+%         function newIndex = setNodeTypeTank(nodeID)   
+%             
+%         end
+        
         function setNodeSourceQuality(obj, value, varargin)
             % Sets the values of quality source strength.
             %
@@ -12307,7 +12354,7 @@ classdef epanet <handle
             end
             node_index = addBinNode(obj, 1, nodeID, coords, elev, demand, patternID, category, quality);
             if nargin == 9
-                
+
                 if strcmp(varargin{7}{1}, 'PIPE')
                     link_index = addBinLinkPipe(obj,varargin{7}{2:end});
                 elseif strcmp(varargin{7}{1}, 'PUMP')

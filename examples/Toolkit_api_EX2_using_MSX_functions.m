@@ -56,13 +56,13 @@ figure
 plot(value.Time/3600,value.Quality{1})
 title('Quality vs Time Link 1')
 xlabel('Time (hrs)')
-ylabel('Quantity')
+ylabel('CL2 Concentration (ppm)')
 % Plot quality over time (in hrs) for link 36 
 figure
 plot(value.Time/3600,value.Quality{36})
 title('Quality vs Time Link 1')
 xlabel('Time (hrs)')
-ylabel('Quantity')
+ylabel('CL2 Concentration (ppm)')
 % Unload MSX library.
 d.apiMSXclose(d);
 d.apiMSXMatlabCleanup(d);
