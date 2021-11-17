@@ -581,43 +581,66 @@ classdef epanet <handle
             end
         end
         function index = change_node_type(obj, id, type)
-            % Get node coordinates and info
+            % Change the type of node to junction, reservoir or tank
+            % The new node has the coordinates and elevation of the deleted
+            % node
+            % Get node coordinates and info 
             oldIndex   = obj.getNodeIndex(id);
             nodeCoords = obj.getNodeCoordinates(oldIndex);
             if (nodeCoords(1) == 0 && nodeCoords(2) == 0)
-                error('Node has zero value for coordinates')
+                warning('Node has zero value for coordinates')
             end
             % Get the elevation
             elev = obj.getNodeElevations(oldIndex);
-            % Get the connected links 
-            connMat = obj.getConnectivityMatrix;
+            % Get the connected links and link info
+            connLinkMat = obj.getNodesConnectingLinksID;
+            lInfo = obj.getLinksInfo;
             linkTypeMat = obj.getLinkType;
             count = 0;
             % Get data of nameID and type for connected links
-            for i = 1:length(connMat(oldIndex,:))
-                if connMat(oldIndex,i) == 1
+            for i = 1:length(connLinkMat(:,1))
+                if  strcmpi(connLinkMat{i,1},id)   
                     count = count + 1;
-                    linkMat{count} = obj.NodeNameID{i};
+                    linkMat(count) = connLinkMat(i,2);
                     typeMat(count) = linkTypeMat(i);
+                    linkIndices(count) = i; 
+                elseif strcmpi(connLinkMat{i,2},id)
+                    count = count + 1;
+                    linkMat(count) = connLinkMat(i,1);
+                    typeMat(count) = linkTypeMat(i);
+                    linkIndices(count) = i; 
                 end
             end
-            obj.getNodesConnectingLinksID
             % Delete the node to be replaced
             obj.deleteNode(oldIndex);
             % Create a new node according to the type
-            if type == 1
+            if type == 0
+                % Add new jucntion with previous nodes coordinates and elevation
+                index = obj.addNodeJunction(id, nodeCoords, elev);
+            elseif type == 1
                 % Add new reservoir with previous nodes coordinates and elevation
-                index = obj.addNodeReservoir(obj, nodeCoords);
-            else
+                index = obj.addNodeReservoir(id, nodeCoords, elev);
+            elseif type == 2
                 % Add new tank with previous nodes coordinates and elevation
                 index = obj.addNodeTank(id, nodeCoords, elev);
             end
             % Add the deleted links with the newIndex
             count = 1;
             for  i = linkMat
-                newlinkID = [id,i{1}];
+                newlinkID = [id,i{1}]; 
                 lType = ['EN_' , typeMat{count}];
-                obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET);
+                lindex = obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET);  
+                % add attributes to the new links
+                obj.setLinkLength(lindex, lInfo.LinkLength(linkIndices(count)));
+                obj.setLinkDiameter(lindex, lInfo.LinkDiameter(linkIndices(count)));
+                obj.setLinkRoughnessCoeff(lindex, lInfo.LinkRoughnessCoeff(linkIndices(count)));
+                if lInfo.LinkMinorLossCoeff(linkIndices(count))~= 0
+                    obj.setLinkMinorLossCoeff(lindex, lInfo.LinkMinorLossCoeff(linkIndices(count)));
+                end
+                obj.setLinkInitialStatus(lindex,lInfo.LinkInitialStatus(linkIndices(count)));
+                obj.setLinkInitialSetting(lindex,lInfo.LinkInitialSetting(linkIndices(count)));
+                obj.setLinkBulkReactionCoeff(lindex,lInfo.LinkBulkReactionCoeff(linkIndices(count)));
+                obj.setLinkWallReactionCoeff(lindex,lInfo.LinkWallReactionCoeff(linkIndices(count)));
                 count = count + 1;
             end
         end
@@ -6308,12 +6331,17 @@ classdef epanet <handle
             % See also plot, setLinkNodesIndex, addNodeJunction,
             %          obj.addLinkPipe, deleteNode, setNodeBaseDemands.
             xy = [0 0];
+            elev = 0;
             if nargin == 3
                 xy = varargin{1};
+            elseif nargin ==4
+                xy = varargin{1};
+                elev = varargin{2};
             end
             [index, errcode] = obj.apiENaddnode(resID, obj.ToolkitConstants.EN_RESERVOIR, obj.LibEPANET);
             error(obj.getError(errcode));
             obj.setNodeCoordinates(index, [xy(1), xy(2)]);
+            obj.setNodeElevations(index, elev);
         end
         function index = addNodeTank(obj, tankID, varargin)
             % Adds a new tank.
@@ -6904,7 +6932,10 @@ classdef epanet <handle
             leftPipeIndex = obj.addLinkPipe(pipeID,leftNodeID{1},newNodeID);
             obj.setNodesConnectingLinksID(leftPipeIndex, leftNodeID{1}, newNodeID);
             obj.setLinkPipeData(leftPipeIndex, linkLength, linkDia, linkRoughnessCoeff, linkMinorLossCoeff)
-            obj.setLinkInitialStatus(leftPipeIndex,linkInitialStatus);
+            if linkMinorLossCoeff ~= 0 
+                obj.setLinklinkMinorLossCoeff(leftPipeIndex,linkMinorLossCoeff);
+            end
+            obj.setLinkInitialSetting(leftPipeIndex,linkInitialSetting);
             obj.setLinkInitialSetting(leftPipeIndex,linkInitialSetting);
             obj.setLinkBulkReactionCoeff(leftPipeIndex,linkBulkReactionCoeff);
             obj.setLinkWallReactionCoeff(leftPipeIndex,linkWallReactionCoeff);
@@ -6914,6 +6945,9 @@ classdef epanet <handle
             rightPipeIndex  = obj.addLinkPipe(newPipeID,newNodeID,rightNodeID{1});
             obj.setNodesConnectingLinksID(rightPipeIndex,newNodeID,rightNodeID{1});
             obj.setLinkPipeData(rightPipeIndex, linkLength, linkDia, linkRoughnessCoeff, linkMinorLossCoeff)
+            if linkMinorLossCoeff ~= 0 
+                obj.setLinklinkMinorLossCoeff(rightPipeIndex,linkMinorLossCoeff);
+            end
             obj.setLinkInitialStatus(rightPipeIndex,linkInitialStatus);
             obj.setLinkInitialSetting(rightPipeIndex,linkInitialSetting);
             obj.setLinkBulkReactionCoeff(rightPipeIndex,linkBulkReactionCoeff);
@@ -8859,26 +8893,48 @@ classdef epanet <handle
             %          setNodeTankCanOverFlow, setNodeTankDiameter, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, value, varargin)
         end
-        function setNodeTypeReservoir(obj, tankIndex)
-            % Transforms a Tank to RESERVOIR
+        function setNodeTypeReservoir(obj, id)
+            % Transforms a node to RESERVOIR
             %
             % Example 1:
             %   d = epanet('Net1.inp');
-            %   d.setTankTypeReservoir(11)
-            %   d.getNodeType
+            %   d.setNodeTypeReservoir('2')
+            %   d.getNodeType(11)
             %   d.plot
-            if (obj.getNodeTypeIndex(tankIndex) ~= 2)
-              error('The current node is not a tank')
+            nodeIndex = obj.getNodeIndex(id);
+            if (obj.getNodeTypeIndex(nodeIndex) == 1)
+              warning('The current node is already a reservoir')
             end
-            elev = obj.getNodeElevations(tankIndex);
-            obj.apiENsettankdata(tankIndex, elev, 0, 0, 0, 0, 0, '', obj.LibEPANET);
-            obj.change_node_type(id, 2)
+            obj.change_node_type(id, 1)
         end
-        
-%         function newIndex = setNodeTypeTank(nodeID)   
-%             
-%         end
-        
+        function setNodeTypeTank(obj, id)
+            % Transforms a node to RESERVOIR
+            %
+            % Example 1:
+            %   d = epanet('Net1.inp');
+            %   d.setNodeTypeTank('11')
+            %   d.getNodeType(11)
+            %   d.plot
+            nodeIndex = obj.getNodeIndex(id);
+            if (obj.getNodeTypeIndex(nodeIndex) == 2)
+              warning('The current node is already a tank')
+            end
+            obj.change_node_type(id, 2)
+        end 
+        function setNodeTypeJunction(obj, id)
+            % Transforms a node to RESERVOIR
+            %
+            % Example 1:
+            %   d = epanet('Net1.inp');
+            %   d.setNodeTypeJunction('10')
+            %   d.getNodeType(1)
+            %   d.plot
+            nodeIndex = obj.getNodeIndex(id);
+            if (obj.getNodeTypeIndex(nodeIndex) == 0)
+              warning('The current node is already a junction')
+            end
+            obj.change_node_type(id, 0)
+        end  
         function setNodeSourceQuality(obj, value, varargin)
             % Sets the values of quality source strength.
             %
