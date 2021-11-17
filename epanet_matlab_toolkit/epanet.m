@@ -584,10 +584,10 @@ classdef epanet <handle
             % Change the type of node to junction, reservoir or tank
             % The new node has the coordinates and elevation of the deleted
             % node
-            % Get node coordinates and info 
+            % Get node coordinates and info
             oldIndex   = obj.getNodeIndex(id);
             nodeCoords = obj.getNodeCoordinates(oldIndex);
-            vertCoords = obj.getLinkVertices; 
+            vertCoords = obj.getLinkVertices;
             if (nodeCoords(1) == 0 && nodeCoords(2) == 0)
                 warning('Node has zero value for coordinates')
             end
@@ -600,16 +600,16 @@ classdef epanet <handle
             count = 0;
             % Get data of nameID and type for connected links
             for i = 1:length(connLinkMat(:,1))
-                if  strcmpi(connLinkMat{i,1},id)   
+                if  strcmpi(connLinkMat{i,1},id)
                     count = count + 1;
                     linkMat(count) = connLinkMat(i,2);
                     typeMat(count) = linkTypeMat(i);
-                    linkIndices(count) = i; 
+                    linkIndices(count) = i;
                 elseif strcmpi(connLinkMat{i,2},id)
                     count = count + 1;
                     linkMat(count) = connLinkMat(i,1);
                     typeMat(count) = linkTypeMat(i);
-                    linkIndices(count) = i; 
+                    linkIndices(count) = i;
                 end
             end
             % Delete the node to be replaced
@@ -628,15 +628,15 @@ classdef epanet <handle
             % Add the deleted links with the newIndex
             count = 1;
             for  i = linkMat
-                newlinkID = [id, i{1}]; 
+                newlinkID = [id, i{1}];
                 lType = ['EN_', typeMat{count}];
                 % Add a link
                 % Check which node x coordinate is smaller to set it as the
                 % start
-                if nodeCoords(1) <= obj.getNodeCoordinates{1}(linkIndices(count)) 
+                if nodeCoords(1) <= obj.getNodeCoordinates{1}(linkIndices(count))
                     lindex = obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET);
                 else
-                    lindex = obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), i{1}, id, obj.LibEPANET);                    
+                    lindex = obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), i{1}, id, obj.LibEPANET);
                 end
                 % add attributes to the new links
                 obj.setLinkLength(lindex, lInfo.LinkLength(linkIndices(count)));
@@ -653,7 +653,7 @@ classdef epanet <handle
                     % Add vertices for neighbour nodes
                     xCoord = vertCoords{linkIndices(count)}.x;
                     yCoord = vertCoords{linkIndices(count)}.y;
-                    setLinkVertices(obj, newlinkID, xCoord, yCoord);   
+                    setLinkVertices(obj, newlinkID, xCoord, yCoord);
                 end
                 count = count + 1;
             end
@@ -661,7 +661,16 @@ classdef epanet <handle
     end
     methods (Static)
         function [Errcode] = apiENwriteline(line, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            % Writes a line of text to a project's report file.
+            %
+            % apiENwriteline(line, LibEPANET)
+            %
+            % Parameters:
+            % line         a text string to write.
+            % LibEPANET    epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(LibEPANET, 'ENwriteline', line);
         end
         function [Errcode] = apiENaddpattern(patid, LibEPANET)
@@ -669,11 +678,29 @@ classdef epanet <handle
             Errcode=calllib(LibEPANET, 'ENaddpattern', patid);
         end
         function [Errcode] = apiENclose(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
+            % Closes a project and frees all of its memory.
+            %
+            % apiENclose(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
+            % See also apiENopen
             [Errcode]=calllib(LibEPANET, 'ENclose');
         end
         function [Errcode] = apiENcloseH(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
+            % Closes the hydraulic solver freeing all of its allocated memory.
+            %
+            % apiENcloseH(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
+            % See also  apiENinitH, apiENrunH, apiENnextH
             [Errcode]=calllib(LibEPANET, 'ENcloseH');
         end
         function [Errcode, value] = apiENgetbasedemand(index, numdemands, LibEPANET)
@@ -697,6 +724,16 @@ classdef epanet <handle
             [Errcode, value]=calllib(LibEPANET, 'ENgetdemandpattern', index, numdemands, 0);
         end
         function [Errcode] = apiENcloseQ(LibEPANET)
+            % Closes the water quality solver, freeing all of its allocated memory.
+            %
+            % apiENcloseQ(LibEPANET)
+            %
+            % Parameters
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % More info:
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode]=calllib(LibEPANET, 'ENcloseQ');
         end
@@ -706,8 +743,19 @@ classdef epanet <handle
             [Errcode, ~, demandIndex]=calllib(LibEPANET, 'ENgetdemandindex', nodeindex, demandName, 0);
         end
         function [Errcode, value] = apiENgetstatistic(code, LibEPANET)
+            % Retrieves a particular simulation statistic.
             % EPANET 20100
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            %
+            % apiENgetstatistic(code, LibEPANET)
+            %
+            % Parameters:
+            % code  	   the type of statistic to retrieve (see EN_AnalysisStatistic).
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % value the value of the statistic.
+            % an error code.
+            % More info: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetstatistic', code, 0);
         end
         function [Errcode, ctype, lindex, setting, nindex, level] = apiENgetcontrol(cindex, LibEPANET)
@@ -715,17 +763,47 @@ classdef epanet <handle
             [Errcode, ctype, lindex, setting, nindex, level]=calllib(LibEPANET, 'ENgetcontrol', cindex, 0, 0, 0, 0, 0);
         end
         function [Errcode, count] = apiENgetcount(countcode, LibEPANET)
+            % Retrieves the number of objects of a given type in a project.
+            %
+            % apiENgetcount(countcode, LibEPANET)
+            %
+            % Parameters:
+            % countcode	number of objects of the specified type
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
             [Errcode, count]=calllib(LibEPANET, 'ENgetcount', countcode, 0);
         end
-        function [errmsg, e] = apiENgeterror(Errcode, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+          function [errmsg, e] = apiENgeterror(Errcode, LibEPANET)
+            % Returns the text of an error message generated by an error code.
+            %
+            % apiENgeterror(Errcode, LibEPANET)
+            %
+            % Parameters:
+            % errcode   an error code.
+            % LibEPANET epanet library DLL name.
+            %
+            % Returns:
+            % errmsg the error message generated by the error code.
+            % e      an error code.
             e=0; errmsg='';
             if Errcode [e, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
             if e, [e, errmsg] = calllib(LibEPANET, 'ENgeterror', e, char(32*ones(1, 79)), 79); end
             end
         end
         function [Errcode, flowunitsindex] = apiENgetflowunits(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
+            % Retrieves a project's flow units.
+            %
+            % apiENgetflowunits(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET    epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % flowunitsindex a flow units code (see EN_FlowUnits).
+            % More info: http://wateranalytics.org/EPANET/group___options.html
             [Errcode, flowunitsindex]=calllib(LibEPANET, 'ENgetflowunits', 0);
         end
         function [Errcode, id] = apiENgetlinkid(index, LibEPANET)
@@ -773,7 +851,17 @@ classdef epanet <handle
             [Errcode, type]=calllib(LibEPANET, 'ENgetnodetype', index, 0);
         end
         function [Errcode, value] = apiENgetoption(optioncode, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
+            % Retrieves the value of an analysis option.
+            %
+            % apiENgetoption(optioncode, LibEPANET)
+            %
+            % Parameters:
+            % optioncode   a type of analysis option (see EN_Option).
+            % LibEPANET    epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % value the current value of the option.
             [Errcode, value]=calllib(LibEPANET, 'ENgetoption', optioncode, 0);
         end
         function [Errcode, id] = apiENgetpatternid(index, LibEPANET)
@@ -815,28 +903,90 @@ classdef epanet <handle
             [Errcode, value]=calllib(LibEPANET, 'ENgetpatternvalue', index, period, 0);
         end
         function [Errcode, qualcode, tracenode] = apiENgetqualtype(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
+            % Retrieves the type of water quality analysis to be run.
+            %
+            % apiENgetqualtype(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET    epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % qualcode    type of analysis to run (see obj.QualityType).
+            % tracenode 	index of the node being traced (if applicable).
             [Errcode, qualcode, tracenode]=calllib(LibEPANET, 'ENgetqualtype', 0, 0);
         end
         function [Errcode, timevalue] = apiENgettimeparam(paramcode, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
+            % Retrieves the value of a time parameter.
+            %
+            % apiENgettimeparam(paramcode, LibEPANET)
+            %
+            % Parameters:
+            % paramcode    a time parameter code (see EN_TimeParameter).
+            % LibEPANET    epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % timevalue the current value of the time parameter (in seconds).
             [Errcode, timevalue]=calllib(LibEPANET, 'ENgettimeparam', paramcode, 0);
         end
         function [Errcode, LibEPANET] = apiENgetversion(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            % Retrieves the toolkit API version number.
+            %
+            % apiENgetversion(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % LibEPANET the version of the OWA-EPANET toolkit.
+            % an error code.
             [Errcode, LibEPANET]=calllib(LibEPANET, 'ENgetversion', 0);
         end
-        function [Errcode] = apiENinit(unitsType, headLossType, LibEPANET)
+          function [Errcode] = apiENinit(unitsType, headLossType, LibEPANET)
+            % Initializes an EPANET project.
             % EPANET Version 2.2
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
+            %
+            % apiENinit(unitsType, headLossType, LibEPANET)
+            %
+            % Parameters:
+            % unitsType    the choice of flow units (see EN_FlowUnits).
+            % headLossType the choice of head loss formula (see EN_HeadLossType).
+            % LibEPANET    epanet library DLL name
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(LibEPANET, 'ENinit', '', '', unitsType, headLossType);
         end
         function [Errcode] = apiENinitH(flag, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
+            % Initializes a network prior to running a hydraulic analysis.
+            %
+            % apiENinitH(flag, LibEPANET)
+            %
+            % Parameters:
+            % flag    	a 2-digit initialization flag (see EN_InitHydOption).
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
+            % See also  apiENinitH, apiENrunH, apiENnextH, apiENreport, apiENsavehydfile
+            % More info: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENinitH', flag);
         end
         function [Errcode] = apiENinitQ(saveflag, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
+            % Initializes a network prior to running a water quality analysis.
+            %
+            % apiENinitQ(saveflag, LibEPANET)
+            %
+            % Parameters:
+            % saveflag  set to EN_SAVE (1) if results are to be saved to the project's
+            %           binary output file, or to EN_NOSAVE (0) if not.
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
+            % See also  apiENinitQ, apiENrunQ, apiENnextQ
+            % More info: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode]=calllib(LibEPANET, 'ENinitQ', saveflag);
         end
         function apiENMatlabCleanup(LibEPANET)
@@ -872,16 +1022,50 @@ classdef epanet <handle
             end
         end
         function [Errcode, tstep] = apiENnextH(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
+            % Determines the length of time until the next hydraulic event occurs in an extended period simulation.
+            %
+            % apiENnextH(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % tstep the time (in seconds) until the next hydraulic event or 0 if at the end of the full simulation duration.
+            % See also  apiENrunH
+            % More info: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode, tstep]=calllib(LibEPANET, 'ENnextH', int32(0));
         end
         function [Errcode, tstep] = apiENnextQ(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
+            % Advances a water quality simulation over the time until the next hydraulic event.
+            %
+            % apiENnextQ(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % tstep time (in seconds) until the next hydraulic event or 0 if at the end of the full simulation duration.
+            % See also  apiENstepQ, apiENrunQ
+            % More info: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode, tstep]=calllib(LibEPANET, 'ENnextQ', int32(0));
             tstep = double(tstep);
         end
         function [Errcode] = apiENopen(inpname, repname, binname, LibEPANET) %DE
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
+            % Opens an EPANET input file & reads in network data.
+            %
+            % apiENopen(inpname, repname, binname, LibEPANET)
+            %
+            % Parameters:
+            % inpname the name of an existing EPANET-formatted input file.
+            % repname the name of a report file to be created (or "" if not needed).
+            % binname the name of a binary output file to be created (or "" if not needed).
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
+            % See also apiENclose
             Errcode=calllib(LibEPANET, 'ENopen', inpname, repname, binname);
             if Errcode && Errcode~=200
                  [~, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
@@ -892,56 +1076,172 @@ classdef epanet <handle
             [Errcode] = calllib(LibEPANET, 'ENepanet', tempfile, rptfile, binfile, lib.pointer);
         end
         function [Errcode] = apiENopenH(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
+            % Opens a project's hydraulic solver.
+            %
+            % apiENopenH(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
+            % See also  apiENinitH, apiENrunH, apiENnextH, apiENcloseH
+            % More info: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENopenH');
         end
         function [Errcode] = apiENopenQ(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
+            % Opens a project's water quality solver.
+            %
+            % apiENopenQ(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % See also  apiENopenQ, apiENinitQ, apiENrunQ, apiENnextQ,
+            % apiENstepQ, apiENcloseQ
+            % More info: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode]=calllib(LibEPANET, 'ENopenQ');
         end
         function [Errcode] = apiENreport(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            % Writes simulation results in a tabular format to a project's report file.
+            %
+            % apiENreport(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % More info: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENreport');
         end
         function [Errcode] = apiENcopyreport(filename, LibEPANET)
+            % Copies the current contents of a project's report file to another file.
             % EPANET Version 2.2
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            %
+            % apiENcopyreport(filename, LibEPANET)
+            %
+            % Parameters:
+            % filename  the full path name of the destination file
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
             [Errcode]=calllib(LibEPANET, 'ENcopyreport', filename);
         end
         function [Errcode] = apiENclearreport(LibEPANET)
+            % Clears the contents of a project's report file.
             % EPANET Version 2.2
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            %
+            % apiENclearreport(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(LibEPANET, 'ENclearreport');
         end
         function [Errcode, value] = apiENgetresultindex(objecttype, index, LibEPANET)
+            % Retrieves the order in which a node or link appears in an output file.
             % EPANET Version 2.2
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            %
+            % apiENgetresultindex(objecttype, index, LibEPANET)
+            %
+            % Parameters:
+            % objecttype  a type of element (either EN_NODE or EN_LINK).
+            % index       the element's current index (starting from 1).
+            % LibEPANET   epanet library DLL name.
+            %
+            % Returns:
+            % value the order in which the element's results were written to file.
+            % an error code.
+            % More info: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode, value]=calllib(LibEPANET, 'ENgetresultindex', objecttype, index, int32(0));
         end
         function [Errcode] = apiENresetreport(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            % Resets a project's report options to their default values.
+            %
+            % apiENresetreport(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % More info: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENresetreport');
         end
         function [Errcode, t] = apiENrunH(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
+            % Computes a hydraulic solution for the current point in time.
+            %
+            % apiENrunH(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % t  the current simulation time in seconds.
+            % See also  apiENinitH, apiENrunH, apiENnextH, apiENcloseH
+            % More info: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode, t]=calllib(LibEPANET, 'ENrunH', int32(0));
             t = double(t);
         end
         function [Errcode, t] = apiENrunQ(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
+            % Makes hydraulic and water quality results at the start of the current
+            % time period available to a project's water quality solver.
+            %
+            % apiENrunQ(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % t  current simulation time in seconds.
+            % See also  apiENopenQ, apiENinitQ, apiENrunQ, apiENnextQ, apiENstepQ
+            % More info: http://wateranalytics.org/EPANET/group___quality.html
             t=int32(0);
             [Errcode, t]=calllib(LibEPANET, 'ENrunQ', t);
         end
         function [Errcode] = apiENsaveH(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
+            % Transfers a project's hydraulics results from its temporary hydraulics file to its binary output file,
+            % where results are only reported at uniform reporting intervals.
+            %
+            % apiENsaveH(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
             [Errcode]=calllib(LibEPANET, 'ENsaveH');
         end
         function [Errcode] = apiENsaveHydfile(fname, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
+            % Saves a project's temporary hydraulics file to disk.
+            %
+            % apiENsaveHydfile(fname, LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
             [Errcode]=calllib(LibEPANET, 'ENsavehydfile', fname);
         end
         function [Errcode] = apiENsaveinpfile(inpname, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
+            % Saves a project's data to an EPANET-formatted text file.
+            %
+            % apiENsaveinpfile(inpname, LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
             Errcode=calllib(LibEPANET, 'ENsaveinpfile', inpname);
         end
         function [Errcode] = apiENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET)
@@ -1047,7 +1347,17 @@ classdef epanet <handle
             [Errcode]=calllib(LibEPANET, 'ENsettankdata', index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve);
         end
         function [Errcode] = apiENsetoption(optioncode, value, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
+            % Sets the value for an anlysis option.
+            %
+            % apiENsetoption(optioncode, value, LibEPANET)
+            %
+            % Parameters:
+            % optioncode   a type of analysis option (see EN_Option).
+            % value        the new value assigned to the option.
+            % LibEPANET    epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(LibEPANET, 'ENsetoption', optioncode, value);
         end
         function [Errcode] = apiENsetpattern(index, factors, nfactors, LibEPANET)
@@ -1059,39 +1369,125 @@ classdef epanet <handle
             [Errcode]=calllib(LibEPANET, 'ENsetpatternvalue', index, period, value);
         end
         function [Errcode] = apiENsetqualtype(qualcode, chemname, chemunits, tracenode, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
+            % Sets the type of water quality analysis to run.
+            %
+            % apiENsetqualtype(qualcode, chemname, chemunits, tracenode, LibEPANET)
+            %
+            % Parameters:
+            % qualcode    the type of analysis to run (see obj.QualityType).
+            % chemname    the name of the quality constituent.
+            % chemunits   the concentration units of the constituent.
+            % tracenode   a type of analysis option (see apiENOption).
+            % LibEPANET   the ID name of the node being traced if qualType = EN_TRACE.
+            %
+            % Returns:
+            % an error code.
+            % More info: http://wateranalytics.org/EPANET/group___options.html
             [Errcode]=calllib(LibEPANET, 'ENsetqualtype', qualcode, chemname, chemunits, tracenode);
         end
         function [Errcode] = apiENsetreport(command, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            % Processes a reporting format command.
+            %
+            % apiENsetreport(command, LibEPANET)
+            %
+            % Parameters:
+            % command    a report formatting command.
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % See also apiENreport
             [Errcode]=calllib(LibEPANET, 'ENsetreport', command);
         end
         function [Errcode] = apiENsetstatusreport(statuslevel, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
+            % Sets the level of hydraulic status reporting.
+            %
+            % apiENsetstatusreport(statuslevel, LibEPANET)
+            %
+            % Parameters:
+            % statuslevel  a status reporting level code (see EN_StatusReport).
+            % LibEPANET    epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % More info: http://wateranalytics.org/EPANET/group___reporting.html
             [Errcode]=calllib(LibEPANET, 'ENsetstatusreport', statuslevel);
         end
         function [Errcode] = apiENsettimeparam(paramcode, timevalue, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
+            % Sets the value of a time parameter.
+            %
+            % apiENsettimeparam(paramcode, timevalue, LibEPANET)
+            %
+            % Parameters:
+            % paramcode    a time parameter code (see EN_TimeParameter).
+            % timevalue    the new value of the time parameter (in seconds).
+            % LibEPANET    the ID name of the node being traced if qualType = EN_TRACE.
+            %
+            % Returns:
+            % an error code.
             paramcode=int32(paramcode);
             timevalue=int32(timevalue);
             [Errcode]=calllib(LibEPANET, 'ENsettimeparam', paramcode, timevalue);
         end
         function [Errcode] = apiENsolveH(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
+            % Runs a complete hydraulic simulation with results for all time periods
+            % written to a temporary hydraulics file.
+            %
+            % apiENsolveH(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % See also apiENopenH, apiENinitH, apiENrunH, apiENnextH, apiENcloseH
+            % More info: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENsolveH');
         end
         function [Errcode] = apiENsolveQ(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
+            % Runs a complete water quality simulation with results at uniform reporting
+            % intervals written to the project's binary output file.
+            %
+            % apiENsolveQ(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % See also apiENopenQ, apiENinitQ, apiENrunQ, apiENnextQ, apiENcloseQ
+            % More info: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENsolveQ');
         end
         function [Errcode, tleft] = apiENstepQ(LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
+            % Advances a water quality simulation by a single water quality time step.
+            %
+            % apiENstepQ(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % tleft  time left (in seconds) to the overall simulation duration.
+            % See also apiENrunQ, apiENnextQ
+            % More info: http://wateranalytics.org/EPANET/group___hydraulics.html
             tleft=int32(0);
             [Errcode, tleft]=calllib(LibEPANET, 'ENstepQ', tleft);
             tleft=double(tleft);
         end
         function [Errcode] = apiENusehydfile(hydfname, LibEPANET)
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
+            % Uses a previously saved binary hydraulics file to supply a project's hydraulics.
+            %
+            % apiENusehydfile(hydfname, LibEPANET)
+            %
+            % Parameters:
+            % hydfname  the name of the binary file containing hydraulic results.
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code
+            % More info: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode]=calllib(LibEPANET, 'ENusehydfile', hydfname);
         end
         function [Errcode] = apiENsetcurve(index, x, y, nfactors, LibEPANET)
@@ -1115,22 +1511,22 @@ classdef epanet <handle
             [Errcode]=calllib(LibEPANET, 'ENsetcurvevalue', index, pnt, x, y);
         end
         function [Errcode, index] = apiENgetcurveindex(id, LibEPANET)
-          % EPANET Version 2.1
-          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
-          [Errcode, ~, index]=calllib(LibEPANET, 'ENgetcurveindex', id, 0);
+            % EPANET Version 2.1
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
+            [Errcode, ~, index]=calllib(LibEPANET, 'ENgetcurveindex', id, 0);
         end
         function [Errcode] = apiENaddcurve(cid, LibEPANET)
-          % EPANET Version 2.1
-          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
-          [Errcode]=calllib(LibEPANET, 'ENaddcurve', cid);
+            % EPANET Version 2.1
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
+            [Errcode]=calllib(LibEPANET, 'ENaddcurve', cid);
         end
         function [Errcode, ids, nvalue, xvalue, yvalue] = apiENgetcurve(obj, value, LibEPANET)
           [Errcode, ids, nvalue, xvalue, yvalue]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, zeros(1, obj.getCurveLengths(value))', zeros(1, obj.getCurveLengths(value))');
         end
         function [Errcode, len] = apiENgetcurvelen(index, LibEPANET)
-          % EPANET Version 2.1
-          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
-          [Errcode, len]=calllib(LibEPANET, 'ENgetcurvelen', index, 0);
+            % EPANET Version 2.1
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
+            [Errcode, len]=calllib(LibEPANET, 'ENgetcurvelen', index, 0);
         end
         function [Errcode, value] = apiENgetheadcurveindex(pumpindex, LibEPANET)
           % EPANET Version 2.1
@@ -1193,14 +1589,37 @@ classdef epanet <handle
           [Errcode]=calllib(LibEPANET, 'ENsetdemandpattern', index, demandIdx, patInd);
         end
         function [Errcode, qualcode, chemname, chemunits, tracenode] = apiENgetqualinfo(LibEPANET)
-          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
-          chm=char(32*ones(1, 31));
-          [Errcode, qualcode, chemname, chemunits, tracenode]=calllib(LibEPANET, 'ENgetqualinfo', 0, chm, chm, 0);
+            % Gets information about the type of water quality analysis requested.
+            %
+            % apiENgetoption(optioncode, LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET    epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % qualcode    type of analysis to run (see obj.QualityType).
+            % chemname    name of chemical constituent.
+            % chemunits   concentration units of the constituent.
+            % tracenode 	index of the node being traced (if applicable).
+            chm=char(32*ones(1, 31));
+            [Errcode, qualcode, chemname, chemunits, tracenode]=calllib(LibEPANET, 'ENgetqualinfo', 0, chm, chm, 0);
         end
         function [index, Errcode] = apiENaddnode(nodeid, nodetype, LibEPANET)
-          % dev-net-builder
-          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
-          [Errcode, ~, index]=calllib(LibEPANET, 'ENaddnode', nodeid, nodetype, 0);
+            % Adds a new node to a project.
+            %
+            % apiENaddnode(nodeid, nodetype, LibEPANET)
+            %
+            % Parameters:
+            % nodeid       the ID name of the node to be added.
+            % nodetype     the type of node being added (see EN_NodeType).
+            % LibEPANET    epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % index    the index of the newly added node.
+            % See also EN_NodeProperty, NodeType
+            [Errcode, ~, index]=calllib(LibEPANET, 'ENaddnode', nodeid, nodetype, 0);
         end
         function [index, Errcode] = apiENaddlink(linkid, linktype, fromnode, tonode, LibEPANET)
           % dev-net-builder
@@ -1253,15 +1672,37 @@ classdef epanet <handle
           [Errcode, demand_name]=calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
         end
         function [Errcode, line1, line2, line3] = apiENgettitle(LibEPANET)
-          % EPANET Version 2.2
-          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
-          c = char(32*ones(1, 79));
-          [Errcode, line1, line2, line3]=calllib(LibEPANET, 'ENgettitle', c, c, c);
+            % Retrieves the title lines of the project.
+            % EPANET Version 2.2
+            %
+            % apiENgettitle(LibEPANET)
+            %
+            % Parameters:
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
+            % line1 first title line
+            % line2 second title line
+            % line3 third title line
+            c = char(32*ones(1, 79));
+            [Errcode, line1, line2, line3]=calllib(LibEPANET, 'ENgettitle', c, c, c);
         end
         function [Errcode] = apiENsettitle(line1, line2, line3, LibEPANET)
-          % EPANET Version 2.2
-          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___project.html
-          [Errcode]=calllib(LibEPANET, 'ENsettitle', line1, line2, line3);
+            % Sets the title lines of the project.
+            % EPANET Version 2.2
+            %
+            % apiENsettitle(line1, line2, line3, LibEPANET)
+            %
+            % Parameters:
+            % line1   first title line
+            % line2   second title line
+            % line3   third title line
+            % LibEPANET epanet library DLL name
+            %
+            % Returns:
+            % an error code.
+            [Errcode]=calllib(LibEPANET, 'ENsettitle', line1, line2, line3);
         end
         function [Errcode] = apiENsetcomment(object, index, comment, LibEPANET)
           % EPANET Version 2.2
@@ -1301,8 +1742,17 @@ classdef epanet <handle
           %     end
           % end
         function [Errcode] = apiENsetflowunits(code, LibEPANET)
-          % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
-          [Errcode]=calllib(LibEPANET, 'ENsetflowunits', code);
+            % Sets a project's flow units.
+            %
+            % apiENsetflowunits(code, LibEPANET)
+            %
+            % Parameters:
+            % code        a flow units code (see EN_FlowUnits)
+            % LibEPANET   epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            [Errcode]=calllib(LibEPANET, 'ENsetflowunits', code);
         end
         function [Errcode, value] = apiENgetnodevalue(index, paramcode, LibEPANET)
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
@@ -6337,7 +6787,7 @@ classdef epanet <handle
             %
             % Example 2:
             %   % Adds a new reservoir with coordinates [X, Y] = [20, 30].
-            %   reservoirID = 'newReservoir_2'; 
+            %   reservoirID = 'newReservoir_2';
             %   reservoirCoords = [20 30];
             %   reservoirIndex = d.addNodeReservoir(reservoirID, reservoirCoords);
             %   d.plot
@@ -6946,7 +7396,7 @@ classdef epanet <handle
             leftPipeIndex = obj.addLinkPipe(pipeID,leftNodeID{1},newNodeID);
             obj.setNodesConnectingLinksID(leftPipeIndex, leftNodeID{1}, newNodeID);
             obj.setLinkPipeData(leftPipeIndex, linkLength, linkDia, linkRoughnessCoeff, linkMinorLossCoeff)
-            if linkMinorLossCoeff ~= 0 
+            if linkMinorLossCoeff ~= 0
                 obj.setLinklinkMinorLossCoeff(leftPipeIndex,linkMinorLossCoeff);
             end
             obj.setLinkInitialSetting(leftPipeIndex,linkInitialSetting);
@@ -6959,7 +7409,7 @@ classdef epanet <handle
             rightPipeIndex  = obj.addLinkPipe(newPipeID,newNodeID,rightNodeID{1});
             obj.setNodesConnectingLinksID(rightPipeIndex,newNodeID,rightNodeID{1});
             obj.setLinkPipeData(rightPipeIndex, linkLength, linkDia, linkRoughnessCoeff, linkMinorLossCoeff)
-            if linkMinorLossCoeff ~= 0 
+            if linkMinorLossCoeff ~= 0
                 obj.setLinklinkMinorLossCoeff(rightPipeIndex,linkMinorLossCoeff);
             end
             obj.setLinkInitialStatus(rightPipeIndex,linkInitialStatus);
@@ -8934,7 +9384,7 @@ classdef epanet <handle
               warning('The current node is already a tank')
             end
             obj.change_node_type(id, 2)
-        end 
+        end
         function setNodeTypeJunction(obj, id)
             % Transforms a node to RESERVOIR
             %
@@ -8948,7 +9398,7 @@ classdef epanet <handle
               warning('The current node is already a junction')
             end
             obj.change_node_type(id, 0)
-        end  
+        end
         function setNodeSourceQuality(obj, value, varargin)
             % Sets the values of quality source strength.
             %
