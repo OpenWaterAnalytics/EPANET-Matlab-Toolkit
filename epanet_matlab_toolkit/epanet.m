@@ -587,6 +587,7 @@ classdef epanet <handle
             % Get node coordinates and info 
             oldIndex   = obj.getNodeIndex(id);
             nodeCoords = obj.getNodeCoordinates(oldIndex);
+            vertCoords = obj.getLinkVertices; 
             if (nodeCoords(1) == 0 && nodeCoords(2) == 0)
                 warning('Node has zero value for coordinates')
             end
@@ -627,9 +628,16 @@ classdef epanet <handle
             % Add the deleted links with the newIndex
             count = 1;
             for  i = linkMat
-                newlinkID = [id,i{1}]; 
-                lType = ['EN_' , typeMat{count}];
-                lindex = obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET);  
+                newlinkID = [id, i{1}]; 
+                lType = ['EN_', typeMat{count}];
+                % Add a link
+                % Check which node x coordinate is smaller to set it as the
+                % start
+                if nodeCoords(1) <= obj.getNodeCoordinates{1}(linkIndices(count)) 
+                    lindex = obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET);
+                else
+                    lindex = obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), i{1}, id, obj.LibEPANET);                    
+                end
                 % add attributes to the new links
                 obj.setLinkLength(lindex, lInfo.LinkLength(linkIndices(count)));
                 obj.setLinkDiameter(lindex, lInfo.LinkDiameter(linkIndices(count)));
@@ -641,6 +649,12 @@ classdef epanet <handle
                 obj.setLinkInitialSetting(lindex,lInfo.LinkInitialSetting(linkIndices(count)));
                 obj.setLinkBulkReactionCoeff(lindex,lInfo.LinkBulkReactionCoeff(linkIndices(count)));
                 obj.setLinkWallReactionCoeff(lindex,lInfo.LinkWallReactionCoeff(linkIndices(count)));
+                if (~isempty(vertCoords{linkIndices(count)}))
+                    % Add vertices for neighbour nodes
+                    xCoord = vertCoords{linkIndices(count)}.x;
+                    yCoord = vertCoords{linkIndices(count)}.y;
+                    setLinkVertices(obj, newlinkID, xCoord, yCoord);   
+                end
                 count = count + 1;
             end
         end
