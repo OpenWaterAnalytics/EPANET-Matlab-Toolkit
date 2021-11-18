@@ -2736,6 +2736,15 @@ classdef epanet <handle
             obj.MSXPattern = obj.getMSXPattern;
         end
         function [Errcode] = apiMSXopen(obj, varargin)
+            % Opens the EPANET-MSX toolkit system.
+            %
+            % apiMSXopen(obj, varargin)
+            %
+            % Parameters:
+            % obj   epanet class object
+            %
+            % Returns:
+            % an error code.
             [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
             if Errcode
                 obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
@@ -2751,6 +2760,15 @@ classdef epanet <handle
             end
         end
         function [Errcode] = apiMSXclose(obj)
+            % Closes the EPANET-MSX toolkit system.
+            %
+            % apiMSXclose(obj)
+            %
+            % Parameters:
+            % obj   epanet class object
+            %
+            % Returns:
+            % an error code.
             [Errcode] = calllib(obj.MSXLibEPANET, 'MSXclose');
         end
         function [e] = apiMSXerror(Errcode, MSXLibEPANET)
@@ -2760,10 +2778,42 @@ classdef epanet <handle
             disp(errstring);
         end
         function [Errcode, count] = apiMSXgetcount(code, MSXLibEPANET)
-          count=0;
-          [Errcode, count] = calllib(MSXLibEPANET, 'MSXgetcount', code, count);
+            % Retrieves the number of objects of a specific type.
+            %
+            % apiMSXgetcount(code, MSXLibEPANET)
+            %
+            % Parameters:
+            % code           type of object being sought and must be one of the following pre-defined constants:
+            %                     MSX_SPECIES (for a chemical species).
+            %                     MSX_CONSTANT (for a reaction constant).
+            %                     MSX_PARAMETER (for a reaction parameter).
+            %                     MSX_PATTERN (for a time pattern).
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % count number of objects of that type defined in the MSX input file
+            count=0;
+            [Errcode, count] = calllib(MSXLibEPANET, 'MSXgetcount', code, count);
         end
         function [Errcode, index] = apiMSXgetindex(varargin)
+            % Retrieves the internal index number of an MSX object given its name.
+            %
+            % apiMSXgetindex(varargin)
+            %
+            % Parameters:
+            % type     type of object being sought and must be one of the following pre-defined constants:
+            %                MSX_SPECIES (for a chemical species).
+            %                MSX_CONSTANT (for a reaction constant).
+            %                MSX_PARAMETER (for a reaction parameter).
+            %                MSX_PATTERN (for a time pattern).
+            % name     string containing the object’s ID name
+            % index    sequence number (starting from 1) of the object in the order it was listed in
+            %          the MSX input file
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             index =0;
             if ~isnumeric(varargin{1})
                 varargin{1}=varargin{2};
@@ -2775,15 +2825,63 @@ classdef epanet <handle
             [Errcode, ~, index]=calllib(MSXLibEPANET, 'MSXgetindex', varargin{1}, varargin{2}, index);
         end
         function [Errcode, id] = apiMSXgetID(type, index, len, MSXLibEPANET)
+              % Retrieves the ID name of an object given its internal index number.
+              %
+              % apiMSXgetID(type, i ndex, len, MSXLibEPANET)
+              %
+              % Parameters:
+              % type           type of object being sought and must be one of the following pre-defined constants:
+              %                     MSX_SPECIES (for a chemical species).
+              %                     MSX_CONSTANT (for a reaction constant).
+              %                     MSX_PARAMETER (for a reaction parameter).
+              %                     MSX_PATTERN (for a time pattern).
+              % index          the sequence number of the object (starting from 1 as listed in the MSX input file)
+              % len            the maximum number of characters that id can hold, not counting the null termination character
+              % MSXLibEPANET   MSX epanet library DLL name.
+              %
+              % Returns:
+              % an error code.
+              % id object’s ID name.
               id=char(32*ones(1, len+1));
               [Errcode, id]=calllib(MSXLibEPANET, 'MSXgetID', type, index, id, len);
               id=id(1:len);
-              end
+        end
         function [Errcode, len] = apiMSXgetIDlen(type, index, MSXLibEPANET)
+              % Retrieves the number of characters in the ID name of an MSX object given its internal index number.
+              %
+              % apiMSXgetIDlen(type, index, MSXLibEPANET)
+              %
+              % Parameters:
+              % type           type of object being sought and must be one of the following pre-defined constants:
+              %                     MSX_SPECIES (for a chemical species).
+              %                     MSX_CONSTANT (for a reaction constant).
+              %                     MSX_PARAMETER (for a reaction parameter).
+              %                     MSX_PATTERN (for a time pattern).
+              % index          the sequence number of the object (starting from 1 as listed in the MSX inputfile).
+              % MSXLibEPANET   MSX epanet library DLL name.
+              %
+              % Returns:
+              % an error code.
               len=0;
               [Errcode, len]=calllib(MSXLibEPANET, 'MSXgetIDlen', type, index, len);
         end
         function [Errcode, type, units, atol, rtol] = apiMSXgetspecies(index, MSXLibEPANET)
+            % Retrieves the attributes of a chemical species given its internal index number.
+            %
+            % apiMSXgetspecies(index, MSXLibEPANET)
+            %
+            % Parameters:
+            % index          sequence number of the species (starting from 1 as listed in the MSX input file).
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % type      is returned with one of the following pre-defined constants:
+            %                 MSX_BULK (defined as 0) for a bulk water species,
+            %                 MSX_WALL (defined as 1) for a pipe wall surface species.
+            % units     mass units that were defined for the species in question.
+            % atol      the absolute concentration tolerance defined for the species (inconcentration units).
+            % rtol      the relative concentration tolerance defined for the species.
             type=0; rtol=0; atol=0;
             units=char(32*ones(1, 16));
             [Errcode, type, units, atol, rtol]=calllib(MSXLibEPANET, 'MSXgetspecies', index, type, units, atol, rtol);
@@ -2795,26 +2893,114 @@ classdef epanet <handle
             end
         end
         function [Errcode, value] = apiMSXgetconstant(index, MSXLibEPANET)
+            % Retrieves the value of a particular reaction constant.
+            %
+            % apiMSXgetconstant(index, MSXLibEPANET)
+            %
+            % Parameters:
+            % index         is the sequence number of the reaction constant (starting from 1) as it
+            %               appeared in the MSX input file.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % value the value assigned to the constant.
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetconstant', index, value);
         end
         function [Errcode, value] = apiMSXgetparameter(type, index, param, MSXLibEPANET)
+            % Retrieves the value of a particular reaction parameter for a given pipe
+            % or tank within the pipe network.
+            %
+            % apiMSXgetparameter(type, index, param, MSXLibEPANET)
+            %
+            % Parameters:
+            % type          is type of object being queried and must be either:
+            %                   MSX_NODE (defined as 0) for a node
+            %                   MSX_LINK (defined as 1) for a link;
+            % index         is the internal sequence number (starting from 1) assigned to the node or link;
+            % param         the sequence number of the parameter (starting from 1 as listed in the MSX input file).
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % value the value assigned to the parameter for the node or link of interest.
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetparameter', type, index, param, value);
         end
         function [Errcode, patlen] = apiMSXgetpatternlen(patindex, MSXLibEPANET)
+            % Retrieves the number of time periods within a source time pattern.
+            %
+            % apiMSXgetpatternlen(patindex, MSXLibEPANET)
+            %
+            % Parameters:
+            % patindex      the internal sequence number (starting from 1) of the pattern as it appears in the MSX input file.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % patlen   the number of time periods (and therefore number of multipliers) that appear in the pattern.
             patlen=0;
             [Errcode, patlen]=calllib(MSXLibEPANET, 'MSXgetpatternlen', patindex, patlen);
         end
         function [Errcode, value] = apiMSXgetpatternvalue(patindex, period, MSXLibEPANET)
+            % Retrieves the multiplier at a specific time period for a given source time pattern.
+            %
+            % apiMSXgetpatternvalue(patindex, period, MSXLibEPANET)
+            %
+            % Parameters:
+            % patindex      the internal sequence number (starting from 1) of the pattern as it appears in the MSX input file.
+            % period        the index of the time period (starting from 1) whose multiplier is being sought.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % value   the value of the pattern’s multiplier in the desired period.
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetpatternvalue', patindex, period, value);
         end
         function [Errcode, value] = apiMSXgetinitqual(type, index, species, MSXLibEPANET)
+            % Retrieves the initial concentration of a particular chemical species assigned to a specific
+            % node or link of the pipe network.
+            %
+            % apiMSXgetinitqual(type, index, species, MSXLibEPANET)
+            %
+            % Parameters:
+            % type          type of object being queried and must be either:
+            %                    MSX_NODE (defined as 0) for a node,
+            %                    MSX_LINK (defined as 1) for a link.
+            % index         the internal sequence number (starting from 1) assigned to the node or link.
+            % species       the sequence number of the species (starting from 1).
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % value the initial concentration of the species at the node or link of interest.
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetinitqual', type, index, species, value);
         end
         function [Errcode, type, level, pat] = apiMSXgetsource(node, species, MSXLibEPANET)
+            % Retrieves information on any external source of a particular chemical species assigned to a
+            % specific node of the pipe network.
+            %
+            % apiMSXgetsource(node, species, MSXLibEPANET)
+            %
+            % Parameters:
+            % node          the internal sequence number (starting from 1) assigned to the node of interest.
+            % species       the sequence number of the species of interest (starting from 1 as listed in the MSX input file).
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % type  the type of external source and will be one of the following predefined constants:
+            %            MSX_NOSOURCE (defined as -1) for no source,
+            %            MSX_CONCEN (defined as 0) for a concentration source,
+            %            MSX_MASS (defined as 1) for a mass booster source,
+            %            MSX_SETPOINT (defined as 2) for a setpoint source,
+            %            MSX_FLOWPACED (defined as 3) for a flow paced source.
+            % level the baseline concentration (or mass flow rate) of the source.
+            % pat   the index of the time pattern used to add variability to the source’s
+            %       baseline level (and will be 0 if no pattern was defined for the source).
             type=0;
             level=0;
             pat=0;
@@ -2842,39 +3028,182 @@ classdef epanet <handle
             end
         end
         function [Errcode] = apiMSXsaveoutfile(outfname, MSXLibEPANET)
+            % Saves water quality results computed for each node, link and reporting time period to a
+            % named binary file.
+            %
+            % apiMSXsaveoutfile(outfname, MSXLibEPANET)
+            %
+            % Parameters:
+            % outfname       name of the permanent output results file.
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode] = calllib(MSXLibEPANET, 'MSXsaveoutfile', outfname);
         end
         function [Errcode] = apiMSXsavemsxfile(msxname, MSXLibEPANET)
+            % Saves the data associated with the current MSX project into a new MSX input file.
+            %
+            % apiMSXsavemsxfile(msxname, MSXLibEPANET)
+            %
+            % Parameters:
+            % msxname        name of the file to which data are saved.
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode] = calllib(MSXLibEPANET, 'MSXsavemsxfile', msxname);
         end
         function [Errcode] = apiMSXsetconstant(index, value, MSXLibEPANET)
+            % Assigns a new value to a specific reaction constant.
+            %
+            % apiMSXgeterror(Errcode, MSXLibEPANET)
+            %
+            % Parameters:
+            % index         the sequence number of the reaction constant (starting from 1) as it appeared in the MSX input file.
+            % value         the new value to be assigned to the constant.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetconstant', index, value);
         end
         function [Errcode] = apiMSXsetparameter(type, index, param, value, MSXLibEPANET)
+            % Assigns a value to a particular reaction parameter for a given pipe or tank within the pipe network.
+            %
+            % apiMSXsetparameter(type, index, param, value, MSXLibEPANET)
+            %
+            % Parameters:
+            % type          type of object being queried and must be either:
+            %                     MSX_NODE (defined as 0) for a node,
+            %                     MSX_LINK (defined as 1) for a link.
+            % index         the internal sequence number (starting from 1) assigned to the node or link.
+            % param         the sequence number of the parameter (starting from 1 as listed in the MSX input file).
+            % value         the value to be assigned to the parameter for the node or link of interest.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetparameter', type, index, param, value);
         end
         function [Errcode] = apiMSXsetinitqual(type, index, species, value, MSXLibEPANET)
+            % Assigns an initial concentration of a particular chemical species to a specific
+            % node or link of the pipe network.
+            %
+            % apiMSXsetinitqual(type, index, species, value, MSXLibEPANET)
+            %
+            % Parameters:
+            % type          type of object being queried and must be either:
+            %                     MSX_NODE (defined as 0) for a node,
+            %                     MSX_LINK (defined as 1) for a link.
+            % index         the internal sequence number (starting from 1) assigned to the node or link.
+            % species       the sequence number of the species (starting from 1 as listed in the MSX input file).
+            % value         the initial concentration of the species to be applied at the node or link of interest.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetinitqual', type, index, species, value);
         end
         function [Errcode] = apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET)
+            % Assigns a new set of multipliers to a given MSX source time pattern.
+            %
+            % apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET)
+            %
+            % Parameters:
+            % index         the internal sequence number (starting from 1) of the pattern as it appears in the
+            %               MSX input file;
+            % factors       array of multiplier values to replace those previously used by the pattern.
+            % nfactors       the number of entries int the multiplier vector factors.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetpattern', index, factors, nfactors);
         end
         function [Errcode] = apiMSXsetpatternvalue(pat, period, value, MSXLibEPANET)
+            % Assigns a new value to the multiplier for a specific time period in a given MSX source time pattern.
+            %
+            % apiMSXsetpatternvalue(pat, period, value, MSXLibEPANET)
+            %
+            % Parameters:
+            % pat           the internal sequence number (starting from 1) of the pattern as it appears in the
+            %               MSX input file
+            % period        the time period (starting from 1) in the pattern to be replaced.
+            % value         the new multiplier value to use for that time period.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetpatternvalue', pat, period, value);
             end
         function [Errcode] = apiMSXsolveQ(MSXLibEPANET)
+            % Solves for water quality over the entire simulation period and saves the results to an internal
+            % scratch file.
+            %
+            % apiMSXsolveQ(MSXLibEPANET)
+            %
+            % Parameters:
+            %
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsolveQ');
         end
         function [Errcode] = apiMSXsolveH(MSXLibEPANET)
+            % Solves for system hydraulics over the entire simulation period saving results
+            % to an internal scratch file.
+            %
+            % apiMSXsolveH(MSXLibEPANET)
+            %
+            % Parameters:
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsolveH');
         end
         function [Errcode] = apiMSXaddpattern(patid, MSXLibEPANET)
+            % Adds a new, empty MSX source time pattern to an MSX project.
+            %
+            % apiMSXaddpattern(patid, MSXLibEPANET)
+            %
+            % Parameters:
+            % patid         the name of the new pattern.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXaddpattern', patid);
         end
         function [Errcode] = apiMSXusehydfile(hydfname, MSXLibEPANET)
+            % Uses a previously saved EPANET hydraulics file as the source of hydraulic information.
+            %
+            %apiMSXusehydfile(hydfname, MSXLibEPANET)
+            %
+            % Parameters:
+            %
+            % hydfname       name of a previously saved hydraulics file for the system being analyzed.
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXusehydfile', hydfname);
         end
         function [Errcode, t, tleft] = apiMSXstep(MSXLibEPANET)
+            % Advances the water quality solution through a single water quality time step when
+            % performing a step-wise simulation.
+            %
+            % apiMSXstep(MSXLibEPANET)
+            %
+            % Parameters:
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % t      current simulation time at the end of the step (in seconds).
+            % tleft  time left in the simulation (also in seconds).
             t=int32(0);
             tleft=int32(0);
             [Errcode, t, tleft]=calllib(MSXLibEPANET, 'MSXstep', t, tleft);
@@ -2882,12 +3211,43 @@ classdef epanet <handle
             tleft = double(tleft);
         end
         function [Errcode] = apiMSXinit(flag, MSXLibEPANET)
+            % Initialize the MSX system before solving for water quality results in step-wise fashion.
+            %
+            % apiMSXinit(flag, MSXLibEPANET)
+            %
+            % Parameters:
+            % flag           Set Flag to 1 if water quality results should be saved to a scratch binary file, or to 0
+            %                if results are not saved to file.
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXinit', flag);
         end
         function [Errcode] = apiMSXreport(MSXLibEPANET)
+            % Writes water quality simulations results as instructed by the MSX input file to a text file.
+            %
+            % apiMSXreport(MSXLibEPANET)
+            %
+            % Parameters:
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode] = calllib(MSXLibEPANET, 'MSXreport');
         end
         function [e, errmsg] = apiMSXgeterror(Errcode, MSXLibEPANET)
+            % Returns the text for an error message given its error code.
+            %
+            % apiMSXgeterror(Errcode, MSXLibEPANET)
+            %
+            % Parameters:
+            % Errcode       the code number of an error condition generated by EPANET-MSX.
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % e         an error code.
+            % errmsg    the text of the error message corresponding to the error code.
             errmsg = char(32*ones(1, 80));
             [e, errmsg] = calllib(MSXLibEPANET, 'MSXgeterror', Errcode, errmsg, 80);
             if e
@@ -2895,10 +3255,47 @@ classdef epanet <handle
             end
         end
         function [Errcode, value] = apiMSXgetqual(type, index, species, MSXLibEPANET)
+            % Retrieves a chemical species concentration at a given node or the average concentration
+            % along a link at the current simulation time step.
+            %
+            % apiMSXgetqual(type, index, species, MSXLibEPANET)
+            %
+            % Parameters:
+            % type          type of object being queried and must be either:
+            %                    MSX_NODE (defined as 0) for a node,
+            %                    MSX_LINK (defined as 1) for a link.
+            % index         the internal sequence number (starting from 1) assigned to the node or link.
+            % species       is the sequence number of the species (starting from 1 as listed in the MSX input file).
+            % MSXLibEPANET  MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % value the computed concentration of the species at the current time period.
             value=0;
             [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetqual', type, index, species, value);
         end
         function [Errcode] = apiMSXsetsource(node, species, type, level, pat, MSXLibEPANET)
+            % Sets the attributes of an external source of a particular chemical species to a specific node of
+            % the pipe network.
+            %
+            % apiMSXsetsource(node, species, type, level, pat, MSXLibEPANET)
+            %
+            % Parameters:
+            % node           the internal sequence number (starting from 1) assigned to the node of interest.
+            % species        the sequence number of the species of interest (starting from 1 as listed in the MSX input file);
+            % type           the type of external source to be utilized and will be one of the following predefined constants:
+            %                     MSX_NOSOURCE (defined as -1) for no source,
+            %                     MSX_CONCEN (defined as 0) for a concentration source,
+            %                     MSX_MASS (defined as 1) for a mass booster source,
+            %                     MSX_SETPOINT (defined as 2) for a setpoint source,
+            %                     MSX_FLOWPACED (defined as 3) for a flow paced source;
+            % level          the baseline concentration (or mass flow rate) of the source.
+            % pat            the index of the time pattern used to add variability to the source’s baseline level
+            %                (use 0 if the source has a constant strength).
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetsource', node, species, type, level, pat);
         end
     end
