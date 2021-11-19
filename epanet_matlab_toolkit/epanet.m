@@ -603,13 +603,17 @@ classdef epanet <handle
                 if  strcmpi(connLinkMat{i,1},id)
                     count = count + 1;
                     linkMat(count) = connLinkMat(i,2);
-                    typeMat(count) = linkTypeMat(i);
-                    linkIndices(count) = i;
+                    linktypeMat(count) = linkTypeMat(i);
+                    linknodeIndex(count) = obj.getNodeIndex(linkMat(count));
+                    linknodeIndices(count) = i;
+                    choiceMat(count) = 1;
                 elseif strcmpi(connLinkMat{i,2},id)
                     count = count + 1;
                     linkMat(count) = connLinkMat(i,1);
-                    typeMat(count) = linkTypeMat(i);
-                    linkIndices(count) = i;
+                    linktypeMat(count) = linkTypeMat(i);
+                    linknodeIndex(count) = obj.getNodeIndex(linkMat(count));
+                    linknodeIndices(count) = i;
+                    choiceMat(count) = 2;
                 end
             end
             % Delete the node to be replaced
@@ -627,33 +631,33 @@ classdef epanet <handle
             end
             % Add the deleted links with the newIndex
             count = 1;
-            for  i = linkMat
-                newlinkID = [id, i{1}];
-                lType = ['EN_', typeMat{count}];
+            for i = linkMat
+                linkId = ['L_',id,i{1}];
+                lType = ['EN_', linktypeMat{count}];
                 % Add a link
                 % Check which node x coordinate is smaller to set it as the
                 % start
-                if nodeCoords(1) <= obj.getNodeCoordinates{1}(linkIndices(count))
-                    lindex = obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET);
+                if  choiceMat(count) == 1
+                    lindex = obj.apiENaddlink(linkId, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET);
                 else
-                    lindex = obj.apiENaddlink(newlinkID, obj.ToolkitConstants.(lType), i{1}, id, obj.LibEPANET);
+                    lindex = obj.apiENaddlink(linkId, obj.ToolkitConstants.(lType), i{1}, id, obj.LibEPANET);
                 end
                 % add attributes to the new links
-                obj.setLinkLength(lindex, lInfo.LinkLength(linkIndices(count)));
-                obj.setLinkDiameter(lindex, lInfo.LinkDiameter(linkIndices(count)));
-                obj.setLinkRoughnessCoeff(lindex, lInfo.LinkRoughnessCoeff(linkIndices(count)));
-                if lInfo.LinkMinorLossCoeff(linkIndices(count))~= 0
-                    obj.setLinkMinorLossCoeff(lindex, lInfo.LinkMinorLossCoeff(linkIndices(count)));
+                obj.setLinkLength(lindex, lInfo.LinkLength(linknodeIndices(count)));
+                obj.setLinkDiameter(lindex, lInfo.LinkDiameter(linknodeIndices(count)));
+                obj.setLinkRoughnessCoeff(lindex, lInfo.LinkRoughnessCoeff(linknodeIndices(count)));
+                if lInfo.LinkMinorLossCoeff(linknodeIndices(count))~= 0
+                    obj.setLinkMinorLossCoeff(lindex, lInfo.LinkMinorLossCoeff(linknodeIndices(count)));
                 end
-                obj.setLinkInitialStatus(lindex,lInfo.LinkInitialStatus(linkIndices(count)));
-                obj.setLinkInitialSetting(lindex,lInfo.LinkInitialSetting(linkIndices(count)));
-                obj.setLinkBulkReactionCoeff(lindex,lInfo.LinkBulkReactionCoeff(linkIndices(count)));
-                obj.setLinkWallReactionCoeff(lindex,lInfo.LinkWallReactionCoeff(linkIndices(count)));
-                if (~isempty(vertCoords{linkIndices(count)}))
-                    % Add vertices for neighbour nodes
-                    xCoord = vertCoords{linkIndices(count)}.x;
-                    yCoord = vertCoords{linkIndices(count)}.y;
-                    setLinkVertices(obj, newlinkID, xCoord, yCoord);
+                obj.setLinkInitialStatus(lindex,lInfo.LinkInitialStatus(linknodeIndices(count)));
+                obj.setLinkInitialSetting(lindex,lInfo.LinkInitialSetting(linknodeIndices(count)));
+                obj.setLinkBulkReactionCoeff(lindex,lInfo.LinkBulkReactionCoeff(linknodeIndices(count)));
+                obj.setLinkWallReactionCoeff(lindex,lInfo.LinkWallReactionCoeff(linknodeIndices(count)));
+                if (~isempty(vertCoords{linknodeIndices(count)}))
+                    % Add vertices with neighbour nodes
+                    xCoord = vertCoords{linknodeIndices(count)}.x;
+                    yCoord = vertCoords{linknodeIndices(count)}.y; 
+                    setLinkVertices(obj, linkId, xCoord, yCoord);
                 end
                 count = count + 1;
             end
@@ -2643,7 +2647,7 @@ classdef epanet <handle
             %
             % Parameters:
             % index      a node's index.
-            % paramcode  the property to retrieve (see EN_NodeProperty).
+            % paramcode  the property to retrieve (see EN_NodeProperty, d.getToolkitConstants).
             % LibEPANET  epanet library DLL name.
             %
             % Returns:
@@ -3355,11 +3359,11 @@ classdef epanet <handle
                 end
             end
             if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
-                [~, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-%                 if isempty(pwdDLL)
-%                     pwdDLL = pwd;
-%                 end
-%                 obj.LibEPANETpath = [pwdDLL, '/'];
+                [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+                 if isempty(pwdDLL)
+                    pwdDLL = pwd;
+                end
+                obj.LibEPANETpath = [pwdDLL, '\'];
                 try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
                 catch
                    obj.Errcode=-1;
@@ -10648,7 +10652,7 @@ classdef epanet <handle
             %          setNodeTankCanOverFlow, setNodeTankDiameter, setNodeTankData.
             set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, value, varargin)
         end
-        function setNodeTypeReservoir(obj, id)
+        function index = setNodeTypeReservoir(obj, id)
             % Transforms a node to RESERVOIR
             % The new node keeps the id,coordinates and elevation of the
             % deleted one
@@ -10662,9 +10666,9 @@ classdef epanet <handle
             if (obj.getNodeTypeIndex(nodeIndex) == 1)
               warning('The current node is already a reservoir')
             end
-            obj.change_node_type(id, 1)
+            index = obj.change_node_type(id, 1);
         end
-        function setNodeTypeTank(obj, id)
+        function index = setNodeTypeTank(obj, id)
             % Transforms a node to TANK
             % The new node keeps the id,coordinates and elevation of the
             % deleted one
@@ -10678,9 +10682,9 @@ classdef epanet <handle
             if (obj.getNodeTypeIndex(nodeIndex) == 2)
               warning('The current node is already a tank')
             end
-            obj.change_node_type(id, 2)
+            index = obj.change_node_type(id, 2);
         end
-        function setNodeTypeJunction(obj, id)
+        function index = setNodeTypeJunction(obj, id)
             % Transforms a node to JUNCTION
             % The new node keeps the id,coordinates and elevation of the
             % deleted one
@@ -10694,7 +10698,7 @@ classdef epanet <handle
             if (obj.getNodeTypeIndex(nodeIndex) == 0)
               warning('The current node is already a junction')
             end
-            obj.change_node_type(id, 0)
+            index = obj.change_node_type(id, 0);
         end
         function setNodeSourceQuality(obj, value, varargin)
             % Sets the values of quality source strength.
@@ -16630,7 +16634,7 @@ classdef epanet <handle
             % theta: angle in degrees to rotate the network counter-clockwise
             % indexRot: index of the node/point to be rotated. If  it's not
             % provided then the first index node is used as pivot.
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
             %Example 1:
             %  Rotate the network by 60 degrees counter-clockwise around
             %  the index 1 node.
@@ -20540,7 +20544,7 @@ function [axesid] = plotnet(obj, varargin)
                      colornode = 'r';
                  end
                  h(:, 3)=plot((x1+x2)/2, (y1+y2)/2, 'k*', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
-                     'MarkerFaceColor', colornode, 'MarkerSize', 7, 'Parent', axesid);
+                     'MarkerFaceColor', colornode, 'MarkerSize', 10, 'Parent', axesid);
                  if ~l(3), legendIndices = [legendIndices 3]; l(3)=1; end
              end
 
