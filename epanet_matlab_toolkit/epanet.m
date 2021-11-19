@@ -10650,6 +10650,8 @@ classdef epanet <handle
         end
         function setNodeTypeReservoir(obj, id)
             % Transforms a node to RESERVOIR
+            % The new node keeps the id,coordinates and elevation of the
+            % deleted one
             %
             % Example 1:
             %   d = epanet('Net1.inp');
@@ -10663,7 +10665,9 @@ classdef epanet <handle
             obj.change_node_type(id, 1)
         end
         function setNodeTypeTank(obj, id)
-            % Transforms a node to RESERVOIR
+            % Transforms a node to TANK
+            % The new node keeps the id,coordinates and elevation of the
+            % deleted one
             %
             % Example 1:
             %   d = epanet('Net1.inp');
@@ -10677,7 +10681,9 @@ classdef epanet <handle
             obj.change_node_type(id, 2)
         end
         function setNodeTypeJunction(obj, id)
-            % Transforms a node to RESERVOIR
+            % Transforms a node to JUNCTION
+            % The new node keeps the id,coordinates and elevation of the
+            % deleted one
             %
             % Example 1:
             %   d = epanet('Net1.inp');
