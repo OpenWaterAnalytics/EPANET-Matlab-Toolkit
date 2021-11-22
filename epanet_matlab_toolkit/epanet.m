@@ -2379,7 +2379,7 @@ classdef epanet <handle
             %
             % Parameters:
             % linkid        The ID name of the link to be added.
-            % linktype      The type of link being added (see obj.LinkType).
+            % linktype      The type of link being added (see EN_LinkType, obj.LinkType).
             % fromnode      The ID name of the link's starting node.
             % tonode        The ID name of the link's ending node.
             % LibEPANET     epanet library DLL name.
