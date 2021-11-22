@@ -656,11 +656,17 @@ classdef epanet <handle
                 if (~isempty(vertCoords{linknodeIndices(count)}))
                     % Add vertices with neighbour nodes
                     xCoord = vertCoords{linknodeIndices(count)}.x;
-                    yCoord = vertCoords{linknodeIndices(count)}.y; 
+                    yCoord = vertCoords{linknodeIndices(count)}.y;
                     setLinkVertices(obj, linkId, xCoord, yCoord);
                 end
                 count = count + 1;
             end
+        end
+        function value_unc = add_unc(~, ext, unc)
+            % Add uncertainty (unc) to the parameter ext
+            ql=ext-unc*ext;
+            qu=ext+unc*ext;
+            value_unc=ql+rand(1,length(ext)).*(qu-ql);
         end
     end
     methods (Static)
@@ -1827,7 +1833,7 @@ classdef epanet <handle
             %
             % Parameters:
             % indexLink     a link's index (starting from 1).
-            % paramcode     the new type to change the link to (see LinkType).
+            % paramcode     the new type to change the link to (see obj.LinkType).
             % actionCode    the action taken if any controls contain the link.
             % LibEPANET     epanet library DLL name.
             %
@@ -1844,7 +1850,7 @@ classdef epanet <handle
             %
             % Parameters:
             % index      a node's index (starting from 1).
-            % paramcode  the property to set (see EN_NodeProperty).
+            % paramcode  the property to set (see EN_NodeProperty, obj.getToolkitConstants).
             % value      the new value for the property.
             % LibEPANET  epanet library DLL name.
             %
@@ -1926,7 +1932,7 @@ classdef epanet <handle
             % apiENsetqualtype(qualcode, chemname, chemunits, tracenode, LibEPANET)
             %
             % Parameters:
-            % qualcode    the type of analysis to run (see obj.QualityType).
+            % qualcode    the type of analysis to run (see EN_QualityType, obj.QualityType).
             % chemname    the name of the quality constituent.
             % chemunits   the concentration units of the constituent.
             % tracenode   a type of analysis option (see apiENOption).
@@ -2373,7 +2379,7 @@ classdef epanet <handle
             %
             % Parameters:
             % linkid        The ID name of the link to be added.
-            % linktype      The type of link being added (see LinkType).
+            % linktype      The type of link being added (see obj.LinkType).
             % fromnode      The ID name of the link's starting node.
             % tonode        The ID name of the link's ending node.
             % LibEPANET     epanet library DLL name.
@@ -2495,7 +2501,7 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
-          [Errcode]=calllib(LibEPANET, 'ENsetdemandmodel', type, pmin, preq, pexp);
+            [Errcode]=calllib(LibEPANET, 'ENsetdemandmodel', type, pmin, preq, pexp);
         end
         function [Errcode] = apiENsetdemandname(node_index, demand_index, demand_name, LibEPANET)
             % Assigns a name to a node's demand category.
@@ -2529,8 +2535,8 @@ classdef epanet <handle
             % an error code.
             % demand_name  The name of the selected category.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
-          demand_name = char(32*ones(1, 31));
-          [Errcode, demand_name]=calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
+            demand_name = char(32*ones(1, 31));
+            [Errcode, demand_name]=calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
         end
         function [Errcode, line1, line2, line3] = apiENgettitle(LibEPANET)
             % Retrieves the title lines of the project.
@@ -2647,7 +2653,7 @@ classdef epanet <handle
             %
             % Parameters:
             % index      a node's index.
-            % paramcode  the property to retrieve (see EN_NodeProperty, d.getToolkitConstants).
+            % paramcode  the property to retrieve (see EN_NodeProperty, obj.getToolkitConstants).
             % LibEPANET  epanet library DLL name.
             %
             % Returns:
@@ -2829,45 +2835,45 @@ classdef epanet <handle
             [Errcode, ~, index]=calllib(MSXLibEPANET, 'MSXgetindex', varargin{1}, varargin{2}, index);
         end
         function [Errcode, id] = apiMSXgetID(type, index, len, MSXLibEPANET)
-              % Retrieves the ID name of an object given its internal index number.
-              %
-              % apiMSXgetID(type, i ndex, len, MSXLibEPANET)
-              %
-              % Parameters:
-              % type           type of object being sought and must be one of the following pre-defined constants:
-              %                     MSX_SPECIES (for a chemical species).
-              %                     MSX_CONSTANT (for a reaction constant).
-              %                     MSX_PARAMETER (for a reaction parameter).
-              %                     MSX_PATTERN (for a time pattern).
-              % index          the sequence number of the object (starting from 1 as listed in the MSX input file)
-              % len            the maximum number of characters that id can hold, not counting the null termination character
-              % MSXLibEPANET   MSX epanet library DLL name.
-              %
-              % Returns:
-              % an error code.
-              % id object’s ID name.
-              id=char(32*ones(1, len+1));
-              [Errcode, id]=calllib(MSXLibEPANET, 'MSXgetID', type, index, id, len);
-              id=id(1:len);
+            % Retrieves the ID name of an object given its internal index number.
+            %
+            % apiMSXgetID(type, i ndex, len, MSXLibEPANET)
+            %
+            % Parameters:
+            % type           type of object being sought and must be one of the following pre-defined constants:
+            %                     MSX_SPECIES (for a chemical species).
+            %                     MSX_CONSTANT (for a reaction constant).
+            %                     MSX_PARAMETER (for a reaction parameter).
+            %                     MSX_PATTERN (for a time pattern).
+            % index          the sequence number of the object (starting from 1 as listed in the MSX input file)
+            % len            the maximum number of characters that id can hold, not counting the null termination character
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % id object’s ID name.
+            id=char(32*ones(1, len+1));
+            [Errcode, id]=calllib(MSXLibEPANET, 'MSXgetID', type, index, id, len);
+            id=id(1:len);
         end
         function [Errcode, len] = apiMSXgetIDlen(type, index, MSXLibEPANET)
-              % Retrieves the number of characters in the ID name of an MSX object given its internal index number.
-              %
-              % apiMSXgetIDlen(type, index, MSXLibEPANET)
-              %
-              % Parameters:
-              % type           type of object being sought and must be one of the following pre-defined constants:
-              %                     MSX_SPECIES (for a chemical species).
-              %                     MSX_CONSTANT (for a reaction constant).
-              %                     MSX_PARAMETER (for a reaction parameter).
-              %                     MSX_PATTERN (for a time pattern).
-              % index          the sequence number of the object (starting from 1 as listed in the MSX inputfile).
-              % MSXLibEPANET   MSX epanet library DLL name.
-              %
-              % Returns:
-              % an error code.
-              len=0;
-              [Errcode, len]=calllib(MSXLibEPANET, 'MSXgetIDlen', type, index, len);
+            % Retrieves the number of characters in the ID name of an MSX object given its internal index number.
+            %
+            % apiMSXgetIDlen(type, index, MSXLibEPANET)
+            %
+            % Parameters:
+            % type           type of object being sought and must be one of the following pre-defined constants:
+            %                     MSX_SPECIES (for a chemical species).
+            %                     MSX_CONSTANT (for a reaction constant).
+            %                     MSX_PARAMETER (for a reaction parameter).
+            %                     MSX_PATTERN (for a time pattern).
+            % index          the sequence number of the object (starting from 1 as listed in the MSX inputfile).
+            % MSXLibEPANET   MSX epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            len=0;
+            [Errcode, len]=calllib(MSXLibEPANET, 'MSXgetIDlen', type, index, len);
         end
         function [Errcode, type, units, atol, rtol] = apiMSXgetspecies(index, MSXLibEPANET)
             % Retrieves the attributes of a chemical species given its internal index number.
@@ -16698,8 +16704,112 @@ classdef epanet <handle
                     end
                 end
             end
-         end
+        end
+        function ContQual = appCreateMultipleScenarios(obj, varargin)
+            % Creates scenarios based on node count of inp file EPANET.
+            %  Load a network.
+            %  Create scenario parameters.
+            %  Create Multiple Scenarios.
+            %  Set quality type.
+            %  Run Scenarios.
+            %  Get computed quality time series.
+            %
+            % Example 1
+            % Create Multiple scenarios with default parameters for Net1.inp
+            %  d = epanet('Net1.inp');
+            %  ContQual = d.appCreateMultipleScenarios();
+            %  figure
+            %  plot(ContQual{6})
+            %  title({['Scenario: ', num2str(6)], ['Contaminant at node ID: ', d.getNodeNameID{6}]})
+            %  xlabel('Time (hrs)')
+            %  ylabel('Quality (mg/L)')
+            %
+            % Example 2
+            % Create Multiple scenarios using all the input parameters and an uncertainty value
+            % of 0.2, for Net1.inp
+            %  d = epanet('Net1.inp');
+            %  ContQual = d.appCreateMultipleScenarios('SimulationTime', 72, 'QualityType', 'g/L', ...
+            %               'SourceInjectionRate', 0.005, 'SourcesInjectionTimes', [3 25], 'Uncertainty', 0.2);
+            %  figure
+            %  plot(ContQual{6})
+            %  title({['Scenario: ', num2str(6)], ['Contaminant at node ID: ', d.getNodeNameID{6}]})
+            %  xlabel('Time (hrs)')
+            %  ylabel('Quality (g/L)')
 
+            % Initialize scenario parameters with default values.
+            SimulationTime = 48; % in hrs
+            qunc=0.05; %Uncertainty
+            obj.setQualityType('chem','mg/L') % Quality type
+            SourceInjectionRate = 10; %mg/L for CONTAMINANT
+            SourcesInjectionTimes=[5 20]; %from...to in hours
+            for i=1:(nargin/2)
+                argument =lower(varargin{2*(i-1)+1});
+                switch argument
+                    case 'simulationtime' % in hrs
+                        SimulationTime = varargin{2*i};
+                    case 'qualitytype'
+                        obj.setQualityType('chem',varargin{2*i});
+                    case 'sourceinjectionrate' % based on quality type
+                        SourceInjectionRate = varargin{2*i};
+                    case 'sourcesinjectiontimes' % from...to in hours
+                        if length(varargin{2*i}) ~= 2
+                            error ('SourcesInjectionTimes must contain 2 values');
+                        end
+                        SourcesInjectionTimes = varargin{2*i};
+                    case 'uncertainty'
+                        qunc = varargin{2*i};
+                    otherwise
+                        error('Invalid property founobj.');
+                end
+            end
+            % Add time parameters
+            obj.setTimeSimulationDuration(SimulationTime*3600);
+            PatternTimeStep = obj.TimePatternStep;
+            % Create a scenario for each node of the net
+            for n = 1:obj.getNodeCount
+                Diameters = obj.add_unc(obj.LinkDiameter, qunc);
+                Lengths = obj.add_unc(obj.LinkLength, qunc);
+                Roughness = obj.add_unc(obj.LinkRoughnessCoeff, qunc);
+                Elevation = obj.add_unc(obj.NodeElevations, qunc);
+                BaseDemand = obj.add_unc(obj.NodeBaseDemands{1}, qunc);
+                tmpPat = obj.Pattern;
+                for i = 1:size(tmpPat, 1)
+                    Pattern = obj.add_unc(tmpPat(i, :), qunc);
+                end
+                obj.setLinkDiameter(Diameters)
+                obj.setLinkLength(Lengths)
+                obj.setLinkRoughnessCoeff(Roughness)
+                obj.setNodeElevations(Elevation)
+                obj.setNodeBaseDemands({BaseDemand})
+                obj.setPatternMatrix(Pattern)
+                obj.setTimeQualityStep(PatternTimeStep);
+                zeroNodes=zeros(1,obj.NodeCount);
+                obj.setNodeInitialQuality(zeroNodes);
+                obj.setLinkBulkReactionCoeff(zeros(1,obj.LinkCount));
+                obj.setLinkWallReactionCoeff(zeros(1,obj.LinkCount));
+                patlen=(SimulationTime)*3600/PatternTimeStep;
+                % Add pattern
+                tmppat=zeros(1,patlen);
+                tmpstartstep=SourcesInjectionTimes(1);
+                tmpendstep=SourcesInjectionTimes(2);
+                tmppat(tmpstartstep:tmpendstep)=1;
+                tmp1=obj.addPattern('CONTAMINANT',tmppat);
+                tmpinjloc=n; %index of node
+                tmp2=zeroNodes;
+                if tmpinjloc~=0
+                    tmp2(tmpinjloc)=tmp1;
+                    nd_index = find(tmp2, 1);
+                    obj.setNodeSourceType(nd_index, 'SETPOINT');
+                    obj.setNodeSourcePatternIndex(tmp2);
+                    tmp2 = zeroNodes;
+                    tmp2(tmpinjloc)=SourceInjectionRate;
+                    obj.setNodeSourceQuality(tmp2)
+                end
+                % Get computed quality time series.
+                res = obj.getComputedQualityTimeSeries;
+                ContQual{n}= res.NodeQuality;
+            end
+        end
     end
 end
 
