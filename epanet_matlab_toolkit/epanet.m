@@ -668,6 +668,116 @@ classdef epanet <handle
             qu=ext+unc*ext;
             value_unc=ql+rand(1,length(ext)).*(qu-ql);
         end
+        function ENMatlabCleanup(LibEPANET)
+            % Load library
+            if libisloaded(LibEPANET)
+                unloadlibrary(LibEPANET);
+            else
+                errstring =['Library ', LibEPANET, '.dll was not loaded.'];
+                disp(errstring);
+            end
+        end
+        function ENLoadLibrary(LibEPANETpath, LibEPANET, varargin)
+            if ~libisloaded(LibEPANET)
+                warning('off', 'MATLAB:loadlibrary:TypeNotFound');
+                if ~isdeployed
+                    if isunix
+                        loadlibrary(LibEPANET, [LibEPANETpath, LibEPANET, '.h']);
+                    else
+                        loadlibrary([LibEPANETpath, LibEPANET], [LibEPANETpath, LibEPANET, '.h']);
+                    end
+                else
+                    loadlibrary('epanet2', @mxepanet); %loadlibrary('epanet2', 'epanet2.h', 'mfilename', 'mxepanet.m');
+                end
+                warning('on', 'MATLAB:loadlibrary:TypeNotFound');
+                if ~isempty(varargin), return; end
+            end
+            if libisloaded(LibEPANET)
+                [~, version]=calllib(LibEPANET, 'ENgetversion', 0);
+                LibEPANETString = ['EPANET version {', num2str(version), '} loaded'];
+                fprintf(LibEPANETString);
+            else
+                warning('There was an error loading the EPANET library (DLL).')
+            end
+        end
+        function [obj] = MSXMatlabSetup(obj, msxname, varargin)
+            arch = computer('arch');
+            pwdepanet = fileparts(which(mfilename));
+            if strcmp(arch, 'win64')
+                obj.MSXLibEPANETPath = [pwdepanet, '\64bit\'];
+            elseif strcmp(arch, 'win32')
+                obj.MSXLibEPANETPath = [pwdepanet, '\32bit\'];
+            end
+            if isunix
+                obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
+            end
+            if ~isempty(varargin)
+                if varargin{1}{1}~=1
+                    if nargin==3
+                        obj.MSXLibEPANETPath=char(varargin{1});
+                        obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
+                        if isempty(varargin{1})
+                            obj.MSXLibEPANETPath='';
+                        end
+                    end
+                end
+            end
+            obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+            if ~libisloaded(obj.MSXLibEPANET)
+                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+            end
+
+            obj.MSXFile = which(char(msxname));
+            %Save the temporary msx file
+            mm=0;
+            if ~isempty(varargin)
+                if varargin{1}{1}==1
+                    mm=1; %for set (write) msx functions
+                end
+            end
+            if mm==1
+                if ~iscell(varargin{1})
+                    obj.MSXTempFile=obj.MSXFile;
+                end
+            else
+                obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
+                copyfile(obj.MSXFile, obj.MSXTempFile);
+            end
+            %Open the file
+            [obj.Errcode] = obj.apiMSXopen(obj);
+            obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
+            obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
+            obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
+
+            obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
+            obj.MSXConstantsCount = obj.getMSXConstantsCount;
+            obj.MSXParametersCount = obj.getMSXParametersCount;
+            obj.MSXPatternsCount = obj.getMSXPatternsCount;
+            obj.MSXSpeciesIndex = obj.getMSXSpeciesIndex;
+            obj.MSXSpeciesNameID = obj.getMSXSpeciesNameID;
+            obj.MSXSpeciesType = obj.getMSXSpeciesType;
+            obj.MSXSpeciesUnits = obj.getMSXSpeciesUnits;
+            obj.MSXSpeciesATOL = obj.getMSXSpeciesATOL;
+            obj.MSXSpeciesRTOL = obj.getMSXSpeciesRTOL;
+            obj.MSXConstantsNameID = obj.getMSXConstantsNameID;
+            obj.MSXConstantsValue  = obj.getMSXConstantsValue;
+            obj.MSXConstantsIndex = obj.getMSXConstantsIndex;
+            obj.MSXParametersNameID = obj.getMSXParametersNameID;
+            obj.MSXParametersIndex = obj.getMSXParametersIndex;
+            obj.MSXParametersTanksValue = obj.getMSXParametersTanksValue;
+            obj.MSXParametersPipesValue = obj.getMSXParametersPipesValue;
+            obj.MSXPatternsNameID = obj.getMSXPatternsNameID;
+            obj.MSXPatternsIndex = obj.getMSXPatternsIndex;
+            obj.MSXPatternsLengths = obj.getMSXPatternsLengths;
+            obj.MSXNodeInitqualValue = obj.getMSXNodeInitqualValue;
+            obj.MSXLinkInitqualValue = obj.getMSXLinkInitqualValue;
+            obj.MSXSources = obj.getMSXSources;
+            obj.MSXSourceType = obj.getMSXSourceType;
+            obj.MSXSourceLevel = obj.getMSXSourceLevel;
+            obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
+            obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
+            obj.MSXPattern = obj.getMSXPattern;
+        end
     end
     methods (Static)
         function [Errcode] = apiENwriteline(line, LibEPANET)
@@ -1257,38 +1367,6 @@ classdef epanet <handle
             % See also  apiENinitQ, apiENrunQ, apiENnextQ
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             [Errcode]=calllib(LibEPANET, 'ENinitQ', saveflag);
-        end
-        function apiENMatlabCleanup(LibEPANET)
-            % Load library
-            if libisloaded(LibEPANET)
-                unloadlibrary(LibEPANET);
-            else
-                errstring =['Library ', LibEPANET, '.dll was not loaded.'];
-                disp(errstring);
-            end
-        end
-        function apiENLoadLibrary(LibEPANETpath, LibEPANET, varargin)
-            if ~libisloaded(LibEPANET)
-                warning('off', 'MATLAB:loadlibrary:TypeNotFound');
-                if ~isdeployed
-                    if isunix
-                        loadlibrary(LibEPANET, [LibEPANETpath, LibEPANET, '.h']);
-                    else
-                        loadlibrary([LibEPANETpath, LibEPANET], [LibEPANETpath, LibEPANET, '.h']);
-                    end
-                else
-                    loadlibrary('epanet2', @mxepanet); %loadlibrary('epanet2', 'epanet2.h', 'mfilename', 'mxepanet.m');
-                end
-                warning('on', 'MATLAB:loadlibrary:TypeNotFound');
-                if ~isempty(varargin), return; end
-            end
-            if libisloaded(LibEPANET)
-                [~, version]=calllib(LibEPANET, 'ENgetversion', 0);
-                LibEPANETString = ['EPANET version {', num2str(version), '} loaded'];
-                fprintf(LibEPANETString);
-            else
-                warning('There was an error loading the EPANET library (DLL).')
-            end
         end
         function [Errcode, tstep] = apiENnextH(LibEPANET)
             % Determines the length of time until the next hydraulic event occurs in an extended period simulation.
@@ -2572,12 +2650,38 @@ classdef epanet <handle
             [Errcode]=calllib(LibEPANET, 'ENsettitle', line1, line2, line3);
         end
         function [Errcode] = apiENsetcomment(object, index, comment, LibEPANET)
+            % Sets a comment to a specific index
             % EPANET Version 2.2
-            % Object a type of object (either EN_NODE, EN_LINK, EN_TIMEPAT or EN_CURVE)
+            %
+            % apiENsetcomment(object, index, comment, LibEPANET)
+            %
+            % Parameters:
+            % object     a type of object (either EN_NODE, EN_LINK, EN_TIMEPAT or EN_CURVE)
+            %            e.g, obj.ToolkitConstants.EN_NODE
+            % index      objects index (starting from 1).
+            % comment    comment to be added.
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
             [Errcode]=calllib(LibEPANET, 'ENsetcomment', object, index, comment);
         end
         function [Errcode, comment] = apiENgetcomment(object, index, LibEPANET)
             % EPANET Version 2.2
+            % Sets a comment to a specific index
+            % EPANET Version 2.2
+            %
+            % apiENsetcomment(object, index, comment, LibEPANET)
+            %
+            % Parameters:
+            % object     a type of object (either EN_NODE, EN_LINK, EN_TIMEPAT or EN_CURVE)
+            %            e.g, obj.ToolkitConstants.EN_NODE
+            % index      objects index (starting from 1).
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % comment  comment to be added.
             comment = char(32*ones(1, 79));
             [Errcode, comment]=calllib(LibEPANET, 'ENgetcomment', object, index, comment);
         end
@@ -2666,84 +2770,6 @@ classdef epanet <handle
             [Errcode, value]=calllib(LibEPANET, 'ENgetnodevalue', index, paramcode, value);
             if Errcode==240, value=NaN; end
             value = double(value);
-        end
-        function [obj] = apiMSXMatlabSetup(obj, msxname, varargin)
-            arch = computer('arch');
-            pwdepanet = fileparts(which(mfilename));
-            if strcmp(arch, 'win64')
-                obj.MSXLibEPANETPath = [pwdepanet, '\64bit\'];
-            elseif strcmp(arch, 'win32')
-                obj.MSXLibEPANETPath = [pwdepanet, '\32bit\'];
-            end
-            if isunix
-                obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
-            end
-            if ~isempty(varargin)
-                if varargin{1}{1}~=1
-                    if nargin==3
-                        obj.MSXLibEPANETPath=char(varargin{1});
-                        obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
-                        if isempty(varargin{1})
-                            obj.MSXLibEPANETPath='';
-                        end
-                    end
-                end
-            end
-            obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-            if ~libisloaded(obj.MSXLibEPANET)
-                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
-            end
-
-            obj.MSXFile = which(char(msxname));
-            %Save the temporary msx file
-            mm=0;
-            if ~isempty(varargin)
-                if varargin{1}{1}==1
-                    mm=1; %for set (write) msx functions
-                end
-            end
-            if mm==1
-                if ~iscell(varargin{1})
-                    obj.MSXTempFile=obj.MSXFile;
-                end
-            else
-                obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
-                copyfile(obj.MSXFile, obj.MSXTempFile);
-            end
-            %Open the file
-            [obj.Errcode] = obj.apiMSXopen(obj);
-            obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
-            obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
-            obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
-
-            obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
-            obj.MSXConstantsCount = obj.getMSXConstantsCount;
-            obj.MSXParametersCount = obj.getMSXParametersCount;
-            obj.MSXPatternsCount = obj.getMSXPatternsCount;
-            obj.MSXSpeciesIndex = obj.getMSXSpeciesIndex;
-            obj.MSXSpeciesNameID = obj.getMSXSpeciesNameID;
-            obj.MSXSpeciesType = obj.getMSXSpeciesType;
-            obj.MSXSpeciesUnits = obj.getMSXSpeciesUnits;
-            obj.MSXSpeciesATOL = obj.getMSXSpeciesATOL;
-            obj.MSXSpeciesRTOL = obj.getMSXSpeciesRTOL;
-            obj.MSXConstantsNameID = obj.getMSXConstantsNameID;
-            obj.MSXConstantsValue  = obj.getMSXConstantsValue;
-            obj.MSXConstantsIndex = obj.getMSXConstantsIndex;
-            obj.MSXParametersNameID = obj.getMSXParametersNameID;
-            obj.MSXParametersIndex = obj.getMSXParametersIndex;
-            obj.MSXParametersTanksValue = obj.getMSXParametersTanksValue;
-            obj.MSXParametersPipesValue = obj.getMSXParametersPipesValue;
-            obj.MSXPatternsNameID = obj.getMSXPatternsNameID;
-            obj.MSXPatternsIndex = obj.getMSXPatternsIndex;
-            obj.MSXPatternsLengths = obj.getMSXPatternsLengths;
-            obj.MSXNodeInitqualValue = obj.getMSXNodeInitqualValue;
-            obj.MSXLinkInitqualValue = obj.getMSXLinkInitqualValue;
-            obj.MSXSources = obj.getMSXSources;
-            obj.MSXSourceType = obj.getMSXSourceType;
-            obj.MSXSourceLevel = obj.getMSXSourceLevel;
-            obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
-            obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
-            obj.MSXPattern = obj.getMSXPattern;
         end
         function [Errcode] = apiMSXopen(obj, varargin)
             % Opens the EPANET-MSX toolkit system.
@@ -3370,7 +3396,7 @@ classdef epanet <handle
                     pwdDLL = pwd;
                 end
                 obj.LibEPANETpath = [pwdDLL, '\'];
-                try obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
+                try obj.ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
                 catch
                    obj.Errcode=-1;
                    error(['File "', obj.LibEPANET, '" is not a valid win application.']);
@@ -3390,7 +3416,7 @@ classdef epanet <handle
                 end
             end
             %Load EPANET Library
-            obj.apiENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
+            obj.ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
             disp([' (EMT version {', obj.classversion, '}).'])
 
             %Load parameters
@@ -11861,7 +11887,7 @@ classdef epanet <handle
             % See also epanet, saveInputFile, closeNetwork.
 
             %apiENclose(obj.LibEPANET);
-            obj.apiENMatlabCleanup(obj.LibEPANET);
+            obj.ENMatlabCleanup(obj.LibEPANET);
             fclose('all');
             files=dir('@#*');
             try delete([obj.InputFile(1:end-4), '.txt']), catch; end
@@ -11880,9 +11906,9 @@ classdef epanet <handle
         end
         function loadMSXFile(obj, msxname, varargin)
             if isempty(varargin)
-                obj.apiMSXMatlabSetup(obj, msxname);
+                obj.MSXMatlabSetup(obj, msxname);
             else
-                obj.apiMSXMatlabSetup(obj, msxname, varargin);
+                obj.MSXMatlabSetup(obj, msxname, varargin);
             end
         end
         function value = getMSXEquationsTerms(obj)
