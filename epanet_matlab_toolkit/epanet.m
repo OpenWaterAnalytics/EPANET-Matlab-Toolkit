@@ -12771,8 +12771,8 @@ classdef epanet <handle
                 file = [obj.LibEPANETpath, 'epanet2', fparam];
             else
                 file = [obj.LibEPANETpath, obj.LibEPANET, fparam];
-                if ~isfile(file)
-                 file = [obj.LibEPANETpath, 'epanet2', fparam];
+                if exist(file, 'file')~= 2 % isfile
+                    file = [obj.LibEPANETpath, 'epanet2', fparam];
                 end
             end
             if isdeployed
