@@ -2614,7 +2614,8 @@ classdef epanet <handle
             %   d.getLinkValveIndex
             %
             % See also getLinkIndex, getLinkPipeIndex, getLinkPumpIndex.
-            value = obj.getLinkPipeCount+obj.getLinkPumpCount+1:obj.getLinkCount;
+            tmpLinkTypes=obj.getLinkType;
+            value = find(~strcmp(tmpLinkTypes, 'PUMP')&~strcmp(tmpLinkTypes, 'PIPE'));
         end
         function value = getNodesConnectingLinksIndex(obj)
             % Retrieves the indexes of the from/to nodes of all links.
@@ -10776,7 +10777,7 @@ classdef epanet <handle
             end
             if isdeployed
             %file=[file(1:end-1), 'txt'];%epanet2.h-->epanet2.txt
-                  file = 'epanet2_enums.txt';%epanet2_enums.h-->epanet2_enums.txt
+                file = 'epanet2_enums.txt';%epanet2_enums.h-->epanet2_enums.txt
             end
             fid = fopen(file);
             tline = fgetl(fid);
