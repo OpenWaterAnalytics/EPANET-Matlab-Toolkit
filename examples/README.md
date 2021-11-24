@@ -49,7 +49,7 @@ EPANET-MATLAB-Toolkit - Examples
 - [Toolkit Example 4:](./Toolkit_EX4_Network_Building.m) Network building.
 ## Toolkit api Examples
 - [Toolkit api Example 1:](./Toolkit_api_EX1_using_EN_functions.m) Create a network using only EN functions
-  
+- [Toolkit api Example 2:](./Toolkit_api_EX2_using_MSX_functions.m) Run a quality analysis using only MSX functions
 &uparrow; [Back to top](#table-of-contents)
 
 

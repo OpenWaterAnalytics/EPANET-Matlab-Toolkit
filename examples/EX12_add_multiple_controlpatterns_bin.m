@@ -59,7 +59,7 @@ disp('a = 60; b = 90;')
 disp('settings = (b-a).*rand((duration/hydstep)+1,1) + a;')
 
 figure;
-plot(Sim.BinnodePressure(:,nodeIndex));
+plot(Sim.BinNodePressure(:,nodeIndex));
 title('Valve Setting Pattern');
 xlabel('Time (hours)');
 ylabel(valveID);

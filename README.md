@@ -421,7 +421,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeTankMixingFraction|Sets the values of tanks mix fraction|
 |setNodeTankMinimumWaterVolume|Sets the values of tanks minimum water volume|
 |setNodeTankMixingModelType|Sets the values of tanks model|
-|setNodeTypeReservoir|Transforms a Tank to RESERVOIR|
+|setNodeTypeJunction|Transforms a node to junction|
+|setNodeTypeReservoir|Transforms a node to reservoir|
+|setNodeTypeTank|Transforms a node to tank|
 |setOptionsAccuracyValue|Sets the value of accurancy|
 |setOptionsGlobalEffic|Sets the value of global pump efficiency(percent) (EPANET Version 2.2)|
 |setOptionsGlobalPrice|Sets the value of global energy price per KWH (EPANET Version 2.2)|
