@@ -8,7 +8,7 @@ inpname='net2-cl2.inp'; %net2-cl2 example
 %% apiMSX
 d=epanet(inpname);
 msxname = [inpname(1:end-4),'.msx'];
-d.apiMSXMatlabSetup(d, msxname);        
+d.MSXMatlabSetup(d, msxname);        
 ss=1:d.LinkCount;%index link
 uu=1:d.MSXSpeciesCount;
 value.Quality = cell(1, length(ss));
