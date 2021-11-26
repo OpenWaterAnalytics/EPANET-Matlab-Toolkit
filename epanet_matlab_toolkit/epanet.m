@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.0'; % 05/10/2021
+        classversion='v2.2.001'; % 24/11/2021
 
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -4429,7 +4429,7 @@ classdef epanet <handle
             % Example:
             %   error = 250;
             %   d.getError(error)
-              [errmssg , Errcode] = obj.apiENgeterror(Errcode, obj.LibEPANET);
+            [errmssg , Errcode] = obj.apiENgeterror(Errcode, obj.LibEPANET);
             warning(errmssg);
             errmssg = '';
         end
@@ -4592,7 +4592,8 @@ classdef epanet <handle
             %   d.getLinkValveIndex
             %
             % See also getLinkIndex, getLinkPipeIndex, getLinkPumpIndex.
-            value = obj.getLinkPipeCount+obj.getLinkPumpCount+1:obj.getLinkCount;
+            tmpLinkTypes=obj.getLinkType;
+            value = find(~strcmp(tmpLinkTypes, 'PUMP')&~strcmp(tmpLinkTypes, 'PIPE'));
         end
         function value = getNodesConnectingLinksIndex(obj)
             % Retrieves the indexes of the from/to nodes of all links.
@@ -8630,7 +8631,7 @@ classdef epanet <handle
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode, obj.LibEPANET);
         end
-        function [leftPipeIndex,rightPipeIndex] = splitPipe(obj,pipeID,newPipeID,newNodeID)
+        function [leftPipeIndex ,rightPipeIndex] = splitPipe(obj, pipeID, newPipeID, newNodeID)
             %SPLITPIPE
             % splits a pipe (pipeID), creating two new pipes (pipeID and newPipeID) and adds a
             % junction/node (newNodeID) in between. If the pipe is linear
@@ -8647,7 +8648,7 @@ classdef epanet <handle
             %   pipeID = '11';
             %   newPipeID= '11a';
             %   newNodeID= '11node';
-            %   d.splitPipe(pipeID,newPipeID,newNodeID)
+            %   [leftPipeIndex, rightPipeIndex] = d.splitPipe(pipeID,newPipeID,newNodeID)
             %   d.getLinkIndex
             %   d.getNodesConnectingLinksID
             %   d.plot('links', 'yes', 'highlightlink',{pipeID}, 'fontsize',8);
@@ -8660,7 +8661,7 @@ classdef epanet <handle
             %   pipeID = 'P-837';
             %   newPipeID= 'P-837a';
             %   newNodeID= 'P-837node';
-            %   d.splitPipe(pipeID,newPipeID,newNodeID)
+            %   [leftPipeIndex, rightPipeIndex] = d.splitPipe(pipeID,newPipeID,newNodeID)
             %   d.plot('links', 'yes', 'highlightlink',{pipeID}, 'fontsize',8);
             %   The new left pipe can be noticed at the top left of the
             %   plot in red colour
@@ -8697,13 +8698,17 @@ classdef epanet <handle
             midElev = (obj.getNodeElevations(leftNodeIndex)+obj.getNodeElevations(rightNodeIndex))/2;
             obj.setNodeJunctionData(newNodeIndex, midElev,0,'');
             obj.setNodeEmitterCoeff(newNodeIndex,obj.getNodeEmitterCoeff(leftNodeIndex));
-            midInitQual = (obj.getNodeInitialQuality(leftNodeIndex)+obj.getNodeInitialQuality(rightNodeIndex))/2;
-            obj.setNodeInitialQuality(newNodeIndex,midInitQual);
-            obj.setNodeSourceQuality(newNodeIndex,obj.getNodeSourceQuality(leftNodeIndex));
-            obj.setNodeSourcePatternIndex(newNodeIndex,obj.getNodeSourcePatternIndex(leftNodeIndex));
-            if (~isnan(obj.getNodeSourceTypeIndex(leftNodeIndex)))
-                obj.setNodeSourceType(newNodeIndex,obj.getNodeSourceTypeIndex(leftNodeIndex));
+            
+            if obj.QualityCode > 0
+                midInitQual = (obj.getNodeInitialQuality(leftNodeIndex)+obj.getNodeInitialQuality(rightNodeIndex))/2;
+                obj.setNodeInitialQuality(newNodeIndex,midInitQual);
+                obj.setNodeSourceQuality(newNodeIndex,obj.getNodeSourceQuality(leftNodeIndex));
+                obj.setNodeSourcePatternIndex(newNodeIndex,obj.getNodeSourcePatternIndex(leftNodeIndex));
+                if (~isnan(obj.getNodeSourceTypeIndex(leftNodeIndex)))
+                    obj.setNodeSourceType(newNodeIndex,obj.getNodeSourceTypeIndex(leftNodeIndex));
+                end
             end
+            
             % Access link properties
             linkProp = obj.getLinksInfo;
             linkDia  = linkProp.LinkDiameter(pipeIndex);
@@ -8745,7 +8750,6 @@ classdef epanet <handle
             obj.setLinkWallReactionCoeff(rightPipeIndex,linkWallReactionCoeff);
             obj.setLinkTypePipe(rightPipeIndex);
         end
-
         function value = getLinkVerticesCount(obj, varargin)
             % Retrieves the number of internal vertex points assigned to a link.
             %
@@ -10691,8 +10695,8 @@ classdef epanet <handle
             %
             % Example 1:
             %   d = epanet('Net1.inp');
-            %   d.setNodeTypeReservoir('2')
-            %   d.getNodeType(11)
+            %   index = d.setNodeTypeReservoir('13')
+            %   d.getNodeType(index)
             %   d.plot
             nodeIndex = obj.getNodeIndex(id);
             if (obj.getNodeTypeIndex(nodeIndex) == 1)
@@ -10707,8 +10711,8 @@ classdef epanet <handle
             %
             % Example 1:
             %   d = epanet('Net1.inp');
-            %   d.setNodeTypeTank('11')
-            %   d.getNodeType(11)
+            %   index = d.setNodeTypeTank('13')
+            %   d.getNodeType(index)
             %   d.plot
             nodeIndex = obj.getNodeIndex(id);
             if (obj.getNodeTypeIndex(nodeIndex) == 2)
@@ -10723,8 +10727,8 @@ classdef epanet <handle
             %
             % Example 1:
             %   d = epanet('Net1.inp');
-            %   d.setNodeTypeJunction('10')
-            %   d.getNodeType(1)
+            %   index = d.setNodeTypeJunction('2')
+            %   d.getNodeType(index)
             %   d.plot
             nodeIndex = obj.getNodeIndex(id);
             if (obj.getNodeTypeIndex(nodeIndex) == 0)
@@ -12802,13 +12806,13 @@ classdef epanet <handle
                 file = [obj.LibEPANETpath, 'epanet2', fparam];
             else
                 file = [obj.LibEPANETpath, obj.LibEPANET, fparam];
-                if ~isfile(file)
-                 file = [obj.LibEPANETpath, 'epanet2', fparam];
+                if exist(file, 'file')~= 2 % isfile
+                    file = [obj.LibEPANETpath, 'epanet2', fparam];
                 end
             end
             if isdeployed
             %file=[file(1:end-1), 'txt'];%epanet2.h-->epanet2.txt
-                  file = 'epanet2_enums.txt';%epanet2_enums.h-->epanet2_enums.txt
+                file = 'epanet2_enums.txt';%epanet2_enums.h-->epanet2_enums.txt
             end
             fid = fopen(file);
             tline = fgetl(fid);
