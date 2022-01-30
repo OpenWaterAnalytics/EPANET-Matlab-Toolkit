@@ -7438,7 +7438,10 @@ classdef epanet <handle
                 mmFinal = mm(chIndex, :);
                 Ok = connFinal(~mmFinal);
                 nodesIndOk = obj.getNodeIndex(Ok);
-                value(i, nodesIndOk) = 1;
+                for v=nodesIndOk
+                    val = value(i, v);
+                    value(i, v) = val + 1;
+                end
             end
         end
         function A = getAdjacencyMatrix(obj)
