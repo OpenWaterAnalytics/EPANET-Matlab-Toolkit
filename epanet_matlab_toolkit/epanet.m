@@ -7441,6 +7441,21 @@ classdef epanet <handle
                 value(i, nodesIndOk) = 1;
             end
         end
+        function A = getAdjacencyMatrix(obj)
+            % Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow
+            % Compute the new adjacency matrix based on the mean flow in the network
+            Fmean = mean(obj.getComputedTimeSeries.Flow,1); % ignores events also you can use getComputedHydraulicTimeSeries
+
+            Fsign = sign(Fmean);
+            Nidx = obj.getLinkNodesIndex;
+            for i = 1:size(Nidx,1)
+                if Fsign(i) == 1
+                    A(Nidx(i,1),Nidx(i,2)) = 1;
+                else
+                    A(Nidx(i,2),Nidx(i,1)) = 1;
+                end
+            end
+        end
         function valueIndex = addCurve(obj, varargin)
            % Adds a new curve appended to the end of the existing curves. (EPANET Version 2.1)
            % Returns the new curve's index.
