@@ -668,7 +668,7 @@ classdef epanet <handle
             qu=ext+unc*ext;
             value_unc=ql+rand(1,length(ext)).*(qu-ql);
         end
-        function ENMatlabCleanup(LibEPANET)
+        function ENMatlabCleanup(obj, LibEPANET)
             % Load library
             if libisloaded(LibEPANET)
                 unloadlibrary(LibEPANET);
