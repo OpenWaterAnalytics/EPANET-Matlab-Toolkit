@@ -11928,7 +11928,7 @@ classdef epanet <handle
         end
         function loadMSXFile(obj, msxname, varargin)
             if isempty(varargin)
-                obj.MSXMatlabSetup(obj, msxname);
+                obj.MSXMatlabSetup(msxname);
             else
                 obj.MSXMatlabSetup(obj, msxname, varargin);
             end
