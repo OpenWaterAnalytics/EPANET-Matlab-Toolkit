@@ -11930,7 +11930,7 @@ classdef epanet <handle
             if isempty(varargin)
                 obj.MSXMatlabSetup(msxname);
             else
-                obj.MSXMatlabSetup(obj, msxname, varargin);
+                obj.MSXMatlabSetup(msxname, varargin);
             end
         end
         function value = getMSXEquationsTerms(obj)
