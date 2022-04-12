@@ -89,6 +89,7 @@ if isempty(fig)
 else
     figure(fig);
 end
+set(fig, 'WindowState', 'maximized');
 if makeavi
     mov=VideoWriter(movfname);%,'quality',quality,'fps',fps,'compression','Cinepak');
 end
