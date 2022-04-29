@@ -7870,7 +7870,8 @@ classdef epanet <handle
             end
             clear initnodematrix;
             k=1;t=1;tleft=1;
-            while (tleft>0)||(t<obj.getTimeSimulationDuration)
+            sim_duration = obj.getTimeSimulationDuration;
+            while (tleft>0)||(t<sim_duration)
                 t=obj.runQualityAnalysis;
                 if find(strcmpi(varargin, 'time'))
                     value.Time(k, :)=t;
@@ -7895,8 +7896,8 @@ classdef epanet <handle
                 end
                 tleft = obj.nextQualityAnalysisStep;
                 k=k+1;
-                if t==obj.getTimeSimulationDuration
-                    t=obj.getTimeSimulationDuration+1;
+                if t==sim_duration
+                    t=sim_duration+1;
                 end
             end
             obj.closeQualityAnalysis;
