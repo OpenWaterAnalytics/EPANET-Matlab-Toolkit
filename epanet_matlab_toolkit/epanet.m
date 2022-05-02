@@ -388,7 +388,7 @@ classdef epanet <handle
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
     end
     properties (Constant = true)
-        classversion='v2.2.001'; % 24/11/2021
+        classversion='v2.2.002'; % 02/05/2022
 
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -7834,7 +7834,7 @@ classdef epanet <handle
             obj.openQualityAnalysis;
             obj.initializeQualityAnalysis;
             %tleft=obj.nextQualityAnalysisStep;
-            totalsteps=obj.getTimeSimulationDuration/obj.getTimeHydraulicStep;
+            totalsteps=obj.getTimeSimulationDuration/obj.getTimeQualityStep;
             initnodematrix=zeros(totalsteps, obj.getNodeCount);
             if size(varargin, 2)==0
                 varargin={'time', 'quality', 'linkquality', 'mass'};
@@ -7894,7 +7894,7 @@ classdef epanet <handle
                 if find(strcmpi(varargin, 'demandSensingNodes'))
                     value.DemandSensingNodes(k, :)=obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
                 end
-                tleft = obj.nextQualityAnalysisStep;
+                tleft = obj.stepQualityAnalysisTimeLeft;
                 k=k+1;
                 if t==sim_duration
                     t=sim_duration+1;
@@ -11204,6 +11204,7 @@ classdef epanet <handle
             %   d.getTimeHydraulicStep
             %
             % See also getTimeHydraulicStep, setTimeQualityStep, setTimePatternStep.
+            obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_HYDSTEP, value, obj.LibEPANET);
         end
         function setTimeQualityStep(obj, value)
@@ -11215,6 +11216,7 @@ classdef epanet <handle
             %   d.getTimeQualityStep
             %
             % See also getTimeQualityStep, setTimeHydraulicStep, setTimePatternStep.
+            obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_QUALSTEP, value, obj.LibEPANET);
         end
         function setTimePatternStep(obj, value)
@@ -11226,6 +11228,7 @@ classdef epanet <handle
             %   d.getTimePatternStep
             %
             % See also getTimePatternStep, setTimePatternStart, setTimeHydraulicStep.
+            obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_PATTERNSTEP, value, obj.LibEPANET);
         end
         function setTimePatternStart(obj, value)
@@ -11237,6 +11240,7 @@ classdef epanet <handle
             %   d.getTimePatternStart
             %
             % See also getTimePatternStart, setTimePatternStep, setTimeHydraulicStep.
+            obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_PATTERNSTART, value, obj.LibEPANET);
         end
         function setTimeReportingStep(obj, value)
@@ -11248,6 +11252,7 @@ classdef epanet <handle
             %   d.getTimeReportingStep
             %
             % See also getTimeReportingStep, setTimeReportingStart, setTimeRuleControlStep.
+            obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_REPORTSTEP, value, obj.LibEPANET);
         end
         function setTimeReportingStart(obj, value)
@@ -11259,6 +11264,7 @@ classdef epanet <handle
             %   d.getTimeReportingStart
             %
             % See also getTimeReportingStart, setTimeReportingStep, setTimePatternStart.
+            obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_REPORTSTART, value, obj.LibEPANET);
         end
         function setTimeRuleControlStep(obj, value)
@@ -11270,6 +11276,7 @@ classdef epanet <handle
             %   d.getTimeRuleControlStep
             %
             % See also getTimeRuleControlStep, setTimeReportingStep, setTimePatternStep.
+            obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_RULESTEP, value, obj.LibEPANET);
         end
         function setTimeStatisticsType(obj, value)
@@ -12327,49 +12334,42 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k=1; tleft=1;t=0;
+            k=1; tleft=1;
             value.Time(k, :)=0;
-            time_step = obj.getMSXTimeStep;
-            timeSmle=obj.getTimeSimulationDuration;%bug at time
-            while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
+            if node_indices(end) < link_indices(end)
+                for lnk=link_indices
+                    value.LinkQuality(k, lnk)=obj.getMSXLinkInitqualValue{lnk}(specie_name);
+                    if lnk < node_indices(end) + 1
+                        value.NodeQuality(k, lnk)=obj.getMSXNodeInitqualValue{lnk}(specie_name);
+                    end
+                end
+            else
+                for lnk=node_indices
+                    value.NodeQuality(k, lnk)=obj.getMSXNodeInitqualValue{lnk}(specie_name);
+                    if lnk < link_indices(end) + 1
+                        value.LinkQuality(k, lnk)=obj.getMSXLinkInitqualValue{lnk}(specie_name);
+                    end
+                end
+            end
+            while(tleft>0 && obj.Errcode==0)
+                k=k+1;
                 [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
-                if t<time_step || t==time_step
-                    if node_indices(end) < link_indices(end)
-                        for lnk=link_indices
-                            value.LinkQuality(k, lnk)=obj.getMSXLinkInitqualValue{lnk}(specie_name);
-                            if lnk < node_indices(end) + 1
-                                value.NodeQuality(k, lnk)=obj.getMSXNodeInitqualValue{lnk}(specie_name);
-                            end
-                        end
-                    else
-                        for lnk=node_indices
-                            value.NodeQuality(k, lnk)=obj.getMSXNodeInitqualValue{lnk}(specie_name);
-                            if lnk < link_indices(end) + 1
-                                value.LinkQuality(k, lnk)=obj.getMSXLinkInitqualValue{lnk}(specie_name);
-                            end
+                if node_indices(end) < link_indices(end)
+                    for lnk=link_indices
+                        value.LinkQuality(k, lnk)=obj.getMSXSpeciesConcentration(1, lnk, specie_name);%link code 1
+                        if lnk < node_indices(end) + 1
+                            value.NodeQuality(k, lnk)=obj.getMSXSpeciesConcentration(0, lnk, specie_name);%node code0
                         end
                     end
                 else
-                    if node_indices(end) < link_indices(end)
-                        for lnk=link_indices
-                            value.LinkQuality(k, lnk)=obj.getMSXSpeciesConcentration(1, lnk, specie_name);%link code 1
-                            if lnk < node_indices(end) + 1
-                                value.NodeQuality(k, lnk)=obj.getMSXSpeciesConcentration(0, lnk, specie_name);%node code0
-                            end
-                        end
-                    else
-                        for lnk=node_indices
-                            value.NodeQuality(k, lnk)=obj.getMSXSpeciesConcentration(0, lnk, specie_name);%link code 1
-                            if lnk < link_indices(end) + 1
-                                value.LinkQuality(k, lnk)=obj.getMSXSpeciesConcentration(1, lnk, specie_name);%node code0
-                            end
+                    for lnk=node_indices
+                        value.NodeQuality(k, lnk)=obj.getMSXSpeciesConcentration(0, lnk, specie_name);%link code 1
+                        if lnk < link_indices(end) + 1
+                            value.LinkQuality(k, lnk)=obj.getMSXSpeciesConcentration(1, lnk, specie_name);%node code0
                         end
                     end
                 end
-                if k>1
-                    value.Time(k, :)=t;
-                end
-                k=k+1;
+                value.Time(k, :)=t;
             end
         end
         function value = getMSXComputedQualityNode(obj, varargin)
@@ -12396,61 +12396,27 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k = 1; tleft = 1; t = 0;
-            value.Time(k, :)=0;
-            time_step = obj.getMSXTimeStep;
-            timeSmle=obj.getTimeSimulationDuration;%bug at time
-            while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
-                [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
-                if ~isempty(varargin)
-                    if t<time_step || t==time_step
-                        i=1;
-                        for nl=ss
-                            g=1;
-                            for j=uu
-                                value.Quality{i}(k, g)=obj.getMSXNodeInitqualValue{nl}(j);
-                                g=g+1;
-                            end
-                            i=i+1;
-                        end
-                    else
-                        i=1;
-                        for nl=ss
-                            g=1;
-                            for j=uu
-                                value.Quality{i}(k, g)=obj.getMSXSpeciesConcentration(0, nl, j);%node code0
-                                g=g+1;
-                            end
-                            i=i+1;
-                        end
-                    end
-                else
-                    if t<time_step || t==time_step
-                        i=1;
-                        for nl=ss
-                            g=1;
-                            for j=uu
-                                value.Quality{i}(k, g)=obj.getMSXNodeInitqualValue{(nl)}(j);
-                                g=g+1;
-                            end
-                            i=i+1;
-                        end
-                    else
-                        i=1;
-                        for nl=ss
-                            g=1;
-                            for j=uu
-                                value.Quality{i}(k, g)=obj.getMSXSpeciesConcentration(0, (nl), j);%node code0
-                                g=g+1;
-                            end
-                            i=i+1;
-                        end
-                    end
+            k = 1; tleft = 1; i = 1;
+            for nl=ss
+                g=1;
+                for j=uu
+                    value.Quality{i}(k, g) = obj.getMSXNodeInitqualValue{nl}(j);
+                    g=g+1;
                 end
-                if k>1
-                    value.Time(k, :)=t;
+                i=i+1;
+            end    
+            while(tleft>0 && obj.Errcode==0)
+                [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
+                k=k+1; i=1;
+                for nl=ss
+                    g=1;
+                    for j=uu
+                        value.Quality{i}(k, g)=obj.getMSXSpeciesConcentration(1, nl, j);% node code0
+                        g=g+1;
+                    end
+                    i=i+1;
                 end
-                k=k+1;
+                value.Time(k, :)=t;
             end
         end
         function value = getMSXComputedQualityLink(obj, varargin)
@@ -12477,60 +12443,27 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k = 1; tleft = 1;
-            time_step = obj.getMSXTimeStep;
-            value.Time(k, :)=0;
+            k = 1; tleft = 1; i = 1;
+            for nl=ss
+                g=1;
+                for j=uu
+                    value.Quality{i}(k, g) = obj.getMSXLinkInitqualValue{nl}(j);
+                    g=g+1;
+                end
+                i=i+1;
+            end    
             while(tleft>0 && obj.Errcode==0)
-                [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
-                if ~isempty(varargin)
-                    if t<time_step || t==time_step
-                        i=1;
-                        for nl=ss
-                            g=1;
-                            for j=uu
-                                value.Quality{i}(k, g)=obj.getMSXLinkInitqualValue{nl}(j);
-                                g=g+1;
-                            end
-                            i=i+1;
-                        end
-                    else
-                        i=1;
-                        for nl=ss
-                            g=1;
-                            for j=uu
-                                value.Quality{i}(k, g)=obj.getMSXSpeciesConcentration(1, nl, j);
-                                g=g+1;
-                            end
-                            i=i+1;
-                        end
+                [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
+                k=k+1; i=1;
+                for nl=ss
+                    g=1;
+                    for j=uu
+                        value.Quality{i}(k, g)=obj.getMSXSpeciesConcentration(1, nl, j);% link code1
+                        g=g+1;
                     end
-                else
-                    if t<time_step || t==time_step
-                        i=1;
-                        for nl=ss
-                            g=1;
-                            for j=uu
-                                value.Quality{i}(k, g)=obj.getMSXLinkInitqualValue{(nl)}(j);
-                                g=g+1;
-                            end
-                            i=i+1;
-                        end
-                    else
-                        i=1;
-                        for nl=ss
-                            g=1;
-                            for j=uu
-                                value.Quality{i}(k, g)=obj.getMSXSpeciesConcentration(1, (nl), j);%link code1
-                                g=g+1;
-                            end
-                            i=i+1;
-                        end
-                    end
+                    i=i+1;
                 end
-                if k>1
-                    value.Time(k, :)=t;
-                end
-                k=k+1;
+                value.Time(k, :)=t;
             end
         end
         function plotMSXSpeciesNodeConcentration(obj, varargin)
@@ -12758,7 +12691,7 @@ classdef epanet <handle
         end
         function [t, tleft]= stepMSXQualityAnalysisTimeLeft(obj)
             [obj.Errcode, t, tleft] = obj.apiMSXstep(obj.MSXLibEPANET);
-            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
+            % if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function saveMSXFile(obj, msxname)
             [obj.Errcode] = obj.apiMSXsavemsxfile(msxname, obj.MSXLibEPANET);
@@ -16752,111 +16685,6 @@ classdef epanet <handle
                         obj.setLinkVertices(LinkID,newxVertCoord,newvyVertCoord);
                     end
                 end
-            end
-        end
-        function ContQual = appCreateMultipleScenarios(obj, varargin)
-            % Creates scenarios based on node count of inp file EPANET.
-            %  Load a network.
-            %  Create scenario parameters.
-            %  Create Multiple Scenarios.
-            %  Set quality type.
-            %  Run Scenarios.
-            %  Get computed quality time series.
-            %
-            % Example 1
-            % Create Multiple scenarios with default parameters for Net1.inp
-            %  d = epanet('Net1.inp');
-            %  ContQual = d.appCreateMultipleScenarios();
-            %  figure
-            %  plot(ContQual{6})
-            %  title({['Scenario: ', num2str(6)], ['Contaminant at node ID: ', d.getNodeNameID{6}]})
-            %  xlabel('Time (hrs)')
-            %  ylabel('Quality (mg/L)')
-            %
-            % Example 2
-            % Create Multiple scenarios using all the input parameters and an uncertainty value
-            % of 0.2, for Net1.inp
-            %  d = epanet('Net1.inp');
-            %  ContQual = d.appCreateMultipleScenarios('SimulationTime', 72, 'QualityType', 'g/L', ...
-            %               'SourceInjectionRate', 0.005, 'SourcesInjectionTimes', [3 25], 'Uncertainty', 0.2);
-            %  figure
-            %  plot(ContQual{6})
-            %  title({['Scenario: ', num2str(6)], ['Contaminant at node ID: ', d.getNodeNameID{6}]})
-            %  xlabel('Time (hrs)')
-            %  ylabel('Quality (g/L)')
-
-            % Initialize scenario parameters with default values.
-            SimulationTime = 48; % in hrs
-            qunc=0.05; %Uncertainty
-            obj.setQualityType('chem','mg/L') % Quality type
-            SourceInjectionRate = 10; %mg/L for CONTAMINANT
-            SourcesInjectionTimes=[5 20]; %from...to in hours
-            for i=1:(nargin/2)
-                argument =lower(varargin{2*(i-1)+1});
-                switch argument
-                    case 'simulationtime' % in hrs
-                        SimulationTime = varargin{2*i};
-                    case 'qualitytype'
-                        obj.setQualityType('chem',varargin{2*i});
-                    case 'sourceinjectionrate' % based on quality type
-                        SourceInjectionRate = varargin{2*i};
-                    case 'sourcesinjectiontimes' % from...to in hours
-                        if length(varargin{2*i}) ~= 2
-                            error ('SourcesInjectionTimes must contain 2 values');
-                        end
-                        SourcesInjectionTimes = varargin{2*i};
-                    case 'uncertainty'
-                        qunc = varargin{2*i};
-                    otherwise
-                        error('Invalid property founobj.');
-                end
-            end
-            % Add time parameters
-            obj.setTimeSimulationDuration(SimulationTime*3600);
-            PatternTimeStep = obj.TimePatternStep;
-            % Create a scenario for each node of the net
-            for n = 1:obj.getNodeCount
-                Diameters = obj.add_unc(obj.LinkDiameter, qunc);
-                Lengths = obj.add_unc(obj.LinkLength, qunc);
-                Roughness = obj.add_unc(obj.LinkRoughnessCoeff, qunc);
-                Elevation = obj.add_unc(obj.NodeElevations, qunc);
-                BaseDemand = obj.add_unc(obj.NodeBaseDemands{1}, qunc);
-                tmpPat = obj.Pattern;
-                for i = 1:size(tmpPat, 1)
-                    Pattern = obj.add_unc(tmpPat(i, :), qunc);
-                end
-                obj.setLinkDiameter(Diameters)
-                obj.setLinkLength(Lengths)
-                obj.setLinkRoughnessCoeff(Roughness)
-                obj.setNodeElevations(Elevation)
-                obj.setNodeBaseDemands({BaseDemand})
-                obj.setPatternMatrix(Pattern)
-                obj.setTimeQualityStep(PatternTimeStep);
-                zeroNodes=zeros(1,obj.NodeCount);
-                obj.setNodeInitialQuality(zeroNodes);
-                obj.setLinkBulkReactionCoeff(zeros(1,obj.LinkCount));
-                obj.setLinkWallReactionCoeff(zeros(1,obj.LinkCount));
-                patlen=(SimulationTime)*3600/PatternTimeStep;
-                % Add pattern
-                tmppat=zeros(1,patlen);
-                tmpstartstep=SourcesInjectionTimes(1);
-                tmpendstep=SourcesInjectionTimes(2);
-                tmppat(tmpstartstep:tmpendstep)=1;
-                tmp1=obj.addPattern('CONTAMINANT',tmppat);
-                tmpinjloc=n; %index of node
-                tmp2=zeroNodes;
-                if tmpinjloc~=0
-                    tmp2(tmpinjloc)=tmp1;
-                    nd_index = find(tmp2, 1);
-                    obj.setNodeSourceType(nd_index, 'SETPOINT');
-                    obj.setNodeSourcePatternIndex(tmp2);
-                    tmp2 = zeroNodes;
-                    tmp2(tmpinjloc)=SourceInjectionRate;
-                    obj.setNodeSourceQuality(tmp2)
-                end
-                % Get computed quality time series.
-                res = obj.getComputedQualityTimeSeries;
-                ContQual{n}= res.NodeQuality;
             end
         end
     end
