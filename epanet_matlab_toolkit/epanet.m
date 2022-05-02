@@ -12411,7 +12411,7 @@ classdef epanet <handle
                 for nl=ss
                     g=1;
                     for j=uu
-                        value.Quality{i}(k, g)=obj.getMSXSpeciesConcentration(1, nl, j);% node code0
+                        value.Quality{i}(k, g)=obj.getMSXSpeciesConcentration(0, nl, j);% node code0
                         g=g+1;
                     end
                     i=i+1;
