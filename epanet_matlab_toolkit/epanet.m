@@ -7896,9 +7896,6 @@ classdef epanet <handle
                 end
                 tleft = obj.stepQualityAnalysisTimeLeft;
                 k=k+1;
-                if t==sim_duration
-                    t=sim_duration+1;
-                end
             end
             obj.closeQualityAnalysis;
         end

@@ -53,7 +53,8 @@ d.closeHydraulicAnalysis
 d.openQualityAnalysis
 d.initializeQualityAnalysis
 tleft=1; P=[];T_Q=[];Q=[];  
-while (tleft>0)
+sim_duration = d.getTimeSimulationDuration();
+while (tleft>0 || t < sim_duration)
     t=d.runQualityAnalysis;
     Q=[Q; d.getNodeActualQuality];
     T_Q=[T_Q; t];
