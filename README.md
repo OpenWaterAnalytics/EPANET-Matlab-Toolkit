@@ -328,6 +328,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deleteCurve|Deletes a data curve from the project|
 |deleteLink|Deletes a link|
 |deleteNode|Deletes a node|
+|deleteNodeJunctionDemand|Deletes a demand from a junction given the junction index and demand index(EPANET Version 2.2)|
 |deletePattern|Deletes a time pattern from a project|
 |deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
 |deleteRules|Deletes an existing rule-based control given it's index. (EPANET Version 2.2)|
@@ -819,6 +820,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENcopyreport|Copies the current contents of a project's report file to another file|
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
+|ENdeletedemand|Deletes a demand from a junction node|
 |ENsetcurveid|Changes the ID name of a data curve given its index|
 |ENsetpatternid|Changes the ID name of a time pattern given its index|
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
