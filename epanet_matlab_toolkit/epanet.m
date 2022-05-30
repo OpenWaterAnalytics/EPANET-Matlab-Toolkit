@@ -8020,6 +8020,7 @@ classdef epanet <handle
             % See also getPattern, setPattern, setPatternNameID
                 %          setPatternValue, setPatternComment.
             [obj.Errcode] = obj.apiENaddpattern(varargin{1}, obj.LibEPANET);
+            obj.getError(obj.Errcode)
             index = getPatternIndex(obj, varargin{1});
             if nargin==2
                 setPattern(obj, index, ones(1, max(obj.getPatternLengths)));
