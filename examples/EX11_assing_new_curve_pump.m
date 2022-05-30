@@ -18,7 +18,7 @@ d = epanet('Net1.inp');
 fprintf('\n');
 
 % Add new curve in the network.
-indexCurve=d.addCurve('NewCurve', [1800 200; 1500 400]);
+indexCurve=d.addCurve('NewCurve', [1800 300; 1500 500]);
 
 % Get pump index.
 pumpIndex = d.getLinkPumpIndex(1);
@@ -39,4 +39,4 @@ disp(['On pump index: ' num2str(PumpIndex)] );
 fprintf('\n');
 
 % Unload library.
-d.unload
+%d.unload
