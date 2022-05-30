@@ -77,8 +77,8 @@ d.getLinkStatus(2)
 d.getLinkSettings
 d.getLinkSettings(2)
 
-% d.getLinkQuality    % bug in epanet
-% d.getLinkQuality(2)
+d.getLinkQuality    
+d.getLinkQuality(2)
 
 %% Set links info
 d.getLinkDiameter
@@ -154,5 +154,5 @@ d.getLinkSettings(2)
 d.setLinkSettings(2, 121)
 d.getLinkSettings(2)
 
-d.unload
+% d.unload
 fprintf('Test finished.\n')
