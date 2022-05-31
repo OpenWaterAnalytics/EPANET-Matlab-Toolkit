@@ -533,7 +533,6 @@ classdef epanet <handle
             end
         end
         function set_node_demand_pattern(obj, fun, propertie, value, extra)
-
             categ = 1;
             if length(extra) == 2
                 indices = value;
@@ -3432,11 +3431,11 @@ classdef epanet <handle
                 end
                 obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
-            %               else
-            %                 obj.InputFile = varargin{1};
-            %                 % initializes an EPANET project that isn't opened with an input file
-            %                 obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
-            %                 warning('Initializes the EPANET project!');
+            else
+                obj.InputFile = varargin{1};
+                % initializes an EPANET project that isn't opened with an input file
+                obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
+                warning('Initializes the EPANET project!');
             end
             if nargin>0
                 %Save the temporary input file
@@ -8709,7 +8708,6 @@ classdef epanet <handle
                     obj.setNodeSourceType(newNodeIndex,obj.getNodeSourceTypeIndex(leftNodeIndex));
                 end
             end
-            
             % Access link properties
             linkProp = obj.getLinksInfo;
             linkDia  = linkProp.LinkDiameter(pipeIndex);
