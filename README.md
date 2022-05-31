@@ -26,15 +26,15 @@ For support, please use the OWA community forum : http://community.wateranalytic
 - [List of EPANET 2.012 Functions Supported](#List-of-EPANET-2012-Functions-Supported)
 - [List of EPANET 2.2 Functions Supported](#List-of-EPANET-22-Functions-Supported)
 
-## How to cite 
+## How to cite
 
 D.G. Eliades, M. Kyriakou, S. Vrachimis and M.M. Polycarpou, "EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB", in *Proc. 14th International Conference on Computing and Control for the Water Industry (CCWI)*, The Netherlands, Nov 2016, p.8. (doi:10.5281/zenodo.831493)
 
 ```
-@INPROCEEDINGS{Eliades2016, 
-author={Eliades, Demetrios G. and Kyriakou, Marios and Vrachimis, Stelios and Polycarpou, Marios M.}, 
-title={EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB}, 
-booktitle={Proc. 14th International Conference on Computing and Control for the Water Industry (CCWI)}, 
+@INPROCEEDINGS{Eliades2016,
+author={Eliades, Demetrios G. and Kyriakou, Marios and Vrachimis, Stelios and Polycarpou, Marios M.},
+title={EPANET-MATLAB Toolkit: An Open-Source Software for Interfacing EPANET with MATLAB},
+booktitle={Proc. 14th International Conference on Computing and Control for the Water Industry (CCWI)},
 year={2016},
 pages={8},
 address = {The Netherlands},
@@ -47,7 +47,7 @@ DOI={10.5281/zenodo.831493}}
 ## Requirements
 
 * [Matlab](http://www.mathworks.com/)
-* [EPANET 2.2](https://github.com/OpenWaterAnalytics/epanet) 
+* [EPANET 2.2](https://github.com/OpenWaterAnalytics/epanet)
 
 &uparrow; [Back to top](#table-of-contents)
 
@@ -55,12 +55,12 @@ DOI={10.5281/zenodo.831493}}
 
 In order to use the EPANET-MATLAB-Toolkit the <b> MinGW-w64 compiler </b> must be install: <p>
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=R_RABL3_6EY
-" target="_blank"><img src="http://img.youtube.com/vi/R_RABL3_6EY/0.jpg" 
+" target="_blank"><img src="http://img.youtube.com/vi/R_RABL3_6EY/0.jpg"
 alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="5" /></a>
 
 In case you have a version of matlab older than 2015b install the <b> Windows SDK compiler </b>: <p>
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=hc3OkDypd24
-" target="_blank"><img src="http://img.youtube.com/vi/hc3OkDypd24/0.jpg" 
+" target="_blank"><img src="http://img.youtube.com/vi/hc3OkDypd24/0.jpg"
 alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="5" /></a>
 
 &uparrow; [Back to top](#table-of-contents)
@@ -87,7 +87,7 @@ help d.plot
 
 ## How to fix/report bugs
 
-To fix a bug `Fork` the `EPANET-Matlab Toolkit`, `Edit` the code and make the appropriate change, and then `Pull` it so that we evaluate it. 
+To fix a bug `Fork` the `EPANET-Matlab Toolkit`, `Edit` the code and make the appropriate change, and then `Pull` it so that we evaluate it.
 
 Keep in mind that some bugs may exist in the `EPANET` libraries, in case you are not receiving the expected results.
 
@@ -97,7 +97,7 @@ Keep in mind that some bugs may exist in the `EPANET` libraries, in case you are
 
 * `EPANET`: Public Domain
 * `EPANET-MSX`: GNU Lesser General Public License
-* `EPANET-Matlab Toolkit`: EUPL 
+* `EPANET-Matlab Toolkit`: EUPL
 
 &uparrow; [Back to top](#table-of-contents)
 
@@ -120,7 +120,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |loadEPANETFile| Open the EPANET Toolkit system|
 |appShiftNetwor|Shifts the network in x and y directions|
 |appRotateNetwork|Rotates the network by theta degrees counter-clockwise using as pivot a specific node|
-|getError| Returns the description of an error code| 
+|getError| Returns the description of an error code|
+|getAdjacencyMatrix|Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow|
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
 |getComputedTimeSeries|Computed Hydraulic & Quality Time Series using the bimary file who created from executable|
@@ -327,6 +328,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deleteCurve|Deletes a data curve from the project|
 |deleteLink|Deletes a link|
 |deleteNode|Deletes a node|
+|deleteNodeJunctionDemand|Deletes a demand from a junction given the junction index and demand index(EPANET Version 2.2)|
 |deletePattern|Deletes a time pattern from a project|
 |deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
 |deletenodejunctiondemand|Deletes a demand from a junction given the junction index and demand index.|
@@ -819,6 +821,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENcopyreport|Copies the current contents of a project's report file to another file|
 |ENdeletelink|Deletes a link|
 |ENdeletenode|Deletes a node|
+|ENdeletedemand|Deletes a demand from a junction node|
 |ENsetcurveid|Changes the ID name of a data curve given its index|
 |ENsetpatternid|Changes the ID name of a time pattern given its index|
 |ENsetdemandpattern|Sets the index of the demand pattern assigned to a node for a category index|
