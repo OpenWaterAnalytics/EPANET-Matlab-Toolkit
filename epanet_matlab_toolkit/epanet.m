@@ -386,6 +386,7 @@ classdef epanet <handle
         BinUnits;                    % Units of all parameters
         BinUnits_US_Customary;       % Equal with 1 if is US-Customary
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
+        ph;
     end
     properties (Constant = true)
         classversion='v2.2.002'; % 02/05/2022
@@ -684,7 +685,7 @@ classdef epanet <handle
                     if isunix
                         loadlibrary(LibEPANET, [LibEPANETpath, LibEPANET, '.h']);
                     else
-                        loadlibrary([LibEPANETpath, LibEPANET], [LibEPANETpath, LibEPANET, '.h']);
+                        loadlibrary([LibEPANETpath, LibEPANET], [LibEPANETpath, LibEPANET, '_2.h']);
                     end
                 else
                     loadlibrary('epanet2', @mxepanet); %loadlibrary('epanet2', 'epanet2.h', 'mfilename', 'mxepanet.m');
@@ -693,7 +694,7 @@ classdef epanet <handle
                 if ~isempty(varargin), return; end
             end
             if libisloaded(LibEPANET)
-                [~, version]=calllib(LibEPANET, 'ENgetversion', 0);
+                [~, version]=calllib(LibEPANET, 'EN_getversion', 0);
                 LibEPANETString = ['EPANET version {', num2str(version), '} loaded'];
                 fprintf(LibEPANETString);
             else
@@ -1320,7 +1321,7 @@ classdef epanet <handle
             % Returns:
             % LibEPANET the version of the OWA-EPANET toolkit.
             % an error code.
-            [Errcode, LibEPANET]=calllib(LibEPANET, 'ENgetversion', 0);
+            [Errcode, LibEPANET]=calllib(LibEPANET, 'EN_getversion', 0);
         end
         function [Errcode] = apiENinit(unitsType, headLossType, LibEPANET)
             % Initializes an EPANET project.
@@ -1399,7 +1400,7 @@ classdef epanet <handle
             [Errcode, tstep]=calllib(LibEPANET, 'ENnextQ', int32(0));
             tstep = double(tstep);
         end
-        function [Errcode] = apiENopen(inpname, repname, binname, LibEPANET) %DE
+        function [Errcode] = apiENopen(inpname, repname, binname, LibEPANET, ph) %DE
             % Opens an EPANET input file & reads in network data.
             %
             % apiENopen(inpname, repname, binname, LibEPANET)
@@ -1413,9 +1414,9 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % See also apiENclose
-            Errcode=calllib(LibEPANET, 'ENopen', inpname, repname, binname);
+            Errcode=calllib(LibEPANET, 'EN_open', ph, inpname, repname, binname);
             if Errcode && Errcode~=200
-                 [~, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
+                 [~, errmsg] = calllib(LibEPANET, 'EN_geterror', Errcode, char(32*ones(1, 79)), 79);
                disp(errmsg);
             end
         end
@@ -3419,7 +3420,12 @@ classdef epanet <handle
             %Load EPANET Library
             obj.ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
             disp([' (EMT version {', obj.classversion, '}).'])
-
+            ph = uint64(1500000);
+            ph = struct;
+            % setdatatype(ph,'uint64Ptr',1,64)
+            % Create Project
+            [obj.Errcode, obj.ph]=calllib(obj.LibEPANET, 'EN_createproject', ph);
+            
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
 
@@ -3431,7 +3437,7 @@ classdef epanet <handle
                 if nargin==2 && strcmpi(varargin{2}, 'CREATE')
                     warning(['Network name "', inp , '.inp" already exists.'])
                 end
-                obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
+                obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET, obj.ph);
                 error(obj.getError(obj.Errcode));
             else
                 obj.InputFile = varargin{1};
