@@ -1553,6 +1553,7 @@ classdef epanet <handle
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             t=int32(0);
             [Errcode, t]=calllib(LibEPANET, 'ENrunQ', t);
+            t = double(t);
         end
         function [Errcode] = apiENsaveH(LibEPANET)
             % Transfers a project's hydraulics results from its temporary hydraulics file to its binary output file,
@@ -8715,7 +8716,7 @@ classdef epanet <handle
             midElev = (obj.getNodeElevations(leftNodeIndex)+obj.getNodeElevations(rightNodeIndex))/2;
             obj.setNodeJunctionData(newNodeIndex, midElev,0,'');
             obj.setNodeEmitterCoeff(newNodeIndex,obj.getNodeEmitterCoeff(leftNodeIndex));
-            
+
             if obj.QualityCode > 0
                 midInitQual = (obj.getNodeInitialQuality(leftNodeIndex)+obj.getNodeInitialQuality(rightNodeIndex))/2;
                 obj.setNodeInitialQuality(newNodeIndex,midInitQual);
@@ -11716,6 +11717,7 @@ classdef epanet <handle
             %
             % See also nextQualityAnalysisStep, runHydraulicAnalysis.
             [obj.Errcode, tstep] = obj.apiENnextH(obj.LibEPANET);
+            tstep = double(tstep);
         end
         function tstep = nextQualityAnalysisStep(obj)
             % Advances the water quality simulation to the start of the next hydraulic time period.
@@ -12402,7 +12404,7 @@ classdef epanet <handle
                     g=g+1;
                 end
                 i=i+1;
-            end    
+            end
             while(tleft>0 && obj.Errcode==0)
                 [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
                 k=k+1; i=1;
@@ -12449,7 +12451,7 @@ classdef epanet <handle
                     g=g+1;
                 end
                 i=i+1;
-            end    
+            end
             while(tleft>0 && obj.Errcode==0)
                 [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
                 k=k+1; i=1;
