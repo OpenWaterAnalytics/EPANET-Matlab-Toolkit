@@ -710,6 +710,9 @@ classdef epanet <handle
             end
             if isunix
                 obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
+                if ismac
+                    obj.MSXLibEPANETPath = [pwdepanet, '/mac/'];
+                end
             end
             if ~isempty(varargin)
                 if varargin{1}{1}~=1
