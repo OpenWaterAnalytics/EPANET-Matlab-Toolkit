@@ -694,7 +694,7 @@ classdef epanet <handle
                 if ~isempty(varargin), return; end
             end
             if libisloaded(LibEPANET)
-                [~, version]=calllib(LibEPANET, 'EN_getversion', 0);
+                [~, version]=calllib(LibEPANET, 'ENgetversion', 0);
                 LibEPANETString = ['EPANET version {', num2str(version), '} loaded'];
                 fprintf(LibEPANETString);
             else
@@ -1321,7 +1321,7 @@ classdef epanet <handle
             % Returns:
             % LibEPANET the version of the OWA-EPANET toolkit.
             % an error code.
-            [Errcode, LibEPANET]=calllib(LibEPANET, 'EN_getversion', 0);
+            [Errcode, LibEPANET]=calllib(LibEPANET, 'ENgetversion', 0);
         end
         function [Errcode] = apiENinit(unitsType, headLossType, LibEPANET)
             % Initializes an EPANET project.
@@ -1414,9 +1414,9 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % See also apiENclose
-            Errcode=calllib(LibEPANET, 'EN_open', ph, inpname, repname, binname);
+            Errcode=calllib(LibEPANET, 'ENopen', inpname, repname, binname);
             if Errcode && Errcode~=200
-                 [~, errmsg] = calllib(LibEPANET, 'EN_geterror', Errcode, char(32*ones(1, 79)), 79);
+                 [~, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
                disp(errmsg);
             end
         end
@@ -3420,11 +3420,11 @@ classdef epanet <handle
             %Load EPANET Library
             obj.ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
             disp([' (EMT version {', obj.classversion, '}).'])
-            ph = uint64(1500000);
-            ph = struct;
+            %ph = uint64(1500000);
+            %ph = struct;
             % setdatatype(ph,'uint64Ptr',1,64)
             % Create Project
-            [obj.Errcode, obj.ph]=calllib(obj.LibEPANET, 'EN_createproject', ph);
+            %[obj.Errcode, obj.ph]=calllib(obj.LibEPANET, 'EN_createproject', ph);
             
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
@@ -3437,7 +3437,7 @@ classdef epanet <handle
                 if nargin==2 && strcmpi(varargin{2}, 'CREATE')
                     warning(['Network name "', inp , '.inp" already exists.'])
                 end
-                obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET, obj.ph);
+                obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
             else
                 obj.InputFile = varargin{1};
@@ -12772,6 +12772,7 @@ classdef epanet <handle
             %file=[file(1:end-1), 'txt'];%epanet2.h-->epanet2.txt
                 file = 'epanet2_enums.txt';%epanet2_enums.h-->epanet2_enums.txt
             end
+            
             fid = fopen(file);
             tline = fgetl(fid);
             i=1; constants={};

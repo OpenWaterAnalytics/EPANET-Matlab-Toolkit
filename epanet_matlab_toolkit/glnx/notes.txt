@@ -1,5 +1,10 @@
 1. Unzip libepanet
 2. run terminal
-3. sudo cp libepanet.so /lib64/libepanet.so
+3. 
 4. use msx files
 5. sudo rm libepanet.so
+
+
+Check library links
+sudo /sbin/ldconfig -v
+sudo cp libepanet.so usr/lib/x86_64-linux-gnu
