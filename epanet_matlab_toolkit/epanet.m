@@ -3353,6 +3353,7 @@ classdef epanet <handle
                 obj.LibEPANETpath = [pwdepanet, '/32bit/'];
             end
             if isunix
+                try unloadlibrary('libepanet');catch; end
                 obj.LibEPANETpath = [pwdepanet, '/glnx/'];
                 obj.LibEPANET = 'libepanet';
             end
@@ -3384,7 +3385,6 @@ classdef epanet <handle
             if nargin>0
                 obj.Bin=1;
                 [~, inp]=fileparts(obj.InputFile);
-                % nargin>0
                 if isempty(inp)
                     if nargin==2 && strcmpi(varargin{2}, 'CREATE')
                         % skip
