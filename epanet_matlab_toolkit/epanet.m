@@ -389,7 +389,7 @@ classdef epanet <handle
         ph;
     end
     properties (Constant = true)
-        classversion='v2.2.002'; % 02/05/2022
+        classversion='v2.2.003'; % 02/06/2022
 
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -711,6 +711,9 @@ classdef epanet <handle
             end
             if isunix
                 obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
+                if ismac
+                    obj.MSXLibEPANETPath = [pwdepanet, '/mac/'];
+                end
             end
             if ~isempty(varargin)
                 if varargin{1}{1}~=1
@@ -3352,6 +3355,7 @@ classdef epanet <handle
                 obj.LibEPANETpath = [pwdepanet, '/32bit/'];
             end
             if isunix
+                try unloadlibrary('libepanet');catch; end
                 obj.LibEPANETpath = [pwdepanet, '/glnx/'];
                 obj.LibEPANET = 'libepanet';
             end
@@ -3383,7 +3387,6 @@ classdef epanet <handle
             if nargin>0
                 obj.Bin=1;
                 [~, inp]=fileparts(obj.InputFile);
-                % nargin>0
                 if isempty(inp)
                     if nargin==2 && strcmpi(varargin{2}, 'CREATE')
                         % skip
@@ -7909,14 +7912,18 @@ classdef epanet <handle
         function value = getComputedTimeSeries(obj)
             obj.saveInputFile(obj.TempInpFile);
             [fid, binfile, ~] = runEPANETexe(obj);
-            value = readEpanetBin(fid, binfile, 0);
-            value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
-            % Remove report bin, files @#
-            warning off;
-            fclose('all');
-            files=dir('@#*');
-            if ~isempty(files); delete('@#*'); end
-            warning on;
+            if fid < 0
+                value = obj.getComputedTimeSeries_ENepanet();
+            else
+                value = readEpanetBin(fid, binfile, 0);
+                value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
+                % Remove report bin, files @#
+                warning off;
+                fclose('all');
+                files=dir('@#*');
+                if ~isempty(files); delete('@#*'); end
+                warning on;
+            end
         end
         function value = getComputedTimeSeries_ENepanet(obj)
             obj.saveInputFile(obj.TempInpFile);
@@ -19369,8 +19376,9 @@ function [fid, binfile, rptfile] = runEPANETexe(obj)
      end
      if isunix
          r = sprintf('%s%s %s %s %s', obj.LibEPANETpath, obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
-     elseif ismac
-         r = sprintf('%s%s %s %s %s', obj.LibEPANETpath, obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
+         if ismac
+            r = sprintf('%s%s %s %s %s', obj.LibEPANETpath, obj.LibEPANET, obj.BinTempfile, rptfile, binfile);
+         end
      end
      if obj.getCMDCODE, [~, ~]=system(r); else, system(r); end
      fid = fopen(binfile, 'r');
