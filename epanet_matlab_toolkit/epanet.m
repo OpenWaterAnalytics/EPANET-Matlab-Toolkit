@@ -3353,13 +3353,11 @@ classdef epanet <handle
                 obj.LibEPANETpath = [pwdepanet, '/32bit/'];
             end
             if isunix
-                try unloadlibrary('libepanet');catch; end
                 obj.LibEPANETpath = [pwdepanet, '/glnx/'];
-                obj.LibEPANET = 'libepanet';
+                obj.LibEPANET = 'epanet2';
             end
             if ismac
                 obj.LibEPANETpath = [pwdepanet, '/mac/'];
-                obj.LibEPANET = 'libepanet';
             end
             if nargin>0
                 if ~isdeployed
