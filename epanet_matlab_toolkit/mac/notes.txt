@@ -1,0 +1,4 @@
+- Open terminal
+- cd epanet_matlab_toolkit/glnx
+- tar -xvzf libepanet.tar.gz
+- sudo cp libepanet.so /lib/libepanet.so ~~~ 
