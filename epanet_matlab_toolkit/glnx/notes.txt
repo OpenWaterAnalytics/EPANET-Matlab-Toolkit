@@ -1,4 +1,5 @@
-- Open terminal
-- cd epanet_matlab_toolkit/glnx
-- (centos) sudo cp epanet2.so /lib64/libepanet.so 
-- (ubuntu) sudo cp epanet2.so /lib/x86_64-linux-gnu/libepanet.so
+1. open terminal
+2. tar -xvzf libepanet.tar.gz
+3. sudo cp libepanet.so /lib64/libepanet.so | /lib/x86_64-linux-gnu/libepanet.so
+4. use msx files
+5. sudo rm libepanet.so
