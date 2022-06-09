@@ -3344,7 +3344,7 @@ classdef epanet <handle
             %Constructor of the EPANET Class
             try unloadlibrary('epanet2');catch; end
             try unloadlibrary('epanetmsx');catch; end
-            % DLLs  
+            % DLLs
             arch = computer('arch');
             pwdepanet = fileparts(which(mfilename));
             if strcmpi(arch, 'win64')% if no DLL is given, select one automatically
@@ -3354,7 +3354,7 @@ classdef epanet <handle
             end
             if isunix
                 obj.LibEPANETpath = [pwdepanet, '/glnx/'];
-                obj.LibEPANET = 'libepanet';
+                obj.LibEPANET = 'epanet2';
             end
             if ismac
                 obj.LibEPANETpath = [pwdepanet, '/mac/'];
