@@ -685,7 +685,7 @@ classdef epanet <handle
                     if isunix
                         loadlibrary(LibEPANET, [LibEPANETpath, LibEPANET, '.h']);
                     else
-                        loadlibrary([LibEPANETpath, LibEPANET], [LibEPANETpath, LibEPANET, '_2.h']);
+                        loadlibrary([LibEPANETpath, LibEPANET], [LibEPANETpath, LibEPANET, '.h']);
                     end
                 else
                     loadlibrary('epanet2', @mxepanet); %loadlibrary('epanet2', 'epanet2.h', 'mfilename', 'mxepanet.m');
@@ -3433,20 +3433,20 @@ classdef epanet <handle
             %For the getComputedQualityTimeSeries
             obj.solve = 0;
             %Open the file
-
-            if ~isempty(obj.InputFile)
-                if nargin==2 && strcmpi(varargin{2}, 'CREATE')
-                    warning(['Network name "', inp , '.inp" already exists.'])
-                end
-                obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
-                error(obj.getError(obj.Errcode));
-            else
-                obj.InputFile = varargin{1};
-                % initializes an EPANET project that isn't opened with an input file
-                obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
-                warning('Initializes the EPANET project!');
-            end
             if nargin>0
+                if ~isempty(obj.InputFile)
+                    if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                        warning(['Network name "', inp , '.inp" already exists.'])
+                    end
+                    obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
+                else
+                    obj.InputFile = varargin{1};
+                    % initializes an EPANET project that isn't opened with an input file
+                    obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
+                    warning('Initializes the EPANET project!');
+                end
+            
                 %Save the temporary input file
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
                 obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
@@ -11946,6 +11946,10 @@ classdef epanet <handle
             disp('EPANET Class is unloaded')
         end
         function loadMSXFile(obj, msxname, varargin)
+            % Loads an msx file 
+            %
+            % Example:
+            %  d.loadMSXfile('net2-cl2.inp')
             if isempty(varargin)
                 obj.MSXMatlabSetup(msxname);
             else
@@ -11965,6 +11969,14 @@ classdef epanet <handle
             [value] = get_MSX_Options(obj.MSXFile, '', 1);
         end
         function value = getMSXTimeStep(obj)
+            % Retrieves the time step from the msx file. 
+            %
+            % Example:
+            %   d=epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXTimeStep
+            %
+            % See also setMSXTimeStep
             [value] = get_MSX_Options(obj.MSXFile, 'timestep', 0);
             value = value.TimeStep;
         end
@@ -11977,6 +11989,13 @@ classdef epanet <handle
             value = value.AreaUnits;
         end
         function value = getMSXRateUnits(obj)
+            % Retrieves MSX rate units
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXRateUnits
+            %
+            % See also setMSXRateUnits
             [value] = get_MSX_Options(obj.MSXFile, 'rate_units', 0);
             value = value.RateUnits;
         end
@@ -12635,6 +12654,16 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXTimeStep(obj, timestep)
+            % Sets the time step
+            % 
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXTimeStep
+            %  d.setMSXTimeStep(3600);
+            %  g.getMSXTimeStep
+            %
+            % See also getMSXTimeStep
             setMSXOptions(obj, 'timestep', timestep);
         end
         function setMSXAreaUnitsFT2(obj)
