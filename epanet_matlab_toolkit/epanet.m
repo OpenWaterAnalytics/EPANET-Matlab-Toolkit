@@ -12135,8 +12135,8 @@ classdef epanet <handle
             % Retrieves the number of patterns.
             %
             % Example:
-            %   d = epanet('net2-cl2.inp');
-            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d = epanet('example.inp');
+            %   d.loadMSXFile('example.msx'); 
             %   d.getMSXPatternsCount
             [obj.Errcode, value] = obj.apiMSXgetcount(7, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
@@ -12147,9 +12147,9 @@ classdef epanet <handle
             % Example:
             %   d = epanet('Net3-NH2CL.inp');
             %   d.loadMSXFile('Net3-NH2CL.msx'); 
-            %   d.getMSXSpeciesNameID          % Retrieves the IDs of all the species.
-            %   d.getMSXSpeciesNameID(1)       % Retrieves the IDs of the first specie.
-            %   d.getMSXSpeciesNameID([1,2,3]) % Retrieves the IDs of the first three species.
+            %   d.getMSXSpeciesNameID        % Retrieves the IDs of all the species.
+            %   d.getMSXSpeciesNameID(1)     % Retrieves the IDs of the first specie.
+            %   d.getMSXSpeciesNameID([1:3]) % Retrieves the IDs of the first three species.
             if isempty(varargin)
                 spcnt = obj.getMSXSpeciesCount;
                 value = cell(1, spcnt);
@@ -12175,9 +12175,9 @@ classdef epanet <handle
             % Example:
             %   d = epanet('net3-bio.inp');
             %   d.loadMSXFile('net3-bio.msx'); 
-            %   d.getMSXSpeciesType          % Retrieves the type of all the species.
-            %   d.getMSXSpeciesType{1}       % Retrieves the type of the first specie.
-            %   d.getMSXSpeciesType{[5,6,7]} % Retrieves the type of the last three species.
+            %   d.getMSXSpeciesType        % Retrieves the type of all the species.
+            %   d.getMSXSpeciesType{1}     % Retrieves the type of the first specie.
+            %   d.getMSXSpeciesType{[5:7]} % Retrieves the type of the last three species.
             msxSpCnt = obj.getMSXSpeciesCount;
             value = cell(1, msxSpCnt);
             if msxSpCnt
@@ -12325,9 +12325,9 @@ classdef epanet <handle
             % Example:
             %   d = epanet('Net3-NH2CL.inp');
             %   d.loadMSXFile('Net3-NH2CL.msx'); 
-            %   d.getMSXParametersNameID          % Retrieves the IDs of all the parameters.
-            %   d.getMSXParametersNameID(1)       % Retrieves the ID of the first parameter.
-            %   d.getMSXParametersNameID([1,2,3]) % Retrieves the IDs of the first three parameters.
+            %   d.getMSXParametersNameID        % Retrieves the IDs of all the parameters.
+            %   d.getMSXParametersNameID(1)     % Retrieves the ID of the first parameter.
+            %   d.getMSXParametersNameID([1:3]) % Retrieves the IDs of the first three parameters.
             if isempty(varargin)
                 if ~obj.getMSXParametersCount, value={};return; end
                 for i=1:obj.getMSXParametersCount
@@ -12407,10 +12407,12 @@ classdef epanet <handle
         function value = getMSXPatternsNameID(obj, varargin)
             % Retrieves the patterns ID.
             %
-            % Example: 
-            %   d.getMSXPatternsNameID          % Retrieves the IDs of all the patterns (if they exist).
-            %   d.getMSXPatternsNameID(1)       % Retrieves the ID of the first pattern (if they exist).
-            %   d.getMSXPatternsNameID([1,2,3]) % Retrieves the IDs of the first three patterns (if they exist).
+            % Example:
+            %   d = epanet('example.inp');
+            %   d.loadMSXFile('example.msx');
+            %   d.getMSXPatternsNameID        % Retrieves the IDs of all the patterns.
+            %   d.getMSXPatternsNameID(1)     % Retrieves the ID of the first pattern.
+            %   d.getMSXPatternsNameID(1:3) % Retrieves the IDs of the first three patterns.
             if isempty(varargin)
                 if ~obj.getMSXPatternsCount, value={};return; end
                 for i=1:obj.getMSXPatternsCount
@@ -12434,9 +12436,11 @@ classdef epanet <handle
             % Retrieves the patterns index.
             %
             % Example: 
-            %   d.getMSXPatternsIndex          % Retrieves the indices of all the patterns (if they exist).
-            %   d.getMSXPatternsIndex(1)       % Retrieves the index of the first pattern (if they exist).
-            %   d.getMSXPatternsIndex([1,2,3]) % Retrieves the indices of the first three patterns (if they exist).
+            %   d = epanet('example.inp');
+            %   d.loadMSXFile('example.msx');
+            %   d.getMSXPatternsIndex          % Retrieves the indices of all the patterns.
+            %   d.getMSXPatternsIndex('P1')    % Retrieves the index of the first pattern.
+            %   d.getMSXPatternsIndex({'P1', 'P2', 'P3') % Retrieves the indices of the first three patterns.
             if isempty(varargin)
                 value=1:obj.getMSXPatternsCount;
                 if isempty(value), value=[]; end
@@ -12453,10 +12457,12 @@ classdef epanet <handle
         function value = getMSXPatternsLengths(obj, varargin)
             % Retrieves the pattern lengths.
             %
-            % Example: 
-            %   d.getMSXPatternsLengths          % Retrieves the lengths of all the patterns (if they exist).
-            %   d.getMSXPatternsLengths(1)       % Retrieves the length of the first pattern (if they exist).
-            %   d.getMSXPatternsLengths([1,2,3]) % Retrieves the lengths of the first three patterns (if they exist).
+            % Example:
+            %   d = epanet('example.inp');
+            %   d.loadMSXFile('example.msx');
+            %   d.getMSXPatternsLengths        % Retrieves the lengths of all the patterns.
+            %   d.getMSXPatternsLengths(1)     % Retrieves the length of the first pattern.
+            %   d.getMSXPatternsLengths(1:3) % Retrieves the lengths of the first three patterns.
             value =[];
             if isempty(varargin)
                 if obj.getMSXPatternsCount
@@ -12488,9 +12494,9 @@ classdef epanet <handle
             % Example:
             %   d = epanet('net2-cl2.inp');
             %   d.loadMSXFile('net2-cl2.msx'); 
-            %   d.getMSXNodeInitqualValue          % Retrieves the initial quality of all nodes.
-            %   d.getMSXNodeInitqualValue{1}       % Retrieves the initial quality of the first node.
-            %   d.getMSXNodeInitqualValue{[1,2,3]} % Retrieves the initial quality  of the first three nodes.
+            %   d.getMSXNodeInitqualValue      % Retrieves the initial quality of all nodes.
+            %   d.getMSXNodeInitqualValue{1}   % Retrieves the initial quality of the first node.
+            %   d.getMSXNodeInitqualValue{1:3} % Retrieves the initial quality  of the first three nodes.
             if ~obj.getMSXSpeciesCount, value{1}(1)=0; return; end
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
@@ -12505,9 +12511,9 @@ classdef epanet <handle
             % Example:
             %   d = epanet('net2-cl2.inp');
             %   d.loadMSXFile('net2-cl2.msx'); 
-            %   d.getMSXLinkInitqualValue          % Retrieves the initial quality of all links.
-            %   d.getMSXLinkInitqualValue{1}       % Retrieves the initial quality of the first link.
-            %   d.getMSXLinkInitqualValue{[1,2,3]} % Retrieves the initial quality  of the first three links.
+            %   d.getMSXLinkInitqualValue      % Retrieves the initial quality of all links.
+            %   d.getMSXLinkInitqualValue{1}   % Retrieves the initial quality of the first link.
+            %   d.getMSXLinkInitqualValue{1:3} % Retrieves the initial quality  of the first three links.
             if ~obj.getMSXSpeciesCount, value{1}(1)=0; return; end
             for i=1:obj.getLinkCount
                 for j=1:obj.getMSXSpeciesCount
@@ -12522,9 +12528,12 @@ classdef epanet <handle
             % Example:
             %   d = epanet('net2-cl2.inp');
             %   d.loadMSXFile('net2-cl2.msx'); 
-            %   d.getMSXLinkInitqualValue          % Retrieves the initial quality of all links.
-            %   d.getMSXLinkInitqualValue{1}       % Retrieves the initial quality of the first link.
-            %   d.getMSXLinkInitqualValue{[1,2,3]} % Retrieves the initial quality  of the first three links.
+            %   sourceInfo = d.getMSXSources          
+            %   sourceInfo.MSXSourceType
+            %   sourceInfo.MSXSourceTypeCode 
+            %   sourceInfo.MSXsourceLevel
+            %   sourceInfo.MSXSourcePatternIndex 
+            %   sourceInfo.MSXSourceNodeNameID
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, obj.MSXSourceType{i}{j}, obj.MSXSourceLevel{i}(j), obj.MSXSourcePatternIndex{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
@@ -12541,9 +12550,25 @@ classdef epanet <handle
             value.MSXSourceNodeNameID=SnodeID;
         end
         function value = getMSXSourceNodeNameID(obj)
+            % Retrieves the sources node ID.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXSourceNodeNameID        % Retrieves all the source node IDs.       
+            %   d.getMSXSourceNodeNameID{1}     % Retrieves the first source node ID.
+            %   d.getMSXSourceNodeNameID{34:36} % Retrieves the source IDs of nodes 34 to 36.
             value = obj.getNodeNameID;
         end
         function value = getMSXSourceType(obj)
+            % Retrieves the sources type.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXSourceType          % Retrieves all the source types.       
+            %   d.getMSXSourceType{1}       % Retrieves the first node source type.
+            %   d.getMSXSourceType{1:5}     % Retrieves the source type of nodes 1 to 5
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, value{i}{j}, ~, ~] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
@@ -12552,6 +12577,14 @@ classdef epanet <handle
             end
         end
         function value = getMSXSourceLevel(obj)
+            % Retrieves the sources level.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXSourceLevel          % Retrieves all the source level.       
+            %   d.getMSXSourceLevel{1}       % Retrieves the first node source level.
+            %   d.getMSXSourceLevel{1:5}     % Retrieves the source level of nodes 1 to 5
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, ~, value{i}(j), ~] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
@@ -12560,6 +12593,14 @@ classdef epanet <handle
             end
         end
         function value = getMSXSourcePatternIndex(obj)
+            % Retrieves the sources pattern index.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXSourcePatternIndex          % Retrieves all the source pattern index.       
+            %   d.getMSXSourcePatternIndex{1}       % Retrieves the first node source pattern index.
+            %   d.getMSXSourcePatternIndex{1:5}     % Retrieves the source pattern index of nodes 1 to 5
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, ~, ~, value{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
@@ -12567,7 +12608,15 @@ classdef epanet <handle
                 end
             end
         end
-        function value = getMSXPattern(obj) %Mass flow rate per minute of a chemical source
+        function value = getMSXPattern(obj) 
+            % Retrieves the time patterns.
+            %
+            % Example:
+            %   d = epanet('example.inp');
+            %   d.loadMSXFile('example.msx'); 
+            %   patterns = d.getMSXPattern  % Retrieves all the patterns.       
+            %   patterns(1,:)     % Retrieves the first pattern.
+            %   patterns(1:3,:)   % Retrieves the first three patterns.
             tmpmaxlen=max(obj.getMSXPatternsLengths);
             value=nan(obj.getMSXPatternsCount, tmpmaxlen);
             for i=1:obj.getMSXPatternsCount
@@ -12585,16 +12634,34 @@ classdef epanet <handle
             end
         end
         function value = getMSXPatternValue(obj, patternIndex, patternStep)
-            % Mass flow rate per minute of a chemical source
+            % Retrieves the multiplier at a specific time period for a given source time pattern.
+            %
+            % Example:
+            %   d = epanet('example.inp');
+            %   d.loadMSXFile('example.msx'); 
+            %   d.getMSXPatternValue(4,1)  % Retrieves the first multiplier of the fourth patterns.       
             [obj.Errcode, value] = obj.apiMSXgetpatternvalue(patternIndex, patternStep, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXSpeciesConcentration(obj, type, index, species)
+            % Returns the node/link concentration for specific specie.
+            %
+            % type options:
+            %        node = 0
+            %        link = 1  
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXComputedQualitySpecie('CL2')
+            %   speciesIndex = d.getMSXSpeciesIndex('CL2')
+            %   d.getMSXSpeciesConcentration(0, 1, spIndex) % Retrieves the CL2 concentration of the first node.
+            %   d.getMSXSpeciesConcentration(1, 1, spIndex) % Retrieves the CL2 concentration of the first link.  
             [obj.Errcode, value] = obj.apiMSXgetqual(type, index, species, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXComputedQualitySpecie(obj, specie)
-            % Returns the quality nodes for specific specie
+            % Returns the node/link quality for specific specie.
             %
             % Example:
             %   d = epanet('net2-cl2.inp');
@@ -12658,6 +12725,16 @@ classdef epanet <handle
             end
         end
         function value = getMSXComputedQualityNode(obj, varargin)
+            % Returns the computed quality for nodes.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   MSX_comp = d.getMSXComputedQualityNode    
+            %   MSX_comp.Quality % row: time, col: node index
+            %   MSX_comp.Time
+            %   d.getMSXComputedQualityNode(1).Quality     % Compute quality for the first node
+            %   d.getMSXComputedQualityNode(1:3).Quality   % Compute quality for the first three nodes
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -12705,6 +12782,16 @@ classdef epanet <handle
             end
         end
         function value = getMSXComputedQualityLink(obj, varargin)
+            % Returns the computed quality for links.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   MSX_comp = d.getMSXComputedQualityLink
+            %   MSX_comp.Quality % row: time, col: link index
+            %   MSX_comp.Time
+            %   d.getMSXComputedQualityLink(1).Quality     % Compute quality for the first link.
+            %   d.getMSXComputedQualityLink(1:3).Quality   % Compute quality for the first three links.
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
