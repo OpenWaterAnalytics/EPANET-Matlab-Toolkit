@@ -12877,24 +12877,52 @@ classdef epanet <handle
             end
         end
         function value = getMSXError(obj, Errcode)
+            % Retrieves the MSX erorr message for specific erorr code.
+            %
+            % Example:
+            %   d.getMSXError(510)
             [obj.Errcode, value] = obj.apiMSXgeterror(Errcode, obj.MSXLibEPANET);
             if Errcode == 519
                 error('Please check the MSX file. Maybe node/link ids do not exist in the input file.');
             end
         end
-        function solveMSXCompleteHydraulics(obj, varargin)
+        function solveMSXCompleteHydraulics(obj)
+            % Solve complete hydraulic over the entire simulation period.
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.solveMSXCompleteHydraulics
             [obj.Errcode] = obj.apiMSXsolveH(obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
-        function solveMSXCompleteQuality(obj, varargin)
+        function solveMSXCompleteQuality(obj)
+            % Solve complete hydraulic over the entire simulation period.
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.solveMSXCompleteQuality
             [obj.Errcode] = obj.apiMSXsolveQ(obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
-        function writeMSXReport(obj, varargin)
+        function writeMSXReport(obj)
+            % Writes water quality simulations results in a text file.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.writeMSXReport
             [obj.Errcode]=obj.apiMSXreport(obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function [status, result] = writeMSXReportExe(obj, varargin)
+            % Write report in a text file using epanetmsx.exe file.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.writeMSXReportExe('net2-cl2_report.txt')
             if isempty(varargin)
                 rptfile=['@#', char(java.util.UUID.randomUUID), '.txt'];
             else
