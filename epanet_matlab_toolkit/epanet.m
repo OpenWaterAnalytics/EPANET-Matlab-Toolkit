@@ -12772,7 +12772,7 @@ classdef epanet <handle
             end
             value.Quality = cell(1, length(ss));
             % Obtain a hydraulic solution
-            obj.solveMSXCompleteHydraulics(obj.MSXLibEPANET);
+            obj.solveMSXCompleteHydraulics;
             % Run a step-wise water quality analysis without saving
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
@@ -12829,7 +12829,7 @@ classdef epanet <handle
             end
             value.Quality = cell(1, length(ss));
             % Obtain a hydraulic solution
-            obj.solveMSXCompleteHydraulics(obj.MSXLibEPANET);
+            obj.solveMSXCompleteHydraulics;
             % Run a step-wise water quality analysis without saving
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
@@ -12858,6 +12858,13 @@ classdef epanet <handle
             end
         end
         function plotMSXSpeciesNodeConcentration(obj, varargin)
+            % Plots concentration of species for nodes over time. 
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.plotMSXSpeciesNodeConcentration(5,1)     % Plots first node's concentration of the first specie over time.  
+            %   d.plotMSXSpeciesNodeConcentration([1:5],1) % Plots concentration of nodes 1to 5 for the first specie over time.
             s=obj.getMSXComputedQualityNode(varargin{1}, varargin{2});
             nodesID=obj.getNodeNameID;
             SpeciesNameID=obj.getMSXSpeciesNameID;nd=1;
@@ -12877,6 +12884,13 @@ classdef epanet <handle
             end
         end
         function plotMSXSpeciesLinkConcentration(obj, varargin)
+            % Plots concentration of species for links over time. 
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.plotMSXSpeciesLinkConcentration(5,1)     % Plots first node's concentration of the first specie over time.  
+            %   d.plotMSXSpeciesLinkConcentration([1:5],1) % Plots concentration of nodes 1to 5 for the first specie over time.
             s=obj.getMSXComputedQualityLink(varargin{1}, varargin{2});
             linksID=obj.getLinkNameID;
             SpeciesNameID=obj.getMSXSpeciesNameID;nd=1;
@@ -13015,7 +13029,7 @@ classdef epanet <handle
             %   d = epanet('net3-bio.inp');
             %   d.loadMSXFile('net3-bio.msx');
             %   d.getMSXConstantsValue
-            %   d.setMSXConstantsValue([1, 2, 3]) % Set the values of the first three constants.
+            %   d.setMSXConstantsValue([1, 2, 3]); % Set the values of the first three constants.
             %   d.getMSXConstantsValue
             for i=1:length(value)
                 [obj.Errcode] = obj.apiMSXsetconstant(i, value(i), obj.MSXLibEPANET);
@@ -13023,6 +13037,18 @@ classdef epanet <handle
             end
         end
         function setMSXParametersTanksValue(obj, NodeTankIndex, paramindex, value)
+            % Assigns a value to a particular reaction parameter for a given tank within the pipe network.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   a = d.getNodeTankIndex;
+            %   d.getMSXParametersTanksValue{a(1)}
+            %   d.setMSXParametersTanksValue(a(1),1,0.5) % Sets the value of the first tank 
+            %                                             (tank_index, parameter_index, value)
+            %   d.getMSXParametersTanksValue{a(1)} 
+            %
+            %
             if ~sum(NodeTankIndex==obj.NodeTankIndex)
                 fprintf('>> Invalid Tank Index <<\n');obj.NodeTankIndex
                 return;
@@ -13031,6 +13057,14 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXParametersPipesValue(obj, pipeIndex, value)
+            % Assigns a value to a particular reaction parameter for a given pipe within the pipe network.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXParametersPipesValue
+            %   d.setMSXParametersPipesValue(1,[1.5 2]) % Sets the value of the first pipe.
+            %   d.getMSXParametersPipesValue
             for i=1:length(value)
                 [obj.Errcode] = obj.apiMSXsetparameter(1, pipeIndex, i, value(i), obj.MSXLibEPANET);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
@@ -13399,10 +13433,18 @@ classdef epanet <handle
             setMSXOptions(obj, 'rtol', rtol);
         end
         function saveMSXQualityFile(obj, outfname)
+            % Saves the quality as bin file.
+            d.saveMSXQualityFile('testMSXQuality.bin')
             [obj.Errcode]=obj.apiMSXsaveoutfile(outfname, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function useMSXHydraulicFile(obj, hydname)
+            %
+            %
+            % Example:
+            %  d.saveHydraulicsOutputReportingFile
+            %  d.saveHydraulicFile('testMSXHydraulics.hyd')
+            %  d.useMSXHydraulicFile('testMSXHydraulics.hyd')
             [obj.Errcode]=obj.apiMSXusehydfile(hydname, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
@@ -13441,6 +13483,14 @@ classdef epanet <handle
             % if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function saveMSXFile(obj, msxname)
+            % Saves the data associated with the current MSX project into a new MSX input file.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.saveMSXFile('testMSX.msx');
+            %
+            % See also writeMSXFile 
             [obj.Errcode] = obj.apiMSXsavemsxfile(msxname, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
@@ -13490,6 +13540,10 @@ classdef epanet <handle
             fclose(f);
         end
         function unloadMSX(obj)
+            % Unload library and close the MSX Toolkit system.
+            %
+            % Example:
+            %   d.unloadMSX
             obj.apiMSXclose(obj);
             obj.apiMSXMatlabCleanup(obj);
             fclose('all');
