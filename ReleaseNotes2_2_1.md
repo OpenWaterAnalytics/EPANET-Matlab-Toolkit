@@ -9,7 +9,7 @@
 ## List of EPANET 2.2.1 Matlab Class Functions
 |Function|Description|
 |---------|---------|
-|appCreateMultipleScenario|Creates scenarios based on node count of inp file EPANET|
+|appCreateMultipleScenarios|Creates scenarios based on node count of inp file EPANET|
 |appRotateNetwork|Rotates the network by theta degrees counter-clockwise|
 |appShiftNetwork|Shifts the network in x and y directions|
 |getLinkQuality|Retrieves the value of link quality|

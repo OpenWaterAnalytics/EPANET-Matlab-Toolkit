@@ -232,16 +232,16 @@ end
 
 %% QUALITY
 values = d.getMSXLinkInitqualValue
-nodeIndex=1; speciesIndex=1;
-values{nodeIndex}(speciesIndex)=1000;%
+linkIndex=1; speciesIndex=1;
+values{linkIndex}(speciesIndex)=1000;
 d.setMSXLinkInitqualValue(values)     
 d.getMSXLinkInitqualValue 
 disp('Press any key to continue...')
 pause
 
-linkIndex=1; speciesIndex=1;
+nodeIndex=1; speciesIndex=1;
 values = d.getMSXNodeInitqualValue
-values{linkIndex}(speciesIndex)=1500;%
+values{nodeIndex}(speciesIndex)=1500;
 d.setMSXNodeInitqualValue(values)
 d.getMSXNodeInitqualValue   
 

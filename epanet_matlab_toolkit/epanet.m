@@ -386,6 +386,7 @@ classdef epanet <handle
         BinUnits;                    % Units of all parameters
         BinUnits_US_Customary;       % Equal with 1 if is US-Customary
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
+        ph;
     end
     properties (Constant = true)
         classversion='v2.2.003'; % 02/06/2022
@@ -1402,7 +1403,7 @@ classdef epanet <handle
             [Errcode, tstep]=calllib(LibEPANET, 'ENnextQ', int32(0));
             tstep = double(tstep);
         end
-        function [Errcode] = apiENopen(inpname, repname, binname, LibEPANET) %DE
+        function [Errcode] = apiENopen(inpname, repname, binname, LibEPANET, ph) %DE
             % Opens an EPANET input file & reads in network data.
             %
             % apiENopen(inpname, repname, binname, LibEPANET)
@@ -1556,6 +1557,7 @@ classdef epanet <handle
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             t=int32(0);
             [Errcode, t]=calllib(LibEPANET, 'ENrunQ', t);
+            t = double(t);
         end
         function [Errcode] = apiENsaveH(LibEPANET)
             % Transfers a project's hydraulics results from its temporary hydraulics file to its binary output file,
@@ -3344,7 +3346,7 @@ classdef epanet <handle
             %Constructor of the EPANET Class
             try unloadlibrary('epanet2');catch; end
             try unloadlibrary('epanetmsx');catch; end
-            % DLLs
+            % DLLs  
             arch = computer('arch');
             pwdepanet = fileparts(which(mfilename));
             if strcmpi(arch, 'win64')% if no DLL is given, select one automatically
@@ -3354,7 +3356,7 @@ classdef epanet <handle
             end
             if isunix
                 obj.LibEPANETpath = [pwdepanet, '/glnx/'];
-                obj.LibEPANET = 'epanet2';
+                obj.LibEPANET = 'libepanet';
             end
             if ismac
                 obj.LibEPANETpath = [pwdepanet, '/mac/'];
@@ -3419,27 +3421,32 @@ classdef epanet <handle
             %Load EPANET Library
             obj.ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
             disp([' (EMT version {', obj.classversion, '}).'])
-
+            %ph = uint64(1500000);
+            %ph = struct;
+            % setdatatype(ph,'uint64Ptr',1,64)
+            % Create Project
+            %[obj.Errcode, obj.ph]=calllib(obj.LibEPANET, 'EN_createproject', ph);
+            
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
 
             %For the getComputedQualityTimeSeries
             obj.solve = 0;
             %Open the file
-
-            if ~isempty(obj.InputFile)
-                if nargin==2 && strcmpi(varargin{2}, 'CREATE')
-                    warning(['Network name "', inp , '.inp" already exists.'])
-                end
-                obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
-                error(obj.getError(obj.Errcode));
-            %               else
-            %                 obj.InputFile = varargin{1};
-            %                 % initializes an EPANET project that isn't opened with an input file
-            %                 obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
-            %                 warning('Initializes the EPANET project!');
-            end
             if nargin>0
+                if ~isempty(obj.InputFile)
+                    if nargin==2 && strcmpi(varargin{2}, 'CREATE')
+                        warning(['Network name "', inp , '.inp" already exists.'])
+                    end
+                    obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET);
+                    error(obj.getError(obj.Errcode));
+                else
+                    obj.InputFile = varargin{1};
+                    % initializes an EPANET project that isn't opened with an input file
+                    obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
+                    warning('Initializes the EPANET project!');
+                end
+            
                 %Save the temporary input file
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
                 obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
@@ -8041,6 +8048,7 @@ classdef epanet <handle
             % See also getPattern, setPattern, setPatternNameID
                 %          setPatternValue, setPatternComment.
             [obj.Errcode] = obj.apiENaddpattern(varargin{1}, obj.LibEPANET);
+            obj.getError(obj.Errcode)
             index = getPatternIndex(obj, varargin{1});
             if nargin==2
                 setPattern(obj, index, ones(1, max(obj.getPatternLengths)));
@@ -8719,7 +8727,7 @@ classdef epanet <handle
             midElev = (obj.getNodeElevations(leftNodeIndex)+obj.getNodeElevations(rightNodeIndex))/2;
             obj.setNodeJunctionData(newNodeIndex, midElev,0,'');
             obj.setNodeEmitterCoeff(newNodeIndex,obj.getNodeEmitterCoeff(leftNodeIndex));
-            
+
             if obj.QualityCode > 0
                 midInitQual = (obj.getNodeInitialQuality(leftNodeIndex)+obj.getNodeInitialQuality(rightNodeIndex))/2;
                 obj.setNodeInitialQuality(newNodeIndex,midInitQual);
@@ -11720,6 +11728,7 @@ classdef epanet <handle
             %
             % See also nextQualityAnalysisStep, runHydraulicAnalysis.
             [obj.Errcode, tstep] = obj.apiENnextH(obj.LibEPANET);
+            tstep = double(tstep);
         end
         function tstep = nextQualityAnalysisStep(obj)
             % Advances the water quality simulation to the start of the next hydraulic time period.
@@ -11917,7 +11926,7 @@ classdef epanet <handle
             %   d.unload
             %
             % See also epanet, saveInputFile, closeNetwork.
-
+            %
             %apiENclose(obj.LibEPANET);
             obj.ENMatlabCleanup(obj.LibEPANET);
             fclose('all');
@@ -11937,6 +11946,10 @@ classdef epanet <handle
             disp('EPANET Class is unloaded')
         end
         function loadMSXFile(obj, msxname, varargin)
+            % Loads an msx file 
+            %
+            % Example:
+            %   d.loadMSXfile('net2-cl2.msx')
             if isempty(varargin)
                 obj.MSXMatlabSetup(msxname);
             else
@@ -11944,67 +11957,234 @@ classdef epanet <handle
             end
         end
         function value = getMSXEquationsTerms(obj)
+            % Retrieves equation terms. 
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXEquationsTerms
+            %
+            % See also getMSXEquationsPipes, getMSXEquationsTanks.
             [value, ~, ~] = getEquations(obj.MSXFile);
         end
         function value = getMSXEquationsPipes(obj)
+            % Retrieves equation for pipes.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXEquationsPipes
+            %
+            % See also getMSXEquationsTerms, getMSXEquationsTanks.
             [~, value, ~] = getEquations(obj.MSXFile);
         end
         function value = getMSXEquationsTanks(obj)
+            % Retrieves equation for tanks.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXfile('net2-cl2.msx');
+            %   d.getMSXEquationsTanks
+            %
+            % See also getMSXEquationsTerms, getMSXEquationsPipes.
             [~, ~, value] = getEquations(obj.MSXFile);
         end
         function value = getMSXOptions(obj)
+            % Retrieves all the options.
+            % 
+            % Example:
+            %   d=epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXOptions
             [value] = get_MSX_Options(obj.MSXFile, '', 1);
         end
         function value = getMSXTimeStep(obj)
+            % Retrieves the time step. 
+            %
+            % Example:
+            %   d=epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXTimeStep
+            %
+            % See also setMSXTimeStep.
             [value] = get_MSX_Options(obj.MSXFile, 'timestep', 0);
             value = value.TimeStep;
         end
         function value = getMSXSolver(obj)
+            % Retrieves the solver method. 
+            % 
+            % Numerical integration methods:
+            %   EUL = standard Euler integrator
+            %   RK5 = Runge-Kutta 5th order integrator
+            %   ROS2 = 2nd order Rosenbrock integrator. 
+            %
+            % Example:
+            %   d=epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXSolver
+            %
+            % See also setMSXSolverEUL, setMSXSolverRK5, setMSXSolverROS2.
             [value] = get_MSX_Options(obj.MSXFile, 'solver', 0);
             value = value.Solver;
         end
         function value = getMSXAreaUnits(obj)
+            % Retrieves the solver method. 
+            % 
+            % Numerical integration methods:
+            %   EUL = standard Euler integrator
+            %   RK5 = Runge-Kutta 5th order integrator
+            %   ROS2 = 2nd order Rosenbrock integrator. 
+            %
+            % Example:
+            %   d=epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXSolver
+            %
+            % See also setMSXAreaUnitsFT2, setMSXAreaUnitsM2,
+            %          setMSXAreaUnitsCM2.
             [value] = get_MSX_Options(obj.MSXFile, 'area_units', 0);
             value = value.AreaUnits;
         end
         function value = getMSXRateUnits(obj)
+            % Retrieves  rate units.
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXRateUnits
+            %
+            % See also setMSXRateUnits.
             [value] = get_MSX_Options(obj.MSXFile, 'rate_units', 0);
             value = value.RateUnits;
         end
         function value = getMSXRtol(obj)
+            % Retrieves the relative accuracy level.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXRtol
+            %
+            % See also getMSXAtol.
             [value] = get_MSX_Options(obj.MSXFile, 'rtol', 0);
             value = value.Rtol;
         end
         function value = getMSXAtol(obj)
+            % Retrieves the absolute tolerance.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXAtol
+            %
+            % See also getMSXRtol.
             [value] = get_MSX_Options(obj.MSXFile, 'atol', 0);
             value = value.Atol;
         end
         function value = getMSXCoupling(obj)
+            % Retrieves the degree of coupling for solving DAE's.
+            %
+            % Coupling Options:
+            %   NONE: The solution to the algebraic equations is only updated 
+            %         at the end of each integration time step.
+            %   FULL: The updating is done whenever a new set of values for the 
+            %         rate-dependent variables in the reaction
+            %         rate expressions is computed.
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXCoupling
+            %
+            % See also setMSXCouplingFULL, setMSXCouplingNONE. 
             [value] = get_MSX_Options(obj.MSXFile, 'COUPLING', 0);
             value = value.Coupling;
         end
         function value = getMSXCompiler(obj)
+            % Retrieves the chemistry function compiler code.
+            %
+            % Compiler Options:
+            %   NONE: no compiler (default option)
+            %   gc: MinGW or Gnu C++ compilers
+            %   vc: Visual C++ compiler
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXCompiler
+            %
+            % See also setMSXCompilerNONE, setMSXCompilerVC,
+            %          setMSXCompilerGC.
             [value] = get_MSX_Options(obj.MSXFile, 'compiler', 0);
             value = value.Compiler;
         end
         function value = getMSXSpeciesCount(obj)
-            % Species, Constants, Parameters, Patterns
+            % Retrieves the number of species.
+            %
+            % Example:
+            %   d = epanet('Net3-NH2CL.inp');
+            %   d.loadMSXFile('Net3-NH2CL.msx'); 
+            %   d.getMSXSpeciesCount
+            %
+            % See also getMSXSpeciesIndex, getMSXSpeciesNameID, getMSXSpeciesConcentration, 
+            %          getMSXSpeciesType, getMSXSpeciesUnits, getMSXSpeciesATOL,
+            %          getMSXSpeciesRTOL.
             [obj.Errcode, value] = obj.apiMSXgetcount(3, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXConstantsCount(obj)
+            % Retrieves the number of constants.
+            %
+            % Example:
+            %   d = epanet('Net3-NH2CL.inp');
+            %   d.loadMSXFile('Net3-NH2CL.msx'); 
+            %   d.getMSXConstantsCount
+            % 
+            % See also getMSXConstantsIndex, getMSXConstantsValue, 
+            %          getMSXConstantsNameID.
             [obj.Errcode, value] = obj.apiMSXgetcount(6, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXParametersCount(obj)
+            % Retrieves the number of parameters.
+            %
+            % Example:
+            %   d = epanet('Net3-NH2CL.inp');
+            %   d.loadMSXFile('Net3-NH2CL.msx'); 
+            %   d.getMSXParametersCount
+            %
+            % See also setMSXParametersTanksValue, setMSXParametersPipesValue,
+            %          getMSXParametersIndex, getMSXParametersTanksValue, 
+            %          getMSXParametersPipesValue.
             [obj.Errcode, value] = obj.apiMSXgetcount(5, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXPatternsCount(obj)
+            % Retrieves the number of patterns.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.addMSXPattern('P1', [1.0, 0.0 1.0]);
+            %   d.addMSXPattern('P2', [0.0, 0.0 2.0]);
+            %   d.getMSXPatternsCount
+            %
+            % See also setMSXPattern, setMSXPatternValue, addMSXPattern.
             [obj.Errcode, value] = obj.apiMSXgetcount(7, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXSpeciesNameID(obj, varargin)
+            % Retrieves the species' ID.
+            %
+            % Example:
+            %   d = epanet('Net3-NH2CL.inp');
+            %   d.loadMSXFile('Net3-NH2CL.msx'); 
+            %   d.getMSXSpeciesNameID        % Retrieves the IDs of all the species.
+            %   d.getMSXSpeciesNameID(1)     % Retrieves the IDs of the first specie.
+            %   d.getMSXSpeciesNameID([1:3]) % Retrieves the IDs of the first three species.
+            %
+            % See also getMSXSpeciesIndex, getMSXSpeciesCount, getMSXSpeciesConcentration, 
+            %          getMSXSpeciesType, getMSXSpeciesUnits, getMSXSpeciesATOL,
+            %          getMSXSpeciesRTOL.
             if isempty(varargin)
                 spcnt = obj.getMSXSpeciesCount;
                 value = cell(1, spcnt);
@@ -12025,6 +12205,18 @@ classdef epanet <handle
             end
         end
         function value = getMSXSpeciesType(obj)
+            % Retrieves the species' type.
+            %
+            % Example:
+            %   d = epanet('net3-bio.inp');
+            %   d.loadMSXFile('net3-bio.msx'); 
+            %   d.getMSXSpeciesType        % Retrieves the type of all the species.
+            %   d.getMSXSpeciesType{1}     % Retrieves the type of the first specie.
+            %   d.getMSXSpeciesType{[5:7]} % Retrieves the type of the last three species.
+            %
+            % See also getMSXSpeciesIndex, getMSXSpeciesCount, getMSXSpeciesConcentration, 
+            %          getMSXSpeciesnameID, getMSXSpeciesUnits, getMSXSpeciesATOL,
+            %          getMSXSpeciesRTOL.
             msxSpCnt = obj.getMSXSpeciesCount;
             value = cell(1, msxSpCnt);
             if msxSpCnt
@@ -12035,6 +12227,19 @@ classdef epanet <handle
             end
         end
         function value = getMSXSpeciesUnits(obj)
+            % Retrieves the species' units.
+            %
+            % Example:
+            %   d = epanet('net3-bio.inp');
+            %   d.loadMSXFile('net3-bio.msx'); 
+            %   d.getMSXSpeciesUnits          % Retrieves the units of all the species.
+            %   d.getMSXSpeciesUnits{1}       % Retrieves the units of the first specie.
+            %   d.getMSXSpeciesUnits{[1,16]}  % Retrieves the units of the species with 
+            %                                   indices 1 and 16.
+            %
+            % See also getMSXSpeciesIndex, getMSXSpeciesCount, getMSXSpeciesConcentration, 
+            %          getMSXSpeciesType, getMSXSpeciesNameID, getMSXSpeciesATOL,
+            %          getMSXSpeciesRTOL.
             msxSpCnt = obj.getMSXSpeciesCount;
             value = cell(1, msxSpCnt);
             if msxSpCnt
@@ -12044,6 +12249,17 @@ classdef epanet <handle
             end
         end
         function value = getMSXSpeciesATOL(obj)
+            % Retrieves the species' absolute tolerance.
+            %
+            % Example:
+            %   d = epanet('net3-bio.inp');
+            %   d.loadMSXFile('net3-bio.msx'); 
+            %   d.getMSXSpeciesATOL
+            %
+            % See also getMSXSpeciesIndex, getMSXSpeciesCount, getMSXSpeciesConcentration, 
+            %          getMSXSpeciesType, getMSXSpeciesNameID, getMSXSpeciesUnits,
+            %          getMSXSpeciesRTOL.
+            msxSpCnt = obj.getMSXSpeciesCount;
             value = [];
             msxSpCnt = obj.getMSXSpeciesCount;
             if msxSpCnt
@@ -12054,6 +12270,16 @@ classdef epanet <handle
             end
         end
         function value = getMSXSpeciesRTOL(obj)
+            % Retrieves the species' relative accuracy level.
+            %
+            % Example:
+            %   d = epanet('net3-bio.inp');
+            %   d.loadMSXFile('net3-bio.msx'); 
+            %   d.getMSXSpeciesRTOL  
+            %
+            % See also getMSXSpeciesIndex, getMSXSpeciesCount, getMSXSpeciesConcentration, 
+            %          getMSXSpeciesType, getMSXSpeciesNameID, getMSXSpeciesUnits,
+            %          getMSXSpeciesATOL.
             value = [];
             msxSpCnt = obj.getMSXSpeciesCount;
             if msxSpCnt
@@ -12064,6 +12290,18 @@ classdef epanet <handle
             end
         end
         function value = getMSXSpeciesIndex(obj, varargin)
+            % Retrieves the species' index.
+            %
+            % Example:
+            %   d = epanet('Net3-NH2CL.inp');
+            %   d.loadMSXFile('Net3-NH2CL.msx'); 
+            %   d.getMSXSpeciesIndex          % Retrieves the index of all the species.
+            %   d.getMSXSpeciesIndex('Na')    % Retrieves the index of the Na.
+            %   d.getMSXSpeciesIndex({'CL2', 'Nb', 'Na'}) % Retrieves the indices of CL2, Nb and Na.
+            %
+            % See also getMSXSpeciesUnits, getMSXSpeciesCount, getMSXSpeciesConcentration, 
+            %          getMSXSpeciesType, getMSXSpeciesNameID, getMSXSpeciesRTOL,
+            %          getMSXSpeciesATOL.
             if isempty(varargin)
                 value=1:obj.getMSXSpeciesCount;
                 if isempty(value), value=[]; end
@@ -12078,6 +12316,17 @@ classdef epanet <handle
             end
         end
         function value = getMSXConstantsNameID(obj)
+            % Retrieves the constant's ID.
+            %
+            % Example:
+            %   d = epanet('Net3-NH2CL.inp');
+            %   d.loadMSXFile('Net3-NH2CL.msx'); 
+            %   d.getMSXConstantsNameID        % Retrieves the IDs of all the constants.
+            %   d.getMSXConstantsNameID{1}     % Retrieves the ID of the first constant.
+            %   d.getMSXConstantsNameID{[1,2]} % Retrieves the IDs of the first two constants.
+            %
+            % See also getMSXConstantsCount, getMSXConstantsValue, 
+            %          getMSXConstantsNameID.
             value={};
             if obj.getMSXConstantsCount
                 for i=1:obj.getMSXConstantsCount
@@ -12089,6 +12338,17 @@ classdef epanet <handle
             end
         end
         function value = getMSXConstantsValue(obj)
+            % Retrieves the constant's value.
+            %
+            % Example:
+            %   d = epanet('net3-bio.inp');
+            %   d.loadMSXFile('net3-bio.msx'); 
+            %   d.getMSXConstantsValue        % Retrieves the values of all the constants.
+            %   d.getMSXConstantsValue{1}     % Retrieves the value of the first constant.
+            %   d.getMSXConstantsValue{[1,2]} % Retrieves the values of the first two constants.
+            %
+            % See also setMSXConstantsValue, getMSXConstantsCount, 
+            %          getMSXConstantsIndex, getMSXConstantsNameID.
             value=[];
             if obj.getMSXConstantsCount
                 for i=1:obj.getMSXConstantsCount
@@ -12098,6 +12358,16 @@ classdef epanet <handle
             end
         end
         function value = getMSXConstantsIndex(obj, varargin)
+            % Retrieves the constant's index.
+            %
+            % Example:
+            %   d = epanet('Net3-NH2CL.inp');
+            %   d.loadMSXFile('Net3-NH2CL.msx'); 
+            %   d.getMSXConstantsIndex        % Retrieves the index of all the species.
+            %   d.getMSXConstantsIndex('S1')  % Retrieves the index of S1.
+            %
+            % See also getMSXConstantsCount, getMSXConstantsValue, 
+            %          getMSXConstantsNameID.
             if isempty(varargin)
                 value=1:obj.getMSXConstantsCount;
                 if isempty(value), value=[]; end
@@ -12112,6 +12382,17 @@ classdef epanet <handle
             end
         end
         function value = getMSXParametersNameID(obj, varargin)
+            % Retrieves the parameter's ID.
+            %
+            % Example:
+            %   d = epanet('Net3-NH2CL.inp');
+            %   d.loadMSXFile('Net3-NH2CL.msx'); 
+            %   d.getMSXParametersNameID        % Retrieves the IDs of all the parameters.
+            %   d.getMSXParametersNameID(1)     % Retrieves the ID of the first parameter.
+            %   d.getMSXParametersNameID([1:3]) % Retrieves the IDs of the first three parameters.
+            %
+            % See also getMSXParametersCount, getMSXParametersIndex, 
+            %          getMSXParametersTanksValue, getMSXParametersPipesValue.
             if isempty(varargin)
                 if ~obj.getMSXParametersCount, value={};return; end
                 for i=1:obj.getMSXParametersCount
@@ -12132,6 +12413,18 @@ classdef epanet <handle
             end
         end
         function value = getMSXParametersIndex(obj, varargin)
+            % Retrieves the parameter's indices.
+            %
+            % Example:
+            %   d = epanet('Net3-NH2CL.inp');
+            %   d.loadMSXFile('Net3-NH2CL.msx'); 
+            %   d.getMSXParametersIndex          % Retrieves the indices of all the parameters.
+            %   d.getMSXParametersIndex('k1')    % Retrieves the index of the first parameter.
+            %   d.getMSXParametersIndex({'k1', 'k3', 'kDOC1'}) % Retrieves the indices of the 
+            %                                                    parameters 'k1', 'k3' and 'kDOC1'.
+            %
+            % See also getMSXParametersCount, getMSXParametersIndex, 
+            %          getMSXParametersTanksValue, getMSXParametersPipesValue.
             if isempty(varargin)
                 value=1:obj.getMSXParametersCount;
                 if isempty(value), value=[]; end
@@ -12146,6 +12439,16 @@ classdef epanet <handle
             end
         end
         function value = getMSXParametersTanksValue(obj)
+            % Retrieves the parameters tanks value.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   tankIndex = d.getNodeTankIndex
+            %   d.getMSXParametersTanksValue{tankIndex} % Retrieves the value of the first tank.
+            %
+            % See also setMSXParametersTanksValue, getMSXParametersCount, 
+            %          getMSXParametersIndex, getMSXParametersPipesValue.
             value={};
             if ~obj.getMSXParametersCount, value=0;return;end
             if ~length(obj.NodeTankIndex), value=0;return;end
@@ -12157,6 +12460,16 @@ classdef epanet <handle
             end
         end
         function value = getMSXParametersPipesValue(obj)
+            % Retrieves the parameters pipes value.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXParametersPipesValue 
+            % 
+            % See also setMSXParametersPipesValue, getMSXParametersTanksValue,
+            %          getMSXParametersCount, getMSXParametersIndex.
+            value={};
             if ~obj.getMSXParametersCount, value=[];return; end
             for i=1:obj.getLinkPipeCount
                 for j=1:obj.getMSXParametersCount
@@ -12166,6 +12479,21 @@ classdef epanet <handle
             end
         end
         function value = getMSXPatternsNameID(obj, varargin)
+            % Retrieves the patterns ID.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.addMSXPattern('P1', [1.0, 0.0 1.0]);
+            %   d.addMSXPattern('P2', [0.0, 0.0 2.0]);
+            %   d.addMSXPattern('P3', [0.0, 1.0 2.0]);
+            %   d.addMSXPattern('P4', [1.0, 1.0 2.0]);
+            %   d.getMSXPatternsNameID        % Retrieves the IDs of all the patterns.
+            %   d.getMSXPatternsNameID(1)     % Retrieves the ID of the first pattern.
+            %   d.getMSXPatternsNameID(1:3)   % Retrieves the IDs of the first three patterns.
+            %
+            % See also getMSXPattern, getMSXPatternsIndex, getMSXPatternsLengths,
+            %          setMSXPattern, setMSXPatternMatrix, setMSXPatternValue.
             if isempty(varargin)
                 if ~obj.getMSXPatternsCount, value={};return; end
                 for i=1:obj.getMSXPatternsCount
@@ -12186,6 +12514,21 @@ classdef epanet <handle
             end
         end
         function value = getMSXPatternsIndex(obj, varargin)
+            % Retrieves the patterns index.
+            %
+            % Example: 
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.addMSXPattern('P1', [1.0, 0.0 1.0]);
+            %   d.addMSXPattern('P2', [0.0, 0.0 2.0]);
+            %   d.addMSXPattern('P3', [0.0, 1.0 2.0]);
+            %   d.addMSXPattern('P4', [1.0, 1.0 2.0]);
+            %   d.getMSXPatternsIndex          % Retrieves the indices of all the patterns.
+            %   d.getMSXPatternsIndex('P1')    % Retrieves the index of the first pattern.
+            %   d.getMSXPatternsIndex({'P1', 'P2', 'P3'}) % Retrieves the indices of the first three patterns.
+            %
+            % See also getMSXPattern, getMSXPatternsNameID, getMSXPatternsLengths,
+            %          setMSXPattern, setMSXPatternMatrix, setMSXPatternValue.
             if isempty(varargin)
                 value=1:obj.getMSXPatternsCount;
                 if isempty(value), value=[]; end
@@ -12200,6 +12543,20 @@ classdef epanet <handle
             end
         end
         function value = getMSXPatternsLengths(obj, varargin)
+            % Retrieves the pattern lengths.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.addMSXPattern('P1', [1.0, 0.0 1.0]);
+            %   d.addMSXPattern('P2', 1.0);
+            %   d.addMSXPattern('P3', [0.0, 1.0 2.0]);
+            %   d.addMSXPattern('P4', [1.0, 2.0]);
+            %   d.getMSXPatternsLengths        % Retrieves the lengths of all the patterns.
+            %   d.getMSXPatternsLengths(1)     % Retrieves the length of the first pattern.
+            %   d.getMSXPatternsLengths(1:3) % Retrieves the lengths of the first three patterns.
+            % See also getMSXPattern, getMSXPatternsIndex, getMSXPatternsNameID,
+            %          setMSXPattern, setMSXPatternMatrix, setMSXPatternValue.
             value =[];
             if isempty(varargin)
                 if obj.getMSXPatternsCount
@@ -12226,6 +12583,16 @@ classdef epanet <handle
             end
         end
         function value = getMSXNodeInitqualValue(obj)
+            % Retrieves the nodes initial quality value.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXNodeInitqualValue      % Retrieves the initial quality of all nodes.
+            %   d.getMSXNodeInitqualValue{1}   % Retrieves the initial quality of the first node.
+            %   d.getMSXNodeInitqualValue{1:3} % Retrieves the initial quality  of the first three nodes.
+            %
+            % See also setMSXNodeInitqualValue.
             if ~obj.getMSXSpeciesCount, value{1}(1)=0; return; end
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
@@ -12235,6 +12602,16 @@ classdef epanet <handle
             end
         end
         function value = getMSXLinkInitqualValue(obj)
+            % Retrieves the links initial quality value.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXLinkInitqualValue      % Retrieves the initial quality of all links.
+            %   d.getMSXLinkInitqualValue{1}   % Retrieves the initial quality of the first link.
+            %   d.getMSXLinkInitqualValue{1:3} % Retrieves the initial quality  of the first three links.
+            %
+            % See also setMSXLinkInitqualValue.
             if ~obj.getMSXSpeciesCount, value{1}(1)=0; return; end
             for i=1:obj.getLinkCount
                 for j=1:obj.getMSXSpeciesCount
@@ -12244,6 +12621,20 @@ classdef epanet <handle
             end
         end
         function value = getMSXSources(obj)
+            % Retrieves source info of the nodes.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   sourceInfo = d.getMSXSources          
+            %   sourceInfo.MSXSourceType
+            %   sourceInfo.MSXSourceTypeCode 
+            %   sourceInfo.MSXsourceLevel
+            %   sourceInfo.MSXSourcePatternIndex 
+            %   sourceInfo.MSXSourceNodeNameID
+            %
+            % See also setMSXSources, getMSXSourceNodeNameID, getMSXSourceType
+            %          getMSXSourceLevel, getMSXSourcePatternIndex.
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, obj.MSXSourceType{i}{j}, obj.MSXSourceLevel{i}(j), obj.MSXSourcePatternIndex{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
@@ -12257,12 +12648,34 @@ classdef epanet <handle
             value.MSXSourceTypeCode=obj.MSXSourceTypeCode;
             value.MSXsourceLevel=obj.MSXSourceLevel;
             value.MSXSourcePatternIndex=obj.MSXSourcePatternIndex;
-            value.apiMSXSourceNodeNameID=SnodeID;
+            value.MSXSourceNodeNameID=SnodeID;
         end
         function value = getMSXSourceNodeNameID(obj)
+            % Retrieves the sources node ID.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXSourceNodeNameID        % Retrieves all the source node IDs.       
+            %   d.getMSXSourceNodeNameID{1}     % Retrieves the first source node ID.
+            %   d.getMSXSourceNodeNameID{34:36} % Retrieves the source IDs of nodes 34 to 36.
+            %
+            % See also getMSXSources, getMSXSourceType
+            %          getMSXSourceLevel, getMSXSourcePatternIndex.
             value = obj.getNodeNameID;
         end
         function value = getMSXSourceType(obj)
+            % Retrieves the sources type.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXSourceType          % Retrieves all the source types.       
+            %   d.getMSXSourceType{1}       % Retrieves the first node source type.
+            %   d.getMSXSourceType{1:5}     % Retrieves the source type of nodes 1 to 5
+            %
+            % See also getMSXSources, getMSXSourceNodeNameID
+            %          getMSXSourceLevel, getMSXSourcePatternIndex.
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, value{i}{j}, ~, ~] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
@@ -12271,6 +12684,18 @@ classdef epanet <handle
             end
         end
         function value = getMSXSourceLevel(obj)
+            % Retrieves the sources level.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXSourceLevel          % Retrieves all the source level.       
+            %   d.getMSXSourceLevel{1}       % Retrieves the first node source level.
+            %   d.getMSXSourceLevel{1:5}     % Retrieves the source level
+            %   of nodes 1 to 5.
+            %
+            % See also getMSXSources, getMSXSourceNodeNameID
+            %          getMSXSourceType, getMSXSourcePatternIndex.
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, ~, value{i}(j), ~] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
@@ -12279,6 +12704,17 @@ classdef epanet <handle
             end
         end
         function value = getMSXSourcePatternIndex(obj)
+            % Retrieves the sources pattern index.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXSourcePatternIndex          % Retrieves all the source pattern index.       
+            %   d.getMSXSourcePatternIndex{1}       % Retrieves the first node source pattern index.
+            %   d.getMSXSourcePatternIndex{1:5}     % Retrieves the source pattern index of nodes 1 to 5
+            %
+            % See also getMSXSources, getMSXSourceNodeNameID
+            %          getMSXSourceType, getMSXSourceLevel.
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
                     [obj.Errcode, ~, ~, value{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
@@ -12286,7 +12722,22 @@ classdef epanet <handle
                 end
             end
         end
-        function value = getMSXPattern(obj) %Mass flow rate per minute of a chemical source
+        function value = getMSXPattern(obj) 
+            % Retrieves the time patterns.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.addMSXPattern('P1', [1.0 0.0 1.0]);
+            %   d.addMSXPattern('P2', [1.0 0.0 1.0]);
+            %   d.addMSXPattern('P3', [0.0 1.0 2.0]);
+            %   d.addMSXPattern('P4', [1.0 2.0 2.5]);
+            %   patterns = d.getMSXPattern  % Retrieves all the patterns.       
+            %   patterns(1,:)     % Retrieves the first pattern.
+            %   patterns(1:3,:)   % Retrieves the first three patterns.
+            %
+            % See also setMSXPattern, setMSXPatternMatrix, setMSXPatternValue, 
+            %          getMSXPatternsIndex, getMSXPatternsNameID,.
             tmpmaxlen=max(obj.getMSXPatternsLengths);
             value=nan(obj.getMSXPatternsCount, tmpmaxlen);
             for i=1:obj.getMSXPatternsCount
@@ -12304,22 +12755,53 @@ classdef epanet <handle
             end
         end
         function value = getMSXPatternValue(obj, patternIndex, patternStep)
-            % Mass flow rate per minute of a chemical source
+            % Retrieves the multiplier at a specific time period for a given source time pattern.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.addMSXPattern('P1', [1.0 0.0 3.0]);
+            %   d.getMSXPatternValue(1,3)  % Retrieves the third multiplier of the first pattern.       
+            %
+            % See also setMSXPatternValue, setMSXPattern, setMSXPatternMatrix, 
+            %          getMSXPatternsIndex, getMSXPatternsNameID.
             [obj.Errcode, value] = obj.apiMSXgetpatternvalue(patternIndex, patternStep, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXSpeciesConcentration(obj, type, index, species)
+            % Returns the node/link concentration for specific specie.
+            %
+            % type options:
+            %        node = 0
+            %        link = 1  
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx'); 
+            %   d.getMSXComputedQualitySpecie('CL2')
+            %   speciesIndex = d.getMSXSpeciesIndex('CL2')
+            %   d.getMSXSpeciesConcentration(0, 1, spIndex) % Retrieves the CL2 concentration of the first node.
+            %   d.getMSXSpeciesConcentration(1, 1, spIndex) % Retrieves the CL2 concentration of the first link.  
+            %
+            % See also getMSXSpeciesIndex, getMSXSpeciesNameID,
+            %          getMSXSpeciesCount, getMSXSpeciesType,
+            %          getMSXSpeciesUnits, getMSXSpeciesATOL,
+            %          getMSXSpeciesRTOL.
             [obj.Errcode, value] = obj.apiMSXgetqual(type, index, species, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXComputedQualitySpecie(obj, specie)
-            % Return the quality nodes for specific specie
+            % Returns the node/link quality for specific specie.
+            %
             % Example:
-            %       MSX_comp = d.getMSXComputedQualitySpecie('CL2')
-            %            MSX_comp.NodeQuality % row: time, col: node index
-            %            MSX_comp.LinkQuality % row: time, col: link index
-            %            MSX_comp.Time
-
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   MSX_comp = d.getMSXComputedQualitySpecie('CL2')
+            %   MSX_comp.NodeQuality % row: time, col: node index
+            %   MSX_comp.LinkQuality % row: time, col: link index
+            %   MSX_comp.Time
+            %
+            % See also getMSXComputedQualityNode, getMSXComputedQualityLink.
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -12331,7 +12813,7 @@ classdef epanet <handle
             value.NodeQuality = nan(1, length(node_indices));
             value.LinkQuality = nan(1, length(node_indices));
             % Obtain a hydraulic solution
-            obj.solveMSXCompleteHydraulics(obj.MSXLibEPANET);
+            obj.solveMSXCompleteHydraulics;
             % Run a step-wise water quality analysis without saving
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
@@ -12375,6 +12857,18 @@ classdef epanet <handle
             end
         end
         function value = getMSXComputedQualityNode(obj, varargin)
+            % Returns the computed quality for nodes.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   MSX_comp = d.getMSXComputedQualityNode    
+            %   MSX_comp.Quality % row: time, col: node index
+            %   MSX_comp.Time
+            %   d.getMSXComputedQualityNode(1).Quality     % Compute quality for the first node
+            %   d.getMSXComputedQualityNode(1:3).Quality   % Compute quality for the first three nodes
+            %
+            % See also getMSXComputedQualitylink, getMSXComputedQualitySpecie.
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -12393,7 +12887,7 @@ classdef epanet <handle
             end
             value.Quality = cell(1, length(ss));
             % Obtain a hydraulic solution
-            obj.solveMSXCompleteHydraulics(obj.MSXLibEPANET);
+            obj.solveMSXCompleteHydraulics;
             % Run a step-wise water quality analysis without saving
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
@@ -12406,7 +12900,7 @@ classdef epanet <handle
                     g=g+1;
                 end
                 i=i+1;
-            end    
+            end
             while(tleft>0 && obj.Errcode==0)
                 [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
                 k=k+1; i=1;
@@ -12422,6 +12916,18 @@ classdef epanet <handle
             end
         end
         function value = getMSXComputedQualityLink(obj, varargin)
+            % Returns the computed quality for links.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   MSX_comp = d.getMSXComputedQualityLink
+            %   MSX_comp.Quality % row: time, col: link index
+            %   MSX_comp.Time
+            %   d.getMSXComputedQualityLink(1).Quality     % Compute quality for the first link.
+            %   d.getMSXComputedQualityLink(1:3).Quality   % Compute quality for the first three links.
+            %
+            % See also getMSXComputedQualityNode, getMSXComputedQualitySpecie.
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -12440,7 +12946,7 @@ classdef epanet <handle
             end
             value.Quality = cell(1, length(ss));
             % Obtain a hydraulic solution
-            obj.solveMSXCompleteHydraulics(obj.MSXLibEPANET);
+            obj.solveMSXCompleteHydraulics;
             % Run a step-wise water quality analysis without saving
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
@@ -12453,7 +12959,7 @@ classdef epanet <handle
                     g=g+1;
                 end
                 i=i+1;
-            end    
+            end
             while(tleft>0 && obj.Errcode==0)
                 [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
                 k=k+1; i=1;
@@ -12469,6 +12975,15 @@ classdef epanet <handle
             end
         end
         function plotMSXSpeciesNodeConcentration(obj, varargin)
+            % Plots concentration of species for nodes over time. 
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.plotMSXSpeciesNodeConcentration(5,1)     % Plots first node's concentration of the first specie over time.  
+            %   d.plotMSXSpeciesNodeConcentration([1:5],1) % Plots concentration of nodes 1to 5 for the first specie over time.
+            %
+            % See also plotMSXSpeciesLinkConcentration.
             s=obj.getMSXComputedQualityNode(varargin{1}, varargin{2});
             nodesID=obj.getNodeNameID;
             SpeciesNameID=obj.getMSXSpeciesNameID;nd=1;
@@ -12488,6 +13003,15 @@ classdef epanet <handle
             end
         end
         function plotMSXSpeciesLinkConcentration(obj, varargin)
+            % Plots concentration of species for links over time. 
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.plotMSXSpeciesLinkConcentration(5,1)     % Plots first node's concentration of the first specie over time.  
+            %   d.plotMSXSpeciesLinkConcentration([1:5],1) % Plots concentration of nodes 1to 5 for the first specie over time.
+            %
+            % See also plotMSXSpeciesNodeConcentration.
             s=obj.getMSXComputedQualityLink(varargin{1}, varargin{2});
             linksID=obj.getLinkNameID;
             SpeciesNameID=obj.getMSXSpeciesNameID;nd=1;
@@ -12507,24 +13031,60 @@ classdef epanet <handle
             end
         end
         function value = getMSXError(obj, Errcode)
+            % Retrieves the MSX erorr message for specific erorr code.
+            %
+            % Example:
+            %   d.getMSXError(510)
             [obj.Errcode, value] = obj.apiMSXgeterror(Errcode, obj.MSXLibEPANET);
             if Errcode == 519
                 error('Please check the MSX file. Maybe node/link ids do not exist in the input file.');
             end
         end
-        function solveMSXCompleteHydraulics(obj, varargin)
+        function solveMSXCompleteHydraulics(obj)
+            % Solve complete hydraulic over the entire simulation period.
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.solveMSXCompleteHydraulics
+            %
+            % See also solveMSXCompleteQuality.
             [obj.Errcode] = obj.apiMSXsolveH(obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
-        function solveMSXCompleteQuality(obj, varargin)
+        function solveMSXCompleteQuality(obj)
+            % Solve complete hydraulic over the entire simulation period.
+            % 
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.solveMSXCompleteQuality
+            %
+            % See also solveMSXCompleteHydraulics.
             [obj.Errcode] = obj.apiMSXsolveQ(obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
-        function writeMSXReport(obj, varargin)
+        function writeMSXReport(obj)
+            % Writes water quality simulations results in a text file.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.writeMSXReport
+            %
+            % See also writeMSXReportExe. 
             [obj.Errcode]=obj.apiMSXreport(obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function [status, result] = writeMSXReportExe(obj, varargin)
+            % Write report in a text file using epanetmsx.exe file.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.writeMSXReportExe('net2-cl2_report.txt')
+            %
+            % See also writeMSXReport.
             if isempty(varargin)
                 rptfile=['@#', char(java.util.UUID.randomUUID), '.txt'];
             else
@@ -12549,6 +13109,18 @@ classdef epanet <handle
         %           value = readMSXBinaryFile(binfile);
         %       end
         function index = addMSXPattern(obj, varargin)
+            % Adds new time pattern
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXPatternsNameID
+            %   mult = [0.5, 0.8, 1.2, 1.0, 0.7, 0.3];
+            %   d.addMSXPattern('Pattern1', mult);
+            %   d.getMSXPattern
+            %   d.getMSXPatternsNameID
+            % 
+            % See also getMSXPattern, setMSXPattern.
             index=-1;
             if nargin==2
                 [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
@@ -12564,6 +13136,20 @@ classdef epanet <handle
             end
         end
         function setMSXSources(obj, nodeID, speciesID, sourcetype, concentration, patID)
+            % Sets the attributes of an external source of a particular chemical species 
+            % to a specific node of the pipe network.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx')
+            %   srcs = d.getMSXSources
+            %   d.addMSXPattern('PatAsIII',[2 .3 .4 6 5 2 4]);
+            %   d.setMSXSources(d.NodeNameID{2}, d.MSXSpeciesNameID{1}, ...
+            %                       'Setpoint', 0.5, 'PatAsIII') % Sets the second node as setpoint.
+            %   srcs = d.getMSXSources
+            %
+            % See also getMSXSources, getMSXSourceNodeNameID, getMSXSourceType
+            %          getMSXSourceLevel, getMSXSourcePatternIndex.
             node = obj.getNodeIndex(nodeID);
             species = obj.getMSXSpeciesIndex(speciesID);
             type = find(strcmpi(obj.MSXTYPESOURCE, sourcetype))-2;
@@ -12571,12 +13157,37 @@ classdef epanet <handle
             obj.apiMSXsetsource(node, species, type, concentration, pat, obj.MSXLibEPANET);
         end
         function setMSXConstantsValue(obj, value)
+            % Sets the values of constants.
+            %
+            % Example:
+            %   d = epanet('net3-bio.inp');
+            %   d.loadMSXFile('net3-bio.msx');
+            %   d.getMSXConstantsValue
+            %   d.setMSXConstantsValue([1, 2, 3]); % Set the values of the first three constants.
+            %   d.getMSXConstantsValue
+            %
+            % See also getMSXConstantsCount, getMSXConstantsIndex, 
+            %          getMSXConstantsNameID.
             for i=1:length(value)
                 [obj.Errcode] = obj.apiMSXsetconstant(i, value(i), obj.MSXLibEPANET);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function setMSXParametersTanksValue(obj, NodeTankIndex, paramindex, value)
+            % Assigns a value to a particular reaction parameter for a given tank within the pipe network.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   a = d.getNodeTankIndex;
+            %   d.getMSXParametersTanksValue{a(1)}
+            %   d.setMSXParametersTanksValue(a(1),1,0.5) % Sets the value of the first tank 
+            %                                             (tank_index, parameter_index, value)
+            %   d.getMSXParametersTanksValue{a(1)} 
+            %
+            % See also getMSXParametersTanksValue, setMSXParametersPipesValue,
+            %          getMSXParametersPipesValue, getMSXParametersCount, 
+            %          getMSXParametersIndex.
             if ~sum(NodeTankIndex==obj.NodeTankIndex)
                 fprintf('>> Invalid Tank Index <<\n');obj.NodeTankIndex
                 return;
@@ -12585,12 +13196,36 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXParametersPipesValue(obj, pipeIndex, value)
+            % Assigns a value to a particular reaction parameter for a given pipe within the pipe network.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.getMSXParametersPipesValue
+            %   d.setMSXParametersPipesValue(1,[1.5 2]) % Sets the value of the first pipe.
+            %   d.getMSXParametersPipesValue
+            %
+            % See also getMSXParametersPipesValue, setMSXParametersTanksValue,
+            %          getMSXParametersTanksValue, getMSXParametersCount, 
+            %          getMSXParametersIndex.
             for i=1:length(value)
                 [obj.Errcode] = obj.apiMSXsetparameter(1, pipeIndex, i, value(i), obj.MSXLibEPANET);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
         function setMSXNodeInitqualValue(obj, value)
+            % Sets all nodes initial quality value.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   linkIndex=1; speciesIndex=1;
+            %   values = d.getMSXNodeInitqualValue
+            %   values{linkIndex}(speciesIndex)=1500;
+            %   d.setMSXNodeInitqualValue(values) % Sets all values and change the first node's value to 1500.
+            %   d.getMSXNodeInitqualValue  
+            %
+            % See also getMSXNodeInitqualValue, setMSXLinkInitqualValue.
             for i=1:length(value)
                 for j=1:size(value{1}, 2)
                     [obj.Errcode] = obj.apiMSXsetinitqual(0, i, j, value{i}(j), obj.MSXLibEPANET);
@@ -12599,6 +13234,18 @@ classdef epanet <handle
             end
         end
         function setMSXLinkInitqualValue(obj, value)
+            % Sets all links initial quality value.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   linkIndex=1; speciesIndex=1;
+            %   values = d.getMSXLinkInitqualValue
+            %   values{linkIndex}(speciesIndex)=1500;
+            %   d.setMSXLinkInitqualValue(values) % Sets all values and change the first link's value to 1500.
+            %   d.getMSXLinkInitqualValue 
+            %
+            % See also getMSXLinkInitqualValue, setMSXNodeInitqualValue.
             for i=1:length(value)
                 for j=1:size(value{1}, 2)
                     [obj.Errcode] = obj.apiMSXsetinitqual(1, i, j, value{i}(j), obj.MSXLibEPANET);
@@ -12607,6 +13254,17 @@ classdef epanet <handle
             end
         end
         function setMSXPattern(obj, pat, patternVector)
+            % Sets the multiplier at a specific time period for a given pattern.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.addMSXPattern('Pl', [1.0 2.0 1.5 1.0])
+            %   d.getMSXPattern
+            %   d.setMSXPattern(1, [1.0 0.0 3.0]);
+            %   d.getMSXPattern      
+            % 
+            % See also getMSXPattern, addMSXPattern.
             if ischar(pat)
                 pat=obj.getMSXPatternsIndex(pat);
             end
@@ -12615,6 +13273,16 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXPatternMatrix(obj, patternMatrix)
+            % Sets the pattern matrix.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');    
+            %   d.addMSXPattern('1', []);
+            %   d.setMSXPatternMatrix([.1 .2 .5 .2 1 .9]);
+            %   d.getMSXPattern 
+            % 
+            % See also getMSXPattern, addMSXPattern.
             nfactors=size(patternMatrix, 2);
             for i=1:size(patternMatrix, 1)
                 [obj.Errcode] = obj.apiMSXsetpattern(i, patternMatrix(i, :), nfactors, obj.MSXLibEPANET);
@@ -12622,80 +13290,378 @@ classdef epanet <handle
             end
         end
         function setMSXPatternValue(obj, index, patternTimeStep, patternFactor)
+            % Sets the pattern factor for an index for a specific time step.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');    
+            %   d.addMSXPattern('P1', [2.0 2.0 2.0 2.0]);
+            %   d.getMSXPatternValue(1,1)
+            %   d.setMSXPatternValue(1,1,3.0); % Sets the first timestep of the first pattern to 0.
+            %   d.getMSXPatternValue(1,1) 
+            % 
+            % See also getMSXPatternValue, getMSXPattern, addMSXPattern.
             [obj.Errcode] = obj.apiMSXsetpatternvalue(index, patternTimeStep, patternFactor, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXTimeStep(obj, timestep)
+            % Sets the time step.
+            % 
+            % The default timestep is 300 seconds (5 minutes).
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXTimeStep
+            %  d.setMSXTimeStep(3600);
+            %  d.getMSXTimeStep
+            %
+            % See also getMSXTimeStep.
             setMSXOptions(obj, 'timestep', timestep);
         end
         function setMSXAreaUnitsFT2(obj)
+            % Sets the area units to square feet.
+            % 
+            % The default is FT2.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXAreaUnits
+            %  d.setMSXAreaUnitsFT2;
+            %  d.getMSXAreaUnits
+            %
+            % See also setMSXAreaUnitsM2, setMSXAreaUnitsCM2.
             setMSXOptions(obj, 'areaunits', 'FT2');
         end
         function setMSXAreaUnitsM2(obj)
+            % Sets the area units to square meters.
+            %
+            % The default is FT2.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXAreaUnits
+            %  d.setMSXAreaUnitsM2;
+            %  d.getMSXAreaUnits
+            %
+            % See also setMSXAreaUnitsFT2, setMSXAreaUnitsCM2.
             setMSXOptions(obj, 'areaunits', 'M2');
         end
         function setMSXAreaUnitsCM2(obj)
+            % Sets the area units to square centimeters.
+            %
+            % The default is FT2.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXAreaUnits
+            %  d.setMSXAreaUnitsCM2;
+            %  d.getMSXAreaUnits
+            %
+            % See also setMSXAreaUnitsFT2, setMSXAreaUnitsM2.
             setMSXOptions(obj, 'areaunits', 'CM2');
         end
         function setMSXRateUnitsSEC(obj)
+            % Sets the rate units to seconds.
+            % 
+            % The default units are hours (HR)
+            % 
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXRateUnits
+            %  d.setMSXRateUnitsSEC;
+            %  d.getMSXRateUnits
+            %
+            % See also setMSXRateUnitsMIN, setMSXRateUnitsHR,
+            %          setMSXRateUnitsDAY.
             setMSXOptions(obj, 'rateunits', 'SEC');
         end
         function setMSXRateUnitsMIN(obj)
+            % Sets the rate units to minutes.
+            %
+            % The default units are hours (HR)
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXRateUnits
+            %  d.setMSXRateUnitsMIN;
+            %  d.getMSXRateUnits
+            %
+            % See also setMSXRateUnitsSEC, setMSXRateUnitsHR,
+            %          setMSXRateUnitsDAY.
             setMSXOptions(obj, 'rateunits', 'MIN');
         end
         function setMSXRateUnitsHR(obj)
+            % Sets the rate units to hours.
+            %
+            % The default units are hours (HR)
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXRateUnits
+            %  d.setMSXRateUnitsHR;
+            %  d.getMSXRateUnits
+            %
+            % See also setMSXRateUnitsSEC, setMSXRateUnitsMIN
+            %          setMSXRateUnitsDAY.
             setMSXOptions(obj, 'rateunits', 'HR');
         end
         function setMSXRateUnitsDAY(obj)
+            % Sets the rate units to days.
+            % 
+            % The default units are hours (HR)
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXRateUnits
+            %  d.setMSXRateUnitsDAY;
+            %  d.getMSXRateUnits
+            %
+            % See also setMSXRateUnitsSEC, setMSXRateUnitsMIN
+            %          setMSXRateUnitsHR.
             setMSXOptions(obj, 'rateunits', 'DAY');
         end
         function setMSXSolverEUL(obj)
+            % Sets the numerical integration method to solve the reaction 
+            % system to standard Euler integrator (EUL).
+            % 
+            % The default solver is EUL.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXSolver
+            %  d.setMSXSolverEUL;
+            %  d.getMSXSolver
+            %
+            % See also setMSXSolverRK5, setMSXSolverROS2.
             setMSXOptions(obj, 'solver', 'EUL');
         end
         function setMSXSolverRK5(obj)
+            % Sets the numerical integration method to solve the reaction 
+            % system to Runge-Kutta 5th order integrator (RK5).
+            % 
+            % The default solver is EUL.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXSolver
+            %  d.setMSXSolverRK5;
+            %  d.getMSXSolver
+            %
+            % See also setMSXSolverEUL, setMSXSolverROS2.
             setMSXOptions(obj, 'solver', 'RK5');
         end
         function setMSXSolverROS2(obj)
+            % Sets the numerical integration method to solve the reaction 
+            % system to 2nd order Rosenbrock integrator (ROS2).
+            % 
+            % The default solver is EUL.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXSolver
+            %  d.setMSXSolverROS2;
+            %  d.getMSXSolver
+            %
+            % See also setMSXSolverEUL, setMSXSolverRK5.
             setMSXOptions(obj, 'solver', 'ROS2');
         end
         function setMSXCouplingFULL(obj)
+            % Sets coupling to FULL.
+            % 
+            % COUPLING determines to what degree the solution of any algebraic 
+            % equilibrium equations is coupled to the integration of the reaction 
+            % rate equations. With FULL coupling the updating is done whenever a 
+            % new set of values for the rate-dependent variables in the reaction
+            % rate expressions is computed. The default is FULL coupling.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXCoupling
+            %  d.setMSXCouplingFULL;
+            %  d.getMSXCoupling
+            %
+            % See also setMSXCouplingNONE.
             setMSXOptions(obj, 'coupling', 'FULL');
         end
         function setMSXCouplingNONE(obj)
+            % Sets coupling to NONE.
+            % 
+            % COUPLING determines to what degree the solution of any algebraic 
+            % equilibrium equations is coupled to the integration of the reaction 
+            % rate equations. If coupling is NONE then the solution to the
+            % algebraic equations is only updated at the end of each
+            % integration time step. The default is FULL coupling.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXCoupling
+            %  d.setMSXCouplingFULL;
+            %  d.getMSXCoupling
+            %
+            % See also setMSXCouplingFULL.
             setMSXOptions(obj, 'coupling', 'NONE');
         end
         function setMSXCompilerNONE(obj)
+            % Sets chemistry function compiler code to NONE.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXCompiler
+            %  d.setMSXCompilerNONE;
+            %  d.getMSXCompiler
+            %
+            % See also setMSXCompilerVC, setMSXCompilerGC.
             setMSXOptions(obj, 'compiler', 'NONE');
         end
         function setMSXCompilerVC(obj)
+            % Sets chemistry function compiler code to VC.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXCompiler
+            %  d.setMSXCompilerVC; 
+            %  d.getMSXCompiler
+            %
+            % See also setMSXCompilerNONE, setMSXCompilerGC.
             setMSXOptions(obj, 'compiler', 'VC');
         end
         function setMSXCompilerGC(obj)
+            % Sets chemistry function compiler code to GC.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2-vc.msx');
+            %  d.getMSXCompiler
+            %  d.setMSXCompilerGC;
+            %  d.getMSXCompiler
+            %
+            % See also setMSXCompilerNONE, setMSXCompilerVC.
             setMSXOptions(obj, 'compiler', 'GC');
         end
         function setMSXAtol(obj, atol)
+            % Sets the absolute tolerance used to determine when two concentration levels of a
+            % species are the same. 
+            % 
+            % If no ATOL option is specified then it defaults to 0.01 
+            % (regardless of species concentration units). 
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXAtol
+            %  d.setMSXAtol(2e-3);
+            %  d.getMSXAtol
+            %
+            % See also setMSXRtol.
             setMSXOptions(obj, 'atol', atol);
         end
         function setMSXRtol(obj, rtol)
+            % Sets the relative accuracy level on a species’ concentration 
+            % used to adjust time steps in the RK5 and ROS2 integration methods. 
+            % 
+            % If no RTOL option is specified then it defaults to 0.001.  
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXRtol
+            %  d.setMSXRtol(2e-3);
+            %  d.getMSXRtol
+            %
+            % See also setMSXAtol.
             setMSXOptions(obj, 'rtol', rtol);
         end
         function saveMSXQualityFile(obj, outfname)
+            % Saves the quality as bin file.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.getMSXComputedQualitySpecie('CL2')   
+            %  d.saveMSXQualityFile('testMSXQuality.bin')
             [obj.Errcode]=obj.apiMSXsaveoutfile(outfname, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function useMSXHydraulicFile(obj, hydname)
+            % Uses a previously saved EPANET hydraulics file as the source 
+            % of hydraulic information.
+            %
+            % Example:
+            %  d = epanet('net2-cl2.inp');
+            %  d.loadMSXFile('net2-cl2.msx');
+            %  d.saveHydraulicsOutputReportingFile
+            %  d.saveHydraulicFile('testMSXHydraulics.hyd')
+            %  d.useMSXHydraulicFile('testMSXHydraulics.hyd')
+            %
+            % See also saveHydraulicsOutputReportingFile, saveHydraulicFile.
             [obj.Errcode]=obj.apiMSXusehydfile(hydname, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function initializeMSXQualityAnalysis(obj, flag)
+            % Initializes the MSX system before solving for water quality results
+            % in step-wise fashion.
+            %
+            % flag options:
+            %    1: if water quality results should be saved to a scratch 
+            %       binary file or  
+            %    0: if results are not saved to file.
+            %   
+            % Example:  
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   tleft = 1; err = 0;
+            %   d.solveMSXCompleteHydraulics;
+            %   d.initializeMSXQualityAnalysis(0); 
+            %   while(tleft>0)
+            %       [~, tleft] = d.stepMSXQualityAnalysisTimeLeft;
+            %   end
+            %
+            % See also solveMSXCompleteHydraulics, stepMSXQualityAnalysisTimeLeft.
             [obj.Errcode] = obj.apiMSXinit(flag, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function [t, tleft]= stepMSXQualityAnalysisTimeLeft(obj)
+            % Advances the water quality solution through a single water quality time step when
+            % performing a step-wise simulation.
+            %
+            % Example:  
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   tleft = 1; err = 0;
+            %   d.solveMSXCompleteHydraulics;
+            %   d.initializeMSXQualityAnalysis(0); 
+            %   while(tleft>0)
+            %       [~, tleft] = d.stepMSXQualityAnalysisTimeLeft;
+            %   end
+            %
+            % See also solveMSXCompleteHydraulics, initializeMSXQualityAnalysis.
             [obj.Errcode, t, tleft] = obj.apiMSXstep(obj.MSXLibEPANET);
             % if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function saveMSXFile(obj, msxname)
+            % Saves the data associated with the current MSX project into a new MSX input file.
+            %
+            % Example:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   d.saveMSXFile('testMSX.msx');
+            %
+            % See also writeMSXFile. 
             [obj.Errcode] = obj.apiMSXsavemsxfile(msxname, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
@@ -12745,6 +13711,10 @@ classdef epanet <handle
             fclose(f);
         end
         function unloadMSX(obj)
+            % Unload library and close the MSX Toolkit system.
+            %
+            % Example:
+            %   d.unloadMSX
             obj.apiMSXclose(obj);
             obj.apiMSXMatlabCleanup(obj);
             fclose('all');
@@ -12768,6 +13738,7 @@ classdef epanet <handle
             %file=[file(1:end-1), 'txt'];%epanet2.h-->epanet2.txt
                 file = 'epanet2_enums.txt';%epanet2_enums.h-->epanet2_enums.txt
             end
+            
             fid = fopen(file);
             tline = fgetl(fid);
             i=1; constants={};
