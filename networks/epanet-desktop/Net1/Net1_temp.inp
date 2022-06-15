@@ -100,9 +100,9 @@ wall reactions are included.
 
 [TIMES]
  DURATION            24:00:00
- HYDRAULIC TIMESTEP  1:00:00
+ HYDRAULIC TIMESTEP  0:05:00
  QUALITY TIMESTEP    0:05:00
- REPORT TIMESTEP     1:00:00
+ REPORT TIMESTEP     0:05:00
  REPORT START        0:00:00
  PATTERN TIMESTEP    2:00:00
  PATTERN START       0:00:00
@@ -140,7 +140,7 @@ wall reactions are included.
  Demand              PRECISION 2
  Head                PRECISION 2
  Pressure            PRECISION 2
- Quality             PRECISION 2
+ Quality             NO
  Length              NO
  Diameter            NO
  Flow                PRECISION 2
