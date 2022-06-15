@@ -9741,11 +9741,11 @@ classdef epanet <handle
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
-                [obj.Errcode] = ENsetlinkid(indices, value, obj.LibEPANET);
+                [obj.Errcode] = apiENsetlinkid(indices, value, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
             else
                 for i=indices
-                    [obj.Errcode] = ENsetlinkid(i, value{j}, obj.LibEPANET); j=j+1;
+                    [obj.Errcode] = apiENsetlinkid(i, value{j}, obj.LibEPANET); j=j+1;
                     error(obj.getError(obj.Errcode));
                 end
             end
