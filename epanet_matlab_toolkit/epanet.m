@@ -4266,7 +4266,7 @@ classdef epanet <handle
             %  d.plotNetGraph;
             %
             % See also getNetGraph
-            netgraph = obj.getNetGraph;
+            netgraph = obj.getGraph;
             plot(netgraph); 
         end
 
