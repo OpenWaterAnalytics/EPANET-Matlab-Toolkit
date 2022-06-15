@@ -4270,11 +4270,37 @@ classdef epanet <handle
             plot(netgraph); 
         end
 
-        function json_txt = toJson(~, values, varargin)
+        function json_txt = toJson(~, values)
+            % Creates json text variable
+            %
+            % Example 1:
+            %   flow = d.getComputedTimeSeries.Flow;
+            %   d.toJson(flow);     % Create json variable with flow values.
+            %
+            % Example 2:
+            %   compVals = d.getComputedTimeSeries;
+            %   tojsonFile(compVals, 'AllValues'); % Create AllValues.json and 
+            %                                        add all computed values.
+            %
+            % See also toJsonFile.
             json_txt = jsonencode(values);
         end
 
         function toJsonFile(obj, values, varargin)
+            % Creates a .json file and adds the input values in json format.
+            %
+            % Example 1:
+            %   flow = d.getComputedTimeSeries.Flow;
+            %   d.tojsonFile(flow, 'Flow'); % Create Flow.json and add flow.
+            %   open('Flow.json')
+            %
+            % Example 2:
+            %   compVals = d.getComputedTimeSeries;
+            %   tojsonFile(compVals, 'AllValues'); % Create AllValues.json and 
+            %                                        add all computed values.
+            %   open('AllValues.json');
+            %
+            % See also toJson.
             if (nargin==2)
                 jsonName = 'new_json_file.json';
             else
