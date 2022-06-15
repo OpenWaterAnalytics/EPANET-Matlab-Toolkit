@@ -4252,7 +4252,7 @@ classdef epanet <handle
             % Retrieves the graph of the current epanet network.
             %
             % Example:
-            %  d.getNetGraph;
+            %  d.getGraph;
             %
             % See also plotNetGraph
             conmat = obj.getConnectivityMatrix;
@@ -4263,13 +4263,30 @@ classdef epanet <handle
             % Plots the graph of the current epanet network.
             %
             % Example:
-            %  d.plotNetGraph;
+            %  d.plotGraph;
             %
             % See also getNetGraph
             netgraph = obj.getGraph;
             plot(netgraph); 
         end
 
+        function json_txt = toJson(~, values, varargin)
+            json_txt = jsonencode(values);
+        end
+
+        function toJsonFile(obj, values, varargin)
+            if (nargin==2)
+                jsonName = 'new_json_file.json';
+            else
+                jsonName = varargin{1};
+                if ~contains(jsonName, '.json')
+                        jsonName = [jsonName, '.json'];
+                end
+            end
+            json_txt = obj.toJson(values);    
+            fid = fopen(jsonName, 'w');
+            fprintf(fid, '%s', json_txt);      
+        end
         function value = getRuleInfo(obj, varargin)
             % Retrieves summary information about a rule-based control given it's index. (EPANET Version 2.2)
             %
