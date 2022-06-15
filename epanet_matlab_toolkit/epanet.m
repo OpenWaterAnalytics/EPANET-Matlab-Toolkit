@@ -4248,7 +4248,7 @@ classdef epanet <handle
             end
         end
 
-        function netgraph = getNetGraph(obj)
+        function netgraph = getGraph(obj)
             % Retrieves the graph of the current epanet network.
             %
             % Example:
@@ -4259,7 +4259,7 @@ classdef epanet <handle
             netgraph = graph(conmat);        
         end
 
-        function plotNetGraph(obj)
+        function plotGraph(obj)
             % Plots the graph of the current epanet network.
             %
             % Example:
