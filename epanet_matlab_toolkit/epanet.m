@@ -1386,6 +1386,7 @@ classdef epanet <handle
             % See also  apiENrunH
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode, tstep]=calllib(LibEPANET, 'ENnextH', int32(0));
+            tstep = double(tstep);
         end
         function [Errcode, tstep] = apiENnextQ(LibEPANET)
             % Advances a water quality simulation over the time until the next hydraulic event.
@@ -11740,6 +11741,7 @@ classdef epanet <handle
             %
             % See also nextHydraulicAnalysisStep, runQualityAnalysis.
             [obj.Errcode, tstep] = obj.apiENnextQ(obj.LibEPANET);
+            tstep = double(tstep);
         end
         function openHydraulicAnalysis(obj)
             % Opens the hydraulics analysis system.
@@ -11773,6 +11775,7 @@ classdef epanet <handle
             %
             % See also runQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode, tstep] = obj.apiENrunH(obj.LibEPANET);
+            tstep = double(tstep);
         end
         function tstep = runQualityAnalysis(obj)
             % Makes available the hydraulic and water quality results that occur at the start of
