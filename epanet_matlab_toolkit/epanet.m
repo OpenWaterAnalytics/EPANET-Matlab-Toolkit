@@ -4247,6 +4247,29 @@ classdef epanet <handle
                 j=j+1;
             end
         end
+
+        function netgraph = getNetGraph(obj)
+            % Retrieves the graph of the current epanet network.
+            %
+            % Example:
+            %  d.getNetGraph;
+            %
+            % See also plotNetGraph
+            conmat = obj.getConnectivityMatrix;
+            netgraph = graph(conmat);        
+        end
+
+        function plotNetGraph(obj)
+            % Plots the graph of the current epanet network.
+            %
+            % Example:
+            %  d.plotNetGraph;
+            %
+            % See also getNetGraph
+            netgraph = obj.getNetGraph;
+            plot(netgraph); 
+        end
+
         function value = getRuleInfo(obj, varargin)
             % Retrieves summary information about a rule-based control given it's index. (EPANET Version 2.2)
             %
