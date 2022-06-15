@@ -5,16 +5,20 @@
 * New examples using only apiEN and apiMSX functions:
   * Toolkit_api_EX1_using_EN_functions
   * Toolkit_api_EX2_using_MSX_functions
-* Help text for all apiEN and apiMSX functions 
+* Help text for all apiEN and apiMSX functions
+* Help text for all MSX functions 
 ## List of EPANET 2.2.1 Matlab Class Functions
 |Function|Description|
 |---------|---------|
 |appCreateMultipleScenarios|Creates scenarios based on node count of inp file EPANET|
 |appRotateNetwork|Rotates the network by theta degrees counter-clockwise|
 |appShiftNetwork|Shifts the network in x and y directions|
+|getGraph|Retrieves the graph of the current epanet network|
 |getLinkQuality|Retrieves the value of link quality|
+|plotGraph|Plots the graph of the current epanet network|
 |setNodeTypeJunction|Transforms a node to junction|
 |setNodeTypeReservoir|Transforms a node to reservoir|
 |setNodeTypeTank|Transforms a node to tank|
 |splitPipe|Splits a pipe, creating two new pipes and adds a junction in between them|
-
+|toJson|Creates json text variable|
+|toJsonFile|Creates a .json file and adds the input values in json format|
