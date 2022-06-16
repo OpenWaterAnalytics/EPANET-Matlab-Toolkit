@@ -39,7 +39,7 @@ for u=1:hrs
     status(find(~status_code)) = {'Closed'};
     for j=1:length(step)
         for np=1:pipe_count
-            Time{i} = sprintf('%03d:%02d:00',hours(u),step(j));
+            Time{i} = sprintf('%03d:%02d:00',hours(u),30);
             sps = blanks(spsmax-length(pipeIDs{np}));
             Controls(i,: ) = ['LINK ',pipeIDs{np}, sps,' ', status{np}, ' AT CLOCKTIME ',Time{i}];
             d.addControls(['LINK ',pipeIDs{np}, sps,' ', status{np}, ' AT CLOCKTIME ',Time{i}]);
