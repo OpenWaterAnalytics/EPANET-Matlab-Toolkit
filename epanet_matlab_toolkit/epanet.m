@@ -1386,6 +1386,7 @@ classdef epanet <handle
             % See also  apiENrunH
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             [Errcode, tstep]=calllib(LibEPANET, 'ENnextH', int32(0));
+            tstep = double(tstep);
         end
         function [Errcode, tstep] = apiENnextQ(LibEPANET)
             % Advances a water quality simulation over the time until the next hydraulic event.
@@ -1424,6 +1425,16 @@ classdef epanet <handle
             end
         end
         function [Errcode] = apiENepanet(tempfile, rptfile, binfile, LibEPANET)
+            % Runs a complete EPANET simulation.
+            % 
+            % Parameters:
+            % inpfile     Input file to use.
+            % rptfile     Output file to report to.
+            % binfile     Results file to generate.
+            % LibEPANET   epanet library DLL name.
+            % 
+            % Returns:
+            % an error code.
             [Errcode] = calllib(LibEPANET, 'ENepanet', tempfile, rptfile, binfile, lib.pointer);
         end
         function [Errcode] = apiENopenH(LibEPANET)
@@ -2215,6 +2226,20 @@ classdef epanet <handle
             [Errcode]=calllib(LibEPANET, 'ENaddcurve', cid);
         end
         function [Errcode, ids, nvalue, xvalue, yvalue] = apiENgetcurve(obj, value, LibEPANET)
+            % Retrieves all of a curve's data.
+            % 
+            % apiENgetcurve(index, LibEPANET)
+            % 
+            % Parameters:
+            % index      a curve's index (starting from 1).
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % out_id	 the curve's ID name.
+            % nPoints	 the number of data points on the curve.
+            % xValues	 the curve's x-values.
+            % yValues	 the curve's y-values.
             [Errcode, ids, nvalue, xvalue, yvalue]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, zeros(1, obj.getCurveLengths(value))', zeros(1, obj.getCurveLengths(value))');
         end
         function [Errcode, len] = apiENgetcurvelen(index, LibEPANET)
@@ -2507,7 +2532,7 @@ classdef epanet <handle
         function [Errcode] = apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET)
             % Assigns a curve to a pump's head curve.
             %
-            % apiENgetvertexcount(index, LibEPANET)
+            % apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET)
             %
             % Parameters:
             % pumpindex     the index of a pump link (starting from 1).
@@ -4245,6 +4270,72 @@ classdef epanet <handle
                 error(obj.getError(obj.Errcode));
                 j=j+1;
             end
+        end
+
+        function netgraph = getGraph(obj)
+            % Retrieves the graph of the current epanet network.
+            %
+            % Example:
+            %  d.getGraph;
+            %
+            % See also plotNetGraph
+            conmat = obj.getConnectivityMatrix;
+            netgraph = graph(conmat);        
+        end
+
+        function plotGraph(obj)
+            % Plots the graph of the current epanet network.
+            %
+            % Example:
+            %  d.plotGraph;
+            %
+            % See also getNetGraph
+            netgraph = obj.getGraph;
+            plot(netgraph); 
+        end
+
+        function json_txt = toJson(~, values)
+            % Creates json text variable
+            %
+            % Example 1:
+            %   flow = d.getComputedTimeSeries.Flow;
+            %   d.toJson(flow);     % Create json variable with flow values.
+            %
+            % Example 2:
+            %   compVals = d.getComputedTimeSeries;
+            %   tojsonFile(compVals, 'AllValues'); % Create AllValues.json and 
+            %                                        add all computed values.
+            %
+            % See also toJsonFile.
+            json_txt = jsonencode(values);
+        end
+
+        function toJsonFile(obj, values, varargin)
+            % Creates a .json file and adds the input values in json format.
+            %
+            % Example 1:
+            %   flow = d.getComputedTimeSeries.Flow;
+            %   d.tojsonFile(flow, 'Flow'); % Create Flow.json and add flow.
+            %   open('Flow.json')
+            %
+            % Example 2:
+            %   compVals = d.getComputedTimeSeries;
+            %   tojsonFile(compVals, 'AllValues'); % Create AllValues.json and 
+            %                                        add all computed values.
+            %   open('AllValues.json');
+            %
+            % See also toJson.
+            if (nargin==2)
+                jsonName = 'new_json_file.json';
+            else
+                jsonName = varargin{1};
+                if ~contains(jsonName, '.json')
+                        jsonName = [jsonName, '.json'];
+                end
+            end
+            json_txt = obj.toJson(values);    
+            fid = fopen(jsonName, 'w');
+            fprintf(fid, '%s', json_txt);      
         end
         function value = getRuleInfo(obj, varargin)
             % Retrieves summary information about a rule-based control given it's index. (EPANET Version 2.2)
@@ -9674,11 +9765,11 @@ classdef epanet <handle
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
-                [obj.Errcode] = ENsetlinkid(indices, value, obj.LibEPANET);
+                [obj.Errcode] = apiENsetlinkid(indices, value, obj.LibEPANET);
                 error(obj.getError(obj.Errcode));
             else
                 for i=indices
-                    [obj.Errcode] = ENsetlinkid(i, value{j}, obj.LibEPANET); j=j+1;
+                    [obj.Errcode] = apiENsetlinkid(i, value{j}, obj.LibEPANET); j=j+1;
                     error(obj.getError(obj.Errcode));
                 end
             end
@@ -11740,6 +11831,7 @@ classdef epanet <handle
             %
             % See also nextHydraulicAnalysisStep, runQualityAnalysis.
             [obj.Errcode, tstep] = obj.apiENnextQ(obj.LibEPANET);
+            tstep = double(tstep);
         end
         function openHydraulicAnalysis(obj)
             % Opens the hydraulics analysis system.
@@ -11773,6 +11865,7 @@ classdef epanet <handle
             %
             % See also runQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode, tstep] = obj.apiENrunH(obj.LibEPANET);
+            tstep = double(tstep);
         end
         function tstep = runQualityAnalysis(obj)
             % Makes available the hydraulic and water quality results that occur at the start of
