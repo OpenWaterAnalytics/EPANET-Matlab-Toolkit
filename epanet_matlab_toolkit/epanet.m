@@ -1425,6 +1425,16 @@ classdef epanet <handle
             end
         end
         function [Errcode] = apiENepanet(tempfile, rptfile, binfile, LibEPANET)
+            % Runs a complete EPANET simulation.
+            % 
+            % Parameters:
+            % inpfile     Input file to use.
+            % rptfile     Output file to report to.
+            % binfile     Results file to generate.
+            % LibEPANET   epanet library DLL name.
+            % 
+            % Returns:
+            % an error code.
             [Errcode] = calllib(LibEPANET, 'ENepanet', tempfile, rptfile, binfile, lib.pointer);
         end
         function [Errcode] = apiENopenH(LibEPANET)
@@ -2216,6 +2226,20 @@ classdef epanet <handle
             [Errcode]=calllib(LibEPANET, 'ENaddcurve', cid);
         end
         function [Errcode, ids, nvalue, xvalue, yvalue] = apiENgetcurve(obj, value, LibEPANET)
+            % Retrieves all of a curve's data.
+            % 
+            % apiENgetcurve(index, LibEPANET)
+            % 
+            % Parameters:
+            % index      a curve's index (starting from 1).
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            % out_id	 the curve's ID name.
+            % nPoints	 the number of data points on the curve.
+            % xValues	 the curve's x-values.
+            % yValues	 the curve's y-values.
             [Errcode, ids, nvalue, xvalue, yvalue]=calllib(LibEPANET, 'ENgetcurve', value, char(32*ones(1, 31)), 0, zeros(1, obj.getCurveLengths(value))', zeros(1, obj.getCurveLengths(value))');
         end
         function [Errcode, len] = apiENgetcurvelen(index, LibEPANET)
@@ -2508,7 +2532,7 @@ classdef epanet <handle
         function [Errcode] = apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET)
             % Assigns a curve to a pump's head curve.
             %
-            % apiENgetvertexcount(index, LibEPANET)
+            % apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET)
             %
             % Parameters:
             % pumpindex     the index of a pump link (starting from 1).
