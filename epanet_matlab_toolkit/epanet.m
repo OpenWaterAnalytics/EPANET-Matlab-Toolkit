@@ -4278,20 +4278,20 @@ classdef epanet <handle
             % Example:
             %  d.getGraph;
             %
-            % See also plotNetGraph
+            % See also plotGraph
             conmat = obj.getConnectivityMatrix;
             netgraph = graph(conmat);        
         end
 
-        function plotGraph(obj)
+        function h = plotGraph(obj)
             % Plots the graph of the current epanet network.
             %
             % Example:
             %  d.plotGraph;
             %
-            % See also getNetGraph
+            % See also getGraph
             netgraph = obj.getGraph;
-            plot(netgraph); 
+            h = plot(netgraph); 
         end
 
         function json_txt = toJson(~, values)
