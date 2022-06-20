@@ -21597,8 +21597,16 @@ function [axesid] = plotnet(obj, varargin)
                  if length(hh) && isempty(selectColorLink)
                      colornode = 'r';
                  end
-                 h(:, 3)=plot((x1+x2)/2, (y1+y2)/2, 'k*', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
-                     'MarkerFaceColor', colornode, 'MarkerSize', 10, 'Parent', axesid);
+                 % Check for vertices
+                 if (isempty(v.nodecoords{3}{i}))
+                     h(:, 3)=plot((x1+x2)/2, (y1+y2)/2, 'k*', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                         'MarkerFaceColor', colornode, 'MarkerSize', 10, 'Parent', axesid);
+                 else
+                     xPos = v.nodecoords{3}{i}(ceil(end/2));
+                     yPos = v.nodecoords{4}{i}(ceil(end/2));
+                     h(:, 3)=plot(xPos, yPos, 'k*', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                         'MarkerFaceColor', colornode, 'MarkerSize', 10, 'Parent', axesid);
+                 end
                  if ~l(3), legendIndices = [legendIndices 3]; l(3)=1; end
              end
 
