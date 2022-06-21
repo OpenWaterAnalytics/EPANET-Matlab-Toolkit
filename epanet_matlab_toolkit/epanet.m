@@ -5300,16 +5300,37 @@ classdef epanet <handle
                 end
             end
         end
-        function value = getNodeReservoirNameID(obj)
+        function value = getNodeReservoirNameID(obj, varargin)
             % Retrieves the reservoir ID label.
             %
-            % Example :
-            %   d.getNodeReservoirNameID
+            % The examples are based on d = epanet('ky9.inp');
+            %
+            % Example 1:
+            %   d.getNodeReservoirNameID   % Retrieves the IDs of all reservoirs.
+            %
+            % Example 2:
+            %   d.getNodeReservoirNameID(1) % Retrieves the ID of the 1st reservoir.
+            %
+            % Example 3:
+            %   d.getNodeReservoirNameID([1:3]) % Retrieves the ID of the first
+            %                                     three reservoirs.
+            %
+            % Example 4:
+            %   d.getNodeReservoirNameID([1244,1246]) % Retrieves the ID of the reservoirs
+            %                                           with indices 1244 and 1246.
             %
             % See also getNodeNameID, getNodeJunctionNameID, getNodeIndex,
             %          getNodeReservoirIndex, getNodeType, getNodesInfo.
-            %
             value=obj.getNodeNameID(obj.getNodeReservoirIndex);
+            resIndices = obj.getNodeReservoirIndex;
+            if ~isempty(varargin)
+                if ismember(0, ismember(varargin{1}, resIndices)) 
+                    resIndices = obj.getNodeReservoirIndex(varargin{1});
+                    value = obj.getNodeNameID(resIndices); 
+                else
+                    value = obj.getNodeNameID(varargin{1});                     
+                end
+            end
         end
         function value = getNodeJunctionNameID(obj)
             % Retrieves the junction ID label.
@@ -5351,16 +5372,38 @@ classdef epanet <handle
                 error(obj.getError(obj.Errcode));
             end
         end
-        function value = getNodeReservoirIndex(obj)
+        function value = getNodeReservoirIndex(obj, varargin)
             % Retrieves the indices of reservoirs.
             %
-            % Example:
-            %   d.getNodeReservoirIndex
+            % The examples are based on d = epanet('ky9.inp');
+            %
+            % Example 1:
+            %   d.getNodeReservoirIndex % Retrieves all reservoir indices.
+            %   
+            % Example 2:
+            %   d.getNodeReservoirIndex([1,2]) % Retrieves the first two reservoirs indices.
+            %  
+            % Example 3:
+            %   d.getNodeReservoirIndex({'R-1', 'R-4'}) % Retrieves the indices of reservoirs
+            %                                            'R-1' and 'R-4'.
             %
             % See also getNodeNameID, getNodeIndex, getNodeJunctionIndex,
             %          getNodeType, getNodeTypeIndex, getNodesInfo.
             tmpNodeTypes=obj.getNodeType;
-            value = find(strcmp(tmpNodeTypes, 'RESERVOIR'));
+            valueAllInd = find(strcmp(tmpNodeTypes, 'RESERVOIR'));        
+            if ~isempty(varargin)
+                if iscell(varargin{1}) || ischar(varargin{1})
+                    value = obj.getNodeIndex(varargin{1});
+                    if ismember(0, ismember(value, valueAllInd))  
+                        error('Undefined reservoir IDs provided')
+                    end
+                else
+                    try value = valueAllInd(varargin{1});
+                    catch, error('Undefined reservoir indices provided'); end
+                end
+            else
+                value = valueAllInd;
+            end
         end
         function value = getNodeJunctionIndex(obj)
             % Retrieves the indices of junctions.
@@ -6547,7 +6590,7 @@ classdef epanet <handle
             %   d.getNodeTankNameID([1:5]) % Retrieves the ID of the first five tanks.
             %
             % Example 4:
-            %   d.getNodeTankNameID([923,929,931]) % Retrieves the ID of thr tanks
+            %   d.getNodeTankNameID([923,929,931]) % Retrieves the ID of the tanks
             %                                        with indices 932,929,and 931.
             %
             % See also getNodeTankCount, getNodeTankIndex.
