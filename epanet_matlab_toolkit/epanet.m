@@ -6501,27 +6501,66 @@ classdef epanet <handle
                 j=j+1;
             end
         end
-        function value = getNodeTankIndex(obj)
+        function value = getNodeTankIndex(obj, varargin)
             % Retrieves the tank indices.
             %
-            % Example:
-            %   d.getNodeTankIndex
-            %
-            % See also getNodeTankCount, getNodeTankNameID.
-            tmpNodeTypes=obj.getNodeType;
-            value = find(strcmp(tmpNodeTypes, 'TANK'));
-        end
-        function value = getNodeTankNameID(obj)
-            % Retrieves the tank IDs.
+            % The examples are based on d = epanet('ky10.inp');
             %
             % Example 1:
-            %   d.getNodeTankNameID      % Retrieves the IDs of all tanks
+            %   d.getNodeTankIndex % Retrieves all tank indices.
+            %   
+            % Example 2:
+            %   d.getNodeTankIndex([1:3]) % Retrieves the first three tank's indices.
+            %  
+            % Example 3:
+            %   d.getNodeTankIndex({'T-1', 'T-2'}) % Retrieves the indices of tanks
+            %                                        'T-1' and 'T-2'.
+            % See also getNodeTankCount, getNodeTankNameID.
+            tmpNodeTypes=obj.getNodeType;
+            valueAllInd = find(strcmp(tmpNodeTypes, 'TANK'));
+            if ~isempty(varargin)
+                if iscell(varargin{1}) || ischar(varargin{1})
+                    value = obj.getNodeIndex(varargin{1});
+                    if ismember(0, ismember(value, valueAllInd))  
+                        error('Undefined tank IDs provided')
+                    end
+                else
+                    try value = valueAllInd(varargin{1});
+                    catch, error('Undefined tank indices provided'); end
+                end
+            else
+                value = valueAllInd;
+            end
+        end
+        function value = getNodeTankNameID(obj, varargin)
+            % Retrieves the tank IDs.
+            %
+            % The examples are based on d = epanet('ky10.inp');
+            %
+            % Example 1:
+            %   d.getNodeTankNameID      % Retrieves the IDs of all tanks.
             %
             % Example 2:
-            %   d.getNodeTankNameID{1}   % Retrieves the ID of the 1st tank
+            %   d.getNodeTankNameID(1)   % Retrieves the ID of the 1st tank.
+            %
+            % Example 3:
+            %   d.getNodeTankNameID([1:5]) % Retrieves the ID of the first five tanks.
+            %
+            % Example 4:
+            %   d.getNodeTankNameID([923,929,931]) % Retrieves the ID of thr tanks
+            %                                        with indices 932,929,and 931.
             %
             % See also getNodeTankCount, getNodeTankIndex.
-            value=obj.getNodeNameID(obj.getNodeTankIndex);
+            value = obj.getNodeNameID(obj.getNodeTankIndex);
+            tankIndices = obj.getNodeTankIndex;
+            if ~isempty(varargin)
+                if ismember(0, ismember(varargin{1}, tankIndices)) 
+                    tankIndices = obj.getNodeTankIndex(varargin{1});
+                    value = obj.getNodeNameID(tankIndices); 
+                else
+                    value = obj.getNodeNameID(varargin{1});                     
+                end
+            end
         end
         function tankData = getNodeTankData(obj, varargin)
             % Retrieves a group of properties for a tank. (EPANET Version 2.2)
@@ -21392,7 +21431,7 @@ function [indices, value] = getNodeJunctionIndices(obj, varargin)
      % EPANET Version 2.2
      indices =getIndices(obj.getNodeJunctionCount, varargin{1});
      value = zeros(1, length(indices));
- end
+end
 function [indices, value] = getCurveIndices(obj, varargin)
      indices =getIndices(obj.getCurveCount, varargin{1});
      value = zeros(1, length(indices));
