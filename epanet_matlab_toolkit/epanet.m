@@ -12897,7 +12897,7 @@ classdef epanet <handle
             % Example 2:
             %   d = epanet('example.inp');            
             %   d.loadMSXFile('example.msx');
-            %   MSX_comp = d.getMSXComputedQualitySpecie; % Computes quality for all
+            %   MSX_comp = d.getMSXComputedQualitySpecie  % Computes quality for all
             %                                              the species in 3D arrays.
             %   MSX_comp.NodeQuality(:,:,1) % Gets node quality for the first specie.
             %   MSX_comp.LinkQuality(:,:,5) % Gets link quality for the fith specie.
@@ -12905,7 +12905,7 @@ classdef epanet <handle
             % Example 3:
             %   d = epanet('example.inp');            
             %   d.loadMSXFile('example.msx');
-            %   MSX_comp = d.getMSXComputedQualitySpecie({'AStot', 'AS5s'}); % Computes quality for all
+            %   MSX_comp = d.getMSXComputedQualitySpecie({'AStot', 'AS5s'}) % Computes quality for all
             %                                                               the species in 3D arrays.
             %   MSX_comp.NodeQuality(:,:,1) % Gets node quality for the first specie.
             %   MSX_comp.NodeQuality(:,:,2) % Gets node quality for the second specie.
