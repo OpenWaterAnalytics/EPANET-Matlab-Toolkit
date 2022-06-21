@@ -12883,10 +12883,10 @@ classdef epanet <handle
             [obj.Errcode, value] = obj.apiMSXgetqual(type, index, species, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
-        function value = getMSXComputedQualitySpecie(obj, specie)
+        function value = getMSXComputedQualitySpecie(obj, varargin)
             % Returns the node/link quality for specific specie.
             %
-            % Example:
+            % Example 1:    
             %   d = epanet('net2-cl2.inp');
             %   d.loadMSXFile('net2-cl2.msx');
             %   MSX_comp = d.getMSXComputedQualitySpecie('CL2')
@@ -12894,17 +12894,38 @@ classdef epanet <handle
             %   MSX_comp.LinkQuality % row: time, col: link index
             %   MSX_comp.Time
             %
+            % Example 2:
+            %   d = epanet('example.inp');            
+            %   d.loadMSXFile('example.msx');
+            %   MSX_comp = d.getMSXComputedQualitySpecie; % Computes quality for all
+            %                                              the species in 3D arrays.
+            %   MSX_comp.NodeQuality(:,:,1) % Gets node quality for the first specie.
+            %   MSX_comp.LinkQuality(:,:,5) % Gets link quality for the fith specie.
+            % 
+            % Example 3:
+            %   d = epanet('example.inp');            
+            %   d.loadMSXFile('example.msx');
+            %   MSX_comp = d.getMSXComputedQualitySpecie({'AStot', 'AS5s'}); % Computes quality for all
+            %                                                               the species in 3D arrays.
+            %   MSX_comp.NodeQuality(:,:,1) % Gets node quality for the first specie.
+            %   MSX_comp.NodeQuality(:,:,2) % Gets node quality for the second specie.
+            %
             % See also getMSXComputedQualityNode, getMSXComputedQualityLink.
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
             end
+            if isempty(varargin)
+                specie = obj.getMSXSpeciesNameID;
+            else
+                specie = varargin{1};
+            end
             link_indices = 1:obj.getLinkCount;%for all link index
             node_indices = 1:obj.getNodeCount;%for all node index
-            specie_name = obj.getMSXSpeciesIndex(specie);
+            specie_name_ind = obj.getMSXSpeciesIndex(specie);
 
-            value.NodeQuality = nan(1, length(node_indices));
-            value.LinkQuality = nan(1, length(node_indices));
+            value.NodeQuality = nan(1, length(node_indices), length(specie_name_ind));
+            value.LinkQuality = nan(1, length(node_indices), length(specie_name_ind));
             % Obtain a hydraulic solution
             obj.solveMSXCompleteHydraulics;
             % Run a step-wise water quality analysis without saving
@@ -12914,17 +12935,21 @@ classdef epanet <handle
             k=1; tleft=1;
             value.Time(k, :)=0;
             if node_indices(end) < link_indices(end)
-                for lnk=link_indices
-                    value.LinkQuality(k, lnk)=obj.getMSXLinkInitqualValue{lnk}(specie_name);
-                    if lnk < node_indices(end) + 1
-                        value.NodeQuality(k, lnk)=obj.getMSXNodeInitqualValue{lnk}(specie_name);
+                for i=1:length(specie_name_ind)
+                    for lnk=link_indices
+                        value.LinkQuality(k, lnk, i)=obj.getMSXLinkInitqualValue{lnk}(specie_name_ind(i));
+                        if lnk < node_indices(end) + 1
+                            value.NodeQuality(k, lnk, i)=obj.getMSXNodeInitqualValue{lnk}(specie_name_ind(i));
+                        end
                     end
                 end
             else
-                for lnk=node_indices
-                    value.NodeQuality(k, lnk)=obj.getMSXNodeInitqualValue{lnk}(specie_name);
-                    if lnk < link_indices(end) + 1
-                        value.LinkQuality(k, lnk)=obj.getMSXLinkInitqualValue{lnk}(specie_name);
+                for i=1:length(specie_name_ind)
+                    for lnk=node_indices
+                        value.NodeQuality(k, lnk, i)=obj.getMSXNodeInitqualValue{lnk}(specie_name_ind(i));
+                        if lnk < link_indices(end) + 1
+                            value.LinkQuality(k, lnk, i)=obj.getMSXLinkInitqualValue{lnk}(specie_name_ind(i));
+                        end
                     end
                 end
             end
@@ -12932,17 +12957,21 @@ classdef epanet <handle
                 k=k+1;
                 [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
                 if node_indices(end) < link_indices(end)
-                    for lnk=link_indices
-                        value.LinkQuality(k, lnk)=obj.getMSXSpeciesConcentration(1, lnk, specie_name);%link code 1
-                        if lnk < node_indices(end) + 1
-                            value.NodeQuality(k, lnk)=obj.getMSXSpeciesConcentration(0, lnk, specie_name);%node code0
+                    for i=1:length(specie_name_ind)
+                        for lnk=link_indices
+                            value.LinkQuality(k, lnk, i)=obj.getMSXSpeciesConcentration(1, lnk, specie_name_ind(i));%link code 1
+                            if lnk < node_indices(end) + 1
+                                value.NodeQuality(k, lnk, i)=obj.getMSXSpeciesConcentration(0, lnk, specie_name_ind(i));%node code0
+                            end
                         end
                     end
                 else
-                    for lnk=node_indices
-                        value.NodeQuality(k, lnk)=obj.getMSXSpeciesConcentration(0, lnk, specie_name);%link code 1
-                        if lnk < link_indices(end) + 1
-                            value.LinkQuality(k, lnk)=obj.getMSXSpeciesConcentration(1, lnk, specie_name);%node code0
+                    for i=1:length(specie_name_ind)
+                        for lnk=node_indices
+                            value.NodeQuality(k, lnk, i)=obj.getMSXSpeciesConcentration(0, lnk, specie_name_ind(i));%link code 1
+                            if lnk < link_indices(end) + 1
+                                value.LinkQuality(k, lnk, i)=obj.getMSXSpeciesConcentration(1, lnk, specie_name_ind(i));%node code0
+                            end
                         end
                     end
                 end
