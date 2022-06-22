@@ -4590,37 +4590,61 @@ classdef epanet <handle
             % See also getLinkNameID, getLinkPumpNameID, getNodeNameID.
             value=obj.getLinkNameID(obj.getLinkPipeIndex);
         end
-        function value = getLinkPumpNameID(obj)
+        function value = getLinkPumpNameID(obj, varargin)
             % Retrieves the pump ID.
             %
+            % The examples are based on d = epanet('Richmond_standard.inp');
+            %
             % Example 1:
-            %   d.getLinkPumpNameID        % Retrieves the ID's of all pumps
+            %   d.getLinkPumpNameID        % Retrieves the ID's of all pumps.
             %
             % Example 2:
-            %   d.getLinkPumpNameID{1}     % Retrieves the ID of the 1st pump
+            %   d.getLinkPumpNameID(1)     % Retrieves the ID of the 1st pump.
             %
             % Example 3:
-            %   d.getLinkPumpNameID{1:2}   % Retrieves the ID of the first 2 pumps
+            %   d.getLinkPumpNameID(1:3)   % Retrieves the ID of the first 3 pumps.
             %
             % See also getLinkNameID, getLinkPipeNameID, getNodeNameID.
             value = obj.getLinkNameID(obj.getLinkPumpIndex);
-            error(obj.getError(obj.Errcode));
+            pIndices = obj.getLinkPumpIndex;
+            if ~isempty(varargin)
+                if ismember(0, ismember(varargin{1}, pIndices)) 
+                    pIndices = obj.getLinkPumpIndex(varargin{1});
+                    value = obj.getLinkNameID(pIndices); 
+                else
+                    value = obj.getLinkNameID(varargin{1});                     
+                end
+            end
         end
-        function value = getLinkValveNameID(obj)
+        function value = getLinkValveNameID(obj, varargin)
             % Retrieves the valve ID.
             %
+            % The examples are based on d = epanet('BWSN_Network_1.inp');
+            %
             % Example 1:
-            %   d.getLinkValveNameID        % Retrieves the ID's of all valves
+            %   d.getLinkValveNameID        % Retrieves the ID's of all valves.
             %
             % Example 2:
-            %   d.getLinkValveNameID{1}     % Retrieves the ID of the 1st valve
+            %   d.getLinkValveNameID(1)     % Retrieves the ID of the 1st valve.
             %
             % Example 3:
-            %   d.getLinkValveNameID{1:3}   % Retrieves the ID of the first 3 valves
+            %   d.getLinkValveNameID(1:3)   % Retrieves the ID of the first 3 valves.
+            %
+            % Example 4:
+            %   d.getLinkValveNameID([171, 175]) % Retrieves the ID of the reservoirs
+            %                                           with indices 171 and 175.
             %
             % See also getLinkNameID, getLinkPumpNameID, getNodeNameID.
             value=obj.getLinkNameID(obj.getLinkValveIndex);
-            error(obj.getError(obj.Errcode));
+            vIndices = obj.getLinkValveIndex;
+            if ~isempty(varargin)
+                if ismember(0, ismember(varargin{1}, vIndices)) 
+                    vIndices = obj.getLinkValveIndex(varargin{1});
+                    value = obj.getLinkNameID(vIndices); 
+                else
+                    value = obj.getLinkNameID(varargin{1});                     
+                end
+            end
         end
         function value = getLinkIndex(obj, varargin)
             % Retrieves the indices of all links, or the indices of an ID set of links.
@@ -4668,31 +4692,65 @@ classdef epanet <handle
         function value = getLinkPumpIndex(obj, varargin)
             % Retrieves the pump indices.
             %
+            % The examples are based on d = epanet('Richmond_standard.inp');
+            %
             % Example 1:
-            %   d.getLinkPumpIndex        % Retrieves the indices of all pumps
-            %
+            %   d.getLinkPumpIndex % Retrieves all pump indices.
+            %   
             % Example 2:
-            %   d.getLinkPumpIndex(1)     % Retrieves the index of the 1st pump
-            %
+            %   d.getLinkPumpIndex(1:2)  % Retrieves the first two pump indices.
+            %  
             % Example 3:
-            %   d.getLinkPumpIndex(1:2)   % Retrieves the indices of the first 2 pumps
-            %
+            %   d.getLinkPumpIndex({'3A', '5C'}) % Retrieves the indices of pumps
+            %                                            '3A' and '5C'.
             % See also getLinkIndex, getLinkPipeIndex, getLinkValveIndex.
             tmpLinkTypes=obj.getLinkType;
-            value = find(strcmp(tmpLinkTypes, 'PUMP'));
+            valueAllInd = find(strcmp(tmpLinkTypes, 'PUMP'));
             if ~isempty(varargin)
-                value = value(varargin{1});
+                if iscell(varargin{1}) || ischar(varargin{1})
+                    value = obj.getLinkIndex(varargin{1});
+                    if ismember(0, ismember(value, valueAllInd))  
+                        error('Undefined pump IDs provided')
+                    end
+                else
+                    try value = valueAllInd(varargin{1});
+                    catch, error('Undefined pump indices provided'); end
+                end
+            else
+                value = valueAllInd;
             end
         end
-        function value = getLinkValveIndex(obj)
+        function value = getLinkValveIndex(obj, varargin)
             % Retrieves the valve indices.
             %
-            % Example:
-            %   d.getLinkValveIndex
+            % The examples are based on d = epanet('BWSN_Network_1.inp');
+            %
+            % Example 1:
+            %   d.getLinkValveIndex % Retrieves all valve indices.
+            %   
+            % Example 2:
+            %   d.getLinkValveIndex(1:2)  % Retrieves the first two valves indices.
+            %  
+            % Example 3:
+            %   d.getLinkValveIndex({'VALVE-173', 'VALVE-174'})  % Retrieves the indices of 
+            %                                                      valves 'R-1' and 'R-4'.
             %
             % See also getLinkIndex, getLinkPipeIndex, getLinkPumpIndex.
-            tmpLinkTypes=obj.getLinkType;
-            value = find(~strcmp(tmpLinkTypes, 'PUMP')&~strcmp(tmpLinkTypes, 'PIPE'));
+            tmpLinkTypes=obj.getLinkType;       
+            valueAllInd = find(~strcmp(tmpLinkTypes, 'PUMP')&~strcmp(tmpLinkTypes, 'PIPE'));
+            if ~isempty(varargin)
+                if iscell(varargin{1}) || ischar(varargin{1})
+                    value = obj.getLinkIndex(varargin{1});
+                    if ismember(0, ismember(value, valueAllInd))  
+                        error('Undefined valve IDs provided')
+                    end
+                else
+                    try value = valueAllInd(varargin{1});
+                    catch, error('Undefined valve indices provided'); end
+                end
+            else
+                value = valueAllInd;
+            end
         end
         function value = getNodesConnectingLinksIndex(obj)
             % Retrieves the indexes of the from/to nodes of all links.
@@ -6553,7 +6611,7 @@ classdef epanet <handle
             %   d.getNodeTankIndex % Retrieves all tank indices.
             %   
             % Example 2:
-            %   d.getNodeTankIndex([1:3]) % Retrieves the first three tank's indices.
+            %   d.getNodeTankIndex(1:3)  % Retrieves the first three tank's indices.
             %  
             % Example 3:
             %   d.getNodeTankIndex({'T-1', 'T-2'}) % Retrieves the indices of tanks
@@ -6587,7 +6645,7 @@ classdef epanet <handle
             %   d.getNodeTankNameID(1)   % Retrieves the ID of the 1st tank.
             %
             % Example 3:
-            %   d.getNodeTankNameID([1:5]) % Retrieves the ID of the first five tanks.
+            %   d.getNodeTankNameID(1:5) % Retrieves the ID of the first five tanks.
             %
             % Example 4:
             %   d.getNodeTankNameID([923,929,931]) % Retrieves the ID of the tanks
