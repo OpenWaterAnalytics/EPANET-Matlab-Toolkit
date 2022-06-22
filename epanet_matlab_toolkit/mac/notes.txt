@@ -1,3 +1,6 @@
-- Open terminal
-- cd epanet_matlab_toolkit/glnx
-- sudo cp epanet2.dylib /lib/libepanet.dylib ~~~ 
+*** BEFORE RUNNING EPANET ***
+1. open terminal
+2. cd epanet_matlab_toolkit/mac
+3. sudo cp libepanet2.dylib /lib64/libepanet.so (centos)
+   sudo cp libepanet2.dylib /lib/.../libepanet.so (ubuntu)
+4. run d = epanet('Net1.inp')
