@@ -469,7 +469,7 @@ classdef epanet <handle
             [indices, value] = getLinkIndices(obj, varargin);
             j=1;
             for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, constant, obj.LibEPANET);
+                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, constant, obj.LibEPANET, obj.ph);
                 error(obj.getError(obj.Errcode));
                 j=j+1;
             end
@@ -485,7 +485,7 @@ classdef epanet <handle
             if isempty(varargin{1})
                 j=1;
                 for i=1:count
-                    [obj.Errcode] = eval(['obj.', fun, '(indices(i), propertie, value(j), obj.LibEPANET)']);
+                    [obj.Errcode] = eval(['obj.', fun, '(indices(i), propertie, value(j), obj.LibEPANET, obj.ph)']);
                     error(obj.getError(obj.Errcode));
                     if ~isscalar(value)
                         j=j+1;
@@ -498,7 +498,7 @@ classdef epanet <handle
                 end
                 j=1;
                 for i=1:length(value)
-                    [obj.Errcode] = eval(['obj.', fun, '(value(i), propertie, varargin{1}(j), obj.LibEPANET)']);
+                    [obj.Errcode] = eval(['obj.', fun, '(value(i), propertie, varargin{1}(j), obj.LibEPANET, obj.ph)']);
                     error(obj.getError(obj.Errcode));
                     if ~isscalar(varargin{1})
                         j=j+1;
@@ -2592,7 +2592,7 @@ classdef epanet <handle
             if ph.isNull
                 [Errcode, ~, index]=calllib(LibEPANET, 'ENgetcurveindex', id, 0);
             else
-                [Errcode, ~, ~, index]=calllib(LibEPANET, 'ENg_etcurveindex', ph, id, 0);
+                [Errcode, ~, ~, index]=calllib(LibEPANET, 'EN_getcurveindex', ph, id, 0);
             end
         end
         function [Errcode] = apiENaddcurve(cid, LibEPANET, ph)
