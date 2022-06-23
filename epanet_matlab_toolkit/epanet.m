@@ -672,11 +672,13 @@ classdef epanet <handle
         end
         function ENMatlabCleanup(obj, LibEPANET)
             % Unload library
-            [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
-            obj.ph.isNull = 0; % Set it to 0 to pass the ph.isNull condition on api functions
-                               % call and stop on error 'Error using calllib 
-                               % Library was not found' after unloading library.
-            obj.ph.unloaded = 1;
+            if ~obj.ph.isNull
+                [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
+                obj.ph.isNull = 0; % Set it to 0 to pass the ph.isNull condition on api functions
+                                   % call and stop on error 'Error using calllib 
+                                   % Library was not found' after unloading library.
+                obj.ph.unloaded = 1;
+            end
             if libisloaded(LibEPANET)
                 try
                     unloadlibrary(LibEPANET);
@@ -2461,7 +2463,7 @@ classdef epanet <handle
             %
             % Parameters:
             % LibEPANET epanet library DLL name
-            %
+            %                                                      
             % Returns:
             % an error code
             % See also apiENopenQ, apiENinitQ, apiENrunQ, apiENnextQ, apiENcloseQ
@@ -2768,7 +2770,7 @@ classdef epanet <handle
             % an error code.
             % x  the vertex's X-coordinate value.
             % y  the vertex's Y-coordinate value.
-            if ph.isNone
+            if ph.isNull
                 [Errcode, x, y] = calllib(LibEPANET, 'ENgetvertex', index, vertex, 0, 0);
             else
                 [Errcode, ~, x, y] = calllib(LibEPANET, 'EN_getvertex', ph, index, vertex, 0, 0);
@@ -2789,7 +2791,7 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            if ph.isNone
+            if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetvertices', index, x, y, vertex);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_setvertices', ph, index, x, y, vertex);
@@ -2829,7 +2831,7 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
-            if ph.isNone
+            if ph.isNull
                 Errcode = calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand, demandPattern, demandName);
             else
                 Errcode = calllib(LibEPANET, 'EN_adddemand', ph, nodeIndex, baseDemand, demandPattern, demandName);
@@ -2848,7 +2850,7 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            if ph.isNone
+            if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENdeletedemand', nodeIndex, demandIndex);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_deletedemand', ph, nodeIndex, demandIndex);
@@ -2868,7 +2870,7 @@ classdef epanet <handle
             %
             % Returns:
             % an error code
-            if ph.isNone
+            if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetbasedemand', index, demandIdx, value);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_setbasedemand', ph, index, demandIdx, value);
@@ -2888,7 +2890,7 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
-            if ph.isNone
+            if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetdemandpattern', index, demandIdx, patInd);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_setdemandpattern', ph, index, demandIdx, patInd);
@@ -2909,7 +2911,7 @@ classdef epanet <handle
             % chemunits   concentration units of the constituent.
             % tracenode 	index of the node being traced (if applicable).
             chm=char(32*ones(1, 31));
-            if ph.isNone
+            if ph.isNull
                 [Errcode, qualcode, chemname, chemunits, tracenode] = calllib(LibEPANET, 'ENgetqualinfo', 0, chm, chm, 0);
             else
                 [Errcode, ~, qualcode, chemname, chemunits, tracenode] = calllib(LibEPANET, 'EN_getqualinfo', ph, 0, chm, chm, 0);
@@ -2929,7 +2931,7 @@ classdef epanet <handle
             % an error code.
             % index    the index of the newly added node.
             % See also EN_NodeProperty, NodeType
-            if ph.isNone
+            if ph.isNull
                 [Errcode, ~, index] = calllib(LibEPANET, 'ENaddnode', nodeid, nodetype, 0);
             else
                 [Errcode, ~, ~, index] = calllib(LibEPANET, 'EN_addnode', ph, nodeid, nodetype, 0);
@@ -2951,7 +2953,7 @@ classdef epanet <handle
             % an error code.
             % index the index of the newly added link.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
-            if ph.isNone
+            if ph.isNull
                 [Errcode, ~, ~, ~, index] = calllib(LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
             else
                 [Errcode, ~, ~, ~, ~, index] = calllib(LibEPANET, 'EN_addlink', ph, linkid, linktype, fromnode, tonode, 0);
@@ -2971,7 +2973,7 @@ classdef epanet <handle
             % an error code.
             % See also EN_NodeProperty, NodeType
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
-            if ph.isNone
+            if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENdeletenode', indexNode, condition);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_deletenode', ph, indexNode, condition);
@@ -2990,7 +2992,7 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
-            if ph.isNone
+            if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENdeletelink', indexLink, condition);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_deletelink', ph, indexLink, condition);
@@ -3008,7 +3010,7 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            if ph.isNone
+            if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_setheadcurveindex', ph, pumpindex, curveindex);
@@ -3030,7 +3032,7 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % cindex 	index of the new control.
-            if ph.isNone
+            if ph.isNull
                 [Errcode, cindex] = calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
             else
                 [Errcode, ~, cindex] = calllib(LibEPANET, 'EN_addcontrol', ph, ctype, lindex, setting, nindex, level, 0);
@@ -3048,7 +3050,7 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            if ph.isNone
+            if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENdeletecontrol', index);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_deletecontrol', ph, index);
@@ -3949,9 +3951,10 @@ classdef epanet <handle
                     end
                 end
             end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
+            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE') ...
+                                && ~strcmpi(varargin{2}, 'ph') % e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-                 if isempty(pwdDLL)
+                if isempty(pwdDLL)
                     pwdDLL = pwd;
                 end
                 obj.LibEPANETpath = [pwdDLL, '\'];
@@ -3980,13 +3983,13 @@ classdef epanet <handle
             
             % Create Project - EPANET 2.2 supported function
             obj.ph = libpointer('voidPtr');
-%             if contains('ph', varargin) 
-%                 try
-%                     [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
-%                     setdatatype(obj.ph, 'ProjectPtr') 
-%                 catch 
-%                 end
-%             end
+            if contains('ph', varargin) 
+                try
+                    [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
+                    setdatatype(obj.ph, 'ProjectPtr') 
+                catch 
+                end
+            end
          
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
