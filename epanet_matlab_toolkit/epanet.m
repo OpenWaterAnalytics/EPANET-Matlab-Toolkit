@@ -8377,7 +8377,7 @@ classdef epanet <handle
             % Example:
             %   d.getENfunctionsImpemented
             %
-            % See also getLibFunctions, getVersion.
+            % See also getLibFunctions, getVersion, getEN_functionsImpemented.
             [tline]=regexp(fileread([mfilename, '.m']), '\n', 'split');
             u=1;obj.Errcode;
             value = cell(1, 1);
@@ -8394,6 +8394,41 @@ classdef epanet <handle
                 end
             end
             value = unique(value)';
+        end
+        function value = getEN_functionsImpemented(obj)
+            % Retrieves the epanet functions that have been developed.
+            %
+            % Example:
+            %   d.getEN_functionsImpemented
+            %
+            % See also getLibFunctions, getVersion, getENfunctionsImpemented.
+            mfilename = 'epanet';
+            [tline]=regexp(fileread([mfilename, '.m']), '\n', 'split');
+            u=1;obj.Errcode;
+            value = cell(1, 1);
+            for i=1:length(tline)
+                if ~isempty(regexp(tline{i}, 'EN_\w', 'match'))
+                    enfunc = regexp(tline{i}, '\w*EN_\w*', 'match');
+                    checkL = isstrprop(enfunc, 'upper');
+                    if length(checkL{1})>2
+                        if strcmp(enfunc{1}(1:3), 'EN_')
+                            value(u) = enfunc(1);
+                            u=u+1;
+                        end
+                    end
+                end
+            end
+            value = unique(value)';
+            lib_functions = obj.libFunctions;
+            contain_mat = contains(lib_functions, value);
+            value = cell(sum(contain_mat~=0),1);
+            j = 1;
+            for i=1:length(contain_mat)
+                if contain_mat(i)
+                    value{j} = lib_functions{i};
+                    j = j+1;
+                end
+            end
         end
         function value = getLibFunctions(obj)
             % Retrieves the functions of DLL.
