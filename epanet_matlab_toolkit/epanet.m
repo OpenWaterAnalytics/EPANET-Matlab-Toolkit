@@ -892,6 +892,38 @@ classdef epanet <handle
                 [Errcode, ~, value] = calllib(LibEPANET, 'EN_getbasedemand', ph, index, numdemands, 0);
             end
         end
+        function apiEN_createproject(obj)
+            % Creates a new epanet project.
+            %
+            % apiEN_createproject(LibEPANET)
+            %
+            % See also apiEN_deleteproject, apiEN_fffffff
+            ph = libpointer('voidPtr');
+            [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', ph);
+            setdatatype(obj.ph, 'ProjectPtr') 
+            error(obj.getError(obj.Errcode));
+        end
+        function apiEN_deleteproject(obj)
+            % Deletes the epanet project.
+            %
+            % apiEN_deleteproject(obj)
+            %
+            % See also apiEN_createproject, apiEN_fffffff
+            [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
+            obj.ph.isNull = 0;
+            error(obj.getError(obj.Errcode));
+        end
+        function [Errcode, inpname, repname, binname, pviewprog] = apiEN_runproject(obj, inpname, repname, binname, LibEPANET, ph)
+            % Deletes the epanet project.
+            %
+            % apiEN_runproject(obj)
+            %
+            % See also apiEN_deleteproject, apiEN_fffffff
+            p = libpointer('voidPtr');
+            [Errcode, ~, inpname, repname, binname, pviewprog] = calllib(LibEPANET, ...
+                                        'EN_runproject', ph, inpname, repname, binname, p);
+            error(obj.getError(Errcode));
+        end
         function [Errcode] = apiENsetlinkid(index, newid, LibEPANET, ph)
             % Changes the ID name of a link.
             % EPANET Version 2.2
@@ -1601,7 +1633,7 @@ classdef epanet <handle
             if ph.isNull
                 Errcode = calllib(LibEPANET, 'ENopen', inpname, repname, binname);
             else
-                Errcode = calllib(LibEPANET, 'EN_open', ph,inpname, repname, binname);
+                Errcode = calllib(LibEPANET, 'EN_open', ph, inpname, repname, binname);
             end
             if Errcode && Errcode~=200
                  [~, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
@@ -9669,7 +9701,28 @@ classdef epanet <handle
             index = obj.getLinkIndex(linkID);
             [obj.Errcode]=obj.apiENsetvertices(index, x, y, size(x, 2), obj.LibEPANET, obj.ph);
             error(obj.getError(obj.Errcode));
-
+        end    
+      function createProject(obj)
+            % Creates the epanet project.
+            % Only for EN_ functions
+            %
+            % Example:
+            %   d.createProject;
+            %
+            % See also deleteProject.
+            obj.apiEN_createproject(obj);
+      end
+      function deleteProject(obj)
+            % Deletes the epanet project.
+            % Only for EN_ functions
+            %
+            % Example:
+            %   d = epanet('Net1.inp', 'ph');
+            %   d.deleteProject;
+            %   d.getNodeElevations % Results in error 
+            %
+            % See also createProject.
+            obj.apiEN_deleteproject(obj);
         end
         function Errcode = deleteNode(obj, idNode, varargin)
             % Deletes nodes. (EPANET Version 2.2)
