@@ -561,7 +561,7 @@ classdef epanet <handle
                         if c > obj.getNodeDemandCategoriesNumber(i)
                             addNodeJunctionDemand(obj, i, param(j));
                         else
-                            [obj.Errcode] = eval(['obj.', fun, '(i, c, param(j), obj.LibEPANET)']);
+                            [obj.Errcode] = eval(['obj.', fun, '(i, c, param(j), obj.LibEPANET, obj.ph)']);
                         end
                     else
                         [obj.Errcode] = obj.apiENsetnodevalue(i, propertie, param(j), obj.LibEPANET, obj.ph);
@@ -640,9 +640,9 @@ classdef epanet <handle
                 % Check which node x coordinate is smaller to set it as the
                 % start
                 if  choiceMat(count) == 1
-                    lindex = obj.apiENaddlink(linkId, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET);
+                    lindex = obj.apiENaddlink(linkId, obj.ToolkitConstants.(lType), id, i{1}, obj.LibEPANET, obj.ph);
                 else
-                    lindex = obj.apiENaddlink(linkId, obj.ToolkitConstants.(lType), i{1}, id, obj.LibEPANET);
+                    lindex = obj.apiENaddlink(linkId, obj.ToolkitConstants.(lType), i{1}, id, obj.LibEPANET, obj.ph);
                 end
                 % add attributes to the new links
                 obj.setLinkLength(lindex, lInfo.LinkLength(linknodeIndices(count)));
@@ -672,11 +672,13 @@ classdef epanet <handle
         end
         function ENMatlabCleanup(obj, LibEPANET)
             % Unload library
-            [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
-            obj.ph.isNull = 0; % Set it to 0 to pass the ph.isNull condition on api functions
-                               % call and stop on error 'Error using calllib 
-                               % Library was not found' after unloading library.
-            obj.ph.unloaded = 1;
+            if ~obj.ph.isNull
+                [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
+                obj.ph.isNull = 0; % Set it to 0 to pass the ph.isNull condition on api functions
+                                   % call and stop on error 'Error using calllib 
+                                   % Library was not found' after unloading library.
+                obj.ph.unloaded = 1;
+            end
             if libisloaded(LibEPANET)
                 try
                     unloadlibrary(LibEPANET);
@@ -820,14 +822,16 @@ classdef epanet <handle
         function [Errcode] = apiENaddpattern(patid, LibEPANET, ph)
             % Adds a new time pattern to a project.
             %
-            % apiENaddpattern(patid, LibEPANET)
+            % apiENaddpattern(patid, LibEPANET, ph)
             %
             % Parameters:
             % patid      the ID name of the pattern to add.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             if ph.isNull
                 Errcode = calllib(LibEPANET, 'ENaddpattern', patid);
@@ -838,14 +842,16 @@ classdef epanet <handle
         function [Errcode] = apiENclose(LibEPANET, ph)
             % Closes a project and frees all of its memory.
             %
-            % apiENclose(LibEPANET)
+            % apiENclose(LibEPANET, ph)
             %
             % Parameters:
             % LibEPANET epanet library DLL name
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code.
-            % See also apiENopen
+            %
+            % See also apiENopen.
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENclose');
             else
@@ -855,14 +861,16 @@ classdef epanet <handle
         function [Errcode] = apiENcloseH(LibEPANET, ph)
             % Closes the hydraulic solver freeing all of its allocated memory.
             %
-            % apiENcloseH(LibEPANET)
+            % apiENcloseH(LibEPANET, ph)
             %
             % Parameters:
             % LibEPANET epanet library DLL name
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code.
-            % See also  apiENinitH, apiENrunH, apiENnextH
+            %
+            % See also  apiENinitH, apiENrunH, apiENnextH.
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENcloseH');
             else
@@ -890,19 +898,62 @@ classdef epanet <handle
                 [Errcode, ~, value] = calllib(LibEPANET, 'EN_getbasedemand', ph, index, numdemands, 0);
             end
         end
+        function apiEN_createproject(obj)
+            % Creates a new epanet project.
+            %
+            % apiEN_createproject(obj)
+            %
+            % Parameters:
+            % obj   epanet class object.
+            %
+            % See also apiEN_deleteproject.
+            ph = libpointer('voidPtr');
+            [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', ph);
+            setdatatype(obj.ph, 'ProjectPtr') 
+            error(obj.getError(obj.Errcode));
+        end
+        function apiEN_deleteproject(obj)
+            % Deletes the epanet project.
+            %
+            % apiEN_deleteproject(obj)
+            %
+            % Parameters:
+            % obj   epanet class object.
+            %
+            % See also apiEN_createproject.
+            [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
+            obj.ph.isNull = 0;
+            error(obj.getError(obj.Errcode));
+        end
+        function [Errcode, inpname, repname, binname, pviewprog] = apiEN_runproject(obj, inpname, repname, binname, LibEPANET, ph)
+            % Deletes the epanet project.
+            %
+            % Parameters:
+            % obj  
+            %
+            % apiEN_runproject(obj)
+            %
+            % See also apiEN_deleteproject.
+            p = libpointer('voidPtr');
+            [Errcode, ~, inpname, repname, binname, pviewprog] = calllib(LibEPANET, ...
+                                        'EN_runproject', ph, inpname, repname, binname, p);
+            error(obj.getError(Errcode));
+        end
         function [Errcode] = apiENsetlinkid(index, newid, LibEPANET, ph)
             % Changes the ID name of a link.
             % EPANET Version 2.2
             %
-            % apiENsetlinkid(index, newid, LibEPANET)
+            % apiENsetlinkid(index, newid, LibEPANET, ph)
             %
             % Parameters:
             % index         a link's index (starting from 1).
             % newid         the new ID name for the link.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetlinkid', index, newid);
@@ -914,11 +965,12 @@ classdef epanet <handle
             % Retrieves the number of demand categories for a junction node.
             % EPANET 20100
             %
-            % apiENgetnumdemands(index, LibEPANET)
+            % apiENgetnumdemands(index, LibEPANET, ph)
             %
             % Parameters:
             % index    	   the index of a node (starting from 1).
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
@@ -931,18 +983,19 @@ classdef epanet <handle
         end
         function [Errcode, value] = apiENgetdemandpattern(index, numdemands, LibEPANET, ph)
             % Retrieves the index of a time pattern assigned to one of a node's demand categories.
-            % EPANET 20100
             %
-            % apiENgetdemandpattern(index, numdemands, LibEPANET)
+            % apiENgetdemandpattern(index, numdemands, LibEPANET, ph)
             %
             % Parameters:
             % index    	   the node's index (starting from 1).
             % numdemands   the index of a demand category for the node (starting from 1).
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
             % value  the index of the category's time pattern.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
             if ph.isNull
                 [Errcode, value] = calllib(LibEPANET, 'ENgetdemandpattern', index, numdemands, 0);
@@ -953,14 +1006,15 @@ classdef epanet <handle
         function [Errcode] = apiENcloseQ(LibEPANET, ph)
             % Closes the water quality solver, freeing all of its allocated memory.
             %
-            % apiENcloseQ(LibEPANET)
+            % apiENcloseQ(LibEPANET, ph)
             %
             % Parameters
             % LibEPANET epanet library DLL name
+            % ph        epanet project handle.
             %
             % Returns:
-            % an error code
-            % OWA-EPANET Toolkit:
+            % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENcloseQ');
@@ -972,12 +1026,13 @@ classdef epanet <handle
             % Retrieves the index of a node's named demand category.
             % EPANET Version 2.2
             %
-            % apiENgetdemandindex(nodeindex, demandName, LibEPANET)
+            % apiENgetdemandindex(nodeindex, demandName, LibEPANET, ph)
             %
             % Parameters:
             % nodeindex    the index of a node (starting from 1).
             % demandName   the name of a demand category for the node.
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
@@ -990,17 +1045,18 @@ classdef epanet <handle
         end
         function [Errcode, value] = apiENgetstatistic(code, LibEPANET, ph)
             % Retrieves a particular simulation statistic.
-            % EPANET 20100
             %
-            % apiENgetstatistic(code, LibEPANET)
+            % apiENgetstatistic(code, LibEPANET, ph)
             %
             % Parameters:
-            % code  	   the type of statistic to retrieve (see EN_AnalysisStatistic).
+            % code  	 the type of statistic to retrieve (see EN_AnalysisStatistic).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % value the value of the statistic.
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             if ph.isNull
                 [Errcode, value] = calllib(LibEPANET, 'ENgetstatistic', code, 0);
@@ -1011,11 +1067,12 @@ classdef epanet <handle
         function [Errcode, ctype, lindex, setting, nindex, level] = apiENgetcontrol(cindex, LibEPANET, ph)
             % Retrieves the properties of a simple control.
             %
-            % apiENgetcontrol(cindex, LibEPANET)
+            % apiENgetcontrol(cindex, LibEPANET, ph)
             %
             % Parameters:
             % cindex      the control's index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1033,11 +1090,12 @@ classdef epanet <handle
         function [Errcode, count] = apiENgetcount(countcode, LibEPANET, ph)
             % Retrieves the number of objects of a given type in a project.
             %
-            % apiENgetcount(countcode, LibEPANET)
+            % apiENgetcount(countcode, LibEPANET, ph)
             %
             % Parameters:
-            % countcode	number of objects of the specified type
+            % countcode	number of objects of the specified type.
             % LibEPANET epanet library DLL name
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1050,11 +1108,12 @@ classdef epanet <handle
           function [errmsg, e] = apiENgeterror(Errcode, LibEPANET, ph)
             % Returns the text of an error message generated by an error code.
             %
-            % apiENgeterror(Errcode, LibEPANET)
+            % apiENgeterror(Errcode, LibEPANET, ph)
             %
             % Parameters:
             % errcode   an error code.
             % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % errmsg the error message generated by the error code.
@@ -1068,14 +1127,16 @@ classdef epanet <handle
         function [Errcode, flowunitsindex] = apiENgetflowunits(LibEPANET, ph)
             % Retrieves a project's flow units.
             %
-            % apiENgetflowunits(LibEPANET)
+            % apiENgetflowunits(LibEPANET, ph)
             %
             % Parameters:
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
             % flowunitsindex a flow units code (see EN_FlowUnits).
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
             if ph.isNull
                 [Errcode, flowunitsindex]=calllib(LibEPANET, 'ENgetflowunits', 0);
@@ -1086,15 +1147,17 @@ classdef epanet <handle
         function [Errcode, id] = apiENgetlinkid(index, LibEPANET, ph)
             % Gets the ID name of a link given its index.
             %
-            % apiENgetlinkid(index, LibEPANET)
+            % apiENgetlinkid(index, LibEPANET, ph)
             %
             % Parameters:
-            % index      	a link's index (starting from 1).
+            % index       a link's index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
             % id   The link's ID name.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             id=char(32*ones(1, 31));
             if ph.isNull
@@ -1106,11 +1169,12 @@ classdef epanet <handle
         function [Errcode, index] = apiENgetlinkindex(id, LibEPANET, ph)
             % Gets the index of a link given its ID name.
             %
-            % apiENgetlinkindex(id, LibEPANET)
+            % apiENgetlinkindex(id, LibEPANET, ph)
             %
             % Parameters:
             % id      	  a link's ID name.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1124,11 +1188,12 @@ classdef epanet <handle
         function [Errcode, from, to] = apiENgetlinknodes(index, LibEPANET, ph)
             % Gets the indexes of a link's start- and end-nodes.
             %
-            % apiENgetlinknodes(index, LibEPANET)
+            % apiENgetlinknodes(index, LibEPANET, ph)
             %
             % Parameters:
-            % index      	a link's index (starting from 1).
+            % index       a link's index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1145,11 +1210,12 @@ classdef epanet <handle
         function [Errcode, typecode] = apiENgetlinktype(index, LibEPANET, ph)
             % Retrieves a link's type.
             %
-            % apiENgetlinktype(index, LibEPANET)
+            % apiENgetlinktype(index, LibEPANET, ph)
             %
             % Parameters:
-            % index      	a link's index (starting from 1).
+            % index       a link's index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1165,16 +1231,18 @@ classdef epanet <handle
         function [Errcode, value] = apiENgetlinkvalue(index, paramcode, LibEPANET, ph)
             % Retrieves a property value for a link.
             %
-            % apiENgetlinkvalue(index, paramcode, LibEPANET)
+            % apiENgetlinkvalue(index, paramcode, LibEPANET, ph)
             %
             % Parameters:
             % index       a link's index (starting from 1).
             % paramcode   the property to retrieve (see EN_LinkProperty).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
             % value   the current value of the property.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             if ph.isNull
                 [Errcode, value] = calllib(LibEPANET, 'ENgetlinkvalue', index, paramcode, 0);
@@ -1186,15 +1254,17 @@ classdef epanet <handle
         function [Errcode, id] = apiENgetnodeid(index, LibEPANET, ph)
             % Gets the ID name of a node given its index.
             %
-            % apiENgetnodeid(index, LibEPANET)
+            % apiENgetnodeid(index, LibEPANET, ph)
             %
             % Parameters:
             % index      a node index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
             % id   the node's ID name.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             id=char(32*ones(1, 31));
             if ph.isNull
@@ -1205,17 +1275,18 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetnodeid(index, newid, LibEPANET, ph)
             % Changes the ID name of a node.
-            % EPANET Version 2.2
             %
-            % apiENsetnodeid(index, newid, LibEPANET)
+            % apiENsetnodeid(index, newid, LibEPANET, ph)
             %
             % Parameters:
             % index      a node's index (starting from 1).
             % newid      the new ID name for the node.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetnodeid', index, newid);
@@ -1226,11 +1297,12 @@ classdef epanet <handle
         function [Errcode, index] = apiENgetnodeindex(id, LibEPANET, ph)
             % Gets the index of a node given its ID name.
             %
-            % apiENgetnodeindex(id, LibEPANET)
+            % apiENgetnodeindex(id, LibEPANET, ph)
             %
             % Parameters:
             % id      	 a node ID name.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1244,11 +1316,12 @@ classdef epanet <handle
         function [Errcode, type] = apiENgetnodetype(index, LibEPANET, ph)
             % Retrieves a node's type given its index.
             %
-            % apiENgetnodetype(index, LibEPANET)
+            % apiENgetnodetype(index, LibEPANET, ph)
             %
             % Parameters:
             % index      a node's index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1262,11 +1335,12 @@ classdef epanet <handle
         function [Errcode, value] = apiENgetoption(optioncode, LibEPANET, ph)
             % Retrieves the value of an analysis option.
             %
-            % apiENgetoption(optioncode, LibEPANET)
+            % apiENgetoption(optioncode, LibEPANET, ph)
             %
             % Parameters:
             % optioncode   a type of analysis option (see EN_Option).
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1280,15 +1354,17 @@ classdef epanet <handle
         function [Errcode, id] = apiENgetpatternid(index, LibEPANET, ph)
             % Retrieves the ID name of a time pattern given its index.
             %
-            % apiENgetpatternid(index, LibEPANET)
+            % apiENgetpatternid(index, LibEPANET, ph)
             %
             % Parameters:
             % index      a time pattern index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
             % id   the time pattern's ID name.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             id=char(32*ones(1, 31));
             if ph.isNull
@@ -1301,14 +1377,16 @@ classdef epanet <handle
             % Retrieves the ID name of a curve given its index.
             % EPANET Version 2.1
             %
-            % apiENgetcurveid(index, LibEPANET)
+            % apiENgetcurveid(index, LibEPANET, ph)
             %
             % Parameters:
             % index       a curve's index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             id=char(32*ones(1, 31));
             if ph.isNull
@@ -1319,17 +1397,18 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetcurveid(index, id, LibEPANET, ph)
             % Changes the ID name of a data curve given its index.
-            % EPANET Version 2.2
             %
-            % apiENsetcurveid(index, id, LibEPANET)
+            % apiENsetcurveid(index, id, LibEPANET, ph)
             %
             % Parameters:
             % index       a curve's index (starting from 1).
-            % id        	  an array of new x-values for the curve.
+            % id          an array of new x-values for the curve.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             if ph.isNull
                 [Errcode, ~] = calllib(LibEPANET, 'ENsetcurveid', index, id);
@@ -1339,17 +1418,18 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetpatternid(index, id, LibEPANET, ph)
             % Changes the ID name of a time pattern given its index.
-            % EPANET Version 2.2
             %
-            % apiENsetpatternid(index, id, LibEPANET)
+            % apiENsetpatternid(index, id, LibEPANET, ph)
             %
             % Parameters:
             % index      a time pattern index (starting from 1).
             % id         the time pattern's new ID name.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             if ph.isNull
                 [Errcode, ~] = calllib(LibEPANET, 'ENsetpatternid', index, id);
@@ -1361,11 +1441,12 @@ classdef epanet <handle
             % Retrieves a curve's type.
             % EPANET Version 2.2
             %
-            % apiENgetcurvetype(index, LibEPANET)
+            % apiENgetcurvetype(index, LibEPANET, ph)
             %
             % Parameters:
             % index       a curve's index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1379,11 +1460,12 @@ classdef epanet <handle
         function [Errcode, index] = apiENgetpatternindex(id, LibEPANET, ph)
             % Retrieves the index of a time pattern given its ID name.
             %
-            % apiENgetpatternindex(id, LibEPANET)
+            % apiENgetpatternindex(id, LibEPANET, ph)
             %
             % Parameters:
             % id         the ID name of a time pattern.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1397,11 +1479,12 @@ classdef epanet <handle
         function [Errcode, len] = apiENgetpatternlen(index, LibEPANET, ph)
             % Retrieves the number of time periods in a time pattern.
             %
-            % apiENgetpatternlen(index, LibEPANET)
+            % apiENgetpatternlen(index, LibEPANET, ph)
             %
             % Parameters:
             % index      a time pattern index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1415,12 +1498,13 @@ classdef epanet <handle
         function [Errcode, value] = apiENgetpatternvalue(index, period, LibEPANET, ph)
             % Retrieves a time pattern's factor for a given time period.
             %
-            % apiENgetpatternvalue(index, period, LibEPANET)
+            % apiENgetpatternvalue(index, period, LibEPANET, ph)
             %
             % Parameters:
             % index      a time pattern index (starting from 1).
             % period     a time period in the pattern (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1434,15 +1518,16 @@ classdef epanet <handle
         function [Errcode, qualcode, tracenode] = apiENgetqualtype(LibEPANET, ph)
             % Retrieves the type of water quality analysis to be run.
             %
-            % apiENgetqualtype(LibEPANET)
+            % apiENgetqualtype(LibEPANET, ph)
             %
             % Parameters:
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
             % qualcode    type of analysis to run (see obj.QualityType).
-            % tracenode 	index of the node being traced (if applicable).
+            % tracenode   index of the node being traced (if applicable).
             if ph.isNull
                 [Errcode, qualcode, tracenode] = calllib(LibEPANET, 'ENgetqualtype', 0, 0);
             else
@@ -1452,11 +1537,12 @@ classdef epanet <handle
         function [Errcode, timevalue] = apiENgettimeparam(paramcode, LibEPANET, ph)
             % Retrieves the value of a time parameter.
             %
-            % apiENgettimeparam(paramcode, LibEPANET)
+            % apiENgettimeparam(paramcode, LibEPANET, ph)
             %
             % Parameters:
             % paramcode    a time parameter code (see EN_TimeParameter).
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1470,10 +1556,11 @@ classdef epanet <handle
         function [Errcode, LibEPANET] = apiENgetversion(LibEPANET, ph)
             % Retrieves the toolkit API version number.
             %
-            % apiENgetversion(LibEPANET)
+            % apiENgetversion(LibEPANET, ph)
             %
             % Parameters:
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % LibEPANET the version of the OWA-EPANET toolkit.
@@ -1488,12 +1575,13 @@ classdef epanet <handle
             % Initializes an EPANET project.
             % EPANET Version 2.2
             %
-            % apiENinit(unitsType, headLossType, LibEPANET)
+            % apiENinit(unitsType, headLossType, LibEPANET, ph)
             %
             % Parameters:
             % unitsType    the choice of flow units (see EN_FlowUnits).
             % headLossType the choice of head loss formula (see EN_HeadLossType).
-            % LibEPANET    epanet library DLL name
+            % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1506,15 +1594,18 @@ classdef epanet <handle
         function [Errcode] = apiENinitH(flag, LibEPANET, ph)
             % Initializes a network prior to running a hydraulic analysis.
             %
-            % apiENinitH(flag, LibEPANET)
+            % apiENinitH(flag, LibEPANET, ph)
             %
             % Parameters:
-            % flag    	a 2-digit initialization flag (see EN_InitHydOption).
-            % LibEPANET epanet library DLL name
+            % flag    	 a 2-digit initialization flag (see EN_InitHydOption).
+            % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
-            % See also  apiENinitH, apiENrunH, apiENnextH, apiENreport, apiENsavehydfile
+            %
+            % See also  apiENinitH, apiENrunH, apiENnextH, apiENreport,
+            %           apiENsavehydfile.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENinitH', flag);
@@ -1525,16 +1616,18 @@ classdef epanet <handle
         function [Errcode] = apiENinitQ(saveflag, LibEPANET, ph)
             % Initializes a network prior to running a water quality analysis.
             %
-            % apiENinitQ(saveflag, LibEPANET)
+            % apiENinitQ(saveflag, LibEPANET, ph)
             %
             % Parameters:
-            % saveflag  set to EN_SAVE (1) if results are to be saved to the project's
-            %           binary output file, or to EN_NOSAVE (0) if not.
-            % LibEPANET epanet library DLL name
+            % saveflag   set to EN_SAVE (1) if results are to be saved to the project's
+            %            binary output file, or to EN_NOSAVE (0) if not.
+            % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
-            % See also  apiENinitQ, apiENrunQ, apiENnextQ
+            %
+            % See also  apiENinitQ, apiENrunQ, apiENnextQ.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENinitQ', saveflag);
@@ -1545,15 +1638,18 @@ classdef epanet <handle
         function [Errcode, tstep] = apiENnextH(LibEPANET, ph)
             % Determines the length of time until the next hydraulic event occurs in an extended period simulation.
             %
-            % apiENnextH(LibEPANET)
+            % apiENnextH(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code
-            % tstep the time (in seconds) until the next hydraulic event or 0 if at the end of the full simulation duration.
-            % See also  apiENrunH
+            % tstep the time (in seconds) until the next hydraulic event or 0 
+            %       if at the end of the full simulation duration.
+            %
+            % See also  apiENrunH.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             if ph.isNull
                 [Errcode, tstep] = calllib(LibEPANET, 'ENnextH', int32(0));
@@ -1565,15 +1661,18 @@ classdef epanet <handle
         function [Errcode, tstep] = apiENnextQ(LibEPANET, ph)
             % Advances a water quality simulation over the time until the next hydraulic event.
             %
-            % apiENnextQ(LibEPANET)
+            % apiENnextQ(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code
-            % tstep time (in seconds) until the next hydraulic event or 0 if at the end of the full simulation duration.
-            % See also  apiENstepQ, apiENrunQ
+            % tstep time (in seconds) until the next hydraulic event or 0 if 
+            %       at the end of the full simulation duration.
+            %
+            % See also  apiENstepQ, apiENrunQ.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             if ph.isNull
                 [Errcode, tstep] = calllib(LibEPANET, 'ENnextQ', int32(0));
@@ -1585,21 +1684,23 @@ classdef epanet <handle
         function [Errcode] = apiENopen(inpname, repname, binname, LibEPANET, ph) %DE
             % Opens an EPANET input file & reads in network data.
             %
-            % apiENopen(inpname, repname, binname, LibEPANET)
+            % apiENopen(inpname, repname, binname, LibEPANET, ph)
             %
             % Parameters:
-            % inpname the name of an existing EPANET-formatted input file.
-            % repname the name of a report file to be created (or "" if not needed).
-            % binname the name of a binary output file to be created (or "" if not needed).
-            % LibEPANET epanet library DLL name
+            % inpname      the name of an existing EPANET-formatted input file.
+            % repname      the name of a report file to be created (or "" if not needed).
+            % binname      the name of a binary output file to be created (or "" if not needed).
+            % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % See also apiENclose
             if ph.isNull
                 Errcode = calllib(LibEPANET, 'ENopen', inpname, repname, binname);
             else
-                Errcode = calllib(LibEPANET, 'EN_open', ph,inpname, repname, binname);
+                Errcode = calllib(LibEPANET, 'EN_open', ph, inpname, repname, binname);
             end
             if Errcode && Errcode~=200
                  [~, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
@@ -1609,11 +1710,14 @@ classdef epanet <handle
         function [Errcode] = apiENepanet(tempfile, rptfile, binfile, LibEPANET)
             % Runs a complete EPANET simulation.
             % 
+            % apiENepanet(tempfile, rptfile, binfile, LibEPANET)
+            % 
             % Parameters:
             % inpfile     Input file to use.
             % rptfile     Output file to report to.
             % binfile     Results file to generate.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             % 
             % Returns:
             % an error code.
@@ -1622,14 +1726,16 @@ classdef epanet <handle
         function [Errcode] = apiENopenH(LibEPANET, ph)
             % Opens a project's hydraulic solver.
             %
-            % apiENopenH(LibEPANET)
+            % apiENopenH(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code.
-            % See also  apiENinitH, apiENrunH, apiENnextH, apiENcloseH
+            %
+            % See also  apiENinitH, apiENrunH, apiENnextH, apiENcloseH.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENopenH');
@@ -1640,15 +1746,17 @@ classdef epanet <handle
         function [Errcode] = apiENopenQ(LibEPANET, ph)
             % Opens a project's water quality solver.
             %
-            % apiENopenQ(LibEPANET)
+            % apiENopenQ(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code
+            %
             % See also  apiENopenQ, apiENinitQ, apiENrunQ, apiENnextQ,
-            % apiENstepQ, apiENcloseQ
+            %           apiENstepQ, apiENcloseQ
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENopenQ');
@@ -1659,13 +1767,15 @@ classdef epanet <handle
         function [Errcode] = apiENreport(LibEPANET, ph)
             % Writes simulation results in a tabular format to a project's report file.
             %
-            % apiENreport(LibEPANET)
+            % apiENreport(LibEPANET, ph)
             %
             % Parameters:
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENreport');
@@ -1675,16 +1785,16 @@ classdef epanet <handle
         end
         function [Errcode] = apiENcopyreport(filename, LibEPANET, ph)
             % Copies the current contents of a project's report file to another file.
-            % EPANET Version 2.2
             %
-            % apiENcopyreport(filename, LibEPANET)
+            % apiENcopyreport(filename, LibEPANET, ph)
             %
             % Parameters:
-            % filename  the full path name of the destination file
-            % LibEPANET epanet library DLL name
+            % filename  the full path name of the destination file.
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
-            % an error code
+            % an error code.
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENcopyreport', filename);
             else
@@ -1693,12 +1803,12 @@ classdef epanet <handle
         end
         function [Errcode] = apiENclearreport(LibEPANET, ph)
             % Clears the contents of a project's report file.
-            % EPANET Version 2.2
             %
-            % apiENclearreport(LibEPANET)
+            % apiENclearreport(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1712,16 +1822,18 @@ classdef epanet <handle
             % Retrieves the order in which a node or link appears in an output file.
             % EPANET Version 2.2
             %
-            % apiENgetresultindex(objecttype, index, LibEPANET)
+            % apiENgetresultindex(objecttype, index, LibEPANET, ph)
             %
             % Parameters:
             % objecttype  a type of element (either EN_NODE or EN_LINK).
             % index       the element's current index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % value the order in which the element's results were written to file.
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             if ph.isNull
                 [Errcode, value] = calllib(LibEPANET, 'ENgetresultindex', objecttype, index, int32(0));
@@ -1732,13 +1844,15 @@ classdef epanet <handle
         function [Errcode] = apiENresetreport(LibEPANET, ph)
             % Resets a project's report options to their default values.
             %
-            % apiENresetreport(LibEPANET)
+            % apiENresetreport(LibEPANET, ph)
             %
             % Parameters:
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENresetreport');
@@ -1749,15 +1863,17 @@ classdef epanet <handle
         function [Errcode, t] = apiENrunH(LibEPANET, ph)
             % Computes a hydraulic solution for the current point in time.
             %
-            % apiENrunH(LibEPANET)
+            % apiENrunH(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code
             % t  the current simulation time in seconds.
-            % See also  apiENinitH, apiENrunH, apiENnextH, apiENcloseH
+            %
+            % See also  apiENinitH, apiENrunH, apiENnextH, apiENcloseH.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             if ph.isNull
                 [Errcode, t] = calllib(LibEPANET, 'ENrunH', int32(0));
@@ -1770,15 +1886,18 @@ classdef epanet <handle
             % Makes hydraulic and water quality results at the start of the current
             % time period available to a project's water quality solver.
             %
-            % apiENrunQ(LibEPANET)
+            % apiENrunQ(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code
             % t  current simulation time in seconds.
-            % See also  apiENopenQ, apiENinitQ, apiENrunQ, apiENnextQ, apiENstepQ
+            %
+            % See also  apiENopenQ, apiENinitQ, apiENrunQ, 
+            %           apiENnextQ, apiENstepQ.
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___quality.html
             t=int32(0);
             if ph.isNull
@@ -1792,13 +1911,14 @@ classdef epanet <handle
             % Transfers a project's hydraulics results from its temporary hydraulics file to its binary output file,
             % where results are only reported at uniform reporting intervals.
             %
-            % apiENsaveH(LibEPANET)
+            % apiENsaveH(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
-            % an error code
+            % an error code.
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsaveH');
             else
@@ -1808,13 +1928,14 @@ classdef epanet <handle
         function [Errcode] = apiENsaveHydfile(fname, LibEPANET, ph)
             % Saves a project's temporary hydraulics file to disk.
             %
-            % apiENsaveHydfile(fname, LibEPANET)
+            % apiENsaveHydfile(fname, LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
-            % an error code
+            % an error code.
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsavehydfile', fname);
             else
@@ -1824,13 +1945,14 @@ classdef epanet <handle
         function [Errcode] = apiENsaveinpfile(inpname, LibEPANET, ph)
             % Saves a project's data to an EPANET-formatted text file.
             %
-            % apiENsaveinpfile(inpname, LibEPANET)
+            % apiENsaveinpfile(inpname, LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
-            % an error code
+            % an error code.
             if ph.isNull
                 Errcode = calllib(LibEPANET, 'ENsaveinpfile', inpname);
             else
@@ -1840,16 +1962,17 @@ classdef epanet <handle
         function [Errcode] = apiENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET, ph)
             % Sets the properties of an existing simple control.
             %
-            % apiENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET)
+            % apiENsetcontrol(cindex, ctype, lindex, setting, nindex, level, LibEPANET, ph)
             %
             % Parameters:
             % cindex      the control's index (starting from 1).
-            % ctype   the type of control (see ControlTypes).
-            % lindex  the index of the link being controlled.
-            % setting the control setting applied to the link.
-            % nindex  the index of the node used to trigger the control (0 for EN_TIMER and EN_TIMEOFDAY controls).
-            % level   the action level (tank level, junction pressure, or time in seconds) that triggers the control.
+            % ctype       the type of control (see ControlTypes).
+            % lindex      the index of the link being controlled.
+            % setting     the control setting applied to the link.
+            % nindex      the index of the node used to trigger the control (0 for EN_TIMER and EN_TIMEOFDAY controls).
+            % level       the action level (tank level, junction pressure, or time in seconds) that triggers the control.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1861,16 +1984,17 @@ classdef epanet <handle
         end
         function [Errcode] = apiENaddrule(rule, LibEPANET, ph)
             % Adds a new rule-based control to a project.
-            % EPANET Version 2.2
             %
-            % apiENaddrule(rule, LibEPANET)
+            % apiENaddrule(rule, LibEPANET, ph)
             %
             % Parameters:
             % rule        text of the rule following the format used in an EPANET input file.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             if ph.isNull
                 [Errcode, ~] = calllib(LibEPANET, 'ENaddrule', rule);
@@ -1882,11 +2006,12 @@ classdef epanet <handle
             % Deletes an existing rule-based control.
             % EPANET Version 2.2
             %
-            % apiENdeleterule(index, LibEPANET)
+            % apiENdeleterule(index, LibEPANET, ph)
             %
             % Parameters:
             % index       the index of the rule to be deleted (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1900,12 +2025,13 @@ classdef epanet <handle
             % Gets the properties of a premise in a rule-based control.
             % EPANET Version 2.2
             %
-            % apiENgetpremise(ruleIndex, premiseIndex, LibEPANET)
+            % apiENgetpremise(ruleIndex, premiseIndex, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	 the rule's index (starting from 1).
             % premiseIndex   the position of the premise in the rule's list of premises (starting from 1).
             % LibEPANET      epanet library DLL name.
+            % ph             epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1926,14 +2052,14 @@ classdef epanet <handle
         end
         function [Errcode, linkIndex, status, setting] = apiENgetthenaction(ruleIndex, actionIndex, LibEPANET, ph)
             % Gets the properties of a THEN action in a rule-based control.
-            % EPANET Version 2.2
             %
-            % apiENgetthenaction(ruleIndex, actionIndex, LibEPANET)
+            % apiENgetthenaction(ruleIndex, actionIndex, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	the rule's index (starting from 1).
             % actionIndex   the index of the THEN action to retrieve (starting from 1).
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1950,9 +2076,8 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetthenaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET, ph)
             % Sets the properties of a THEN action in a rule-based control.
-            % EPANET Version 2.2
             %
-            % apiENsetthenaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET)
+            % apiENsetthenaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	the rule's index (starting from 1).
@@ -1961,6 +2086,7 @@ classdef epanet <handle
             % status        the new status assigned to the link (see EN_RuleStatus)..
             % setting       the new value assigned to the link's setting.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1974,12 +2100,13 @@ classdef epanet <handle
             % Gets the properties of an ELSE action in a rule-based control.
             % EPANET Version 2.2
             %
-            % apiENgetelseaction(ruleIndex, actionIndex, LibEPANET)
+            % apiENgetelseaction(ruleIndex, actionIndex, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	the rule's index (starting from 1).
             % actionIndex   the index of the ELSE action to retrieve (starting from 1).
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
@@ -1996,9 +2123,8 @@ classdef epanet <handle
         end
         function [Errcode] =  apiENsetelseaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET, ph)
             % Sets the properties of an ELSE action in a rule-based control.
-            % EPANET Version 2.2
             %
-            % apiENsetelseaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET)
+            % apiENsetelseaction(ruleIndex, actionIndex, linkIndex, status, setting, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	the rule's index (starting from 1).
@@ -2007,6 +2133,7 @@ classdef epanet <handle
             % status        the new status assigned to the link (see RULESTATUS).
             % setting       the new value assigned to the link's setting.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2018,14 +2145,14 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetrulepriority(ruleIndex, priority, LibEPANET, ph)
             % Sets the priority of a rule-based control.
-            % EPANET Version 2.2
             %
-            % apiENsetrulepriority(ruleIndex, priority, LibEPANET)
+            % apiENsetrulepriority(ruleIndex, priority, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	the rule's index (starting from 1).
             % priority      the priority value assigned to the rule.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2038,9 +2165,9 @@ classdef epanet <handle
         function [Errcode] = apiENsetpremise(ruleIndex, premiseIndex, logop, object, ...
                                               objIndex, variable, relop, status, value, LibEPANET, ph)
             % Sets the properties of a premise in a rule-based control.
-            % EPANET Version 2.2
             %
-            % apiENsetpremise(ruleIndex, premiseIndex, logop, object, objIndex, variable, relop, status, value, LibEPANET)
+            % apiENsetpremise(ruleIndex, premiseIndex, logop, object, objIndex, variable, relop, 
+            %                     status, value, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	the rule's index (starting from 1).
@@ -2053,9 +2180,11 @@ classdef epanet <handle
             % status        the status that the object's status is compared to (see RULESTATUS).
             % value         the value that the object's variable is compared to.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetpremise', ruleIndex, premiseIndex, logop, ...
@@ -2069,13 +2198,14 @@ classdef epanet <handle
             % Sets the index of an object in a premise of a rule-based control.
             % EPANET Version 2.2
             %
-            % apiENsetpremiseindex(ruleIndex, premiseIndex, objIndex, LibEPANET)
+            % apiENsetpremiseindex(ruleIndex, premiseIndex, objIndex, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	the rule's index (starting from 1).
             % premiseIndex  the premise's index (starting from 1).
             % objIndex      the index of the object (e.g. the index of a tank).
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2089,13 +2219,14 @@ classdef epanet <handle
             % Sets the status being compared to in a premise of a rule-based control.
             % EPANET Version 2.2
             %
-            % apiENsetpremisestatus(ruleIndex, premiseIndex, status, LibEPANET)
+            % apiENsetpremisestatus(ruleIndex, premiseIndex, status, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	the rule's index (starting from 1).
             % premiseIndex  the premise's index (starting from 1).
             % status        the status that the premise's object status is compared to (see RULESTATUS).
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2107,15 +2238,15 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetpremisevalue(ruleIndex, premiseIndex, value, LibEPANET, ph)
             % Sets the value in a premise of a rule-based control.
-            % EPANET Version 2.2
             %
-            % apiENsetpremisevalue(ruleIndex, premiseIndex, value, LibEPANET)
+            % apiENsetpremisevalue(ruleIndex, premiseIndex, value, LibEPANET, ph)
             %
             % Parameters:
             % ruleIndex   	the rule's index (starting from 1).
             % premiseIndex  the premise's index (starting from 1).
             % value         The value that the premise's variable is compared to.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2127,17 +2258,18 @@ classdef epanet <handle
         end
         function [Errcode, id] = apiENgetruleID(index, LibEPANET, ph)
             % Gets the ID name of a rule-based control given its index.
-            % EPANET Version 2.2
             %
-            % apiENgetruleID(index, LibEPANET)
+            % apiENgetruleID(index, LibEPANET, ph)
             %
             % Parameters:
             % index   	  the rule's index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
             % id  the rule's ID name.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___rules.html
             if ph.isNull
                 [Errcode, id] = calllib(LibEPANET, 'ENgetruleID', index, '');
@@ -2147,17 +2279,17 @@ classdef epanet <handle
         end
         function [Errcode, nPremises, nThenActions, nElseActions, priority] = apiENgetrule(index, LibEPANET, ph)
             % Retrieves summary information about a rule-based control.
-            % EPANET Version 2.2
             %
-            % apiENgetrule(index, LibEPANET)
+            % apiENgetrule(index, LibEPANET, ph)
             %
             % Parameters:
             % index   	  the rule's index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
-            % nPremises     	number of premises in the rule's IF section.
+            % nPremises       number of premises in the rule's IF section.
             % nThenActions    number of actions in the rule's THEN section.
             % nElseActions    number of actions in the rule's ELSE section.
             % priority        the rule's priority value.
@@ -2171,15 +2303,15 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetlinknodes(index, startnode, endnode, LibEPANET, ph)
             % Sets the indexes of a link's start- and end-nodes.
-            % EPANET Version 2.2
             %
-            % apiENsetlinknodes(index, startnode, endnode, LibEPANET)
+            % apiENsetlinknodes(index, startnode, endnode, LibEPANET, ph)
             %
             % Parameters:
             % index         a link's index (starting from 1).
             % startnode     The index of the link's start node (starting from 1).
             % endnode       The index of the link's end node (starting from 1).
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2192,16 +2324,18 @@ classdef epanet <handle
         function [Errcode] = apiENsetlinkvalue(index, paramcode, value, LibEPANET, ph)
             % Sets a property value for a link.
             %
-            % apiENsetlinkvalue(index, paramcode, value, LibEPANET)
+            % apiENsetlinkvalue(index, paramcode, value, LibEPANET, ph)
             %
             % Parameters:
             % index         a link's index.
             % paramcode     the property to set (see EN_LinkProperty).
             % value         the new value for the property.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetlinkvalue', index, paramcode, value);
@@ -2211,9 +2345,8 @@ classdef epanet <handle
         end
         function [Errcode, index] = apiENsetpipedata(index, length, diam, rough, mloss, LibEPANET, ph)
             % Sets a group of properties for a pipe link.
-            % EPANET Version 2.2
             %
-            % apiENsetpipedata(index, length, diam, rough, mloss, LibEPANET)
+            % apiENsetpipedata(index, length, diam, rough, mloss, LibEPANET, ph)
             %
             % Parameters:
             % index        	the index of a pipe link (starting from 1).
@@ -2222,9 +2355,11 @@ classdef epanet <handle
             % rough         the pipe's roughness coefficient.
             % mloss         the pipe's minor loss coefficient.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetpipedata', index, length, diam, rough, mloss);
@@ -2234,18 +2369,19 @@ classdef epanet <handle
         end
         function [Errcode, index] = apiENsetlinktype(indexLink, paramcode, actionCode, LibEPANET, ph)
             % Changes a link's type.
-            % EPANET Version 2.2
             %
-            % apiENsetlinktype(id, paramcode, actionCode, LibEPANET)
+            % apiENsetlinktype(id, paramcode, actionCode, LibEPANET, ph)
             %
             % Parameters:
             % indexLink     a link's index (starting from 1).
             % paramcode     the new type to change the link to (see obj.LinkType).
             % actionCode    the action taken if any controls contain the link.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
             if ph.isNull
                 [Errcode, index] = calllib(LibEPANET, 'ENsetlinktype', indexLink, paramcode, actionCode);
@@ -2255,18 +2391,19 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetnodevalue(index, paramcode, value, LibEPANET, ph)
             % Sets a property value for a node.
-            % EPANET Version 2.2
             %
-            % apiENsetnodevalue(index, paramcode, value, LibEPANET)
+            % apiENsetnodevalue(index, paramcode, value, LibEPANET, ph)
             %
             % Parameters:
             % index      a node's index (starting from 1).
             % paramcode  the property to set (see EN_NodeProperty, obj.getToolkitConstants).
             % value      the new value for the property.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetnodevalue', index, paramcode, value);
@@ -2278,11 +2415,11 @@ classdef epanet <handle
             % Sets a group of properties for a tank node.
             % EPANET Version 2.2
             %
-            % apiENsettankdata(index, paramcode, value, LibEPANET)
+            % apiENsettankdata(index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve, LibEPANET, ph)
             %
             % Parameters:
             % index       a tank node's index (starting from 1).
-            % elev      	the tank's bottom elevation.
+            % elev        the tank's bottom elevation.
             % initlvl     the initial water level in the tank.
             % minlvl      the minimum water level for the tank.
             % maxlvl      the maximum water level for the tank.
@@ -2290,9 +2427,11 @@ classdef epanet <handle
             % minvol      the new value for the property.
             % volcurve    the volume of the tank at its minimum water level.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsettankdata', index, elev, initlvl, minlvl, maxlvl, diam, minvol, volcurve);
@@ -2303,12 +2442,13 @@ classdef epanet <handle
         function [Errcode] = apiENsetoption(optioncode, value, LibEPANET, ph)
             % Sets the value for an anlysis option.
             %
-            % apiENsetoption(optioncode, value, LibEPANET)
+            % apiENsetoption(optioncode, value, LibEPANET, ph)
             %
             % Parameters:
             % optioncode   a type of analysis option (see EN_Option).
             % value        the new value assigned to the option.
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2321,16 +2461,18 @@ classdef epanet <handle
         function [Errcode] = apiENsetpattern(index, factors, nfactors, LibEPANET, ph)
             % Sets the pattern factors for a given time pattern.
             %
-            % apiENsetpattern(index, factors, nfactors, LibEPANET)
+            % apiENsetpattern(index, factors, nfactors, LibEPANET, ph)
             %
             % Parameters:
             % index      a time pattern index (starting from 1).
             % factors    an array of new pattern factor values.
             % nfactors   the number of factor values supplied.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___patterns.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetpattern', index, factors, nfactors);
@@ -2341,13 +2483,14 @@ classdef epanet <handle
         function [Errcode] = apiENsetpatternvalue(index, period, value, LibEPANET, ph)
             % Sets a time pattern's factor for a given time period.
             %
-            % apiENsetpatternvalue(index, period, value, LibEPANET)
+            % apiENsetpatternvalue(index, period, value, LibEPANET, ph)
             %
             % Parameters:
             % index      a time pattern index (starting from 1).
             % period     a time period in the pattern (starting from 1).
             % value      the new value of the pattern factor for the given time period.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2360,7 +2503,7 @@ classdef epanet <handle
         function [Errcode] = apiENsetqualtype(qualcode, chemname, chemunits, tracenode, LibEPANET, ph)
             % Sets the type of water quality analysis to run.
             %
-            % apiENsetqualtype(qualcode, chemname, chemunits, tracenode, LibEPANET)
+            % apiENsetqualtype(qualcode, chemname, chemunits, tracenode, LibEPANET, ph)
             %
             % Parameters:
             % qualcode    the type of analysis to run (see EN_QualityType, obj.QualityType).
@@ -2368,9 +2511,11 @@ classdef epanet <handle
             % chemunits   the concentration units of the constituent.
             % tracenode   a type of analysis option (see apiENOption).
             % LibEPANET   the ID name of the node being traced if qualType = EN_TRACE.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___options.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetqualtype', qualcode, chemname, chemunits, tracenode);
@@ -2381,14 +2526,16 @@ classdef epanet <handle
         function [Errcode] = apiENsetreport(command, LibEPANET, ph)
             % Processes a reporting format command.
             %
-            % apiENsetreport(command, LibEPANET)
+            % apiENsetreport(command, LibEPANET, ph)
             %
             % Parameters:
             % command    a report formatting command.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % See also apiENreport
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetreport', command);
@@ -2399,14 +2546,16 @@ classdef epanet <handle
         function [Errcode] = apiENsetstatusreport(statuslevel, LibEPANET, ph)
             % Sets the level of hydraulic status reporting.
             %
-            % apiENsetstatusreport(statuslevel, LibEPANET)
+            % apiENsetstatusreport(statuslevel, LibEPANET, ph)
             %
             % Parameters:
             % statuslevel  a status reporting level code (see EN_StatusReport).
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___reporting.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetstatusreport', statuslevel);
@@ -2423,6 +2572,7 @@ classdef epanet <handle
             % paramcode    a time parameter code (see EN_TimeParameter).
             % timevalue    the new value of the time parameter (in seconds).
             % LibEPANET    the ID name of the node being traced if qualType = EN_TRACE.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2438,13 +2588,15 @@ classdef epanet <handle
             % Runs a complete hydraulic simulation with results for all time periods
             % written to a temporary hydraulics file.
             %
-            % apiENsolveH(LibEPANET)
+            % apiENsolveH(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code
+            %
             % See also apiENopenH, apiENinitH, apiENrunH, apiENnextH, apiENcloseH
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             if ph.isNull
@@ -2457,13 +2609,15 @@ classdef epanet <handle
             % Runs a complete water quality simulation with results at uniform reporting
             % intervals written to the project's binary output file.
             %
-            % apiENsolveQ(LibEPANET)
+            % apiENsolveQ(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
-            %
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
+            %                                                      
             % Returns:
             % an error code
+            %
             % See also apiENopenQ, apiENinitQ, apiENrunQ, apiENnextQ, apiENcloseQ
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             if ph.isNull
@@ -2475,14 +2629,16 @@ classdef epanet <handle
         function [Errcode, tleft] = apiENstepQ(LibEPANET, ph)
             % Advances a water quality simulation by a single water quality time step.
             %
-            % apiENstepQ(LibEPANET)
+            % apiENstepQ(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code
             % tleft  time left (in seconds) to the overall simulation duration.
+            %
             % See also apiENrunQ, apiENnextQ
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             tleft=int32(0);
@@ -2496,14 +2652,16 @@ classdef epanet <handle
         function [Errcode] = apiENusehydfile(hydfname, LibEPANET, ph)
             % Uses a previously saved binary hydraulics file to supply a project's hydraulics.
             %
-            % apiENusehydfile(hydfname, LibEPANET)
+            % apiENusehydfile(hydfname, LibEPANET, ph)
             %
             % Parameters:
             % hydfname  the name of the binary file containing hydraulic results.
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENusehydfile', hydfname);
@@ -2512,10 +2670,9 @@ classdef epanet <handle
             end
         end
         function [Errcode] = apiENsetcurve(index, x, y, nfactors, LibEPANET, ph)
-            % assigns a set of data points to a curve.
-            % EPANET Version 2.1
+            % Assigns a set of data points to a curve.
             %
-            % apiENsetcurve(index, x, y, nfactors, LibEPANET)
+            % apiENsetcurve(index, x, y, nfactors, LibEPANET, ph)
             %
             % Parameters:
             % index       a curve's index (starting from 1).
@@ -2523,9 +2680,11 @@ classdef epanet <handle
             % y        	  an array of new y-values for the curve.
             % nfactors    the new number of data points for the curve.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % See also apiENsetcurvevalue
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             if ph.isNull
@@ -2536,14 +2695,14 @@ classdef epanet <handle
         end
         function [Errcode, x, y] = apiENgetcurvevalue(index, period, LibEPANET, ph)
             % Retrieves the value of a single data point for a curve.
-            % EPANET Version 2.1
             %
-            % apiENgetcurvevalue(index, period, LibEPANET)
+            % apiENgetcurvevalue(index, period, LibEPANET, ph)
             %
             % Parameters:
             % index       a curve's index (starting from 1).
             % period      the index of a point on the curve (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2557,16 +2716,16 @@ classdef epanet <handle
         end
         function [Errcode, x, y] = apiENsetcurvevalue(index, pnt, x, y, LibEPANET, ph)
             % Sets the value of a single data point for a curve.
-            % EPANET Version 2.1
             %
-            % apiENsetcurvevalue(index, pnt, x, y, LibEPANET)
+            % apiENsetcurvevalue(index, pnt, x, y, LibEPANET, ph)
             %
             % Parameters:
             % index       a curve's index (starting from 1).
-            % pnt        	the index of a point on the curve (starting from 1).
+            % pnt         the index of a point on the curve (starting from 1).
             % x        	  the point's new x-value.
             % y        	  the point's new y-value.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2578,13 +2737,13 @@ classdef epanet <handle
         end
         function [Errcode, index] = apiENgetcurveindex(id, LibEPANET, ph)
             % Retrieves the index of a curve given its ID name.
-            % EPANET Version 2.1
             %
-            % apiENgetcurveindex(id, LibEPANET)
+            % apiENgetcurveindex(id, LibEPANET, ph)
             %
             % Parameters:
             % id          the ID name of a curve.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2597,16 +2756,17 @@ classdef epanet <handle
         end
         function [Errcode] = apiENaddcurve(cid, LibEPANET, ph)
             % Adds a new data curve to a project.
-            % EPANET Version 2.1
             %
-            % apiENaddcurve(cid, LibEPANET)
+            % apiENaddcurve(cid, LibEPANET, ph)
             %
             % Parameters:
             % cid        The ID name of the curve to be added.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___curves.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENaddcurve', cid);
@@ -2617,11 +2777,12 @@ classdef epanet <handle
         function [Errcode, ids, nvalue, xvalue, yvalue] = apiENgetcurve(obj, value, LibEPANET, ph)
             % Retrieves all of a curve's data.
             % 
-            % apiENgetcurve(index, LibEPANET)
+            % apiENgetcurve(index, LibEPANET, ph)
             % 
             % Parameters:
             % index      a curve's index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2639,13 +2800,13 @@ classdef epanet <handle
         end
         function [Errcode, len] = apiENgetcurvelen(index, LibEPANET, ph)
             % Retrieves the number of points in a curve.
-            % EPANET Version 2.1
             %
-            % apiENgetcurvelen(index, LibEPANET)
+            % apiENgetcurvelen(index, LibEPANET, ph)
             %
             % Parameters:
             % index       a curve's index (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2660,11 +2821,12 @@ classdef epanet <handle
             % Retrieves the curve assigned to a pump's head curve.
             % EPANET Version 2.1
             %
-            % apiENgetheadcurveindex(pumpindex, LibEPANET)
+            % apiENgetheadcurveindex(pumpindex, LibEPANET, ph)
             %
             % Parameters:
             % pumpindex      the index of a pump link (starting from 1).
             % LibEPANET      epanet library DLL name.
+            % ph             epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2677,13 +2839,13 @@ classdef epanet <handle
         end
         function [Errcode, value] = apiENgetpumptype(pumpindex, LibEPANET, ph)
             % Retrieves the type of head curve used by a pump.
-            % EPANET Version 2.1
             %
-            % apiENgetpumptype(pumpindex, LibEPANET)
+            % apiENgetpumptype(pumpindex, LibEPANET, ph)
             %
             % Parameters:
             % pumpindex   the index of a pump link (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2696,13 +2858,13 @@ classdef epanet <handle
         end
         function [Errcode, value] = apiENgetaveragepatternvalue(index, LibEPANET, ph)
             % Retrieves the average of all pattern factors in a time pattern.
-            % EPANET Version 2.1
             %
-            % apiENgetaveragepatternvalue(index, LibEPANET)
+            % apiENgetaveragepatternvalue(index, LibEPANET, ph)
             %
             % Parameters:
             % index      a time pattern index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2715,17 +2877,17 @@ classdef epanet <handle
         end
         function [Errcode, x, y] = apiENgetcoord(index, LibEPANET, ph)
             % Gets the (x,y) coordinates of a node.
-            % EPANET Version 2.1
             %
-            % apiENgetcoord(index, LibEPANET)
+            % apiENgetcoord(index, LibEPANET, ph)
             %
             % Parameters:
             % index      a node index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
-            % x 	the node's X-coordinate value.
+            % x   the node's X-coordinate value.
             % y   the node's Y-coordinate value.
             if ph.isNull
                 [Errcode, x, y] = calllib(LibEPANET, 'ENgetcoord', index, 0, 0);
@@ -2735,15 +2897,15 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetcoord(index, x, y, LibEPANET, ph)
             % Sets the (x,y) coordinates of a node.
-            % EPANET Version 2.1
             %
-            % apiENsetcoord(index, x, y, LibEPANET)
+            % apiENsetcoord(index, x, y, LibEPANET, ph)
             %
             % Parameters:
             % index      a node's index.
             % x          the node's X-coordinate value.
             % y          the node's Y-coordinate value.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2753,28 +2915,31 @@ classdef epanet <handle
                 [Errcode] = calllib(LibEPANET, 'EN_setcoord', ph, index, x, y);
             end
         end
-        function [Errcode, x, y] = apiENgetvertex(index, vertex, LibEPANET)
+        function [Errcode, x, y] = apiENgetvertex(index, vertex, LibEPANET, ph)
             % Retrieves the coordinate's of a vertex point assigned to a link.
-            % EPANET Version 2.2
             %
-            % apiENgetvertex(index, vertex, LibEPANET)
+            % apiENgetvertex(index, vertex, LibEPANET, ph)
             %
             % Parameters:
             % index      a link's index (starting from 1).
             % vertex     a vertex point index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
             % x  the vertex's X-coordinate value.
             % y  the vertex's Y-coordinate value.
-            [Errcode, x, y]=calllib(LibEPANET, 'ENgetvertex', index, vertex, 0, 0);
+            if ph.isNull
+                [Errcode, x, y] = calllib(LibEPANET, 'ENgetvertex', index, vertex, 0, 0);
+            else
+                [Errcode, ~, x, y] = calllib(LibEPANET, 'EN_getvertex', ph, index, vertex, 0, 0);
+            end
         end
-        function [Errcode] = apiENsetvertices(index, x, y, vertex, LibEPANET)
+        function [Errcode] = apiENsetvertices(index, x, y, vertex, LibEPANET, ph)
             % Assigns a set of internal vertex points to a link.
-            % EPANET Version 2.2
             %
-            % apiENsetvertices(index, x, y, vertex, LibEPANET)
+            % apiENsetvertices(index, x, y, vertex, LibEPANET, ph)
             %
             % Parameters:
             % index      a link's index (starting from 1).
@@ -2782,19 +2947,25 @@ classdef epanet <handle
             % y          an array of Y-coordinates for the vertex points.
             % vertex     the number of vertex points being assigned.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(LibEPANET, 'ENsetvertices', index, x, y, vertex);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetvertices', index, x, y, vertex);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setvertices', ph, index, x, y, vertex);
+            end
         end
         function [Errcode, count] = apiENgetvertexcount(index, LibEPANET, ph)
             % Retrieves the number of internal vertex points assigned to a link.
             %
-            % apiENgetvertexcount(index, LibEPANET)
+            % apiENgetvertexcount(index, LibEPANET, ph)
             %
             % Parameters:
             % index      a link's index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2805,11 +2976,11 @@ classdef epanet <handle
                 [Errcode, ~, count] = calllib(LibEPANET, 'EN_getvertexcount', ph, index, 0);
             end
         end
-        function [Errcode] = apiENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
+        function [Errcode] = apiENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET, ph)
             % appends a new demand to a junction node demands list.
             % EPANET Version 2.2
             %
-            % apiENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET)
+            % apiENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET, ph)
             %
             % Parameters:
             % nodeIndex        the index of a node (starting from 1).
@@ -2817,66 +2988,87 @@ classdef epanet <handle
             % demandPattern    the name of a time pattern used by the demand.
             % demandName       the name of the demand's category.
             % LibEPANET        epanet library DLL name.
+            % ph               epanet project handle.
             %
             % Returns:
             % an error code.
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
-            [Errcode, ~, ~]=calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand, demandPattern, demandName);
-        end
-        function [Errcode] = apiENdeletedemand(nodeIndex, demandIndex, LibEPANET)
-            % deletes a demand from a junction node.
-            % EPANET Version 2.2
             %
-            % apiENdeletedemand(nodeIndex, demandIndex, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
+            if ph.isNull
+                Errcode = calllib(LibEPANET, 'ENadddemand', nodeIndex, baseDemand, demandPattern, demandName);
+            else
+                Errcode = calllib(LibEPANET, 'EN_adddemand', ph, nodeIndex, baseDemand, demandPattern, demandName);
+            end
+        end
+        function [Errcode] = apiENdeletedemand(nodeIndex, demandIndex, LibEPANET, ph)
+            % deletes a demand from a junction node.
+            %
+            % apiENdeletedemand(nodeIndex, demandIndex, LibEPANET, ph)
             %
             % Parameters:
             % nodeIndex        the index of a node (starting from 1).
             % demandIndex      the position of the demand in the node's demands list (starting from 1).
             % LibEPANET        epanet library DLL name.
+            % ph               epanet project handle.
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(LibEPANET, 'ENdeletedemand', nodeIndex, demandIndex);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENdeletedemand', nodeIndex, demandIndex);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_deletedemand', ph, nodeIndex, demandIndex);
+            end
         end
-        function [Errcode] = apiENsetbasedemand(index, demandIdx, value, LibEPANET)
+        function [Errcode] = apiENsetbasedemand(index, demandIdx, value, LibEPANET, ph)
             % Sets the base demand for one of a node's demand categories.
-            % EPANET Version 2.1
             %
-            % apiENsetbasedemand(index, demandIdx, value, LibEPANET)
+            % apiENsetbasedemand(index, demandIdx, value, LibEPANET, ph)
             %
             % Parameters:
             % index    	    a node's index (starting from 1).
             % demandIdx     the index of a demand category for the node (starting from 1).
             % value    	   	the new base demand for the category.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
-            % an error code
-          [Errcode]=calllib(LibEPANET, 'ENsetbasedemand', index, demandIdx, value);
+            % an error code.
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetbasedemand', index, demandIdx, value);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setbasedemand', ph, index, demandIdx, value);
+            end
         end
-        function [Errcode] = apiENsetdemandpattern(index, demandIdx, patInd, LibEPANET)
+        function [Errcode] = apiENsetdemandpattern(index, demandIdx, patInd, LibEPANET, ph)
             % Sets the index of a time pattern used for one of a node's demand categories.
             %
-            % apiENsetdemandpattern(index, demandIdx, patInd, LibEPANET)
+            % apiENsetdemandpattern(index, demandIdx, patInd, LibEPANET, ph)
             %
             % Parameters:
             % index         a node's index (starting from 1).
             % demandIdx     the index of one of the node's demand categories (starting from 1).
             % patInd        the index of the time pattern assigned to the category.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
-            [Errcode]=calllib(LibEPANET, 'ENsetdemandpattern', index, demandIdx, patInd);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetdemandpattern', index, demandIdx, patInd);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setdemandpattern', ph, index, demandIdx, patInd);
+            end
         end
-        function [Errcode, qualcode, chemname, chemunits, tracenode] = apiENgetqualinfo(LibEPANET)
+        function [Errcode, qualcode, chemname, chemunits, tracenode] = apiENgetqualinfo(LibEPANET, ph)
             % Gets information about the type of water quality analysis requested.
             %
-            % apiENgetoption(optioncode, LibEPANET)
+            % apiENgetoption(optioncode, LibEPANET, ph)
             %
             % Parameters:
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
@@ -2885,28 +3077,38 @@ classdef epanet <handle
             % chemunits   concentration units of the constituent.
             % tracenode 	index of the node being traced (if applicable).
             chm=char(32*ones(1, 31));
-            [Errcode, qualcode, chemname, chemunits, tracenode]=calllib(LibEPANET, 'ENgetqualinfo', 0, chm, chm, 0);
+            if ph.isNull
+                [Errcode, qualcode, chemname, chemunits, tracenode] = calllib(LibEPANET, 'ENgetqualinfo', 0, chm, chm, 0);
+            else
+                [Errcode, ~, qualcode, chemname, chemunits, tracenode] = calllib(LibEPANET, 'EN_getqualinfo', ph, 0, chm, chm, 0);
+            end
         end
-        function [index, Errcode] = apiENaddnode(nodeid, nodetype, LibEPANET)
+        function [index, Errcode] = apiENaddnode(nodeid, nodetype, LibEPANET, ph)
             % Adds a new node to a project.
             %
-            % apiENaddnode(nodeid, nodetype, LibEPANET)
+            % apiENaddnode(nodeid, nodetype, LibEPANET, ph)
             %
             % Parameters:
             % nodeid       the ID name of the node to be added.
             % nodetype     the type of node being added (see EN_NodeType).
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
             % index    the index of the newly added node.
+            %
             % See also EN_NodeProperty, NodeType
-            [Errcode, ~, index]=calllib(LibEPANET, 'ENaddnode', nodeid, nodetype, 0);
+            if ph.isNull
+                [Errcode, ~, index] = calllib(LibEPANET, 'ENaddnode', nodeid, nodetype, 0);
+            else
+                [Errcode, ~, ~, index] = calllib(LibEPANET, 'EN_addnode', ph, nodeid, nodetype, 0);
+            end
         end
-        function [index, Errcode] = apiENaddlink(linkid, linktype, fromnode, tonode, LibEPANET)
+        function [index, Errcode] = apiENaddlink(linkid, linktype, fromnode, tonode, LibEPANET, ph)
             % Adds a new link to a project.
             %
-            % apiENaddlink(linkid, linktype, fromnode, tonode, LibEPANET)
+            % apiENaddlink(linkid, linktype, fromnode, tonode, LibEPANET, ph)
             %
             % Parameters:
             % linkid        The ID name of the link to be added.
@@ -2914,62 +3116,85 @@ classdef epanet <handle
             % fromnode      The ID name of the link's starting node.
             % tonode        The ID name of the link's ending node.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
             % index the index of the newly added link.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
-            [Errcode, ~, ~, ~, index]=calllib(LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
+            if ph.isNull
+                [Errcode, ~, ~, ~, index] = calllib(LibEPANET, 'ENaddlink', linkid, linktype, fromnode, tonode, 0);
+            else
+                [Errcode, ~, ~, ~, ~, index] = calllib(LibEPANET, 'EN_addlink', ph, linkid, linktype, fromnode, tonode, 0);
+            end
         end
-        function [Errcode] = apiENdeletenode(indexNode, condition, LibEPANET)
+        function [Errcode] = apiENdeletenode(indexNode, condition, LibEPANET, ph)
             % Deletes a node from a project.
             %
-            % apiENdeletenode(indexNode, condition, LibEPANET)
+            % apiENdeletenode(indexNode, condition, LibEPANET, ph)
             %
             % Parameters:
             % indexNode    the index of the node to be deleted.
-            % condition    	the action taken if any control contains the node and its links.
+            % condition    the action taken if any control contains the node and its links.
             % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
             % Returns:
             % an error code.
             % See also EN_NodeProperty, NodeType
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
-          [Errcode]=calllib(LibEPANET, 'ENdeletenode', indexNode, condition);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENdeletenode', indexNode, condition);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_deletenode', ph, indexNode, condition);
+            end
         end
-        function [Errcode] = apiENdeletelink(indexLink, condition, LibEPANET)
+        function [Errcode] = apiENdeletelink(indexLink, condition, LibEPANET, ph)
             % Deletes a link from the project.
             %
-            % apiENdeletelink(indexLink, condition, LibEPANET)
+            % apiENdeletelink(indexLink, condition, LibEPANET, ph)
             %
             % Parameters:
             % indexLink      the index of the link to be deleted.
             % condition      The action taken if any control contains the link.
             % LibEPANET      epanet library DLL name.
+            % ph             epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___links.html
-            [Errcode]=calllib(LibEPANET, 'ENdeletelink', indexLink, condition);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENdeletelink', indexLink, condition);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_deletelink', ph, indexLink, condition);
+            end
         end
-        function [Errcode] = apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET)
+        function [Errcode] = apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET, ph)
             % Assigns a curve to a pump's head curve.
             %
-            % apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET)
+            % apiENsetheadcurveindex(pumpindex, curveindex, LibEPANET, ph)
             %
             % Parameters:
             % pumpindex     the index of a pump link (starting from 1).
             % curveindex    the index of a curve to be assigned as the pump's head curve.
             % LibEPANET     epanet library DLL name.
+            % ph            epanet project handle.
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetheadcurveindex', pumpindex, curveindex);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setheadcurveindex', ph, pumpindex, curveindex);
+            end
         end
-        function [Errcode, cindex] = apiENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
+        function [Errcode, cindex] = apiENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET, ph)
             % Adds a new simple control to a project.
             %
-            % apiENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET)
+            % apiENaddcontrol(ctype, lindex, setting, nindex, level, LibEPANET, ph)
             %
             % Parameters:
             % ctype       the type of control to add (see ControlTypes).
@@ -2978,34 +3203,44 @@ classdef epanet <handle
             % nindex      index of the node used to control the link (0 for EN_TIMER and EN_TIMEOFDAY controls).
             % level       action level (tank level, junction pressure, or time in seconds) that triggers the control.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
             % cindex 	index of the new control.
-            [Errcode, cindex]=calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
+            if ph.isNull
+                [Errcode, cindex] = calllib(LibEPANET, 'ENaddcontrol', ctype, lindex, setting, nindex, level, 0);
+            else
+                [Errcode, ~, cindex] = calllib(LibEPANET, 'EN_addcontrol', ph, ctype, lindex, setting, nindex, level, 0);
+            end
         end
-        function [Errcode] = apiENdeletecontrol(index, LibEPANET)
+        function [Errcode] = apiENdeletecontrol(index, LibEPANET, ph)
             % Deletes an existing simple control.
-            % EPANET Version 2.2
             %
-            % apiENdeletecontrol(index, LibEPANET)
+            % apiENdeletecontrol(index, LibEPANET, ph)
             %
             % Parameters:
             % index       the index of the control to delete (starting from 1).
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(LibEPANET, 'ENdeletecontrol', index);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENdeletecontrol', index);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_deletecontrol', ph, index);
+
+            end
         end
         function [Errcode, type, pmin, preq, pexp] = apiENgetdemandmodel(LibEPANET, ph)
             % Retrieves the type of demand model in use and its parameters.
-            % EPANET Version 2.2
             %
-            % apiENgetdemandmodel(LibEPANET)
+            % apiENgetdemandmodel(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET    epanet library DLL name.
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -3013,6 +3248,7 @@ classdef epanet <handle
             % pmin  Pressure below which there is no demand.
             % preq  Pressure required to deliver full demand.
             % pexp  Pressure exponent in demand function.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
             if ph.isNull
                 [Errcode, type, pmin, preq, pexp] = calllib(LibEPANET, 'ENgetdemandmodel', 0, 0, 0, 0);
@@ -3020,11 +3256,10 @@ classdef epanet <handle
                 [Errcode, ~, type, pmin, preq, pexp] = calllib(LibEPANET, 'EN_getdemandmodel', ph, 0, 0, 0, 0);
             end
         end
-        function [Errcode] = apiENsetdemandmodel(type, pmin, preq, pexp, LibEPANET)
+        function [Errcode] = apiENsetdemandmodel(type, pmin, preq, pexp, LibEPANET, ph)
             % Sets the type of demand model to use and its parameters.
-            % EPANET Version 2.2
             %
-            % apiENsetbasedemand(index, demandIdx, value, LibEPANET)
+            % apiENsetdemandmodel(type, pmin, preq, pexp, LibEPANET, ph)
             %
             % Parameters:
             % type       Type of demand model (see DEMANDMODEL).
@@ -3032,85 +3267,108 @@ classdef epanet <handle
             % preq    	 Pressure required to deliver full demand.
             % pexp    	 Pressure exponent in demand function.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
-            [Errcode]=calllib(LibEPANET, 'ENsetdemandmodel', type, pmin, preq, pexp);
-        end
-        function [Errcode] = apiENsetdemandname(node_index, demand_index, demand_name, LibEPANET)
-            % Assigns a name to a node's demand category.
-            % EPANET Version 2.2
             %
-            % apiENsetdemandname(node_index, demand_index, demand_name, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetdemandmodel', type, pmin, preq, pexp);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setdemandmodel', ph, type, pmin, preq, pexp);
+            end
+        end
+        function [Errcode] = apiENsetdemandname(node_index, demand_index, demand_name, LibEPANET, ph)
+            % Assigns a name to a node's demand category.
+            %
+            % apiENsetdemandname(node_index, demand_index, demand_name, LibEPANET, ph)
             %
             % Parameters:
             % node_index     a node's index (starting from 1).
             % demand_index   the index of one of the node's demand categories (starting from 1).
             % demand_name    the new name assigned to the category.
             % LibEPANET      epanet library DLL name.
+            % ph             epanet project handle.
             %
             % Returns:
             % an error code.
-            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
-            [Errcode]=calllib(LibEPANET, 'ENsetdemandname', node_index, demand_index, demand_name);
-        end
-        function [Errcode, demand_name] = apiENgetdemandname(node_index, demand_index, LibEPANET)
-            % Retrieves the name of a node's demand category.
-            % EPANET Version 2.2
             %
-            % apiENgetdemandname(node_index, demand_index, LibEPANET)
+            % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetdemandname', node_index, demand_index, demand_name);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setdemandname', ph, node_index, demand_index, demand_name);
+            end
+        end
+        function [Errcode, demand_name] = apiENgetdemandname(node_index, demand_index, LibEPANET, ph)
+            % Retrieves the name of a node's demand category.
+            %
+            % apiENgetdemandname(node_index, demand_index, LibEPANET, ph)
             %
             % Parameters:
-            % node_index    	a node's index (starting from 1).
+            % node_index      a node's index (starting from 1).
             % demand_index    the index of one of the node's demand categories (starting from 1).
             % LibEPANET       epanet library DLL name.
+            % ph              epanet project handle.
             %
             % Returns:
             % an error code.
             % demand_name  The name of the selected category.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___demands.html
             demand_name = char(32*ones(1, 31));
-            [Errcode, demand_name]=calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
+            if ph.isNull
+                [Errcode, demand_name] = calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
+            else
+                [Errcode, demand_name] = calllib(LibEPANET, 'EN_getdemandname', ph, node_index, demand_index, demand_name);
+            end
         end
-        function [Errcode, line1, line2, line3] = apiENgettitle(LibEPANET)
+        function [Errcode, line1, line2, line3] = apiENgettitle(LibEPANET, ph)
             % Retrieves the title lines of the project.
-            % EPANET Version 2.2
             %
-            % apiENgettitle(LibEPANET)
+            % apiENgettitle(LibEPANET, ph)
             %
             % Parameters:
-            % LibEPANET epanet library DLL name
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code.
-            % line1 first title line
-            % line2 second title line
-            % line3 third title line
+            % line1 first title line.
+            % line2 second title line.
+            % line3 third title line.
             c = char(32*ones(1, 79));
-            [Errcode, line1, line2, line3]=calllib(LibEPANET, 'ENgettitle', c, c, c);
+            if ph.isNull
+                [Errcode, line1, line2, line3] = calllib(LibEPANET, 'ENgettitle', c, c, c);
+            else
+                [Errcode, ~, line1, line2, line3] = calllib(LibEPANET, 'EN_gettitle', ph, c, c, c);
+            end
         end
-        function [Errcode] = apiENsettitle(line1, line2, line3, LibEPANET)
+        function [Errcode] = apiENsettitle(line1, line2, line3, LibEPANET, ph)
             % Sets the title lines of the project.
-            % EPANET Version 2.2
             %
-            % apiENsettitle(line1, line2, line3, LibEPANET)
+            % apiENsettitle(line1, line2, line3, LibEPANET, ph)
             %
             % Parameters:
-            % line1   first title line
-            % line2   second title line
-            % line3   third title line
-            % LibEPANET epanet library DLL name
+            % line1     first title line.
+            % line2     second title line.
+            % line3     third title line.
+            % LibEPANET epanet library DLL name.
+            % ph        epanet project handle.
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(LibEPANET, 'ENsettitle', line1, line2, line3);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsettitle', line1, line2, line3);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_settitle', ph, line1, line2, line3);
+            end
         end
-        function [Errcode] = apiENsetcomment(object, index, comment, LibEPANET)
+        function [Errcode] = apiENsetcomment(object, index, comment, LibEPANET, ph)
             % Sets a comment to a specific index
-            % EPANET Version 2.2
             %
-            % apiENsetcomment(object, index, comment, LibEPANET)
+            % apiENsetcomment(object, index, comment, LibEPANET, ph)
             %
             % Parameters:
             % object     a type of object (either EN_NODE, EN_LINK, EN_TIMEPAT or EN_CURVE)
@@ -3118,53 +3376,65 @@ classdef epanet <handle
             % index      objects index (starting from 1).
             % comment    comment to be added.
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(LibEPANET, 'ENsetcomment', object, index, comment);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetcomment', object, index, comment);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setcomment', ph, object, index, comment);
+            end
         end
-        function [Errcode, comment] = apiENgetcomment(object, index, LibEPANET)
-            % EPANET Version 2.2
+        function [Errcode, comment] = apiENgetcomment(object, index, LibEPANET, ph)
             % Sets a comment to a specific index
-            % EPANET Version 2.2
             %
-            % apiENsetcomment(object, index, comment, LibEPANET)
+            % apiENgetcomment(object, index, LibEPANET, ph)
             %
             % Parameters:
             % object     a type of object (either EN_NODE, EN_LINK, EN_TIMEPAT or EN_CURVE)
             %            e.g, obj.ToolkitConstants.EN_NODE
             % index      objects index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
             % comment  comment to be added.
             comment = char(32*ones(1, 79));
-            [Errcode, comment]=calllib(LibEPANET, 'ENgetcomment', object, index, comment);
+            if ph.isNull
+                [Errcode, comment] = calllib(LibEPANET, 'ENgetcomment', object, index, comment);
+            else
+                [Errcode, ~, comment] = calllib(LibEPANET, 'EN_getcomment', ph, object, index, comment);
+            end
         end
-        function [Errcode] = apiENdeletepattern(indexPat, LibEPANET)
+        function [Errcode] = apiENdeletepattern(indexPat, LibEPANET, ph)
             % Deletes a time pattern from a project.
-            % EPANET Version 2.2
             %
-            % apiENdeletepattern(indexPat, LibEPANET)
+            % apiENdeletepattern(indexPat, LibEPANET, ph)
             %
             % Parameters:
             % indexPat   the time pattern's index (starting from 1).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(LibEPANET, 'ENdeletepattern', indexPat);
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENdeletepattern', indexPat);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_deletepattern', ph, indexPat);
+            end
         end
         function [Errcode] = apiENdeletecurve(indexCurve, LibEPANET, ph)
             % Deletes a data curve from a project.
-            % EPANET Version 2.2
             %
-            % apiENdeletecurve(indexCurve, LibEPANET)
+            % apiENdeletecurve(indexCurve, LibEPANET, ph)
             %
             % Parameters:
             % indexCurve  The ID name of the curve to be added.
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -3176,19 +3446,20 @@ classdef epanet <handle
         end
         function [Errcode] = apiENsetjuncdata(index, elev, dmnd, dmndpat, LibEPANET, ph)
             % Sets a group of properties for a junction node.
-            % EPANET Version 2.2
             %
-            % apiENsetjuncdata(index, elev, dmnd, dmndpat, LibEPANET)
+            % apiENsetjuncdata(index, elev, dmnd, dmndpat, LibEPANET, ph)
             %
             % Parameters:
             % index      a junction node's index (starting from 1).
             % elev       the value of the junction's elevation.
             % dmnd       the value of the junction's primary base demand.
             % dmndpat    the ID name of the demand's time pattern ("" for no pattern).
-            % LibEPANET  epanet library DLL name
+            % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENsetjuncdata', index, elev, dmnd, dmndpat);
@@ -3205,11 +3476,12 @@ classdef epanet <handle
         function [Errcode] = apiENsetflowunits(code, LibEPANET, ph)
             % Sets a project's flow units.
             %
-            % apiENsetflowunits(code, LibEPANET)
+            % apiENsetflowunits(code, LibEPANET, ph)
             %
             % Parameters:
             % code        a flow units code (see EN_FlowUnits)
             % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
             %
             % Returns:
             % an error code.
@@ -3222,16 +3494,18 @@ classdef epanet <handle
         function [Errcode, value] = apiENgetnodevalue(index, paramcode, LibEPANET, ph)
             % Retrieves a property value for a node.
             %
-            % apiENgetnodevalue(index, paramcode, LibEPANET)
+            % apiENgetnodevalue(index, paramcode, LibEPANET, ph)
             %
             % Parameters:
             % index      a node's index.
             % paramcode  the property to retrieve (see EN_NodeProperty, obj.getToolkitConstants).
             % LibEPANET  epanet library DLL name.
+            % ph         epanet project handle.
             %
             % Returns:
             % an error code.
             % value the current value of the property.
+            %
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___nodes.html
             value=single(0);
             index=int32(index);
@@ -3244,10 +3518,10 @@ classdef epanet <handle
             if Errcode==240, value=NaN; end
             value = double(value);
         end
-        function [Errcode] = apiMSXopen(obj, varargin)
+        function [Errcode] = apiMSXopen(obj)
             % Opens the EPANET-MSX toolkit system.
             %
-            % apiMSXopen(obj, varargin)
+            % apiMSXopen(obj)
             %
             % Parameters:
             % obj   epanet class object
@@ -3861,9 +4135,10 @@ classdef epanet <handle
                     end
                 end
             end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')% e.g. d = epanet('Net1.inp', 'epanet2');
+            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE') ...
+                                && ~strcmpi(varargin{2}, 'ph') % e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-                 if isempty(pwdDLL)
+                if isempty(pwdDLL)
                     pwdDLL = pwd;
                 end
                 obj.LibEPANETpath = [pwdDLL, '\'];
@@ -3892,10 +4167,12 @@ classdef epanet <handle
             
             % Create Project - EPANET 2.2 supported function
             obj.ph = libpointer('voidPtr');
-            try
-                [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
-                setdatatype(obj.ph, 'ProjectPtr') 
-            catch 
+            if contains('ph', varargin) 
+                try
+                    [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
+                    setdatatype(obj.ph, 'ProjectPtr') 
+                catch 
+                end
             end
          
             %Load parameters
@@ -6065,26 +6342,26 @@ classdef epanet <handle
                 demandName = varargin{4};
             end
             if isscalar(nodeIndex)
-                [obj.Errcode]=obj.apiENadddemand(nodeIndex, baseDemand , demandPattern, demandName, obj.LibEPANET);
+                [obj.Errcode]=obj.apiENadddemand(nodeIndex, baseDemand , demandPattern, demandName, obj.LibEPANET, obj.ph);
                 error(obj.getError(obj.Errcode));
             elseif ~isscalar(nodeIndex)&&  isscalar(baseDemand) && ~iscell(demandPattern) && ~iscell(demandName)
                 for i=1:length(nodeIndex)
-                    [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand , demandPattern, demandName, obj.LibEPANET);
+                    [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand , demandPattern, demandName, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                 end
             elseif ~isscalar(nodeIndex)&& ~isscalar(baseDemand) && ~iscell(demandPattern) && ~iscell(demandName)
                 for i=1:length(nodeIndex)
-                    [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand(i) , demandPattern, demandName, obj.LibEPANET);
+                    [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand(i) , demandPattern, demandName, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                 end
             elseif ~isscalar(nodeIndex) &&  ~isscalar(baseDemand) && iscell(demandPattern) && ~iscell(demandName)
                 for i=1:length(nodeIndex)
-                    [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName, obj.LibEPANET);
+                    [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                 end
             elseif ~isscalar(nodeIndex) &&  ~isscalar(baseDemand) && iscell(demandPattern) && iscell(demandName)
                 for i=1:length(nodeIndex)
-                    [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName{i}, obj.LibEPANET);
+                    [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName{i}, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                 end
             end
@@ -6143,20 +6420,20 @@ classdef epanet <handle
                 if isscalar(nodeIndex)
                     numDemand=size(obj.getNodeJunctionDemandIndex);
                     for i=1:numDemand(1)
-                        [obj.Errcode]=obj.apiENdeletedemand(nodeIndex, 1, obj.LibEPANET);
+                        [obj.Errcode]=obj.apiENdeletedemand(nodeIndex, 1, obj.LibEPANET, obj.ph);
                         error(obj.getError(obj.Errcode));
                     end
                 elseif ~isscalar(nodeIndex)
                     for j=1:length(nodeIndex)
                         numDemand=size(obj.getNodeJunctionDemandIndex);
                         for i=1:numDemand(1)
-                            [obj.Errcode]=obj.apiENdeletedemand(nodeIndex(j), 1, obj.LibEPANET);
+                            [obj.Errcode]=obj.apiENdeletedemand(nodeIndex(j), 1, obj.LibEPANET, obj.ph);
                             error(obj.getError(obj.Errcode));
                         end
                     end
                 end
             elseif nargin==3
-                [obj.Errcode]=obj.apiENdeletedemand(nodeIndex, varargin{2}, obj.LibEPANET);
+                [obj.Errcode]=obj.apiENdeletedemand(nodeIndex, varargin{2}, obj.LibEPANET, obj.ph);
                 error(obj.getError(obj.Errcode));
             end
         end
@@ -6176,7 +6453,7 @@ classdef epanet <handle
             for i=indices
                 v=1;
                 for u=1:numdemands(j)
-                    [obj.Errcode, val{v, j}] = obj.apiENgetdemandname(i, u, obj.LibEPANET);v=v+1;
+                    [obj.Errcode, val{v, j}] = obj.apiENgetdemandname(i, u, obj.LibEPANET, obj.ph);v=v+1;
                 end
                 j=j+1;
             end
@@ -6202,14 +6479,14 @@ classdef epanet <handle
                 cnt = obj.getNodeCount;
                 value = cell(1, cnt);
                 for i=1:cnt
-                    [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_NODE, i, obj.LibEPANET);
+                    [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_NODE, i, obj.LibEPANET, obj.ph);
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
                 k=1;
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
-                    [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_NODE, i, obj.LibEPANET);
+                    [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_NODE, i, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                     k=k+1;
                 end
@@ -6231,11 +6508,11 @@ classdef epanet <handle
             if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
-                [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_NODE, indices, value, obj.LibEPANET);
+                [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_NODE, indices, value, obj.LibEPANET, obj.ph);
                 error(obj.getError(obj.Errcode));
             else
                 for i=indices
-                    [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_NODE, i, value{j}, obj.LibEPANET); j=j+1;
+                    [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_NODE, i, value{j}, obj.LibEPANET, obj.ph); j=j+1;
                     error(obj.getError(obj.Errcode));
                 end
             end
@@ -6247,7 +6524,7 @@ classdef epanet <handle
             %   [Line1, Line2, Line3] = d.getTitle()    % Retrieves the three title lines of the project
             %
             % See also setTitle.
-            [obj.Errcode, Line1, Line2, Line3] = obj.apiENgettitle(obj.LibEPANET);
+            [obj.Errcode, Line1, Line2, Line3] = obj.apiENgettitle(obj.LibEPANET, obj.ph);
         end
         function value = getNodeBaseDemands(obj, varargin)
             % Retrieves the value of all node base demands.
@@ -7403,14 +7680,14 @@ classdef epanet <handle
                 cnt = obj.getPatternCount;
                 value = cell(1, cnt);
                 for i=1:cnt
-                    [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, obj.LibEPANET);
+                    [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, obj.LibEPANET, obj.ph);
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
                 k=1;
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
-                    [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, obj.LibEPANET);
+                    [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                     k=k+1;
                 end
@@ -7642,14 +7919,14 @@ classdef epanet <handle
                 cnt = obj.getCurveCount;
                 value = cell(1, cnt);
                 for i=1:cnt
-                    [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_CURVE, i, obj.LibEPANET);
+                    [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_CURVE, i, obj.LibEPANET, obj.ph);
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
                 k=1;
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
-                    [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_CURVE, i, obj.LibEPANET);
+                    [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_CURVE, i, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                     k=k+1;
                 end
@@ -7698,11 +7975,11 @@ classdef epanet <handle
             if nargin==3, indices = value; value=varargin{1}; else, indices = getCurveIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
-                [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_CURVE, indices, value, obj.LibEPANET);
+                [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_CURVE, indices, value, obj.LibEPANET, obj.ph);
                 error(obj.getError(obj.Errcode));
             else
                 for i=indices
-                    [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_CURVE, i, value{j}, obj.LibEPANET); j=j+1;
+                    [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_CURVE, i, value{j}, obj.LibEPANET, obj.ph); j=j+1;
                     error(obj.getError(obj.Errcode));
                 end
             end
@@ -7837,7 +8114,7 @@ classdef epanet <handle
             %
             % See also getQualityInfo, getQualityCode.
             if any(strcmp(obj.getLibFunctions, 'ENgetqualinfo'))
-                [obj.Errcode, ~, value] = obj.apiENgetqualinfo(obj.LibEPANET);
+                [obj.Errcode, ~, value] = obj.apiENgetqualinfo(obj.LibEPANET, obj.ph);
             else
                 obj.saveInputFile(obj.BinTempfile);
                 value = obj.getBinQualType;
@@ -7866,7 +8143,7 @@ classdef epanet <handle
             %   d.getQualityInfo.QualityType        % Retrieves the quality type
             %
             % See also getQualityType, getQualityCode.
-            [obj.Errcode, value.QualityCode, value.QualityChemName, value.QualityChemUnits, value.TraceNode] = obj.apiENgetqualinfo(obj.LibEPANET);
+            [obj.Errcode, value.QualityCode, value.QualityChemName, value.QualityChemUnits, value.TraceNode] = obj.apiENgetqualinfo(obj.LibEPANET, obj.ph);
             value.QualityType = obj.TYPEQUALITY(value.QualityCode+1);
         end
         function value = getQualityCode(obj)
@@ -8284,7 +8561,7 @@ classdef epanet <handle
             % Example:
             %   d.getENfunctionsImpemented
             %
-            % See also getLibFunctions, getVersion.
+            % See also getLibFunctions, getVersion, getEN_functionsImpemented.
             [tline]=regexp(fileread([mfilename, '.m']), '\n', 'split');
             u=1;obj.Errcode;
             value = cell(1, 1);
@@ -8301,6 +8578,41 @@ classdef epanet <handle
                 end
             end
             value = unique(value)';
+        end
+        function value = getEN_functionsImpemented(obj)
+            % Retrieves the epanet functions that have been developed.
+            %
+            % Example:
+            %   d.getEN_functionsImpemented
+            %
+            % See also getLibFunctions, getVersion, getENfunctionsImpemented.
+            mfilename = 'epanet';
+            [tline]=regexp(fileread([mfilename, '.m']), '\n', 'split');
+            u=1;obj.Errcode;
+            value = cell(1, 1);
+            for i=1:length(tline)
+                if ~isempty(regexp(tline{i}, 'EN_\w', 'match'))
+                    enfunc = regexp(tline{i}, '\w*EN_\w*', 'match');
+                    checkL = isstrprop(enfunc, 'upper');
+                    if length(checkL{1})>2
+                        if strcmp(enfunc{1}(1:3), 'EN_')
+                            value(u) = enfunc(1);
+                            u=u+1;
+                        end
+                    end
+                end
+            end
+            value = unique(value)';
+            lib_functions = obj.libFunctions;
+            contain_mat = contains(lib_functions, value);
+            value = cell(sum(contain_mat~=0),1);
+            j = 1;
+            for i=1:length(contain_mat)
+                if contain_mat(i)
+                    value{j} = lib_functions{i};
+                    j = j+1;
+                end
+            end
         end
         function value = getLibFunctions(obj)
             % Retrieves the functions of DLL.
@@ -8807,7 +9119,7 @@ classdef epanet <handle
             if nargin == 6
                 dmndpat = varargin{4};
             end
-            [index, errcode] = obj.apiENaddnode(juncID, obj.ToolkitConstants.EN_JUNCTION, obj.LibEPANET);
+            [index, errcode] = obj.apiENaddnode(juncID, obj.ToolkitConstants.EN_JUNCTION, obj.LibEPANET, obj.ph);
             error(obj.getError(errcode));
             obj.setNodeCoordinates(index, [xy(1), xy(2)]);
             obj.setNodeJunctionData(index, elev, dmnd, dmndpat);
@@ -8839,7 +9151,7 @@ classdef epanet <handle
                 xy = varargin{1};
                 elev = varargin{2};
             end
-            [index, errcode] = obj.apiENaddnode(resID, obj.ToolkitConstants.EN_RESERVOIR, obj.LibEPANET);
+            [index, errcode] = obj.apiENaddnode(resID, obj.ToolkitConstants.EN_RESERVOIR, obj.LibEPANET, obj.ph);
             error(obj.getError(errcode));
             obj.setNodeCoordinates(index, [xy(1), xy(2)]);
             obj.setNodeElevations(index, elev);
@@ -8920,7 +9232,7 @@ classdef epanet <handle
             if nargin >= 10
                 volcurve = varargin{8};
             end
-            [index, errcode] = obj.apiENaddnode(tankID, obj.ToolkitConstants.EN_TANK, obj.LibEPANET);
+            [index, errcode] = obj.apiENaddnode(tankID, obj.ToolkitConstants.EN_TANK, obj.LibEPANET, obj.ph);
             error(obj.getError(errcode));
             obj.setNodeCoordinates(index, [xy(1), xy(2)]);
             if diam == 0 && strcmp(obj.getNodeType(index), 'TANK')
@@ -8993,7 +9305,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addNodeJunction, deleteLink, setLinkDiameter.
-            index = obj.apiENaddlink(cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(cvpipeID, obj.ToolkitConstants.EN_CVPIPE, fromNode, toNode, obj.LibEPANET, obj.ph);
             if nargin >= 5
                 obj.setLinkLength(index, varargin{1});
             end
@@ -9069,7 +9381,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipeCV,
             %          addNodeJunction, deleteLink, setLinkDiameter.
-            index = obj.apiENaddlink(pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(pipeID, obj.ToolkitConstants.EN_PIPE, fromNode, toNode, obj.LibEPANET, obj.ph);
             if nargin >= 5
                 obj.setLinkLength(index, varargin{1});
             end
@@ -9143,7 +9455,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addNodeJunction, deleteLink, setLinkInitialStatus.
-            index = obj.apiENaddlink(pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(pumpID, obj.ToolkitConstants.EN_PUMP, fromNode, toNode, obj.LibEPANET, obj.ph);
             if nargin >= 5
                 obj.setLinkInitialStatus(index, varargin{1});
             end
@@ -9227,7 +9539,7 @@ classdef epanet <handle
             else
                 vtype = obj.ToolkitConstants.EN_GPV;
             end
-            index = obj.apiENaddlink(vID, vtype, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(vID, vtype, fromNode, toNode, obj.LibEPANET, obj.ph);
             if nargin >= 6
                 obj.setLinkDiameter(index, varargin{2});
             end
@@ -9253,7 +9565,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePSV, deleteLink, setLinkTypeValveFCV.
-            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PRV, fromNode, toNode, obj.LibEPANET, obj.ph);
         end
         function index = addLinkValvePSV(obj, vID, fromNode, toNode)
             % Adds a new PSV valve.
@@ -9270,7 +9582,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveGPV.
-            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PSV, fromNode, toNode, obj.LibEPANET, obj.ph);
         end
         function index = addLinkValvePBV(obj, vID, fromNode, toNode)
             % Adds a new PBV valve.
@@ -9287,7 +9599,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValvePRV.
-            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PBV, fromNode, toNode, obj.LibEPANET, obj.ph);
         end
         function index = addLinkValveFCV(obj, vID, fromNode, toNode)
             % Adds a new FCV valve.
@@ -9304,7 +9616,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveTCV.
-            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_FCV, fromNode, toNode, obj.LibEPANET, obj.ph);
         end
         function index = addLinkValveTCV(obj, vID, fromNode, toNode)
             % Adds a new TCV valve.
@@ -9321,7 +9633,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
-            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_TCV, fromNode, toNode, obj.LibEPANET, obj.ph);
         end
         function index = addLinkValveGPV(obj, vID, fromNode, toNode)
             % Adds a new GPV valve.
@@ -9338,7 +9650,7 @@ classdef epanet <handle
             %
             % See also plot, setLinkNodesIndex, addLinkPipe,
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
-            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode, obj.LibEPANET);
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode, obj.LibEPANET, obj.ph);
         end
         function [leftPipeIndex ,rightPipeIndex] = splitPipe(obj, pipeID, newPipeID, newNodeID)
             %SPLITPIPE
@@ -9519,7 +9831,7 @@ classdef epanet <handle
                      data{j} = [];
                 end
                 for i=1:obj.getLinkVerticesCount(l)
-                    [obj.Errcode, data{j}.x(i), data{j}.y(i)]=obj.apiENgetvertex(l, i, obj.LibEPANET);
+                    [obj.Errcode, data{j}.x(i), data{j}.y(i)]=obj.apiENgetvertex(l, i, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                 end
                 j = j +1;
@@ -9539,9 +9851,30 @@ classdef epanet <handle
             % See also getLinkVertices, getLinkVerticesCount, getBinLinkVertices,
             %          getBinLinkVerticesCount.
             index = obj.getLinkIndex(linkID);
-            [obj.Errcode]=obj.apiENsetvertices(index, x, y, size(x, 2), obj.LibEPANET);
+            [obj.Errcode]=obj.apiENsetvertices(index, x, y, size(x, 2), obj.LibEPANET, obj.ph);
             error(obj.getError(obj.Errcode));
-
+        end    
+      function createProject(obj)
+            % Creates the epanet project.
+            % Only for EN_ functions
+            %
+            % Example:
+            %   d.createProject;
+            %
+            % See also deleteProject.
+            obj.apiEN_createproject(obj);
+      end
+      function deleteProject(obj)
+            % Deletes the epanet project.
+            % Only for EN_ functions
+            %
+            % Example:
+            %   d = epanet('Net1.inp', 'ph');
+            %   d.deleteProject;
+            %   d.getNodeElevations % Results in error 
+            %
+            % See also createProject.
+            obj.apiEN_deleteproject(obj);
         end
         function Errcode = deleteNode(obj, idNode, varargin)
             % Deletes nodes. (EPANET Version 2.2)
@@ -9584,11 +9917,11 @@ classdef epanet <handle
             if iscell(idNode)
                 for j = 1:length(idNode)
                     indexNode = obj.getNodeIndex(idNode(j));
-                    [Errcode] = obj.apiENdeletenode(indexNode, condition, obj.LibEPANET);
+                    [Errcode] = obj.apiENdeletenode(indexNode, condition, obj.LibEPANET, obj.ph);
                     error(obj.getError(Errcode));
                 end
             else
-                [Errcode] = obj.apiENdeletenode(idNode, condition, obj.LibEPANET);
+                [Errcode] = obj.apiENdeletenode(idNode, condition, obj.LibEPANET, obj.ph);
                 error(obj.getError(Errcode));
             end
         end
@@ -9626,7 +9959,7 @@ classdef epanet <handle
             else
                 indexLink = idLink;
             end
-            [Errcode] = obj.apiENdeletelink(indexLink, condition, obj.LibEPANET);
+            [Errcode] = obj.apiENdeletelink(indexLink, condition, obj.LibEPANET, obj.ph);
             error(obj.getError(Errcode));
             %if obj.Bin, obj.Errcode = reloadNetwork(obj); end
         end
@@ -9650,7 +9983,7 @@ classdef epanet <handle
             else
                 indexPat = idPat;
             end
-            [Errcode] = obj.apiENdeletepattern(indexPat, obj.LibEPANET);
+            [Errcode] = obj.apiENdeletepattern(indexPat, obj.LibEPANET, obj.ph);
             error(obj.getError(Errcode));
         end
         function Errcode = deleteCurve(obj, idCurve)
@@ -9825,7 +10158,7 @@ classdef epanet <handle
                     controlSettingValue = varargin{2};
                     nodeIndex = varargin{3};
                     controlLevel = varargin{4};
-                    [obj.Errcode, index] = obj.apiENaddcontrol(control, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
+                    [obj.Errcode, index] = obj.apiENaddcontrol(control, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                 end
             end
@@ -9861,7 +10194,7 @@ classdef epanet <handle
                 index = varargin{2};
             end
             for i=length(index):-1:1
-                [Errcode] = obj.apiENdeletecontrol(index(i), obj.LibEPANET);
+                [Errcode] = obj.apiENdeletecontrol(index(i), obj.LibEPANET, obj.ph);
                 error(obj.getError(Errcode));
             end
         end
@@ -10007,14 +10340,14 @@ classdef epanet <handle
                 cnt = obj.getLinkCount;
                 value = cell(1, cnt);
                 for i=1:cnt
-                    [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_LINK, i, obj.LibEPANET);
+                    [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_LINK, i, obj.LibEPANET, obj.ph);
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
                 k=1;
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
-                    [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_LINK, i, obj.LibEPANET);
+                    [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_LINK, i, obj.LibEPANET, obj.ph);
                     error(obj.getError(obj.Errcode));
                     k=k+1;
                 end
@@ -10041,11 +10374,11 @@ classdef epanet <handle
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
-                [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_LINK, indices, value, obj.LibEPANET);
+                [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_LINK, indices, value, obj.LibEPANET, obj.ph);
                 error(obj.getError(obj.Errcode));
             else
                 for i=indices
-                    [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_LINK, i, value{j}, obj.LibEPANET); j=j+1;
+                    [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_LINK, i, value{j}, obj.LibEPANET, obj.ph); j=j+1;
                     error(obj.getError(obj.Errcode));
                 end
             end
@@ -10783,7 +11116,7 @@ classdef epanet <handle
             if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
             for i=indices
-                [obj.Errcode] = obj.apiENsetheadcurveindex(i, value(j),obj.LibEPANET); j=j+1;
+                [obj.Errcode] = obj.apiENsetheadcurveindex(i, value(j),obj.LibEPANET, obj.ph); j=j+1;
                 error(obj.getError(obj.Errcode));
             end
         end
@@ -11544,7 +11877,7 @@ classdef epanet <handle
             if isempty(model_type)
                 error('Please give Demand model type: DDA or PDA');
             end
-            [obj.Errcode] = obj.apiENsetdemandmodel(model_type, pmin, preq, pexp, obj.LibEPANET);
+            [obj.Errcode] = obj.apiENsetdemandmodel(model_type, pmin, preq, pexp, obj.LibEPANET, obj.ph);
         end
         function setNodeJunctionDemandName(obj, nodeIndex, demandIndex, demandName)
             % Assigns a name to a node's demand category. (EPANET Version 2.2)
@@ -11559,7 +11892,7 @@ classdef epanet <handle
             %
             % See also getNodeJunctionDemandName, setNodeBaseDemands, setDemandModel,
             %          addNodeJunctionDemand, deleteNodeJunctionDemand.
-            [obj.Errcode] = obj.apiENsetdemandname(nodeIndex, demandIndex, demandName, obj.LibEPANET);
+            [obj.Errcode] = obj.apiENsetdemandname(nodeIndex, demandIndex, demandName, obj.LibEPANET, obj.ph);
             error(obj.getError(obj.Errcode));
         end
         function setNodeJunctionData(obj, index, elev, dmnd, dmndpat)
@@ -11609,7 +11942,7 @@ classdef epanet <handle
             if nargin > 3
                 line3 = varargin{3};
             end
-            [obj.Errcode] = obj.apiENsettitle(line1, line2, line3, obj.LibEPANET);
+            [obj.Errcode] = obj.apiENsettitle(line1, line2, line3, obj.LibEPANET, obj.ph);
             error(obj.getError(obj.Errcode));
         end
         function setOptionsMaxTrials(obj, value)
@@ -12028,11 +12361,11 @@ classdef epanet <handle
             if nargin==3, indices = value; value=varargin{1}; else, indices = getPatternIndices(obj, varargin); end
             j=1;
             if length(indices) == 1
-                [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, indices, value, obj.LibEPANET);
+                [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, indices, value, obj.LibEPANET, obj.ph);
                 error(obj.getError(obj.Errcode));
             else
                 for i=indices
-                    [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, value{j}, obj.LibEPANET); j=j+1;
+                    [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, value{j}, obj.LibEPANET, obj.ph); j=j+1;
                     error(obj.getError(obj.Errcode));
                 end
             end
@@ -21905,14 +22238,14 @@ function controlRuleIndex = addControlFunction(obj, value)
              [controlTypeIndex, linkIndex, controlSettingValue, ...
              nodeIndex, controlLevel] = obj.controlSettings(obj, value(c).Control);
              [obj.Errcode, controlRuleIndex(c)] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
-             controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
+             controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
              error(obj.getError(obj.Errcode));
          end
      else
          [controlTypeIndex, linkIndex, controlSettingValue, ...
              nodeIndex, controlLevel] = controlSettings(obj, value);
          [obj.Errcode, controlRuleIndex] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
-             controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET);
+             controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
          error(obj.getError(obj.Errcode));
      end
  end
