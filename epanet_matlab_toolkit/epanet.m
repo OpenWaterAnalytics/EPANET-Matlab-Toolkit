@@ -748,8 +748,11 @@ classdef epanet <handle
             if ~libisloaded(obj.MSXLibEPANET)
                 loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
             end
-
-            % Legacy library
+            % epanetMSX library
+            if ~libisloaded('epanetMSX')
+                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, 'msxtoolkit.h'], 'alias','epanetMSX');
+            end
+            % legacy library
             if ~libisloaded('legacymsx')
                 loadlibrary([obj.MSXLibEPANETPath, 'legacymsx'], [obj.MSXLibEPANETPath, ['legacyToolkit', '.h']]);
             end
@@ -3533,7 +3536,6 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            obj.MSXTempFile
             inp_file = [obj.MSXTempFile(1:end-3), 'inp'];
             msx_file = obj.MSXTempFile;
             out_file = [obj.MSXTempFile(1:end-3), 'txt'];
@@ -3951,7 +3953,7 @@ classdef epanet <handle
             % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetinitqual', type, index, species, value);
         end
-        function [Errcode] = apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET)
+        function [Errcode] = apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET, MSX)
             % Assigns a new set of multipliers to a given MSX source time pattern.
             %
             % apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET)
@@ -3965,7 +3967,11 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(MSXLibEPANET, 'MSXsetpattern', index, factors, nfactors);
+            if ~libisloaded('legacymsx')
+                [Errcode] = calllib(MSXLibEPANET, 'MSXsetpattern', index, factors, nfactors);
+            else
+                [Errcode] = calllib(MSXLibEPANET, 'MSX_setpattern', MSX, index, factors, nfactors);
+            end
         end
         function [Errcode] = apiMSXsetpatternvalue(pat, period, value, MSXLibEPANET)
             % Assigns a new value to the multiplier for a specific time period in a given MSX source time pattern.
@@ -3997,7 +4003,7 @@ classdef epanet <handle
             % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsolveQ');
         end
-        function [Errcode] = apiMSXsolveH(MSXLibEPANET)
+        function [Errcode] = apiMSXsolveH(MSXLibEPANET, MSX)
             % Solves for system hydraulics over the entire simulation period saving results
             % to an internal scratch file.
             %
@@ -4008,9 +4014,13 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(MSXLibEPANET, 'MSXsolveH');
+            if ~libisloaded('legacymsx')
+                [Errcode] = calllib(MSXLibEPANET, 'MSXsolveH');
+            else
+                [Errcode] = calllib('legacymsx', 'MSXsolveH', MSX);
+            end
         end
-        function [Errcode] = apiMSXaddpattern(patid, MSXLibEPANET)
+        function [Errcode] = apiMSXaddpattern(patid, MSXLibEPANET, MSX)
             % Adds a new, empty MSX source time pattern to an MSX project.
             %
             % apiMSXaddpattern(patid, MSXLibEPANET)
@@ -4021,7 +4031,11 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(MSXLibEPANET, 'MSXaddpattern', patid);
+            if ~libisloaded('legacymsx')
+                [Errcode] = calllib(MSXLibEPANET, 'MSXaddpattern', patid);
+            else
+                [Errcode] = calllib(MSXLibEPANET, 'MSX_addpattern', MSX, patid);
+            end
         end
         function [Errcode] = apiMSXusehydfile(hydfname, MSXLibEPANET)
             % Uses a previously saved EPANET hydraulics file as the source of hydraulic information.
@@ -4037,7 +4051,7 @@ classdef epanet <handle
             % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXusehydfile', hydfname);
         end
-        function [Errcode, t, tleft] = apiMSXstep(MSXLibEPANET)
+        function [Errcode, t, tleft] = apiMSXstep(MSXLibEPANET, MSX)
             % Advances the water quality solution through a single water quality time step when
             % performing a step-wise simulation.
             %
@@ -4052,11 +4066,15 @@ classdef epanet <handle
             % tleft  time left in the simulation (also in seconds).
             t=int32(0);
             tleft=int32(0);
-            [Errcode, t, tleft]=calllib(MSXLibEPANET, 'MSXstep', t, tleft);
+            if ~libisloaded('legacymsx')
+                [Errcode, t, tleft] = calllib(MSXLibEPANET, 'MSXstep', t, tleft);
+            else
+                [Errcode, ~, t, tleft] = calllib(MSXLibEPANET, 'MSX_step', MSX, t, tleft);
+            end    
             t = double(t);
             tleft = double(tleft);
         end
-        function [Errcode] = apiMSXinit(flag, MSXLibEPANET)
+        function [Errcode] = apiMSXinit(flag, MSXLibEPANET, MSX)
             % Initialize the MSX system before solving for water quality results in step-wise fashion.
             %
             % apiMSXinit(flag, MSXLibEPANET)
@@ -4068,7 +4086,11 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(MSXLibEPANET, 'MSXinit', flag);
+            if ~libisloaded('legacymsx')
+                [Errcode] = calllib(MSXLibEPANET, 'MSXinit', flag);
+            else
+                [Errcode] = calllib('legacymsx', 'Legacyinit', MSX, flag);
+            end
         end
         function [Errcode] = apiMSXreport(MSXLibEPANET)
             % Writes water quality simulations results as instructed by the MSX input file to a text file.
@@ -4095,12 +4117,12 @@ classdef epanet <handle
             % e         an error code.
             % errmsg    the text of the error message corresponding to the error code.
             errmsg = char(32*ones(1, 80));
-            [e, errmsg] = calllib(MSXLibEPANET, 'MSXgeterror', Errcode, errmsg, 80);
+            [e, errmsg] = calllib('epanetMSX', 'MSXgeterror', Errcode, errmsg, 80);
             if e
                 obj.apiMSXerror(e);
             end
         end
-        function [Errcode, value] = apiMSXgetqual(type, index, species, MSXLibEPANET)
+        function [Errcode, value] = apiMSXgetqual(type, index, species, MSXLibEPANET, MSX)
             % Retrieves a chemical species concentration at a given node or the average concentration
             % along a link at the current simulation time step.
             %
@@ -4118,7 +4140,11 @@ classdef epanet <handle
             % an error code.
             % value the computed concentration of the species at the current time period.
             value=0;
-            [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetqual', type, index, species, value);
+            if ~libisloaded('legacymsx')
+                [Errcode, value] = calllib(MSXLibEPANET, 'MSXgetqual', type, index, species, value);
+            else
+                [Errcode, ~, value] = calllib(MSXLibEPANET, 'MSX_getQualityByIndex', MSX, type, index, species, value);
+            end
         end
         function [Errcode] = apiMSXsetsource(node, species, type, level, pat, MSXLibEPANET)
             % Sets the attributes of an external source of a particular chemical species to a specific node of
@@ -8897,7 +8923,7 @@ classdef epanet <handle
             obj.openQualityAnalysis;
             obj.initializeQualityAnalysis;
             %tleft=obj.nextQualityAnalysisStep;
-            totalsteps=obj.getTimeSimulationDuration/obj.getTimeQualityStep;
+            totalsteps = obj.getTimeSimulationDuration/obj.getTimeQualityStep;
             initnodematrix=zeros(totalsteps, obj.getNodeCount);
             if size(varargin, 2)==0
                 varargin={'time', 'quality', 'linkquality', 'mass'};
@@ -13388,11 +13414,11 @@ classdef epanet <handle
                 if isempty(value), value=[]; end
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
-                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(3, varargin{1}{j}, obj.MSXLibEPANET);
+                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(3, varargin{1}{j}, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(3, varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode, value] = obj.apiMSXgetindex(3, varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -13868,7 +13894,7 @@ classdef epanet <handle
             %          getMSXSpeciesCount, getMSXSpeciesType,
             %          getMSXSpeciesUnits, getMSXSpeciesATOL,
             %          getMSXSpeciesRTOL.
-            [obj.Errcode, value] = obj.apiMSXgetqual(type, index, species, obj.MSXLibEPANET);
+            [obj.Errcode, value] = obj.apiMSXgetqual(type, index, species, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXComputedQualitySpecie(obj, varargin)
@@ -14159,7 +14185,7 @@ classdef epanet <handle
             %   d.solveMSXCompleteHydraulics
             %
             % See also solveMSXCompleteQuality.
-            [obj.Errcode] = obj.apiMSXsolveH(obj.MSXLibEPANET);
+            [obj.Errcode] = obj.apiMSXsolveH(obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function solveMSXCompleteQuality(obj)
@@ -14233,14 +14259,14 @@ classdef epanet <handle
             % See also getMSXPattern, setMSXPattern.
             index=-1;
             if nargin==2
-                [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
-                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             elseif nargin==3
-                [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
-                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 setMSXPattern(obj, index, varargin{2});
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
@@ -14379,7 +14405,7 @@ classdef epanet <handle
                 pat=obj.getMSXPatternsIndex(pat);
             end
             nfactors=length(patternVector);
-            [obj.Errcode] = obj.apiMSXsetpattern(pat, patternVector, nfactors, obj.MSXLibEPANET);
+            [obj.Errcode] = obj.apiMSXsetpattern(pat, patternVector, nfactors, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXPatternMatrix(obj, patternMatrix)
@@ -14742,7 +14768,7 @@ classdef epanet <handle
             %   end
             %
             % See also solveMSXCompleteHydraulics, stepMSXQualityAnalysisTimeLeft.
-            [obj.Errcode] = obj.apiMSXinit(flag, obj.MSXLibEPANET);
+            [obj.Errcode] = obj.apiMSXinit(flag, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function [t, tleft]= stepMSXQualityAnalysisTimeLeft(obj)
@@ -14760,7 +14786,7 @@ classdef epanet <handle
             %   end
             %
             % See also solveMSXCompleteHydraulics, initializeMSXQualityAnalysis.
-            [obj.Errcode, t, tleft] = obj.apiMSXstep(obj.MSXLibEPANET);
+            [obj.Errcode, t, tleft] = obj.apiMSXstep(obj.MSXLibEPANET, obj.MSX);
             % if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function saveMSXFile(obj, msxname)
