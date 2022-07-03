@@ -1,5 +1,5 @@
-<a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
-
+﻿<a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
+  
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493)
 
 
