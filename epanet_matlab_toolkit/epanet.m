@@ -8556,7 +8556,7 @@ classdef epanet <handle
             end
         end
         function value = getENfunctionsImpemented(obj)
-            % Retrieves the epanet functions that have been developed.
+            % Retrieves the epanet EN functions that have been developed.
             %
             % Example:
             %   d.getENfunctionsImpemented
@@ -8580,7 +8580,7 @@ classdef epanet <handle
             value = unique(value)';
         end
         function value = getEN_functionsImpemented(obj)
-            % Retrieves the epanet functions that have been developed.
+            % Retrieves the epanet EN_ functions that have been developed.
             %
             % Example:
             %   d.getEN_functionsImpemented
@@ -9855,7 +9855,7 @@ classdef epanet <handle
             error(obj.getError(obj.Errcode));
         end    
       function createProject(obj)
-            % Creates the epanet project.
+            % Creates an epanet project.
             % Only for EN_ functions
             %
             % Example:
@@ -9865,10 +9865,10 @@ classdef epanet <handle
             obj.apiEN_createproject(obj);
       end
       function deleteProject(obj)
-            % Deletes the epanet project.
+            % Deletes an epanet project.
             % Only for EN_ functions
             %
-            % Example:
+            % Example:  
             %   d = epanet('Net1.inp', 'ph');
             %   d.deleteProject;
             %   d.getNodeElevations % Results in error 
