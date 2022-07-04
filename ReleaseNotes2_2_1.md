@@ -23,7 +23,7 @@
 
 
 
-## List of EPANET 2.2.1 Matlab Class Functions
+## List of New EPANET 2.2.1 Matlab Class Functions
 |Function|Description|
 |---------|---------|
 |appRotateNetwork|Rotates the network by theta degrees counter-clockwise|
@@ -34,6 +34,7 @@
 |getGraph|Retrieves the graph of the current epanet network|
 |getLinkQuality|Retrieves the value of link quality|
 |plotGraph|Plots the graph of the current epanet network|
+|runProject|Runs a complete EPANET simulation|
 |setNodeTypeJunction|Transforms a node to junction|
 |setNodeTypeReservoir|Transforms a node to reservoir|
 |setNodeTypeTank|Transforms a node to tank|

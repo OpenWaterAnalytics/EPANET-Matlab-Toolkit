@@ -353,6 +353,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |openHydraulicAnalysis|Opens the hydraulics analysis system|
 |openQualityAnalysis|Opens the water quality analysis system|
 |runHydraulicAnalysis|Runs a single period hydraulic analysis, retrieving the current simulation clock time t|
+|runProject|Runs a complete EPANET simulation|
 |runQualityAnalysis|Makes available the hydraulic and water quality results that occur at the start of the next time period of a water quality analysis, where the start of the period is returned in t|
 |saveHydraulicFile|Saves the current contents of the binary hydraulics file to a file|
 |saveHydraulicsOutputReportingFile|Transfers results of a hydraulic simulation from the binary Hydraulics file to the binary Output file, where results are only reported at uniform reporting intervals|
