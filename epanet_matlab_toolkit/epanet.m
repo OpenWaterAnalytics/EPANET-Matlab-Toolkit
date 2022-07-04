@@ -3528,6 +3528,10 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
+            if ~obj.ph.isNull
+                [Errcode] = calllib(obj.LibEPANET, 'ENopen', obj.TempInpFile, '', '');
+                error(obj.getError(obj.Errcode));
+            end
             [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
             if Errcode
                 obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
