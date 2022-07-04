@@ -1,5 +1,5 @@
-<a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
-
+﻿<a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
+  
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493)
 
 
@@ -120,6 +120,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |loadEPANETFile| Open the EPANET Toolkit system|
 |appShiftNetwor|Shifts the network in x and y directions|
 |appRotateNetwork|Rotates the network by theta degrees counter-clockwise using as pivot a specific node|
+|createProject|Creates an epanet project|
+|deleteProject|Deletes an epanet project|
 |getError| Returns the description of an error code|
 |getAdjacencyMatrix|Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow|
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
@@ -139,8 +141,10 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getCurveValue|Retrieves (x,y) values of specific curve index|
 |getCurveXY|Retrieves (x,y) values of all curves|
 |getDemandModel|Retrieves the type of demand model in use and its parameters|
+|getEN_functionsImpemented|Retrieves the epanet EN_ functions that have been developed|
 |getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
 |getFlowUnits|Retrieves the units used to express all flow rates|
+|getGraph|Retrieves the graph of the current epanet network|
 |getLibFunctions|Retrieves the functions of DLL|
 |getLinkActualQuality|Current computed link quality (read only)|
 |getLinkBulkReactionCoeff|Bulk chemical reaction coefficient|
@@ -349,11 +353,13 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |openHydraulicAnalysis|Opens the hydraulics analysis system|
 |openQualityAnalysis|Opens the water quality analysis system|
 |runHydraulicAnalysis|Runs a single period hydraulic analysis, retrieving the current simulation clock time t|
+|runProject|Runs a complete EPANET simulation|
 |runQualityAnalysis|Makes available the hydraulic and water quality results that occur at the start of the next time period of a water quality analysis, where the start of the period is returned in t|
 |saveHydraulicFile|Saves the current contents of the binary hydraulics file to a file|
 |saveHydraulicsOutputReportingFile|Transfers results of a hydraulic simulation from the binary Hydraulics file to the binary Output file, where results are only reported at uniform reporting intervals|
 |saveInputFile|Writes all current network input data to a file using the format of an EPANET input file|
 |plot|Plot the network input file|
+|plotGraph|Plots the graph of the current epanet network|
 |setControls|Sets the parameters of a simple control statement|
 |setCurve|Sets x,y values for a specific curve|
 |setCurveNameID|Sets the name ID of a curve given it's index and the new ID. (EPANET Version 2.2)|
@@ -478,6 +484,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |solveCompleteQuality|Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file|
 |splitPipe|Splits a pipe, creating two new pipes and adds a junction in between them|
 |stepQualityAnalysisTimeLeft|Advances the water quality simulation one water quality time step. The time remaining in the overall simulation is returned in tleft|
+|toJson|Creates json text variable|
+|toJsonFile|Creates a .json file and adds the input values in json format|
 |useHydraulicFile|Uses the contents of the specified file as the current binary hydraulics file|
 |writeLineInReportFile|Writes a line of text to the EPANET report file|
 |writeReport|Writes a formatted text report on simulation results to the Report file|

@@ -906,7 +906,7 @@ classdef epanet <handle
             % Parameters:
             % obj   epanet class object.
             %
-            % See also apiEN_deleteproject.
+            % See also apiEN_deleteproject, apiEN_runproject.
             ph = libpointer('voidPtr');
             [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', ph);
             setdatatype(obj.ph, 'ProjectPtr') 
@@ -920,7 +920,7 @@ classdef epanet <handle
             % Parameters:
             % obj   epanet class object.
             %
-            % See also apiEN_createproject.
+            % See also apiEN_createproject, apiEN_runproject.
             [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
             obj.ph.isNull = 0;
             error(obj.getError(obj.Errcode));
@@ -933,8 +933,8 @@ classdef epanet <handle
             %
             % apiEN_runproject(obj)
             %
-            % See also apiEN_deleteproject.
-            p = libpointer('voidPtr');
+            % See also apiEN_createproject, apiEN_deleteproject.
+            p = libpointer('voidPtr');  
             [Errcode, ~, inpname, repname, binname, pviewprog] = calllib(LibEPANET, ...
                                         'EN_runproject', ph, inpname, repname, binname, p);
             error(obj.getError(Errcode));
@@ -3528,6 +3528,10 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
+            if ~obj.ph.isNull
+                [Errcode] = calllib(obj.LibEPANET, 'ENopen', obj.TempInpFile, '', '');
+                error(obj.getError(obj.Errcode));
+            end
             [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
             if Errcode
                 obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
@@ -4997,7 +5001,7 @@ classdef epanet <handle
             end
         end
 
-        function netgraph = getGraph(obj)
+        function netgraph = getGraph(obj, varargin)
             % Retrieves the graph of the current epanet network.
             %
             % Example:
@@ -5005,17 +5009,22 @@ classdef epanet <handle
             %
             % See also plotGraph
             conmat = obj.getConnectivityMatrix;
-            netgraph = graph(conmat);        
+            if isempty(varargin{1})
+                netgraph = graph(conmat);
+            elseif contains('nodes', varargin{1}) && strcmp(varargin{1}(find(contains('nodes', varargin{1}))+1), 'yes')
+                    netgraph = graph(conmat, obj.getNodeNameID);        
+            end
         end
 
-        function h = plotGraph(obj)
+        function h = plotGraph(obj, varargin)
             % Plots the graph of the current epanet network.
             %
             % Example:
             %  d.plotGraph;
             %
             % See also getGraph
-            netgraph = obj.getGraph;
+            figure
+            netgraph = obj.getGraph(varargin);
             h = plot(netgraph); 
         end
 
@@ -8556,7 +8565,7 @@ classdef epanet <handle
             end
         end
         function value = getENfunctionsImpemented(obj)
-            % Retrieves the epanet functions that have been developed.
+            % Retrieves the epanet EN functions that have been developed.
             %
             % Example:
             %   d.getENfunctionsImpemented
@@ -8580,7 +8589,7 @@ classdef epanet <handle
             value = unique(value)';
         end
         function value = getEN_functionsImpemented(obj)
-            % Retrieves the epanet functions that have been developed.
+            % Retrieves the epanet EN_ functions that have been developed.
             %
             % Example:
             %   d.getEN_functionsImpemented
@@ -9854,27 +9863,40 @@ classdef epanet <handle
             [obj.Errcode]=obj.apiENsetvertices(index, x, y, size(x, 2), obj.LibEPANET, obj.ph);
             error(obj.getError(obj.Errcode));
         end    
-      function createProject(obj)
-            % Creates the epanet project.
+        function createProject(obj)
+            % Creates an epanet project.
             % Only for EN_ functions
             %
             % Example:
             %   d.createProject;
             %
-            % See also deleteProject.
+            % See also deleteProject, runProject.
             obj.apiEN_createproject(obj);
-      end
-      function deleteProject(obj)
-            % Deletes the epanet project.
+        end
+        function deleteProject(obj)
+            % Deletes an epanet project.
             % Only for EN_ functions
             %
-            % Example:
+            % Example:  
             %   d = epanet('Net1.inp', 'ph');
             %   d.deleteProject;
             %   d.getNodeElevations % Results in error 
             %
-            % See also createProject.
+            % See also createProject, runProject.
             obj.apiEN_deleteproject(obj);
+        end
+        function runProject(obj)
+            % Runs a complete EPANET simulation.
+            % Only for EN_ functions
+            %
+            % Example:
+            %   d.createProject;
+            %
+            % See also createProject, deleteProject.
+            inpname = obj.TempInpFile;
+            repname = [obj.TempInpFile(1:end-3),'txt'];
+            binname = [obj.TempInpFile(1:end-3),'bin'];
+            obj.apiEN_runproject(obj, inpname, repname, binname, obj.LibEPANET, obj.ph);
         end
         function Errcode = deleteNode(obj, idNode, varargin)
             % Deletes nodes. (EPANET Version 2.2)
