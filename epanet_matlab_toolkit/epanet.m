@@ -4139,8 +4139,7 @@ classdef epanet <handle
                     end
                 end
             end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE') ...
-                                && ~strcmpi(varargin{2}, 'ph') % e.g. d = epanet('Net1.inp', 'epanet2');
+            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')  % e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
                 if isempty(pwdDLL)
                     pwdDLL = pwd;
@@ -4170,15 +4169,12 @@ classdef epanet <handle
             disp([' (EMT version {', obj.classversion, '}).'])
             
             % Create Project - EPANET 2.2 supported function
-            obj.ph = libpointer('voidPtr');
-            if contains('ph', varargin) 
-                try
-                    [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
-                    setdatatype(obj.ph, 'ProjectPtr') 
-                catch 
-                end
+            obj.ph = libpointer('voidPtr'); 
+            try
+                [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
+                setdatatype(obj.ph, 'ProjectPtr') 
+            catch 
             end
-         
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
 
@@ -9878,7 +9874,7 @@ classdef epanet <handle
             % Only for EN_ functions
             %
             % Example:  
-            %   d = epanet('Net1.inp', 'ph');
+            %   d = epanet('Net1.inp');
             %   d.deleteProject;
             %   d.getNodeElevations % Results in error 
             %
