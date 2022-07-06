@@ -10,7 +10,7 @@ start_toolkit;
 
 % Create an empty INP file
 testinp = 'TESTING.inp';
-d = epanet(testinp, 'CREATE');
+d = epanet;
 
 % Initialize epanet flow units 
 d.initializeEPANET(d.ToolkitConstants.EN_GPM, d.ToolkitConstants.EN_HW);
