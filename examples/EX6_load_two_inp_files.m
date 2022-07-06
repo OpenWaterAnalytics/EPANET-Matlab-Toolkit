@@ -16,8 +16,8 @@ start_toolkit;
 
 % Load networks.
 % Add ph to use epanet project handle (EN_ functions).
-d1 = epanet('Net1.inp', 'ph'); 
-d2 = epanet('Net2.inp', 'ph');
+d1 = epanet('Net1.inp'); 
+d2 = epanet('Net2.inp');
 
 % Disp elevations for the two networks.
 disp('Net1 - Elevations:')

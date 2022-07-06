@@ -26,7 +26,6 @@ for i = 1:size(Nidx,1)
     end
 end
 
-A
 
 %   Unload library
 G.unload;
