@@ -334,6 +334,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deleteNode|Deletes a node|
 |deleteNodeJunctionDemand|Deletes a demand from a junction given the junction index and demand index(EPANET Version 2.2)|
 |deletePattern|Deletes a time pattern from a project|
+|deletePatternAll|Deletes all time patterns from a project|
 |deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
 |deletenodejunctiondemand|Deletes a demand from a junction given the junction index and demand index.|
 |deleteRules|Deletes an existing rule-based control given it's index. (EPANET Version 2.2)|
@@ -353,6 +354,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |openHydraulicAnalysis|Opens the hydraulics analysis system|
 |openQualityAnalysis|Opens the water quality analysis system|
 |runHydraulicAnalysis|Runs a single period hydraulic analysis, retrieving the current simulation clock time t|
+|reverseLinkNodeIndices|Reverses the node indices that connect a link|
 |runProject|Runs a complete EPANET simulation|
 |runQualityAnalysis|Makes available the hydraulic and water quality results that occur at the start of the next time period of a water quality analysis, where the start of the period is returned in t|
 |saveHydraulicFile|Saves the current contents of the binary hydraulics file to a file|
