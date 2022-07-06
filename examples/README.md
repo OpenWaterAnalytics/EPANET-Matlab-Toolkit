@@ -42,6 +42,9 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 24:](./EX24_delete_all_patterns.m) Delete all patterns.
 - [Example 25:](./EX25_set_node_name_ids.m) Set node name IDs.
 - [Example 26:](./EX26_using_parfor.m) Using parfor in EMT.
+- [Example 27:](./EX27_adjacency_matrix.m) Compute the adjacency matrix (connectivity graph).
+- [Example 27:](./EX28_tojson.m) Exports values to json format.
+
 
 ## Toolkit Examples
 - [Toolkit Example 2:](./Toolkit_EX2_Hydrant_rating_curve.m) Hydrant rating curve
