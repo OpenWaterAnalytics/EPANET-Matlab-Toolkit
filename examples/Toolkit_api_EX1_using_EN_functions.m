@@ -2,7 +2,7 @@
 %  This creates the opportunity to use relational database files or GIS/CAD files.
 %  THE USER HAS TO ADD api to call THE EN FUNCTIONS e.g., apiENaddnode
 %  
-%Clear 
+% Clear - Start Toolkit 
 clear; close('all'); clc;
 start_toolkit;
 

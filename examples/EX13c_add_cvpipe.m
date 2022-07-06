@@ -7,12 +7,12 @@
 %   Unload library.
 
 %%
-%Clear 
+% Clear - Start Toolkit 
 clear; close('all'); clc;
 start_toolkit;
 
 % Load a network.
-d = epanet('Net1.inp');
+d = epanet('Net1.inp'); 
 
 disp('Add a CV pipe')
 

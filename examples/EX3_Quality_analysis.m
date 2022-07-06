@@ -14,7 +14,7 @@
 %   Unload libraries.
 
 %%
-% Clear
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 
@@ -28,7 +28,7 @@ d = epanet('net2-cl2.inp');
 qual_res = d.getComputedQualityTimeSeries %Value x Node, Value x Link
 
 % Compute Quality step by step.
-% d.solveCompleteHydraulics #needed
+d.solveCompleteHydraulics 
 d.openQualityAnalysis
 d.initializeQualityAnalysis
 tleft=1; P=[];T=[];QsN=[]; QsL=[]; 

@@ -1,6 +1,6 @@
 %% Run a quality analysis using only MSX functions
 %  THE USER HAS TO ADD api to call THE MSX FUNCTIONS e.g., apiMSXsolveH
-%Clear
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 % Create EPANET object using the INP file

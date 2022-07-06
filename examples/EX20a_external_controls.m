@@ -8,11 +8,10 @@
 %   Unload library.
 
 %%
-% Clear
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 
-% Second way
 % Load network.
 d = epanet('Net1.inp');
 

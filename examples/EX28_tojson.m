@@ -8,7 +8,7 @@
 %   Unload library.
 
 %%
-% Clear
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 
@@ -27,6 +27,6 @@ allJsonTxt = d.toJson(values);
 d.toJsonFile(values.Flow, 'Flows'); % input: value, filename (.json)
 d.toJsonFile(values, 'AllValues');
 
-%   Unload library.
+% Unload library.
 d.unload;
     

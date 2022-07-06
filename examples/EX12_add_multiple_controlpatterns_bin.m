@@ -8,7 +8,7 @@
 %   Run simulation with executable.
 
 %%
-%Clear 
+% Clear - Start Toolkit 
 clear; close('all'); clc;
 start_toolkit;
 
