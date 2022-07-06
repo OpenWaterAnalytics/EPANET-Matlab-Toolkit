@@ -926,12 +926,17 @@ classdef epanet <handle
             error(obj.getError(obj.Errcode));
         end
         function [Errcode, inpname, repname, binname, pviewprog] = apiEN_runproject(obj, inpname, repname, binname, LibEPANET, ph)
-            % Deletes the epanet project.
+            % Runs a complete EPANET simulation.
+            % Only for EN_ functions
             %
             % Parameters:
-            % obj  
+            % inpname      the name of an existing EPANET-formatted input file.
+            % repname      the name of a report file to be created (or "" if not needed).
+            % binname      the name of a binary output file to be created (or "" if not needed).
+            % LibEPANET    epanet library DLL name.
+            % ph           epanet project handle.
             %
-            % apiEN_runproject(obj)
+            % apiEN_runproject(obj, inpname, repname, binname, LibEPANET, ph)
             %
             % See also apiEN_createproject, apiEN_deleteproject.
             p = libpointer('voidPtr');  
@@ -5000,28 +5005,43 @@ classdef epanet <handle
         function netgraph = getGraph(obj, varargin)
             % Retrieves the graph of the current epanet network.
             %
-            % Example:
-            %  d.getGraph;
+            % Example 1:
+            %  G = d.getGraph; % Get net graph with node indices.
             %
-            % See also plotGraph
+            % Example 2:
+            %  G = d.getGraph('nodes', 'yes'); % Get net graph with node name IDs.
+            %
+            % See also plotGraph.
             conmat = obj.getConnectivityMatrix;
-            if isempty(varargin{1})
+            if contains('nodes', varargin) && ...
+               strcmp(varargin(find(contains('nodes', varargin))+1), 'yes')
+                    netgraph = graph(conmat, obj.getNodeNameID);
+            else
                 netgraph = graph(conmat);
-            elseif contains('nodes', varargin{1}) && strcmp(varargin{1}(find(contains('nodes', varargin{1}))+1), 'yes')
-                    netgraph = graph(conmat, obj.getNodeNameID);        
             end
         end
 
         function h = plotGraph(obj, varargin)
             % Plots the graph of the current epanet network.
             %
-            % Example:
-            %  d.plotGraph;
+            % Example 1:
+            %  d.plotGraph; % Plot graph with node indices.
             %
-            % See also getGraph
+            % Example 2:
+            %  d.plotGraph('nodes', 'yes'); % Plot graph with node name IDs.
+            %
+            % Example 3:
+            %  fig = d.plotGraph('nodes', 'yes', 'links', 'yes'); % Plot graph with node name 
+            %                                                       IDs and link name IDs.
+            %
+            % See also getGraph.
             figure
-            netgraph = obj.getGraph(varargin);
+            netgraph = obj.getGraph(varargin{:});
             h = plot(netgraph); 
+            if contains('links', varargin) && ...
+               strcmp(varargin(find(contains('links', varargin))+1), 'yes')
+                   h.EdgeLabel = obj.getLinkNameID; 
+            end
         end
 
         function json_txt = toJson(~, values)
@@ -9261,7 +9281,7 @@ classdef epanet <handle
             % 3) Roughness Coefficient
             % 4) Minor Loss Coefficient
             %
-            % % If no properties are given, the default values are:
+            %   If no properties are given, the default values are:
             %   length = 330 feet (~100.5 m)
             %   diameter = 10 inches (25.4 cm)
             %   roughness coefficient = 130 (Hazen-Williams formula) or
@@ -9269,7 +9289,7 @@ classdef epanet <handle
             %                           0.01 (Chezy-Manning formula)
             %   minor Loss Coefficient = 0
             %
-            % % The examples are based on d = epanet('NET1.inp');
+            %   The examples are based on d = epanet('NET1.inp');
             %
             % Example 1:
             %   % Adds a new control valve pipe given no properties.
@@ -9893,7 +9913,12 @@ classdef epanet <handle
             % Only for EN_ functions
             %
             % Example:
+            %   d = epanet('Net1.inp');
+            %   d.deleteProject;
+            %   d.getNodeCount; % Results in error
             %   d.createProject;
+            %   d.loadEPANETFile(d.TempInpFile);
+            %   d.getNodeCount 
             %
             % See also deleteProject, runProject.
             obj.apiEN_createproject(obj);
@@ -9910,16 +9935,23 @@ classdef epanet <handle
             % See also createProject, runProject.
             obj.apiEN_deleteproject(obj);
         end
-        function runProject(obj)
+        function repname = runProject(obj, varargin)
             % Runs a complete EPANET simulation.
             % Only for EN_ functions
             %
-            % Example:
-            %   d.createProject;
+            % Example 1:
+            %   repname = d.runProject; % Runs simulation and saves output at repname .txt file.
+            %
+            % Example 2:
+            %   repname = d.runProject('outfile.txt'); % Runs simulation and saves output in outfile.txt file.
             %
             % See also createProject, deleteProject.
             inpname = obj.TempInpFile;
-            repname = [obj.TempInpFile(1:end-3),'txt'];
+            if nargin == 2
+                repname = varargin{1};
+            else
+                repname = [obj.TempInpFile(1:end-3),'txt'];
+            end
             binname = [obj.TempInpFile(1:end-3),'bin'];
             obj.apiEN_runproject(obj, inpname, repname, binname, obj.LibEPANET, obj.ph);
         end
@@ -10015,16 +10047,16 @@ classdef epanet <handle
             %
             % Example 1:
             %   idPat = d.getPatternNameID(1);   % Retrieves the ID of the 1st pattern
-            %   d.deletePattern(idPat)           % Deletes the 1st pattern given it's ID
+            %   d.deletePattern(idPat);          % Deletes the 1st pattern given it's ID
             %   d.getPatternNameID
             %
             % Example 2:
             %   index = 1;
-            %   d.deletePattern(index)           % Deletes the 1st pattern given it's index
+            %   d.deletePattern(index);          % Deletes the 1st pattern given it's index
             %   d.getPatternNameID
             %
-            % See also addPattern, setPattern, setPatternNameID,
-            %          setPatternValue, setPatternComment.
+            % See also deletePatternAll, addPattern, setPattern,
+            %          setPatternNameID, setPatternValue, setPatternComment.
             if ischar(idPat) || iscell(idPat)
                 indexPat = obj.getPatternIndex(idPat);
             else
@@ -11159,21 +11191,21 @@ classdef epanet <handle
             %   d.setLinkPumpPatternIndex(pumpIndex, [1, 2])   % Sets the pump speed time pattern index = 1 and 2 to the pumps with index 118 and 119 respectively
             %   d.getLinkPumpPatternIndex
             %
-	    % Example 6:
+            % Example 6:
             %   % To remove the pattern index from the pumps you can use input 0
             %   pumpIndex = d.getLinkPumpIndex;
-	    %   d.setLinkPumpPatternIndex(pumpIndex, 0)
-	    %
+            %   d.setLinkPumpPatternIndex(pumpIndex, 0)
+            %
             % See also getLinkPumpPatternIndex, setLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
             set_Node_Link(obj, 'pump', 'apiENsetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, value, varargin)
         end
         function value = setLinkPumpHeadCurveIndex(obj, value, varargin)
-	    % Example 1:
-	    %   To remove curve index from the pumps you can use input 0
+            % Example 1:
+            %   To remove curve index from the pumps you can use input 0
             %   pumpIndex = d.getLinkPumpIndex;
             %   d.setLinkPumpHeadCurveIndex(pumpIndex, 0)
-	    %
+            %
             % See also setLinkPumpPatternIndex, getLinkPumpPower, setLinkPumpHCurve,
             %          setLinkPumpECurve, setLinkPumpECost.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
@@ -13893,8 +13925,8 @@ classdef epanet <handle
             % Example 3:
             %   d = epanet('example.inp');            
             %   d.loadMSXFile('example.msx');
-            %   MSX_comp = d.getMSXComputedQualitySpecie({'AStot', 'AS5s'}) % Computes quality for all
-            %                                                               the species in 3D arrays.
+            %   MSX_comp = d.getMSXComputedQualitySpecie({'AStot', 'AS5s'}) % Computes quality for 'AStot', 'AS5s'
+            %                                                               species in 3D arrays.
             %   MSX_comp.NodeQuality(:,:,1) % Gets node quality for the first specie.
             %   MSX_comp.NodeQuality(:,:,2) % Gets node quality for the second specie.
             %
