@@ -5506,6 +5506,9 @@ classdef epanet <handle
             if nargin == 2
                 cntL = varargin{1};
                 indices = cntL;
+                if iscell(indices) || ischar(indices)
+                    indices = obj.getLinkIndex(indices);
+                end
             else
                 cntL = obj.getLinkCount;
                 indices = 1:cntL;
@@ -9859,6 +9862,32 @@ classdef epanet <handle
             [obj.Errcode]=obj.apiENsetvertices(index, x, y, size(x, 2), obj.LibEPANET, obj.ph);
             error(obj.getError(obj.Errcode));
         end    
+        function reverseLinkNodeIndices(obj, linkindices)
+            % Reverses the node indices that connect a link.
+            %
+            % The examples are based on: d = epanet('Net1.inp');
+            %
+            % Example 1:
+            % d.getLinkNodesIndex(1)
+            % d.reverseLinkNodeIndices(1); % Reverses the first pipe's node indices.
+            % d.getLinkNodesIndex(1)
+            %
+            % Example 2:
+            % d.getLinkNodesIndex(1:5)
+            % d.reverseLinkNodeIndices(1:5); % Reverses the first five pipe's node indices.
+            % d.getLinkNodesIndex(1:5)
+            %
+            % Example 3:
+            % pipeIDs = {'110','112'};
+            % d.getLinkNodesIndex(pipeIDs)
+            % d.reverseLinkNodeIndices(pipeIDs); % Reverses pipes '110' and '112' node indices.
+            % d.getLinkNodesIndex(pipeIDs)
+            if iscell(linkindices) || ischar(linkindices)
+                linkindices = obj.getLinkIndex(linkindices);
+            end
+            linkNodes = obj.getLinkNodesIndex(linkindices);
+            obj.setLinkNodesIndex(linkindices, linkNodes(:,2), linkNodes(:,1))
+        end
         function createProject(obj)
             % Creates an epanet project.
             % Only for EN_ functions
@@ -10003,6 +10032,22 @@ classdef epanet <handle
             end
             [Errcode] = obj.apiENdeletepattern(indexPat, obj.LibEPANET, obj.ph);
             error(obj.getError(Errcode));
+        end
+        function deletePatternAll(obj)
+            % Deletes all time patterns from a project.
+            %
+            % Example:
+            %   d = epanet('ky10.inp');
+            %   d.getPatternCount
+            %   d.deletePatternAll;
+            %   d.getPatternCount
+            %
+            % See also deletePattern, addPattern, setPattern,
+            %          setPatternNameID, setPatternValue, setPatternComment.
+            idPatAll = obj.getPatternNameID;
+            for i=length(idPatAll):-1:1
+                obj.deletePattern(idPatAll(i));
+            end
         end
         function Errcode = deleteCurve(obj, idCurve)
             % Deletes a data curve from a project.
