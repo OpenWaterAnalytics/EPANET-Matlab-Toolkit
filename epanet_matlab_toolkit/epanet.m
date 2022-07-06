@@ -718,88 +718,8 @@ classdef epanet <handle
                 warning('There was an error loading the EPANET library (DLL).')
             end
         end
-        function [obj] = MSXMatlabSetup(obj, msxname, varargin)
-            arch = computer('arch');
-            pwdepanet = fileparts(which(mfilename));
-            if strcmp(arch, 'win64')
-                obj.MSXLibEPANETPath = [pwdepanet, '\64bit\'];
-            elseif strcmp(arch, 'win32')
-                obj.MSXLibEPANETPath = [pwdepanet, '\32bit\'];
-            end
-            if isunix
-                obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
-                if ismac
-                    obj.MSXLibEPANETPath = [pwdepanet, '/mac/'];
-                end
-            end
-            if ~isempty(varargin)
-                if varargin{1}{1}~=1
-                    if nargin==3
-                        obj.MSXLibEPANETPath=char(varargin{1});
-                        obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
-                        if isempty(varargin{1})
-                            obj.MSXLibEPANETPath='';
-                        end
-                    end
-                end
-            end
-            obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
-            if ~libisloaded(obj.MSXLibEPANET)
-                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
-            end
-
-            obj.MSXFile = which(char(msxname));
-            %Save the temporary msx file
-            mm=0;
-            if ~isempty(varargin)
-                if varargin{1}{1}==1
-                    mm=1; %for set (write) msx functions
-                end
-            end
-            if mm==1
-                if ~iscell(varargin{1})
-                    obj.MSXTempFile=obj.MSXFile;
-                end
-            else
-                obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
-                copyfile(obj.MSXFile, obj.MSXTempFile);
-            end
-            %Open the file
-            [obj.Errcode] = obj.apiMSXopen(obj);
-            obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
-            obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
-            obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
-
-            obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
-            obj.MSXConstantsCount = obj.getMSXConstantsCount;
-            obj.MSXParametersCount = obj.getMSXParametersCount;
-            obj.MSXPatternsCount = obj.getMSXPatternsCount;
-            obj.MSXSpeciesIndex = obj.getMSXSpeciesIndex;
-            obj.MSXSpeciesNameID = obj.getMSXSpeciesNameID;
-            obj.MSXSpeciesType = obj.getMSXSpeciesType;
-            obj.MSXSpeciesUnits = obj.getMSXSpeciesUnits;
-            obj.MSXSpeciesATOL = obj.getMSXSpeciesATOL;
-            obj.MSXSpeciesRTOL = obj.getMSXSpeciesRTOL;
-            obj.MSXConstantsNameID = obj.getMSXConstantsNameID;
-            obj.MSXConstantsValue  = obj.getMSXConstantsValue;
-            obj.MSXConstantsIndex = obj.getMSXConstantsIndex;
-            obj.MSXParametersNameID = obj.getMSXParametersNameID;
-            obj.MSXParametersIndex = obj.getMSXParametersIndex;
-            obj.MSXParametersTanksValue = obj.getMSXParametersTanksValue;
-            obj.MSXParametersPipesValue = obj.getMSXParametersPipesValue;
-            obj.MSXPatternsNameID = obj.getMSXPatternsNameID;
-            obj.MSXPatternsIndex = obj.getMSXPatternsIndex;
-            obj.MSXPatternsLengths = obj.getMSXPatternsLengths;
-            obj.MSXNodeInitqualValue = obj.getMSXNodeInitqualValue;
-            obj.MSXLinkInitqualValue = obj.getMSXLinkInitqualValue;
-            obj.MSXSources = obj.getMSXSources;
-            obj.MSXSourceType = obj.getMSXSourceType;
-            obj.MSXSourceLevel = obj.getMSXSourceLevel;
-            obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
-            obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
-            obj.MSXPattern = obj.getMSXPattern;
-        end
     end
+
     methods (Static)
         function [Errcode] = apiENwriteline(line, LibEPANET, ph)
             % Writes a line of text to a project's report file.
@@ -4401,6 +4321,88 @@ classdef epanet <handle
             disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
         end % End of epanet class constructor
         
+        function [obj] = MSXMatlabSetup(obj, msxname, varargin)
+            arch = computer('arch');
+            pwdepanet = fileparts(which(mfilename));
+            if strcmp(arch, 'win64')
+                obj.MSXLibEPANETPath = [pwdepanet, '\64bit\'];
+            elseif strcmp(arch, 'win32')
+                obj.MSXLibEPANETPath = [pwdepanet, '\32bit\'];
+            end
+            if isunix
+                obj.MSXLibEPANETPath = [pwdepanet, '/glnx/'];
+                if ismac
+                    obj.MSXLibEPANETPath = [pwdepanet, '/mac/'];
+                end
+            end
+            if ~isempty(varargin)
+                if varargin{1}{1}~=1
+                    if nargin==3
+                        obj.MSXLibEPANETPath=char(varargin{1});
+                        obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
+                        if isempty(varargin{1})
+                            obj.MSXLibEPANETPath='';
+                        end
+                    end
+                end
+            end
+            obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
+            if ~libisloaded(obj.MSXLibEPANET)
+                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+            end
+
+            obj.MSXFile = which(char(msxname));
+            %Save the temporary msx file
+            mm=0;
+            if ~isempty(varargin)
+                if varargin{1}{1}==1
+                    mm=1; %for set (write) msx functions
+                end
+            end
+            if mm==1
+                if ~iscell(varargin{1})
+                    obj.MSXTempFile=obj.MSXFile;
+                end
+            else
+                obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
+                copyfile(obj.MSXFile, obj.MSXTempFile);
+            end
+            %Open the file
+            [obj.Errcode] = obj.apiMSXopen(obj);
+            obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
+            obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
+            obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
+
+            obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
+            obj.MSXConstantsCount = obj.getMSXConstantsCount;
+            obj.MSXParametersCount = obj.getMSXParametersCount;
+            obj.MSXPatternsCount = obj.getMSXPatternsCount;
+            obj.MSXSpeciesIndex = obj.getMSXSpeciesIndex;
+            obj.MSXSpeciesNameID = obj.getMSXSpeciesNameID;
+            obj.MSXSpeciesType = obj.getMSXSpeciesType;
+            obj.MSXSpeciesUnits = obj.getMSXSpeciesUnits;
+            obj.MSXSpeciesATOL = obj.getMSXSpeciesATOL;
+            obj.MSXSpeciesRTOL = obj.getMSXSpeciesRTOL;
+            obj.MSXConstantsNameID = obj.getMSXConstantsNameID;
+            obj.MSXConstantsValue  = obj.getMSXConstantsValue;
+            obj.MSXConstantsIndex = obj.getMSXConstantsIndex;
+            obj.MSXParametersNameID = obj.getMSXParametersNameID;
+            obj.MSXParametersIndex = obj.getMSXParametersIndex;
+            obj.MSXParametersTanksValue = obj.getMSXParametersTanksValue;
+            obj.MSXParametersPipesValue = obj.getMSXParametersPipesValue;
+            obj.MSXPatternsNameID = obj.getMSXPatternsNameID;
+            obj.MSXPatternsIndex = obj.getMSXPatternsIndex;
+            obj.MSXPatternsLengths = obj.getMSXPatternsLengths;
+            obj.MSXNodeInitqualValue = obj.getMSXNodeInitqualValue;
+            obj.MSXLinkInitqualValue = obj.getMSXLinkInitqualValue;
+            obj.MSXSources = obj.getMSXSources;
+            obj.MSXSourceType = obj.getMSXSourceType;
+            obj.MSXSourceLevel = obj.getMSXSourceLevel;
+            obj.MSXSourcePatternIndex = obj.getMSXSourcePatternIndex;
+            obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
+            obj.MSXPattern = obj.getMSXPattern;
+        end
+
         function openAnyInp(obj, varargin)
             % Open as on matlab editor any EPANET input file using built
             % function open. Open current loaded input file (not temporary)
