@@ -677,7 +677,6 @@ classdef epanet <handle
             % Unload library
             if ~obj.ph.isNull
                 [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
-                error(obj.getError(obj.Errcode));
                 obj.ph.isNull = 0; % Set it to 0 to pass the ph.isNull condition on api functions
                                    % call and stop on error 'Error using calllib 
                                    % Library was not found' after unloading library.
@@ -7060,7 +7059,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                % error(obj.getError(obj.Errcode));
                 j=j+1;
             end
         end
@@ -7778,7 +7777,7 @@ classdef epanet <handle
                     value = cell(1, length(varargin{1}));
                     for i=varargin{1}
                         [obj.Errcode, value{k}]=obj.apiENgetpatternid(i, obj.LibEPANET, obj.ph);
-                        error(obj.getError(obj.Errcode));
+                        % error(obj.getError(obj.Errcode));
                         k=k+1;
                     end
                 end
@@ -9148,7 +9147,7 @@ classdef epanet <handle
             % See also getPattern, setPattern, setPatternNameID
                 %          setPatternValue, setPatternComment.
             [obj.Errcode] = obj.apiENaddpattern(varargin{1}, obj.LibEPANET, obj.ph);
-            obj.getError(obj.Errcode)
+            error(obj.getError(obj.Errcode));
             index = getPatternIndex(obj, varargin{1});
             if nargin==2
                 setPattern(obj, index, ones(1, max(obj.getPatternLengths)));
@@ -13027,7 +13026,7 @@ classdef epanet <handle
             [obj.Errcode] = obj.apiENsaveH(obj.LibEPANET, obj.ph);
             error(obj.getError(obj.Errcode));
         end
-        function tleft=stepQualityAnalysisTimeLeft(obj)
+        function tleft = stepQualityAnalysisTimeLeft(obj)
             % Advances the water quality simulation one water quality time step.
             % The time remaining in the overall simulation is returned in tleft.
             %
@@ -13038,7 +13037,7 @@ classdef epanet <handle
             %
             % See also runQualityAnalysis, closeQualityAnalysis.
             [obj.Errcode, tleft] = obj.apiENstepQ(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            % error(obj.getError(obj.Errcode));
         end
         function [Errcode] = saveInputFile(obj, inpname, varargin)
             % Writes all current network input data to a file using the format of an EPANET input file.
