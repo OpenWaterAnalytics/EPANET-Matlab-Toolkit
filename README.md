@@ -216,6 +216,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeJunctionIndex|Retrieves the junctions indices|
 |getNodeJunctionNameID|Retrieves the junctions IDs|
 |getNodeJunctionDemandIndex|Retrieves the demand index of the junctions. (EPANET Version 2.2)|
+|getNodeLinks|Retrieves the links which a specific node is connected to|
 |getNodeMassFlowRate|Retrieves the computed mass flow rates per minute of chemical sources|
 |getNodeNameID|Retrieves the ID label of all nodes or some nodes with a specified index|
 |getNodeDemandCategoriesNumber|Retrieves the number of demand categories for a node|
