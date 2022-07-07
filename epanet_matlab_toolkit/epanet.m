@@ -517,6 +517,7 @@ classdef epanet <handle
                 j = 1;
                 for i=indices
                     [obj.Errcode, value(j)] = eval(['obj.', fun, '(i, propertie, obj.LibEPANET, obj.ph)']);
+                    error(obj.getError(obj.Errcode));
                     j=j+1;
                 end
             else
@@ -528,6 +529,7 @@ classdef epanet <handle
                 j = 1;
                 for i=1:length(varargin{1})
                     [obj.Errcode, value(j)] = eval(['obj.', fun, '(varargin{1}(i), propertie, obj.LibEPANET, obj.ph)']);
+                    error(obj.getError(obj.Errcode));
                     if ~isscalar(varargin{1})
                         j=j+1;
                     end
@@ -1856,6 +1858,7 @@ classdef epanet <handle
             % apiENsaveHydfile(fname, LibEPANET, ph)
             %
             % Parameters:
+            % fname     hydraulic filename.
             % LibEPANET epanet library DLL name.
             % ph        epanet project handle.
             %
@@ -1873,6 +1876,7 @@ classdef epanet <handle
             % apiENsaveinpfile(inpname, LibEPANET, ph)
             %
             % Parameters:
+            % inpname   text file name.
             % LibEPANET epanet library DLL name.
             % ph        epanet project handle.
             %
@@ -2797,7 +2801,7 @@ classdef epanet <handle
             if ph.isNull
                 [Errcode, value] = calllib(LibEPANET, 'ENgetaveragepatternvalue', index, 0);
             else
-                [Errcode, value] = calllib(LibEPANET, 'EN_getaveragepatternvalue', ph, index, 0);
+                [Errcode, ~, value] = calllib(LibEPANET, 'EN_getaveragepatternvalue', ph, index, 0);
             end
         end
         function [Errcode, x, y] = apiENgetcoord(index, LibEPANET, ph)
@@ -3246,7 +3250,7 @@ classdef epanet <handle
             if ph.isNull
                 [Errcode, demand_name] = calllib(LibEPANET, 'ENgetdemandname', node_index, demand_index, demand_name);
             else
-                [Errcode, demand_name] = calllib(LibEPANET, 'EN_getdemandname', ph, node_index, demand_index, demand_name);
+                [Errcode, ~, demand_name] = calllib(LibEPANET, 'EN_getdemandname', ph, node_index, demand_index, demand_name);
             end
         end
         function [Errcode, line1, line2, line3] = apiENgettitle(LibEPANET, ph)
@@ -8322,7 +8326,7 @@ classdef epanet <handle
             %   d.getTimeStartTime
             %
             % See also getTimeSimulationDuration, getTimePatternStart.
-            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_STARTTIME, obj.LibEPANET);
+            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_STARTTIME, obj.LibEPANET, obj.ph);
         end
         function value = getTimeHTime(obj)
             % Retrieves the elapsed time of current hydraulic solution.
@@ -8331,7 +8335,7 @@ classdef epanet <handle
             %   d.getTimeHTime
             %
             % See also getTimeHydraulicStep, getComputedHydraulicTimeSeries.
-            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HTIME, obj.LibEPANET);
+            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HTIME, obj.LibEPANET, obj.ph);
         end
         function value = getTimeQTime(obj)
             % Retrieves the elapsed time of current quality solution.
@@ -8340,7 +8344,7 @@ classdef epanet <handle
             %   d.getTimeQTime
             %
             % See also getTimeQualityStep, getComputedQualityTimeSeries.
-            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_QTIME, obj.LibEPANET);
+            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_QTIME, obj.LibEPANET, obj.ph);
         end
         function value = getTimeHaltFlag(obj)
             % Retrieves the number of halt flag indicating if the simulation was halted.
@@ -8349,7 +8353,7 @@ classdef epanet <handle
             %   d.getTimeHaltFlag
             %
             % See also getTimeStartTime, getTimeSimulationDuration.
-            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HALTFLAG, obj.LibEPANET);
+            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HALTFLAG, obj.LibEPANET, obj.ph);
         end
         function value = getTimeNextEvent(obj)
             % Retrieves the shortest time until a tank becomes empty or full.
@@ -8358,7 +8362,7 @@ classdef epanet <handle
             %   d.getTimeNextEvent
             %
             % See also getTimeNextEventTank.
-            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENT, obj.LibEPANET);
+            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENT, obj.LibEPANET, obj.ph);
         end
         function value = getTimeNextEventTank(obj)
             % Retrieves the index of tank with shortest time to become empty or full.
@@ -8367,7 +8371,7 @@ classdef epanet <handle
             %   d.getTimeNextEventTank
             %
             % See also getTimeNextEvent.
-            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENTTANK, obj.LibEPANET);
+            [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENTTANK, obj.LibEPANET, obj.ph);
         end
         function value = getCurvesInfo(obj)
             % Retrieves all the info of curves. (EPANET Version 2.1)
@@ -12910,6 +12914,7 @@ classdef epanet <handle
             %
             % See also saveHydraulicFile, closeHydraulicAnalysis.
             [obj.Errcode] = obj.apiENsaveH(obj.LibEPANET, obj.ph);
+            error(obj.getError(obj.Errcode));
         end
         function tleft=stepQualityAnalysisTimeLeft(obj)
             % Advances the water quality simulation one water quality time step.
@@ -12922,6 +12927,7 @@ classdef epanet <handle
             %
             % See also runQualityAnalysis, closeQualityAnalysis.
             [obj.Errcode, tleft] = obj.apiENstepQ(obj.LibEPANET, obj.ph);
+            error(obj.getError(obj.Errcode));
         end
         function [Errcode] = saveInputFile(obj, inpname, varargin)
             % Writes all current network input data to a file using the format of an EPANET input file.
@@ -12937,6 +12943,7 @@ classdef epanet <handle
                 inpname = obj.TempInpFile;
             end
             [Errcode] = obj.apiENsaveinpfile('@#', obj.LibEPANET, obj.ph);
+            error(obj.getError(obj.Errcode));
             copyfile('@#', inpname);% temporary
             delete('@#');
             %else
@@ -12975,6 +12982,7 @@ classdef epanet <handle
             %
             % See also writeReport, copyReport.
             [obj.Errcode] = obj.apiENwriteline(line, obj.LibEPANET, obj.ph);
+            error(obj.getError(obj.Errcode));
         end
         function writeReport(obj)
             % Writes a formatted text report on simulation results to the Report file.
@@ -12992,6 +13000,7 @@ classdef epanet <handle
             %
             % See also copyReport, writeLineInReportFile.
             [obj.Errcode]=obj.apiENreport(obj.LibEPANET, obj.ph);
+            error(obj.getError(obj.Errcode));
         end
         function copyReport(obj, fileName)
             % Copies the current contents of a project's report file to another file. (EPANET Version 2.2)
@@ -13002,6 +13011,7 @@ classdef epanet <handle
             %
             % See also writeReport, writeLineInReportFile, clearReport.
             [obj.Errcode] = obj.apiENcopyreport (fileName, obj.LibEPANET, obj.ph);
+            error(obj.getError(obj.Errcode));
         end
         function resultindex = getNodeResultIndex(obj, node_index)
             % Retrieves the order in which a node's results
@@ -13013,6 +13023,7 @@ classdef epanet <handle
             %
             % See also getComputedHydraulicTimeSeries, deleteNode, getLinkResultIndex
             [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_NODE, node_index, obj.LibEPANET, obj.ph);
+            error(obj.getError(obj.Errcode));
         end
         function resultindex = getLinkResultIndex(obj, link_index)
             % Retrieves the order in which a link's results
@@ -13024,6 +13035,7 @@ classdef epanet <handle
             %
             % See also getComputedHydraulicTimeSeries, deleteNode, getNodeResultIndex
             [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_LINK, link_index, obj.LibEPANET, obj.ph);
+            error(obj.getError(obj.Errcode));
         end
         function clearReport(obj)
             % Clears the contents of a project's report file. (EPANET Version 2.2)
@@ -13033,6 +13045,7 @@ classdef epanet <handle
             %
             % See also writeReport, writeLineInReportFile, copyReport.
             [obj.Errcode] = obj.apiENclearreport(obj.LibEPANET, obj.ph);
+            error(obj.getError(obj.Errcode));
         end
         function unload(obj)
             % Unload library and close the EPANET Toolkit system.
