@@ -12999,7 +12999,7 @@ classdef epanet <handle
             %
             % See also runQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode, tstep] = obj.apiENrunH(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            % error(obj.getError(obj.Errcode));
             tstep = double(tstep);
         end
         function tstep = runQualityAnalysis(obj)
