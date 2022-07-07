@@ -265,6 +265,7 @@ d.getMSXPatternValue(1,5)
 d.saveMSXFile('testMSX.msx');                                                               
           
 d.saveMSXQualityFile('testMSXQuality.bin')
+d.getComputedHydraulicTimeSeries;
 
 d.saveHydraulicsOutputReportingFile
 d.saveHydraulicFile('testMSXHydraulics.hyd')

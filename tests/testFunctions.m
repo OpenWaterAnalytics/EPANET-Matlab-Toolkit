@@ -8,7 +8,7 @@ clear;
 close all;
 
 % Create EPANET object using the INP file
-inpname='BWSN_Network_1.inp'; 
+inpname='Net1.inp'; 
 % Net1 Net2 Net3 BWSN_Network_1 example
 
 % version='epanet2'; % version dev2.1
