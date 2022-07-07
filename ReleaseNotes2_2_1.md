@@ -79,6 +79,7 @@ More updated functions: getNodeTankNameID, getLinkValveNameID, getLinkPumpNameID
 |deleteProject|Deletes an epanet project|
 |getEN_functionsImpemented|Retrieves the epanet EN_ functions that have been developed|
 |getGraph|Retrieves the graph of the current epanet network|
+|getNodeLinks|Retrieves the links which a specific node is connected to|
 |getLinkQuality|Retrieves the value of link quality|
 |plotGraph|Plots the graph of the current epanet network|
 |reverseLinkNodeIndices|Reverses the node indices that connect a link|

@@ -5518,10 +5518,28 @@ classdef epanet <handle
             % Duplicate function with getLinkNodesIndex for new version.
             %
             % Example:
-            %   d.getNodesConnectingLinksIndex
+            %   d.getNodesConnectingLinksIndex, getNodeLinks.
+            %
+            % See also getLinkNodesIndex, getNodeLinks.
+            value = obj.getLinkNodesIndex;
+        end
+        function value = getNodeLinks(obj, nodeindex)
+            % Retrieves the links which a node is specific connected to.
+            %
+            % Example 1:
+            %   nodeindex = 2;
+            %   d.getNodeLinks(nodeindex)
+            %
+            % Example 2:
+            %   nodeID = '10';
+            %   d.getNodeLinks(nodeID)
             %
             % See also getLinkNodesIndex, getNodesConnectingLinksID.
-            value = obj.getLinkNodesIndex;
+            if ischar(nodeindex), nodeindex = obj.getNodeIndex(nodeindex); end
+            LinkNodesIndex = obj.getLinkNodesIndex;
+            links_1 = find(nodeindex == LinkNodesIndex(:,1))';
+            links_2 = find(nodeindex == LinkNodesIndex(:,2))';
+            value = sort([links_1, links_2]);
         end
         function value = getLinkNodesIndex(obj, varargin)
             % Retrieves the indexes of the from/to nodes of all links.
@@ -5532,7 +5550,7 @@ classdef epanet <handle
             % Example 2:
             %   d.getLinkNodesIndex(2)  % Link index
             %
-            % See also getNodesConnectingLinksID.
+            % See also getNodeLinks, getNodesConnectingLinksID.
             if nargin == 2
                 cntL = varargin{1};
                 indices = cntL;
@@ -5562,7 +5580,7 @@ classdef epanet <handle
             %   linkIndex = 1;
             %   d.getNodesConnectingLinksID{1, 1:2}   % Retrieves the id of the from/to nodes of the 1st link
             %
-            % See also getLinkNodesIndex.
+            % See also getLinkNodesIndex, getNodeLinks.
             value={};
             obj.NodesConnectingLinksIndex=obj.getLinkNodesIndex;
             if obj.getLinkCount
@@ -6939,7 +6957,7 @@ classdef epanet <handle
             value=zeros(1, length(varargin{1}));v=1;
             for i=varargin{1}
                 [obj.Errcode, value(v)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);v=v+1;
-                error(obj.getError(obj.Errcode));
+                % error(obj.getError(obj.Errcode));
             end
         end
         function value = getNodeHydaulicHead(obj, varargin)
