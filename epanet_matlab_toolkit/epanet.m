@@ -4428,11 +4428,6 @@ classdef epanet <handle
             % Load epanet file when use bin functions.
             % Example:
             %   d.loadEPANETFile(d.TempInpFile);
-            if isunix
-                loadlibrary(obj.LibEPANET, [obj.LibEPANETpath, obj.LibEPANET, '.h']);
-            else
-                loadlibrary([obj.LibEPANETpath, obj.LibEPANET], [obj.LibEPANETpath, obj.LibEPANET, '.h']);
-            end
             obj.solve = 0;
             if nargin==2
                 [Errcode] = obj.apiENopen(varargin{1}, [varargin{1}(1:end-4), '.txt'], [varargin{1}(1:end-4), '.bin'], obj.LibEPANET, obj.ph);
