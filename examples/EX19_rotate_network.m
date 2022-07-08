@@ -18,7 +18,7 @@
 
 %%
 % Clear
-clc; close all; clear all;
+clc; close all; clear;
 
 % Load network and paths.
 start_toolkit;

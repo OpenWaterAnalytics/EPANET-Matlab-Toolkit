@@ -7,7 +7,7 @@
 %   Not needed to unload library because not used in this example.
 
 %%
-%Clear 
+% Clear - Start Toolkit 
 clear; close('all'); clc;
 start_toolkit;
 

@@ -8,7 +8,7 @@
 %   Unload library.
 
 %%
-%Clear 
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 
@@ -39,4 +39,4 @@ disp(['On pump index: ' num2str(PumpIndex)] );
 fprintf('\n');
 
 % Unload library.
-%d.unload
+d.unload

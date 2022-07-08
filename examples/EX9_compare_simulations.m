@@ -6,10 +6,10 @@
 %   Step by step hydraulic analysis.
 %   Step by step quality analysis.
 %   Unload library.
-%   Run time d.getComputedTimeSeries.
+%   Plot various analysis functions results.
 
 %%
-%Clear 
+% Clear - Start Toolkit 
 clear; close('all'); clc;
 start_toolkit;
 

@@ -9,7 +9,7 @@
 
 %% https://github.com/OpenWaterAnalytics/EPANET/wiki/Example-3
 
-%Clear 
+% Clear - Start Toolkit 
 clear; close('all'); clc;
 start_toolkit;
 

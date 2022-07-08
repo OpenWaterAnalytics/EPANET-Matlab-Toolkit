@@ -14,7 +14,7 @@
 % https://github.com/OpenWaterAnalytics/EPANET/blob/a184a3a39a7bf3663943c0504c6c1c2f632f44dd/tests/test_pda.cpp
 
 %%
-% Clear
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 

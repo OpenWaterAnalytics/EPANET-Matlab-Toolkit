@@ -1,14 +1,15 @@
 %% Run a quality analysis using only MSX functions
 %  THE USER HAS TO ADD api to call THE MSX FUNCTIONS e.g., apiMSXsolveH
-%Clear
+
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 % Create EPANET object using the INP file
 inpname='net2-cl2.inp'; %net2-cl2 example
 %% apiMSX
-d=epanet(inpname);
+d = epanet(inpname);
 msxname = [inpname(1:end-4),'.msx'];
-d.MSXMatlabSetup(d, msxname);        
+d.MSXMatlabSetup(msxname);        
 ss=1:d.LinkCount;%index link
 uu=1:d.MSXSpeciesCount;
 value.Quality = cell(1, length(ss));

@@ -4,18 +4,18 @@
 %
 % http://wateranalytics.org/EPANET/_example2.html
 
-%Clear 
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 
 % Create an empty INP file
 testinp = 'TESTING.inp';
-d = epanet(testinp, 'CREATE');
+d = epanet;
 
 % Initialize epanet flow units 
 d.initializeEPANET(d.ToolkitConstants.EN_GPM, d.ToolkitConstants.EN_HW);
 
-%  an elevation of 700 ft and a demand of 0
+% Set an elevation of 700 ft and a demand of 0
 index = d.addNodeJunction('J1');
 d.setNodeJunctionData(index, 700, 0, '');
 d.setNodeCoordinates(index, [0 0])

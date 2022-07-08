@@ -6,7 +6,7 @@
 %   Unload library.
 
 %%
-% Clear
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 
@@ -26,7 +26,6 @@ for i = 1:size(Nidx,1)
     end
 end
 
-A
 
 %   Unload library
 G.unload;

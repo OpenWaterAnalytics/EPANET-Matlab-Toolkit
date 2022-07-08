@@ -9,7 +9,7 @@
 
 %%
 function EX8_tanks_to_reservoirs()
-%Clear 
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 

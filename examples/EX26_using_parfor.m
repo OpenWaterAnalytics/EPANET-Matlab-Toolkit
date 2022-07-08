@@ -8,14 +8,13 @@ try
 catch
 end
 
-d = epanet('Net1.inp');%, 'loadfile'); 
+d = epanet('Net1.inp'); 
 
 clear H;clc;
 
 number_scenarios = 100;
 
 parfor i = 1:number_scenarios
-    loadlibrary('epanet2', 'epanet2.h')
     d.loadEPANETFile(d.TempInpFile);
     
     % set parameters

@@ -10,6 +10,7 @@
 clc;
 clear;
 close all;clear class;
+start_toolkit
 
 % Create EPANET object using the INP file
 inpname='net2-cl2.inp'; %net2-cl2 example
@@ -265,6 +266,7 @@ d.getMSXPatternValue(1,5)
 d.saveMSXFile('testMSX.msx');                                                               
           
 d.saveMSXQualityFile('testMSXQuality.bin')
+d.getComputedHydraulicTimeSeries;
 
 d.saveHydraulicsOutputReportingFile
 d.saveHydraulicFile('testMSXHydraulics.hyd')

@@ -20,7 +20,7 @@
 % https://github.com/OpenWaterAnalytics/EPANET/blob/dev/tests/test_overflow.cpp
 
 %%
-% Clear
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 

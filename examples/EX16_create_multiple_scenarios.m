@@ -1,4 +1,4 @@
-% Creates scenarios based on node count of inp file EPANET.
+%% Creates scenarios based on node count of inp file EPANET.
 % This example contains:
 %   Load a network.
 %   Create scenario parameters.
@@ -14,7 +14,7 @@
 
 %% 
 function CN = EX16_create_multiple_scenarios()
-    % Clear
+    % Clear - Start Toolkit 
     clear; close('all'); clc;
     start_toolkit;
 

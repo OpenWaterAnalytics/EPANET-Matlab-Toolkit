@@ -8,7 +8,7 @@
 %   Unload library.
 
 %%
-% Clear
+% Clear - Start Toolkit
 clear; close('all'); clc;
 start_toolkit;
 
@@ -24,9 +24,9 @@ flowJsonTxt = d.toJson(values.Flow);
 allJsonTxt = d.toJson(values);
 
 % Create json files containing all variables from the analysis.
-d.toJsonFile(values.Flow, 'Flows');
+d.toJsonFile(values.Flow, 'Flows'); % input: value, filename (.json)
 d.toJsonFile(values, 'AllValues');
 
-%   Unload library.
+% Unload library.
 d.unload;
     
