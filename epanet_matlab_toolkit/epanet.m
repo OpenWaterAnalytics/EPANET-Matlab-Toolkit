@@ -6947,17 +6947,22 @@ classdef epanet <handle
         function value = getNodeActualDemandSensingNodes(obj, varargin)
             % Retrieves the computed demand values at some sensing nodes.
             %
-            % Example:
-            %   d.getNodeActualDemandSensingNodes(1)   % Retrieves the computed demand value of the first sensing node
+            % Example 1:
+            %   d.getNodeActualDemandSensingNodes      % Retrieves the computed demand value of the
+            %                                            all the sensing nodes.
+            %
+            % Example 2:
+            %   d.getNodeActualDemandSensingNodes(1)   % Retrieves the computed demand value of the 
+            %                                            first sensing node.
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also getNodeActualDemand, getNodeHydaulicHead, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            value=zeros(1, length(varargin{1}));v=1;
-            for i=varargin{1}
+            [indices, value] = getNodeIndices(obj, varargin);v=1;
+            for i=indices
                 [obj.Errcode, value(v)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);v=v+1;
-                % error(obj.getError(obj.Errcode));
+                error(obj.getError(obj.Errcode));
             end
         end
         function value = getNodeHydaulicHead(obj, varargin)
@@ -7077,7 +7082,6 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET, obj.ph);
-                % error(obj.getError(obj.Errcode));
                 j=j+1;
             end
         end
@@ -13017,7 +13021,6 @@ classdef epanet <handle
             %
             % See also runQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode, tstep] = obj.apiENrunH(obj.LibEPANET, obj.ph);
-            % error(obj.getError(obj.Errcode));
             tstep = double(tstep);
         end
         function tstep = runQualityAnalysis(obj)
@@ -13055,7 +13058,6 @@ classdef epanet <handle
             %
             % See also runQualityAnalysis, closeQualityAnalysis.
             [obj.Errcode, tleft] = obj.apiENstepQ(obj.LibEPANET, obj.ph);
-            % error(obj.getError(obj.Errcode));
         end
         function [Errcode] = saveInputFile(obj, inpname, varargin)
             % Writes all current network input data to a file using the format of an EPANET input file.
