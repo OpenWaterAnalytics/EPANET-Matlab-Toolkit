@@ -381,7 +381,7 @@ newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
 Code='PIPE';
-[errcode]=d.addBinReservoir('S1',x,y,newElevation,newPipeID,...
+[errcode]=d.addBinNodeReservoir('S1',x,y,newElevation,newPipeID,...
 ToNodeID,newLength,newDiameter,newRoughness,Code);
 d.plot('nodes','yes','links','yes');
 
