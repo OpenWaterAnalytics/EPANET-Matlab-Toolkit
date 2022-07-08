@@ -6959,10 +6959,9 @@ classdef epanet <handle
             %
             % See also getNodeActualDemand, getNodeHydaulicHead, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeJunctionIndices(obj, varargin);v=1;
+            [indices, value] = getNodeIndices(obj, varargin);v=1;
             for i=indices
                 [obj.Errcode, value(v)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);v=v+1;
-                error(obj.getError(obj.Errcode));
             end
         end
         function value = getNodeHydaulicHead(obj, varargin)
