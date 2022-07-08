@@ -30,7 +30,7 @@ function [Errcode, count] = apiENgetcount(countcode, LibEPANET, ph)
 ```
 * Help text for all MSX functions 
 * Fix bugs, cleanup, and updates
-* Updated Examples 
+* Transitioned Examples from .m to .mlx 
 
 List of all the examples: https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/tree/master/examples#readme
 
