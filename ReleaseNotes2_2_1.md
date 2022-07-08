@@ -7,7 +7,7 @@
 * The user is now able to use EN and MSX functions explicitily. Api has been added in front of EN and MSX functions (e.g., apiENopen and apiMSΧopen). Check the new examples featuring only apiEN and apiMSX functions:
   * [Toolkit_api_EX1_using_EN_functions](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/dev/examples/Toolkit_api_EX1_using_EN_functions.m)
   * [Toolkit_api_EX2_using_MSX_functions](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/dev/examples/Toolkit_api_EX2_using_MSX_functions.m)
-* Help text for all apiEN and apiMSX functions
+* Help text for all apiEN and apiMSX functions.
 ```
 Help text for apiEN_getcount.
 
@@ -28,9 +28,9 @@ function [Errcode, count] = apiENgetcount(countcode, LibEPANET, ph)
           ------------
 
 ```
-* Help text for all MSX functions 
-* Fix bugs, cleanup, and updates
-* Transitioned Examples from .m to .mlx 
+* Help text for all MSX functions. 
+* Fix bugs, cleanup, and updates.
+* Transitioned Examples to Live Code File Format (.mlx). 
 
 List of all the examples: https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/tree/master/examples#readme
 
