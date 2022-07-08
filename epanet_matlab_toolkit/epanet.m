@@ -4375,7 +4375,7 @@ classdef epanet <handle
             end
             %Open the file
             [obj.Errcode] = obj.apiMSXopen(obj);
-            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
+            if obj.Errcode, warning(obj.getMSXError(obj.Errcode)); end
             obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
             obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
             obj.MSXEquationsTanks = obj.getMSXEquationsTanks;

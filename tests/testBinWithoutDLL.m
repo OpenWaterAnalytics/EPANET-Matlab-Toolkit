@@ -344,7 +344,7 @@ newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
 Code='PIPE';
-d.addBinNodeJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,...
+errcode=d.addBinNodeJunction(newID,[x,y],newElevation,newBaseDemand,newDemandPattern,'1', 0.5, newPipeID,...
 ToNodeID,newLength,newDiameter,newRoughness,Code);
 
 % [errcode]=addBinPipe(newLink,fromNode,toNode,newLength,newDiameter,newRoughness)
