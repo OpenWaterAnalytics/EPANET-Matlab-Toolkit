@@ -710,11 +710,7 @@ classdef epanet <handle
                 if ~isempty(varargin), return; end
             end
             if libisloaded(LibEPANET)
-                try 
-                    [~, obj.Version] = calllib(LibEPANET, 'ENgetversion', 0);
-                catch
-                    [~, obj.Version]= calllib(LibEPANET, 'EN_getversion', 0);
-                end
+                [~, obj.Version] = calllib(LibEPANET, 'ENgetversion', 0);
                 LibEPANETString = ['EPANET version {', num2str(obj.Version), '} loaded'];
                 fprintf(LibEPANETString);
             else
@@ -4432,6 +4428,11 @@ classdef epanet <handle
             % Load epanet file when use bin functions.
             % Example:
             %   d.loadEPANETFile(d.TempInpFile);
+            if isunix
+                loadlibrary(obj.LibEPANET, [obj.LibEPANETpath, obj.LibEPANET, '.h']);
+            else
+                loadlibrary([obj.LibEPANETpath, obj.LibEPANET], [obj.LibEPANETpath, obj.LibEPANET, '.h']);
+            end
             obj.solve = 0;
             if nargin==2
                 [Errcode] = obj.apiENopen(varargin{1}, [varargin{1}(1:end-4), '.txt'], [varargin{1}(1:end-4), '.bin'], obj.LibEPANET, obj.ph);
