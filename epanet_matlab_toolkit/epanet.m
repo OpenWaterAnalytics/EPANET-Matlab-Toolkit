@@ -1,5 +1,5 @@
 classdef epanet <handle
-    %EPANET-Matlab Toolkit version dev2.2: A Matlab Class for EPANET and EPANET-MSX
+    %EPANET-Matlab Toolkit version EMT v2.2.1: A Matlab Class for EPANET and EPANET-MSX
     %libraries
     %
     %
@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.003'; % 02/06/2022
+        classversion='v2.2.1'; % 08/07/2022
 
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -22762,10 +22762,10 @@ function [axesid] = plotnet(obj, varargin)
              hh=strfind(highlightlinkindex, i);
 
              if length(hh) && ~isempty(selectColorLink)
-                 line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', [.5 .5 .5], 'Parent', axesid);
+                 line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', .5, 'Color', [.5 .5 .5], 'Parent', axesid);
              end
              if ~length(hh)
-                 h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Parent', axesid);
+                 h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', .5, 'Parent', axesid);
                  if ~l(1), legendIndices = [legendIndices 1]; l(1)=1; end
              end
 
@@ -22775,13 +22775,13 @@ function [axesid] = plotnet(obj, varargin)
                  if length(hh) && isempty(selectColorLink)
                      colornode = 'r';
                  end
-                 h(:, 2)=plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 2, 'MarkerEdgeColor', 'm', ...
+                 h(:, 2)=plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 1.5, 'MarkerEdgeColor', 'm', ...
                      'MarkerFaceColor', 'm', ...
-                     'MarkerSize', 5, 'Parent', axesid);
+                     'MarkerSize', 4.5, 'Parent', axesid);
                  if ~l(2), legendIndices = [legendIndices 2]; l(2)=1; end
-                 plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                 plot((x1+x2)/2, (y1+y2)/2, 'mv', 'LineWidth', 1.5, 'MarkerEdgeColor', colornode, ...
                      'MarkerFaceColor', colornode, ...
-                     'MarkerSize', 5, 'Parent', axesid);
+                     'MarkerSize', 4.5, 'Parent', axesid);
              end
 
              % Plot Valves
@@ -22792,13 +22792,13 @@ function [axesid] = plotnet(obj, varargin)
                  end
                  % Check for vertices
                  if (isempty(v.nodecoords{3}{i}))
-                     h(:, 3)=plot((x1+x2)/2, (y1+y2)/2, 'k*', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
-                         'MarkerFaceColor', colornode, 'MarkerSize', 10, 'Parent', axesid);
+                     h(:, 3)=plot((x1+x2)/2, (y1+y2)/2, 'k*', 'LineWidth', 1.5, 'MarkerEdgeColor', colornode, ...
+                         'MarkerFaceColor', colornode, 'MarkerSize', 7, 'Parent', axesid);
                  else
                      xPos = v.nodecoords{3}{i}(ceil(end/2));
                      yPos = v.nodecoords{4}{i}(ceil(end/2));
-                     h(:, 3)=plot(xPos, yPos, 'k*', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
-                         'MarkerFaceColor', colornode, 'MarkerSize', 10, 'Parent', axesid);
+                     h(:, 3)=plot(xPos, yPos, 'k*', 'LineWidth', 1.5, 'MarkerEdgeColor', colornode, ...
+                         'MarkerFaceColor', colornode, 'MarkerSize', 7, 'Parent', axesid);
                  end
                  if ~l(3), legendIndices = [legendIndices 3]; l(3)=1; end
              end
@@ -22843,9 +22843,9 @@ function [axesid] = plotnet(obj, varargin)
 
              hh=strfind(highlightnodeindex, i);
              if ~length(hh)
-                 h(:, 4)=plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', 'b', ...
+                 h(:, 4)=plot(x, y, 'o', 'LineWidth', 1.5, 'MarkerEdgeColor', 'b', ...
                  'MarkerFaceColor', 'b', ...
-                 'MarkerSize', 5, 'Parent', axesid);
+                 'MarkerSize', 2.5, 'Parent', axesid);
                  if ~l(4), legendIndices = [legendIndices 4]; l(4)=1; end
              end
 
@@ -22855,13 +22855,13 @@ function [axesid] = plotnet(obj, varargin)
                  if length(hh) && isempty(selectColorNode)
                      colornode = 'r';
                  end
-                 h(:, 5)=plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', 'g', ...
+                 h(:, 5)=plot(x, y, 's', 'LineWidth', 1.5, 'MarkerEdgeColor', 'g', ...
                      'MarkerFaceColor', 'g', ...
-                     'MarkerSize', 13, 'Parent', axesid);
+                     'MarkerSize', 9, 'Parent', axesid);
                  if ~l(5), legendIndices = [legendIndices 5]; l(5)=1; end
-                 plot(x, y, 's', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                 plot(x, y, 's', 'LineWidth', 1.5, 'MarkerEdgeColor', colornode, ...
                      'MarkerFaceColor', colornode, ...
-                     'MarkerSize', 13, 'Parent', axesid);
+                     'MarkerSize', 9, 'Parent', axesid);
              end
              % Plot Tanks
              if sum(strfind(v.tankindex, i))
@@ -22871,14 +22871,14 @@ function [axesid] = plotnet(obj, varargin)
                  elseif length(hh) && ~isempty(selectColorNode)
                      colornode= 'c';
                  end
-                 h(:, 6)=plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', 'c', ...
+                 h(:, 6)=plot(x, y, 'p', 'LineWidth', 1.5, 'MarkerEdgeColor', 'c', ...
                      'MarkerFaceColor', 'c', ...
-                     'MarkerSize', 16, 'Parent', axesid);
+                     'MarkerSize', 11, 'Parent', axesid);
                  if ~l(6), legendIndices = [legendIndices 6]; l(6)=1; end
 
-                 plot(x, y, 'p', 'LineWidth', 2, 'MarkerEdgeColor', colornode, ...
+                 plot(x, y, 'p', 'LineWidth', 1.5, 'MarkerEdgeColor', colornode, ...
                      'MarkerFaceColor', colornode, ...
-                     'MarkerSize', 16, 'Parent', axesid);
+                     'MarkerSize', 11, 'Parent', axesid);
              end
 
              if length(hh) && isempty(selectColorNode)
