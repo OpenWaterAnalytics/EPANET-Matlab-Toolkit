@@ -15784,7 +15784,7 @@ classdef epanet <handle
                 return
             end
             parameter=['Quality            	Trace ', varargin{1}];
-            [Errcode]=setBinParam(indexParameter, parameter, sections);
+            [Errcode]=setBinParam(obj, indexParameter, parameter, sections);
         end
         function [Errcode]=setBinTimeSimulationDuration(obj, varargin)
             parameter=varargin{1};
@@ -16086,7 +16086,7 @@ classdef epanet <handle
             v=obj.getBinPatternsInfo;
             patterns=v.BinPatternNameID;
             if sum(strcmp(idpattern, patterns))
-                Errcode=setBinParam( idpattern, values, sections);
+                Errcode=setBinParam(obj, idpattern, values, sections);
             else
                 warning('Invalid argument found.');Errcode=-1;
                 return
@@ -16882,19 +16882,19 @@ classdef epanet <handle
         function [Errcode]=addBinValveGPV(obj, newLink, fromNode, toNode, diameter, setting)
             [Errcode]=addLink(obj, 8, newLink, fromNode, toNode, diameter, setting); % General Purpose Valve
         end
-        function [Errcode]=addBinCurvePump(newCurveID, varargin)
+        function [Errcode]=addBinCurvePump(obj, newCurveID, varargin)
             CurveX=varargin{1};
             CurveY=varargin{2};
-            [Errcode]= addBinCurve(newCurveID, CurveX, CurveY, 0);  %ID Flow-OptionsHeadloss
+            [Errcode]= addBinCurve(obj, newCurveID, CurveX, CurveY, 0);  %ID Flow-OptionsHeadloss
         end
-        function [Errcode]=addBinCurveEfficiency(newCurveID, CurveX, CurveY)
-            [Errcode]= addBinCurve(newCurveID, CurveX, CurveY, 1);  %ID Flow-Efficiency
+        function [Errcode]=addBinCurveEfficiency(obj, newCurveID, CurveX, CurveY)
+            [Errcode]= addBinCurve(obj, newCurveID, CurveX, CurveY, 1);  %ID Flow-Efficiency
         end
-        function [Errcode]=addBinCurveVolume(newCurveID, CurveX, CurveY)
-            [Errcode]= addBinCurve(newCurveID, CurveX, CurveY, 2);  %ID Heigh-Volume
+        function [Errcode]=addBinCurveVolume(obj, newCurveID, CurveX, CurveY)
+            [Errcode]= addBinCurve(obj, newCurveID, CurveX, CurveY, 2);  %ID Heigh-Volume
         end
-        function [Errcode]=addBinCurveHeadloss(newCurveID, CurveX, CurveY)
-            [Errcode]= addBinCurve(newCurveID, CurveX, CurveY, 3);  %ID Flow-OptionsHeadloss
+        function [Errcode]=addBinCurveHeadloss(obj, newCurveID, CurveX, CurveY)
+            [Errcode]= addBinCurve(obj, newCurveID, CurveX, CurveY, 3);  %ID Flow-OptionsHeadloss
         end
         function [Errcode]=addBinControl(obj, x, status, y_t_c, param, z, varargin)
             if nargin==6
@@ -16908,7 +16908,7 @@ classdef epanet <handle
             end
         end
         function [Errcode]=removeBinNodeID(obj, NodeID)
-            [Errcode]=rmNode(obj, NodeID);
+            [Errcode] = rmNode(obj, NodeID);
         end
         function [Errcode]=removeBinCurveID(obj, CurveID)
             [Errcode]=rmCurveID(obj, CurveID);
@@ -17011,7 +17011,7 @@ classdef epanet <handle
             end
             zz=abs(obj.BinLinkPumpCount+1+obj.BinLinkValveCount-obj.BinCountStatuslines);
             sections={'[STATUS]', '[PATTERNS]', 'pump'};
-            [Errcode]=setBinParam2( parameter, sections, zz);
+            [Errcode] = setBinParam2(obj, parameter, sections, zz);
         end
         function [Errcode]=setBinLinkPipesParameters(obj, varargin)
             % Initiality
@@ -19699,7 +19699,7 @@ function value = getBinParam(obj, sections, varargin)
     end
     warning on;
  end
-function [Errcode]= addBinCurve(newCurveID, varargin)
+function [Errcode]= addBinCurve(obj, newCurveID, varargin)
      v=obj.getBinCurvesInfo;Errcode=0;
      CurveX=varargin{1};
      CurveY=varargin{2};
