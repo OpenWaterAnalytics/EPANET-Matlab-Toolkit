@@ -3,10 +3,8 @@
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints, 
 % indicated with a short dash (-) on the left of each line number.
-clc;
-clear;
-close all;
-clear class;
+clc; clear; close all; clear class;
+start_toolkit;
 
 % Create EPANET object using the INP file
 inpname='Net1.inp'; 
@@ -344,7 +342,7 @@ newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
 Code='PIPE';
-d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,...
+errcode=d.addBinNodeJunction(newID,[x,y],newElevation,newBaseDemand,newDemandPattern,'1', 0.5, newPipeID,...
 ToNodeID,newLength,newDiameter,newRoughness,Code);
 
 % [errcode]=addBinPipe(newLink,fromNode,toNode,newLength,newDiameter,newRoughness)
@@ -352,7 +350,7 @@ ToNodeID,newLength,newDiameter,newRoughness,Code);
 d.Binplot('nodes','yes','links','yes');
 
 % Add Reservoir + pipe
-newID='S1';
+newID ='S1';
 [x,y]=ginput(1);
 newElevation=500; %ft
 ToNodeID='10'; 
@@ -360,28 +358,19 @@ newPipeID='P3';
 newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
-Code='PIPE';
-[errcode]=d.addBinReservoir('S1',x,y,newElevation,newPipeID,...
-ToNodeID,newLength,newDiameter,newRoughness,Code);
+newNodeIndex = d.addBinNodeReservoir(newID,[x,y],newElevation)
+newlinkIndex = d.addBinLinkPipe(newPipeID, newID, ToNodeID, newLength,newDiameter,newRoughness)
 d.Binplot('nodes','yes','links','yes');
 
 % Add Tank + pipe
 [x,y]=ginput(1);
-MaxLevel=20;
-Diameter=50;
-Initlevel=10;
-newElevation=500;
-initqual=0;
-MinLevel=0;
-MinVol=0;
 newPipeID='P4';
 ToNodeID='32'; 
 newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
-Code='PIPE';
-d.addBinTank('T1',x,y,MaxLevel,Diameter,Initlevel,newElevation,initqual,MinLevel,MinVol,newPipeID,...
-ToNodeID,newLength,newDiameter,newRoughness,Code);
+newNodeIndex = d.addBinNodeTank('T1',[x,y]); % Add tank with default settings.
+newlinkIndex = d.addBinLinkPipe(newPipeID, 'T1', ToNodeID, newLength,newDiameter,newRoughness);
 d.Binplot('nodes','yes','links','yes');
 
 % Remove Tank
@@ -390,8 +379,6 @@ d.Binplot('nodes','yes','links','yes');
 
 d.addBinPipe('pp1','23','32',1000,10,100);
 d.Binplot('nodes','yes','highlightlink',{'pp1'},'fontsize',8);
-disp('Press any key to continue...')
-%pause
 
 % PUMP
 % Add junction + pump
@@ -403,13 +390,9 @@ newElevation=500; %ft
 newBaseDemand=0;
 newDemandPattern='1';
 newPumpID='PU1';
-Code='PUMP';
-newCurveIDofPump='C-1'; 
-newCurveXvalue=1500;
-newCurveYvalue=250;
-newCurveType='PUMP'; % PUMP, EFFICIENCY, VOLUME, HEADLOSS            
-d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPumpID,...
-ToNodeID,newCurveIDofPump,newCurveXvalue,newCurveYvalue,newCurveType,'PUMP');
+newCurveType='PUMP'; % PUMP, EFFICIENCY, VOLUME, HEADLOSS           
+newNodeIndex = d.addBinNodeJunction(newID,[x,y],newElevation,newBaseDemand,newDemandPattern,'1', 0);
+newlinkIndex = d.addBinLinkPump(newPumpID, newID, ToNodeID);
 d.Binplot('nodes','yes','highlightlink',{'PU1'},'fontsize',10);
 
 % Add Reservoir + pump
@@ -418,12 +401,8 @@ newID='S2';
 newElevation=500; %ft
 ToNodeID='11'; 
 newPumpID='PU2';
-Code='PUMP';
-newCurveIDofPump='C-1n'; 
-newCurveXvalue=1500;
-newCurveYvalue=250;
-[errcode]=d.addBinReservoir(newID,x,y,newElevation,newPumpID,...
-ToNodeID,newCurveIDofPump,newCurveXvalue,newCurveYvalue,newCurveType,Code);
+newNodeIndex = d.addBinNodeReservoir(newID,[x,y],newElevation)
+newlinkIndex = d.addBinLinkPump(newPumpID, newID, ToNodeID)
 d.Binplot('nodes','yes','highlightlink',{'PU2'},'fontsize',10);
 % Remove reservoir S1 AND S2
 [errcode]=d.removeBinNodeID('S1');
@@ -433,21 +412,14 @@ d.Binplot('nodes','yes','links','yes');
 % Add Tank + pump
 newID='T2';
 [x,y]=ginput(1);
-MaxLevel=20;
-Diameter=50;
-Initlevel=10;
-newElevation=500;
-initqual=0;
-MinLevel=0;
-MinVol=0;
 newPumpID='PU3';
 ToNodeID='32'; 
 Code='PUMP';
 newCurveIDofPump='C-1n2'; 
 newCurveXvalue=[1500 1800 2000];
 newCurveYvalue=[250 200 0];
-d.addBinTank(newID,x,y,MaxLevel,Diameter,Initlevel,newElevation,initqual,MinLevel,MinVol,newPumpID,...
-ToNodeID,newCurveIDofPump,newCurveXvalue,newCurveYvalue,newCurveType,Code);
+newNodeIndex = d.addBinNodeTank(newID,[x,y]); % Add tank with default settings.
+newlinkIndex = d.addBinLinkPump(newPipeID, newID, ToNodeID);
 d.Binplot('nodes','yes','links','yes');
 
 % add pump and add curve
@@ -468,10 +440,10 @@ newBaseDemand=0;
 newDemandPattern='1';
 newValveID='V1prv'; 
 newValveDiameter=100; 
-Code='PRV'; 
+Type ='PRV'; 
 newValveSetting=15; 
-d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newValveID,...
-ToNodeID,newValveDiameter,newValveSetting,Code);
+newNodeIndex = d.addBinNodeJunction(newID,[x,y],newElevation,newBaseDemand,newDemandPattern,'1', 0)
+newValveIndex = d.addBinLinkValve(newValveID, newID, ToNodeID, Type, newValveDiameter, newValveSetting) 
 d.Binplot('nodes','yes','highlightlink',{'V1prv'},'fontsize',10);
 
 % Add Reservoir + PSV
@@ -481,10 +453,10 @@ newElevation=500; %ft
 ToNodeID='11'; 
 newValveID='V2psv'; 
 newValveDiameter=100; 
-Code='PSV'; 
+Type ='PSV'; 
 newValveSetting=15; 
-d.addBinReservoir(newID,x,y,newElevation,newValveID,...
-ToNodeID,newValveDiameter,newValveSetting,Code);
+newNodeIndex = d.addBinNodeReservoir(newID,[x,y])
+newValveIndex = d.addBinLinkValve(newValveID, newID, ToNodeID, Type, newValveDiameter, newValveSetting) 
 d.Binplot('nodes','yes','highlightlink',{'V2psv'},'fontsize',10);
 d.removeBinNodeID('S3');
     
@@ -502,8 +474,8 @@ newValveID='V3pbv';
 newValveDiameter=100; 
 Code='PBV'; 
 newValveSetting=15; 
-d.addBinTank(newID,x,y,MaxLevel,Diameter,Initlevel,newElevation,initqual,MinLevel,MinVol,newValveID,...
-ToNodeID,newValveDiameter,newValveSetting,Code);
+newNodeIndex = d.addBinNodeTank(newID,[x,y]) % Add tank with default settings.
+newValveIndex = d.addBinLinkValve(newValveID, newID, ToNodeID, Type, newValveDiameter, newValveSetting) 
 d.Binplot('nodes','yes','links','yes');
 disp('Press any key to continue...')
 pause

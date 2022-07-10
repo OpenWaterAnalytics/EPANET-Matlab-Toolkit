@@ -3,10 +3,8 @@
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints, 
 % indicated with a short dash (-) on the left of each line number.
-clc;
-clear;
-close all;
-clear class;
+clc; clear; close all; clear class;
+start_toolkit;
 
 % Create EPANET object using the INP file
 inpname='Net1.inp';
@@ -309,10 +307,10 @@ errcode=d.setBinNodeTankParameters('elevation',tankElevation,'initlevel',tankIni
     tankMixModel=d.getNodeTankMixingModelType
     tankMixModel{end}='2Comp'; % Constants for mixing models: 'MIX1','2Comp', 'FIFO','LIFO' (2Comp=MIX2)
 
-    tankMixFraction=d.getNodeTankMinimumFraction
+    tankMixFraction=d.getNodeTankMixingFraction
     tankMixFraction(end)=2;
     errcode=d.setBinNodeTankParameters('mixmodel',tankMixModel,'mixfraction',tankMixFraction); % Bug on mixfraction
-    d.getNodeTankMinimumFraction
+    d.getNodeTankMixingFraction
     d.getNodeTankMixingModelType
     disp('Press any key to continue...')
     pause
@@ -361,8 +359,9 @@ newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
 Code='PIPE';
-errcode=d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPipeID,...
+errcode=d.addBinNodeJunction(newID,[x,y],newElevation,newBaseDemand,newDemandPattern,'1', 0.5, newPipeID,...
 ToNodeID,newLength,newDiameter,newRoughness,Code);
+   
 
 % [errcode]=addBinPipe(newLink,fromNode,toNode,newLength,newDiameter,newRoughness)
 [errcode]=d.addBinPipe('P2','J1','31',1000,10,100);
@@ -379,28 +378,21 @@ newPipeID='P3';
 newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
-Code='PIPE';
-[errcode]=d.addBinReservoir('S1',x,y,newElevation,newPipeID,...
-ToNodeID,newLength,newDiameter,newRoughness,Code);
+
+newNodeIndex = d.addBinNodeReservoir(newID,[x,y],newElevation)
+newlinkIndex = d.addBinLinkPipe(newPipeID, newID, ToNodeID, newLength,newDiameter,newRoughness)
 d.plot('nodes','yes','links','yes');
 
 % Add Tank + pipe
 [x,y]=ginput(1);
-MaxLevel=20;
-Diameter=50;
-Initlevel=10;
-newElevation=500;
-initqual=0;
-MinLevel=0;
-MinVol=0;
 newPipeID='P4';
-ToNodeID='32'; 
+ToNodeID='32';  
 newLength=1000; %ft
 newDiameter=10; %in
 newRoughness=100;
-Code='PIPE';
-errcode=d.addBinTank('T1',x,y,MaxLevel,Diameter,Initlevel,newElevation,initqual,MinLevel,MinVol,newPipeID,...
-ToNodeID,newLength,newDiameter,newRoughness,Code);
+newNodeIndex = d.addBinNodeTank('T1',[x,y]); % Add tank with default settings.
+newlinkIndex = d.addBinLinkPipe(newPipeID, 'T1', ToNodeID, newLength,newDiameter,newRoughness);
+
 d.plot('nodes','yes','links','yes');
 
 % Remove Tank
@@ -409,10 +401,8 @@ d.plot('nodes','yes','links','yes');
 
 errcode=d.addBinPipe('pp1','23','32',1000,10,100);
 d.plot('nodes','yes','highlightlink',{'pp1'},'fontsize',8);
-disp('Press any key to continue...')
-%pause
 
-% PUMP
+%% PUMP
 % Add junction + pump
 d.Binplot;
 newID='J2';
@@ -427,9 +417,10 @@ newCurveIDofPump='C-1';
 newCurveXvalue=1500;
 newCurveYvalue=250;
 newCurveType='PUMP'; % PUMP, EFFICIENCY, VOLUME, HEADLOSS            
-errcode=d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newPumpID,...
-ToNodeID,newCurveIDofPump,newCurveXvalue,newCurveYvalue,newCurveType,'PUMP');
+newNodeIndex = d.addBinNodeJunction(newID,[x,y],newElevation,newBaseDemand,newDemandPattern,'1', 0);
+newlinkIndex = d.addBinLinkPump(newPumpID, newID, ToNodeID);
 d.Binplot('nodes','yes','highlightlink',{'PU1'},'fontsize',10);
+
 
 % Add Reservoir + pump
 newID='S2';
@@ -437,49 +428,37 @@ newID='S2';
 newElevation=500; %ft
 ToNodeID='11'; 
 newPumpID='PU2';
-Code='PUMP';
-newCurveIDofPump='C-1n'; 
-newCurveXvalue=1500;
-newCurveYvalue=250;
-[errcode]=d.addBinReservoir(newID,x,y,newElevation,newPumpID,...
-ToNodeID,newCurveIDofPump,newCurveXvalue,newCurveYvalue,newCurveType,Code);
+newNodeIndex = d.addBinNodeReservoir(newID,[x,y],newElevation)
+newlinkIndex = d.addBinLinkPump(newPumpID, newID, ToNodeID)
 d.Binplot('nodes','yes','highlightlink',{'PU2'},'fontsize',10);
-% Remove reservoir S1 AND S2
-[errcode]=d.removeBinNodeID('S1');
-[errcode]=d.removeBinNodeID('S2');
-d.plot('nodes','yes','links','yes');
 
 % Add Tank + pump
 newID='T2';
 [x,y]=ginput(1);
-MaxLevel=20;
-Diameter=50;
-Initlevel=10;
-newElevation=500;
-initqual=0;
-MinLevel=0;
-MinVol=0;
 newPumpID='PU3';
 ToNodeID='32'; 
-Code='PUMP';
 newCurveIDofPump='C-1n2'; 
 newCurveXvalue=[1500 1800 2000];
 newCurveYvalue=[250 200 0];
-errcode=d.addBinTank(newID,x,y,MaxLevel,Diameter,Initlevel,newElevation,initqual,MinLevel,MinVol,newPumpID,...
-ToNodeID,newCurveIDofPump,newCurveXvalue,newCurveYvalue,newCurveType,Code);
-d.plot('nodes','yes','links','yes');
+newNodeIndex = d.addBinNodeTank(newID,[x,y]); % Add tank with default settings.
+newlinkIndex = d.addBinLinkPump(newPipeID, newID, ToNodeID);
+
+d.Binplot('nodes','yes','links','yes');
 
 % add pump and add curve
-errcode=d.addBinPump('PUMP1','21','32','C-2',1955,250,'PUMP') % CurveType: PUMP, EFFICIENCY, VOLUME, HEADLOSS            
+errcode=d.addBinLinkPump('PUMP1','21','32','C-2',1955,250,'PUMP') % CurveType: PUMP, EFFICIENCY, VOLUME, HEADLOSS            
 power=18;
-errcode=d.addBinPump('PUMP2','12','23',power) % POWER PUMP        
-d.plot('nodes','yes','highlightlink',{'PUMP1','PUMP2'},'fontsize',10);
+errcode=d.addBinLinkPump('PUMP2','12','23',power) % POWER PUMP        
+d.Binplot;
 
 
+d=epanet(inpname)
+close all;
+d.BinUpdateClass;
 % VALVE ['PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV']
 % Add junction + PRV (any valve)
-d.Binplot;
 newID='J3';
+d.Binplot;
 [x,y]=ginput(1);
 ToNodeID='10'; 
 newElevation=500; %ft
@@ -487,27 +466,25 @@ newBaseDemand=0;
 newDemandPattern='1';
 newValveID='V1prv'; 
 newValveDiameter=100; 
-Code='PRV'; 
+Type = 'PRV'; 
 newValveSetting=15; 
-errcode=d.addBinJunction(newID,x,y,newElevation,newBaseDemand,newDemandPattern,newValveID,...
-ToNodeID,newValveDiameter,newValveSetting,Code);
+newNodeIndex = d.addBinNodeJunction(newID,[x,y],newElevation,newBaseDemand,newDemandPattern,'1', 0);
+newValveIndex = d.addBinLinkValve(newValveID, newID, ToNodeID, Type, newValveDiameter, newValveSetting) 
+
 d.Binplot('nodes','yes','highlightlink',{'V1prv'},'fontsize',10);
 
 % Add Reservoir + PSV
 newID='S3';
 [x,y]=ginput(1);
-newElevation=500; %ft
 ToNodeID='11'; 
 newValveID='V2psv'; 
-newValveDiameter=100; 
-Code='PSV'; 
+newValveDiameter=100
+Type ='PSV'; 
 newValveSetting=15; 
-[errcode]=d.addBinReservoir(newID,x,y,newElevation,newValveID,...
-ToNodeID,newValveDiameter,newValveSetting,Code);
+newNodeIndex = d.addBinNodeReservoir(newID,[x,y])
+newValveIndex = d.addBinLinkValve(newValveID, newID, ToNodeID, Type, newValveDiameter, newValveSetting) 
+
 d.Binplot('nodes','yes','highlightlink',{'V2psv'},'fontsize',10);
-if errcode
-    [errcode]=d.removeBinNodeID('S3');
-end
 
 % Add Tank + PBV
 newID='T3';
@@ -521,25 +498,23 @@ MinLevel=0;
 MinVol=0;
 newValveID='V3pbv'; 
 newValveDiameter=100; 
-Code='PBV'; 
+Type = 'PBV'; 
 newValveSetting=15; 
-errcode=d.addBinTank(newID,x,y,MaxLevel,Diameter,Initlevel,newElevation,initqual,MinLevel,MinVol,newValveID,...
-ToNodeID,newValveDiameter,newValveSetting,Code);
-d.plot('nodes','yes','links','yes');
+newNodeIndex = d.addBinNodeTank(newID,[x,y]) % Add tank with default settings.
+newValveIndex = d.addBinLinkValve(newValveID, newID, ToNodeID, Type, newValveDiameter, newValveSetting) 
+d.Binplot('nodes','yes','links','yes');
 disp('Press any key to continue...')
 pause
-
 
 %% Remove NODE, LINK - functions
 % Remove node
 [errcode]=d.removeBinNodeID('J3');
-[errcode]=d.removeBinNodeID('T3');
-d.plot('nodes','yes','links','yes');
+d.Binplot('nodes','yes','links','yes');
 
 % Remove Link
-d.plot('highlightlink',{'121'})
+d.Binplot('highlightlink',{'121'})
 errcode=d.removeBinLinkID('121')
-d.plot('nodes','yes','highlightlink',{'PUMP1','PU1'},'fontsize',10);
+d.Binplot('nodes','yes','highlightlink',{'PUMP1','PU1'},'fontsize',10);
 errcode=d.removeBinLinkID('PUMP1')
 errcode=d.removeBinLinkID('PU1');d.Binplot('nodes','yes','links','yes');
 %Warning: Node J2 disconnected. 
@@ -551,22 +526,22 @@ toNode='J2';
 fromNode='22';
 newValveDiameter=110;
 newValveSetting=10; 
-errcode=d.addBinValvePRV(newValveID,fromNode,toNode,newValveDiameter,newValveSetting);
-d.plot('nodes','yes','links','yes','highlightlink',{'V1'},'highlightnode',{'J1'})
+errcode = d.addBinValvePRV(newValveID,fromNode,toNode,newValveDiameter,newValveSetting);
+d.Binplot('nodes','yes','links','yes','highlightlink',{'V1'},'highlightnode',{'J1'})
 errcode=d.removeBinNodeID('J1');
-d.plot('nodes','yes','links','yes');
+d.Binplot('nodes','yes','links','yes');
 %PSV 
 errcode=d.addBinValvePSV('V2','32','10',newValveDiameter,newValveSetting);
-d.plot('nodes','yes','highlightlink',{'V2','V1'},'fontsize',8);
+d.Binplot('nodes','yes','highlightlink',{'V2','V1'},'fontsize',8);
 %PBV
 errcode=d.addBinValvePBV('V3','12','23',newValveDiameter,newValveSetting);
-d.plot('nodes','yes','highlightlink',{'V3'},'fontsize',8);
+d.Binplot('nodes','yes','highlightlink',{'V3'},'fontsize',8);
 % FCV
 errcode=d.addBinValveFCV('V4','21','10',newValveDiameter,newValveSetting);
-d.plot('nodes','yes','highlightlink',{'V4'},'fontsize',8);
+d.Binplot('nodes','yes','highlightlink',{'V4'},'fontsize',8);
 %TCV
 errcode=d.addBinValveTCV('V5','32','13',newValveDiameter,newValveSetting);
-d.plot('nodes','yes','highlightlink',{'V5'},'fontsize',8);
+d.Binplot('nodes','yes','highlightlink',{'V5'},'fontsize',8);
 d.getBinComputedAllParameters  %"Run was unsuccessful."
 d.getComputedHydraulicTimeSeries
 % %GPV
@@ -575,7 +550,7 @@ if errcode
     d.Binplot('nodes','yes','highlightlink',{'V6'},'fontsize',8);
     errcode=d.removeBinLinkID('V6');
 end
-d.plot;
+d.Binplot;
 disp('Press any key to continue...')
 pause
 close all;
@@ -631,7 +606,7 @@ pause
 
 %% GET, SET Initial Quality 
 % SECTION [QUALITY]
-d.BinUpdateClass
+% d.BinUpdateClass
 p=d.BinNodeInitialQuality;
 p(end)=1;
 errcode=d.setBinNodeInitialQuality(p)
@@ -641,6 +616,9 @@ pause
 
 
 
+close all;
+d = epanet(inpname)
+d.BinUpdateClass;
 %% GET, SET OPTIONS
 % SECTION [OPTIONS]
 d.getBinOptionsInfo
@@ -717,8 +695,7 @@ errcode=d.addBinCurveEfficiency('C-2n',[1500 1800 2000],[250 200 0])%Flow-Effici
 errcode=d.addBinCurveVolume('C33',[1500 1800 2000],[250 200 0])%Heigh-Volume
 errcode=d.addBinCurveHeadloss('C44',[1500 1800 2000],[250 200 0])%Flow-Headloss
 d.getBinCurvesInfo
-errcode=d.removeBinCurveID('C-1');
-errcode=d.removeBinLinkID('PU3');
+errcode=d.removeBinCurveID('C-1n3');
 d.getBinCurvesInfo
 % warning Flow & Heigh
 errcode=d.addBinCurvePump('C-11',[2000 1500 1800],[250 200 0])
@@ -907,7 +884,6 @@ d.getBinComputedAllParameters
 
 disp('Press any key to continue...')
 pause
-
 
 %% OTHER PROPERTIES
 d.BinUpdateClass

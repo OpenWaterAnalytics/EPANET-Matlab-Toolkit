@@ -3,9 +3,8 @@
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints,  
 % indicated with a short dash (-) on the left of each line number.
-clc;
-clear;
-close all;
+clc; clear; close all; clear class;
+start_toolkit;
 
 % Create EPANET object using the INP file
 inpname='Net1.inp';  
@@ -77,8 +76,8 @@ d.getLinkStatus(2)
 d.getLinkSettings
 d.getLinkSettings(2)
 
-% d.getLinkQuality    % bug in epanet
-% d.getLinkQuality(2)
+d.getLinkQuality    
+d.getLinkQuality(2)
 
 %% Set links info
 d.getLinkDiameter
@@ -154,5 +153,5 @@ d.getLinkSettings(2)
 d.setLinkSettings(2, 121)
 d.getLinkSettings(2)
 
-d.unload
+% d.unload
 fprintf('Test finished.\n')

@@ -3,9 +3,8 @@
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints,  
 % indicated with a short dash (-) on the left of each line number.
-clc;
-clear;
-close all;
+clc; clear; close all; clear class;
+start_toolkit;
 
 % Create EPANET object using the INP file
 inpname='Net1.inp';  

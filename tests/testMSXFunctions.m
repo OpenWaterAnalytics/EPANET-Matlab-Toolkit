@@ -6,13 +6,11 @@
 
 % Execute "addpath(genpath(pwd))" in main folder before running this, to load all EPANET
 % functions
-
-clc;
-clear;
-close all;clear class;
+clc; clear; close all; clear class;
+start_toolkit;
 
 % Create EPANET object using the INP file
-inpname='example.inp'; %net2-cl2 example
+inpname='net2-cl2.inp'; %net2-cl2 example
 
 %% MSX Functions
 d=epanet(inpname);
@@ -232,16 +230,16 @@ end
 
 %% QUALITY
 values = d.getMSXLinkInitqualValue
-nodeIndex=1; speciesIndex=1;
-values{nodeIndex}(speciesIndex)=1000;%
+linkIndex=1; speciesIndex=1;
+values{linkIndex}(speciesIndex)=1000;
 d.setMSXLinkInitqualValue(values)     
 d.getMSXLinkInitqualValue 
 disp('Press any key to continue...')
 pause
 
-linkIndex=1; speciesIndex=1;
+nodeIndex=1; speciesIndex=1;
 values = d.getMSXNodeInitqualValue
-values{linkIndex}(speciesIndex)=1500;%
+values{nodeIndex}(speciesIndex)=1500;
 d.setMSXNodeInitqualValue(values)
 d.getMSXNodeInitqualValue   
 
@@ -265,6 +263,7 @@ d.getMSXPatternValue(1,5)
 d.saveMSXFile('testMSX.msx');                                                               
           
 d.saveMSXQualityFile('testMSXQuality.bin')
+d.solveCompleteHydraulics;
 
 d.saveHydraulicsOutputReportingFile
 d.saveHydraulicFile('testMSXHydraulics.hyd')

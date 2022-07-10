@@ -1,5 +1,6 @@
-1. Unzip libepanet
-2. run terminal
-3. sudo cp libepanet.so /lib64/libepanet.so
-4. use msx files
-5. sudo rm libepanet.so
+*** BEFORE RUNNING EPANET ***
+1. open terminal
+2. cd epanet_matlab_toolkit/glnx
+3. sudo cp libepanet2.so /lib64/libepanet.so (centos)
+   sudo cp libepanet2.so /lib/x86_64-linux-gnu/libepanet.so (ubuntu)
+4. run d = epanet('Net1.inp')

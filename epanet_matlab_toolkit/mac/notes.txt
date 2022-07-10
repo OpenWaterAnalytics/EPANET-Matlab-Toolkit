@@ -1,0 +1,5 @@
+*** BEFORE RUNNING EPANET ***
+1. open terminal
+2. cd epanet_matlab_toolkit/mac
+3.sudo cp libepanet2.dylib /usr/local/lib/libepanet.dylib
+4. run d = epanet('Net1.inp')
