@@ -1,6 +1,5 @@
-<a href="http://www.kios.ucy.ac.cy"><img src="http://www.kios.ucy.ac.cy/templates/favourite/images/kios_logo_hover.png"/><a>
-
-
+﻿<a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
+  
 EPANET-MATLAB-Toolkit - Examples
 ==================================
 
@@ -39,11 +38,10 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 21:](./EX21_Pressure_driven_analysis_option.mlx) Pressure driven analysis.
 - [Example 22:](./EX22_Overflow_option_for_tanks.mlx) Overflow of tanks.
 - [Example 23:](./EX23_Change_connection_links.mlx) Change connection of the links.
-- [Example 24:](./EX24_delete_all_patterns.mlx) Delete all patterns.
-- [Example 25:](./EX25_set_node_name_ids.mlx) Set node name IDs.
-- [Example 26:](./EX26_using_parfor.m) Using parfor in EMT.
-- [Example 27:](./EX27_adjacency_matrix.mlx) Compute the adjacency matrix (connectivity graph).
-- [Example 27:](./EX28_tojson.mlx) Exports values to json format.
+- [Example 24:](./EX24_set_node_name_ids.mlx) Set node name IDs.
+- [Example 25:](./EX25_using_parfor.m) Using parfor in EMT.
+- [Example 26:](./EX26_adjacency_matrix.mlx) Compute the adjacency matrix (connectivity graph).
+- [Example 27:](./EX27_tojson.mlx) Exports values to json format.
 
 
 ## Toolkit Examples
