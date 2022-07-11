@@ -5444,7 +5444,9 @@ classdef epanet <handle
             %
             % See also getLinkIndex, getLinkPumpIndex.
             tmpLinkTypes=obj.getLinkType;
-            value = find(strcmp(tmpLinkTypes, 'PIPE'));
+            valuePs = find(strcmp(tmpLinkTypes, 'PIPE'));
+            valueCVs = find(strcmp(tmpLinkTypes, 'CVPIPE'));
+            value = sort([valuePs, valueCVs]);
         end
         function value = getLinkPumpIndex(obj, varargin)
             % Retrieves the pump indices.
@@ -5494,7 +5496,7 @@ classdef epanet <handle
             %
             % See also getLinkIndex, getLinkPipeIndex, getLinkPumpIndex.
             tmpLinkTypes=obj.getLinkType;       
-            valueAllInd = find(~strcmp(tmpLinkTypes, 'PUMP')&~strcmp(tmpLinkTypes, 'PIPE'));
+            valueAllInd = find(~strcmp(tmpLinkTypes, 'PUMP')&~strcmp(tmpLinkTypes, 'PIPE')&~strcmp(tmpLinkTypes, 'CVPIPE'));
             if ~isempty(varargin)
                 if iscell(varargin{1}) || ischar(varargin{1})
                     value = obj.getLinkIndex(varargin{1});
