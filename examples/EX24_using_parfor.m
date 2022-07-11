@@ -1,5 +1,4 @@
 % Using PARFOR
-% More fast function with parfor is coming..
 
 tic
 start_toolkit;
