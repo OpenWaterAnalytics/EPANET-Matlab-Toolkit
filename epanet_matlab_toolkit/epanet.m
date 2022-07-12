@@ -4142,7 +4142,7 @@ classdef epanet <handle
                 if nargin==2
                     if strcmpi(varargin{2}, 'LOADFILE')
                         obj.libFunctions = libfunctions(obj.LibEPANET);
-                        disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
+                        disp(['Input File "', varargin{1}, '" loaded successfully.']);
                         obj.LibEPANET = 'epanet2';
                         return;
                     end
@@ -4318,7 +4318,7 @@ classdef epanet <handle
             for i=1:length(getFields_infoUnits)
                 obj.(getFields_infoUnits{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
             end
-            disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
+            disp(['Input File "', varargin{1}, '" loaded successfully.']);
         end % End of epanet class constructor
         
         function [obj] = apiMSXMatlabSetup(obj, msxname, varargin)
