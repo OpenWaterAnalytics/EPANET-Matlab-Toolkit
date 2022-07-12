@@ -1,4 +1,4 @@
-﻿<a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
+<a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493)
 
@@ -115,14 +115,15 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 
 |Function|Description|
 |---------|---------|
-|epanet| Load Input file and open the EPANET Toolkit system|
+|epanet|Load Input file and open the EPANET Toolkit system|
 |unload|Unload library and close the EPANET Toolkit system|
-|loadEPANETFile| Open the EPANET Toolkit system|
+|loadEPANETFile|Open the EPANET Toolkit system|
+|loadlibrary|Load the EPANET library|
 |appShiftNetwor|Shifts the network in x and y directions|
 |appRotateNetwork|Rotates the network by theta degrees counter-clockwise using as pivot a specific node|
 |createProject|Creates an epanet project|
 |deleteProject|Deletes an epanet project|
-|getError| Returns the description of an error code|
+|getError|Returns the description of an error code|
 |getAdjacencyMatrix|Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow|
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|

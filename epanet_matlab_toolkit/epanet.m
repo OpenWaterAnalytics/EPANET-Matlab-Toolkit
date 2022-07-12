@@ -13199,6 +13199,9 @@ classdef epanet <handle
             end
             disp('EPANET Class is unloaded')
         end
+        function loadlibrary(obj)
+            obj.ENLoadLibrary(0)
+        end
         function loadMSXFile(obj, msxname, varargin)
             % Loads an msx file 
             %
