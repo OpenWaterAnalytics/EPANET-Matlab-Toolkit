@@ -4323,7 +4323,7 @@ classdef epanet <handle
             disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
         end % End of epanet class constructor
         
-        function [obj] = MSXMatlabSetup(obj, msxname, varargin)
+        function [obj] = apiMSXMatlabSetup(obj, msxname, varargin)
             arch = computer('arch');
             pwdepanet = fileparts(which(mfilename));
             if strcmp(arch, 'win64')
@@ -13206,9 +13206,9 @@ classdef epanet <handle
             % Example:
             %   d.loadMSXfile('net2-cl2.msx')
             if isempty(varargin)
-                obj.MSXMatlabSetup(msxname);
+                obj.apiMSXMatlabSetup(msxname);
             else
-                obj.MSXMatlabSetup(msxname, varargin);
+                obj.apiMSXMatlabSetup(msxname, varargin);
             end
         end
         function value = getMSXEquationsTerms(obj)
