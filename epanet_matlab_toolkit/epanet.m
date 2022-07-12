@@ -5939,7 +5939,7 @@ classdef epanet <handle
             %   d.getLinkActualQuality(1)   % Retrieves the current computed link quality for the first link
             %
             % Example 3:
-            %   check examples/EX14_hydraulic_and_quality_analysis.m
+            %   check examples/EX13_hydraulic_and_quality_analysis.m
             %
             % See also getLinkFlows, getLinkStatus, getLinkPumpState,
             %          getLinkSettings, getLinkPumpEfficiency.
@@ -14951,7 +14951,7 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function msx = writeMSXFile(~, msx)
-            % Checkout example: /examples/EX15_write_msx_file.m
+            % Checkout example: /examples/EX14_write_msx_file.m
             space=5;
             f = writenewTemp(msx.FILENAME);
             fprintf(f, '[TITLE]\n');

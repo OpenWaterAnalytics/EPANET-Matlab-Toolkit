@@ -18,30 +18,29 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 5:](./EX5_Plot_values_parameters.mlx) Plot values parameters. 
 - [Example 6:](./EX6_load_two_inp_files.mlx) Load two inp files.
 - [Example 7:](./EX7_set_pump_curves.mlx) Set pump curves.
-- [Example 8:](./EX8_tanks_to_reservoirs.m) Tanks to reservoirs.
-- [Example 9:](./EX9_compare_simulations.mlx) Compare Simulations.
-- [Example 10:](./EX10_close_pipes_during_sim.mlx) Close pipes during simulation.
-- [Example 11:](./EX11_assing_new_curve_pump.mlx) Assign a new curve to a pump.
-- [Example 12:](./EX12_add_multiple_controlpatterns_bin.mlx) Add multiple control patterns.
-- [Example 13a:](./EX13a_add_cvpipe_junction.mlx) Add pipe and junction via bin function.
-- [Example 13b:](./EX13b_add_cvpipe_bin.mlx) Add pipe via bin function.
-- [Example 13c:](./EX13c_add_cvpipe.mlx) Add pipe via normal function.
-- [Example 14:](./EX14_hydraulic_and_quality_analysis.mlx) Hydraulic and Quality analysis.
-- [Example 15:](./EX15_write_msx_file.mlx) Write MSX file.
-- [Example 16:](./EX16_create_multiple_scenarios.mlx) Creating scenarios.
-- [Example 17a:](./EX17a_add_multiple_controls_pipestatus_bin.mlx) Add controls via bin functions.
-- [Example 17b:](./EX17b_add_multiple_controls_pipestatus.mlx) Add controls via normal functions.
-- [Example 18:](./EX18_change_status_pipes.mlx) Change status of pipe during simulation.
-- [Example 19:](./EX19_rotate_network.mlx) Rotate network.
-- [Example 20a:](./EX20a_external_controls.mlx) Change of external Controls.
-- [Example 20b:](./EX20b_external_controls.mlx) Addition of external Controls.
-- [Example 21:](./EX21_Pressure_driven_analysis_option.mlx) Pressure driven analysis.
-- [Example 22:](./EX22_Overflow_option_for_tanks.mlx) Overflow of tanks.
-- [Example 23:](./EX23_Change_connection_links.mlx) Change connection of the links.
-- [Example 24:](./EX24_set_node_name_ids.mlx) Set node name IDs.
-- [Example 25:](./EX25_using_parfor.m) Using parfor in EMT.
-- [Example 26:](./EX26_adjacency_matrix.mlx) Compute the adjacency matrix (connectivity graph).
-- [Example 27:](./EX27_tojson.mlx) Exports values to json format.
+- [Example 8:](./EX9_compare_simulations.mlx) Compare Simulations.
+- [Example 9:](./EX10_close_pipes_during_sim.mlx) Close pipes during simulation.
+- [Example 10:](./EX10_assing_new_curve_pump.mlx) Assign a new curve to a pump.
+- [Example 11:](./EX11_add_multiple_controlpatterns_bin.mlx) Add multiple control patterns.
+- [Example 12:](./EX12a_add_cvpipe_junction.mlx) Add pipe and junction via bin function.
+- [Example 12:](./EX12b_add_cvpipe_bin.mlx) Add pipe via bin function.
+- [Example 12c:](./EX12c_add_cvpipe.mlx) Add pipe via normal function.
+- [Example 13:](./EX13_hydraulic_and_quality_analysis.mlx) Hydraulic and Quality analysis.
+- [Example 14:](./EX14_write_msx_file.mlx) Write MSX file.
+- [Example 15:](./EX15_create_multiple_scenarios.mlx) Creating scenarios.
+- [Example 16a:](./EX16a_add_multiple_controls_pipestatus_bin.mlx) Add controls via bin functions.
+- [Example 16b:](./EX16b_add_multiple_controls_pipestatus.mlx) Add controls via normal functions.
+- [Example 17:](./EX17_change_status_pipes.mlx) Change status of pipe during simulation.
+- [Example 18:](./EX18_rotate_network.mlx) Rotate network.
+- [Example 19a:](./EX19a_external_controls.mlx) Change of external Controls.
+- [Example 19b:](./EX19b_external_controls.mlx) Addition of external Controls.
+- [Example 20:](./EX20_Pressure_driven_analysis_option.mlx) Pressure driven analysis.
+- [Example 21:](./EX21_Overflow_option_for_tanks.mlx) Overflow of tanks.
+- [Example 22:](./EX22_Change_connection_links.mlx) Change connection of the links.
+- [Example 23:](./EX23_set_node_name_ids.mlx) Set node name IDs.
+- [Example 24:](./EX24_using_parfor.m) Using parfor in EMT.
+- [Example 25:](./EX25_adjacency_matrix.mlx) Compute the adjacency matrix (connectivity graph).
+- [Example 26:](./EX26_tojson.mlx) Exports values to json format.
 
 
 ## Toolkit Examples
