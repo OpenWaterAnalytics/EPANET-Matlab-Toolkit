@@ -694,8 +694,6 @@ classdef epanet <handle
                 disp(errstring);
             end
         end
-        function ENLoadLibrary(obj, LibEPANETpath, LibEPANET, varargin)
-            if ~libisloaded(LibEPANET)
         function ENLoadLibrary(obj, varargin)
         if ~libisloaded(obj.LibEPANET)
             warning('off', 'MATLAB:loadlibrary:TypeNotFound');
