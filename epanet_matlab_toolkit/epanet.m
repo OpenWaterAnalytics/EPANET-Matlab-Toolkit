@@ -22981,7 +22981,7 @@ function [axesid] = plotnet(obj, varargin)
      end
      axis(axesid, 'off');
      try
-         whitebg(fig, 'w');
+         set(fig,'color','w');
      catch
      end
      if strcmpi(extend, 'yes')

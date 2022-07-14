@@ -18,7 +18,6 @@ parfor i = 1:iterations
     
     % Computed Hydraulics
     H{i} = d.getComputedHydraulicTimeSeries;
-    Q{i} = d.getComputedQualityTimeSeries;
 end
 d.unload;
 toc
