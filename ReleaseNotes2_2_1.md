@@ -1,16 +1,16 @@
 ## New functionalities
 * The epanet class initialization function can now run without an input:
-  i.e., d = epanet, so that the user can create a network from scratch. Check the following example: [Toolkit_EX4_Network_Building](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/examples/Toolkit_EX4_Network_Building.m)
+  i.e., d = epanet, so that the user can create a network from scratch. Check the following example: [Toolkit_EX4_Network_Building](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/examples/Toolkit_EX4_Network_Building.mlx)
 
 
 * Use of EN_ functions, using a project handle (ph). This creates the possibility 
   of working with more than one networks (EPANET Input Files), i.e., many EPANET classes simultaneously!
-  Check the following example: [EX6_load_two_inp_files](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/examples/EX6_load_two_inp_files.m )
+  Check the following example: [EX6_load_two_inp_files](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/examples/EX6_load_two_inp_files.mlx)
 
 
 * The user is now able to use EN and MSX functions explicitily. Api has been added in front of EN and MSX functions (e.g., apiENopen and apiMSΧopen). Check the new examples featuring only apiEN and apiMSX functions:
-  * [Toolkit_api_EX1_using_EN_functions](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/dev/examples/Toolkit_api_EX1_using_EN_functions.m)
-  * [Toolkit_api_EX2_using_MSX_functions](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/dev/examples/Toolkit_api_EX2_using_MSX_functions.m)
+  * [Toolkit_api_EX1_using_EN_functions](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/examples/Toolkit_api_EX1_using_EN_functions.mlx)
+  * [Toolkit_api_EX2_using_MSX_functions](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/examples/Toolkit_api_EX2_using_MSX_functions.mlx)
 
 
 * Help text for all apiEN and apiMSX functions.

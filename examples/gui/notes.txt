@@ -1,0 +1,4 @@
+# This example is work only for 64bit of Windows.
+
+1. open emtgui.prj
+2. select package

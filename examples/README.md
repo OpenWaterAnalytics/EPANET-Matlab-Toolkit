@@ -50,6 +50,9 @@ EPANET-MATLAB-Toolkit - Examples
 ## Toolkit api Examples
 - [Toolkit api Example 1:](./Toolkit_api_EX1_using_EN_functions.mlx) Create a network using only EN functions
 - [Toolkit api Example 2:](./Toolkit_api_EX2_using_MSX_functions.mlx) Run a quality analysis using only MSX functions
+
+[Movie example](./movie-example/)
+[GUI example - Create standAlone application](./gui/)
 &uparrow; [Back to top](#table-of-contents)
 
 

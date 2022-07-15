@@ -694,31 +694,31 @@ classdef epanet <handle
                 disp(errstring);
             end
         end
-        function ENLoadLibrary(obj, LibEPANETpath, LibEPANET, varargin)
-            if ~libisloaded(LibEPANET)
-                warning('off', 'MATLAB:loadlibrary:TypeNotFound');
-                if ~isdeployed
-                    if isunix
-                        loadlibrary(LibEPANET, [LibEPANETpath, LibEPANET, '.h']);
-                    else
-                        loadlibrary([LibEPANETpath, LibEPANET], [LibEPANETpath, LibEPANET, '.h']);
-                    end
+        function ENLoadLibrary(obj, varargin)
+        if ~libisloaded(obj.LibEPANET)
+            warning('off', 'MATLAB:loadlibrary:TypeNotFound');
+            if ~isdeployed
+                if isunix
+                    loadlibrary(obj.LibEPANET, [obj.LibEPANETpath, obj.LibEPANET, '.h']);
                 else
-                    loadlibrary('epanet2', @mxepanet); %loadlibrary('epanet2', 'epanet2.h', 'mfilename', 'mxepanet.m');
+                    loadlibrary([obj.LibEPANETpath, obj.LibEPANET], [obj.LibEPANETpath, obj.LibEPANET, '.h']);
                 end
-                warning('on', 'MATLAB:loadlibrary:TypeNotFound');
-                if ~isempty(varargin), return; end
-            end
-            if libisloaded(LibEPANET)
-                [~, obj.Version] = calllib(LibEPANET, 'ENgetversion', 0);
-                LibEPANETString = ['EPANET version {', num2str(obj.Version), '} loaded'];
-                fprintf(LibEPANETString);
             else
-                warning('There was an error loading the EPANET library (DLL).')
+                loadlibrary('epanet2', @mxepanet); %loadlibrary('epanet2', 'epanet2.h', 'mfilename', 'mxepanet.m');
             end
+            warning('on', 'MATLAB:loadlibrary:TypeNotFound');
+            if ~isempty(varargin), return; end
+        end
+        if libisloaded(obj.LibEPANET)
+            if ~isempty(varargin), return; end
+            [~, obj.Version] = calllib(obj.LibEPANET, 'ENgetversion', 0);
+            LibEPANETString = ['EPANET version {', num2str(obj.Version), '} loaded'];
+            fprintf(LibEPANETString);
+        else
+            warning('There was an error loading the EPANET library (DLL).')
         end
     end
-
+    end
     methods (Static)
         function [Errcode] = apiENwriteline(line, LibEPANET, ph)
             % Writes a line of text to a project's report file.
@@ -826,8 +826,8 @@ classdef epanet <handle
             % obj   epanet class object.
             %
             % See also apiEN_deleteproject, apiEN_runproject.
-            ph = libpointer('voidPtr');
-            [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', ph);
+            obj.ph = libpointer('voidPtr');
+            [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
             setdatatype(obj.ph, 'ProjectPtr') 
             error(obj.getError(obj.Errcode));
         end
@@ -4065,13 +4065,13 @@ classdef epanet <handle
                     end
                 end
             end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE')  % e.g. d = epanet('Net1.inp', 'epanet2');
+            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE') % e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
                 if isempty(pwdDLL)
                     pwdDLL = pwd;
                 end
                 obj.LibEPANETpath = [pwdDLL, '\'];
-                try obj.ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET, 0);
+                try obj.ENLoadLibrary(0);
                 catch
                    obj.Errcode=-1;
                    error(['File "', obj.LibEPANET, '" is not a valid win application.']);
@@ -4091,15 +4091,12 @@ classdef epanet <handle
                 end
             end
             %Load EPANET Library
-            obj.ENLoadLibrary(obj.LibEPANETpath, obj.LibEPANET);
+            obj.ENLoadLibrary;
             disp([' (EMT version {', obj.classversion, '}).'])
             
             % Create Project - EPANET 2.2 supported function
-            obj.ph = libpointer('voidPtr'); 
             try
-                [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
-                error(obj.getError(obj.Errcode));
-                setdatatype(obj.ph, 'ProjectPtr') 
+                obj.createProject;
             catch 
             end
             %Load parameters
@@ -4124,6 +4121,7 @@ classdef epanet <handle
             
                 %Save the temporary input file
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
+
                 obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
                 obj.closeNetwork;  %apiENclose; %Close input file
                 %Load temporary file
@@ -4144,7 +4142,7 @@ classdef epanet <handle
                 if nargin==2
                     if strcmpi(varargin{2}, 'LOADFILE')
                         obj.libFunctions = libfunctions(obj.LibEPANET);
-                        disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
+                        disp(['Input File "', varargin{1}, '" loaded successfully.']);
                         obj.LibEPANET = 'epanet2';
                         return;
                     end
@@ -4320,10 +4318,10 @@ classdef epanet <handle
             for i=1:length(getFields_infoUnits)
                 obj.(getFields_infoUnits{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
             end
-            disp(['Input File "', varargin{1}, '" loaded sucessfuly.']);
+            disp(['Input File "', varargin{1}, '" loaded successfully.']);
         end % End of epanet class constructor
         
-        function [obj] = MSXMatlabSetup(obj, msxname, varargin)
+        function [obj] = apiMSXMatlabSetup(obj, msxname, varargin)
             arch = computer('arch');
             pwdepanet = fileparts(which(mfilename));
             if strcmp(arch, 'win64')
@@ -5939,7 +5937,7 @@ classdef epanet <handle
             %   d.getLinkActualQuality(1)   % Retrieves the current computed link quality for the first link
             %
             % Example 3:
-            %   check examples/EX13_hydraulic_and_quality_analysis.m
+            %   check examples/EX13_hydraulic_and_quality_analysis.mlx
             %
             % See also getLinkFlows, getLinkStatus, getLinkPumpState,
             %          getLinkSettings, getLinkPumpEfficiency.
@@ -10019,6 +10017,7 @@ classdef epanet <handle
             %   d.getNodeCount 
             %
             % See also deleteProject, runProject.
+            % obj.ENLoadLibrary(0);
             obj.apiEN_createproject(obj);
         end
         function deleteProject(obj)
@@ -13200,15 +13199,18 @@ classdef epanet <handle
             end
             disp('EPANET Class is unloaded')
         end
+        function loadlibrary(obj)
+            obj.ENLoadLibrary(0)
+        end
         function loadMSXFile(obj, msxname, varargin)
             % Loads an msx file 
             %
             % Example:
             %   d.loadMSXfile('net2-cl2.msx')
             if isempty(varargin)
-                obj.MSXMatlabSetup(msxname);
+                obj.apiMSXMatlabSetup(msxname);
             else
-                obj.MSXMatlabSetup(msxname, varargin);
+                obj.apiMSXMatlabSetup(msxname, varargin);
             end
         end
         function value = getMSXEquationsTerms(obj)
@@ -14951,7 +14953,7 @@ classdef epanet <handle
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function msx = writeMSXFile(~, msx)
-            % Checkout example: /examples/EX14_write_msx_file.m
+            % Checkout example: /examples/EX14_write_msx_file.mlx
             space=5;
             f = writenewTemp(msx.FILENAME);
             fprintf(f, '[TITLE]\n');
@@ -22979,7 +22981,7 @@ function [axesid] = plotnet(obj, varargin)
      end
      axis(axesid, 'off');
      try
-         whitebg(fig, 'w');
+         set(fig,'color','w');
      catch
      end
      if strcmpi(extend, 'yes')
