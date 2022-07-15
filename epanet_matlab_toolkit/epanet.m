@@ -699,7 +699,7 @@ classdef epanet <handle
             warning('off', 'MATLAB:loadlibrary:TypeNotFound');
             if ~isdeployed
                 if isunix
-                    loadlibrary(obj.LibEPANET, [obj.LibEPANETpath, LibEPANET, '.h']);
+                    loadlibrary(obj.LibEPANET, [obj.LibEPANETpath, obj.LibEPANET, '.h']);
                 else
                     loadlibrary([obj.LibEPANETpath, obj.LibEPANET], [obj.LibEPANETpath, obj.LibEPANET, '.h']);
                 end
