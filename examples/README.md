@@ -51,8 +51,18 @@ EPANET-MATLAB-Toolkit - Examples
 - [Toolkit api Example 1:](./Toolkit_api_EX1_using_EN_functions.mlx) Create a network using only EN functions
 - [Toolkit api Example 2:](./Toolkit_api_EX2_using_MSX_functions.mlx) Run a quality analysis using only MSX functions
 
-[Movie example](./movie-example/)
-[GUI example - Create standAlone application](./gui/)
+[Movie example](./movie-example/) 
+
+<a href="https://www.youtube.com/watch?v=IfEMk_ybjiY
+" target="_blank"><img src="http://img.youtube.com/vi/IfEMk_ybjiY/0.jpg"
+alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="0" /></a>
+
+[GUI example - Create standalone application](./gui/)
+
+<a href="https://www.youtube.com/watch?v=Qf8_hgYxGyM
+" target="_blank"><img src="http://img.youtube.com/vi/Qf8_hgYxGyM/0.jpg"
+alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="0" /></a>
+
 &uparrow; [Back to top](#table-of-contents)
 
 
