@@ -52,7 +52,9 @@ EPANET-MATLAB-Toolkit - Examples
 - [Toolkit api Example 2:](./Toolkit_api_EX2_using_MSX_functions.mlx) Run a quality analysis using only MSX functions
 
 [Movie example](./movie-example/)
-[GUI example - Create standAlone application](./gui/)
+
+[GUI example - Create standalone application](./gui/)
+
 &uparrow; [Back to top](#table-of-contents)
 
 
