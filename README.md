@@ -6,7 +6,7 @@
 EPANET-MATLAB-Toolkit
 ==================================
 
-The `EPANET-Matlab Toolkit` is an open-source software, originally developed by the [KIOS Research Center for Intelligent Systems and Networks of the University of Cyprus](http://www.kios.ucy.ac.cy/) which operates within the Matlab environment, for providing a programming interface for the latest version of [EPANET](https://github.com/OpenWaterAnalytics/epanet), a hydraulic and quality modeling software created by the US EPA, with Matlab, a  high-level technical computing software. The goal of the EPANET Matlab Toolkit is to serve as a common programming framework for research and development in the growing field of smart water networks.
+The `EPANET-Matlab Toolkit` is an open-source software, originally developed by the [KIOS Research and Innovation Center of Excellence, University of Cyprus](http://www.kios.ucy.ac.cy/) which operates within the Matlab environment, for providing a programming interface for the latest version of [EPANET](https://github.com/OpenWaterAnalytics/epanet), a hydraulic and quality modeling software created by the US EPA, with Matlab, a  high-level technical computing software. The goal of the EPANET Matlab Toolkit is to serve as a common programming framework for research and development in the growing field of smart water networks.
 
 The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, modifying, simulating and plotting results produced by the EPANET libraries.  
 
@@ -16,15 +16,15 @@ For support, please use the OWA community forum : http://community.wateranalytic
 
 - [How to cite](#how-to-cite)
 - [Requirements](#requirements)
-- [How to install necessary compilers](#How-to-install-necessary-compilers)
-- [How to use the Toolkit](#How-to-use-the-Toolkit)
-- [How to fix/report bugs](#How-to-fixreport-bugs)
-- [Licenses](#Licenses)
-- [Contributors](#Contributors)
-- [List of Matlab Class Functions](#List-of-Matlab-Class-Functions)
-- [List of EPANET 2.1 Functions Supported](#List-of-EPANET-21-Functions-Supported)
-- [List of EPANET 2.012 Functions Supported](#List-of-EPANET-2012-Functions-Supported)
-- [List of EPANET 2.2 Functions Supported](#List-of-EPANET-22-Functions-Supported)
+- [How to install necessary compilers](#how-to-install-necessary-compilers)
+- [How to use the Toolkit](#how-to-use-the-toolkit)
+- [How to fix/report bugs](#how-to-fixreport-bugs)
+- [Licenses](#licenses)
+- [Contributors](#contributors)
+- [List of Matlab Class Functions](#list-of-matlab-class-functions)
+- [List of EPANET 2.1 Functions Supported](#list-of-epanet-21-functions-supported)
+- [List of EPANET 2.012 Functions Supported](#list-of-epanet-2012-functions-supported)
+- [List of EPANET 2.2 Functions Supported](#list-of-epanet-22-functions-supported)
 
 ## How to cite
 
