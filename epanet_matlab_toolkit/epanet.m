@@ -7418,27 +7418,7 @@ classdef epanet <handle
             %   d.getNodeTankVolume(tankIndex)   % Retrieves the volume of the tanks given their indices
             %
             % See also getNodeTankData.
-            indices = obj.getNodeTankIndex; 
-            if isempty(varargin)
-                value = zeros(1, length(indices)); j = 1;
-                for i=indices
-                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_TANKVOLUME, obj.LibEPANET, obj.ph);
-                    j=j+1;
-                end
-            else
-                varargin = varargin{1};
-                if ~ismember(varargin, indices)
-                    varargin = indices(varargin);
-                end
-                value = zeros(1, length(varargin));
-                j = 1;
-                for i=1:length(varargin)
-                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(varargin(i), obj.ToolkitConstants.EN_TANKVOLUME, obj.LibEPANET, obj.ph);
-                    if ~isscalar(varargin)
-                        j=j+1;
-                    end
-                end
-            end
+            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKVOLUME, varargin);
         end
         function value = getNodeTankMaximumWaterVolume(obj, varargin)
             % Retrieves the tank maximum water volume. (EPANET Version 2.1)
