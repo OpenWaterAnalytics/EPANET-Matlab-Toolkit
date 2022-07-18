@@ -11741,27 +11741,7 @@ classdef epanet <handle
             %
             % See also getNodeTankInitialLevel, setNodeTankMinimumWaterLevel, setNodeTankMaximumWaterLevel,
             %          setNodeTankMinimumWaterVolume, setNodeTankMixingFraction, setNodeTankData.
-            indices = obj.getNodeTankIndex; 
-            if isempty(varargin)
-                value = zeros(1, length(indices)); j = 1;
-                for i=indices
-                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_TANKLEVEL, obj.LibEPANET, obj.ph);
-                    j=j+1;
-                end
-            else
-                varargin = varargin{1};
-                if ~ismember(varargin, indices)
-                    varargin = indices(varargin);
-                end
-                value = zeros(1, length(varargin));
-                j = 1;
-                for i=1:length(varargin)
-                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(varargin(i), obj.ToolkitConstants.EN_TANKLEVEL, obj.LibEPANET, obj.ph);
-                    if ~isscalar(varargin)
-                        j=j+1;
-                    end
-                end
-            end
+            set_Node_Link(obj, 'tank', 'apiENsetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, value, varargin)
         end
         function setNodeTankMixingModelType(obj, value, varargin)
             % Sets the mixing model type value for tanks.
