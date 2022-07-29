@@ -5,5 +5,4 @@ function check_error(status)
     else
         disp('False');
     end
-
 end
