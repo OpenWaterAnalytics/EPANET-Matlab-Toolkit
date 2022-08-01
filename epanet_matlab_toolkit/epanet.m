@@ -1150,7 +1150,7 @@ classdef epanet <handle
                 [Errcode, ~, typecode] = calllib(LibEPANET, 'EN_getlinktype', ph, index, 0);
             end
             typecode = double(typecode);
-            if ~isnumeric(typecode), typecode = getTypeLink(typecode); end
+            % if ~isnumeric(typecode), typecode = getTypeLink(typecode); end
         end
         function [Errcode, value] = apiENgetlinkvalue(index, paramcode, LibEPANET, ph)
             % Retrieves a property value for a link.
