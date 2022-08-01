@@ -1144,9 +1144,9 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % typecode   the link's type (see LinkType).
-            if ph.isNull
+            try 
                 [Errcode, typecode] = calllib(LibEPANET, 'ENgetlinktype', index, 0);
-            else
+            catch
                 [Errcode, ~, typecode] = calllib(LibEPANET, 'EN_getlinktype', ph, index, 0);
             end
             typecode = double(typecode);
@@ -5592,7 +5592,7 @@ classdef epanet <handle
         function value = getLinkType(obj, varargin)
             % Retrieves the link-type code for all links.
             %
-            % Example 1:
+            % Example 1:    
             %    d.getLinkType      % Retrieves the link-type code for all links
             %
             % Example 2:
@@ -14176,7 +14176,7 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k=1; tleft=1;
+            k=1; tleft=1;t=0;
             value.Time(k, :)=0;
             if node_indices(end) < link_indices(end)
                 for i=1:length(specie_name_ind)
@@ -14197,7 +14197,8 @@ classdef epanet <handle
                     end
                 end
             end
-            while(tleft>0 && obj.Errcode==0)
+            timeSmle=obj.getTimeSimulationDuration;
+            while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
                 k=k+1;
                 [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
                 if node_indices(end) < link_indices(end)
@@ -14258,7 +14259,7 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k = 1; tleft = 1; i = 1;
+            k = 1; tleft = 1; i = 1; t = 0;
             for nl=ss
                 g=1;
                 for j=uu
@@ -14266,8 +14267,9 @@ classdef epanet <handle
                     g=g+1;
                 end
                 i=i+1;
-            end
-            while(tleft>0 && obj.Errcode==0)
+            end 
+            timeSmle=obj.getTimeSimulationDuration;
+            while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
                 [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
                 k=k+1; i=1;
                 for nl=ss
@@ -14317,7 +14319,7 @@ classdef epanet <handle
             % RESULTS to file
             obj.initializeMSXQualityAnalysis(0);
             % Retrieve species concentration at node
-            k = 1; tleft = 1; i = 1;
+            k = 1; tleft = 1; i = 1; t = 0;
             for nl=ss
                 g=1;
                 for j=uu
@@ -14326,7 +14328,8 @@ classdef epanet <handle
                 end
                 i=i+1;
             end
-            while(tleft>0 && obj.Errcode==0)
+            timeSmle=obj.getTimeSimulationDuration;
+            while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
                 [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
                 k=k+1; i=1;
                 for nl=ss
@@ -15084,7 +15087,7 @@ classdef epanet <handle
             obj.apiMSXclose(obj);
             obj.apiMSXMatlabCleanup(obj);
             fclose('all');
-            disp('MSX unloaded');
+            %disp('MSX unloaded');
         end
         function ToolkitConstants = getToolkitConstants(obj)
             if obj.getVersion <= 20101
