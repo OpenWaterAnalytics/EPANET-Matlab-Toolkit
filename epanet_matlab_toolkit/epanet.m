@@ -4126,7 +4126,8 @@ classdef epanet <handle
                 %Save the temporary input file
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
                 
-                obj.saveInputFile(obj.BinTempfile); %create a new INP file (Working Copy) using the SAVE command of EPANET
+                copyfile(obj.InputFile, obj.BinTempfile); % create a new INP file (Working Copy) using the SAVE command of EPANET
+                
                 obj.closeNetwork;  %apiENclose; %Close input file
                 %Load temporary file
                 rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
