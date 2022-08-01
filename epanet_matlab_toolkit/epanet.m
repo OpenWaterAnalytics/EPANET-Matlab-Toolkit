@@ -8944,6 +8944,9 @@ classdef epanet <handle
             k = 1;tstep = 1;
             pipecount = obj.getLinkPipeCount;
             valvecount = obj.getLinkValveCount;
+            junctioncount = obj.getNodeJunctionCount;
+            rescount = obj.getNodeReservoirCount;
+            
             while (tstep>0)
                 t = obj.runHydraulicAnalysis;
                 if find(strcmpi(varargin, 'time'))
@@ -8967,7 +8970,7 @@ classdef epanet <handle
                     value.Head(k, :) = obj.getNodeHydaulicHead;
                 end
                 if find(strcmpi(varargin, 'tankvolume'))
-                    value.TankVolume(k, :) = obj.getNodeTankVolume;
+                    value.TankVolume(k, :) = [zeros(1, junctioncount) zeros(1, rescount) obj.getNodeTankVolume];
                 end
                 if find(strcmpi(varargin, 'flow'))
                     value.Flow(k, :) = obj.getLinkFlows;
@@ -15084,7 +15087,7 @@ classdef epanet <handle
             obj.apiMSXclose(obj);
             obj.apiMSXMatlabCleanup(obj);
             fclose('all');
-            disp('MSX unloaded');
+            %disp('MSX unloaded');
         end
         function ToolkitConstants = getToolkitConstants(obj)
             if obj.getVersion <= 20101
