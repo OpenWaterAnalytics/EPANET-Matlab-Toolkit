@@ -1,5 +1,7 @@
 %% MSX no inp, msx files test 
 clear;clc;
+start_toolkit;
+
 try unloadlibrary epanetmsx; catch, end
 try unloadlibrary legacymsx; catch, end
 
