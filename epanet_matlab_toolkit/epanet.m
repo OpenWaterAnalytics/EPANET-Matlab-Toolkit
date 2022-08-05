@@ -14155,11 +14155,6 @@ classdef epanet <handle
             %   MSX_comp.NodeQuality(:,:,2) % Gets node quality for the second specie.
             %
             % See also getMSXComputedQualityNode, getMSXComputedQualityLink.
-            if ~obj.ph.isNull
-                obj.saveInputFile(obj.TempInpFile);
-                obj.unloadMSX;
-                obj.loadMSXFile(obj.MSXTempFile);
-            end
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -14241,11 +14236,6 @@ classdef epanet <handle
             %   d.getMSXComputedQualityNode(1:3).Quality   % Compute quality for the first three nodes
             %
             % See also getMSXComputedQualitylink, getMSXComputedQualitySpecie.
-            if ~obj.ph.isNull
-                obj.saveInputFile(obj.TempInpFile);
-                obj.unloadMSX;
-                obj.loadMSXFile(obj.MSXTempFile);
-            end
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -14306,11 +14296,6 @@ classdef epanet <handle
             %   d.getMSXComputedQualityLink(1:3).Quality   % Compute quality for the first three links.
             %
             % See also getMSXComputedQualityNode, getMSXComputedQualitySpecie.
-            if ~obj.ph.isNull
-                obj.saveInputFile(obj.TempInpFile);
-                obj.unloadMSX;
-                obj.loadMSXFile(obj.MSXTempFile);
-            end
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
