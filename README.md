@@ -2,11 +2,12 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493)
 
+[![View OpenWaterAnalytics/EPANET-Matlab-Toolkit on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/25100-openwateranalytics-epanet-matlab-toolkit)
 
 EPANET-MATLAB-Toolkit
 ==================================
 
-The `EPANET-Matlab Toolkit` is an open-source software, originally developed by the [KIOS Research Center for Intelligent Systems and Networks of the University of Cyprus](http://www.kios.ucy.ac.cy/) which operates within the Matlab environment, for providing a programming interface for the latest version of [EPANET](https://github.com/OpenWaterAnalytics/epanet), a hydraulic and quality modeling software created by the US EPA, with Matlab, a  high-level technical computing software. The goal of the EPANET Matlab Toolkit is to serve as a common programming framework for research and development in the growing field of smart water networks.
+The `EPANET-Matlab Toolkit` is an open-source software, originally developed by the [KIOS Research and Innovation Center of Excellence, University of Cyprus](http://www.kios.ucy.ac.cy/) which operates within the Matlab environment, for providing a programming interface for the latest version of [EPANET](https://github.com/OpenWaterAnalytics/epanet), a hydraulic and quality modeling software created by the US EPA, with Matlab, a  high-level technical computing software. The goal of the EPANET Matlab Toolkit is to serve as a common programming framework for research and development in the growing field of smart water networks.
 
 The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, modifying, simulating and plotting results produced by the EPANET libraries.  
 
@@ -16,15 +17,15 @@ For support, please use the OWA community forum : http://community.wateranalytic
 
 - [How to cite](#how-to-cite)
 - [Requirements](#requirements)
-- [How to install necessary compilers](#How-to-install-necessary-compilers)
-- [How to use the Toolkit](#How-to-use-the-Toolkit)
-- [How to fix/report bugs](#How-to-fixreport-bugs)
-- [Licenses](#Licenses)
-- [Contributors](#Contributors)
-- [List of Matlab Class Functions](#List-of-Matlab-Class-Functions)
-- [List of EPANET 2.1 Functions Supported](#List-of-EPANET-21-Functions-Supported)
-- [List of EPANET 2.012 Functions Supported](#List-of-EPANET-2012-Functions-Supported)
-- [List of EPANET 2.2 Functions Supported](#List-of-EPANET-22-Functions-Supported)
+- [How to install necessary compilers](#how-to-install-necessary-compilers)
+- [How to use the Toolkit](#how-to-use-the-toolkit)
+- [How to fix/report bugs](#how-to-fixreport-bugs)
+- [Licenses](#licenses)
+- [Contributors](#contributors)
+- [List of Matlab Class Functions](#list-of-matlab-class-functions)
+- [List of EPANET 2.1 Functions Supported](#list-of-epanet-21-functions-supported)
+- [List of EPANET 2.012 Functions Supported](#list-of-epanet-2012-functions-supported)
+- [List of EPANET 2.2 Functions Supported](#list-of-epanet-22-functions-supported)
 
 ## How to cite
 
@@ -113,14 +114,19 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 
 ## List of Matlab Class Functions
 
+![](emt_tree.png)
+
 |Function|Description|
 |---------|---------|
-|epanet| Load Input file and open the EPANET Toolkit system|
+|epanet|Load Input file and open the EPANET Toolkit system|
 |unload|Unload library and close the EPANET Toolkit system|
-|loadEPANETFile| Open the EPANET Toolkit system|
+|loadEPANETFile|Open the EPANET Toolkit system|
+|loadlibrary|Load the EPANET library|
 |appShiftNetwor|Shifts the network in x and y directions|
 |appRotateNetwork|Rotates the network by theta degrees counter-clockwise using as pivot a specific node|
-|getError| Returns the description of an error code|
+|createProject|Creates an epanet project|
+|deleteProject|Deletes an epanet project|
+|getError|Returns the description of an error code|
 |getAdjacencyMatrix|Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow|
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
@@ -139,8 +145,10 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getCurveValue|Retrieves (x,y) values of specific curve index|
 |getCurveXY|Retrieves (x,y) values of all curves|
 |getDemandModel|Retrieves the type of demand model in use and its parameters|
+|getEN_functionsImpemented|Retrieves the epanet EN_ functions that have been developed|
 |getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
 |getFlowUnits|Retrieves the units used to express all flow rates|
+|getGraph|Retrieves the graph of the current epanet network|
 |getLibFunctions|Retrieves the functions of DLL|
 |getLinkActualQuality|Current computed link quality (read only)|
 |getLinkBulkReactionCoeff|Bulk chemical reaction coefficient|
@@ -212,6 +220,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeJunctionIndex|Retrieves the junctions indices|
 |getNodeJunctionNameID|Retrieves the junctions IDs|
 |getNodeJunctionDemandIndex|Retrieves the demand index of the junctions. (EPANET Version 2.2)|
+|getNodeLinks|Retrieves the links which a specific node is connected to|
 |getNodeMassFlowRate|Retrieves the computed mass flow rates per minute of chemical sources|
 |getNodeNameID|Retrieves the ID label of all nodes or some nodes with a specified index|
 |getNodeDemandCategoriesNumber|Retrieves the number of demand categories for a node|
@@ -330,6 +339,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deleteNode|Deletes a node|
 |deleteNodeJunctionDemand|Deletes a demand from a junction given the junction index and demand index(EPANET Version 2.2)|
 |deletePattern|Deletes a time pattern from a project|
+|deletePatternAll|Deletes all time patterns from a project|
 |deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
 |deletenodejunctiondemand|Deletes a demand from a junction given the junction index and demand index.|
 |deleteRules|Deletes an existing rule-based control given it's index. (EPANET Version 2.2)|
@@ -349,11 +359,14 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |openHydraulicAnalysis|Opens the hydraulics analysis system|
 |openQualityAnalysis|Opens the water quality analysis system|
 |runHydraulicAnalysis|Runs a single period hydraulic analysis, retrieving the current simulation clock time t|
+|reverseLinkNodeIndices|Reverses the node indices that connect a link|
+|runProject|Runs a complete EPANET simulation|
 |runQualityAnalysis|Makes available the hydraulic and water quality results that occur at the start of the next time period of a water quality analysis, where the start of the period is returned in t|
 |saveHydraulicFile|Saves the current contents of the binary hydraulics file to a file|
 |saveHydraulicsOutputReportingFile|Transfers results of a hydraulic simulation from the binary Hydraulics file to the binary Output file, where results are only reported at uniform reporting intervals|
 |saveInputFile|Writes all current network input data to a file using the format of an EPANET input file|
 |plot|Plot the network input file|
+|plotGraph|Plots the graph of the current epanet network|
 |setControls|Sets the parameters of a simple control statement|
 |setCurve|Sets x,y values for a specific curve|
 |setCurveNameID|Sets the name ID of a curve given it's index and the new ID. (EPANET Version 2.2)|
@@ -478,6 +491,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |solveCompleteQuality|Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file|
 |splitPipe|Splits a pipe, creating two new pipes and adds a junction in between them|
 |stepQualityAnalysisTimeLeft|Advances the water quality simulation one water quality time step. The time remaining in the overall simulation is returned in tleft|
+|toJson|Creates json text variable|
+|toJsonFile|Creates a .json file and adds the input values in json format|
 |useHydraulicFile|Uses the contents of the specified file as the current binary hydraulics file|
 |writeLineInReportFile|Writes a line of text to the EPANET report file|
 |writeReport|Writes a formatted text report on simulation results to the Report file|
