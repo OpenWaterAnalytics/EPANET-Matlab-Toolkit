@@ -4,13 +4,13 @@ try unloadlibrary epanetmsx; catch, end
 try unloadlibrary legacymsx; catch, end
 
 %% Load MSXCore
-lib_core = 'C:\Users\mario\OneDrive - University of Cyprus\GitHub\EPANET-Matlab-Toolkit\epanet_matlab_toolkit\64bit\epanetmsx';
-h_file_core = 'C:\Users\mario\OneDrive - University of Cyprus\GitHub\EPANET-Matlab-Toolkit\epanet_matlab_toolkit\64bit\epanetmsx.h';
+lib_core = [fileparts(which('64bit/epanetmsx.dll')), '\epanetmsx'];
+h_file_core = which('64bit/epanetmsx.h');
 loadlibrary(lib_core, h_file_core);
 
 %% Load Legacy
-lib_legacy = 'C:\Users\mario\OneDrive - University of Cyprus\GitHub\EPANET-Matlab-Toolkit\epanet_matlab_toolkit\64bit\legacymsx';
-h_file_legacy = 'C:\Users\mario\OneDrive - University of Cyprus\GitHub\EPANET-Matlab-Toolkit\epanet_matlab_toolkit\64bit\legacyToolkit.h';
+lib_legacy = [fileparts(which('64bit/legacymsx.dll')), '\legacymsx'];
+h_file_legacy = which('64bit/legacyToolkit.h');
 loadlibrary(lib_legacy, h_file_legacy);
 
 %% Open MSX project
