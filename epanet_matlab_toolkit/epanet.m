@@ -48,6 +48,7 @@ classdef epanet <handle
     %   permissions and limitations under the Licence.
     properties
         ph                           % EPANET project handle
+        MSX                          % MSX project handle
         ControlLevelValues;          % The control level values
         ControlLinkIndex;            % Set of control links index
         ControlNodeIndex;            % Set of control nodes index
@@ -213,7 +214,7 @@ classdef epanet <handle
         Units_SI_Metric;             % Equal with 1 if is SI-Metric
         Units_US_Customary;          % Equal with 1 if is US-Customary
         Version;                     % EPANET version
-        
+
         % Parameters used with EPANET MSX
         MSXLibEPANET;                % MSX EPANET library dll
         MSXLibEPANETPath;            % MSX EPANET library path
@@ -251,7 +252,7 @@ classdef epanet <handle
         MSXSpeciesUnits;             % Species mass units
         MSXEquationsTanks;           % Species dynamics in tanks
         MSXEquationsTerms;           % Species dynamics in terms
-        
+
         % Parameters used when the Binary mode is used
         Bin;                         % Check if use Bin functions (use saveInputFile if is 1)
         BinControlLinksID;           % Set of control links ID
@@ -387,11 +388,11 @@ classdef epanet <handle
         BinUnits;                    % Units of all parameters
         BinUnits_US_Customary;       % Equal with 1 if is US-Customary
         CMDCODE;                     % Code=1 Hide, Code=0 Show (messages at command window)
-        
+
     end
     properties (Constant = true)
         classversion='v2.2.2'; % 17/07/2022
-        
+
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
         RULEVARIABLE={'DEMAND', 'HEAD', 'GRADE', 'LEVEL', 'PRESSURE', 'FLOW', 'STATUS', ... % Constants for rule-based controls: 'DEMAND', 'HEAD', 'GRADE' etc. % EPANET Version 2.2
@@ -452,7 +453,7 @@ classdef epanet <handle
                     varargin = char(varargin{1});
                 end
                 obj.saveBinInpFile(varargin);
-                
+
             elseif typecode
                 [Errcode] = obj.apiENsetflowunits(unitcode, obj.LibEPANET, obj.ph);
                 if nargin==4
@@ -470,7 +471,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, constant, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -486,7 +487,7 @@ classdef epanet <handle
                 j=1;
                 for i=1:count
                     [obj.Errcode] = eval(['obj.', fun, '(indices(i), propertie, value(j), obj.LibEPANET, obj.ph)']);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     if ~isscalar(value)
                         j=j+1;
                     end
@@ -499,7 +500,7 @@ classdef epanet <handle
                 j=1;
                 for i=1:length(value)
                     [obj.Errcode] = eval(['obj.', fun, '(value(i), propertie, varargin{1}(j), obj.LibEPANET, obj.ph)']);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     if ~isscalar(varargin{1})
                         j=j+1;
                     end
@@ -517,7 +518,7 @@ classdef epanet <handle
                 j = 1;
                 for i=indices
                     [obj.Errcode, value(j)] = eval(['obj.', fun, '(i, propertie, obj.LibEPANET, obj.ph)']);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     j=j+1;
                 end
             else
@@ -529,7 +530,7 @@ classdef epanet <handle
                 j = 1;
                 for i=1:length(varargin{1})
                     [obj.Errcode, value(j)] = eval(['obj.', fun, '(varargin{1}(i), propertie, obj.LibEPANET, obj.ph)']);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     if ~isscalar(varargin{1})
                         j=j+1;
                     end
@@ -537,7 +538,7 @@ classdef epanet <handle
             end
         end
         function set_node_demand_pattern(obj, fun, propertie, value, extra)
-            
+
             categ = 1;
             if length(extra) == 2
                 indices = value;
@@ -569,7 +570,7 @@ classdef epanet <handle
                         [obj.Errcode] = obj.apiENsetnodevalue(i, propertie, param(j), obj.LibEPANET, obj.ph);
                     end
                     j=j+1;
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -829,7 +830,7 @@ classdef epanet <handle
             obj.ph = libpointer('voidPtr');
             [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
             setdatatype(obj.ph, 'ProjectPtr')
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function apiEN_deleteproject(obj)
             % Deletes the epanet project.
@@ -842,7 +843,7 @@ classdef epanet <handle
             % See also apiEN_createproject, apiEN_runproject.
             [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
             obj.ph.isNull = 0;
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function [Errcode, inpname, repname, binname, pviewprog] = apiEN_runproject(obj, inpname, repname, binname, LibEPANET, ph)
             % Runs a complete EPANET simulation.
@@ -1144,9 +1145,9 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % typecode   the link's type (see LinkType).
-            try 
+            if ph.isNull
                 [Errcode, typecode] = calllib(LibEPANET, 'ENgetlinktype', index, 0);
-            catch
+            else
                 [Errcode, ~, typecode] = calllib(LibEPANET, 'EN_getlinktype', ph, index, 0);
             end
             typecode = double(typecode);
@@ -3156,7 +3157,7 @@ classdef epanet <handle
                 [Errcode] = calllib(LibEPANET, 'ENdeletecontrol', index);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_deletecontrol', ph, index);
-                
+
             end
         end
         function [Errcode, type, pmin, preq, pexp] = apiENgetdemandmodel(LibEPANET, ph)
@@ -3454,11 +3455,20 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
+            inp_file = [obj.MSXTempFile(1:end-3), 'inp'];
+            msx_file = obj.MSXTempFile;
+            out_file = [obj.MSXTempFile(1:end-3), 'txt'];
+            str_leg = {'', inp_file, msx_file, out_file};
+            str_leg_point = libpointer('stringPtrPtr', str_leg);
+            obj.MSX = libpointer('voidPtr');
+            Errcode = calllib('legacymsx', 'Legacyopen', obj.MSX, str_leg_point);
+            setdatatype(obj.MSX, 'ProjectPtr');
             if ~obj.ph.isNull
                 [Errcode] = calllib(obj.LibEPANET, 'ENopen', obj.TempInpFile, '', '');
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
             [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
+            % [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', obj.MSXTempFile);
             if Errcode
                 obj.apiMSXerror(Errcode, obj.MSXLibEPANET);
             end
@@ -3490,7 +3500,7 @@ classdef epanet <handle
             [e, errstring] = calllib(MSXLibEPANET, 'MSXgeterror', Errcode, errstring, len);
             disp(errstring);
         end
-        function [Errcode, count] = apiMSXgetcount(code, MSXLibEPANET)
+        function [Errcode, count] = apiMSXgetcount(code, MSXLibEPANET, MSX)
             % Retrieves the number of objects of a specific type.
             %
             % apiMSXgetcount(code, MSXLibEPANET)
@@ -3507,7 +3517,12 @@ classdef epanet <handle
             % an error code.
             % count number of objects of that type defined in the MSX input file
             count=0;
-            [Errcode, count] = calllib(MSXLibEPANET, 'MSXgetcount', code, count);
+            if ~libisloaded('legacymsx')
+                [Errcode, count] = calllib(MSXLibEPANET, 'MSXgetcount', code, count);
+            else
+                [Errcode, ~, count] = calllib(MSXLibEPANET, 'MSX_getcount', MSX, code, count);
+            end
+
         end
         function [Errcode, index] = apiMSXgetindex(varargin)
             % Retrieves the internal index number of an MSX object given its name.
@@ -3532,12 +3547,19 @@ classdef epanet <handle
                 varargin{1}=varargin{2};
                 varargin{2}=varargin{3};
                 MSXLibEPANET=varargin{4};
+                MSX = varargin{5};
             else
                 MSXLibEPANET=varargin{3};
+                MSX = varargin{4};
             end
-            [Errcode, ~, index]=calllib(MSXLibEPANET, 'MSXgetindex', varargin{1}, varargin{2}, index);
+            if ~libisloaded('legacymsx')
+                [Errcode, ~, index] = calllib(MSXLibEPANET, 'MSXgetindex', varargin{1}, varargin{2}, index);
+            else
+                [Errcode, ~, ~, index] = calllib(MSXLibEPANET, 'MSX_getindex', MSX, varargin{1}, varargin{2}, index);
+            end
+
         end
-        function [Errcode, id] = apiMSXgetID(type, index, len, MSXLibEPANET)
+        function [Errcode, id] = apiMSXgetID(type, index, len, MSXLibEPANET, MSX)
             % Retrieves the ID name of an object given its internal index number.
             %
             % apiMSXgetID(type, i ndex, len, MSXLibEPANET)
@@ -3556,10 +3578,15 @@ classdef epanet <handle
             % an error code.
             % id object’s ID name.
             id=char(32*ones(1, len+1));
-            [Errcode, id]=calllib(MSXLibEPANET, 'MSXgetID', type, index, id, len);
+            if ~libisloaded('legacymsx')
+                [Errcode, id]=calllib(MSXLibEPANET, 'MSXgetID', type, index, id, len);
+            else
+                [Errcode, ~, id]=calllib(MSXLibEPANET, 'MSX_getID', MSX, type, index, id, len);
+            end
+
             id=id(1:len);
         end
-        function [Errcode, len] = apiMSXgetIDlen(type, index, MSXLibEPANET)
+        function [Errcode, len] = apiMSXgetIDlen(type, index, MSXLibEPANET, MSX)
             % Retrieves the number of characters in the ID name of an MSX object given its internal index number.
             %
             % apiMSXgetIDlen(type, index, MSXLibEPANET)
@@ -3576,9 +3603,13 @@ classdef epanet <handle
             % Returns:
             % an error code.
             len=0;
-            [Errcode, len]=calllib(MSXLibEPANET, 'MSXgetIDlen', type, index, len);
+            if ~libisloaded('legacymsx')
+                [Errcode, len] = calllib(MSXLibEPANET, 'MSXgetIDlen', type, index, len);
+            else
+                [Errcode, ~, len] = calllib(MSXLibEPANET, 'MSX_getIDlen', MSX, type, index, len);
+            end
         end
-        function [Errcode, type, units, atol, rtol] = apiMSXgetspecies(index, MSXLibEPANET)
+        function [Errcode, type, units, atol, rtol] = apiMSXgetspecies(index, MSXLibEPANET, MSX)
             % Retrieves the attributes of a chemical species given its internal index number.
             %
             % apiMSXgetspecies(index, MSXLibEPANET)
@@ -3596,8 +3627,12 @@ classdef epanet <handle
             % atol      the absolute concentration tolerance defined for the species (inconcentration units).
             % rtol      the relative concentration tolerance defined for the species.
             type=0; rtol=0; atol=0;
-            units=char(32*ones(1, 16));
-            [Errcode, type, units, atol, rtol]=calllib(MSXLibEPANET, 'MSXgetspecies', index, type, units, atol, rtol);
+            units = char(32*ones(1, 16));
+            if ~libisloaded('legacymsx')
+                [Errcode, type, units, atol, rtol]=calllib(MSXLibEPANET, 'MSXgetspecies', index, type, units, atol, rtol);
+            else
+                [Errcode, ~, type, units, atol, rtol] = calllib(MSXLibEPANET, 'MSX_getspecies', MSX, index, type, units, atol, rtol);
+            end
             switch type
                 case 0
                     type='BULK';   % for a bulk water species
@@ -3605,7 +3640,7 @@ classdef epanet <handle
                     type='WALL';   % for a pipe wall surface species
             end
         end
-        function [Errcode, value] = apiMSXgetconstant(index, MSXLibEPANET)
+        function [Errcode, value] = apiMSXgetconstant(index, MSXLibEPANET, MSX)
             % Retrieves the value of a particular reaction constant.
             %
             % apiMSXgetconstant(index, MSXLibEPANET)
@@ -3619,9 +3654,13 @@ classdef epanet <handle
             % an error code.
             % value the value assigned to the constant.
             value=0;
-            [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetconstant', index, value);
+            if ~libisloaded('legacymsx')
+                [Errcode, value] = calllib(MSXLibEPANET, 'MSXgetconstant', index, value);
+            else
+                [Errcode, ~, value] = calllib(MSXLibEPANET, 'MSX_getconstant', MSX, index, value);
+            end
         end
-        function [Errcode, value] = apiMSXgetparameter(type, index, param, MSXLibEPANET)
+        function [Errcode, value] = apiMSXgetparameter(type, index, param, MSXLibEPANET, MSX)
             % Retrieves the value of a particular reaction parameter for a given pipe
             % or tank within the pipe network.
             %
@@ -3639,9 +3678,13 @@ classdef epanet <handle
             % an error code.
             % value the value assigned to the parameter for the node or link of interest.
             value=0;
-            [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetparameter', type, index, param, value);
+            if ~libisloaded('legacymsx')
+                [Errcode, value] = calllib(MSXLibEPANET, 'MSXgetparameter', type, index, param, value);
+            else
+                [Errcode, ~, value] = calllib(MSXLibEPANET, 'MSX_getparameter', MSX, type, index, param, value);
+            end
         end
-        function [Errcode, patlen] = apiMSXgetpatternlen(patindex, MSXLibEPANET)
+        function [Errcode, patlen] = apiMSXgetpatternlen(patindex, MSXLibEPANET, MSX)
             % Retrieves the number of time periods within a source time pattern.
             %
             % apiMSXgetpatternlen(patindex, MSXLibEPANET)
@@ -3654,9 +3697,13 @@ classdef epanet <handle
             % an error code.
             % patlen   the number of time periods (and therefore number of multipliers) that appear in the pattern.
             patlen=0;
-            [Errcode, patlen]=calllib(MSXLibEPANET, 'MSXgetpatternlen', patindex, patlen);
+            if ~libisloaded('legacymsx')
+                [Errcode, patlen] = calllib(MSXLibEPANET, 'MSXgetpatternlen', patindex, patlen);
+            else
+                [Errcode, ~, patlen] = calllib(MSXLibEPANET, 'MSX_getpatternlen', MSX, patindex, patlen);
+            end
         end
-        function [Errcode, value] = apiMSXgetpatternvalue(patindex, period, MSXLibEPANET)
+        function [Errcode, value] = apiMSXgetpatternvalue(patindex, period, MSXLibEPANET, MSX)
             % Retrieves the multiplier at a specific time period for a given source time pattern.
             %
             % apiMSXgetpatternvalue(patindex, period, MSXLibEPANET)
@@ -3670,9 +3717,13 @@ classdef epanet <handle
             % an error code.
             % value   the value of the pattern’s multiplier in the desired period.
             value=0;
-            [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetpatternvalue', patindex, period, value);
+            if ~libisloaded('legacymsx')
+                [Errcode, value] = calllib(MSXLibEPANET, 'MSXgetpatternvalue', patindex, period, value);
+            else
+                [Errcode, ~, value] = calllib(MSXLibEPANET, 'MSX_getpatternvalue', MSX, patindex, period, value);
+            end
         end
-        function [Errcode, value] = apiMSXgetinitqual(type, index, species, MSXLibEPANET)
+        function [Errcode, value] = apiMSXgetinitqual(type, index, species, MSXLibEPANET, MSX)
             % Retrieves the initial concentration of a particular chemical species assigned to a specific
             % node or link of the pipe network.
             %
@@ -3690,9 +3741,13 @@ classdef epanet <handle
             % an error code.
             % value the initial concentration of the species at the node or link of interest.
             value=0;
-            [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetinitqual', type, index, species, value);
+            if ~libisloaded('legacymsx')
+                [Errcode, value] = calllib(MSXLibEPANET, 'MSXgetinitqual', type, index, species, value);
+            else
+                [Errcode, ~, value] = calllib(MSXLibEPANET, 'MSX_getinitqual', MSX, type, index, species, value);
+            end
         end
-        function [Errcode, type, level, pat] = apiMSXgetsource(node, species, MSXLibEPANET)
+        function [Errcode, type, level, pat] = apiMSXgetsource(node, species, MSXLibEPANET, MSX)
             % Retrieves information on any external source of a particular chemical species assigned to a
             % specific node of the pipe network.
             %
@@ -3717,7 +3772,11 @@ classdef epanet <handle
             type=0;
             level=0;
             pat=0;
-            [Errcode, type, level, pat]=calllib(MSXLibEPANET, 'MSXgetsource', node, species, type, level, pat);
+            if ~libisloaded('legacymsx')
+                [Errcode, type, level, pat] = calllib(MSXLibEPANET, 'MSXgetsource', node, species, type, level, pat);
+            else
+                [Errcode, ~, type, level, pat] = calllib(MSXLibEPANET, 'MSX_getsource', MSX, node, species, type, level, pat);
+            end
             switch type     % type codes
                 case -1
                     type='NOSOURCE';  % for no source
@@ -3818,7 +3877,7 @@ classdef epanet <handle
             % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetinitqual', type, index, species, value);
         end
-        function [Errcode] = apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET)
+        function [Errcode] = apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET, MSX)
             % Assigns a new set of multipliers to a given MSX source time pattern.
             %
             % apiMSXsetpattern(index, factors, nfactors, MSXLibEPANET)
@@ -3832,7 +3891,11 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(MSXLibEPANET, 'MSXsetpattern', index, factors, nfactors);
+            if ~libisloaded('legacymsx')
+                [Errcode] = calllib(MSXLibEPANET, 'MSXsetpattern', index, factors, nfactors);
+            else
+                [Errcode] = calllib(MSXLibEPANET, 'MSX_setpattern', MSX, index, factors, nfactors);
+            end
         end
         function [Errcode] = apiMSXsetpatternvalue(pat, period, value, MSXLibEPANET)
             % Assigns a new value to the multiplier for a specific time period in a given MSX source time pattern.
@@ -3864,7 +3927,7 @@ classdef epanet <handle
             % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXsolveQ');
         end
-        function [Errcode] = apiMSXsolveH(MSXLibEPANET)
+        function [Errcode] = apiMSXsolveH(MSXLibEPANET, MSX)
             % Solves for system hydraulics over the entire simulation period saving results
             % to an internal scratch file.
             %
@@ -3875,9 +3938,13 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(MSXLibEPANET, 'MSXsolveH');
+            if ~libisloaded('legacymsx')
+                [Errcode] = calllib(MSXLibEPANET, 'MSXsolveH');
+            else
+                [Errcode] = calllib('legacymsx', 'MSXsolveH', MSX);
+            end
         end
-        function [Errcode] = apiMSXaddpattern(patid, MSXLibEPANET)
+        function [Errcode] = apiMSXaddpattern(patid, MSXLibEPANET, MSX)
             % Adds a new, empty MSX source time pattern to an MSX project.
             %
             % apiMSXaddpattern(patid, MSXLibEPANET)
@@ -3888,7 +3955,11 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(MSXLibEPANET, 'MSXaddpattern', patid);
+            if ~libisloaded('legacymsx')
+                [Errcode] = calllib(MSXLibEPANET, 'MSXaddpattern', patid);
+            else
+                [Errcode] = calllib(MSXLibEPANET, 'MSX_addpattern', MSX, patid);
+            end
         end
         function [Errcode] = apiMSXusehydfile(hydfname, MSXLibEPANET)
             % Uses a previously saved EPANET hydraulics file as the source of hydraulic information.
@@ -3904,7 +3975,7 @@ classdef epanet <handle
             % an error code.
             [Errcode]=calllib(MSXLibEPANET, 'MSXusehydfile', hydfname);
         end
-        function [Errcode, t, tleft] = apiMSXstep(MSXLibEPANET)
+        function [Errcode, t, tleft] = apiMSXstep(MSXLibEPANET, MSX)
             % Advances the water quality solution through a single water quality time step when
             % performing a step-wise simulation.
             %
@@ -3919,11 +3990,15 @@ classdef epanet <handle
             % tleft  time left in the simulation (also in seconds).
             t=int32(0);
             tleft=int32(0);
-            [Errcode, t, tleft]=calllib(MSXLibEPANET, 'MSXstep', t, tleft);
+            if ~libisloaded('legacymsx')
+                [Errcode, t, tleft] = calllib(MSXLibEPANET, 'MSXstep', t, tleft);
+            else
+                [Errcode, ~, t, tleft] = calllib(MSXLibEPANET, 'MSX_step', MSX, t, tleft);
+            end
             t = double(t);
             tleft = double(tleft);
         end
-        function [Errcode] = apiMSXinit(flag, MSXLibEPANET)
+        function [Errcode] = apiMSXinit(flag, MSXLibEPANET, MSX)
             % Initialize the MSX system before solving for water quality results in step-wise fashion.
             %
             % apiMSXinit(flag, MSXLibEPANET)
@@ -3935,7 +4010,11 @@ classdef epanet <handle
             %
             % Returns:
             % an error code.
-            [Errcode]=calllib(MSXLibEPANET, 'MSXinit', flag);
+            if ~libisloaded('legacymsx')
+                [Errcode] = calllib(MSXLibEPANET, 'MSXinit', flag);
+            else
+                [Errcode] = calllib('legacymsx', 'Legacyinit', MSX, flag);
+            end
         end
         function [Errcode] = apiMSXreport(MSXLibEPANET)
             % Writes water quality simulations results as instructed by the MSX input file to a text file.
@@ -3962,12 +4041,12 @@ classdef epanet <handle
             % e         an error code.
             % errmsg    the text of the error message corresponding to the error code.
             errmsg = char(32*ones(1, 80));
-            [e, errmsg] = calllib(MSXLibEPANET, 'MSXgeterror', Errcode, errmsg, 80);
+            [e, errmsg] = calllib('epanetMSX', 'MSXgeterror', Errcode, errmsg, 80);
             if e
                 obj.apiMSXerror(e);
             end
         end
-        function [Errcode, value] = apiMSXgetqual(type, index, species, MSXLibEPANET)
+        function [Errcode, value] = apiMSXgetqual(type, index, species, MSXLibEPANET, MSX)
             % Retrieves a chemical species concentration at a given node or the average concentration
             % along a link at the current simulation time step.
             %
@@ -3985,7 +4064,11 @@ classdef epanet <handle
             % an error code.
             % value the computed concentration of the species at the current time period.
             value=0;
-            [Errcode, value]=calllib(MSXLibEPANET, 'MSXgetqual', type, index, species, value);
+            if ~libisloaded('legacymsx')
+                [Errcode, value] = calllib(MSXLibEPANET, 'MSXgetqual', type, index, species, value);
+            else
+                [Errcode, ~, value] = calllib(MSXLibEPANET, 'MSX_getQualityByIndex', MSX, type, index, species, value);
+            end
         end
         function [Errcode] = apiMSXsetsource(node, species, type, level, pat, MSXLibEPANET)
             % Sets the attributes of an external source of a particular chemical species to a specific node of
@@ -4012,7 +4095,7 @@ classdef epanet <handle
             [Errcode]=calllib(MSXLibEPANET, 'MSXsetsource', node, species, type, level, pat);
         end
     end
-    
+
     methods
         function obj = epanet(varargin)
             %Constructor of the EPANET Class
@@ -4094,10 +4177,10 @@ classdef epanet <handle
             %Load EPANET Library
             obj.ENLoadLibrary;
             disp([' (EMT version {', obj.classversion, '}).'])
-            
+
             % Create Project - EPANET 2.2 supported function
             obj.ph = libpointer('voidPtr');
-            if contains('ph', varargin) 
+            if contains('ph', varargin)
                 try
                     obj.createProject;
                 catch
@@ -4105,7 +4188,7 @@ classdef epanet <handle
             end
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
-            
+
             %For the getComputedQualityTimeSeries
             obj.solve = 0;
             %Open the file
@@ -4115,32 +4198,32 @@ classdef epanet <handle
                         warning(['Network name "', inp , '.inp" already exists.'])
                     end
                     obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 else
                     obj.InputFile = varargin{1};
                     % initializes an EPANET project that isn't opened with an input file
                     obj.initializeEPANET(obj.ToolkitConstants.EN_GPM, obj.ToolkitConstants.EN_HW);
                     warning('Initializes the EPANET project!');
                 end
-                
+
                 %Save the temporary input file
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
-                
+
                 copyfile(obj.InputFile, obj.BinTempfile); % create a new INP file (Working Copy) using the SAVE command of EPANET
-                
+
                 obj.closeNetwork;  %apiENclose; %Close input file
                 %Load temporary file
                 rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
                 binfile = [obj.InputFile(1:end-4), '_temp.bin'];
                 obj.Errcode=obj.apiENopen(obj.BinTempfile, rptfile, binfile, obj.LibEPANET, obj.ph);
                 if obj.Errcode
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 else
                     disp(['Loading File "', varargin{1}, '"...']);
                 end
                 % Hide messages at command window from bin computed
                 obj.CMDCODE=1;
-                
+
                 % Using new variable for temp file
                 obj.TempInpFile = obj.BinTempfile;
                 % Load file only, return
@@ -4152,7 +4235,7 @@ classdef epanet <handle
                         return;
                     end
                 end
-                
+
                 % Get some link data
                 lnkInfo = obj.getLinksInfo;
                 getFields_link_info = fields(lnkInfo);
@@ -4316,7 +4399,7 @@ classdef epanet <handle
             obj.NodeCoordinates{2} = value{2};
             obj.NodeCoordinates{3} = value{3};
             obj.NodeCoordinates{4} = value{4};
-            
+
             % US Customary - SI metric
             infoUnits = obj.getUnits;
             getFields_infoUnits = fields(infoUnits);
@@ -4325,7 +4408,7 @@ classdef epanet <handle
             end
             disp(['Input File "', varargin{1}, '" loaded successfully.']);
         end % End of epanet class constructor
-        
+
         function [obj] = apiMSXMatlabSetup(obj, msxname, varargin)
             arch = computer('arch');
             pwdepanet = fileparts(which(mfilename));
@@ -4355,7 +4438,7 @@ classdef epanet <handle
             if ~libisloaded(obj.MSXLibEPANET)
                 loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
             end
-            
+
             obj.MSXFile = which(char(msxname));
             %Save the temporary msx file
             mm=0;
@@ -4378,7 +4461,7 @@ classdef epanet <handle
             obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
             obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
             obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
-            
+
             obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
             obj.MSXConstantsCount = obj.getMSXConstantsCount;
             obj.MSXParametersCount = obj.getMSXParametersCount;
@@ -4408,7 +4491,7 @@ classdef epanet <handle
             obj.MSXSourceNodeNameID = obj.getMSXSourceNodeNameID;
             obj.MSXPattern = obj.getMSXPattern;
         end
-        
+
         function openAnyInp(obj, varargin)
             % Open as on matlab editor any EPANET input file using built
             % function open. Open current loaded input file (not temporary)
@@ -4445,7 +4528,7 @@ classdef epanet <handle
             % Example:
             %       d.runsCompleteSimulation;
             %       d.runsCompleteSimulation('results'); % using obj.apiENepanet
-            
+
             if nargin == 1
                 obj.solveCompleteHydraulics;
                 Errcode = obj.solveCompleteQuality;
@@ -4550,7 +4633,7 @@ classdef epanet <handle
                     obj.ControlLinkIndex(j), obj.ControlSettings(j), ...
                     obj.ControlNodeIndex(j), obj.ControlLevelValues(j)]...
                     = obj.apiENgetcontrol(i, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 obj.ControlTypes(j)=obj.TYPECONTROL(obj.ControlTypesIndex(j)+1);
                 value(j).Type = obj.ControlTypes{j};
                 %value{i}.TypeIndex = obj.ControlTypesIndex(i);
@@ -4641,7 +4724,7 @@ classdef epanet <handle
                         value_premise = '';
                     end
                     premises{j, 1} = [obj.LOGOP{logop}, ' ', obj.RULEOBJECT{object-5 }, space, char(objectNameID), space, obj.RULEVARIABLE{variable+1}, ' ', obj.RULEOPERATOR{relop+1}, ' ', ruleStatus, value_premise];
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
                 cnt = obj.getRuleInfo.ThenActions(i);
                 thenactions = cell(cnt, 1);
@@ -4665,7 +4748,7 @@ classdef epanet <handle
                         setting = '';
                     end
                     thenactions{j, 1} = [logop, ' ', link_type, ' ', linkNameID, status, setting];
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
                 cnt = obj.getRuleInfo.ElseActions(i);
                 elseactions = cell(cnt, 1);
@@ -4689,7 +4772,7 @@ classdef epanet <handle
                         setting = '';
                     end
                     elseactions{j, 1} = [logop, ' ', link_type, ' ', linkNameID, status, setting];
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
                 if nargin==1
                     k = i;
@@ -4721,7 +4804,7 @@ classdef epanet <handle
             %
             % See also deleteRules, setRules, getRules, getRuleInfo,
             %          setRuleThenAction, setRuleElseAction, setRulePriority.
-            
+
             %rule_new = split(rule, '\n ');
             rule_new = regexp(rule, '\\n', 'split');
             rule_final = [];
@@ -4729,7 +4812,7 @@ classdef epanet <handle
                 rule_final = [rule_final rule_new{i} newline];
             end
             [obj.Errcode] = obj.apiENaddrule(rule_final, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setRules(obj, ruleIndex, rule)
             % Sets a rule - based control. (EPANET Version 2.2)
@@ -4799,7 +4882,7 @@ classdef epanet <handle
             end
             linkIndex = obj.getLinkIndex(then_new{3});
             [obj.Errcode] = obj.apiENsetthenaction(ruleIndex, actionIndex, linkIndex, status, setting, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setRuleElseAction(obj, ruleIndex, actionIndex, else_action)
             % Sets rule - based control else actions. (EPANET Version 2.2)
@@ -4831,7 +4914,7 @@ classdef epanet <handle
             end
             linkIndex = obj.getLinkIndex(else_new{3});
             [obj.Errcode] = obj.apiENsetelseaction(ruleIndex, actionIndex, linkIndex, status, setting, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setRulePriority(obj, ruleIndex, priority)
             % Sets rule - based control priority. (EPANET Version 2.2)
@@ -4848,7 +4931,7 @@ classdef epanet <handle
             % See also setRules, setRuleThenAction, setRuleElseAction,
             %          getRuleInfo, getRules, addRules, deleteRules.
             [obj.Errcode] = obj.apiENsetrulepriority(ruleIndex, priority, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setRulePremise(obj, ruleIndex, premiseIndex, premise)
             % Sets the premise of a rule - based control. (EPANET Version 2.2)
@@ -4873,7 +4956,7 @@ classdef epanet <handle
             %
             % See also setRulePremiseObejctNameID, setRulePremiseStatus, setRulePremiseValue,
             %          setRules, getRules, addRules, deleteRules.
-            
+
             %  premise_new = split(premise, ' ');
             premise_new = regexp(premise, '\s', 'split');
             logop_code = ismember(obj.LOGOP, premise_new{1});
@@ -4910,7 +4993,7 @@ classdef epanet <handle
             end
             [obj.Errcode] = obj.apiENsetpremise(ruleIndex, premiseIndex, logop, object, objIndex, variable, ...
                 relop, status, value, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setRulePremiseObejctNameID(obj, ruleIndex, premiseIndex, objNameID)
             % Sets the ID of an object in a premise of a rule-based control. (EPANET Version 2.2)
@@ -4934,7 +5017,7 @@ classdef epanet <handle
                 objIndex = obj.getLinkIndex(objNameID);
             end
             [obj.Errcode] = obj.apiENsetpremiseindex(ruleIndex, premiseIndex, objIndex, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setRulePremiseStatus(obj, ruleIndex, premiseIndex, status)
             % Sets the status being compared to in a premise of a rule-based control. (EPANET Version 2.2)
@@ -4961,7 +5044,7 @@ classdef epanet <handle
                 status_code = obj.ToolkitConstants.EN_R_IS_ACTIVE;
             end
             [obj.Errcode] = obj.apiENsetpremisestatus(ruleIndex, premiseIndex, status_code, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setRulePremiseValue(obj, ruleIndex, premiseIndex, value)
             % Sets the value being compared to in a premise of a rule-based control. (EPANET Version 2.2)
@@ -4979,7 +5062,7 @@ classdef epanet <handle
             % See also setRulePremise, setRulePremiseObejctNameID, setRulePremiseStatus,
             %          setRules, getRules, addRules, deleteRules.
             [obj.Errcode] = obj.apiENsetpremisevalue(ruleIndex, premiseIndex, value, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getRuleID(obj, varargin)
             % Retrieves the ID name of a rule-based control given its index. (EPANET Version 2.2)
@@ -5006,11 +5089,11 @@ classdef epanet <handle
             j=1;
             for i=1:length(index)
                 [obj.Errcode, value{j}] = obj.apiENgetruleID(index(i), obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
-        
+
         function netgraph = getGraph(obj, varargin)
             % Retrieves the graph of the current epanet network.
             %
@@ -5029,7 +5112,7 @@ classdef epanet <handle
                 netgraph = graph(conmat);
             end
         end
-        
+
         function h = plotGraph(obj, varargin)
             % Plots the graph of the current epanet network.
             %
@@ -5052,7 +5135,7 @@ classdef epanet <handle
                 h.EdgeLabel = obj.getLinkNameID;
             end
         end
-        
+
         function json_txt = toJson(~, values)
             % Creates json text variable
             %
@@ -5068,7 +5151,7 @@ classdef epanet <handle
             % See also toJsonFile.
             json_txt = jsonencode(values);
         end
-        
+
         function toJsonFile(obj, values, varargin)
             % Creates a .json file and adds the input values in json format.
             %
@@ -5121,7 +5204,7 @@ classdef epanet <handle
             for i=1:length(index)
                 [~, value.Premises(i), value.ThenActions(i), value.ElseActions(i), value.Priority(i)] = ...
                     obj.apiENgetrule(index(i), obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function Errcode = deleteRules(varargin)
@@ -5152,7 +5235,7 @@ classdef epanet <handle
             end
             for i=length(index):-1:1
                 [Errcode] = obj.apiENdeleterule(index(i), obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getNodeCount(obj)
@@ -5163,7 +5246,7 @@ classdef epanet <handle
             %
             % See also getNodeIndex, getLinkCount.
             [obj.Errcode, value] = obj.apiENgetcount(obj.ToolkitConstants.EN_NODECOUNT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getNodeTankReservoirCount(obj)
             % Retrieves the number of tanks.
@@ -5173,7 +5256,7 @@ classdef epanet <handle
             %
             % See also getNodeTankIndex, getNodeReservoirIndex.
             [obj.Errcode, value] = obj.apiENgetcount(obj.ToolkitConstants.EN_TANKCOUNT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getLinkCount(obj)
             % Retrieves the number of links.
@@ -5183,7 +5266,7 @@ classdef epanet <handle
             %
             % See also getLinkIndex, getNodeCount.
             [obj.Errcode, value] = obj.apiENgetcount(obj.ToolkitConstants.EN_LINKCOUNT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getPatternCount(obj)
             % Retrieves the number of patterns.
@@ -5193,7 +5276,7 @@ classdef epanet <handle
             %
             % See also getPatternIndex, getPattern.
             [obj.Errcode, value] = obj.apiENgetcount(obj.ToolkitConstants.EN_PATCOUNT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getCurveCount(obj)
             % Retrieves the number of curves.
@@ -5203,7 +5286,7 @@ classdef epanet <handle
             %
             % See also getCurveIndex, getCurvesInfo.
             [obj.Errcode, value] = obj.apiENgetcount(obj.ToolkitConstants.EN_CURVECOUNT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getControlRulesCount(obj)
             % Retrieves the number of controls.
@@ -5213,7 +5296,7 @@ classdef epanet <handle
             %
             % See also getControls, getRuleCount.
             [obj.Errcode, value] = obj.apiENgetcount(obj.ToolkitConstants.EN_CONTROLCOUNT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getRuleCount(obj)
             % Retrieves the number of rules. (EPANET Version 2.2)
@@ -5223,7 +5306,7 @@ classdef epanet <handle
             %
             % See also getRules, getControlRulesCount.
             [obj.Errcode, value] = obj.apiENgetcount(obj.ToolkitConstants.EN_RULECOUNT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getNodeTankCount(obj)
             % Retrieves the number of Tanks.
@@ -5298,7 +5381,7 @@ classdef epanet <handle
             % Example:
             %   d.getFlowUnits
             [obj.Errcode, flowunitsindex] = obj.apiENgetflowunits(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             value=obj.TYPEUNITS{flowunitsindex+1};
         end
         function value = getLinkNameID(obj, varargin)
@@ -5321,7 +5404,7 @@ classdef epanet <handle
                 value=cell(1, cnt);
                 for i=1:cnt
                     [obj.Errcode, value{i}] = obj.apiENgetlinkid(i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             else
                 k=1;
@@ -5331,7 +5414,7 @@ classdef epanet <handle
                     [obj.Errcode, value{k}] = obj.apiENgetlinkid(i, obj.LibEPANET, obj.ph);
                     if obj.Errcode==204, value=[];  return; end
                     k=k+1;
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -5431,12 +5514,12 @@ classdef epanet <handle
                 value = zeros(1, length(varargin{1}));
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(k)] = obj.apiENgetlinkindex(varargin{1}{j}, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = obj.apiENgetlinkindex(varargin{1}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getLinkPipeIndex(obj)
@@ -5566,7 +5649,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode, linkFromNode, linkToNode] = obj.apiENgetlinknodes(i, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 value(j, :)= [linkFromNode, linkToNode];
                 j = j +1;
             end
@@ -5592,7 +5675,7 @@ classdef epanet <handle
         function value = getLinkType(obj, varargin)
             % Retrieves the link-type code for all links.
             %
-            % Example 1:    
+            % Example 1:
             %    d.getLinkType      % Retrieves the link-type code for all links
             %
             % Example 2:
@@ -5617,7 +5700,7 @@ classdef epanet <handle
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetlinktype(i, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -5829,7 +5912,7 @@ classdef epanet <handle
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_FLOW, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -5851,7 +5934,7 @@ classdef epanet <handle
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -5873,7 +5956,7 @@ classdef epanet <handle
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -5975,7 +6058,7 @@ classdef epanet <handle
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -5996,7 +6079,7 @@ classdef epanet <handle
             [indices, value] = getLinkIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LINKQUAL, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -6200,7 +6283,7 @@ classdef epanet <handle
                 value = cell(1, cnt);
                 for i=1:cnt
                     [obj.Errcode, value{i}]=obj.apiENgetnodeid(i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
@@ -6208,7 +6291,7 @@ classdef epanet <handle
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
                     [obj.Errcode, value{k}]=obj.apiENgetnodeid(i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             end
@@ -6277,12 +6360,12 @@ classdef epanet <handle
                 value = zeros(1, length(varargin{1}));
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(k)] = obj.apiENgetnodeindex(varargin{1}{j}, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = obj.apiENgetnodeindex(varargin{1}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getNodeReservoirIndex(obj, varargin)
@@ -6362,7 +6445,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodetype(i, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -6404,7 +6487,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -6417,7 +6500,7 @@ classdef epanet <handle
             % See also setDemandModel, getNodeBaseDemands, getNodeDemandCategoriesNumber
             %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
             [obj.Errcode, value.DemandModelCode, value.DemandModelPmin, value.DemandModelPreq, value.DemandModelPexp] = obj.apiENgetdemandmodel(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             value.DemandModelType = obj.DEMANDMODEL(value.DemandModelCode+1);
         end
         function categoryIndex = addNodeJunctionDemand(obj, varargin)
@@ -6472,26 +6555,26 @@ classdef epanet <handle
             end
             if isscalar(nodeIndex)
                 [obj.Errcode]=obj.apiENadddemand(nodeIndex, baseDemand , demandPattern, demandName, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             elseif ~isscalar(nodeIndex)&&  isscalar(baseDemand) && ~iscell(demandPattern) && ~iscell(demandName)
                 for i=1:length(nodeIndex)
                     [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand , demandPattern, demandName, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             elseif ~isscalar(nodeIndex)&& ~isscalar(baseDemand) && ~iscell(demandPattern) && ~iscell(demandName)
                 for i=1:length(nodeIndex)
                     [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand(i) , demandPattern, demandName, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             elseif ~isscalar(nodeIndex) &&  ~isscalar(baseDemand) && iscell(demandPattern) && ~iscell(demandName)
                 for i=1:length(nodeIndex)
                     [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             elseif ~isscalar(nodeIndex) &&  ~isscalar(baseDemand) && iscell(demandPattern) && iscell(demandName)
                 for i=1:length(nodeIndex)
                     [obj.Errcode]=obj.apiENadddemand(nodeIndex(i), baseDemand(i) , demandPattern{i}, demandName{i}, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
             if ~isscalar(nodeIndex) && ~iscell(demandName)
@@ -6550,20 +6633,20 @@ classdef epanet <handle
                     numDemand=size(obj.getNodeJunctionDemandIndex);
                     for i=1:numDemand(1)
                         [obj.Errcode]=obj.apiENdeletedemand(nodeIndex, 1, obj.LibEPANET, obj.ph);
-                        error(obj.getError(obj.Errcode));
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     end
                 elseif ~isscalar(nodeIndex)
                     for j=1:length(nodeIndex)
                         numDemand=size(obj.getNodeJunctionDemandIndex);
                         for i=1:numDemand(1)
                             [obj.Errcode]=obj.apiENdeletedemand(nodeIndex(j), 1, obj.LibEPANET, obj.ph);
-                            error(obj.getError(obj.Errcode));
+                            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                         end
                     end
                 end
             elseif nargin==3
                 [obj.Errcode]=obj.apiENdeletedemand(nodeIndex, varargin{2}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getNodeJunctionDemandName(obj, varargin)
@@ -6583,7 +6666,7 @@ classdef epanet <handle
                 v=1;
                 for u=1:numdemands(j)
                     [obj.Errcode, val{v, j}] = obj.apiENgetdemandname(i, u, obj.LibEPANET, obj.ph);v=v+1;
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
                 j=j+1;
             end
@@ -6610,7 +6693,7 @@ classdef epanet <handle
                 value = cell(1, cnt);
                 for i=1:cnt
                     [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_NODE, i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
@@ -6618,7 +6701,7 @@ classdef epanet <handle
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
                     [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_NODE, i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             end
@@ -6640,11 +6723,11 @@ classdef epanet <handle
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_NODE, indices, value, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             else
                 for i=indices
                     [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_NODE, i, value{j}, obj.LibEPANET, obj.ph); j=j+1;
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -6656,7 +6739,7 @@ classdef epanet <handle
             %
             % See also setTitle.
             [obj.Errcode, Line1, Line2, Line3] = obj.apiENgettitle(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getNodeBaseDemands(obj, varargin)
             % Retrieves the value of all node base demands.
@@ -6679,7 +6762,7 @@ classdef epanet <handle
                 v=1;
                 for u=1:numdemands(j)
                     [obj.Errcode, val(v, j)] = obj.apiENgetbasedemand(i, u, obj.LibEPANET, obj.ph);v=v+1;
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
                 j=j+1;
             end
@@ -6701,7 +6784,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnumdemands(i, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -6722,14 +6805,14 @@ classdef epanet <handle
                 v=1;
                 for u=1:numdemands(i)
                     [obj.Errcode, val(v, i)] = obj.apiENgetdemandpattern(i, u, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     v = v+1;
                 end
             end
             for i=obj.getNodeReservoirIndex
                 if ismember(i, obj.getNodeReservoirIndex)
                     [obj.Errcode, val(v, i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
             for i=1:size(val, 1)
@@ -6795,12 +6878,12 @@ classdef epanet <handle
                 demandName = varargin{2};
                 if isscalar(nodeIndex) && ~iscell(demandName)
                     [obj.Errcode, value] = obj.apiENgetdemandindex(nodeIndex, demandName, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 elseif ~isscalar(nodeIndex) && iscell(demandName)
                     value=zeros(1, length(nodeIndex));
                     for i=1:length(nodeIndex)
                         [obj.Errcode, value(i)] = obj.apiENgetdemandindex(nodeIndex(i), demandName{i}, obj.LibEPANET, obj.ph);
-                        error(obj.getError(obj.Errcode));
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     end
                 end
             elseif nargin==2
@@ -6811,7 +6894,7 @@ classdef epanet <handle
                     for i=1:length(demandName)
                         demandNameIn = demandName{i};
                         [obj.Errcode, value(i)] = obj.apiENgetdemandindex(nodeIndex, demandNameIn{varargin{1}}, obj.LibEPANET, obj.ph);
-                        error(obj.getError(obj.Errcode));
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     end
                 else
                     value = zeros(length(demandName), length(nodeIndex));
@@ -6819,7 +6902,7 @@ classdef epanet <handle
                         demandNameIn = demandName{i};
                         for j=1:length(nodeIndex)
                             [obj.Errcode, value(i, j)] = obj.apiENgetdemandindex(nodeIndex(j), demandNameIn{nodeIndex(j)}, obj.LibEPANET, obj.ph);
-                            error(obj.getError(obj.Errcode));
+                            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                         end
                     end
                 end
@@ -6831,7 +6914,7 @@ classdef epanet <handle
                     for j=1:length(demandName{i})
                         demandNameIn = demandName{i}{j};
                         [obj.Errcode, value(i, j)] = obj.apiENgetdemandindex(j, demandNameIn, obj.LibEPANET, obj.ph);
-                        error(obj.getError(obj.Errcode));
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     end
                 end
             else
@@ -6846,13 +6929,13 @@ classdef epanet <handle
             %   Output: *iter = # of iterations to reach solution
             %           *relerr = convergence error in solution
             [obj.Errcode, value.Iterations] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_ITERATIONS, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             [obj.Errcode, value.RelativeError] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_RELATIVEERROR, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             [obj.Errcode, value.DeficientNodes] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEFICIENTNODES, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             [obj.Errcode, value.DemandReduction] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEMANDREDUCTION, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getNodePatternIndex(obj, varargin)
             % Retrieves the value of all node demand pattern indices.
@@ -6868,7 +6951,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -6885,7 +6968,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -6902,7 +6985,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -7013,7 +7096,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -7053,7 +7136,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_HEAD, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -7114,7 +7197,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -7134,7 +7217,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -7170,7 +7253,7 @@ classdef epanet <handle
             value=zeros(1, length(varargin{1}));v=1;
             for i=varargin{1}
                 [obj.Errcode, value(v)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);v=v+1
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getNodeTankInitialWaterVolume(obj, varargin)
@@ -7474,7 +7557,7 @@ classdef epanet <handle
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMANDDEFICIT, obj.LibEPANET, obj.ph);
-%                 error(obj.getError(obj.Errcode));
+%                 error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -7590,7 +7673,7 @@ classdef epanet <handle
             %
             % See also setOptionsMaxTrials, getOptionsExtraTrials, getOptionsAccuracyValue.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_TRIALS, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsAccuracyValue(obj)
             % Retrieves the total normalized flow change for hydraulic convergence.
@@ -7600,7 +7683,7 @@ classdef epanet <handle
             %
             % See also setOptionsAccuracyValue, getOptionsExtraTrials, getOptionsMaxTrials.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_ACCURACY, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsQualityTolerance(obj)
             % Retrieves the water quality analysis tolerance.
@@ -7610,7 +7693,7 @@ classdef epanet <handle
             %
             % See also setOptionsQualityTolerance, getOptionsSpecificDiffusivity, getOptionsLimitingConcentration.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_TOLERANCE, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsEmitterExponent(obj)
             % Retrieves the power exponent for the emmitters.
@@ -7620,7 +7703,7 @@ classdef epanet <handle
             %
             % See also setOptionsEmitterExponent, getOptionsPatternDemandMultiplier, getOptionsAccuracyValue.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_EMITEXPON, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsPatternDemandMultiplier(obj)
             % Retrieves the global pattern demand multiplier.
@@ -7630,7 +7713,7 @@ classdef epanet <handle
             %
             % See also setOptionsPatternDemandMultiplier, getOptionsEmitterExponent, getOptionsAccuracyValue.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_DEMANDMULT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsHeadError(obj)
             % Retrieves the maximum head loss error for hydraulic convergence. (EPANET Version 2.2)
@@ -7640,7 +7723,7 @@ classdef epanet <handle
             %
             % See also setOptionsHeadError, getOptionsEmitterExponent, getOptionsAccuracyValue.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_HEADERROR, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsFlowChange(obj)
             % Retrieves the maximum flow change for hydraulic convergence. (EPANET Version 2.2)
@@ -7650,7 +7733,7 @@ classdef epanet <handle
             %
             % See also setOptionsFlowChange, getOptionsHeadError, getOptionsHeadLossFormula.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_FLOWCHANGE, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsHeadLossFormula(obj)
             % Retrieves the headloss formula. (EPANET Version 2.2)
@@ -7661,7 +7744,7 @@ classdef epanet <handle
             % See also setOptionsHeadLossFormula, getOptionsHeadError, getOptionsFlowChange.
             [obj.Errcode, headloss] = obj.apiENgetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, obj.LibEPANET, obj.ph);
             value= obj.TYPEHEADLOSS{headloss+1};
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsGlobalEffic(obj)
             % Retrieves the global efficiency for pumps(percent). (EPANET Version 2.2)
@@ -7671,7 +7754,7 @@ classdef epanet <handle
             %
             % See also setOptionsGlobalEffic, getOptionsGlobalPrice, getOptionsGlobalPattern.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_GLOBALEFFIC, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsGlobalPrice(obj)
             % Retrieves the global average energy price per kW-Hour. (EPANET Version 2.2)
@@ -7681,7 +7764,7 @@ classdef epanet <handle
             %
             % See also setOptionsGlobalPrice, getOptionsGlobalEffic, getOptionsGlobalPattern.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_GLOBALPRICE, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsGlobalPattern(obj)
             % Retrieves the index of the global energy price pattern. (EPANET Version 2.2)
@@ -7691,7 +7774,7 @@ classdef epanet <handle
             %
             % See also setOptionsGlobalPattern, getOptionsGlobalEffic, getOptionsGlobalPrice.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_GLOBALPATTERN, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsDemandCharge(obj)
             % Retrieves the energy charge per maximum KW usage. (EPANET Version 2.2)
@@ -7701,7 +7784,7 @@ classdef epanet <handle
             %
             % See also setOptionsDemandCharge, getOptionsGlobalPrice, getOptionsGlobalPattern.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_DEMANDCHARGE, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsSpecificGravity(obj)
             % Retrieves the specific gravity. (EPANET Version 2.2)
@@ -7711,7 +7794,7 @@ classdef epanet <handle
             %
             % See also setOptionsSpecificGravity, getOptionsSpecificViscosity, getOptionsHeadLossFormula.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_SP_GRAVITY, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsSpecificViscosity(obj)
             % Retrieves the specific viscosity. (EPANET Version 2.2)
@@ -7721,7 +7804,7 @@ classdef epanet <handle
             %
             % See also setOptionsSpecificViscosity, getOptionsSpecificGravity, getOptionsHeadLossFormula.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_SP_VISCOS, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsExtraTrials(obj)
             % Retrieves the extra trials allowed if hydraulics don't converge. (EPANET Version 2.2)
@@ -7731,7 +7814,7 @@ classdef epanet <handle
             %
             % See also setOptionsExtraTrials, getOptionsMaxTrials, getOptionsMaximumCheck.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_UNBALANCED, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsCheckFrequency(obj)
             % Retrieves the frequency of hydraulic status checks. (EPANET Version 2.2)
@@ -7741,7 +7824,7 @@ classdef epanet <handle
             %
             % See also setOptionsCheckFrequency, getOptionsMaxTrials, getOptionsMaximumCheck.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_CHECKFREQ, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsMaximumCheck(obj)
             % Retrieves the maximum trials for status checking. (EPANET Version 2.2)
@@ -7751,7 +7834,7 @@ classdef epanet <handle
             %
             % See also setOptionsMaximumCheck, getOptionsMaxTrials, getOptionsCheckFrequency.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_MAXCHECK, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsDampLimit(obj)
             % Retrieves the accuracy level where solution damping begins. (EPANET Version 2.2)
@@ -7761,7 +7844,7 @@ classdef epanet <handle
             %
             % See also setOptionsDampLimit, getOptionsMaxTrials, getOptionsCheckFrequency.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_DAMPLIMIT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsSpecificDiffusivity(obj)
             % Retrieves the specific diffusivity (relative to chlorine at 20 deg C). (EPANET Version 2.2)
@@ -7771,7 +7854,7 @@ classdef epanet <handle
             %
             % See also setOptionsSpecificDiffusivity, getOptionsSpecificViscosity, getOptionsSpecificGravity.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_SP_DIFFUS, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsPipeBulkReactionOrder(obj)
             % Retrieves the bulk water reaction order for pipes. (EPANET Version 2.2)
@@ -7781,7 +7864,7 @@ classdef epanet <handle
             %
             % See also setOptionsPipeBulkReactionOrder, getOptionsPipeWallReactionOrder, getOptionsTankBulkReactionOrder.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_BULKORDER, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsPipeWallReactionOrder(obj)
             % Retrieves the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)
@@ -7791,7 +7874,7 @@ classdef epanet <handle
             %
             % See also setOptionsPipeWallReactionOrder, getOptionsPipeBulkReactionOrder, getOptionsTankBulkReactionOrder.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_WALLORDER, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsTankBulkReactionOrder(obj)
             % Retrieves the bulk water reaction order for tanks. (EPANET Version 2.2)
@@ -7801,7 +7884,7 @@ classdef epanet <handle
             %
             % See also setOptionsTankBulkReactionOrder, getOptionsPipeBulkReactionOrder, getOptionsPipeWallReactionOrder.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_TANKORDER, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getOptionsLimitingConcentration(obj)
             % Retrieves the limiting concentration for growth reactions. (EPANET Version 2.2)
@@ -7811,7 +7894,7 @@ classdef epanet <handle
             %
             % See also setOptionsLimitingConcentration, getOptionsPipeBulkReactionOrder, getOptionsPipeWallReactionOrder.
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_CONCENLIMIT, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getPatternComment(obj, varargin)
             % Retrieves the comment string assigned to the pattern object.
@@ -7831,7 +7914,7 @@ classdef epanet <handle
                 value = cell(1, cnt);
                 for i=1:cnt
                     [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
@@ -7839,7 +7922,7 @@ classdef epanet <handle
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
                     [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             end
@@ -7864,14 +7947,14 @@ classdef epanet <handle
                     value = cell(1, patCnt);
                     for i=1:patCnt
                         [obj.Errcode, value{i}]=obj.apiENgetpatternid(i, obj.LibEPANET, obj.ph);
-                        error(obj.getError(obj.Errcode));
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     end
                 else
                     k=1;
                     value = cell(1, length(varargin{1}));
                     for i=varargin{1}
                         [obj.Errcode, value{k}]=obj.apiENgetpatternid(i, obj.LibEPANET, obj.ph);
-                        % error(obj.getError(obj.Errcode));
+                        % error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                         k=k+1;
                     end
                 end
@@ -7896,7 +7979,7 @@ classdef epanet <handle
             end
             for i=1:length(index)
                 [obj.Errcode] = obj.apiENsetpatternid(index(i), id{i}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getCurveNameID(obj, varargin)
@@ -7919,14 +8002,14 @@ classdef epanet <handle
                     value = cell(1, curCnt);
                     for i=1:curCnt
                         [obj.Errcode, value{i}]=obj.apiENgetcurveid(i, obj.LibEPANET, obj.ph);
-                        error(obj.getError(obj.Errcode));
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     end
                 else
                     k=1;
                     value = cell(1, length(varargin{1}));
                     for i=varargin{1}
                         [obj.Errcode, value{k}]=obj.apiENgetcurveid(i, obj.LibEPANET, obj.ph);
-                        error(obj.getError(obj.Errcode));
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                         k=k+1;
                     end
                 end
@@ -7951,7 +8034,7 @@ classdef epanet <handle
             end
             for i=1:length(index)
                 [obj.Errcode] = obj.apiENsetcurveid(index(i), id{i}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getCurveLengths(obj, varargin)
@@ -7973,7 +8056,7 @@ classdef epanet <handle
                 value = zeros(1, curCnt);
                 for i=tmpCurves
                     [obj.Errcode, value(i)]=obj.apiENgetcurvelen(i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             elseif isa(varargin{1}, 'cell')
                 k=1;
@@ -7981,18 +8064,18 @@ classdef epanet <handle
                 value = zeros(1, lentmpCurves);
                 for j=1:lentmpCurves
                     [obj.Errcode, value(k)] = obj.apiENgetcurvelen(obj.getCurveIndex(varargin{1}{j}), obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = obj.apiENgetcurvelen(obj.getCurveIndex(varargin{1}), obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             elseif isa(varargin{1}, 'numeric')
                 k=1;
                 value = zeros(1, length(varargin{1}));
                 for i=varargin{1}
                     [obj.Errcode, value(k)]=obj.apiENgetcurvelen(i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             end
@@ -8019,12 +8102,12 @@ classdef epanet <handle
                 value = zeros(1, length(varargin{1}));
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(k)] = obj.apiENgetcurveindex(varargin{1}{j}, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = obj.apiENgetcurveindex(varargin{1}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getCurveTypeIndex(obj, varargin)
@@ -8043,7 +8126,7 @@ classdef epanet <handle
             [indices, value] = getCurveIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] =obj.apiENgetcurvetype(i, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -8081,7 +8164,7 @@ classdef epanet <handle
                 value = cell(1, cnt);
                 for i=1:cnt
                     [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_CURVE, i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
@@ -8089,7 +8172,7 @@ classdef epanet <handle
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
                     [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_CURVE, i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             end
@@ -8114,7 +8197,7 @@ classdef epanet <handle
             % See also setCurveValue, getCurvesInfo.
             nfactors=size(curveVector, 1);%x = number of points in curve
             [obj.Errcode] = obj.apiENsetcurve(index, curveVector(:, 1), curveVector(:, 2), nfactors, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = setCurveComment(obj, value, varargin)
             % Sets the comment string of a curve.
@@ -8138,11 +8221,11 @@ classdef epanet <handle
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_CURVE, indices, value, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             else
                 for i=indices
                     [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_CURVE, i, value{j}, obj.LibEPANET, obj.ph); j=j+1;
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -8164,7 +8247,7 @@ classdef epanet <handle
             % See also getCurveValue, setCurve, getCurvesInfo.
             x=value(1); y=value(2);
             [obj.Errcode] = obj.apiENsetcurvevalue(index, curvePnt, x, y, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getPatternIndex(obj, varargin)
             % Retrieves the index of all or some time patterns given their IDs.
@@ -8190,12 +8273,12 @@ classdef epanet <handle
                 value = zeros(1, length(varargin{1}));
                 for j=1:length(varargin{1})
                     [obj.Errcode, value(k)] = obj.apiENgetpatternindex(varargin{1}{j}, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = obj.apiENgetpatternindex(varargin{1}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getPatternLengths(obj, varargin)
@@ -8219,7 +8302,7 @@ classdef epanet <handle
                 value = zeros(1, patCnt);
                 for i=tmpPatterns
                     [obj.Errcode, value(i)]=obj.apiENgetpatternlen(i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             elseif isa(varargin{1}, 'cell')
                 k=1;
@@ -8227,18 +8310,18 @@ classdef epanet <handle
                 value = zeros(1, lentmppat);
                 for j=1:lentmppat
                     [obj.Errcode, value(k)] = obj.apiENgetpatternlen(obj.getPatternIndex(varargin{1}{j}), obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             elseif isa(varargin{1}, 'char')
                 [obj.Errcode, value] = obj.apiENgetpatternlen(obj.getPatternIndex(varargin{1}), obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             elseif isa(varargin{1}, 'numeric')
                 k=1;
                 value = zeros(1, length(varargin{1}));
                 for i=varargin{1}
                     [obj.Errcode, value(k)]=obj.apiENgetpatternlen(i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             end
@@ -8256,7 +8339,7 @@ classdef epanet <handle
                 tmplength=obj.getPatternLengths(i);
                 for j=1:tmplength
                     [obj.Errcode, value(i, j)] = obj.apiENgetpatternvalue(i, j, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
                 if tmplength<tmpmaxlen
                     for j=(tmplength+1):tmpmaxlen
@@ -8275,7 +8358,7 @@ classdef epanet <handle
             %
             % See also getPattern, getPatternLengths, getPatternAverageValue.
             [obj.Errcode, value] = obj.apiENgetpatternvalue(patternIndex, patternStep, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getQualityType(obj, varargin)
             % Retrieves the type of water quality analysis type.
@@ -8286,7 +8369,7 @@ classdef epanet <handle
             % See also getQualityInfo, getQualityCode.
             if any(strcmp(obj.getLibFunctions, 'ENgetqualinfo'))
                 [obj.Errcode, ~, value] = obj.apiENgetqualinfo(obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             else
                 obj.saveInputFile(obj.BinTempfile);
                 value = obj.getBinQualType;
@@ -8316,7 +8399,7 @@ classdef epanet <handle
             %
             % See also getQualityType, getQualityCode.
             [obj.Errcode, value.QualityCode, value.QualityChemName, value.QualityChemUnits, value.TraceNode] = obj.apiENgetqualinfo(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             value.QualityType = obj.TYPEQUALITY(value.QualityCode+1);
         end
         function value = getQualityCode(obj)
@@ -8333,7 +8416,7 @@ classdef epanet <handle
             %
             % See also getQualityInfo, getQualityType.
             [obj.Errcode, value, obj.QualityTraceNodeIndex] = obj.apiENgetqualtype(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getQualityTraceNodeIndex(obj)
             % Retrieves the trace node index of water quality analysis type.
@@ -8343,7 +8426,7 @@ classdef epanet <handle
             %
             % See also getQualityInfo, getQualityType.
             [obj.Errcode, obj.QualityCode, value] = obj.apiENgetqualtype(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeSimulationDuration(obj)
             % Retrieves the value of simulation duration.
@@ -8353,7 +8436,7 @@ classdef epanet <handle
             %
             % See also getTimePatternStep, getTimeHydraulicStep.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_DURATION, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeHydraulicStep(obj)
             % Retrieves the value of the hydraulic time step.
@@ -8363,7 +8446,7 @@ classdef epanet <handle
             %
             % See also getTimeQualityStep, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HYDSTEP, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeQualityStep(obj)
             % Retrieves the value of the water quality time step.
@@ -8373,7 +8456,7 @@ classdef epanet <handle
             %
             % See also getTimeHydraulicStep, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_QUALSTEP, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimePatternStep(obj)
             % Retrieves the value of the pattern time step.
@@ -8383,7 +8466,7 @@ classdef epanet <handle
             %
             % See also getTimePatternStart, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_PATTERNSTEP, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimePatternStart(obj)
             % Retrieves the value of pattern start time.
@@ -8393,7 +8476,7 @@ classdef epanet <handle
             %
             % See also getTimePatternStep, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_PATTERNSTART, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeReportingStep(obj)
             % Retrieves the value of the reporting time step.
@@ -8403,7 +8486,7 @@ classdef epanet <handle
             %
             % See also getTimeReportingPeriods, getTimeReportingStart.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_REPORTSTEP, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeReportingStart(obj)
             % Retrieves the value of the reporting start time.
@@ -8413,7 +8496,7 @@ classdef epanet <handle
             %
             % See also getTimeReportingPeriods, getTimeReportingStep.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_REPORTSTART, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeRuleControlStep(obj)
             % Retrieves the time step for evaluating rule-based controls.
@@ -8423,7 +8506,7 @@ classdef epanet <handle
             %
             % See also getTimeHydraulicStep.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_RULESTEP, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeStatisticsType(obj)
             % Retrieves the type of time series post-processing.
@@ -8440,7 +8523,7 @@ classdef epanet <handle
             %
             % See also getTimeStatisticsIndex, getTimeSimulationDuration.
             [obj.Errcode, obj.TimeStatisticsIndex] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_STATISTIC, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             value=obj.TYPESTATS(obj.TimeStatisticsIndex+1);
         end
         function value = getTimeStatisticsIndex(obj)
@@ -8458,7 +8541,7 @@ classdef epanet <handle
             %
             % See also getTimeStatisticsType, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_STATISTIC, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeReportingPeriods(obj)
             % Retrieves the number of reporting periods saved to the binary.
@@ -8468,7 +8551,7 @@ classdef epanet <handle
             %
             % See also getTimeReportingStart, getTimeReportingStep.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_PERIODS, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         %%%%% EPANET Version 2.1 %%%%%
         function value = getTimeStartTime(obj)
@@ -8479,7 +8562,7 @@ classdef epanet <handle
             %
             % See also getTimeSimulationDuration, getTimePatternStart.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_STARTTIME, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeHTime(obj)
             % Retrieves the elapsed time of current hydraulic solution.
@@ -8489,7 +8572,7 @@ classdef epanet <handle
             %
             % See also getTimeHydraulicStep, getComputedHydraulicTimeSeries.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HTIME, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeQTime(obj)
             % Retrieves the elapsed time of current quality solution.
@@ -8499,7 +8582,7 @@ classdef epanet <handle
             %
             % See also getTimeQualityStep, getComputedQualityTimeSeries.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_QTIME, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeHaltFlag(obj)
             % Retrieves the number of halt flag indicating if the simulation was halted.
@@ -8509,7 +8592,7 @@ classdef epanet <handle
             %
             % See also getTimeStartTime, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HALTFLAG, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeNextEvent(obj)
             % Retrieves the shortest time until a tank becomes empty or full.
@@ -8519,7 +8602,7 @@ classdef epanet <handle
             %
             % See also getTimeNextEventTank.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENT, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getTimeNextEventTank(obj)
             % Retrieves the index of tank with shortest time to become empty or full.
@@ -8529,7 +8612,7 @@ classdef epanet <handle
             %
             % See also getTimeNextEvent.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENTTANK, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getCurvesInfo(obj)
             % Retrieves all the info of curves. (EPANET Version 2.1)
@@ -8555,7 +8638,7 @@ classdef epanet <handle
             for i=1:obj.getCurveCount
                 [obj.Errcode, value.CurveNameID{i}, value.CurveNvalue{i}, value.CurveXvalue{i}, value.CurveYvalue{i}] = ...
                     obj.apiENgetcurve(obj, i, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getCounts(obj)
@@ -8582,7 +8665,7 @@ classdef epanet <handle
             value.SimpleControls = obj.getControlRulesCount;
             value.RuleBasedControls = obj.getRuleCount;
             value.Patterns = obj.getPatternCount;
-            
+
         end
         function value = getConnectivityMatrix(obj, varargin)
             conn = obj.getNodesConnectingLinksID;
@@ -8607,7 +8690,7 @@ classdef epanet <handle
             % Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow
             % Compute the new adjacency matrix based on the mean flow in the network
             Fmean = mean(obj.getComputedTimeSeries.Flow,1); % ignores events also you can use getComputedHydraulicTimeSeries
-            
+
             Fsign = sign(Fmean);
             Nidx = obj.getLinkNodesIndex;
             for i = 1:size(Nidx,1)
@@ -8636,7 +8719,7 @@ classdef epanet <handle
             valueIndex = 0;
             if (4>nargin && nargin>1)
                 [obj.Errcode] = obj.apiENaddcurve(varargin{1}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 valueIndex = getCurveIndex(obj, varargin{1});
                 if nargin==3
                     setCurve(obj, valueIndex, varargin{2});
@@ -8677,18 +8760,18 @@ classdef epanet <handle
                     for i=1:tmplen(cur)
                         if pnt
                             [obj.Errcode, value(i, 1), value(i, 2)] = obj.apiENgetcurvevalue(cur, pnt, obj.LibEPANET, obj.ph);
-                            error(obj.getError(obj.Errcode));
+                            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                             break;
                         else
                             [obj.Errcode, value{j}(i, 1), value{j}(i, 2)] = obj.apiENgetcurvevalue(cur, i, obj.LibEPANET, obj.ph);
-                            error(obj.getError(obj.Errcode));
+                            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                         end
                     end
                     j=j+1;
                 end
             else
                 obj.Errcode = 206;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function [curveIndex, pumpIndex] = getLinkPumpHeadCurveIndex(obj)
@@ -8703,7 +8786,7 @@ classdef epanet <handle
             curveIndex = zeros(1, length(pumpIndex));
             for i=pumpIndex
                 [obj.Errcode, curveIndex(j)] = obj.apiENgetheadcurveindex(i, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 j=j+1;
             end
         end
@@ -8725,7 +8808,7 @@ classdef epanet <handle
             if pumpCnt
                 for i=obj.getLinkPumpIndex
                     [obj.Errcode, value(j)] = obj.apiENgetpumptype(i, obj.LibEPANET, obj.ph);
-%                     error(obj.getError(obj.Errcode));
+%                     error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     j=j+1;
                 end
             end
@@ -8751,7 +8834,7 @@ classdef epanet <handle
             value = zeros(1, obj.getPatternCount);
             for i=obj.getPatternIndex
                 [obj.Errcode, value(i)] = obj.apiENgetaveragepatternvalue(i, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getENfunctionsImpemented(obj)
@@ -8831,7 +8914,7 @@ classdef epanet <handle
             %
             % See also getENfunctionsImpemented, getLibFunctions.
             [obj.Errcode, value] = obj.apiENgetversion(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getLinkPumpSwitches(obj)
             % Retrieves the number of pump switches.
@@ -9038,7 +9121,7 @@ classdef epanet <handle
             obj.openQualityAnalysis;
             obj.initializeQualityAnalysis;
             %tleft=obj.nextQualityAnalysisStep;
-            totalsteps=obj.getTimeSimulationDuration/obj.getTimeQualityStep;
+            totalsteps = obj.getTimeSimulationDuration/obj.getTimeQualityStep;
             initnodematrix=zeros(totalsteps, obj.getNodeCount);
             if size(varargin, 2)==0
                 varargin={'time', 'quality', 'linkquality', 'mass'};
@@ -9125,7 +9208,7 @@ classdef epanet <handle
             rptfile=[obj.TempInpFile(1:end-4), '.txt'];
             binfile=['@#', uuID, '.bin'];
             obj.Errcode = obj.apiENepanet(obj.TempInpFile, rptfile, binfile, obj.LibEPANET);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             fid = fopen(binfile, 'r');
             value = readEpanetBin(fid, binfile, 0);
             value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
@@ -9133,7 +9216,7 @@ classdef epanet <handle
             files=dir('@#*');
             if ~isempty(files); delete('@#*'); end
             obj.Errcode = obj.apiENopen(obj.TempInpFile, [obj.TempInpFile(1:end-4), '.txt'], [obj.TempInpFile(1:end-4), '.bin'], obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement.
@@ -9155,7 +9238,7 @@ classdef epanet <handle
                 value.Units_SI_Metric=1;
                 value.Units_US_Customary=0;
             end
-            
+
             value.LinkFlowUnits = obj.getFlowUnits;
             if value.Units_US_Customary
                 value.NodePressureUnits='psi';
@@ -9212,7 +9295,7 @@ classdef epanet <handle
             % See also solveCompleteQuality.
             obj.solve = 1;
             [Errcode] = obj.apiENsolveH(obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function Errcode = solveCompleteQuality(obj)
             % Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file.
@@ -9222,7 +9305,7 @@ classdef epanet <handle
             %
             % See also solveCompleteHydraulics.
             [Errcode] = obj.apiENsolveQ(obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function index = addPattern(obj, varargin)
             % Adds a new time pattern to the network.
@@ -9246,7 +9329,7 @@ classdef epanet <handle
             % See also getPattern, setPattern, setPatternNameID
             %          setPatternValue, setPatternComment.
             [obj.Errcode] = obj.apiENaddpattern(varargin{1}, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             index = getPatternIndex(obj, varargin{1});
             if nargin==2
                 setPattern(obj, index, ones(1, max(obj.getPatternLengths)));
@@ -9892,8 +9975,8 @@ classdef epanet <handle
             %   d.plot('links', 'yes', 'highlightlink',{pipeID}, 'fontsize',8);
             %   The new left pipe can be noticed at the top left of the
             %   plot in red colour
-            
-            
+
+
             % Find the coordinates of the Nodes connected
             % with the link/pipe
             pipeIndex  = obj.getLinkIndex(pipeID);
@@ -9925,7 +10008,7 @@ classdef epanet <handle
             midElev = (obj.getNodeElevations(leftNodeIndex)+obj.getNodeElevations(rightNodeIndex))/2;
             obj.setNodeJunctionData(newNodeIndex, midElev,0,'');
             obj.setNodeEmitterCoeff(newNodeIndex,obj.getNodeEmitterCoeff(leftNodeIndex));
-            
+
             if obj.QualityCode > 0
                 midInitQual = (obj.getNodeInitialQuality(leftNodeIndex)+obj.getNodeInitialQuality(rightNodeIndex))/2;
                 obj.setNodeInitialQuality(newNodeIndex,midInitQual);
@@ -9935,7 +10018,7 @@ classdef epanet <handle
                     obj.setNodeSourceType(newNodeIndex,obj.getNodeSourceTypeIndex(leftNodeIndex));
                 end
             end
-            
+
             % Access link properties
             linkProp = obj.getLinksInfo;
             linkDia  = linkProp.LinkDiameter(pipeIndex);
@@ -10000,7 +10083,7 @@ classdef epanet <handle
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetvertexcount(i, obj.LibEPANET, obj.ph);
                 j = j +1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function data = getLinkVertices(obj, varargin)
@@ -10038,7 +10121,7 @@ classdef epanet <handle
                 end
                 for i=1:obj.getLinkVerticesCount(l)
                     [obj.Errcode, data{j}.x(i), data{j}.y(i)]=obj.apiENgetvertex(l, i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
                 j = j +1;
             end
@@ -10058,7 +10141,7 @@ classdef epanet <handle
             %          getBinLinkVerticesCount.
             index = obj.getLinkIndex(linkID);
             [obj.Errcode]=obj.apiENsetvertices(index, x, y, size(x, 2), obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function reverseLinkNodeIndices(obj, linkindices)
             % Reverses the node indices that connect a link.
@@ -10358,7 +10441,7 @@ classdef epanet <handle
                     controlLevel = varargin{4};
                     [obj.Errcode] = obj.apiENsetcontrol(index, control, linkIndex, controlSettingValue, ...
                         nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -10434,7 +10517,7 @@ classdef epanet <handle
                     nodeIndex = varargin{3};
                     controlLevel = varargin{4};
                     [obj.Errcode, index] = obj.apiENaddcontrol(control, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -10510,7 +10593,7 @@ classdef epanet <handle
             for i=1:length(Index)
                 [obj.Errcode] = obj.apiENsetpipedata(Index(i), Length(i), Diameter(i), RoughnessCoeff(i), ...
                     MinorLossCoeff(i), obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setLinkNodesIndex(obj, linkIndex, startNode, endNode)
@@ -10538,7 +10621,7 @@ classdef epanet <handle
             %          setLinkNameID, setLinkComment.
             for i=1:length(linkIndex)
                 [obj.Errcode] = obj.apiENsetlinknodes(linkIndex(i), startNode(i), endNode(i), obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setNodesConnectingLinksID(obj, linkIndex, startNodeID, endNodeID)
@@ -10593,7 +10676,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = getLinkComment(obj, varargin)
@@ -10616,7 +10699,7 @@ classdef epanet <handle
                 value = cell(1, cnt);
                 for i=1:cnt
                     [obj.Errcode, value{i}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_LINK, i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             else
                 if isempty(varargin{1}), varargin{1}=0; end
@@ -10624,7 +10707,7 @@ classdef epanet <handle
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
                     [obj.Errcode, value{k}]=obj.apiENgetcomment(obj.ToolkitConstants.EN_LINK, i, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     k=k+1;
                 end
             end
@@ -10651,11 +10734,11 @@ classdef epanet <handle
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_LINK, indices, value, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             else
                 for i=indices
                     [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_LINK, i, value{j}, obj.LibEPANET, obj.ph); j=j+1;
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -10686,7 +10769,7 @@ classdef epanet <handle
             end
             index = obj.check_if_numeric(id);
             [obj.Errcode, index] = obj.apiENsetlinktype(index, obj.ToolkitConstants.EN_PIPE, condition, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function index = setLinkTypePipeCV(obj, id, varargin)
             % Sets the link type cvpipe(pipe with check valve) for a specified link.
@@ -10715,7 +10798,7 @@ classdef epanet <handle
             end
             index = obj.check_if_numeric(id);
             [obj.Errcode, index] = obj.apiENsetlinktype(index, obj.ToolkitConstants.EN_CVPIPE, condition, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function index = setLinkTypePump(obj, id, varargin)
             % Sets the link type pump for a specified link.
@@ -10744,7 +10827,7 @@ classdef epanet <handle
             end
             index = obj.check_if_numeric(id);
             [obj.Errcode, index] = obj.apiENsetlinktype(index, obj.ToolkitConstants.EN_PUMP, condition, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function index = setLinkTypeValveFCV(obj, id, varargin)
             % Sets the link type valve FCV(flow control valve) for a specified link.
@@ -10773,7 +10856,7 @@ classdef epanet <handle
             end
             index = obj.check_if_numeric(id);
             [obj.Errcode, index] = obj.apiENsetlinktype(index, obj.ToolkitConstants.EN_FCV, condition, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function index = setLinkTypeValveGPV(obj, id, varargin)
             % Sets the link type valve GPV(general purpose valve) for a specified link.
@@ -10942,7 +11025,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_LENGTH, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function value = setLinkNameID(obj, value, varargin)
@@ -10966,11 +11049,11 @@ classdef epanet <handle
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = apiENsetlinkid(indices, value, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             else
                 for i=indices
                     [obj.Errcode] = apiENsetlinkid(i, value{j}, obj.LibEPANET, obj.ph); j=j+1;
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -10996,7 +11079,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_ROUGHNESS, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setLinkMinorLossCoeff(obj, value, varargin)
@@ -11021,7 +11104,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_MINORLOSS, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setLinkInitialStatus(obj, value, varargin)
@@ -11048,7 +11131,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_INITSTATUS, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setLinkInitialSetting(obj, value, varargin)
@@ -11073,7 +11156,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_INITSETTING, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setLinkBulkReactionCoeff(obj, value, varargin)
@@ -11098,7 +11181,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_KBULK, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setLinkWallReactionCoeff(obj, value, varargin)
@@ -11123,7 +11206,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_KWALL, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setLinkStatus(obj, value, varargin)
@@ -11150,7 +11233,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_STATUS, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setLinkSettings(obj, value, varargin)
@@ -11175,7 +11258,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_SETTING, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setLinkPumpPower(obj, value, varargin)
@@ -11393,7 +11476,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetheadcurveindex(i, value(j),obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setNodeElevations(obj, value, varargin)
@@ -11418,7 +11501,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setNodeBaseDemands(obj, value, varargin)
@@ -11497,14 +11580,14 @@ classdef epanet <handle
             if ~isempty(varargin)
                 for i=indices
                     [obj.Errcode] = obj.apiENsetcoord(i, value(1), value(2), obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             else
                 for i=1:length(value{1})
                     x=value{1}(i);
                     y=value{2}(i);
                     [obj.Errcode] = obj.apiENsetcoord(i, x, y, obj.LibEPANET, obj.ph);
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -11578,7 +11661,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setNodeInitialQuality(obj, value, varargin)
@@ -11602,7 +11685,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setNodeNameID(obj, value, varargin)
@@ -11632,7 +11715,7 @@ classdef epanet <handle
             end
             for i=indices
                 [obj.Errcode] = obj.apiENsetnodeid(i, value{i}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setNodeTankData(obj, index, elev, intlvl, minlvl, maxlvl, diam, minvol, volcurve)
@@ -11683,7 +11766,7 @@ classdef epanet <handle
             else
                 volcurve={''};
             end
-            
+
             if ~ismember(index, obj.getNodeTankIndex)
                 tankIndices = obj.getNodeTankIndex;
                 index = tankIndices(index);
@@ -11691,7 +11774,7 @@ classdef epanet <handle
             for i=1:length(index)
                 [obj.Errcode] = obj.apiENsettankdata(index(i), elev(i), intlvl(i), minlvl(i), maxlvl(i), ...
                     diam(i), minvol(i), volcurve{i}, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setNodeTankInitialLevel(obj, value, varargin)
@@ -12079,7 +12162,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setNodeSourcePatternIndex(obj, value, varargin)
@@ -12104,7 +12187,7 @@ classdef epanet <handle
             j=1;
             for i=indices
                 [obj.Errcode] = obj.apiENsetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, value(j), obj.LibEPANET, obj.ph); j=j+1;
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setNodeSourceType(obj, index, value)
@@ -12126,7 +12209,7 @@ classdef epanet <handle
             % See also getNodeSourceType, setNodeSourceQuality, setNodeSourcePatternIndex.
             value=find(strcmpi(obj.TYPESOURCE, value)==1)-1;
             [obj.Errcode] = obj.apiENsetnodevalue(index, obj.ToolkitConstants.EN_SOURCETYPE, value, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setDemandModel(obj, code, pmin, preq, pexp)
             % Sets the type of demand model to use and its parameters. (EPANET Version 2.2)
@@ -12155,7 +12238,7 @@ classdef epanet <handle
                 error('Please give Demand model type: DDA or PDA');
             end
             [obj.Errcode] = obj.apiENsetdemandmodel(model_type, pmin, preq, pexp, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setNodeJunctionDemandName(obj, nodeIndex, demandIndex, demandName)
             % Assigns a name to a node's demand category. (EPANET Version 2.2)
@@ -12171,7 +12254,7 @@ classdef epanet <handle
             % See also getNodeJunctionDemandName, setNodeBaseDemands, setDemandModel,
             %          addNodeJunctionDemand, deleteNodeJunctionDemand.
             [obj.Errcode] = obj.apiENsetdemandname(nodeIndex, demandIndex, demandName, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setNodeJunctionData(obj, index, elev, dmnd, dmndpat)
             % Sets a group of properties for a junction node. (EPANET Version 2.2)
@@ -12196,7 +12279,7 @@ classdef epanet <handle
             % See also setNodeTankData, getNodeElevations, getNodeBaseDemands,
             %          getNodeDemandPatternNameID, addPattern, setNodeJunctionDemandName.
             [obj.Errcode] = obj.apiENsetjuncdata(index, elev, dmnd, dmndpat, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTitle(obj, varargin)
             % Sets the title lines of the project. (EPANET Version 2.2)
@@ -12221,7 +12304,7 @@ classdef epanet <handle
                 line3 = varargin{3};
             end
             [obj.Errcode] = obj.apiENsettitle(line1, line2, line3, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setOptionsMaxTrials(obj, value)
             % Sets the maximum hydraulic trials allowed for hydraulic convergence.
@@ -12232,7 +12315,7 @@ classdef epanet <handle
             %
             % See also getOptionsMaxTrials, setOptionsExtraTrials, setOptionsAccuracyValue.
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_TRIALS, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setOptionsAccuracyValue(obj, value)
             % Sets the total normalized flow change for hydraulic convergence.
@@ -12243,7 +12326,7 @@ classdef epanet <handle
             %
             % See also getOptionsAccuracyValue, setOptionsExtraTrials, setOptionsMaxTrials.
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_ACCURACY, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setOptionsQualityTolerance(obj, value)
             % Sets the water quality analysis tolerance.
@@ -12254,7 +12337,7 @@ classdef epanet <handle
             %
             % See also getOptionsQualityTolerance, setOptionsSpecificDiffusivity, setOptionsLimitingConcentration.
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_TOLERANCE, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setOptionsEmitterExponent(obj, value)
             % Sets the power exponent for the emmitters.
@@ -12265,7 +12348,7 @@ classdef epanet <handle
             %
             % See also getOptionsEmitterExponent, setOptionsPatternDemandMultiplier, setOptionsAccuracyValue.
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_EMITEXPON, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setOptionsPatternDemandMultiplier(obj, value)
             % Sets the global pattern demand multiplier.
@@ -12276,7 +12359,7 @@ classdef epanet <handle
             %
             % See also getOptionsPatternDemandMultiplier, setOptionsEmitterExponent, setOptionsAccuracyValue.
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_DEMANDMULT, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setOptionsHeadError(obj, value)
             % Sets the maximum head loss error for hydraulic convergence. (EPANET Version 2.2)
@@ -12287,7 +12370,7 @@ classdef epanet <handle
             %
             % See also getOptionsHeadError, setOptionsEmitterExponent, setOptionsAccuracyValue.
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_HEADERROR, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setOptionsFlowChange(obj, value)
             % Sets the maximum flow change for hydraulic convergence. (EPANET Version 2.2)
@@ -12298,7 +12381,7 @@ classdef epanet <handle
             %
             % See also getOptionsFlowChange, setOptionsHeadError, setOptionsHeadLossFormula.
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_FLOWCHANGE, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setOptionsHeadLossFormula(obj, value)
             % Sets the headloss formula. (EPANET Version 2.2)
@@ -12317,7 +12400,7 @@ classdef epanet <handle
                 codevalue=2;
             end
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_HEADLOSSFORM, codevalue, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setOptionsGlobalEffic(obj, value)
             % Sets the global efficiency for pumps(percent). (EPANET Version 2.2)
@@ -12497,7 +12580,7 @@ classdef epanet <handle
             %
             % See also getTimeSimulationDuration, getTimeStartTime, getTimeHaltFlag.
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_DURATION, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTimeHydraulicStep(obj, value)
             % Sets the hydraulic time step.
@@ -12510,7 +12593,7 @@ classdef epanet <handle
             % See also getTimeHydraulicStep, setTimeQualityStep, setTimePatternStep.
             obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_HYDSTEP, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTimeQualityStep(obj, value)
             % Sets the quality time step.
@@ -12523,7 +12606,7 @@ classdef epanet <handle
             % See also getTimeQualityStep, setTimeHydraulicStep, setTimePatternStep.
             obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_QUALSTEP, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTimePatternStep(obj, value)
             % Sets the time pattern step.
@@ -12536,7 +12619,7 @@ classdef epanet <handle
             % See also getTimePatternStep, setTimePatternStart, setTimeHydraulicStep.
             obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_PATTERNSTEP, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTimePatternStart(obj, value)
             % Sets the time when time patterns begin.
@@ -12549,7 +12632,7 @@ classdef epanet <handle
             % See also getTimePatternStart, setTimePatternStep, setTimeHydraulicStep.
             obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_PATTERNSTART, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTimeReportingStep(obj, value)
             % Sets the reporting time step.
@@ -12562,7 +12645,7 @@ classdef epanet <handle
             % See also getTimeReportingStep, setTimeReportingStart, setTimeRuleControlStep.
             obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_REPORTSTEP, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTimeReportingStart(obj, value)
             % Sets the time when reporting starts.
@@ -12575,7 +12658,7 @@ classdef epanet <handle
             % See also getTimeReportingStart, setTimeReportingStep, setTimePatternStart.
             obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_REPORTSTART, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTimeRuleControlStep(obj, value)
             % Sets the rule-based control evaluation time step.
@@ -12588,7 +12671,7 @@ classdef epanet <handle
             % See also getTimeRuleControlStep, setTimeReportingStep, setTimePatternStep.
             obj.solve = 0;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_RULESTEP, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTimeStatisticsType(obj, value)
             % Sets the statistic type.
@@ -12609,7 +12692,7 @@ classdef epanet <handle
             % See also getTimeStatisticsType, setTimeReportingStart, setTimeReportingStep.
             tmpindex=find(strcmpi(obj.TYPESTATS, value)==1)-1;
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_STATISTIC, tmpindex, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setTimeStartTime(obj, value)
             % Sets the simulation starting time of day.
@@ -12621,7 +12704,7 @@ classdef epanet <handle
             %
             % See also getTimeStartTime, setTimeReportingStart, setTimePatternStart.
             [obj.Errcode] = obj.apiENsettimeparam(obj.ToolkitConstants.EN_STARTTIME, value, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function value = setPatternComment(obj, value, varargin)
             % Sets the comment string assigned to the pattern object.
@@ -12648,11 +12731,11 @@ classdef epanet <handle
             j=1;
             if length(indices) == 1
                 [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, indices, value, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             else
                 for i=indices
                     [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, i, value{j}, obj.LibEPANET, obj.ph); j=j+1;
-                    error(obj.getError(obj.Errcode));
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 end
             end
         end
@@ -12673,7 +12756,7 @@ classdef epanet <handle
             %          setPatternNameID, addPattern, deletePattern.
             nfactors=length(patternVector);
             [obj.Errcode] = obj.apiENsetpattern(index, patternVector, nfactors, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setPatternMatrix(obj, patternMatrix)
             % Sets all of the multiplier factors for all time patterns.
@@ -12694,7 +12777,7 @@ classdef epanet <handle
             nfactors=size(patternMatrix, 2);
             for i=1:size(patternMatrix, 1)
                 [obj.Errcode] = obj.apiENsetpattern(i, patternMatrix(i, :), nfactors, obj.LibEPANET, obj.ph);
-                error(obj.getError(obj.Errcode));
+                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             end
         end
         function setPatternValue(obj, index, patternTimeStep, patternFactor)
@@ -12711,7 +12794,7 @@ classdef epanet <handle
             % See also getPattern, setPattern, setPatternMatrix,
             %          setPatternNameID, addPattern, deletePattern.
             [obj.Errcode] = obj.apiENsetpatternvalue(index, patternTimeStep, patternFactor, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setQualityType(obj, varargin)
             % Sets the type of water quality analysis called for.
@@ -12767,7 +12850,7 @@ classdef epanet <handle
                 end
             end
             [obj.Errcode] = obj.apiENsetqualtype(qualcode, chemname, chemunits, tracenode, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setReportFormatReset(obj)
             % Resets a project's report options to their default values.
@@ -12777,7 +12860,7 @@ classdef epanet <handle
             %
             % See also setReport, setReportStatus.
             [obj.Errcode]=obj.apiENresetreport(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setReportStatus(obj, value)
             % Sets the level of hydraulic status reporting.
@@ -12793,7 +12876,7 @@ classdef epanet <handle
             % See also setReport, setReportFormatReset.
             statuslevel=find(strcmpi(obj.TYPEREPORT, value)==1)-1;
             [obj.Errcode] = obj.apiENsetstatusreport(statuslevel, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function setReport(obj, value)
             % Issues a report formatting command. Formatting commands are the same as used in the [REPORT] section of the EPANET Input file.
@@ -12807,7 +12890,7 @@ classdef epanet <handle
             %
             % See also setReportFormatReset, setReport.
             [obj.Errcode] = obj.apiENsetreport(value, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function [Errcode]=setFlowUnitsGPM(obj, varargin)
             % Sets flow units to GPM(Gallons Per Minute).
@@ -12927,7 +13010,7 @@ classdef epanet <handle
             %
             % See also loadEPANETFile, closeHydraulicAnalysis, closeQualityAnalysis.
             [obj.Errcode] = obj.apiENclose(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function closeHydraulicAnalysis(obj)
             % Closes the hydraulic analysis system, freeing all allocated memory.
@@ -12939,7 +13022,7 @@ classdef epanet <handle
             %
             % See also openHydraulicAnalysis, saveHydraulicFile, closeQualityAnalysis.
             [obj.Errcode] = obj.apiENcloseH(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function closeQualityAnalysis(obj)
             % Closes the water quality analysis system, freeing all allocated memory.
@@ -12951,7 +13034,7 @@ classdef epanet <handle
             %
             % See also openQualityAnalysis, initializeQualityAnalysis, closeHydraulicAnalysis.
             [obj.Errcode] = obj.apiENcloseQ(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function saveHydraulicFile(obj, hydname)
             % Saves the current contents of the binary hydraulics file to a file.
@@ -12964,7 +13047,7 @@ classdef epanet <handle
             %
             % See also useHydraulicFile, initializeHydraulicAnalysis.
             [obj.Errcode]=obj.apiENsaveHydfile(hydname, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function useHydraulicFile(obj, hydname)
             % Uses the contents of the specified file as the current binary hydraulics file.
@@ -12975,7 +13058,7 @@ classdef epanet <handle
             %
             % See also saveHydraulicFile, initializeHydraulicAnalysis.
             [obj.Errcode]=obj.apiENusehydfile(hydname, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function initializeEPANET(obj, unitsType, headLossType)
             % Initializes an EPANET project that isn't opened with an input file
@@ -12985,7 +13068,7 @@ classdef epanet <handle
             %
             % See also initializeHydraulicAnalysis.
             [obj.Errcode]=obj.apiENinit(unitsType, headLossType, obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function initializeHydraulicAnalysis(obj, varargin)
             % Initializes storage tank levels, link status and settings, and the simulation clock time prior to running a hydraulic analysis.
@@ -13011,7 +13094,7 @@ classdef epanet <handle
                 code=varargin{1};
             end
             [obj.Errcode] = obj.apiENinitH(code, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function initializeQualityAnalysis(obj, varargin)
             % Initializes water quality and the simulation clock time prior to running a water quality analysis.
@@ -13037,7 +13120,7 @@ classdef epanet <handle
                 code=varargin{1};
             end
             [obj.Errcode] = obj.apiENinitQ(code, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function tstep = nextHydraulicAnalysisStep(obj)
             % Determines the length of time until the next hydraulic event occurs in an extended period simulation.
@@ -13049,7 +13132,7 @@ classdef epanet <handle
             %
             % See also nextQualityAnalysisStep, runHydraulicAnalysis.
             [obj.Errcode, tstep] = obj.apiENnextH(obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             tstep = double(tstep);
         end
         function tstep = nextQualityAnalysisStep(obj)
@@ -13062,7 +13145,7 @@ classdef epanet <handle
             %
             % See also nextHydraulicAnalysisStep, runQualityAnalysis.
             [obj.Errcode, tstep] = obj.apiENnextQ(obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             tstep = double(tstep);
         end
         function openHydraulicAnalysis(obj)
@@ -13075,7 +13158,7 @@ classdef epanet <handle
             %
             % See also openQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode] = obj.apiENopenH(obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function openQualityAnalysis(obj)
             % Opens the water quality analysis system.
@@ -13087,7 +13170,7 @@ classdef epanet <handle
             %
             % See also openHydraulicAnalysis, initializeQualityAnalysis.
             [obj.Errcode] = obj.apiENopenQ(obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function tstep = runHydraulicAnalysis(obj)
             % Runs a single period hydraulic analysis, retrieving the current simulation clock time t.
@@ -13112,7 +13195,7 @@ classdef epanet <handle
             %
             % See also runHydraulicAnalysis, initializeQualityAnalysis.
             [obj.Errcode, tstep] = obj.apiENrunQ(obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function saveHydraulicsOutputReportingFile(obj)
             % Transfers results of a hydraulic simulation from the binary Hydraulics file
@@ -13123,7 +13206,7 @@ classdef epanet <handle
             %
             % See also saveHydraulicFile, closeHydraulicAnalysis.
             [obj.Errcode] = obj.apiENsaveH(obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function tleft = stepQualityAnalysisTimeLeft(obj)
             % Advances the water quality simulation one water quality time step.
@@ -13151,7 +13234,7 @@ classdef epanet <handle
                 inpname = obj.TempInpFile;
             end
             [Errcode] = obj.apiENsaveinpfile('@#', obj.LibEPANET, obj.ph);
-            error(obj.getError(obj.Errcode));
+            error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
             copyfile('@#', inpname);% temporary
             delete('@#');
             %else
@@ -13190,7 +13273,7 @@ classdef epanet <handle
             %
             % See also writeReport, copyReport.
             [obj.Errcode] = obj.apiENwriteline(line, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function writeReport(obj)
             % Writes a formatted text report on simulation results to the Report file.
@@ -13208,7 +13291,7 @@ classdef epanet <handle
             %
             % See also copyReport, writeLineInReportFile.
             [obj.Errcode]=obj.apiENreport(obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function copyReport(obj, fileName)
             % Copies the current contents of a project's report file to another file. (EPANET Version 2.2)
@@ -13219,7 +13302,7 @@ classdef epanet <handle
             %
             % See also writeReport, writeLineInReportFile, clearReport.
             [obj.Errcode] = obj.apiENcopyreport (fileName, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function resultindex = getNodeResultIndex(obj, node_index)
             % Retrieves the order in which a node's results
@@ -13231,7 +13314,7 @@ classdef epanet <handle
             %
             % See also getComputedHydraulicTimeSeries, deleteNode, getLinkResultIndex
             [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_NODE, node_index, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function resultindex = getLinkResultIndex(obj, link_index)
             % Retrieves the order in which a link's results
@@ -13243,7 +13326,7 @@ classdef epanet <handle
             %
             % See also getComputedHydraulicTimeSeries, deleteNode, getNodeResultIndex
             [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_LINK, link_index, obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function clearReport(obj)
             % Clears the contents of a project's report file. (EPANET Version 2.2)
@@ -13253,7 +13336,7 @@ classdef epanet <handle
             %
             % See also writeReport, writeLineInReportFile, copyReport.
             [obj.Errcode] = obj.apiENclearreport(obj.LibEPANET, obj.ph);
-%             error(obj.getError(obj.Errcode));
+%             error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
         end
         function unload(obj)
             % Unload library and close the EPANET Toolkit system.
@@ -13467,7 +13550,7 @@ classdef epanet <handle
             % See also getMSXSpeciesIndex, getMSXSpeciesNameID, getMSXSpeciesConcentration,
             %          getMSXSpeciesType, getMSXSpeciesUnits, getMSXSpeciesATOL,
             %          getMSXSpeciesRTOL.
-            [obj.Errcode, value] = obj.apiMSXgetcount(3, obj.MSXLibEPANET);
+            [obj.Errcode, value] = obj.apiMSXgetcount(3, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXConstantsCount(obj)
@@ -13480,7 +13563,7 @@ classdef epanet <handle
             %
             % See also getMSXConstantsIndex, getMSXConstantsValue,
             %          getMSXConstantsNameID.
-            [obj.Errcode, value] = obj.apiMSXgetcount(6, obj.MSXLibEPANET);
+            [obj.Errcode, value] = obj.apiMSXgetcount(6, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXParametersCount(obj)
@@ -13494,7 +13577,7 @@ classdef epanet <handle
             % See also setMSXParametersTanksValue, setMSXParametersPipesValue,
             %          getMSXParametersIndex, getMSXParametersTanksValue,
             %          getMSXParametersPipesValue.
-            [obj.Errcode, value] = obj.apiMSXgetcount(5, obj.MSXLibEPANET);
+            [obj.Errcode, value] = obj.apiMSXgetcount(5, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXPatternsCount(obj)
@@ -13508,7 +13591,7 @@ classdef epanet <handle
             %   d.getMSXPatternsCount
             %
             % See also setMSXPattern, setMSXPatternValue, addMSXPattern.
-            [obj.Errcode, value] = obj.apiMSXgetcount(7, obj.MSXLibEPANET);
+            [obj.Errcode, value] = obj.apiMSXgetcount(7, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXSpeciesNameID(obj, varargin)
@@ -13528,16 +13611,16 @@ classdef epanet <handle
                 spcnt = obj.getMSXSpeciesCount;
                 value = cell(1, spcnt);
                 for i=1:spcnt
-                    [obj.Errcode, len] = obj.apiMSXgetIDlen(3, i, obj.MSXLibEPANET);
-                    [obj.Errcode, value{i}]=obj.apiMSXgetID(3, i, len, obj.MSXLibEPANET);
+                    [obj.Errcode, len] = obj.apiMSXgetIDlen(3, i, obj.MSXLibEPANET, obj.MSX);
+                    [obj.Errcode, value{i}] = obj.apiMSXgetID(3, i, len, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             else
                 k=1;
                 value = cell(1, length(varargin{1}));
                 for i=varargin{1}
-                    [obj.Errcode, len] = obj.apiMSXgetIDlen(3, i, obj.MSXLibEPANET);
-                    [obj.Errcode, value{k}]=obj.apiMSXgetID(3, i, len, obj.MSXLibEPANET);
+                    [obj.Errcode, len] = obj.apiMSXgetIDlen(3, i, obj.MSXLibEPANET, obj.MSX);
+                    [obj.Errcode, value{k}]=obj.apiMSXgetID(3, i, len, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     k=k+1;
                 end
@@ -13560,7 +13643,7 @@ classdef epanet <handle
             value = cell(1, msxSpCnt);
             if msxSpCnt
                 for i=1:msxSpCnt
-                    [obj.Errcode, value{i}, ~, ~, ~] = obj.apiMSXgetspecies(i, obj.MSXLibEPANET);
+                    [obj.Errcode, value{i}, ~, ~, ~] = obj.apiMSXgetspecies(i, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -13604,7 +13687,7 @@ classdef epanet <handle
             msxSpCnt = obj.getMSXSpeciesCount;
             if msxSpCnt
                 for i=1:msxSpCnt
-                    [obj.Errcode, ~, ~, value, ~] = obj.apiMSXgetspecies(i, obj.MSXLibEPANET);
+                    [obj.Errcode, ~, ~, value, ~] = obj.apiMSXgetspecies(i, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -13624,7 +13707,7 @@ classdef epanet <handle
             msxSpCnt = obj.getMSXSpeciesCount;
             if msxSpCnt
                 for i=1:msxSpCnt
-                    [obj.Errcode, ~, ~, ~, value] = obj.apiMSXgetspecies(i, obj.MSXLibEPANET);
+                    [obj.Errcode, ~, ~, ~, value] = obj.apiMSXgetspecies(i, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -13647,11 +13730,11 @@ classdef epanet <handle
                 if isempty(value), value=[]; end
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
-                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(3, varargin{1}{j}, obj.MSXLibEPANET);
+                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(3, varargin{1}{j}, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(3, varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode, value] = obj.apiMSXgetindex(3, varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -13670,9 +13753,9 @@ classdef epanet <handle
             value={};
             if obj.getMSXConstantsCount
                 for i=1:obj.getMSXConstantsCount
-                    [obj.Errcode, len] = obj.apiMSXgetIDlen(6, i, obj.MSXLibEPANET);
+                    [obj.Errcode, len] = obj.apiMSXgetIDlen(6, i, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
-                    [obj.Errcode, value{i}] = obj.apiMSXgetID(6, i, len, obj.MSXLibEPANET);
+                    [obj.Errcode, value{i}] = obj.apiMSXgetID(6, i, len, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -13692,7 +13775,7 @@ classdef epanet <handle
             value=[];
             if obj.getMSXConstantsCount
                 for i=1:obj.getMSXConstantsCount
-                    [obj.Errcode, value(i)] = obj.apiMSXgetconstant(i, obj.MSXLibEPANET);
+                    [obj.Errcode, value(i)] = obj.apiMSXgetconstant(i, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -13713,11 +13796,11 @@ classdef epanet <handle
                 if isempty(value), value=[]; end
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
-                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(6, varargin{1}{j}, obj.MSXLibEPANET);
+                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(6, varargin{1}{j}, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(6, varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode, value] = obj.apiMSXgetindex(6, varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -13736,17 +13819,17 @@ classdef epanet <handle
             if isempty(varargin)
                 if ~obj.getMSXParametersCount, value={};return; end
                 for i=1:obj.getMSXParametersCount
-                    [obj.Errcode, len] = obj.apiMSXgetIDlen(5, i, obj.MSXLibEPANET);
+                    [obj.Errcode, len] = obj.apiMSXgetIDlen(5, i, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
-                    [obj.Errcode, value{i}]=obj.apiMSXgetID(5, i, len, obj.MSXLibEPANET);
+                    [obj.Errcode, value{i}] = obj.apiMSXgetID(5, i, len, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             else
                 k=1;
                 for i=varargin{1}
-                    [obj.Errcode, len] = obj.apiMSXgetIDlen(5, i, obj.MSXLibEPANET);
+                    [obj.Errcode, len] = obj.apiMSXgetIDlen(5, i, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
-                    [obj.Errcode, value{k}]=obj.apiMSXgetID(5, i, len, obj.MSXLibEPANET);
+                    [obj.Errcode, value{k}] = obj.apiMSXgetID(5, i, len, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     k=k+1;
                 end
@@ -13770,11 +13853,11 @@ classdef epanet <handle
                 if isempty(value), value=[]; end
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
-                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(5, varargin{1}{j}, obj.MSXLibEPANET);
+                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(5, varargin{1}{j}, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(5, varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode, value] = obj.apiMSXgetindex(5, varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -13794,7 +13877,7 @@ classdef epanet <handle
             if ~length(obj.NodeTankIndex), value=0;return;end
             for i=1:length(obj.NodeTankIndex)
                 for j=1:obj.getMSXParametersCount
-                    [obj.Errcode, value{obj.NodeTankIndex(i)}(j)] = obj.apiMSXgetparameter(0, obj.NodeTankIndex(i), j, obj.MSXLibEPANET);
+                    [obj.Errcode, value{obj.NodeTankIndex(i)}(j)] = obj.apiMSXgetparameter(0, obj.NodeTankIndex(i), j, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -13813,7 +13896,7 @@ classdef epanet <handle
             if ~obj.getMSXParametersCount, value=[];return; end
             for i=1:obj.getLinkPipeCount
                 for j=1:obj.getMSXParametersCount
-                    [obj.Errcode, value{i}(j)] = obj.apiMSXgetparameter(1, i, j, obj.MSXLibEPANET);
+                    [obj.Errcode, value{i}(j)] = obj.apiMSXgetparameter(1, i, j, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -13837,17 +13920,17 @@ classdef epanet <handle
             if isempty(varargin)
                 if ~obj.getMSXPatternsCount, value={};return; end
                 for i=1:obj.getMSXPatternsCount
-                    [obj.Errcode, len] = obj.apiMSXgetIDlen(7, i, obj.MSXLibEPANET);
+                    [obj.Errcode, len] = obj.apiMSXgetIDlen(7, i, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
-                    [obj.Errcode, value{i}]=obj.apiMSXgetID(7, i, len, obj.MSXLibEPANET);
+                    [obj.Errcode, value{i}]=obj.apiMSXgetID(7, i, len, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             else
                 k=1;
                 for i=varargin{1}
-                    [obj.Errcode, len] = obj.apiMSXgetIDlen(7, i, obj.MSXLibEPANET);
+                    [obj.Errcode, len] = obj.apiMSXgetIDlen(7, i, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
-                    [obj.Errcode, value{k}]=obj.apiMSXgetID(7, i, len, obj.MSXLibEPANET);
+                    [obj.Errcode, value{k}] = obj.apiMSXgetID(7, i, len, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     k=k+1;
                 end
@@ -13874,11 +13957,11 @@ classdef epanet <handle
                 if isempty(value), value=[]; end
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
-                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(7, varargin{1}{j}, obj.MSXLibEPANET);
+                    [obj.Errcode, value(j)] = obj.apiMSXgetindex(7, varargin{1}{j}, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode, value] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
         end
@@ -13901,17 +13984,17 @@ classdef epanet <handle
             if isempty(varargin)
                 if obj.getMSXPatternsCount
                     for i=obj.getMSXPatternsIndex
-                        [obj.Errcode, value(i)]=obj.apiMSXgetpatternlen(i, obj.MSXLibEPANET);
+                        [obj.Errcode, value(i)] = obj.apiMSXgetpatternlen(i, obj.MSXLibEPANET, obj.MSX);
                         if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     end
                 end
             elseif isa(varargin{1}, 'cell')
                 for j=1:length(varargin{1})
-                    [obj.Errcode, value(j)] = obj.MSXgetpatternlen(obj.getMSXPatternsIndex(varargin{1}{j}), obj.MSXLibEPANET);
+                    [obj.Errcode, value(j)] = obj.MSXgetpatternlen(obj.getMSXPatternsIndex(varargin{1}{j}), obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             elseif isa(varargin{1}, 'char')
-                [obj.Errcode, value] = obj.apiMSXgetpatternlen(obj.getMSXPatternsIndex(varargin{1}), obj.MSXLibEPANET);
+                [obj.Errcode, value] = obj.apiMSXgetpatternlen(obj.getMSXPatternsIndex(varargin{1}), obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             elseif isa(varargin{1}, 'numeric')
                 k=1;
@@ -13936,7 +14019,7 @@ classdef epanet <handle
             if ~obj.getMSXSpeciesCount, value{1}(1)=0; return; end
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
-                    [obj.Errcode, value{i}(j)] = obj.apiMSXgetinitqual(0, i, j, obj.MSXLibEPANET);
+                    [obj.Errcode, value{i}(j)] = obj.apiMSXgetinitqual(0, i, j, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -13955,7 +14038,7 @@ classdef epanet <handle
             if ~obj.getMSXSpeciesCount, value{1}(1)=0; return; end
             for i=1:obj.getLinkCount
                 for j=1:obj.getMSXSpeciesCount
-                    [obj.Errcode, value{i}(j)] = obj.apiMSXgetinitqual(1, i, j, obj.MSXLibEPANET);
+                    [obj.Errcode, value{i}(j)] = obj.apiMSXgetinitqual(1, i, j, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -13977,7 +14060,7 @@ classdef epanet <handle
             %          getMSXSourceLevel, getMSXSourcePatternIndex.
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
-                    [obj.Errcode, obj.MSXSourceType{i}{j}, obj.MSXSourceLevel{i}(j), obj.MSXSourcePatternIndex{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
+                    [obj.Errcode, obj.MSXSourceType{i}{j}, obj.MSXSourceLevel{i}(j), obj.MSXSourcePatternIndex{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                     obj.MSXSourceTypeCode{i}(j)=find(strcmp(obj.MSXTYPESOURCE, obj.MSXSourceType{i}{j}))-2;
                 end
@@ -14018,7 +14101,7 @@ classdef epanet <handle
             %          getMSXSourceLevel, getMSXSourcePatternIndex.
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
-                    [obj.Errcode, value{i}{j}, ~, ~] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
+                    [obj.Errcode, value{i}{j}, ~, ~] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -14038,7 +14121,7 @@ classdef epanet <handle
             %          getMSXSourceType, getMSXSourcePatternIndex.
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
-                    [obj.Errcode, ~, value{i}(j), ~] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
+                    [obj.Errcode, ~, value{i}(j), ~] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -14057,7 +14140,7 @@ classdef epanet <handle
             %          getMSXSourceType, getMSXSourceLevel.
             for i=1:obj.getNodeCount
                 for j=1:obj.getMSXSpeciesCount
-                    [obj.Errcode, ~, ~, value{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET);
+                    [obj.Errcode, ~, ~, value{i}(j)] = obj.apiMSXgetsource(i, j, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
             end
@@ -14083,7 +14166,7 @@ classdef epanet <handle
             for i=1:obj.getMSXPatternsCount
                 tmplength=obj.getMSXPatternsLengths(i);
                 for j=1:tmplength
-                    [obj.Errcode, value(i, j)] = obj.apiMSXgetpatternvalue(i, j, obj.MSXLibEPANET);
+                    [obj.Errcode, value(i, j)] = obj.apiMSXgetpatternvalue(i, j, obj.MSXLibEPANET, obj.MSX);
                     if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
                 end
                 if tmplength<tmpmaxlen
@@ -14091,7 +14174,7 @@ classdef epanet <handle
                         value(i, j)=value(i, j-tmplength);
                     end
                 end
-                
+
             end
         end
         function value = getMSXPatternValue(obj, patternIndex, patternStep)
@@ -14127,7 +14210,7 @@ classdef epanet <handle
             %          getMSXSpeciesCount, getMSXSpeciesType,
             %          getMSXSpeciesUnits, getMSXSpeciesATOL,
             %          getMSXSpeciesRTOL.
-            [obj.Errcode, value] = obj.apiMSXgetqual(type, index, species, obj.MSXLibEPANET);
+            [obj.Errcode, value] = obj.apiMSXgetqual(type, index, species, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function value = getMSXComputedQualitySpecie(obj, varargin)
@@ -14158,6 +14241,11 @@ classdef epanet <handle
             %   MSX_comp.NodeQuality(:,:,2) % Gets node quality for the second specie.
             %
             % See also getMSXComputedQualityNode, getMSXComputedQualityLink.
+            if ~obj.ph.isNull
+                obj.saveInputFile(obj.TempInpFile);
+                obj.unloadMSX;
+                obj.loadMSXFile(obj.MSXTempFile);
+            end
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -14170,7 +14258,7 @@ classdef epanet <handle
             link_indices = 1:obj.getLinkCount;%for all link index
             node_indices = 1:obj.getNodeCount;%for all node index
             specie_name_ind = obj.getMSXSpeciesIndex(specie);
-            
+
             value.NodeQuality = nan(1, length(node_indices), length(specie_name_ind));
             value.LinkQuality = nan(1, length(node_indices), length(specie_name_ind));
             % Obtain a hydraulic solution
@@ -14239,6 +14327,11 @@ classdef epanet <handle
             %   d.getMSXComputedQualityNode(1:3).Quality   % Compute quality for the first three nodes
             %
             % See also getMSXComputedQualitylink, getMSXComputedQualitySpecie.
+            if ~obj.ph.isNull
+                obj.saveInputFile(obj.TempInpFile);
+                obj.unloadMSX;
+                obj.loadMSXFile(obj.MSXTempFile);
+            end
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -14270,7 +14363,7 @@ classdef epanet <handle
                     g=g+1;
                 end
                 i=i+1;
-            end 
+            end
             timeSmle=obj.getTimeSimulationDuration;
             while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
                 [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
@@ -14299,6 +14392,11 @@ classdef epanet <handle
             %   d.getMSXComputedQualityLink(1:3).Quality   % Compute quality for the first three links.
             %
             % See also getMSXComputedQualityNode, getMSXComputedQualitySpecie.
+            if ~obj.ph.isNull
+                obj.saveInputFile(obj.TempInpFile);
+                obj.unloadMSX;
+                obj.loadMSXFile(obj.MSXTempFile);
+            end
             if obj.getMSXSpeciesCount==0
                 value=0;
                 return;
@@ -14421,7 +14519,7 @@ classdef epanet <handle
             %   d.solveMSXCompleteHydraulics
             %
             % See also solveMSXCompleteQuality.
-            [obj.Errcode] = obj.apiMSXsolveH(obj.MSXLibEPANET);
+            [obj.Errcode] = obj.apiMSXsolveH(obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function solveMSXCompleteQuality(obj)
@@ -14495,14 +14593,14 @@ classdef epanet <handle
             % See also getMSXPattern, setMSXPattern.
             index=-1;
             if nargin==2
-                [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
-                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             elseif nargin==3
-                [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode] = obj.apiMSXaddpattern(varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
-                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET);
+                [obj.Errcode, index] = obj.apiMSXgetindex(7, varargin{1}, obj.MSXLibEPANET, obj.MSX);
                 setMSXPattern(obj, index, varargin{2});
                 if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
             end
@@ -14641,7 +14739,7 @@ classdef epanet <handle
                 pat=obj.getMSXPatternsIndex(pat);
             end
             nfactors=length(patternVector);
-            [obj.Errcode] = obj.apiMSXsetpattern(pat, patternVector, nfactors, obj.MSXLibEPANET);
+            [obj.Errcode] = obj.apiMSXsetpattern(pat, patternVector, nfactors, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function setMSXPatternMatrix(obj, patternMatrix)
@@ -15004,7 +15102,7 @@ classdef epanet <handle
             %   end
             %
             % See also solveMSXCompleteHydraulics, stepMSXQualityAnalysisTimeLeft.
-            [obj.Errcode] = obj.apiMSXinit(flag, obj.MSXLibEPANET);
+            [obj.Errcode] = obj.apiMSXinit(flag, obj.MSXLibEPANET, obj.MSX);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
         end
         function [t, tleft]= stepMSXQualityAnalysisTimeLeft(obj)
@@ -15045,12 +15143,12 @@ classdef epanet <handle
             if isfield(msx, 'title')
                 fprintf(f, msx.TITLE);
             end
-            
+
             fprintf(f, '\n\n[OPTIONS]\n');
             options = {'AREA_UNITS', 'RATE_UNITS', 'SOLVER', 'COUPLING', 'COMPILER', ...
                 'TIMESTEP', 'ATOL', 'RTOL'};
             spaces=blanks(space);
-            
+
             for i=1:length(options)
                 if isfield(msx, options{i})
                     fprintf(f, num2str(options{i}));
@@ -15059,7 +15157,7 @@ classdef epanet <handle
                     fprintf(f, '\n');
                 end
             end
-            
+
             FIELDS = {'SPECIES', 'COEFFICIENTS', 'TERMS', 'PIPES', ...
                 'TANKS', 'SOURCES', 'QUALITY', 'GLOBAL', 'PARAMETERS', 'PATTERNS'};
             for sect=FIELDS
@@ -15076,7 +15174,7 @@ classdef epanet <handle
                     end
                 end
             end
-            
+
             fprintf(f, '[REPORT]\n');
             fprintf(f, 'NODES ALL\n');
             fprintf(f, 'LINKS ALL\n');
@@ -15110,7 +15208,7 @@ classdef epanet <handle
                 %file=[file(1:end-1), 'txt'];%epanet2.h-->epanet2.txt
                 file = 'epanet2_enums.txt';%epanet2_enums.h-->epanet2_enums.txt
             end
-            
+
             fid = fopen(file);
             tline = fgetl(fid);
             i=1; constants={};
@@ -15209,7 +15307,7 @@ classdef epanet <handle
                         obj.BinLinkPipeRoughness=[];
                         obj.BinLinkPipeMinorLoss=[];
                         obj.BinLinkType={};
-                        
+
                         obj.BinNodeJunctionCount = length(obj.BinNodeJunctionNameID);
                         obj.BinNodeReservoirCount = length(obj.BinNodeReservoirNameID);
                         obj.BinNodeTankCount = length(obj.BinNodeTankNameID);
@@ -15361,11 +15459,11 @@ classdef epanet <handle
                         obj.BinQualityUnits={};
                         obj.BinOptionsDiffusivity=[];
                         obj.BinOptionsQualityTolerance=[];
-                        
+
                         obj.BinLinkPipeCount = length(obj.BinLinkPipeNameID);
                         obj.BinLinkPumpCount = length(obj.BinLinkPumpNameID);
                         obj.BinLinkValveCount = length(obj.BinLinkValveNameID);
-                        
+
                         obj.BinLinkNameID=[obj.BinLinkPipeNameID obj.BinLinkPumpNameID obj.BinLinkValveNameID];
                         obj.BinLinkCount=obj.BinLinkPipeCount+obj.BinLinkPumpCount+obj.BinLinkValveCount;
                         continue;
@@ -15486,7 +15584,7 @@ classdef epanet <handle
                     ee=regexp(tline, '\w*EFFICIENCY*\w', 'match');
                     nn=regexp(tline, '\w*VOLUME*\w', 'match');
                     kk=regexp(tline, '\w*HEADLOSS*\w', 'match');
-                    
+
                     if strcmp(ee, 'EFFICIENCY'), typecode=1;   % EFFICIENCY
                         obj.BinCurveAllLines{b}=tline;b=b+1;continue;
                     elseif strcmp(nn, 'VOLUME'), typecode=2;   % VOLUME
@@ -15571,7 +15669,7 @@ classdef epanet <handle
                         obj.BinRulesCount=obj.BinRulesCount+1;d=1;
                     end
                     obj.BinRulesControlsInfo{obj.BinRulesCount}{d}=atline;
-                    
+
                     if sum(strcmpi(atline{2}, {'LINK', 'PIPE', 'PUMP', 'VALVE'}))
                         obj.BinRulesControlLinksID{obj.BinRulesCount}{d}=atline{3};
                     elseif sum(strcmpi(atline{2}, {'NODE', 'JUNCTION', 'RESERVOIR', 'TANK'}))
@@ -15674,11 +15772,11 @@ classdef epanet <handle
             obj.BinNodeType(obj.BinNodeJunctionIndex)=obj.TYPENODE(1);
             obj.BinNodeType(obj.BinNodeReservoirIndex)=obj.TYPENODE(2);
             obj.BinNodeType(obj.BinNodeTankIndex)=obj.TYPENODE(3);
-            
+
             obj.BinLinkType(obj.BinLinkPipeIndex)=obj.TYPELINK(2);
             obj.BinLinkType(obj.BinLinkPumpIndex)=obj.TYPELINK(3);
             obj.BinLinkType(obj.BinLinkValveIndex)=obj.BinLinkValveType;
-            
+
             obj.BinLinkSettings = [obj.BinLinkPipeRoughness zeros(1, obj.BinLinkPumpCount) obj.BinLinkValveSetting]';
             obj.BinNodeElevations = single([obj.BinNodeJunctionElevation obj.BinNodeReservoirElevation obj.BinNodeTankElevation]);
             obj.BinLinkDiameters = single([obj.BinLinkPipeDiameters zeros(1, obj.BinLinkPumpCount) obj.BinLinkValveDiameters]);
@@ -15690,7 +15788,7 @@ classdef epanet <handle
             % for i=obj.BinNodeTankIndex
             %    obj.BinNodeDemandPatternNameID{i}='';
             %      end
-            
+
             b={};
             for i=1:obj.BinLinkCount
                 ind=find((strcmp(obj.BinLinkInitialStatusNameID, obj.BinLinkNameID{i}))==1);
@@ -15719,7 +15817,7 @@ classdef epanet <handle
                 obj.BinLinkValveStatus=obj.BinLinkInitialStatus(obj.BinLinkValveIndex);
                 obj.BinLinkValveStatusNameID=obj.BinLinkInitialStatusNameID(obj.BinLinkValveIndex);
             end
-            
+
             if ~isempty(BinCNameID)
                 j=1;
                 for i=1:length(BinCNameID)
@@ -16089,7 +16187,7 @@ classdef epanet <handle
                         % skip
                     else
                         clear atlines;
-                        
+
                         if ll<obj.BinLinkValveCount+1
                             atlines{1}=obj.BinLinkNameID{obj.BinLinkValveIndex(ll)};
                             atlines{2}=obj.BinLinkFromNode{obj.BinLinkValveIndex(ll)};
@@ -16508,7 +16606,7 @@ classdef epanet <handle
             end
             node_index = addBinNode(obj, 1, nodeID, coords, elev, demand, patternID, category, quality);
             if nargin == 9
-                
+
                 if strcmp(varargin{7}{1}, 'PIPE')
                     link_index = addBinLinkPipe(obj,varargin{7}{2:end});
                 elseif strcmp(varargin{7}{1}, 'PUMP')
@@ -17156,7 +17254,7 @@ classdef epanet <handle
                 else
                     clear atlines;
                     atlines = checktlines(tlines{i});
-                    
+
                     if ~isempty(Diameters)%Diameters
                         atlines{5} = num2str(Diameters(ll));
                         newlines=[];
@@ -17256,7 +17354,7 @@ classdef epanet <handle
                     else
                         clear atlines;
                         atlines = checktlines(tlines{i});
-                        
+
                         if ~isempty(Elevations)%Elevations
                             atlines{2} = num2str(Elevations(ll));
                             newlines=[];
@@ -17303,7 +17401,7 @@ classdef epanet <handle
                     else
                         clear atlines;
                         atlines = checktlines(tlines{i});
-                        
+
                         if ~isempty(BaseDemands) && length(atlines)>2%BaseDemands
                             if ~isempty(atlines{3}) && ~sum(atlines{3}==';')
                                 atlines{2} = num2str(BaseDemands(ll));
@@ -17406,7 +17504,7 @@ classdef epanet <handle
                 else
                     clear atlines;
                     atlines = checktlines(tlines{i});
-                    
+
                     if ~isempty(elevations)%elevations
                         atlines{2} = num2str(elevations(ll));
                         newlines=[];
@@ -17473,7 +17571,7 @@ classdef epanet <handle
                 else
                     clear atlines;
                     atlines = checktlines(tlines{i});
-                    
+
                     if ~isempty(MixModel) && ll<=obj.BinNodeTankIndex
                         atlines{2} = num2str(MixModel{ll});
                         newlines=[];
@@ -17538,7 +17636,7 @@ classdef epanet <handle
                 else
                     clear atlines;
                     atlines = checktlines(tlines{i});
-                    
+
                     if ~isempty(elevations)%elevations
                         atlines{2} = num2str(elevations(ll));
                         newlines=[];
@@ -17822,7 +17920,7 @@ classdef epanet <handle
         function value = getBinComputedAllParameters(obj, varargin)
             [fid, binfile, ~] = runEPANETexe(obj);
             value = readEpanetBin(fid, binfile);
-            
+
             % Remove report bin, files @#
             warning off;
             fclose('all');
@@ -17926,7 +18024,7 @@ classdef epanet <handle
                 end
                 clear atline;
                 atline = checktlines(tline);
-                
+
                 if sect==0
                     continue;
                     % Nodes
@@ -18133,7 +18231,7 @@ classdef epanet <handle
                     indices = getNodeIndices(obj, varargin);j=1;
                     for i=indices
                         [obj.Errcode, vx(j), vy(j)]=obj.apiENgetcoord(i, obj.LibEPANET, obj.ph); j=j+1;
-                        error(obj.getError(obj.Errcode));
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                     end
                 catch
                 end
@@ -18146,7 +18244,7 @@ classdef epanet <handle
             elseif vert_function == 0
                 n2_value = BinNodeCoords(obj, 1);
             end
-            
+
             if isempty(varargin)
                 if isempty(n1_value)
                     value{1} = vx;
@@ -18430,7 +18528,7 @@ classdef epanet <handle
             %
             % See also setBinLinkVertices, addBinLinkVertices, deleteBinLinkVertices,
             %          getBinLinkVerticesCount, getNodeCoordinates.
-            
+
             % reload the network
             fid = fopen(obj.BinTempfile); % Opens the file for read access
             while ~feof(fid)
@@ -18624,7 +18722,7 @@ classdef epanet <handle
             value.BinLinkType(value.BinLinkPipeIndex)=obj.TYPELINK(2);
             value.BinLinkType(value.BinLinkPumpIndex)=obj.TYPELINK(3);
             value.BinLinkType(value.BinLinkValveIndex)=value.BinLinkValveType;
-            
+
             b={};
             for i=1:value.BinLinkCount
                 ind=find((strcmp(value.BinLinkInitialStatusNameID, value.BinLinkNameID{i}))==1);
@@ -18678,7 +18776,7 @@ classdef epanet <handle
                         continue;
                     end
                 end
-                
+
                 if sect==0
                     continue;
                     % Nodes
@@ -18727,7 +18825,7 @@ classdef epanet <handle
                         continue;
                     end
                 end
-                
+
                 if sect==0
                     continue;
                     % Nodes
@@ -18890,7 +18988,7 @@ classdef epanet <handle
                         continue;
                     end
                 end
-                
+
                 if sect==0
                     continue;
                     % Times
@@ -19011,7 +19109,7 @@ classdef epanet <handle
             for i=1:obj.NodeCount
                 obj.setNodeCoordinates(i, [newxCoord(i) newyCoord(i)]);
             end
-            
+
             if (sum(obj.getLinkVerticesCount)~= 0)
                 xVertCoord = obj.getNodeCoordinates{3};
                 yVertCoord = obj.getNodeCoordinates{4};
@@ -19079,10 +19177,10 @@ while 1
             continue;
         end
     end
-    
+
     if sect == 0
         continue;
-        
+
         % Options
     elseif sect == 1
         atline = checktlines(tline);
@@ -19132,14 +19230,14 @@ sect=0; i=1; t=1; k=1;
 while 1
     tline = fgetl(fid);
     if ~ischar(tline),   break,   end
-    
+
     % Get first token in the line
     tok = strtok(tline);
-    
+
     % Skip blank Clines and comments
     if isempty(tok), continue, end
     if (tok(1) == ';'), continue, end
-    
+
     if (tok(1) == '[')
         % [TERMS] section
         if strcmpi(tok(1:5), '[TERM')
@@ -19161,10 +19259,10 @@ while 1
             continue;
         end
     end
-    
+
     if sect == 0
         continue;
-        
+
         % Terms
     elseif sect == 1
         Terms{i} = tline;
@@ -19734,7 +19832,7 @@ for i=start+1:stop-1
     else
         clear atline;
         atline = checktlines(tlines{i});
-        
+
         if strcmp(sections{1}, '[STATUS]')
             if sum(strcmp(who, 'atline'))
                 value.BinLinkInitialStatus{d}=atline{2};
@@ -20408,7 +20506,7 @@ for t = 1:length(info)
                 fprintf(fid2, '%s', a{u});
                 fprintf(fid2, '\n%s%s%s%s%s%s%d%s%d%s%d%s%d%s%s', newLink, sps, fromNode, sps, ...
                     toNode, sps, plength, sps, pdiameter, sps, proughness, sps, 0, sps, status);
-                
+
             elseif (cnt==2 && strcmp(a{u}, '[PUMPS]') && nn==0 && typecode==2)
                 if ~isempty(curveID)
                     if isempty(char(crvs.BinCurveNameID))
@@ -20610,7 +20708,7 @@ for t = 1:length(info)
             check_brackets = rr{:};
             ch1 = strcmp(check_brackets, '[');
             ch2 = strcmp(check_brackets, ']');
-            
+
             if strcmp(a{u}, '[CONTROLS]')
                 fprintf(fid2, '%s', a{u});
                 n=1;
@@ -20619,7 +20717,7 @@ for t = 1:length(info)
                 e=1;
             end
             if strcmp(a{u}, '[END]'),  e=1; fprintf(fid2, '%s', a{u});break;   end
-            
+
             if n==1 && e==0 && kk==1
                 if strcmp(a{u}, '[CONTROLS]'), break; end
                 if isempty(a{u})
@@ -20708,7 +20806,7 @@ for t = 1:length(info)
                 if strcmp(a{u}, '[STATUS]'), out=1; end
                 if strcmp(a{u}, '[DEMANDS]'), out=1; end
                 if strcmp(a{u}, '[PATTERNS]'), out=1; end
-                
+
                 if strcmp(a{u}, LinkID) && q~=1 && out==0
                     if xx==1 || strcmp(a{1}, LinkID)
                         u=length(a)+1;
@@ -21252,7 +21350,7 @@ for t = 1:length(info)
                     end
                 end
                 break;
-                
+
                 % section [CURVES]
             elseif (sect==11) && (nn==0)
                 mm=1;
@@ -22360,7 +22458,7 @@ if fid~=-1
     value.BinElevationEachNode=fread(fid, value.BinNumberNodes, 'float')';
     value.BinLengthEachLink=fread(fid, value.BinNumberLinks, 'float')';
     value.BinDiameterEachLink=fread(fid, value.BinNumberLinks, 'float')';
-    
+
     for p=1:value.BinNumberPumps
         value.BinPumpIndexListLinks(p)=fread(fid, 1, 'float')';
         value.BinPumpUtilization(p)=fread(fid, 1, 'float')';
@@ -22370,9 +22468,9 @@ if fid~=-1
         value.BinPeakKwatts(p)=fread(fid, 1, 'float')';
         value.BinAverageCostPerDay(p)=fread(fid, 1, 'float')';
     end
-    
+
     fread(fid, 1, 'float');
-    
+
     for i=1:value.BinNumberReportingPeriods
         value.BinNodeDemand(i, :)         = fread(fid, value.BinNumberNodes, 'float')';
         value.BinNodeHead(i, :)           = fread(fid, value.BinNumberNodes, 'float')';
@@ -22387,7 +22485,7 @@ if fid~=-1
         value.BinLinkReactionRate(i, :)   = fread(fid, value.BinNumberLinks, 'float')';
         value.BinLinkFrictionFactor(i, :) = fread(fid, value.BinNumberLinks, 'float')';
     end
-    
+
     value.BinAverageBulkReactionRate=fread(fid, 1, 'float')';
     value.BinAverageWallReactionRate=fread(fid, 1, 'float')';
     value.BinAverageTankReactionRate=fread(fid, 1, 'float')';
@@ -22399,7 +22497,7 @@ end
 if ~isempty(varargin)
     v = struct();
     v.Time = (0:value.BinReportingTimeStepSec:value.BinSimulationDurationSec)';
-    
+
     fields_param = {'BinNodePressure', 'BinNodeDemand', 'BinNodeHead', 'BinNodeQuality', ...
         'BinLinkFlow', 'BinLinkVelocity', 'BinLinkHeadloss', 'BinLinkStatus', 'BinLinkSetting', ...
         'BinLinkReactionRate', 'BinLinkFrictionFactor', 'BinLinkQuality'};
@@ -22485,7 +22583,7 @@ for h=Index:length(info)
         continue;
     end
     if (tok(1) == '[')
-        
+
         % [COORDINATES] section
         if strcmpi(tok(1:5), '[COOR')
             sect = 17;
@@ -22504,7 +22602,7 @@ for h=Index:length(info)
     end
     if sect==0
         continue;
-        
+
         % Coordinates
     elseif sect==17
         if ~vertices
@@ -22517,7 +22615,7 @@ for h=Index:length(info)
             vx(index) = A{2};
             vy(index) = A{3};
         end
-        
+
         % Vertices
     elseif sect==18
         A = textscan(tline, '%s %f %f');
@@ -22555,7 +22653,7 @@ controlRuleIndex = index;
     nodeIndex, controlLevel] = obj.controlSettings(obj, value);
 [obj.Errcode] = obj.apiENsetcontrol(controlRuleIndex, ...
     controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-error(obj.getError(obj.Errcode));
+error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
 end
 function controlRuleIndex = addControlFunction(obj, value)
 if isstruct(value)
@@ -22564,14 +22662,14 @@ if isstruct(value)
             nodeIndex, controlLevel] = obj.controlSettings(obj, value(c).Control);
         [obj.Errcode, controlRuleIndex(c)] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
             controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-        error(obj.getError(obj.Errcode));
+        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
     end
 else
     [controlTypeIndex, linkIndex, controlSettingValue, ...
         nodeIndex, controlLevel] = controlSettings(obj, value);
     [obj.Errcode, controlRuleIndex] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
         controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-    error(obj.getError(obj.Errcode));
+    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
 end
 end
 function [controlTypeIndex, linkIndex, controlSettingValue, ...
@@ -22835,7 +22933,7 @@ if (strcmpi(lline, 'yes'))
     for i=1:v.linkcount
         FromNode=strfind(strcmp(v.nodesconnlinks(i, 1), v.nodenameid), 1);
         ToNode=strfind(strcmp(v.nodesconnlinks(i, 2), v.nodenameid), 1);
-        
+
         if FromNode
             x1 = double(v.nodecoords{1}(FromNode));
             y1 = double(v.nodecoords{2}(FromNode));
@@ -22844,9 +22942,9 @@ if (strcmpi(lline, 'yes'))
             x2 = double(v.nodecoords{1}(ToNode));
             y2 = double(v.nodecoords{2}(ToNode));
         end
-        
+
         hh=strfind(highlightlinkindex, i);
-        
+
         if length(hh) && ~isempty(selectColorLink)
             line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', .5, 'Color', [.5 .5 .5], 'Parent', axesid);
         end
@@ -22854,7 +22952,7 @@ if (strcmpi(lline, 'yes'))
             h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', .5, 'Parent', axesid);
             if ~l(1), legendIndices = [legendIndices 1]; l(1)=1; end
         end
-        
+
         % Plot Pumps
         if sum(strfind(v.pumpindex, i))
             colornode = 'm';
@@ -22869,7 +22967,7 @@ if (strcmpi(lline, 'yes'))
                 'MarkerFaceColor', colornode, ...
                 'MarkerSize', 4.5, 'Parent', axesid);
         end
-        
+
         % Plot Valves
         if sum(strfind(v.valveindex, i))
             colornode = 'k';
@@ -22888,7 +22986,7 @@ if (strcmpi(lline, 'yes'))
             end
             if ~l(3), legendIndices = [legendIndices 3]; l(3)=1; end
         end
-        
+
         if length(hh) && isempty(selectColorLink)
             line([x1, x2], [y1, y2], 'LineWidth', 1, 'Color', 'r', 'Parent', axesid);
             text((x1+x2)/2, (y1+y2)/2, v.linknameid(i), 'Fontsize', fontsize, 'Parent', axesid);
@@ -22926,7 +23024,7 @@ if (strcmpi(npoint, 'yes'))
     for i=1:v.nodecount
         [x] = double(v.nodecoords{1}(i));
         [y] = double(v.nodecoords{2}(i));
-        
+
         hh=strfind(highlightnodeindex, i);
         if ~length(hh)
             h(:, 4)=plot(x, y, 'o', 'LineWidth', 1.5, 'MarkerEdgeColor', 'b', ...
@@ -22934,7 +23032,7 @@ if (strcmpi(npoint, 'yes'))
                 'MarkerSize', 2.5, 'Parent', axesid);
             if ~l(4), legendIndices = [legendIndices 4]; l(4)=1; end
         end
-        
+
         % Plot Reservoirs
         if sum(strfind(v.resindex, i))
             colornode = 'g';
@@ -22961,12 +23059,12 @@ if (strcmpi(npoint, 'yes'))
                 'MarkerFaceColor', 'c', ...
                 'MarkerSize', 11, 'Parent', axesid);
             if ~l(6), legendIndices = [legendIndices 6]; l(6)=1; end
-            
+
             plot(x, y, 'p', 'LineWidth', 1.5, 'MarkerEdgeColor', colornode, ...
                 'MarkerFaceColor', colornode, ...
                 'MarkerSize', 11, 'Parent', axesid);
         end
-        
+
         if length(hh) && isempty(selectColorNode)
             plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', 'r', ...
                 'MarkerFaceColor', 'r', ...
