@@ -8970,7 +8970,7 @@ classdef epanet <handle
                     value.Head(k, :) = obj.getNodeHydaulicHead;
                 end
                 if find(strcmpi(varargin, 'tankvolume'))
-                    value.TankVolume(k, :) = [zeros(1, junctioncount) zeros(1, rescount) obj.getNodeTankVolume];
+                    value.TankVolume(k, :) = [zeros(1, junctioncount+rescount) obj.getNodeTankVolume];
                 end
                 if find(strcmpi(varargin, 'flow'))
                     value.Flow(k, :) = obj.getLinkFlows;
