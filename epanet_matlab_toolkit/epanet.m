@@ -4374,7 +4374,7 @@ classdef epanet <handle
             end
             %Open the file
             [obj.Errcode] = obj.apiMSXopen(obj);
-            if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
+            if obj.Errcode, warning(obj.getMSXError(obj.Errcode)); end
             obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
             obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
             obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
@@ -4454,7 +4454,7 @@ classdef epanet <handle
                 rptfile = [varargin{1}, '.txt'];
                 binfile = [varargin{1}, '.bin'];
                 obj.Errcode = obj.apiENepanet(obj.BinTempfile, rptfile, binfile, obj.LibEPANET);
-                Errcode = reloadNetwork(obj);
+                Errcode = obj.loadEPANETFile(obj.BinTempfile);
             end
             error(obj.getError(Errcode));
         end
@@ -15737,7 +15737,7 @@ classdef epanet <handle
             fprintf(fid, '%s\n', tlines{:});
             fclose(fid);
             if obj.Bin==1
-                Errcode=reloadNetwork(obj);
+                Errcode=obj.loadEPANETFile(obj.BinTempfile);
             end
         end
         function [Errcode]=setBinQualType(obj, chemname, chemunits, varargin)
@@ -16036,7 +16036,7 @@ classdef epanet <handle
             fprintf(fid, '%s\n', tlines{:});
             fclose(fid);
             if obj.Bin==1
-                Errcode=reloadNetwork(obj);
+                Errcode=obj.loadEPANETFile(obj.BinTempfile);
             end
         end
         function [Errcode]=setBinNodeResDemandPatternNameID(obj, varargin)
@@ -17105,7 +17105,7 @@ classdef epanet <handle
             fprintf(fid, '%s\n', tlines{:});
             fclose(fid);
             if obj.Bin==1
-                Errcode=reloadNetwork(obj);
+                Errcode=obj.loadEPANETFile(obj.BinTempfile);
             end
         end
         function [Errcode]=setBinNodeJunctionsParameters(obj, varargin)
@@ -17233,7 +17233,7 @@ classdef epanet <handle
             fprintf(fid, '%s\n', tlines{:});
             fclose(fid);
             if obj.Bin==1
-                Errcode=reloadNetwork(obj);
+                Errcode=obj.loadEPANETFile(obj.BinTempfile);
             end
         end
         function [Errcode]=setBinNodeTankParameters(obj, varargin)
@@ -17398,7 +17398,7 @@ classdef epanet <handle
             fprintf(fid, '%s\n', tlines{:});
             fclose(fid);
             if obj.Bin==1
-                Errcode=reloadNetwork(obj);
+                Errcode=obj.loadEPANETFile(obj.BinTempfile);
             end
         end
         function [Errcode]=setBinNodeReservoirParameters(obj, varargin)
@@ -17463,7 +17463,7 @@ classdef epanet <handle
             fprintf(fid, '%s\n', tlines{:});
             fclose(fid);
             if obj.Bin==1
-                Errcode=reloadNetwork(obj);
+                Errcode=obj.loadEPANETFile(obj.BinTempfile);
             end
         end
         function [value] = getBinSections(obj)
@@ -18189,7 +18189,7 @@ classdef epanet <handle
             fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
             fprintf(fid, texta);   % Writes the new text in the .inp file
             fclose('all');
-            if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+            if obj.Bin, obj.Errcode = obj.loadEPANETFile(obj.BinTempfile); end
         end
         function Errcode = deleteBinLinkVertices(obj, varargin)
             % Deletes interior vertex points of network links.
@@ -18432,7 +18432,7 @@ classdef epanet <handle
                 fid = fopen(inpfile, 'w');   % Opens file for writing and discard existing contents
                 fprintf(fid, texta);   % Writes the new text in the .inp file
                 fclose('all');
-                if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+                if obj.Bin, obj.Errcode = obj.loadEPANETFile(obj.BinTempfile); end
             end
         end
         function value = getBinLinkNameID(obj)
@@ -18591,7 +18591,7 @@ classdef epanet <handle
                     if length(atline)>1
                         value.BinControlLinksID{d}=atline{2};
                         t = regexp(tline, '\w*TIME\w*', 'match');
-                        if ~isempty(t)
+                        if isempty(t)
                             value.BinControlNodesID{d}=atline{6};
                         end
                     end
@@ -19132,7 +19132,7 @@ else
         end
         fprintf(fid, '%s\n', newlines{:});
         if obj.Bin==1
-            Errcode=reloadNetwork(obj);
+            Errcode=obj.loadEPANETFile(obj.BinTempfile);
         end
     else
         fprintf(fid, '%s\n', tlines{:});
@@ -19433,7 +19433,7 @@ end
 clear parameter;
 fprintf(fid, '%s\n', tlines{:});
 fclose(fid);
-if obj.Bin, Errcode=reloadNetwork(obj); end
+if obj.Bin, Errcode=obj.loadEPANETFile(obj.BinTempfile); end
 end
 function [mm, mins] = sec2hrs(parameter)
 mm='';hrs=0;mins=0;
@@ -19596,7 +19596,7 @@ end
 fprintf(fid, '%s\n', tlines{:});
 fclose(fid);
 if obj.Bin==1
-    Errcode=reloadNetwork(obj);
+    Errcode=obj.loadEPANETFile(obj.BinTempfile);
 end
 end
 function value = getBinParam(obj, sections, varargin)
@@ -19699,7 +19699,7 @@ typecode=varargin{3};
 for i=1:length(CurveX)
     if i+1<length(CurveX)+1
         if CurveX(i)>=CurveX(i+1)
-            if contains([0 1 3], typecode)
+            if strfind([0 1 3], typecode)
                 warning('Flow values are not in ascending order.');
                 Errcode=-1;
                 return;
@@ -19773,7 +19773,7 @@ for t = 1:length(info)
 end
 fclose(fid2);
 if obj.Bin==1
-    Errcode=reloadNetwork(obj);
+    Errcode=obj.loadEPANETFile(obj.BinTempfile);
 end
 end
 function [BinCurveNameID, BinCurveXvalue, BinCurveYvalue, BinCurveAllLines, BinCurveTypes, BinCurveCount, BinCTypes] = CurveInfo(obj)
@@ -19958,7 +19958,7 @@ fclose('all');
 fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
 fprintf(fid, texta);   % Writes the new text in the .inp file
 fclose('all');
-if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+if obj.Bin, obj.Errcode = obj.loadEPANETFile(obj.BinTempfile); end
 node_index = zeros(1, length(nodeID));
 for i = 1:length(nodeID)
     node_index(i) = obj.getBinNodeIndex(nodeID{i});
@@ -20053,7 +20053,7 @@ fclose('all');
 fid = fopen(obj.BinTempfile, 'w');   % Opens file for writing and discard existing contents
 fprintf(fid, texta);   % Writes the new text in the .inp file
 fclose('all');
-if obj.Bin, obj.Errcode = reloadNetwork(obj); end
+if obj.Bin, obj.Errcode = obj.loadEPANETFile(obj.BinTempfile); end
 link_index = zeros(1, length(linkID));
 for i = 1:length(linkID)
     link_index(i) = obj.getBinLinkIndex(linkID{i});
@@ -20252,7 +20252,7 @@ for t = 1:length(info)
     end
 end
 fclose(fid2);
-if obj.Bin, Errcode=reloadNetwork(obj); end
+if obj.Bin, Errcode=obj.loadEPANETFile(obj.BinTempfile); end
 end
 function Errcode=addLink(obj, typecode, newLink, fromNode, toNode, varargin)
 % Link type codes consist of the following constants:
@@ -20343,7 +20343,7 @@ for t = 1:length(info)
     fprintf(fid2, '\n');
 end
 fclose(fid2);
-if obj.Bin, Errcode=reloadNetwork(obj); end
+if obj.Bin, Errcode=obj.loadEPANETFile(obj.BinTempfile); end
 end
 function [Errcode] = rmNode(obj, NodeID)
 % Remove node from the network.
@@ -20420,7 +20420,7 @@ for i=1:length(checklinks)
     warning('Removed link:%s', char(remove_link(i)));
 end
 
-if obj.Bin, Errcode=reloadNetwork(obj); end
+if obj.Bin, Errcode=obj.loadEPANETFile(obj.BinTempfile); end
 end
 function Errcode= rmRulesControl(obj, type, id)
 % Remove control from the network.
@@ -20480,7 +20480,7 @@ if ~isempty(addSectionCoordinates) % && isempty(coordSectionIndex)
 end
 if isempty(endInpIndex), fprintf(f1, '[END]\n'); end
 fclose(f1);
-if obj.Bin, Errcode=reloadNetwork(obj); end
+if obj.Bin, Errcode=obj.loadEPANETFile(obj.BinTempfile); end
 end
 function Errcode=rmControl(obj, type, id)
 % Remove control from the network.
@@ -20557,7 +20557,7 @@ for t = 1:length(info)
 end
 fclose(fid2);
 if obj.Bin==1
-    Errcode=reloadNetwork(obj);
+    Errcode=obj.loadEPANETFile(obj.BinTempfile);
 end
 end
 function [Errcode] = rmLink(obj, LinkID)
@@ -20642,7 +20642,7 @@ end
 if ~ismember(to_node, [links.BinLinkToNode links.BinLinkFromNode]) && ~isempty(from_node)
     warning('Node %s disconnected.', char(from_node));
 end
-if obj.Bin,  Errcode=reloadNetwork(obj); end
+if obj.Bin,  Errcode=obj.loadEPANETFile(obj.BinTempfile); end
 end
 function [Errcode]=addNewControl(obj, x, status, y_t_c, param, z, varargin)
 % syntax
@@ -20725,7 +20725,7 @@ for t = Index:length(info)
     fprintf(fid2, '\n');
 end
 fclose(fid2);
-if obj.Bin, Errcode=reloadNetwork(obj); end
+if obj.Bin, Errcode=obj.loadEPANETFile(obj.BinTempfile); end
 end
 function [Errcode]=rmCurveID(obj, CurveID, varargin)
 % Check if id new already exists
@@ -20798,7 +20798,7 @@ for t = 1:length(info)
     fprintf(fid2, '\n');
 end
 fclose(fid2);
-if obj.Bin, Errcode=reloadNetwork(obj); end
+if obj.Bin, Errcode=obj.loadEPANETFile(obj.BinTempfile); end
 end
 function [Errcode]=Options(obj, newFlowUnits, headloss, varargin)
 % Notes: Flow units codes are as follows:
@@ -21232,7 +21232,7 @@ for t = 1:length(info)
                 % section [CONTROLS]
             elseif (sect==12) && (nn==0)
                 e=regexp(a, ';', 'match');
-                if ~isempty(e)>0
+                if length(e)>0
                     if ~isempty(e{1})
                         break;
                     end
@@ -21359,11 +21359,7 @@ for t = 1:length(info)
     fprintf(fid2, '\n');
 end
 fclose(fid2);
-if obj.Bin, Errcode=reloadNetwork(obj); end
-end
-function Errcode= reloadNetwork(obj)
-%     obj.closeNetwork;
-Errcode=obj.apiENopen([obj.BinTempfile], [obj.BinTempfile(1:end-4), '.txt'], [obj.BinTempfile(1:end-4), '.bin'], obj.LibEPANET, obj.ph);
+if obj.Bin, Errcode=obj.loadEPANETFile(obj.BinTempfile); end
 end
 function setflow(previousFlowUnits, newFlowUnits, fid2, a, sps, mm)
 if isnan(str2double(a{mm+1}))
