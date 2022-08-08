@@ -213,7 +213,7 @@ classdef epanet <handle
         Units_SI_Metric;             % Equal with 1 if is SI-Metric
         Units_US_Customary;          % Equal with 1 if is US-Customary
         Version;                     % EPANET version
-        
+        msg;                         % 1 - Ignore messages for loadfile-ph
         % Parameters used with EPANET MSX
         MSXLibEPANET;                % MSX EPANET library dll
         MSXLibEPANETPath;            % MSX EPANET library path
@@ -686,8 +686,10 @@ classdef epanet <handle
                 try
                     unloadlibrary(LibEPANET);
                 catch
-                    warning(['Library ', LibEPANET,' has not been unloaded because ' ...
-                        'another epanet class is using it.'])
+                    if obj.msg
+                        warning(['Library ', LibEPANET,' has not been unloaded because ' ...
+                            'another epanet class is using it.'])
+                    end
                 end
             else
                 errstring =['Library ', LibEPANET, '.dll was not loaded.'];
@@ -712,8 +714,10 @@ classdef epanet <handle
             if libisloaded(obj.LibEPANET)
                 if ~isempty(varargin), return; end
                 [~, obj.Version] = calllib(obj.LibEPANET, 'ENgetversion', 0);
-                LibEPANETString = ['EPANET version {', num2str(obj.Version), '} loaded'];
-                fprintf(LibEPANETString);
+                if obj.msg
+                    LibEPANETString = ['EPANET version {', num2str(obj.Version), '} loaded (EMT version {', obj.classversion, '}).'];
+                    disp(LibEPANETString);
+                end
             else
                 warning('There was an error loading the EPANET library (DLL).')
             end
@@ -4051,11 +4055,14 @@ classdef epanet <handle
                     if nargin==3, if strcmpi(varargin{3}, 'LOADFILE'); return; end; end
                     obj = BinUpdateClass(obj);
                     obj.saveBinInpFile;
+                    disp(['Load EMT only the bin functions (EMT version {', obj.classversion, '}).']);
+                    disp(['Input File ', varargin{1}, ' loaded successfully.'])
                     return;
                 end
             end
             if nargin>0
-                obj.Bin=1;
+                obj.msg = 1;
+                obj.Bin = 1;
                 [~, inp]=fileparts(obj.InputFile);
                 if isempty(inp)
                     if nargin==2 && strcmpi(varargin{2}, 'CREATE')
@@ -4066,7 +4073,7 @@ classdef epanet <handle
                 end
             end
             if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE') ...
-                                && ~strcmpi(varargin{2}, 'ph') % e.g. d = epanet('Net1.inp', 'epanet2'); % e.g. d = epanet('Net1.inp', 'epanet2');
+                                && ~strcmpi(varargin{2}, 'ph') && ~strcmpi(varargin{2}, 'loadfile-ph')% e.g. d = epanet('Net1.inp', 'epanet2'); % e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
                 if isempty(pwdDLL)
                     pwdDLL = pwd;
@@ -4091,13 +4098,23 @@ classdef epanet <handle
                     end
                 end
             end
+            
+            if nargin==2 && strcmpi(varargin{2}, 'loadfile-ph')
+                obj.msg = 0;
+            end
+            
             %Load EPANET Library
             obj.ENLoadLibrary;
-            disp([' (EMT version {', obj.classversion, '}).'])
             
             % Create Project - EPANET 2.2 supported function
             obj.ph = libpointer('voidPtr');
-            if contains('ph', varargin) 
+            if contains('ph', varargin)
+                try
+                    obj.createProject;
+                catch
+                end
+            end
+            if obj.msg == 0
                 try
                     obj.createProject;
                 catch
@@ -4126,8 +4143,9 @@ classdef epanet <handle
                 %Save the temporary input file
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
                 
-                copyfile(obj.InputFile, obj.BinTempfile); % create a new INP file (Working Copy) using the SAVE command of EPANET
-                
+                copyfile(obj.InputFile, obj.BinTempfile);
+                %obj.saveInputFile(obj.BinTempfile); % create a new INP file (Working Copy) using the SAVE command of EPANET
+
                 obj.closeNetwork;  %apiENclose; %Close input file
                 %Load temporary file
                 rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
@@ -4136,7 +4154,9 @@ classdef epanet <handle
                 if obj.Errcode
                     error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 else
-                    disp(['Loading File "', varargin{1}, '"...']);
+                    if obj.msg
+                        disp(['Loading File "', varargin{1}, '"...']);
+                    end
                 end
                 % Hide messages at command window from bin computed
                 obj.CMDCODE=1;
@@ -4145,9 +4165,11 @@ classdef epanet <handle
                 obj.TempInpFile = obj.BinTempfile;
                 % Load file only, return
                 if nargin==2
-                    if strcmpi(varargin{2}, 'LOADFILE')
+                    if strcmpi(varargin{2}, 'LOADFILE') || strcmpi(varargin{2}, 'loadfile-ph')
                         obj.libFunctions = libfunctions(obj.LibEPANET);
-                        disp(['Input File "', varargin{1}, '" loaded successfully.']);
+                        if obj.msg
+                            disp(['Input File "', varargin{1}, '" loaded successfully.']);
+                        end
                         obj.LibEPANET = 'epanet2';
                         return;
                     end
@@ -8996,7 +9018,7 @@ classdef epanet <handle
             %
             % Example 3:
             %   data = d.getComputedQualityTimeSeries('Time', ...
-            %   'NodeQuality', 'LinkQuality');              %  Retrieves all the time-series Time, NodeQuality, LinkQuality
+            %   'Quality', 'LinkQuality');              %  Retrieves all the time-series Time, NodeQuality, LinkQuality
             %   time = data.Time;
             %   node_quality = data.NodeQuality;
             %   link_quality = data.LinkQuality;
@@ -13168,6 +13190,12 @@ classdef epanet <handle
             %
             %apiENclose(obj.LibEPANET, obj.ph);
             obj.ENMatlabCleanup(obj.LibEPANET);
+            obj.deleteAllTemps;
+            if obj.msg
+                disp('EPANET Class is unloaded');
+            end
+        end
+        function deleteAllTemps(obj)
             fclose('all');
             files=dir('@#*');
             try delete([obj.InputFile(1:end-4), '.txt']), catch; end
@@ -13182,7 +13210,6 @@ classdef epanet <handle
             if exist(obj.MSXTempFile, 'file')==2
                 delete(obj.MSXTempFile);
             end
-            disp('EPANET Class is unloaded')
         end
         function loadlibrary(obj)
             obj.ENLoadLibrary(0)

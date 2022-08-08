@@ -38,7 +38,7 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 21:](./EX21_Overflow_option_for_tanks.mlx) Overflow of tanks.
 - [Example 22:](./EX22_Change_connection_links.mlx) Change connection of the links.
 - [Example 23:](./EX23_set_node_name_ids.mlx) Set node name IDs.
-- [Example 24:](./EX24_using_parfor.m) Using parfor in EMT.
+- [Example 24:](./EX24_Parallel_computations.m) Parallel computations examples.
 - [Example 25:](./EX25_adjacency_matrix.mlx) Compute the adjacency matrix (connectivity graph).
 - [Example 26:](./EX26_tojson.mlx) Exports values to json format.
 
