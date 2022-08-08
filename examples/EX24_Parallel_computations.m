@@ -20,7 +20,7 @@ try
     addpath(dirscenarios);
 catch
 end
-for i = 1:Nsim
+parfor i = 1:Nsim
     % Create temporary file for each scenario
     destinp{i} = [dirscenarios, '/', inpname, '_', num2str(i), '.inp'];
     copyfile(which([inpname, '.inp']), destinp{i});  
