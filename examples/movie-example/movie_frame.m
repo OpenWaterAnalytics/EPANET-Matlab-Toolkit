@@ -1,5 +1,6 @@
-function [NData,fig] = NetworkFrame(fig,vdata,ldata,...
-    PData,SData,NData,d,NodeType,LinkType,varargin)
+function [NData,fig] = movie_frame(fig,vdata,ldata,...
+    PData,SData,NData,d,NodeType,LinkType,hyd,labelvalues,labelstrings,...
+    ylabelinfo,titleinfo,frame,colorbarposition)
 %
 % NetworkFrame plots a static frame of a network graph described in Epanet
 % input format, with nodes and/or links colored using the values in vdata
@@ -110,8 +111,19 @@ function [NData,fig] = NetworkFrame(fig,vdata,ldata,...
 %
 % modified by Marios Kyriakou 25/09/2016
 
-if ~isempty(varargin)
-    hyd=varargin{1};
+% if ~isempty(varargin)
+%     hyd=varargin{1};
+% end
+if ~isempty(ylabelinfo)
+    nodeYlabel = ylabelinfo{1};
+    nodeFontYlabel = ylabelinfo{2};
+else
+    nodeYlabel = '';
+    nodeFontYlabel = 12;
+end
+if ~isempty(titleinfo)
+    figtitle = titleinfo{1};
+    figtitleFontSize = titleinfo{2};
 end
 
 if isempty(fig)
@@ -129,10 +141,19 @@ if isempty(NData)
     NData.c = 'default';
     NData.logtransv = 'n';
     NData.logtransl = 'n';
-    NData.vmin = min(vdata);
-    NData.vmax = max(vdata);
-    NData.lmin = min(ldata);
-    NData.lmax = max(ldata);
+
+    if isempty(labelvalues)
+        NData.vmin = min(vdata);
+        NData.vmax = max(vdata);
+        NData.lmin = min(ldata);
+        NData.lmax = max(ldata);
+    else
+        NData.vmin = labelvalues(1);
+        NData.vmax = labelvalues(end);
+        NData.lmin = labelvalues(1);
+        NData.lmax = labelvalues(end);
+    end
+
     NData.lwidth = 3;
     NData.vsize = 4;
     NData.tsize = 4;
@@ -142,10 +163,18 @@ if isempty(NData)
     if isfield(PData,'c')         NData.c = PData.c; end
     if isfield(PData,'logtransv') NData.logtransv = PData.logtransv; end
     if isfield(PData,'logtransl') NData.logtransl = PData.logtransl; end
-    if isfield(PData,'vmin')      NData.vmin = PData.vmin; end
-    if isfield(PData,'vmax')      NData.vmax = PData.vmax; end
-    if isfield(PData,'lmin')      NData.lmin = PData.lmin; end
-    if isfield(PData,'lmax')      NData.lmax = PData.lmax; end
+    if isempty(labelvalues)
+        if isfield(PData,'vmin')      NData.vmin = PData.vmin; end
+        if isfield(PData,'vmax')      NData.vmax = PData.vmax; end
+        if isfield(PData,'lmin')      NData.lmin = PData.lmin; end
+        if isfield(PData,'lmax')      NData.lmax = PData.lmax; end
+    else
+        if isfield(PData,'vmin')      NData.vmin = PData.vmin; end
+        if isfield(PData,'vmax')      NData.vmax = labelvalues(end); end
+        if isfield(PData,'lmin')      NData.lmin = PData.lmin; end
+        if isfield(PData,'lmax')      NData.lmax = labelvalues(end); end
+    end
+        
     if isfield(PData,'lwidth')    NData.lwidth = PData.lwidth; end
     if isfield(PData,'vsize')     NData.vsize = PData.vsize; end
     if isfield(PData,'tsize')     NData.tsize = PData.tsize; end
@@ -153,7 +182,7 @@ if isempty(NData)
 
     % Colormaps
     colormap(NData.c);
-    NData.cmap = colormap;
+    NData.cmap = colormap("turbo");
 
     % Open Epanet
     % Network Size
@@ -266,13 +295,23 @@ if isempty(NData)
         if strcmp(d.QualityChemName, NodeType), unts_node = d.QualityChemUnits; end
     end
     % Right hand side legend node
-    NData.hvc = colorbar('EastOutside');
+    NData.hvc = colorbar(colorbarposition);
     dv = (maxval - minval)/mapsize;
+    
     labelvalue = minval + ((ytick - 1)*dv);
     if length(labelvalue)==length(ytick)
         labelvalue = [labelvalue labelvalue(end)+labelvalue(2)-labelvalue(1)];
     end
+        
     labelstring = num2str( labelvalue', 5 );
+    
+    if ~isempty(labelvalues)
+        labelvalue = labelvalues;
+    end
+    if ~isempty(labelstrings)
+        labelstring = labelstrings;
+    end
+    
     try
         set(NData.hvc,'ticks',1:length(labelvalue));
         set(NData.hvc,'ticklabels',cellstr(labelstring));
@@ -281,10 +320,10 @@ if isempty(NData)
         labelvalue = [labelvalue labelvalue(end)+labelvalue(2)-labelvalue(1)];
         set(NData.hvc,'yticklabel', labelvalue(2:end)');
     end
-
+    
     if isfield(NData,'hvcL'), ylabel(NData.hvcL, [LinkType,' (',unts_link,')'],'fontsize',12); end
-    if isfield(NData,'hvc'), ylabel(NData.hvc, [NodeType,' (',unts_node,')'],'fontsize',12); end
-
+    if isfield(NData,'hvc'), ylabel(NData.hvc, [NodeType,' (',unts_node,')'],'fontsize',nodeFontYlabel); end
+        
     % Extra node symbols
     NData.snodeh=[];
     if ~isempty(SData)
@@ -379,11 +418,35 @@ end
 if NData.vsize > 0
     if colornodes
         rgb = color(NData.cmap,vdata,vmin,vmax);  % Return the color from the map
+        llengthv = length(find(vdata==0));
+        rgb(find(vdata==0), :) = ones(llengthv, 3);
         rgb(~Ivcolor,:) = rgb(~Ivcolor,:)*0;  % nodes are black if no color
         set(NData.nodeh,{'MarkerFaceColor'},num2cell(rgb,2),{'MarkerEdgeColor'},num2cell(rgb,2));
     else
         rgb = zeros(NData.nnodes,3);          % nodes are black if no color
         set(NData.nodeh,{'MarkerFaceColor'},num2cell(rgb,2),{'MarkerEdgeColor'},num2cell(rgb,2));
+    end
+end
+if ~isempty(titleinfo)
+    if hyd 
+        timestep = d.getTimeHydraulicStep;
+    else
+        timestep = d.getMSXTimeStep;
+    end
+    if timestep == 300
+        if mod((frame-1), 12) == 0
+            if (frame-1) == 1
+                title(gca, {[figtitle,' ', num2str(0), ' seconds'], ''},'fontsize',figtitleFontSize);
+            else
+                title(gca, {[figtitle,' ', num2str((frame-1)/12), ' hours'], ''},'fontsize',figtitleFontSize);
+            end
+        end
+    else
+        if (frame-1) == 1
+            title(gca, {[figtitle,' ', num2str(0), ' seconds'], ''},'fontsize',figtitleFontSize);
+        else
+            title(gca, {[figtitle,' ', num2str((frame-1)*60*60), ' seconds'], ''},'fontsize',figtitleFontSize);
+        end
     end
 end
 

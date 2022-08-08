@@ -1,12 +1,13 @@
-function [NData] = NetworkMovie(V,L,fig,movfname,quality,fps,...
-    PData,SData,d,NodeType,LinkType,varargin)
+function [NData] = movie_network(V,L,fig,movfname,quality,fps,...
+    PData,SData,d,NodeType,LinkType,hyd,labelvalues,labelstrings,ylabelinfo,...
+    titleinfo,colorbarposition)
 %% Synopsis
-% NetworkMovie uses NetworkFrame() to plot the network graph on figure
+% NetworkMovie uses movie_frame() to plot the network graph on figure
 % handle fig with nodes and links colored by V,L, and store the animation
 % as an *.avi movie.  For detailed descriptions of the PData and SData
-% arguments, see NetworkFrame().
+% arguments, see movie_frame().
 %
-% After the first frame is plotted (using NetworkFrame()), control is
+% After the first frame is plotted (using movie_frame()), control is
 % passed to the standard input, and during this time you can use the
 % standard Matlab figure UI controls to modify the figure view as you
 % desire (e.g., zoom, pan).  After the network view is how you want it, the
@@ -34,7 +35,7 @@ function [NData] = NetworkMovie(V,L,fig,movfname,quality,fps,...
 %  V           (nnodes x nframes) matrix of node values to plot
 %  L           (nlinks x nframes) matrix of link values to plot
 %              Either of V or L can be blank, in which case behavior is as
-%              described in NetworkFrame().
+%              described in movie_frame().
 %  fig         Existing figure handle to use.  If [] then new figure is 
 %              created.
 %  movfname    AVI filename to store movie.  If [] then no movie is made,
@@ -43,19 +44,15 @@ function [NData] = NetworkMovie(V,L,fig,movfname,quality,fps,...
 %  fps         frames per second of AVI movie
 %  InpFname    Epanet input file name describing network geometry.
 %  PData       PData structure of plot options as described in
-%              NetworkFrame().
+%              movie_frame().
 %  SData       SData structure of plot symbols as described in
-%              NetworkFrame().
+%              movie_frame().
 %
 % Jim Uber
 % 8/15/2005
 % 4/10/2009 modified
 %
 % modified by Marios Kyriakou 25/09/2016
-
-if ~isempty(varargin)
-    hyd=varargin{1};
-end
 
 nframes = 0;
 if isempty(V)
@@ -85,7 +82,7 @@ if isempty(fig)
     fig=figure;
     axis equal;
     axis off;
-%    set(fig,'Color',[0 0 0]);
+   set(fig,'Color',[1 1 1]);
 else
     figure(fig);
 end
@@ -99,7 +96,7 @@ v = [];
 l = [];
 if colorV, v=V(:,1); end
 if colorL, l=L(:,1); end
-[NData,fig] = NetworkFrame(fig,v,l,PData,SData,[],d,NodeType,LinkType,hyd);
+[NData,fig] = movie_frame(fig,v,l,PData,SData,[],d,NodeType,LinkType,hyd,labelvalues,labelstrings,ylabelinfo,titleinfo,1,colorbarposition);
 
 if makeavi
     mov.FrameRate=fps;
@@ -115,7 +112,7 @@ end
 for i=2:nframes
     if colorV, v=V(:,i); end
     if colorL, l=abs(L(:,i)); end
-    [NData,fig] = NetworkFrame(fig,v,l,PData,SData,NData,d,NodeType,LinkType,hyd);
+    [NData,fig] = movie_frame(fig,v,l,PData,SData,NData,d,NodeType,LinkType,hyd,labelvalues,labelstrings,ylabelinfo,titleinfo,i,colorbarposition);
     if makeavi
         M=getframe(fig);
         writeVideo(mov,M);
