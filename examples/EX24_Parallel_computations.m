@@ -38,8 +38,10 @@ parfor i = 1:Nsim
     disp(['Epoch ',int2str(i)])
 end
 toc;
-% Unload networks and remove temp files
 tic;
+% Stop parallel
+delete(gcp('nocreate'));
+% Unload networks
 for i = 1:Nsim
     G(i).unload();
 end
