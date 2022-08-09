@@ -13,10 +13,10 @@ The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, 
 
 For support, please use the OWA community forum : http://community.wateranalytics.org/
 
-Check out the repository https://github.com/KIOS-Research/CCWI2022-EMT-Tutorial in folder `tutorial`. You can find the short course
-<b>Indroduction To The EPANET-MATLAB Toolkit For Smart Water Networks Research</b> https://wdsa-ccwi2022.upv.es/introduction-to-the-epanet-matlab-toolkit-for-smart-water-networks-research/
+### Tutorial
+We have prepared at tutorial as part of the CCWI-WDSA 2022 conference. You can find the files in the `tutorial` folder at the following [GitHub repository](https://github.com/KIOS-Research/CCWI2022-EMT-Tutorial).
 
-How to use EMT with CodeOcean using postInstall functionality: 
+### How to use EMT with CodeOcean using postInstall functionality: 
 https://help.codeocean.com/en/articles/1110985-installing-user-provided-matlab-toolboxes
 ```
 #!/usr/bin/env bash

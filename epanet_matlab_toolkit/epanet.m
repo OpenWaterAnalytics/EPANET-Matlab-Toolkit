@@ -717,6 +717,7 @@ classdef epanet <handle
                 if obj.msg
                     LibEPANETString = ['EPANET version {', num2str(obj.Version), '} loaded (EMT version {', obj.classversion, '}).'];
                     disp(LibEPANETString);
+                    disp('<a href = "https://doi.org/10.5281/zenodo.831493">Publication DOI: 10.5281/zenodo.831493</a>');
                 end
             else
                 warning('There was an error loading the EPANET library (DLL).')
