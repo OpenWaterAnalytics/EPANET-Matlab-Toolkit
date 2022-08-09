@@ -542,6 +542,7 @@ d.Binplot('nodes','yes','highlightlink',{'V4'},'fontsize',8);
 %TCV
 errcode=d.addBinValveTCV('V5','32','13',newValveDiameter,newValveSetting);
 d.Binplot('nodes','yes','highlightlink',{'V5'},'fontsize',8);
+d.getError(errcode);
 d.getBinComputedAllParameters  %"Run was unsuccessful."
 d.getComputedHydraulicTimeSeries
 % %GPV
