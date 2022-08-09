@@ -13,6 +13,21 @@ The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, 
 
 For support, please use the OWA community forum : http://community.wateranalytics.org/
 
+### Tutorial
+We have prepared at tutorial as part of the CCWI-WDSA 2022 conference. You can find the files in the `tutorial` folder at the following [GitHub repository](https://github.com/KIOS-Research/CCWI2022-EMT-Tutorial).
+
+### How to use EMT with CodeOcean using postInstall functionality: 
+https://help.codeocean.com/en/articles/1110985-installing-user-provided-matlab-toolboxes
+```
+#!/usr/bin/env bash
+set -e
+curl -L https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/archive/v2.2.2.tar.gz | tar xz
+cd EPANET-Matlab-Toolkit-2.2.2
+cd epanet_matlab_toolkit
+mv ./glnx/libepanet2.so libepanet.so
+matlab -nodisplay -r "addpath(genpath('$PWD')); savepath"
+```
+
 ## Table of Contents
 
 - [How to cite](#how-to-cite)
@@ -334,14 +349,14 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addLinkValveTCV|Adds a new TCV valve|
 |addLinkValveGPV|Adds a new GPV valve|
 |addRules|Adds a new rule-based control to a project. (EPANET Version 2.2)|
+|deleteAllTemps|Delete all temporary files (.inp, .bin) created in networks folder|
+|deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
 |deleteCurve|Deletes a data curve from the project|
 |deleteLink|Deletes a link|
 |deleteNode|Deletes a node|
 |deleteNodeJunctionDemand|Deletes a demand from a junction given the junction index and demand index(EPANET Version 2.2)|
 |deletePattern|Deletes a time pattern from a project|
 |deletePatternAll|Deletes all time patterns from a project|
-|deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
-|deletenodejunctiondemand|Deletes a demand from a junction given the junction index and demand index.|
 |deleteRules|Deletes an existing rule-based control given it's index. (EPANET Version 2.2)|
 |clearReport|Clears the contents of a project's report file. (EPANET Version 2.2)|
 |copyReport|Copies the current contents of a project's report file to another file. (EPANET Version 2.2)|
