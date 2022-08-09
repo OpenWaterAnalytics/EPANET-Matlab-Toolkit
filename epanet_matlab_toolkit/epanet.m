@@ -1149,7 +1149,7 @@ classdef epanet <handle
             % Returns:
             % an error code.
             % typecode   the link's type (see LinkType).
-            if ph.isNull 
+            if ph.isNull
                 [Errcode, typecode] = calllib(LibEPANET, 'ENgetlinktype', index, 0);
             else
                 [Errcode, ~, typecode] = calllib(LibEPANET, 'EN_getlinktype', ph, index, 0);
@@ -4073,7 +4073,7 @@ classdef epanet <handle
                 end
             end
             if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE') ...
-                                && ~strcmpi(varargin{2}, 'ph') && ~strcmpi(varargin{2}, 'loadfile-ph')% e.g. d = epanet('Net1.inp', 'epanet2'); % e.g. d = epanet('Net1.inp', 'epanet2');
+                    && ~strcmpi(varargin{2}, 'ph') && ~strcmpi(varargin{2}, 'loadfile-ph')% e.g. d = epanet('Net1.inp', 'epanet2'); % e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
                 if isempty(pwdDLL)
                     pwdDLL = pwd;
@@ -4145,7 +4145,7 @@ classdef epanet <handle
                 
                 copyfile(obj.InputFile, obj.BinTempfile);
                 %obj.saveInputFile(obj.BinTempfile); % create a new INP file (Working Copy) using the SAVE command of EPANET
-
+                
                 obj.closeNetwork;  %apiENclose; %Close input file
                 %Load temporary file
                 rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
@@ -5605,7 +5605,7 @@ classdef epanet <handle
         function value = getLinkType(obj, varargin)
             % Retrieves the link-type code for all links.
             %
-            % Example 1:    
+            % Example 1:
             %    d.getLinkType      % Retrieves the link-type code for all links
             %
             % Example 2:
@@ -8366,7 +8366,7 @@ classdef epanet <handle
             %
             % See also getTimeHydraulicStep, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_QUALSTEP, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimePatternStep(obj)
             % Retrieves the value of the pattern time step.
@@ -8376,7 +8376,7 @@ classdef epanet <handle
             %
             % See also getTimePatternStart, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_PATTERNSTEP, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimePatternStart(obj)
             % Retrieves the value of pattern start time.
@@ -8386,7 +8386,7 @@ classdef epanet <handle
             %
             % See also getTimePatternStep, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_PATTERNSTART, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeReportingStep(obj)
             % Retrieves the value of the reporting time step.
@@ -8396,7 +8396,7 @@ classdef epanet <handle
             %
             % See also getTimeReportingPeriods, getTimeReportingStart.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_REPORTSTEP, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeReportingStart(obj)
             % Retrieves the value of the reporting start time.
@@ -8406,7 +8406,7 @@ classdef epanet <handle
             %
             % See also getTimeReportingPeriods, getTimeReportingStep.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_REPORTSTART, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeRuleControlStep(obj)
             % Retrieves the time step for evaluating rule-based controls.
@@ -8416,7 +8416,7 @@ classdef epanet <handle
             %
             % See also getTimeHydraulicStep.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_RULESTEP, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeStatisticsType(obj)
             % Retrieves the type of time series post-processing.
@@ -8433,7 +8433,7 @@ classdef epanet <handle
             %
             % See also getTimeStatisticsIndex, getTimeSimulationDuration.
             [obj.Errcode, obj.TimeStatisticsIndex] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_STATISTIC, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             value=obj.TYPESTATS(obj.TimeStatisticsIndex+1);
         end
         function value = getTimeStatisticsIndex(obj)
@@ -8451,7 +8451,7 @@ classdef epanet <handle
             %
             % See also getTimeStatisticsType, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_STATISTIC, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeReportingPeriods(obj)
             % Retrieves the number of reporting periods saved to the binary.
@@ -8461,7 +8461,7 @@ classdef epanet <handle
             %
             % See also getTimeReportingStart, getTimeReportingStep.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_PERIODS, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         %%%%% EPANET Version 2.1 %%%%%
         function value = getTimeStartTime(obj)
@@ -8472,7 +8472,7 @@ classdef epanet <handle
             %
             % See also getTimeSimulationDuration, getTimePatternStart.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_STARTTIME, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeHTime(obj)
             % Retrieves the elapsed time of current hydraulic solution.
@@ -8482,7 +8482,7 @@ classdef epanet <handle
             %
             % See also getTimeHydraulicStep, getComputedHydraulicTimeSeries.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HTIME, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeQTime(obj)
             % Retrieves the elapsed time of current quality solution.
@@ -8492,7 +8492,7 @@ classdef epanet <handle
             %
             % See also getTimeQualityStep, getComputedQualityTimeSeries.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_QTIME, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeHaltFlag(obj)
             % Retrieves the number of halt flag indicating if the simulation was halted.
@@ -8502,7 +8502,7 @@ classdef epanet <handle
             %
             % See also getTimeStartTime, getTimeSimulationDuration.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HALTFLAG, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeNextEvent(obj)
             % Retrieves the shortest time until a tank becomes empty or full.
@@ -8512,7 +8512,7 @@ classdef epanet <handle
             %
             % See also getTimeNextEventTank.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENT, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getTimeNextEventTank(obj)
             % Retrieves the index of tank with shortest time to become empty or full.
@@ -8522,7 +8522,7 @@ classdef epanet <handle
             %
             % See also getTimeNextEvent.
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENTTANK, obj.LibEPANET, obj.ph);
-%             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = getCurvesInfo(obj)
             % Retrieves all the info of curves. (EPANET Version 2.1)
@@ -8718,7 +8718,7 @@ classdef epanet <handle
             if pumpCnt
                 for i=obj.getLinkPumpIndex
                     [obj.Errcode, value(j)] = obj.apiENgetpumptype(i, obj.LibEPANET, obj.ph);
-%                     obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                    %                     obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
                     j=j+1;
                 end
             end
@@ -14199,7 +14199,7 @@ classdef epanet <handle
                     g=g+1;
                 end
                 i=i+1;
-            end 
+            end
             timeSmle=obj.getTimeSimulationDuration;
             while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
                 [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
