@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.2 - Last Update: 07/08/2022';
+        classversion='v2.2.3 - Last Update: 19/09/2022';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -8603,6 +8603,7 @@ classdef epanet <handle
             Fmean = mean(obj.getComputedTimeSeries.Flow,1); % ignores events also you can use getComputedHydraulicTimeSeries
             
             Fsign = sign(Fmean);
+            A = zeros(obj.getNodeCount);
             Nidx = obj.getLinkNodesIndex;
             for i = 1:size(Nidx,1)
                 if Fsign(i) == 1
@@ -8611,6 +8612,18 @@ classdef epanet <handle
                     A(Nidx(i,2),Nidx(i,1)) = 1;
                 end
             end
+        end
+        function V = getLinkVolumes(obj)
+            % Get link volumes
+            % Link volume = pi * (diameter/2).^2 * length
+            L = obg.getLinkLength;
+            D = obj.getLinkDiameter;
+            if obj.Units_SI_Metric
+                unt = 100;
+            else
+                unt = 328.08399;
+            end
+            V = pi*((D/unt).^2/4).*L; 
         end
         function valueIndex = addCurve(obj, varargin)
             % Adds a new curve appended to the end of the existing curves. (EPANET Version 2.1)
