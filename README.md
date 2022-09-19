@@ -212,6 +212,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkVelocity|Current computed flow velocity (read only)|
 |getLinkVertices|Retrieves the coordinate's of a vertex point assigned to a link.|
 |getLinkVerticesCount|Retrieves the number of internal vertex points assigned to a link|
+|getLinkVolumes|Get link volumes|
 |getLinkWallReactionCoeff|Pipe wall chemical reaction coefficient|
 |getNodeActualDemand|Retrieves the computed value of all actual demands|
 |getNodeActualDemandSensingNodes|Retrieves the computed demand values at some sensing nodes|

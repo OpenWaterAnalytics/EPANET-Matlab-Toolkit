@@ -8613,6 +8613,18 @@ classdef epanet <handle
                 end
             end
         end
+        function V = getLinkVolumes(obj)
+            % Get link volumes
+            % Link volume = pi * (diameter/2).^2 * length
+            L = obg.getLinkLength;
+            D = obj.getLinkDiameter;
+            if obj.Units_SI_Metric
+                unt = 100;
+            else
+                unt = 328.08399;
+            end
+            V = pi*((D/unt).^2/4).*L; 
+        end
         function valueIndex = addCurve(obj, varargin)
             % Adds a new curve appended to the end of the existing curves. (EPANET Version 2.1)
             % Returns the new curve's index.
