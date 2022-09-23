@@ -5569,6 +5569,7 @@ classdef epanet <handle
                    linksconnTo = find(nodesConnectingLinksIndex(:, 2) == i);
                    value{i} = unique([linksconnFrom', linksconnTo']);
                 end
+            end
         end
         function value = getLinkNodesIndex(obj, varargin)
             % Retrieves the indexes of the from/to nodes of all links.
