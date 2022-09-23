@@ -162,6 +162,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getDemandModel|Retrieves the type of demand model in use and its parameters|
 |getEN_functionsImpemented|Retrieves the epanet EN_ functions that have been developed|
 |getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
+|getFlowDirections|Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow|
 |getFlowUnits|Retrieves the units used to express all flow rates|
 |getGraph|Retrieves the graph of the current epanet network|
 |getLibFunctions|Retrieves the functions of DLL|

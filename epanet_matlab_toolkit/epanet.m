@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.3 - Last Update: 19/09/2022';
+        classversion='v2.2.3 - Last Update: 23/09/2022';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -8631,6 +8631,20 @@ classdef epanet <handle
                 if Fsign(i) == 1
                     A(Nidx(i,1),Nidx(i,2)) = 1;
                 else
+                    A(Nidx(i,2),Nidx(i,1)) = 1;
+                end
+            end
+        end
+        function A = getFlowDirections(obj)
+            % Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow
+            Fmean = mean(obj.getComputedTimeSeries.Flow,1);
+            Fsign = sign(Fmean);
+            A = zeros(obj.getNodeCount);
+            Nidx = obj.getLinkNodesIndex;
+            for i = 1:size(Nidx,1)
+                if Fsign(i) == 1
+                    A(Nidx(i,1),Nidx(i,2)) = 1;
+                else 
                     A(Nidx(i,2),Nidx(i,1)) = 1;
                 end
             end
