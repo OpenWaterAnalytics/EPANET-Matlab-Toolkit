@@ -5052,7 +5052,14 @@ classdef epanet <handle
                 netgraph = graph(conmat);
             end
         end
-        
+        function h = plotDiGraph(obj, varargin)
+            % Plots the network with flow directions
+            f = obj.getFlowDirections;
+            C = obj.getNodeCoordinates;
+            dg = digraph(f);
+            h = plot(dg,'XData',C{1},'YData',C{2});
+            set(gca,'visible','off');
+        end
         function h = plotGraph(obj, varargin)
             % Plots the graph of the current epanet network.
             %
