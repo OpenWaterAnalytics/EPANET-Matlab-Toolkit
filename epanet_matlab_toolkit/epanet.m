@@ -5538,23 +5538,37 @@ classdef epanet <handle
             % See also getLinkNodesIndex, getNodeLinks.
             value = obj.getLinkNodesIndex;
         end
-        function value = getNodeLinks(obj, nodeindex)
+        function value = getNodeLinks(obj, varargin)
             % Retrieves the links which a node is specific connected to.
             %
             % Example 1:
+            %   d.getNodeLinks
+            %
+            % Example 2:
             %   nodeindex = 2;
             %   d.getNodeLinks(nodeindex)
             %
-            % Example 2:
+            % Example 3:
             %   nodeID = '10';
             %   d.getNodeLinks(nodeID)
             %
             % See also getLinkNodesIndex, getNodesConnectingLinksID.
-            if ischar(nodeindex), nodeindex = obj.getNodeIndex(nodeindex); end
-            LinkNodesIndex = obj.getLinkNodesIndex;
-            links_1 = find(nodeindex == LinkNodesIndex(:,1))';
-            links_2 = find(nodeindex == LinkNodesIndex(:,2))';
-            value = sort([links_1, links_2]);
+            if nargin == 2
+                nodeindex = varargin{1};
+                if ischar(nodeindex), nodeindex = obj.getNodeIndex(nodeindex); end
+                LinkNodesIndex = obj.getLinkNodesIndex;
+                links_1 = find(nodeindex == LinkNodesIndex(:,1))';
+                links_2 = find(nodeindex == LinkNodesIndex(:,2))';
+                value = sort([links_1, links_2]);
+            else
+                connmatrix = obj.getConnectivityMatrix;
+                nodesConnectingLinksIndex = obj.getNodesConnectingLinksIndex;
+                value = {};
+                for i=1:size(connmatrix, 1)
+                   linksconnFrom = find(nodesConnectingLinksIndex(:, 1) == i);
+                   linksconnTo = find(nodesConnectingLinksIndex(:, 2) == i);
+                   value{i} = unique([linksconnFrom', linksconnTo']);
+                end
         end
         function value = getLinkNodesIndex(obj, varargin)
             % Retrieves the indexes of the from/to nodes of all links.
