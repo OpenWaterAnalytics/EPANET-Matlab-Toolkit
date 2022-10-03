@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.3 - Last Update: 23/09/2022';
+        classversion='v2.2.3 - Last Update: 03/10/2022';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -22973,16 +22973,14 @@ end
 
 % Legend Plots
 if strcmpi(slegend, 'show')
-    if isempty(highlightnodeindex) || isempty(highlightnodeindex)
-        legendString={'Pipes', 'Pumps', 'Valves', ...
-            'Junctions', 'Reservoirs', 'Tanks'};
-        legendIndices=sort(legendIndices, 'descend');
-        if exist('h', 'var')
-            try
-                legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
-            catch
-                legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
-            end
+    legendString={'Pipes', 'Pumps', 'Valves', ...
+        'Junctions', 'Reservoirs', 'Tanks'};
+    legendIndices=sort(legendIndices, 'descend');
+    if exist('h', 'var')
+        try
+            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
+        catch
+            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
         end
     end
 elseif strcmpi(slegend, 'hide')
