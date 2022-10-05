@@ -182,7 +182,7 @@ if isempty(NData)
 
     % Colormaps
     colormap(NData.c);
-    NData.cmap = colormap("turbo");
+    NData.cmap = PData.ndatacmap;
 
     % Open Epanet
     % Network Size
@@ -419,7 +419,9 @@ if NData.vsize > 0
     if colornodes
         rgb = color(NData.cmap,vdata,vmin,vmax);  % Return the color from the map
         llengthv = length(find(vdata==0));
-        rgb(find(vdata==0), :) = ones(llengthv, 3);
+        if PData.hidezeros
+            rgb(find(vdata==0), :) = ones(llengthv, 3);
+        end
         rgb(~Ivcolor,:) = rgb(~Ivcolor,:)*0;  % nodes are black if no color
         set(NData.nodeh,{'MarkerFaceColor'},num2cell(rgb,2),{'MarkerEdgeColor'},num2cell(rgb,2));
     else
@@ -428,10 +430,14 @@ if NData.vsize > 0
     end
 end
 if ~isempty(titleinfo)
-    if hyd 
+    if hyd
         timestep = d.getTimeHydraulicStep;
     else
-        timestep = d.getMSXTimeStep;
+        try
+            timestep = d.getMSXTimeStep;
+        catch 
+            timestep = d.getTimeQualityStep;
+        end
     end
     if timestep == 300
         if mod((frame-1), 12) == 0
