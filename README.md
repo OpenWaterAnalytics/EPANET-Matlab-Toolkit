@@ -162,6 +162,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getDemandModel|Retrieves the type of demand model in use and its parameters|
 |getEN_functionsImpemented|Retrieves the epanet EN_ functions that have been developed|
 |getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
+|getFlowDirections|Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow|
 |getFlowUnits|Retrieves the units used to express all flow rates|
 |getGraph|Retrieves the graph of the current epanet network|
 |getLibFunctions|Retrieves the functions of DLL|
@@ -382,6 +383,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |saveHydraulicsOutputReportingFile|Transfers results of a hydraulic simulation from the binary Hydraulics file to the binary Output file, where results are only reported at uniform reporting intervals|
 |saveInputFile|Writes all current network input data to a file using the format of an EPANET input file|
 |plot|Plot the network input file|
+|plotDiGraph|Plots the network with flow directions|
 |plotGraph|Plots the graph of the current epanet network|
 |setControls|Sets the parameters of a simple control statement|
 |setCurve|Sets x,y values for a specific curve|

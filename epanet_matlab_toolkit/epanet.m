@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.3 - Last Update: 19/09/2022';
+        classversion='v2.2.3 - Last Update: 18/10/2022';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -672,6 +672,75 @@ classdef epanet <handle
             ql=ext-unc*ext;
             qu=ext+unc*ext;
             value_unc=ql+rand(1,length(ext)).*(qu-ql);
+        end
+        function controlRuleIndex = addControlFunction(obj, value)
+            if isstruct(value)
+                for c=1:length(value)
+                    [controlTypeIndex, linkIndex, controlSettingValue, ...
+                        nodeIndex, controlLevel] = obj.controlSettingsFun(value(c).Control);
+                    [obj.Errcode, controlRuleIndex(c)] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
+                        controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                end
+            else
+                [controlTypeIndex, linkIndex, controlSettingValue, ...
+                    nodeIndex, controlLevel] = obj.controlSettingsFun(value);
+                [obj.Errcode, controlRuleIndex] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
+                    controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
+                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            end
+            end
+            function [controlTypeIndex, linkIndex, controlSettingValue, ...
+                nodeIndex, controlLevel] = controlSettingsFun(obj, value)
+            splitControl = strsplit(value);
+            controlSettingValue = find(strcmpi(obj.TYPESTATUS, splitControl(3)))-1;
+            if isempty(controlSettingValue)
+                if strcmpi(splitControl(3), 'CLOSE')
+                    controlSettingValue = 0;
+                else
+                    % control setting Value (type should be int) for pump or valve
+                    controlSettingValue = str2double(splitControl{3});
+                end
+            end
+            linkIndex = obj.getLinkIndex(splitControl(2));
+            if ~linkIndex
+                warning('Wrong link ID. Please change your control.')
+            end
+            switch upper(splitControl{4})
+                case 'IF'
+                    %LINK linkID status IF NODE nodeID ABOVE/BELOW value
+                    nodeIndex = obj.getNodeIndex(splitControl(6));
+                    controlTypeIndex = 0; % LOWLEVEL
+                    if strcmpi(splitControl(7), 'ABOVE')
+                        controlTypeIndex = 1; % HIGHLEVEL
+                    end
+                    controlLevel = str2double(splitControl{8});
+                case 'AT'
+                    if strcmpi(splitControl{5}, 'CLOCKTIME')
+                        %LINK linkID status AT CLOCKTIME clocktime AM/PM
+                        nodeIndex = 0;
+                        controlTypeIndex = 3;
+                    else
+                        %LINK linkID status AT TIME time
+                        nodeIndex = 0;
+                        controlTypeIndex = 2;
+                    end
+                    if isempty(strfind(splitControl{6}, ':'))
+                        controlLevel = str2double(splitControl{6});
+                    else
+                        [~, ~, days, H, MN, S] = datevec(splitControl{6});
+                        controlLevel = (24*(days-1)+H)*3600+MN*60+S;
+                    end
+                otherwise
+            end
+            end
+        function setControlFunction(obj, index, value)
+            controlRuleIndex = index;
+            [controlTypeIndex, linkIndex, controlSettingValue, ...
+                nodeIndex, controlLevel] = obj.controlSettingsFun(value);
+            [obj.Errcode] = obj.apiENsetcontrol(controlRuleIndex, ...
+                controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function ENMatlabCleanup(obj, LibEPANET)
             % Unload library
@@ -5052,7 +5121,14 @@ classdef epanet <handle
                 netgraph = graph(conmat);
             end
         end
-        
+        function h = plotDiGraph(obj, varargin)
+            % Plots the network with flow directions
+            f = obj.getFlowDirections;
+            C = obj.getNodeCoordinates;
+            dg = digraph(f);
+            h = plot(dg,'XData',C{1},'YData',C{2});
+            set(gca,'visible','off');
+        end
         function h = plotGraph(obj, varargin)
             % Plots the graph of the current epanet network.
             %
@@ -5538,23 +5614,38 @@ classdef epanet <handle
             % See also getLinkNodesIndex, getNodeLinks.
             value = obj.getLinkNodesIndex;
         end
-        function value = getNodeLinks(obj, nodeindex)
+        function value = getNodeLinks(obj, varargin)
             % Retrieves the links which a node is specific connected to.
             %
             % Example 1:
+            %   d.getNodeLinks
+            %
+            % Example 2:
             %   nodeindex = 2;
             %   d.getNodeLinks(nodeindex)
             %
-            % Example 2:
+            % Example 3:
             %   nodeID = '10';
             %   d.getNodeLinks(nodeID)
             %
             % See also getLinkNodesIndex, getNodesConnectingLinksID.
-            if ischar(nodeindex), nodeindex = obj.getNodeIndex(nodeindex); end
-            LinkNodesIndex = obj.getLinkNodesIndex;
-            links_1 = find(nodeindex == LinkNodesIndex(:,1))';
-            links_2 = find(nodeindex == LinkNodesIndex(:,2))';
-            value = sort([links_1, links_2]);
+            if nargin == 2
+                nodeindex = varargin{1};
+                if ischar(nodeindex), nodeindex = obj.getNodeIndex(nodeindex); end
+                LinkNodesIndex = obj.getLinkNodesIndex;
+                links_1 = find(nodeindex == LinkNodesIndex(:,1))';
+                links_2 = find(nodeindex == LinkNodesIndex(:,2))';
+                value = sort([links_1, links_2]);
+            else
+                connmatrix = obj.getConnectivityMatrix;
+                nodesConnectingLinksIndex = obj.getNodesConnectingLinksIndex;
+                value = {};
+                for i=1:size(connmatrix, 1)
+                   linksconnFrom = find(nodesConnectingLinksIndex(:, 1) == i);
+                   linksconnTo = find(nodesConnectingLinksIndex(:, 2) == i);
+                   value{i} = unique([linksconnFrom', linksconnTo']);
+                end
+            end
         end
         function value = getLinkNodesIndex(obj, varargin)
             % Retrieves the indexes of the from/to nodes of all links.
@@ -8609,6 +8700,20 @@ classdef epanet <handle
                 if Fsign(i) == 1
                     A(Nidx(i,1),Nidx(i,2)) = 1;
                 else
+                    A(Nidx(i,2),Nidx(i,1)) = 1;
+                end
+            end
+        end
+        function A = getFlowDirections(obj)
+            % Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow
+            Fmean = mean(obj.getComputedTimeSeries.Flow,1);
+            Fsign = sign(Fmean);
+            A = zeros(obj.getNodeCount);
+            Nidx = obj.getLinkNodesIndex;
+            for i = 1:size(Nidx,1)
+                if Fsign(i) == 1
+                    A(Nidx(i,1),Nidx(i,2)) = 1;
+                else 
                     A(Nidx(i,2),Nidx(i,1)) = 1;
                 end
             end
@@ -22460,75 +22565,6 @@ for tt=1:length(a)
     end
 end
 end
-function setControlFunction(obj, index, value)
-controlRuleIndex = index;
-[controlTypeIndex, linkIndex, controlSettingValue, ...
-    nodeIndex, controlLevel] = obj.controlSettings(obj, value);
-[obj.Errcode] = obj.apiENsetcontrol(controlRuleIndex, ...
-    controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-end
-function controlRuleIndex = addControlFunction(obj, value)
-if isstruct(value)
-    for c=1:length(value)
-        [controlTypeIndex, linkIndex, controlSettingValue, ...
-            nodeIndex, controlLevel] = obj.controlSettings(obj, value(c).Control);
-        [obj.Errcode, controlRuleIndex(c)] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
-            controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-        obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-    end
-else
-    [controlTypeIndex, linkIndex, controlSettingValue, ...
-        nodeIndex, controlLevel] = controlSettings(obj, value);
-    [obj.Errcode, controlRuleIndex] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
-        controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-end
-end
-function [controlTypeIndex, linkIndex, controlSettingValue, ...
-    nodeIndex, controlLevel] = controlSettings(obj, value)
-splitControl = strsplit(value);
-controlSettingValue = find(strcmpi(obj.TYPESTATUS, splitControl(3)))-1;
-if isempty(controlSettingValue)
-    if strcmpi(splitControl(3), 'CLOSE')
-        controlSettingValue = 0;
-    else
-        % control setting Value (type should be int) for pump or valve
-        controlSettingValue = str2double(splitControl{3});
-    end
-end
-linkIndex = obj.getLinkIndex(splitControl(2));
-if ~linkIndex
-    warning('Wrong link ID. Please change your control.')
-end
-switch upper(splitControl{4})
-    case 'IF'
-        %LINK linkID status IF NODE nodeID ABOVE/BELOW value
-        nodeIndex = obj.getNodeIndex(splitControl(6));
-        controlTypeIndex = 0; % LOWLEVEL
-        if strcmpi(splitControl(7), 'ABOVE')
-            controlTypeIndex = 1; % HIGHLEVEL
-        end
-        controlLevel = str2double(splitControl{8});
-    case 'AT'
-        if strcmpi(splitControl{5}, 'CLOCKTIME')
-            %LINK linkID status AT CLOCKTIME clocktime AM/PM
-            nodeIndex = 0;
-            controlTypeIndex = 3;
-        else
-            %LINK linkID status AT TIME time
-            nodeIndex = 0;
-            controlTypeIndex = 2;
-        end
-        if isempty(strfind(splitControl{6}, ':'))
-            controlLevel = str2double(splitControl{6});
-        else
-            [~, ~, days, H, MN, S] = datevec(splitControl{6});
-            controlLevel = (24*(days-1)+H)*3600+MN*60+S;
-        end
-    otherwise
-end
-end
 function indices = getIndices(cnt, varargin)
 if isempty(varargin{1})
     indices=1:cnt;
@@ -22937,16 +22973,14 @@ end
 
 % Legend Plots
 if strcmpi(slegend, 'show')
-    if isempty(highlightnodeindex) || isempty(highlightnodeindex)
-        legendString={'Pipes', 'Pumps', 'Valves', ...
-            'Junctions', 'Reservoirs', 'Tanks'};
-        legendIndices=sort(legendIndices, 'descend');
-        if exist('h', 'var')
-            try
-                legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
-            catch
-                legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
-            end
+    legendString={'Pipes', 'Pumps', 'Valves', ...
+        'Junctions', 'Reservoirs', 'Tanks'};
+    legendIndices=sort(legendIndices, 'descend');
+    if exist('h', 'var')
+        try
+            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition, 'AutoUpdate', 'off');
+        catch
+            legend(h(legendIndices), legendString(legendIndices), 'Location', legendposition);
         end
     end
 elseif strcmpi(slegend, 'hide')

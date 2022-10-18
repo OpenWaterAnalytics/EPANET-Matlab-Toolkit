@@ -44,7 +44,8 @@ PData.vsize = 5;            % Size of vertices in points (0 == omits verts)
 PData.tsize = 10;           % Size of tank/reservoir nodes
 PData.legend = 'v';         % Show a colorbar legend for vertex data
 SData = [];                 % No special node symbols
-
+PData.ndatacmap = colormap(PData.c);
+PData.hidezeros = 1;        % Hide nodes with zero values (1/0).
 
 %% Write the Movie File
 movie_network(V,L,fig,movname,...
