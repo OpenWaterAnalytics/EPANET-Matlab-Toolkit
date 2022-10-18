@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.3 - Last Update: 03/10/2022';
+        classversion='v2.2.3 - Last Update: 18/10/2022';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -672,6 +672,75 @@ classdef epanet <handle
             ql=ext-unc*ext;
             qu=ext+unc*ext;
             value_unc=ql+rand(1,length(ext)).*(qu-ql);
+        end
+        function controlRuleIndex = addControlFunction(obj, value)
+            if isstruct(value)
+                for c=1:length(value)
+                    [controlTypeIndex, linkIndex, controlSettingValue, ...
+                        nodeIndex, controlLevel] = obj.controlSettingsFun(value(c).Control);
+                    [obj.Errcode, controlRuleIndex(c)] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
+                        controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                end
+            else
+                [controlTypeIndex, linkIndex, controlSettingValue, ...
+                    nodeIndex, controlLevel] = obj.controlSettingsFun(value);
+                [obj.Errcode, controlRuleIndex] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
+                    controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
+                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            end
+            end
+            function [controlTypeIndex, linkIndex, controlSettingValue, ...
+                nodeIndex, controlLevel] = controlSettingsFun(obj, value)
+            splitControl = strsplit(value);
+            controlSettingValue = find(strcmpi(obj.TYPESTATUS, splitControl(3)))-1;
+            if isempty(controlSettingValue)
+                if strcmpi(splitControl(3), 'CLOSE')
+                    controlSettingValue = 0;
+                else
+                    % control setting Value (type should be int) for pump or valve
+                    controlSettingValue = str2double(splitControl{3});
+                end
+            end
+            linkIndex = obj.getLinkIndex(splitControl(2));
+            if ~linkIndex
+                warning('Wrong link ID. Please change your control.')
+            end
+            switch upper(splitControl{4})
+                case 'IF'
+                    %LINK linkID status IF NODE nodeID ABOVE/BELOW value
+                    nodeIndex = obj.getNodeIndex(splitControl(6));
+                    controlTypeIndex = 0; % LOWLEVEL
+                    if strcmpi(splitControl(7), 'ABOVE')
+                        controlTypeIndex = 1; % HIGHLEVEL
+                    end
+                    controlLevel = str2double(splitControl{8});
+                case 'AT'
+                    if strcmpi(splitControl{5}, 'CLOCKTIME')
+                        %LINK linkID status AT CLOCKTIME clocktime AM/PM
+                        nodeIndex = 0;
+                        controlTypeIndex = 3;
+                    else
+                        %LINK linkID status AT TIME time
+                        nodeIndex = 0;
+                        controlTypeIndex = 2;
+                    end
+                    if isempty(strfind(splitControl{6}, ':'))
+                        controlLevel = str2double(splitControl{6});
+                    else
+                        [~, ~, days, H, MN, S] = datevec(splitControl{6});
+                        controlLevel = (24*(days-1)+H)*3600+MN*60+S;
+                    end
+                otherwise
+            end
+            end
+        function setControlFunction(obj, index, value)
+            controlRuleIndex = index;
+            [controlTypeIndex, linkIndex, controlSettingValue, ...
+                nodeIndex, controlLevel] = obj.controlSettingsFun(value);
+            [obj.Errcode] = obj.apiENsetcontrol(controlRuleIndex, ...
+                controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function ENMatlabCleanup(obj, LibEPANET)
             % Unload library
@@ -22494,75 +22563,6 @@ for tt=1:length(a)
     else
         atline{uu}=a{tt}; uu=uu+1;
     end
-end
-end
-function setControlFunction(obj, index, value)
-controlRuleIndex = index;
-[controlTypeIndex, linkIndex, controlSettingValue, ...
-    nodeIndex, controlLevel] = obj.controlSettings(obj, value);
-[obj.Errcode] = obj.apiENsetcontrol(controlRuleIndex, ...
-    controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-end
-function controlRuleIndex = addControlFunction(obj, value)
-if isstruct(value)
-    for c=1:length(value)
-        [controlTypeIndex, linkIndex, controlSettingValue, ...
-            nodeIndex, controlLevel] = obj.controlSettings(obj, value(c).Control);
-        [obj.Errcode, controlRuleIndex(c)] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
-            controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-        obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-    end
-else
-    [controlTypeIndex, linkIndex, controlSettingValue, ...
-        nodeIndex, controlLevel] = controlSettings(obj, value);
-    [obj.Errcode, controlRuleIndex] = obj.apiENaddcontrol(controlTypeIndex, linkIndex, ...
-        controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
-    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-end
-end
-function [controlTypeIndex, linkIndex, controlSettingValue, ...
-    nodeIndex, controlLevel] = controlSettings(obj, value)
-splitControl = strsplit(value);
-controlSettingValue = find(strcmpi(obj.TYPESTATUS, splitControl(3)))-1;
-if isempty(controlSettingValue)
-    if strcmpi(splitControl(3), 'CLOSE')
-        controlSettingValue = 0;
-    else
-        % control setting Value (type should be int) for pump or valve
-        controlSettingValue = str2double(splitControl{3});
-    end
-end
-linkIndex = obj.getLinkIndex(splitControl(2));
-if ~linkIndex
-    warning('Wrong link ID. Please change your control.')
-end
-switch upper(splitControl{4})
-    case 'IF'
-        %LINK linkID status IF NODE nodeID ABOVE/BELOW value
-        nodeIndex = obj.getNodeIndex(splitControl(6));
-        controlTypeIndex = 0; % LOWLEVEL
-        if strcmpi(splitControl(7), 'ABOVE')
-            controlTypeIndex = 1; % HIGHLEVEL
-        end
-        controlLevel = str2double(splitControl{8});
-    case 'AT'
-        if strcmpi(splitControl{5}, 'CLOCKTIME')
-            %LINK linkID status AT CLOCKTIME clocktime AM/PM
-            nodeIndex = 0;
-            controlTypeIndex = 3;
-        else
-            %LINK linkID status AT TIME time
-            nodeIndex = 0;
-            controlTypeIndex = 2;
-        end
-        if isempty(strfind(splitControl{6}, ':'))
-            controlLevel = str2double(splitControl{6});
-        else
-            [~, ~, days, H, MN, S] = datevec(splitControl{6});
-            controlLevel = (24*(days-1)+H)*3600+MN*60+S;
-        end
-    otherwise
 end
 end
 function indices = getIndices(cnt, varargin)
