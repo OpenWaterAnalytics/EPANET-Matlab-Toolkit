@@ -1,4 +1,39 @@
-## New functionalities
+### EPANET Matlab Toolkit (EMT) v2.2.3
+
+- Create [CITATION.cff](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/CITATION.md)
+- Create [networkviewer.mlapp](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/examples/gui/networkviewer.mlapp)
+- Minor fix in the function [getAdjacencyMatrix](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/commit/8c1af5736dc445b754b6e7d9ac6547000b824e46)
+- Add the function [getLinkVolumes](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/commit/f7bc19a7c9fc9988510caae1ee7506b6385266ac)
+- Update the function [getNodeLinks](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/commit/0d4adad2d7b4f3555d32ad01a60612eb1337ae86) to return all the links to which all nodes are connected to
+- Add the function [plotDiGraph](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/commit/9c35084091202747d92f18ae5b050bc3061171ab)
+- Add the function [getFlowDirections](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/commit/e9a44771cf39bb4e09d616a82e8264028732dc80)
+- Fix issue #222, a bug in highlightnode and legendposition
+- Some [updates ](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/commit/d8bd5b4cec1b4a1846b86ce5f0121bfefde3db95)in the movie example 
+- Fix issue #223, Error Recognizing setControl Function
+- Merge release notes in one file
+
+### EPANET Matlab Toolkit (EMT) v2.2.2
+
+- Performance updates (getComputed..)
+- Update [EX24_Parallel_computations.m](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/examples/EX24_Parallel_computations.m)
+- Cleanup and some fixes
+- When running `d = epanet('Net1.inp')` creates a temporary input file using the Matlab function `copyfile` instead of `ENsaveinpfile` the first time.
+- Update [Movie Examples](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/tree/master/examples/movie-example)
+- We have prepared a tutorial as part of the CCWI-WDSA 2022 conference. You can find the files in the `tutorial` folder at the following [GitHub repository](https://github.com/KIOS-Research/CCWI2022-EMT-Tutorial).
+  - Basic functionality
+  - Run first EPANET analysis
+  - Run first MSX analysis
+  - How to include uncertainties in simulations
+  - How to analyze network graph
+  - How to place pressure sensors
+  - How to create leakage events
+  - How to detect leakage events
+  - How to place quality sensors
+  - How to create contamination events (using MSX)
+  - How to detect contamination events
+
+### EPANET Matlab Toolkit (EMT) v2.2.1
+
 * The epanet class initialization function can now run without an input:
   i.e., d = epanet, so that the user can create a network from scratch. Check the following example: [Toolkit_EX4_Network_Building](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/examples/Toolkit_EX4_Network_Building.mlx)
 
