@@ -8721,7 +8721,7 @@ classdef epanet <handle
         function V = getLinkVolumes(obj)
             % Get link volumes
             % Link volume = pi * (diameter/2).^2 * length
-            L = obg.getLinkLength;
+            L = obj.getLinkLength;
             D = obj.getLinkDiameter;
             if obj.Units_SI_Metric
                 unt = 100;
