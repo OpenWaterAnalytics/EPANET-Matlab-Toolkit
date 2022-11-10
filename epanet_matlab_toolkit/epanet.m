@@ -4529,7 +4529,7 @@ classdef epanet <handle
             open(obj.TempInpFile);
         end
         function Errcode = loadEPANETFile(obj, varargin)
-            % Load epanet file when use bin functions.
+            % Load EPANET file when use bin functions.
             % Example:
             %   d.loadEPANETFile(d.TempInpFile);
             obj.solve = 0;
@@ -4538,6 +4538,12 @@ classdef epanet <handle
             else
                 [Errcode] = obj.apiENopen(varargin{1}, varargin{2}, varargin{3}, obj.LibEPANET, obj.ph);
             end
+        end
+        function Errcode = loadMSXEPANETFile(obj, msxname)
+            % Load EPANET MSX file
+            % Example:
+            %   d.loadMSXEPANETFile(d.MSXTempFile);
+            [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', msxname);
         end
         function Errcode = runsCompleteSimulation(obj, varargin)
             % Runs a complete hydraulic and water simulation to create
@@ -13341,6 +13347,13 @@ classdef epanet <handle
         end
         function loadlibrary(obj)
             obj.ENLoadLibrary(0)
+        end
+        function loadMSXlibrary(obj)
+            if ~isdeployed
+                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+            else
+                loadlibrary('epanetmsx', @msxepanet);
+            end
         end
         function loadMSXFile(obj, msxname, varargin)
             % Loads an msx file
