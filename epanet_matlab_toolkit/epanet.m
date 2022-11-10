@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.3 - Last Update: 18/10/2022';
+        classversion='v2.2.3 - Last Update: 10/11/2022';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -4445,10 +4445,19 @@ classdef epanet <handle
             end
             obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
             if ~libisloaded(obj.MSXLibEPANET)
-                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+                if ~isdeployed
+                    loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+                else
+                    loadlibrary('epanetmsx', @msxepanet); %loadlibrary('epanetmsx', 'epanetmsx.h', 'mfilename', 'msxepanet.m');
+                end
             end
-            
-            obj.MSXFile = which(char(msxname));
+
+            if ~isdeployed
+                obj.MSXFile = which(char(msxname));
+            else
+                obj.MSXFile = msxname;
+            end
+
             %Save the temporary msx file
             mm=0;
             if ~isempty(varargin)
@@ -4464,13 +4473,13 @@ classdef epanet <handle
                 obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
                 copyfile(obj.MSXFile, obj.MSXTempFile);
             end
+
             %Open the file
             [obj.Errcode] = obj.apiMSXopen(obj);
             if obj.Errcode, warning(obj.getMSXError(obj.Errcode)); end
             obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
             obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
             obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
-            
             obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
             obj.MSXConstantsCount = obj.getMSXConstantsCount;
             obj.MSXParametersCount = obj.getMSXParametersCount;
