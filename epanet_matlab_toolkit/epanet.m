@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.3 - Last Update: 10/11/2022';
+        classversion='v2.2.4 - Last Update: 08/12/2022';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -553,13 +553,14 @@ classdef epanet <handle
                     categ = length(param);
                 end
             end
+            check_function_if_exist = sum(strcmp(obj.libFunctions, fun(4:length(fun))));
             for c=1:categ
                 if isempty(extra) && iscell(value)
                     param = value{c};
                 end
                 j = 1;
                 for i = indices
-                    if ~ismember(i, obj.getNodeReservoirIndex) && sum(strcmp(obj.libFunctions, fun))
+                    if ~ismember(i, obj.getNodeReservoirIndex) && check_function_if_exist
                         if c > obj.getNodeDemandCategoriesNumber(i)
                             addNodeJunctionDemand(obj, i, param(j));
                         else
