@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.3 - Last Update: 18/10/2022';
+        classversion='v2.2.4 - Last Update: 08/12/2022';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -553,13 +553,14 @@ classdef epanet <handle
                     categ = length(param);
                 end
             end
-            for c=1:categ
+            check_function_if_exist = sum(strcmp(obj.libFunctions, fun(4:length(fun))));
+            for c=categ
                 if isempty(extra) && iscell(value)
                     param = value{c};
                 end
                 j = 1;
                 for i = indices
-                    if ~ismember(i, obj.getNodeReservoirIndex) && sum(strcmp(obj.libFunctions, fun))
+                    if ~ismember(i, obj.getNodeReservoirIndex) && check_function_if_exist
                         if c > obj.getNodeDemandCategoriesNumber(i)
                             addNodeJunctionDemand(obj, i, param(j));
                         else
@@ -4445,10 +4446,19 @@ classdef epanet <handle
             end
             obj.MSXLibEPANET='epanetmsx'; % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
             if ~libisloaded(obj.MSXLibEPANET)
-                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+                if ~isdeployed
+                    loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+                else
+                    loadlibrary('epanetmsx', @msxepanet); %loadlibrary('epanetmsx', 'epanetmsx.h', 'mfilename', 'msxepanet.m');
+                end
             end
-            
-            obj.MSXFile = which(char(msxname));
+
+            if ~isdeployed
+                obj.MSXFile = which(char(msxname));
+            else
+                obj.MSXFile = msxname;
+            end
+
             %Save the temporary msx file
             mm=0;
             if ~isempty(varargin)
@@ -4464,13 +4474,13 @@ classdef epanet <handle
                 obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
                 copyfile(obj.MSXFile, obj.MSXTempFile);
             end
+
             %Open the file
             [obj.Errcode] = obj.apiMSXopen(obj);
             if obj.Errcode, warning(obj.getMSXError(obj.Errcode)); end
             obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
             obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
             obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
-            
             obj.MSXSpeciesCount = obj.getMSXSpeciesCount;
             obj.MSXConstantsCount = obj.getMSXConstantsCount;
             obj.MSXParametersCount = obj.getMSXParametersCount;
@@ -4520,7 +4530,7 @@ classdef epanet <handle
             open(obj.TempInpFile);
         end
         function Errcode = loadEPANETFile(obj, varargin)
-            % Load epanet file when use bin functions.
+            % Load EPANET file when use bin functions.
             % Example:
             %   d.loadEPANETFile(d.TempInpFile);
             obj.solve = 0;
@@ -4529,6 +4539,12 @@ classdef epanet <handle
             else
                 [Errcode] = obj.apiENopen(varargin{1}, varargin{2}, varargin{3}, obj.LibEPANET, obj.ph);
             end
+        end
+        function Errcode = loadMSXEPANETFile(obj, msxname)
+            % Load EPANET MSX file
+            % Example:
+            %   d.loadMSXEPANETFile(d.MSXTempFile);
+            [Errcode] = calllib(obj.MSXLibEPANET, 'MSXopen', msxname);
         end
         function Errcode = runsCompleteSimulation(obj, varargin)
             % Runs a complete hydraulic and water simulation to create
@@ -8721,7 +8737,7 @@ classdef epanet <handle
         function V = getLinkVolumes(obj)
             % Get link volumes
             % Link volume = pi * (diameter/2).^2 * length
-            L = obg.getLinkLength;
+            L = obj.getLinkLength;
             D = obj.getLinkDiameter;
             if obj.Units_SI_Metric
                 unt = 100;
@@ -13333,6 +13349,13 @@ classdef epanet <handle
         function loadlibrary(obj)
             obj.ENLoadLibrary(0)
         end
+        function loadMSXlibrary(obj)
+            if ~isdeployed
+                loadlibrary([obj.MSXLibEPANETPath, obj.MSXLibEPANET], [obj.MSXLibEPANETPath, [obj.MSXLibEPANET, '.h']]);
+            else
+                loadlibrary('epanetmsx', @msxepanet);
+            end
+        end
         function loadMSXFile(obj, msxname, varargin)
             % Loads an msx file
             %
@@ -14314,7 +14337,11 @@ classdef epanet <handle
             for nl=ss
                 g=1;
                 for j=uu
-                    value.Quality{i}(k, g) = obj.getMSXNodeInitqualValue{nl}(j);
+                    try
+                        value.Quality{i}(k, g) = obj.getMSXNodeInitqualValue{nl}(j);
+                    catch 
+                        error('Wrong species index. Please check the functions getMSXSpeciesNameID, getMSXSpeciesCount.')
+                    end
                     g=g+1;
                 end
                 i=i+1;
@@ -14374,7 +14401,11 @@ classdef epanet <handle
             for nl=ss
                 g=1;
                 for j=uu
-                    value.Quality{i}(k, g) = obj.getMSXLinkInitqualValue{nl}(j);
+                    try
+                        value.Quality{i}(k, g) = obj.getMSXLinkInitqualValue{nl}(j);
+                    catch 
+                        error('Wrong species index. Please check the functions getMSXSpeciesNameID, getMSXSpeciesCount.')
+                    end
                     g=g+1;
                 end
                 i=i+1;
@@ -14394,14 +14425,144 @@ classdef epanet <handle
                 value.Time(k, :)=t;
             end
         end
-        function plotMSXSpeciesNodeConcentration(obj, varargin)
-            % Plots concentration of species for nodes over time.
+        function value = getMSXComputedTimeSeries(obj, varargin)
+            % Returns the computed quality for links and nodes.
             %
             % Example:
             %   d = epanet('net2-cl2.inp');
             %   d.loadMSXFile('net2-cl2.msx');
-            %   d.plotMSXSpeciesNodeConcentration(5,1)     % Plots first node's concentration of the first specie over time.
-            %   d.plotMSXSpeciesNodeConcentration([1:5],1) % Plots concentration of nodes 1to 5 for the first specie over time.
+            %   MSX_comp = d.getMSXComputedTimeSeries
+            %   speciesindex = 1;
+            %   MSX_comp = d.getMSXComputedTimeSeries('species', speciesindex)
+            %   nodeidnex = d.getNodeIndex;
+            %   MSX_comp = d.getMSXComputedTimeSeries('nodes', nodeidnex, 'species', speciesindex)
+            %   linkidnex = d.getLinkIndex;
+            %   MSX_comp = d.getMSXComputedTimeSeries('links', linkidnex, 'species', speciesindex)
+            %   MSX_comp.Time
+            %
+            % See also getMSXComputedQualityNode, getMSXComputedQualityLink.
+            if obj.getMSXSpeciesCount==0
+                value=0;
+                return;
+            end
+            return_nodes = 0;
+            return_links = 0;
+            if ~isempty(varargin)
+                for i=1:(nargin/2)
+                    argument = lower(varargin{2*(i-1)+1});
+                    switch argument
+                        case 'species' % Species
+                            uu = varargin{2*i};
+                        case 'nodes' % Nodes
+                            ssn = varargin{2*i}; % index node
+                            return_nodes = 1;
+                            value.NodeQuality = {};
+                        case 'links' % Links
+                            ssl = varargin{2*i}; % index link
+                            return_links = 1;
+                            value.LinkQuality = {};
+                        otherwise
+                            error('Invalid property founobj.');              
+                    end
+                end
+                if return_nodes == 0 && return_links == 0 
+                    ssn = 1:obj.getNodeCount;
+                    return_nodes = 1;
+                    return_links = 1;
+                    ssl = 1:obj.getLinkCount;
+                end
+            else
+                ssl = 1:obj.getLinkCount;
+                ssn = 1:obj.getNodeCount;
+                uu  = 1:obj.getMSXSpeciesCount;
+                return_nodes = 1;
+                return_links = 1;
+                value.NodeQuality = {};
+                value.LinkQuality = {};
+            end
+            % Obtain a hydraulic solution
+            obj.solveMSXCompleteHydraulics;
+            % Run a step-wise water quality analysis without saving
+            % RESULTS to file
+            obj.initializeMSXQualityAnalysis(0);
+            % Retrieve species concentration
+            k = 1; tleft = 1; t = 0;
+            tmp_link_quality={};
+            tmp_node_quality={};
+            if return_nodes
+                for j=uu
+                    g=1;i = 1;
+                    for nl=ssn
+                        try
+                            tmp_node_quality{g}{i}(k, 1) = obj.getMSXNodeInitqualValue{nl}(j);
+                        catch 
+                            error('Wrong species index. Please check the functions getMSXSpeciesNameID, getMSXSpeciesCount.')
+                        end
+                        i=i+1;
+                    end
+                    g=g+1;
+                end
+            end
+            if return_links 
+                
+                for j=uu
+                    g=1;i = 1;
+                    for nl=ssl
+                        try
+                            tmp_link_quality{g}{i}(k, 1) = obj.getMSXLinkInitqualValue{nl}(j);
+                        catch 
+                            error('Wrong species index. Please check the functions getMSXSpeciesNameID, getMSXSpeciesCount.')
+                        end
+                        i=i+1;
+                    end
+                    g=g+1;
+                end
+            end
+            timeSmle=obj.getTimeSimulationDuration;
+            while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
+                [t, tleft] = obj.stepMSXQualityAnalysisTimeLeft;
+                k=k+1; 
+                if return_links 
+                    g=1; 
+                    for j=uu
+                        i=1;
+                        for nl=ssl
+                            tmp_link_quality{g}{i}(k, 1)=obj.getMSXSpeciesConcentration(1, nl, j);% link code1
+                            i=i+1;
+                        end
+                        g=g+1;
+                    end
+                end 
+                if return_nodes
+                    g=1; 
+                    for j=uu
+                        i=1;
+                        for nl=ssn
+                            tmp_node_quality{g}{i}(k, 1)=obj.getMSXSpeciesConcentration(0, nl, j);% link code1
+                            i=i+1;
+                        end
+                        g=g+1;
+                    end
+                end
+                value.Time(k, :)=t;
+            end
+            for j=1:length(uu)
+                if return_nodes
+                    value.NodeQuality{j} = cell2mat(tmp_node_quality{j});
+                end
+                if return_links
+                    value.LinkQuality{j} = cell2mat(tmp_link_quality{j});
+                end
+            end
+        end
+        function plotMSXSpeciesNodeConcentration(obj, varargin)
+            % Plots concentration of species for nodes over time.
+            %
+            % Example:
+            %   d = epanet('example.inp');
+            %   d.loadMSXFile('example.msx');
+            %   d.plotMSXSpeciesNodeConcentration(1, 1)     % Plots first node's concentration of the first specie over time.
+            %   d.plotMSXSpeciesNodeConcentration([1:5], 1) % Plots concentration of nodes 1 to 5 for the first specie over time.
             %
             % See also plotMSXSpeciesLinkConcentration.
             s=obj.getMSXComputedQualityNode(varargin{1}, varargin{2});
@@ -14411,11 +14572,11 @@ classdef epanet <handle
                 nodeID=nodesID(l);
                 figure('Name', ['NODE ', char(nodeID)]);
                 for i=varargin{2}
-                    specie(:, i)=s.Quality{nd}(:, i);
+                    specie(:, i)=s.Quality{nd};
                     time(:, i)=s.Time;
                 end
                 nd=nd+1;
-                plot(time, specie);
+                plot(time, specie, 'b');
                 title(['NODE ', char(nodeID)]);
                 ylabel('Quantity');
                 xlabel('Time(s)');
@@ -14426,10 +14587,11 @@ classdef epanet <handle
             % Plots concentration of species for links over time.
             %
             % Example:
-            %   d = epanet('net2-cl2.inp');
-            %   d.loadMSXFile('net2-cl2.msx');
-            %   d.plotMSXSpeciesLinkConcentration(5,1)     % Plots first node's concentration of the first specie over time.
-            %   d.plotMSXSpeciesLinkConcentration([1:5],1) % Plots concentration of nodes 1to 5 for the first specie over time.
+            %   d = epanet('example.inp');
+            %   d.loadMSXFile('example.msx');
+            %   d.plotMSXSpeciesLinkConcentration(5, 2)     % Plots node index 5 concentration of the second specie over time.
+            %   d.plotMSXSpeciesLinkConcentration(1, 1)     % Plots first node's concentration of the first specie over time.
+            %   d.plotMSXSpeciesLinkConcentration([1:5], 3) % Plots concentration of nodes 1 to 5 for the specie index 3 over time.
             %
             % See also plotMSXSpeciesNodeConcentration.
             s=obj.getMSXComputedQualityLink(varargin{1}, varargin{2});
@@ -14439,11 +14601,11 @@ classdef epanet <handle
                 linkID=linksID(l);
                 figure('Name', ['LINK ', char(linkID)]);
                 for i=varargin{2}
-                    specie(:, i)=s.Quality{nd}(:, i);
+                    specie(:, i)=s.Quality{nd};
                     time(:, i)=s.Time;
                 end
                 nd=nd+1;
-                plot(time, specie);
+                plot(time, specie, 'b');
                 title(['LINK ', char(linkID)]);
                 ylabel('Quantity');
                 xlabel('Time(s)');

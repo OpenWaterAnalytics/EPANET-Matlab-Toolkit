@@ -135,8 +135,10 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |---------|---------|
 |epanet|Load Input file and open the EPANET Toolkit system|
 |unload|Unload library and close the EPANET Toolkit system|
-|loadEPANETFile|Open the EPANET Toolkit system|
-|loadlibrary|Load the EPANET library|
+|loadEPANETFile|Re-Load EPANET file - parfor|
+|loadMSXEPANETFile|Re-Load EPANET MSX file - parfor|
+|loadlibrary|Load the EPANET library - parfor|
+|loadMSXlibrary|Load the EPANET MSX library - parfor|
 |appShiftNetwor|Shifts the network in x and y directions|
 |appRotateNetwork|Rotates the network by theta degrees counter-clockwise using as pivot a specific node|
 |createProject|Creates an epanet project|
@@ -536,6 +538,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getMSXComputedQualitySpecie|Retrieves the quality values for specific specie (e.g getMSXComputedQualitySpecie('CL2'))|
 |getMSXComputedQualityLink|Retrieves the concentration of a chemical species at a specific link of the network at the current simulation time step|
 |getMSXComputedQualityNode|Retrieves the concentration of a chemical species at a specific node of the network at the current simulation time step.|
+|getMSXComputedTimeSeries|Retrieves the concentration of chemical species|
 |getMSXConstantsCount|Retrieves the number of constants|
 |getMSXConstantsIndex|Retrieves the internal index number of constants (given its ID name)|
 |getMSXConstantsNameID|Retrieves the ID name of constants (given its internal index number)|
