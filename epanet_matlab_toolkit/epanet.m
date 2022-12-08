@@ -554,7 +554,7 @@ classdef epanet <handle
                 end
             end
             check_function_if_exist = sum(strcmp(obj.libFunctions, fun(4:length(fun))));
-            for c=1:categ
+            for c=categ
                 if isempty(extra) && iscell(value)
                     param = value{c};
                 end
@@ -14455,32 +14455,30 @@ classdef epanet <handle
                             uu = varargin{2*i};
                         case 'nodes' % Nodes
                             ssn = varargin{2*i}; % index node
-                            value.NodeQuality = cell(1, length(ssn));
                             return_nodes = 1;
+                            value.NodeQuality = {};
                         case 'links' % Links
                             ssl = varargin{2*i}; % index link
-                            value.LinkQuality = cell(1, length(ssl));
                             return_links = 1;
+                            value.LinkQuality = {};
                         otherwise
                             error('Invalid property founobj.');              
                     end
                 end
                 if return_nodes == 0 && return_links == 0 
                     ssn = 1:obj.getNodeCount;
-                    value.NodeQuality = {};
                     return_nodes = 1;
                     return_links = 1;
-                    value.LinkQuality = {};
                     ssl = 1:obj.getLinkCount;
                 end
             else
                 ssl = 1:obj.getLinkCount;
                 ssn = 1:obj.getNodeCount;
                 uu  = 1:obj.getMSXSpeciesCount;
-                value.NodeQuality = {};
-                value.LinkQuality = {};
                 return_nodes = 1;
                 return_links = 1;
+                value.NodeQuality = {};
+                value.LinkQuality = {};
             end
             % Obtain a hydraulic solution
             obj.solveMSXCompleteHydraulics;
@@ -14548,7 +14546,7 @@ classdef epanet <handle
                 end
                 value.Time(k, :)=t;
             end
-            for j=uu
+            for j=1:length(uu)
                 if return_nodes
                     value.NodeQuality{j} = cell2mat(tmp_node_quality{j});
                 end
