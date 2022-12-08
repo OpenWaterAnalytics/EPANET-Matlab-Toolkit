@@ -14574,11 +14574,11 @@ classdef epanet <handle
                 nodeID=nodesID(l);
                 figure('Name', ['NODE ', char(nodeID)]);
                 for i=varargin{2}
-                    specie(:, i)=s.Quality{nd}(:, i);
+                    specie(:, i)=s.Quality{nd};
                     time(:, i)=s.Time;
                 end
                 nd=nd+1;
-                plot(time, specie);
+                plot(time, specie, 'b');
                 title(['NODE ', char(nodeID)]);
                 ylabel('Quantity');
                 xlabel('Time(s)');
@@ -14589,10 +14589,11 @@ classdef epanet <handle
             % Plots concentration of species for links over time.
             %
             % Example:
-            %   d = epanet('net2-cl2.inp');
-            %   d.loadMSXFile('net2-cl2.msx');
-            %   d.plotMSXSpeciesLinkConcentration(5,1)     % Plots first node's concentration of the first specie over time.
-            %   d.plotMSXSpeciesLinkConcentration([1:5],1) % Plots concentration of nodes 1to 5 for the first specie over time.
+            %   d = epanet('example.inp');
+            %   d.loadMSXFile('example.msx');
+            %   d.plotMSXSpeciesLinkConcentration(5, 2)     % Plots node index 5 concentration of the second specie over time.
+            %   d.plotMSXSpeciesLinkConcentration(1, 1)     % Plots first node's concentration of the first specie over time.
+            %   d.plotMSXSpeciesLinkConcentration([1:5], 3) % Plots concentration of nodes 1 to 5 for the specie index 3 over time.
             %
             % See also plotMSXSpeciesNodeConcentration.
             s=obj.getMSXComputedQualityLink(varargin{1}, varargin{2});
@@ -14602,11 +14603,11 @@ classdef epanet <handle
                 linkID=linksID(l);
                 figure('Name', ['LINK ', char(linkID)]);
                 for i=varargin{2}
-                    specie(:, i)=s.Quality{nd}(:, i);
+                    specie(:, i)=s.Quality{nd};
                     time(:, i)=s.Time;
                 end
                 nd=nd+1;
-                plot(time, specie);
+                plot(time, specie, 'b');
                 title(['LINK ', char(linkID)]);
                 ylabel('Quantity');
                 xlabel('Time(s)');
