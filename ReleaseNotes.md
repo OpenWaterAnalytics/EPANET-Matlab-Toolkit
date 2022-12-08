@@ -1,3 +1,14 @@
+### EPANET Matlab Toolkit (EMT) v2.2.4
+
+- Update the LICENSE file to the last version of EUPL v. 1.2
+- Minor fix in the function `setNodeBaseDemands` for the demand category (Thanks Roya @RPM-2022).
+- Add the function `getMSXComputedTimeSeries`.
+- Minor fix in the functions `plotMSXSpeciesLinkConcentration`, `plotMSXSpeciesNodeConcentration`
+- Show a message when you set the wrong species index in the functions (getMSXComputed..)
+- Add the library epanetmsx_thunk64 and msxepanet.m to help deploy an app with epanet msx.
+- Add `loadMSXEPANETFile` and `loadMSXlibrary` functions. Used for parallel simulations.
+- Minor fix in the function getLinkVolumes
+
 ### EPANET Matlab Toolkit (EMT) v2.2.3
 
 - Create [CITATION.cff](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/CITATION.md)
