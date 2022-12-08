@@ -14337,11 +14337,7 @@ classdef epanet <handle
             for nl=ss
                 g=1;
                 for j=uu
-                    try
-                        value.Quality{i}(k, g) = obj.getMSXNodeInitqualValue{nl}(j);
-                    catch 
-                        error('Wrong species index. Please check the functions getMSXSpeciesNameID, getMSXSpeciesCount.')
-                    end
+                    value.Quality{i}(k, g) = obj.getMSXNodeInitqualValue{nl}(j);
                     g=g+1;
                 end
                 i=i+1;
@@ -14401,11 +14397,7 @@ classdef epanet <handle
             for nl=ss
                 g=1;
                 for j=uu
-                    try
-                        value.Quality{i}(k, g) = obj.getMSXLinkInitqualValue{nl}(j);
-                    catch 
-                        error('Wrong species index. Please check the functions getMSXSpeciesNameID, getMSXSpeciesCount.')
-                    end
+                    value.Quality{i}(k, g) = obj.getMSXLinkInitqualValue{nl}(j);
                     g=g+1;
                 end
                 i=i+1;
