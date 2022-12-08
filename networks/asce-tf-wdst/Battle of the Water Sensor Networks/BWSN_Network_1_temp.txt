@@ -1,0 +1,13 @@
+  Page 1                                    Thu Dec 08 15:44:47 2022
+
+  ******************************************************************
+  *                           E P A N E T                          *
+  *                   Hydraulic and Water Quality                  *
+  *                   Analysis for Pipe Networks                   *
+  *                         Version 2.2                            *
+  ******************************************************************
+  
+  Analysis begun Thu Dec 08 15:44:47 2022
+
+  Processing MSX input file C:\Users\mkiri\Dropbox\EPANET-Matlab-Toolkit\examples\Arsenite_temp.msx
+  

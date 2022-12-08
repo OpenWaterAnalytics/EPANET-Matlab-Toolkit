@@ -1,0 +1,57 @@
+[TITLE]
+EPANET-MSX Example Network
+
+[JUNCTIONS]
+;ID    Elev  Demand  Pattern
+ A     0     4.1
+ B     0     3.4
+ C     0     5.5
+ D     0     2.3
+
+[RESERVOIRS]
+;ID      Head  Pattern
+ Source  100
+
+[PIPES]
+;ID   Node1   Node2  Length  Diameter  Roughness
+ 1    Source  A      1000    200       100
+ 2    A       B      800     150       100
+ 3    A       C      1200    200       100
+ 4    B       C      1000    150       100
+ 5    C       D      2000    150       100
+
+[TIMES]
+ Duration           	48
+ Hydraulic Timestep 	1:00
+ Quality Timestep   	0:05
+ Report Timestep    	2
+ Report Start       	0
+ Statistic          	NONE
+
+[OPTIONS]
+ Units              	CMH
+ Headloss           	H-W
+ Quality            	NONE
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ A               	2592.89         	7334.41
+ B               	2822.33         	7421.38         
+ C               	2712.26         	7138.36         
+ D               	3026.73         	7138.36                  
+ Source          	1878.93         	7327.04         
+
+[VERTICES]
+;Link            	X-Coord         	Y-Coord
+
+[LABELS]
+;X-Coord           Y-Coord          Label & Anchor Node
+
+[BACKDROP]
+ DIMENSIONS     	0.00            	0.00            	10000.00        	10000.00        
+ UNITS          	None
+ FILE           	
+ OFFSET         	0.00            	0.00            
+
+[END]
+

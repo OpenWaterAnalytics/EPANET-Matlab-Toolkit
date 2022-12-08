@@ -1,3 +1,9 @@
+### EPANET Matlab Toolkit (EMT) v2.2.4
+
+- Update the LICENSE file to the last version of EUPL v. 1.2
+- Minor fix in the function d.setNodeBaseDemands for the demand category (Thanks Roya @RPM-2022).
+- Add loadMSXEPANETFile and loadMSXlibrary functions. Used for MSX parallel simulations.
+
 ### EPANET Matlab Toolkit (EMT) v2.2.3
 
 - Create [CITATION.cff](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/master/CITATION.md)
