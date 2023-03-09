@@ -321,9 +321,12 @@ if isempty(NData)
         set(NData.hvc,'yticklabel', labelvalue(2:end)');
     end
     
-    if isfield(NData,'hvcL'), ylabel(NData.hvcL, [LinkType,' (',unts_link,')'],'fontsize',12); end
-    if isfield(NData,'hvc'), ylabel(NData.hvc, [NodeType,' (',unts_node,')'],'fontsize',nodeFontYlabel); end
-        
+    if ~isempty(unts_node)
+        if isfield(NData,'hvcL'), ylabel(NData.hvcL, [LinkType,' (',unts_link,')'],'fontsize',12); end
+        if isfield(NData,'hvc'), ylabel(NData.hvc, [NodeType,' (',unts_node,')'],'fontsize',nodeFontYlabel); end
+    else
+        if isfield(NData,'hvc'), ylabel(NData.hvc, NodeType,'fontsize',nodeFontYlabel); end
+    end
     % Extra node symbols
     NData.snodeh=[];
     if ~isempty(SData)
