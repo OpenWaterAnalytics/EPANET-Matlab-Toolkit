@@ -4455,6 +4455,9 @@ classdef epanet <handle
 
             if ~isdeployed
                 obj.MSXFile = which(char(msxname));
+                if isempty(obj.MSXFile)
+                    obj.MSXFile = msxname;
+                end
             else
                 obj.MSXFile = msxname;
             end
