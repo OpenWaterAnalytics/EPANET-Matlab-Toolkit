@@ -443,6 +443,50 @@ classdef epanet <handle
         solve = 1;
     end
     methods (Access = private)
+        function value = msx_computed_quality_species(obj, type_code, indices, varargin)
+            
+            if obj.getMSXSpeciesCount==0
+                value=0;
+                return;
+            end
+            if isempty(varargin{1})
+                specie = obj.getMSXSpeciesNameID;
+            else
+                specie = varargin{1}{1};
+            end
+            
+            if type_code == 0
+                type_name = 'Node';
+            else
+                type_name = 'Link';  % Link 1
+            end 
+            specie_name_ind = obj.getMSXSpeciesIndex(specie);
+            value.([type_name, 'Quality']) = nan(1, length(indices), length(specie_name_ind));
+            % Obtain a hydraulic solution
+            obj.solveMSXCompleteHydraulics;
+            % Run a step-wise water quality analysis without saving
+            % RESULTS to file
+            obj.initializeMSXQualityAnalysis(0);
+            % Retrieve species concentration at node
+            k=1; tleft=1;t=0;
+            value.Time(k, :)=0;
+            for i=1:length(specie_name_ind)
+                for lnk=indices
+                    value.([type_name, 'Quality'])(k, lnk, i)=obj.apiMSXgetinitqual(type_code, lnk, specie_name_ind(i), obj.MSXLibEPANET);
+                end
+            end
+            timeSmle=obj.getTimeSimulationDuration;
+            while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
+                k=k+1;
+                [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
+                for i=1:length(specie_name_ind)
+                    for lnk=indices
+                        value.([type_name, 'Quality'])(k, lnk, i)=obj.getMSXSpeciesConcentration(type_code, lnk, specie_name_ind(i));
+                    end
+                end
+                value.Time(k, :)=t;
+            end
+        end
         function Errcode = setFlowUnits(obj, unitcode, typecode, varargin)
             if ~typecode
                 [Errcode]= Options(obj, unitcode);
@@ -14237,6 +14281,36 @@ classdef epanet <handle
             %          getMSXSpeciesRTOL.
             [obj.Errcode, value] = obj.apiMSXgetqual(type, index, species, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
+        end
+        function value = getMSXComputedLinkQualitySpecie(obj, link_indices, varargin)
+            % Returns the link quality for specific specie.
+            %
+            % Example 1:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   node_indices = 1:d.getLinkCount;
+            %   MSX_comp = d.getMSXComputedLinkQualitySpecie(node_indices, 'CL2')
+            %   MSX_comp.LinkQuality % row: time, col: node index
+            %   MSX_comp.Time
+            %
+            % See also getMSXComputedQualitySpecie, getMSXComputedNodeQualitySpecie.
+            type_code = 1;  % Link Code
+            value = obj.msx_computed_quality_species(type_code, link_indices, varargin);
+        end
+        function value = getMSXComputedNodeQualitySpecie(obj, node_indices, varargin)
+            % Returns the node quality for specific specie.
+            %
+            % Example 1:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   node_indices = 1:d.getNodeCount;
+            %   MSX_comp = d.getMSXComputedNodeQualitySpecie(node_indices, 'CL2')
+            %   MSX_comp.NodeQuality % row: time, col: node index
+            %   MSX_comp.Time
+            %
+            % See also getMSXComputedQualitySpecie, getMSXComputedLinkQualitySpecie.
+            type_code = 0; % Node Code
+            value = obj.msx_computed_quality_species(type_code, node_indices, varargin);
         end
         function value = getMSXComputedQualitySpecie(obj, varargin)
             % Returns the node/link quality for specific specie.
