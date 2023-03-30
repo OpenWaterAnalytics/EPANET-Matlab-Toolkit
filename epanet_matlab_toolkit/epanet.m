@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.4 - Last Update: 08/12/2022';
+        classversion='v2.2.5 - Last Update: 30/03/2023';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -4143,8 +4143,8 @@ classdef epanet <handle
                     end
                 end
             end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE') ...
-                    && ~strcmpi(varargin{2}, 'ph') && ~strcmpi(varargin{2}, 'loadfile-ph')% e.g. d = epanet('Net1.inp', 'epanet2'); % e.g. d = epanet('Net1.inp', 'epanet2');
+            if nargin==2 && ~ismember('LOADFILE',upper(varargin)) && ~strcmpi(varargin{2}, 'CREATE') ...
+                    && ~strcmpi(varargin{2}, 'ph') && ~ismember('LOADFILE-PH',upper(varargin))% e.g. d = epanet('Net1.inp', 'epanet2'); % e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
                 if isempty(pwdDLL)
                     pwdDLL = pwd;
@@ -4170,10 +4170,13 @@ classdef epanet <handle
                 end
             end
             
-            if nargin==2 && strcmpi(varargin{2}, 'loadfile-ph')
+            if nargin==2 && ismember('LOADFILE-PH',upper(varargin))
                 obj.msg = 0;
             end
-            
+            if ismember('epanet2', lower(varargin))
+                obj.LibEPANETpath = [pwd, '\'];
+            end
+
             %Load EPANET Library
             obj.ENLoadLibrary;
             
@@ -4235,8 +4238,8 @@ classdef epanet <handle
                 % Using new variable for temp file
                 obj.TempInpFile = obj.BinTempfile;
                 % Load file only, return
-                if nargin==2
-                    if strcmpi(varargin{2}, 'LOADFILE') || strcmpi(varargin{2}, 'loadfile-ph')
+                if nargin>=2
+                    if ismember('LOADFILE', upper(varargin)) || ismember('LOADFILE-PH', upper(varargin))
                         obj.libFunctions = libfunctions(obj.LibEPANET);
                         if obj.msg
                             disp(['Input File "', varargin{1}, '" loaded successfully.']);
