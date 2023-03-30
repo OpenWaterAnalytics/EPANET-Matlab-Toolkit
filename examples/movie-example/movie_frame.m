@@ -186,8 +186,8 @@ if isempty(NData)
 
     % Open Epanet
     % Network Size
-    NData.nnodes = d.NodeCount;
-    NData.nlinks = d.LinkCount;
+    NData.nnodes = d.getNodeCount;
+    NData.nlinks = d.getLinkCount;
 
     % Network topology
     tmp = d.getLinkNodesIndex;
@@ -207,10 +207,11 @@ if isempty(NData)
     end
 
     % Network Geometry (from processing text InpFname)
-    vx = d.NodeCoordinates{1};
-    vy = d.NodeCoordinates{2};
-    vertx = d.NodeCoordinates{3};
-    verty = d.NodeCoordinates{4};
+    coords = d.getNodeCoordinates;
+    vx = coords{1};
+    vy = coords{2};
+    vertx = coords{3};
+    verty = coords{4};
 
     % Link handles
     x(1,:) = vx(NData.from);
@@ -423,7 +424,7 @@ if NData.vsize > 0
         rgb = color(NData.cmap,vdata,vmin,vmax);  % Return the color from the map
         rgb2 = color(NData.cmap,vdata,vmin,vmax);  % Return the color from the map
         llengthv = length(find(vdata==0));
-        rgb2 = ones(d.NodeCount, 3).*[0 0 0.5156];
+        rgb2 = ones(d.getNodeCount, 3).*[0 0 0.5156];
         if PData.hidezeros
             rgb(find(vdata==0), :) = ones(llengthv, 3);
         end
