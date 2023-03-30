@@ -8710,11 +8710,26 @@ classdef epanet <handle
                 end
             end
         end
-        function A = getAdjacencyMatrix(obj)
+        function A = getAdjacencyMatrix(obj, varargin)
             % Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow
             % Compute the new adjacency matrix based on the mean flow in the network
-            Fmean = mean(obj.getComputedTimeSeries.Flow,1); % ignores events also you can use getComputedHydraulicTimeSeries
-            
+            %
+            % Example 1: 
+            %   hydraulics = d.getComputedTimeSeries();
+            %   avg_flows = mean(hydraulics.Flow);
+            %   A = d.getAdjacencyMatrix(avg_flows);
+            %   g = digraph(A);
+            % 
+            % Example 2: 
+            %   A = d.getAdjacencyMatrix;
+            %   g = digraph(A);
+            %
+            % See also getFlowDirections.
+            if nargin == 2
+                Fmean = varargin{1};
+            else
+                Fmean = mean(obj.getComputedTimeSeries.Flow,1); % ignores events also you can use getComputedHydraulicTimeSeries
+            end
             Fsign = sign(Fmean);
             A = zeros(obj.getNodeCount);
             Nidx = obj.getLinkNodesIndex;
@@ -8726,9 +8741,25 @@ classdef epanet <handle
                 end
             end
         end
-        function A = getFlowDirections(obj)
+        function A = getFlowDirections(obj, varargin)
             % Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow
-            Fmean = mean(obj.getComputedTimeSeries.Flow,1);
+            %
+            % Example 1: 
+            %   hydraulics = d.getComputedTimeSeries();
+            %   avg_flows = mean(hydraulics.Flow);
+            %   A = d.getFlowDirections(avg_flows);
+            %   g = digraph(A);
+            % 
+            % Example 2: 
+            %   A = d.getFlowDirections;
+            %   g = digraph(A);
+            %
+            % See also getAdjacencyMatrix.
+            if nargin == 2
+                Fmean = varargin{1};
+            else
+                Fmean = mean(obj.getComputedTimeSeries.Flow,1);
+            end
             Fsign = sign(Fmean);
             A = zeros(obj.getNodeCount);
             Nidx = obj.getLinkNodesIndex;
