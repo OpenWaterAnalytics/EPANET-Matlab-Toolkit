@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.5 - Last Update: 30/03/2023';
+        classversion='v2.2.5 - Last Update: 29/04/2023';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -22321,7 +22321,9 @@ for t = 1:length(info)
     end
 end
 obj.unloadMSX;
-obj.loadMSXFile(obj.MSXTempFile, 1);
+obj.loadMSXlibrary;
+obj.loadMSXEPANETFile(obj.MSXTempFile);
+% obj.loadMSXFile(obj.MSXTempFile, 1);
 end
 function value = getTimes(obj, r, atline, value)
 tmpt=[0 0];
