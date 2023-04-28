@@ -4480,10 +4480,27 @@ classdef epanet <handle
                     obj.MSXLibEPANETPath = [pwdepanet, '/mac/'];
                 end
             end
+            loadfile_options = {'loadfile', 'LOADFILE'};
             if ~isempty(varargin)
                 if varargin{1}{1}~=1
                     if nargin==3
-                        obj.MSXLibEPANETPath=char(varargin{1});
+                        libmsxpath = char(varargin{1});
+                        loadfile_msx = '';
+                        libmsxpath = '';
+                        if any(strcmpi(varargin{1}, loadfile_options))
+                            try
+                                loadfile_msx = upper(varargin{1}{strcmpi(varargin{1}, loadfile_options)});
+                            catch
+                                loadfile_msx = varargin{1};
+                            end
+
+                        end
+                        if ~isempty(loadfile_msx) && any(~strcmpi(loadfile_msx, varargin{1}))
+                            libmsxpath = varargin{1}{~strcmpi(loadfile_msx, varargin{1})};
+                        else
+                            libmsxpath = 'epanetmsx';
+                        end
+                        obj.MSXLibEPANETPath=libmsxpath;
                         obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
                         if isempty(varargin{1})
                             obj.MSXLibEPANETPath='';
@@ -4528,6 +4545,9 @@ classdef epanet <handle
             %Open the file
             [obj.Errcode] = obj.apiMSXopen(obj);
             if obj.Errcode, warning(obj.getMSXError(obj.Errcode)); end
+            if any(strcmpi(varargin{1}, loadfile_options))
+                return
+            end
             obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
             obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
             obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
@@ -13441,7 +13461,10 @@ classdef epanet <handle
             % Loads an msx file
             %
             % Example:
-            %   d.loadMSXfile('net2-cl2.msx')
+            %   d.loadMSXfile('net2-cl2.msx') ||
+            %   d.loadMSXFile('net2-cl2.msx', 'epanetmsx'); ||
+            %   d.loadMSXFile('net2-cl2.msx', 'epanetmsx', 'loadfile'); ||
+            %   d.loadMSXFile('net2-cl2.msx', 'loadfile');
             if isempty(varargin)
                 obj.apiMSXMatlabSetup(msxname);
             else
