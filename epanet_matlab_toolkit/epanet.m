@@ -4484,9 +4484,7 @@ classdef epanet <handle
             if ~isempty(varargin)
                 if varargin{1}{1}~=1
                     if nargin==3
-                        libmsxpath = char(varargin{1});
                         loadfile_msx = '';
-                        libmsxpath = '';
                         if any(strcmpi(varargin{1}, loadfile_options))
                             try
                                 loadfile_msx = upper(varargin{1}{strcmpi(varargin{1}, loadfile_options)});
