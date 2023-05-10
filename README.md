@@ -145,6 +145,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deleteProject|Deletes an epanet project|
 |getError|Returns the description of an error code|
 |getAdjacencyMatrix|Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow|
+|getComputedAnalysisTimeSeries|Computed Hydralic and Quality Time Series|
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
 |getComputedTimeSeries|Computed Hydraulic & Quality Time Series using the bimary file who created from executable|
@@ -536,6 +537,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getMSXAtol|Retrieves the absolute concentration tolerance|
 |getMSXRtol|Retrieves the relative concentration tolerance|
 |getMSXComputedQualitySpecie|Retrieves the quality values for specific specie (e.g getMSXComputedQualitySpecie('CL2'))|
+|getMSXComputedLinkQualitySpecie|Returns the link quality for specific specie|
+|getMSXComputedNodeQualitySpecie|Returns the node quality for specific specie|
 |getMSXComputedQualityLink|Retrieves the concentration of a chemical species at a specific link of the network at the current simulation time step|
 |getMSXComputedQualityNode|Retrieves the concentration of a chemical species at a specific node of the network at the current simulation time step.|
 |getMSXComputedTimeSeries|Retrieves the concentration of chemical species|

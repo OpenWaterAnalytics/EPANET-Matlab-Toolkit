@@ -186,8 +186,8 @@ if isempty(NData)
 
     % Open Epanet
     % Network Size
-    NData.nnodes = d.NodeCount;
-    NData.nlinks = d.LinkCount;
+    NData.nnodes = d.getNodeCount;
+    NData.nlinks = d.getLinkCount;
 
     % Network topology
     tmp = d.getLinkNodesIndex;
@@ -207,10 +207,11 @@ if isempty(NData)
     end
 
     % Network Geometry (from processing text InpFname)
-    vx = d.NodeCoordinates{1};
-    vy = d.NodeCoordinates{2};
-    vertx = d.NodeCoordinates{3};
-    verty = d.NodeCoordinates{4};
+    coords = d.getNodeCoordinates;
+    vx = coords{1};
+    vy = coords{2};
+    vertx = coords{3};
+    verty = coords{4};
 
     % Link handles
     x(1,:) = vx(NData.from);
@@ -321,9 +322,12 @@ if isempty(NData)
         set(NData.hvc,'yticklabel', labelvalue(2:end)');
     end
     
-    if isfield(NData,'hvcL'), ylabel(NData.hvcL, [LinkType,' (',unts_link,')'],'fontsize',12); end
-    if isfield(NData,'hvc'), ylabel(NData.hvc, [NodeType,' (',unts_node,')'],'fontsize',nodeFontYlabel); end
-        
+    if ~isempty(unts_node)
+        if isfield(NData,'hvcL'), ylabel(NData.hvcL, [LinkType,' (',unts_link,')'],'fontsize',12); end
+        if isfield(NData,'hvc'), ylabel(NData.hvc, [NodeType,' (',unts_node,')'],'fontsize',nodeFontYlabel); end
+    else
+        if isfield(NData,'hvc'), ylabel(NData.hvc, NodeType,'fontsize',nodeFontYlabel); end
+    end
     % Extra node symbols
     NData.snodeh=[];
     if ~isempty(SData)
@@ -418,12 +422,18 @@ end
 if NData.vsize > 0
     if colornodes
         rgb = color(NData.cmap,vdata,vmin,vmax);  % Return the color from the map
+        rgb2 = color(NData.cmap,vdata,vmin,vmax);  % Return the color from the map
         llengthv = length(find(vdata==0));
+        rgb2 = ones(d.getNodeCount, 3).*[0 0 0.5156];
         if PData.hidezeros
             rgb(find(vdata==0), :) = ones(llengthv, 3);
         end
         rgb(~Ivcolor,:) = rgb(~Ivcolor,:)*0;  % nodes are black if no color
-        set(NData.nodeh,{'MarkerFaceColor'},num2cell(rgb,2),{'MarkerEdgeColor'},num2cell(rgb,2));
+        rgb2(~Ivcolor,:) = rgb2(~Ivcolor,:)*0;  % nodes are black if no color
+        
+        [row_indices,~] = find(rgb ~= 1);
+        rgb2(row_indices,: ) = rgb(row_indices,: );
+        set(NData.nodeh,{'MarkerFaceColor'},num2cell(rgb,2),{'MarkerEdgeColor'},num2cell(rgb2,2));
     else
         rgb = zeros(NData.nnodes,3);          % nodes are black if no color
         set(NData.nodeh,{'MarkerFaceColor'},num2cell(rgb,2),{'MarkerEdgeColor'},num2cell(rgb,2));

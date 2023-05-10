@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.4 - Last Update: 08/12/2022';
+        classversion='v2.2.5 - Last Update: 10/05/2023';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -443,6 +443,50 @@ classdef epanet <handle
         solve = 1;
     end
     methods (Access = private)
+        function value = msx_computed_quality_species(obj, type_code, indices, varargin)
+            
+            if obj.getMSXSpeciesCount==0
+                value=0;
+                return;
+            end
+            if isempty(varargin{1})
+                specie = obj.getMSXSpeciesNameID;
+            else
+                specie = varargin{1}{1};
+            end
+            
+            if type_code == 0
+                type_name = 'Node';
+            else
+                type_name = 'Link';  % Link 1
+            end 
+            specie_name_ind = obj.getMSXSpeciesIndex(specie);
+            value.([type_name, 'Quality']) = nan(1, length(indices), length(specie_name_ind));
+            % Obtain a hydraulic solution
+            obj.solveMSXCompleteHydraulics;
+            % Run a step-wise water quality analysis without saving
+            % RESULTS to file
+            obj.initializeMSXQualityAnalysis(0);
+            % Retrieve species concentration at node
+            k=1; tleft=1;t=0;
+            value.Time(k, :)=0;
+            for i=1:length(specie_name_ind)
+                for lnk=indices
+                    value.([type_name, 'Quality'])(k, lnk, i)=obj.apiMSXgetinitqual(type_code, lnk, specie_name_ind(i), obj.MSXLibEPANET);
+                end
+            end
+            timeSmle=obj.getTimeSimulationDuration;
+            while(tleft>0 && obj.Errcode==0 && timeSmle~=t)
+                k=k+1;
+                [t, tleft]=obj.stepMSXQualityAnalysisTimeLeft;
+                for i=1:length(specie_name_ind)
+                    for lnk=indices
+                        value.([type_name, 'Quality'])(k, lnk, i)=obj.getMSXSpeciesConcentration(type_code, lnk, specie_name_ind(i));
+                    end
+                end
+                value.Time(k, :)=t;
+            end
+        end
         function Errcode = setFlowUnits(obj, unitcode, typecode, varargin)
             if ~typecode
                 [Errcode]= Options(obj, unitcode);
@@ -4143,8 +4187,8 @@ classdef epanet <handle
                     end
                 end
             end
-            if nargin==2 && ~strcmpi(varargin{2}, 'loadfile') && ~strcmpi(varargin{2}, 'CREATE') ...
-                    && ~strcmpi(varargin{2}, 'ph') && ~strcmpi(varargin{2}, 'loadfile-ph')% e.g. d = epanet('Net1.inp', 'epanet2'); % e.g. d = epanet('Net1.inp', 'epanet2');
+            if nargin==2 && ~ismember('LOADFILE',upper(varargin)) && ~strcmpi(varargin{2}, 'CREATE') ...
+                    && ~strcmpi(varargin{2}, 'ph') && ~ismember('LOADFILE-PH',upper(varargin))% e.g. d = epanet('Net1.inp', 'epanet2'); % e.g. d = epanet('Net1.inp', 'epanet2');
                 [pwdDLL, obj.LibEPANET] = fileparts(varargin{2}); % Get DLL LibEPANET (e.g. epanet20012x86 for 32-bit)
                 if isempty(pwdDLL)
                     pwdDLL = pwd;
@@ -4170,10 +4214,13 @@ classdef epanet <handle
                 end
             end
             
-            if nargin==2 && strcmpi(varargin{2}, 'loadfile-ph')
+            if nargin==2 && ismember('LOADFILE-PH',upper(varargin))
                 obj.msg = 0;
             end
-            
+            if ismember('epanet2', lower(varargin))
+                obj.LibEPANETpath = [pwd, '\'];
+            end
+
             %Load EPANET Library
             obj.ENLoadLibrary;
             
@@ -4235,8 +4282,8 @@ classdef epanet <handle
                 % Using new variable for temp file
                 obj.TempInpFile = obj.BinTempfile;
                 % Load file only, return
-                if nargin==2
-                    if strcmpi(varargin{2}, 'LOADFILE') || strcmpi(varargin{2}, 'loadfile-ph')
+                if nargin>=2
+                    if ismember('LOADFILE', upper(varargin)) || ismember('LOADFILE-PH', upper(varargin))
                         obj.libFunctions = libfunctions(obj.LibEPANET);
                         if obj.msg
                             disp(['Input File "', varargin{1}, '" loaded successfully.']);
@@ -4433,10 +4480,25 @@ classdef epanet <handle
                     obj.MSXLibEPANETPath = [pwdepanet, '/mac/'];
                 end
             end
+            loadfile_options = {'loadfile', 'LOADFILE'};
             if ~isempty(varargin)
                 if varargin{1}{1}~=1
                     if nargin==3
-                        obj.MSXLibEPANETPath=char(varargin{1});
+                        loadfile_msx = '';
+                        if any(strcmpi(varargin{1}, loadfile_options))
+                            try
+                                loadfile_msx = upper(varargin{1}{strcmpi(varargin{1}, loadfile_options)});
+                            catch
+                                loadfile_msx = varargin{1};
+                            end
+
+                        end
+                        if ~isempty(loadfile_msx) && any(~strcmpi(loadfile_msx, varargin{1}))
+                            libmsxpath = varargin{1}{~strcmpi(loadfile_msx, varargin{1})};
+                        else
+                            libmsxpath = 'epanetmsx';
+                        end
+                        obj.MSXLibEPANETPath=libmsxpath;
                         obj.MSXLibEPANETPath=[fileparts(obj.MSXLibEPANETPath), '\'];
                         if isempty(varargin{1})
                             obj.MSXLibEPANETPath='';
@@ -4455,6 +4517,9 @@ classdef epanet <handle
 
             if ~isdeployed
                 obj.MSXFile = which(char(msxname));
+                if isempty(obj.MSXFile)
+                    obj.MSXFile = msxname;
+                end
             else
                 obj.MSXFile = msxname;
             end
@@ -4478,6 +4543,9 @@ classdef epanet <handle
             %Open the file
             [obj.Errcode] = obj.apiMSXopen(obj);
             if obj.Errcode, warning(obj.getMSXError(obj.Errcode)); end
+            if any(strcmpi(varargin{1}, loadfile_options))
+                return
+            end
             obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
             obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
             obj.MSXEquationsTanks = obj.getMSXEquationsTanks;
@@ -8704,11 +8772,26 @@ classdef epanet <handle
                 end
             end
         end
-        function A = getAdjacencyMatrix(obj)
+        function A = getAdjacencyMatrix(obj, varargin)
             % Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow
             % Compute the new adjacency matrix based on the mean flow in the network
-            Fmean = mean(obj.getComputedTimeSeries.Flow,1); % ignores events also you can use getComputedHydraulicTimeSeries
-            
+            %
+            % Example 1: 
+            %   hydraulics = d.getComputedTimeSeries();
+            %   avg_flows = mean(hydraulics.Flow);
+            %   A = d.getAdjacencyMatrix(avg_flows);
+            %   g = digraph(A);
+            % 
+            % Example 2: 
+            %   A = d.getAdjacencyMatrix;
+            %   g = digraph(A);
+            %
+            % See also getFlowDirections.
+            if nargin == 2
+                Fmean = varargin{1};
+            else
+                Fmean = mean(obj.getComputedTimeSeries.Flow,1); % ignores events also you can use getComputedHydraulicTimeSeries
+            end
             Fsign = sign(Fmean);
             A = zeros(obj.getNodeCount);
             Nidx = obj.getLinkNodesIndex;
@@ -8720,9 +8803,25 @@ classdef epanet <handle
                 end
             end
         end
-        function A = getFlowDirections(obj)
+        function A = getFlowDirections(obj, varargin)
             % Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow
-            Fmean = mean(obj.getComputedTimeSeries.Flow,1);
+            %
+            % Example 1: 
+            %   hydraulics = d.getComputedTimeSeries();
+            %   avg_flows = mean(hydraulics.Flow);
+            %   A = d.getFlowDirections(avg_flows);
+            %   g = digraph(A);
+            % 
+            % Example 2: 
+            %   A = d.getFlowDirections;
+            %   g = digraph(A);
+            %
+            % See also getAdjacencyMatrix.
+            if nargin == 2
+                Fmean = varargin{1};
+            else
+                Fmean = mean(obj.getComputedTimeSeries.Flow,1);
+            end
             Fsign = sign(Fmean);
             A = zeros(obj.getNodeCount);
             Nidx = obj.getLinkNodesIndex;
@@ -8972,6 +9071,202 @@ classdef epanet <handle
                 index = find(diff(s.Status(:, obj.getLinkPumpIndex(i))));
                 value(i) = length(index);
             end
+        end
+        function value = getComputedAnalysisTimeSeries(obj, varargin)
+            % Computes hydraulic and quality analysis and retrieves all time-series.
+            %
+            % Data that is computed:
+            %   1) Time              8)  Velocity
+            %   2) Pressure          9)  HeadLoss
+            %   3) Demand            10) Status
+            %   4) DemandDeficit     11) Setting
+            %   5) Head              12) Energy
+            %   6) TankVolume        13) Efficiency
+            %   7) Flow              14) NodeQuality
+            %                        15) LinkQuality
+            %                        16) MassFlowRate
+            %
+            % Example 1:
+            %   d.getComputedAnalysisTimeSeries          % Retrieves all the time-series data
+            %
+            % Example 2:
+            %   d.getComputedAnalysisTimeSeries.Demand          % Retrieves all the time-series demands
+            %   d.getComputedAnalysisTimeSeries.Flow            % Retrieves all the time-series flows
+            %   d.getComputedAnalysisTimeSeries.NodeQuality     % Retrieves all the time-series quality
+            %
+            % Example 3:
+            %   data = d.getComputedAnalysisTimeSeries('Time', ...
+            %    'Demand', 'NodeQuality');                  %  Retrieves all the time-series Time, Pressure, Velocity
+            %   time = data.Time;
+            %   demand = data.Demand;
+            %   quality = data.NodeQuality;
+            %
+            % See also getComputedQualityTimeSeries, getComputedTimeSeries.
+            obj.openHydraulicAnalysis;
+            obj.solve = 1;
+            obj.initializeHydraulicAnalysis(0);
+            obj.openQualityAnalysis;
+            obj.initializeQualityAnalysis(obj.ToolkitConstants.EN_NOSAVE);
+            sim_duration = obj.getTimeSimulationDuration;
+            totalsteps = sim_duration/obj.getTimeHydraulicStep;
+            initnodematrix = zeros(totalsteps, obj.getNodeCount);
+            initlinkmatrix = zeros(totalsteps, obj.getLinkCount);
+            if size(varargin, 2)==0
+                varargin = {'time', 'pressure', 'demand', 'demanddeficit', 'head', 'tankvolume', 'flow', 'velocity', 'headloss', 'status', 'setting', 'energy', 'efficiency', 'state', 'nodequality', 'linkquality', 'massflowrate'};
+                %if ~sum(strcmpi(fields(obj.ToolkitConstants), 'EN_EFFICIENCY'))
+                %    varargin{end} = {''};
+                %end
+            else
+                for i = 1:length(varargin)
+                    if isnumeric(varargin{i})
+                        sensingnodes = i;
+                    end
+                end
+            end
+            if find(strcmpi(varargin, 'time'))
+                value.Time = zeros(totalsteps, 1);
+            end
+            if find(strcmpi(varargin, 'pressure'))
+                value.Pressure = initnodematrix;
+            end
+            if find(strcmpi(varargin, 'demand'))
+                value.Demand = initnodematrix;
+            end
+            if obj.getVersion > 20101
+                if find(strcmpi(varargin, 'demanddeficit'))
+                    value.DemandDeficit = initnodematrix;
+                end
+            end
+            if find(strcmpi(varargin, 'demandSensingNodes'))
+                value.DemandSensingNodes = zeros(totalsteps, length(varargin{sensingnodes}));
+                value.SensingNodesIndices = varargin{sensingnodes};
+            end
+            if find(strcmpi(varargin, 'head'))
+                value.Head = initnodematrix;
+            end
+            if find(strcmpi(varargin, 'tankvolume'))
+                value.TankVolume = initnodematrix;
+            end
+            if find(strcmpi(varargin, 'flow'))
+                value.Flow = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'velocity'))
+                value.Velocity = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'headloss'))
+                value.HeadLoss = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'status'))
+                value.Status = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'setting'))
+                value.Setting = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'energy'))
+                value.Energy = initlinkmatrix;
+            end
+            if obj.getVersion > 20101
+                if find(strcmpi(varargin, 'efficiency'))
+                    value.Efficiency = initlinkmatrix;
+                end
+            end
+            if find(strcmpi(varargin, 'state'))
+                value.State = zeros(totalsteps, obj.getLinkPumpCount);
+            end
+            if find(strcmpi(varargin, 'nodequality'))
+                value.NodeQuality=initnodematrix;
+            end
+            if find(strcmpi(varargin, 'linkquality'))
+                value.LinkQuality=zeros(totalsteps, obj.getLinkCount);
+            end
+            if find(strcmpi(varargin, 'qualitySensingNodes'))
+                value.QualitySensingNodes=zeros(totalsteps, length(varargin{sensingnodes}));
+                value.SensingNodesIndices=varargin{sensingnodes};
+            end
+            if find(strcmpi(varargin, 'massflowrate'))
+                value.MassFlowRate=initnodematrix;
+            end
+            clear initlinkmatrix initnodematrix;
+            k = 1;tstep = 1;
+            pipecount = obj.getLinkPipeCount;
+            valvecount = obj.getLinkValveCount;
+            junctioncount = obj.getNodeJunctionCount;
+            rescount = obj.getNodeReservoirCount;
+            while (tstep>0)||(t<sim_duration)
+                t = obj.runHydraulicAnalysis;
+                qt = obj.runQualityAnalysis;
+
+                if find(strcmpi(varargin, 'time'))
+                    value.Time(k, :) = t;
+                end
+                if find(strcmpi(varargin, 'pressure'))
+                    value.Pressure(k, :) = obj.getNodePressure;
+                end
+                if find(strcmpi(varargin, 'demand'))
+                    value.Demand(k, :) = obj.getNodeActualDemand;
+                end
+                if obj.getVersion > 20101
+                    if find(strcmpi(varargin, 'demanddeficit'))
+                        value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
+                    end
+                end
+                if find(strcmpi(varargin, 'demandSensingNodes'))
+                    value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
+                end
+                if find(strcmpi(varargin, 'head'))
+                    value.Head(k, :) = obj.getNodeHydaulicHead;
+                end
+                if find(strcmpi(varargin, 'tankvolume'))
+                    value.TankVolume(k, :) = [zeros(1, junctioncount+rescount) obj.getNodeTankVolume];
+                end
+                if find(strcmpi(varargin, 'flow'))
+                    value.Flow(k, :) = obj.getLinkFlows;
+                end
+                if find(strcmpi(varargin, 'velocity'))
+                    value.Velocity(k, :) = obj.getLinkVelocity;
+                end
+                if find(strcmpi(varargin, 'headloss'))
+                    value.HeadLoss(k, :) = obj.getLinkHeadloss;
+                end
+                if find(strcmpi(varargin, 'status'))
+                    value.Status(k, :) = obj.getLinkStatus;
+                    value.StatusStr(k, :) = obj.TYPESTATUS(value.Status(k, :) + 1);
+                end
+                if find(strcmpi(varargin, 'setting'))
+                    value.Setting(k, :) = obj.getLinkSettings;
+                end
+                if find(strcmpi(varargin, 'energy'))
+                    value.Energy(k, :) = obj.getLinkEnergy;
+                end
+                if obj.getVersion > 20101
+                    if find(strcmpi(varargin, 'efficiency'))
+                        value.Efficiency(k, :) = [zeros(1, pipecount) obj.getLinkPumpEfficiency zeros(1, valvecount)];
+                    end
+                end
+                if find(strcmpi(varargin, 'nodequality'))
+                    value.NodeQuality(k, :)=obj.getNodeActualQuality;
+                end
+                if find(strcmpi(varargin, 'linkquality'))
+                    value.LinkQuality(k, :)=obj.getLinkActualQuality;
+                end
+                if find(strcmpi(varargin, 'massflowrate'))
+                    value.MassFlowRate(k, :)=obj.getNodeMassFlowRate;
+                end
+                if find(strcmpi(varargin, 'qualitySensingNodes'))
+                    value.QualitySensingNodes(k, :)=obj.getNodeActualQualitySensingNodes(varargin{2});
+                end
+                if obj.getVersion > 20101
+                    if find(strcmpi(varargin, 'state'))
+                        value.State(k, :) = obj.getLinkPumpState;
+                        value.StateStr(k, :) = obj.TYPEPUMPSTATE(value.State(k, :) + 1);
+                    end
+                end
+                tstep = obj.nextHydraulicAnalysisStep;
+                qtstep = obj.nextQualityAnalysisStep;
+                k = k+1;
+            end
+            obj.closeQualityAnalysis;
+            obj.closeHydraulicAnalysis;
         end
         function value = getComputedHydraulicTimeSeries(obj, varargin)
             % Computes hydraulic simulation and retrieves all time-series.
@@ -13360,7 +13655,10 @@ classdef epanet <handle
             % Loads an msx file
             %
             % Example:
-            %   d.loadMSXfile('net2-cl2.msx')
+            %   d.loadMSXfile('net2-cl2.msx') ||
+            %   d.loadMSXFile('net2-cl2.msx', 'epanetmsx'); ||
+            %   d.loadMSXFile('net2-cl2.msx', 'epanetmsx', 'loadfile'); ||
+            %   d.loadMSXFile('net2-cl2.msx', 'loadfile');
             if isempty(varargin)
                 obj.apiMSXMatlabSetup(msxname);
             else
@@ -14200,6 +14498,36 @@ classdef epanet <handle
             %          getMSXSpeciesRTOL.
             [obj.Errcode, value] = obj.apiMSXgetqual(type, index, species, obj.MSXLibEPANET);
             if obj.Errcode, error(obj.getMSXError(obj.Errcode)); end
+        end
+        function value = getMSXComputedLinkQualitySpecie(obj, link_indices, varargin)
+            % Returns the link quality for specific specie.
+            %
+            % Example 1:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   node_indices = 1:d.getLinkCount;
+            %   MSX_comp = d.getMSXComputedLinkQualitySpecie(node_indices, 'CL2')
+            %   MSX_comp.LinkQuality % row: time, col: node index
+            %   MSX_comp.Time
+            %
+            % See also getMSXComputedQualitySpecie, getMSXComputedNodeQualitySpecie.
+            type_code = 1;  % Link Code
+            value = obj.msx_computed_quality_species(type_code, link_indices, varargin);
+        end
+        function value = getMSXComputedNodeQualitySpecie(obj, node_indices, varargin)
+            % Returns the node quality for specific specie.
+            %
+            % Example 1:
+            %   d = epanet('net2-cl2.inp');
+            %   d.loadMSXFile('net2-cl2.msx');
+            %   node_indices = 1:d.getNodeCount;
+            %   MSX_comp = d.getMSXComputedNodeQualitySpecie(node_indices, 'CL2')
+            %   MSX_comp.NodeQuality % row: time, col: node index
+            %   MSX_comp.Time
+            %
+            % See also getMSXComputedQualitySpecie, getMSXComputedLinkQualitySpecie.
+            type_code = 0; % Node Code
+            value = obj.msx_computed_quality_species(type_code, node_indices, varargin);
         end
         function value = getMSXComputedQualitySpecie(obj, varargin)
             % Returns the node/link quality for specific specie.
@@ -22210,7 +22538,9 @@ for t = 1:length(info)
     end
 end
 obj.unloadMSX;
-obj.loadMSXFile(obj.MSXTempFile, 1);
+obj.loadMSXlibrary;
+obj.loadMSXEPANETFile(obj.MSXTempFile);
+% obj.loadMSXFile(obj.MSXTempFile, 1);
 end
 function value = getTimes(obj, r, atline, value)
 tmpt=[0 0];

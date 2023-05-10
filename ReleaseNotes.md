@@ -1,3 +1,22 @@
+### EPANET Matlab Toolkit (EMT) v2.2.5
+
+- Add the function `getComputedAnalysisTimeSeries` (Computed Hydraulic and Quality analysis)
+- Update Movie example (use epanet class function instead of properties)
+- Load epanet file with specific DLL without fill properties: 
+`d = epanet(inpname, 'epanet2', 'loadfile')`; 
+- Update the functions `getAdjacencyMatrix`, `getFlowDirections`
+  help `d.getAdjacencyMatrix` 
+  help `d.getFlowDirections`
+- Add the function `getMSXComputedLinkQualitySpecie` (Returns the link quality for specific specie)
+- Add the function `getMSXComputedNodeQualitySpecie` (Returns the node quality for specific specie)
+- Update in the function `setMSXTimeStep`
+- Update the function `loadMSXFile`, e.g.  
+    ```
+  d.loadMSXFile('net2-cl2.msx', 'epanetmsx');
+    d.loadMSXFile('net2-cl2.msx', 'epanetmsx', 'loadfile');
+    d.loadMSXFile('net2-cl2.msx', 'loadfile');
+  ```
+
 ### EPANET Matlab Toolkit (EMT) v2.2.4
 
 - Update the LICENSE file to the last version of EUPL v. 1.2
