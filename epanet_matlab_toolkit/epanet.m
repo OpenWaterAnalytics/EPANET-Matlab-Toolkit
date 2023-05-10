@@ -9072,6 +9072,202 @@ classdef epanet <handle
                 value(i) = length(index);
             end
         end
+        function value = getComputedAnalysisTimeSeries(obj, varargin)
+            % Computes hydraulic and quality analysis and retrieves all time-series.
+            %
+            % Data that is computed:
+            %   1) Time              8)  Velocity
+            %   2) Pressure          9)  HeadLoss
+            %   3) Demand            10) Status
+            %   4) DemandDeficit     11) Setting
+            %   5) Head              12) Energy
+            %   6) TankVolume        13) Efficiency
+            %   7) Flow              14) NodeQuality
+            %                        15) LinkQuality
+            %                        16) MassFlowRate
+            %
+            % Example 1:
+            %   d.getComputedAnalysisTimeSeries          % Retrieves all the time-series data
+            %
+            % Example 2:
+            %   d.getComputedAnalysisTimeSeries.Demand          % Retrieves all the time-series demands
+            %   d.getComputedAnalysisTimeSeries.Flow            % Retrieves all the time-series flows
+            %   d.getComputedAnalysisTimeSeries.NodeQuality     % Retrieves all the time-series quality
+            %
+            % Example 3:
+            %   data = d.getComputedAnalysisTimeSeries('Time', ...
+            %    'Demand', 'NodeQuality');                  %  Retrieves all the time-series Time, Pressure, Velocity
+            %   time = data.Time;
+            %   demand = data.Demand;
+            %   quality = data.NodeQuality;
+            %
+            % See also getComputedQualityTimeSeries, getComputedTimeSeries.
+            obj.openHydraulicAnalysis;
+            obj.solve = 1;
+            obj.initializeHydraulicAnalysis(0);
+            obj.openQualityAnalysis;
+            obj.initializeQualityAnalysis(obj.ToolkitConstants.EN_NOSAVE);
+            sim_duration = obj.getTimeSimulationDuration;
+            totalsteps = sim_duration/obj.getTimeHydraulicStep;
+            initnodematrix = zeros(totalsteps, obj.getNodeCount);
+            initlinkmatrix = zeros(totalsteps, obj.getLinkCount);
+            if size(varargin, 2)==0
+                varargin = {'time', 'pressure', 'demand', 'demanddeficit', 'head', 'tankvolume', 'flow', 'velocity', 'headloss', 'status', 'setting', 'energy', 'efficiency', 'state', 'nodequality', 'linkquality', 'massflowrate'};
+                %if ~sum(strcmpi(fields(obj.ToolkitConstants), 'EN_EFFICIENCY'))
+                %    varargin{end} = {''};
+                %end
+            else
+                for i = 1:length(varargin)
+                    if isnumeric(varargin{i})
+                        sensingnodes = i;
+                    end
+                end
+            end
+            if find(strcmpi(varargin, 'time'))
+                value.Time = zeros(totalsteps, 1);
+            end
+            if find(strcmpi(varargin, 'pressure'))
+                value.Pressure = initnodematrix;
+            end
+            if find(strcmpi(varargin, 'demand'))
+                value.Demand = initnodematrix;
+            end
+            if obj.getVersion > 20101
+                if find(strcmpi(varargin, 'demanddeficit'))
+                    value.DemandDeficit = initnodematrix;
+                end
+            end
+            if find(strcmpi(varargin, 'demandSensingNodes'))
+                value.DemandSensingNodes = zeros(totalsteps, length(varargin{sensingnodes}));
+                value.SensingNodesIndices = varargin{sensingnodes};
+            end
+            if find(strcmpi(varargin, 'head'))
+                value.Head = initnodematrix;
+            end
+            if find(strcmpi(varargin, 'tankvolume'))
+                value.TankVolume = initnodematrix;
+            end
+            if find(strcmpi(varargin, 'flow'))
+                value.Flow = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'velocity'))
+                value.Velocity = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'headloss'))
+                value.HeadLoss = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'status'))
+                value.Status = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'setting'))
+                value.Setting = initlinkmatrix;
+            end
+            if find(strcmpi(varargin, 'energy'))
+                value.Energy = initlinkmatrix;
+            end
+            if obj.getVersion > 20101
+                if find(strcmpi(varargin, 'efficiency'))
+                    value.Efficiency = initlinkmatrix;
+                end
+            end
+            if find(strcmpi(varargin, 'state'))
+                value.State = zeros(totalsteps, obj.getLinkPumpCount);
+            end
+            if find(strcmpi(varargin, 'nodequality'))
+                value.NodeQuality=initnodematrix;
+            end
+            if find(strcmpi(varargin, 'linkquality'))
+                value.LinkQuality=zeros(totalsteps, obj.getLinkCount);
+            end
+            if find(strcmpi(varargin, 'qualitySensingNodes'))
+                value.QualitySensingNodes=zeros(totalsteps, length(varargin{sensingnodes}));
+                value.SensingNodesIndices=varargin{sensingnodes};
+            end
+            if find(strcmpi(varargin, 'massflowrate'))
+                value.MassFlowRate=initnodematrix;
+            end
+            clear initlinkmatrix initnodematrix;
+            k = 1;tstep = 1;
+            pipecount = obj.getLinkPipeCount;
+            valvecount = obj.getLinkValveCount;
+            junctioncount = obj.getNodeJunctionCount;
+            rescount = obj.getNodeReservoirCount;
+            while (tstep>0)||(t<sim_duration)
+                t = obj.runHydraulicAnalysis;
+                qt = obj.runQualityAnalysis;
+
+                if find(strcmpi(varargin, 'time'))
+                    value.Time(k, :) = t;
+                end
+                if find(strcmpi(varargin, 'pressure'))
+                    value.Pressure(k, :) = obj.getNodePressure;
+                end
+                if find(strcmpi(varargin, 'demand'))
+                    value.Demand(k, :) = obj.getNodeActualDemand;
+                end
+                if obj.getVersion > 20101
+                    if find(strcmpi(varargin, 'demanddeficit'))
+                        value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
+                    end
+                end
+                if find(strcmpi(varargin, 'demandSensingNodes'))
+                    value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
+                end
+                if find(strcmpi(varargin, 'head'))
+                    value.Head(k, :) = obj.getNodeHydaulicHead;
+                end
+                if find(strcmpi(varargin, 'tankvolume'))
+                    value.TankVolume(k, :) = [zeros(1, junctioncount+rescount) obj.getNodeTankVolume];
+                end
+                if find(strcmpi(varargin, 'flow'))
+                    value.Flow(k, :) = obj.getLinkFlows;
+                end
+                if find(strcmpi(varargin, 'velocity'))
+                    value.Velocity(k, :) = obj.getLinkVelocity;
+                end
+                if find(strcmpi(varargin, 'headloss'))
+                    value.HeadLoss(k, :) = obj.getLinkHeadloss;
+                end
+                if find(strcmpi(varargin, 'status'))
+                    value.Status(k, :) = obj.getLinkStatus;
+                    value.StatusStr(k, :) = obj.TYPESTATUS(value.Status(k, :) + 1);
+                end
+                if find(strcmpi(varargin, 'setting'))
+                    value.Setting(k, :) = obj.getLinkSettings;
+                end
+                if find(strcmpi(varargin, 'energy'))
+                    value.Energy(k, :) = obj.getLinkEnergy;
+                end
+                if obj.getVersion > 20101
+                    if find(strcmpi(varargin, 'efficiency'))
+                        value.Efficiency(k, :) = [zeros(1, pipecount) obj.getLinkPumpEfficiency zeros(1, valvecount)];
+                    end
+                end
+                if find(strcmpi(varargin, 'nodequality'))
+                    value.NodeQuality(k, :)=obj.getNodeActualQuality;
+                end
+                if find(strcmpi(varargin, 'linkquality'))
+                    value.LinkQuality(k, :)=obj.getLinkActualQuality;
+                end
+                if find(strcmpi(varargin, 'massflowrate'))
+                    value.MassFlowRate(k, :)=obj.getNodeMassFlowRate;
+                end
+                if find(strcmpi(varargin, 'qualitySensingNodes'))
+                    value.QualitySensingNodes(k, :)=obj.getNodeActualQualitySensingNodes(varargin{2});
+                end
+                if obj.getVersion > 20101
+                    if find(strcmpi(varargin, 'state'))
+                        value.State(k, :) = obj.getLinkPumpState;
+                        value.StateStr(k, :) = obj.TYPEPUMPSTATE(value.State(k, :) + 1);
+                    end
+                end
+                tstep = obj.nextHydraulicAnalysisStep;
+                qtstep = obj.nextQualityAnalysisStep;
+                k = k+1;
+            end
+            obj.closeQualityAnalysis;
+            obj.closeHydraulicAnalysis;
+        end
         function value = getComputedHydraulicTimeSeries(obj, varargin)
             % Computes hydraulic simulation and retrieves all time-series.
             %

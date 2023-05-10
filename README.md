@@ -145,6 +145,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deleteProject|Deletes an epanet project|
 |getError|Returns the description of an error code|
 |getAdjacencyMatrix|Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow|
+|getComputedAnalysisTimeSeries|Computed Hydralic and Quality Time Series|
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
 |getComputedTimeSeries|Computed Hydraulic & Quality Time Series using the bimary file who created from executable|
