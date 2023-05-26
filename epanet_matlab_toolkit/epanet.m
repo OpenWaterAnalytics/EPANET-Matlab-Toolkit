@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.6 - Last Update: 11/05/2023';
+        classversion='v2.2.6 - Last Update: 26/05/2023';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -4543,8 +4543,10 @@ classdef epanet <handle
             %Open the file
             [obj.Errcode] = obj.apiMSXopen(obj);
             if obj.Errcode, warning(obj.getMSXError(obj.Errcode)); end
-            if any(strcmpi(varargin{1}, loadfile_options))
-                return
+            if ~isempty(varargin)
+                if any(strcmpi(varargin{1}, loadfile_options))
+                    return
+                end
             end
             obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
             obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
