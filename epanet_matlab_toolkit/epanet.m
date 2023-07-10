@@ -1,5 +1,5 @@
 classdef epanet <handle
-    %EPANET-Matlab Toolkit version EMT v2.2.2: A Matlab Class for EPANET and EPANET-MSX
+    %EPANET-Matlab Toolkit version EMT v2.2.6: A Matlab Class for EPANET and EPANET-MSX
     %libraries
     %
     %
@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.5 - Last Update: 10/05/2023';
+        classversion='v2.2.6 - Last Update: 26/05/2023';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -4164,7 +4164,7 @@ classdef epanet <handle
                 if strcmpi(varargin{2}, 'BIN')
                     obj.LibEPANET = 'epanet2';
                     obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
-                    copyfile(obj.InputFile, obj.BinTempfile);
+                    copyfile(obj.InputFile, obj.BinTempfile, 'f');
                     obj.InputFile=obj.BinTempfile;
                     obj.Bin=0;
                     if nargin==3, if strcmpi(varargin{3}, 'LOADFILE'); return; end; end
@@ -4261,7 +4261,7 @@ classdef epanet <handle
                 %Save the temporary input file
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
                 
-                copyfile(obj.InputFile, obj.BinTempfile);
+                copyfile(obj.InputFile, obj.BinTempfile, 'f');
                 %obj.saveInputFile(obj.BinTempfile); % create a new INP file (Working Copy) using the SAVE command of EPANET
                 
                 obj.closeNetwork;  %apiENclose; %Close input file
@@ -4537,14 +4537,16 @@ classdef epanet <handle
                 end
             else
                 obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
-                copyfile(obj.MSXFile, obj.MSXTempFile);
+                copyfile(obj.MSXFile, obj.MSXTempFile, 'f');
             end
 
             %Open the file
             [obj.Errcode] = obj.apiMSXopen(obj);
             if obj.Errcode, warning(obj.getMSXError(obj.Errcode)); end
-            if any(strcmpi(varargin{1}, loadfile_options))
-                return
+            if ~isempty(varargin)
+                if any(strcmpi(varargin{1}, loadfile_options))
+                    return
+                end
             end
             obj.MSXEquationsTerms = obj.getMSXEquationsTerms;
             obj.MSXEquationsPipes = obj.getMSXEquationsPipes;
@@ -9527,7 +9529,7 @@ classdef epanet <handle
             obj.closeQualityAnalysis;
         end
         function value = getComputedTimeSeries(obj)
-            obj.saveInputFile(obj.TempInpFile);
+            obj.saveInputFile();
             [fid, binfile, ~] = runEPANETexe(obj);
             if fid < 0
                 value = obj.getComputedTimeSeries_ENepanet();
@@ -9543,7 +9545,8 @@ classdef epanet <handle
             end
         end
         function value = getComputedTimeSeries_ENepanet(obj)
-            obj.saveInputFile(obj.TempInpFile);
+            obj.saveInputFile();
+            obj.closeNetwork();
             uuID = char(java.util.UUID.randomUUID);
             rptfile=[obj.TempInpFile(1:end-4), '.txt'];
             binfile=['@#', uuID, '.bin'];
@@ -13537,10 +13540,10 @@ classdef epanet <handle
             if nargin == 1
                 inpname = obj.TempInpFile;
             end
-            [Errcode] = obj.apiENsaveinpfile('@#', obj.LibEPANET, obj.ph);
+            [Errcode] = obj.apiENsaveinpfile(inpname, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-            copyfile('@#', inpname);% temporary
-            delete('@#');
+%             copyfile('@#', inpname);% temporary
+%             delete('@#');
         end
         function writeLineInReportFile(obj, line)
             % Writes a line of text to the EPANET report file.
@@ -16749,7 +16752,7 @@ classdef epanet <handle
         end
         function saveBinInpFile(obj, varargin)
             if ~isempty(varargin)
-                copyfile(obj.BinTempfile, varargin{1}); return;
+                copyfile(obj.BinTempfile, varargin{1}, 'f'); return;
             end
             [tlines]=regexp( fileread([obj.BinTempfile]), '\n', 'split');
             f = writenewTemp(obj.BinTempfile);
