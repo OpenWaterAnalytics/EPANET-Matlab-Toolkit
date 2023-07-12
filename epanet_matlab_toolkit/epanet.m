@@ -6900,6 +6900,35 @@ classdef epanet <handle
             [obj.Errcode, Line1, Line2, Line3] = obj.apiENgettitle(obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function value = getNodeJunctionBaseDemands(obj, varargin)
+            % Retrieves the value of all junction base demands.
+            %
+            % Example 1:    
+            %   d.getNodeJunctionBaseDemands
+            %   d.getNodeJunctionBaseDemands{1}   % Get categories 1
+            %
+            % Example 2:
+            %   d.getNodeJunctionBaseDemands(2)   % Get junction base demand with categories for specific node index
+            %
+            % See also setNodeBaseDemands, getNodeDemandCategoriesNumber,
+            %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
+            [indices, ~] = getNodeJunctionIndices(obj, varargin);
+            numdemands = obj.getNodeDemandCategoriesNumber(indices);
+            value = cell(1, max(numdemands));
+            cnt = length(indices);
+            val = zeros(max(numdemands), cnt);j=1;
+            for i=indices
+                v=1;
+                for u=1:numdemands(j)
+                    [obj.Errcode, val(v, j)] = obj.apiENgetbasedemand(i, u, obj.LibEPANET, obj.ph);v=v+1;
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                end
+                j=j+1;
+            end
+            for i=1:size(val, 1)
+                value{i} = val(i, :);
+            end
+        end
         function value = getNodeBaseDemands(obj, varargin)
             % Retrieves the value of all node base demands.
             %
@@ -7233,6 +7262,26 @@ classdef epanet <handle
             % See also setNodeTankInitialLevel, getNodeTankInitialWaterVolume, getNodeTankVolume,
             %          getNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel.
             value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, varargin);
+        end
+        function value = getNodeJunctionActualDemand(obj, varargin)
+            % Retrieves the computed value of all actual demands for
+            % junctions.
+            %
+            % Example 1:
+            %   d.getNodeJunctionActualDemand      % Retrieves the computed value of all junction actual demands
+            %
+            % Example 2:
+            %   d.getNodeJunctionActualDemand(1)   % Retrieves the computed value of the first junction actual demand
+            %
+            % For more, you can type `help getNodePressure` and check examples 3 & 4.
+            %
+            % See also getNodeActualDemandSensingNodes, getNodeActualDemand, getNodePressure,
+            %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
+            [indices, value] = getNodeJunctionIndices(obj, varargin);j=1;
+            for i=indices
+                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);
+                j=j+1;
+            end
         end
         function value = getNodeActualDemand(obj, varargin)
             % Retrieves the computed value of all node actual demands.
