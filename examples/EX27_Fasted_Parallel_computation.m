@@ -26,6 +26,10 @@ Pmcs = cell(Nsim,1);
 inpname = 'Net2.inp';
 
 Ginit = epanet('Net2.inp', 'loadfile-ph');
+
+% Get nominal base demands
+base_demands = Ginit.getNodeBaseDemands{1};
+
 tmpinpfile = {};
 tmprptfile = {};
 tmpbinfile = {};
@@ -35,8 +39,6 @@ parfor i = 1:Nsim
     G = Ginit;
     G.loadlibrary;
     G.loadEPANETFile(G.TempInpFile);
-    % Get nominal base demands
-    base_demands = G.getNodeBaseDemands{1};
     % Compute new base demands
     delta_bd = (2*rand(1,length(base_demands))-1).*eta_bar.*base_demands;
     new_base_demands = base_demands + delta_bd;
