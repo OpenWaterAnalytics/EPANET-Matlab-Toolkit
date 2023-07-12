@@ -235,6 +235,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeHydaulicHead|Retrieves the computed values of all hydraulic heads|
 |getNodeIndex|Retrieves the indices of all nodes or some nodes with a specified ID|
 |getNodeInitialQuality|Retrieves the value of all node initial quality|
+|getNodeJunctionActualDemand|Retrieves the computed value of all actual demands for junctions|
 |getNodeJunctionBaseDemands|Retrieves the value of all junction base demands|
 |getNodeJunctionCount|Retrieves the number of junctions|
 |getNodeJunctionDemandName|Gets the name of a node's demand category|

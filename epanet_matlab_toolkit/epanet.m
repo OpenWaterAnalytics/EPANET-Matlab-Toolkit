@@ -7264,7 +7264,8 @@ classdef epanet <handle
             value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, varargin);
         end
         function value = getNodeJunctionActualDemand(obj, varargin)
-            % Retrieves the computed value of all junction actual demands.
+            % Retrieves the computed value of all actual demands for
+            % junctions.
             %
             % Example 1:
             %   d.getNodeJunctionActualDemand      % Retrieves the computed value of all junction actual demands
@@ -7274,7 +7275,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
-            % See also getNodeActualDemandSensingNodes, getNodeHydaulicHead, getNodePressure,
+            % See also getNodeActualDemandSensingNodes, getNodeActualDemand, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeJunctionIndices(obj, varargin);j=1;
             for i=indices

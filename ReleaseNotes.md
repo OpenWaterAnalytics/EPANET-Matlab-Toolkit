@@ -4,6 +4,7 @@
 - Update the function `getComputedTimeSeries_ENepanet` to work in parallel
 - Add the function `readEpanetBinaryFile`
 - Add the function `getNodeJunctionBaseDemands` #230 
+- Add the function `getNodeJunctionActualDemand` #230 
 
 ### EPANET Matlab Toolkit (EMT) v2.2.5
 
