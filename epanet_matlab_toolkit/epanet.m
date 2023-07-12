@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.6 - Last Update: 26/05/2023';
+        classversion='v2.2.6.1 - Last Update: 12/07/2023';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -9544,22 +9544,42 @@ classdef epanet <handle
                 warning on;
             end
         end
-        function value = getComputedTimeSeries_ENepanet(obj)
-            obj.saveInputFile();
-            obj.closeNetwork();
-            uuID = char(java.util.UUID.randomUUID);
-            rptfile=[obj.TempInpFile(1:end-4), '.txt'];
-            binfile=['@#', uuID, '.bin'];
-            obj.Errcode = obj.apiENepanet(obj.TempInpFile, rptfile, binfile, obj.LibEPANET);
-            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-            fid = fopen(binfile, 'r');
-            value = readEpanetBin(fid, binfile, 0);
-            value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
-            fclose('all');
-            files=dir('@#*');
-            if ~isempty(files); delete('@#*'); end
-            obj.Errcode = obj.apiENopen(obj.TempInpFile, [obj.TempInpFile(1:end-4), '.txt'], [obj.TempInpFile(1:end-4), '.bin'], obj.LibEPANET, obj.ph);
-            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        function value = getComputedTimeSeries_ENepanet(obj, tempfile, binfile)
+            if nargin < 2 || isempty(binfile)
+                uuID = char(java.util.UUID.randomUUID);
+                rptfile=[obj.TempInpFile(1:end-4), '.txt'];
+                binfile=['@#', uuID, '.bin'];
+            end
+
+            if nargin > 2
+                calllib(obj.LibEPANET, 'ENepanet', tempfile, '', binfile, lib.pointer);
+                fid = fopen(binfile, 'r');
+                try
+                    value = readEpanetBinaryFile(fid, binfile, 0);
+                catch
+                    fclose(fid);
+                    try
+                        value = readEpanetBinaryFile(fid, binfile, 0);
+                    catch
+                        fclose(fid);
+                    end
+                end
+                warning('off'); try fclose(fid); catch, end; try delete(binfile); catch, end; warning('on');
+            else
+                obj.saveInputFile();
+                obj.closeNetwork();
+
+                obj.Errcode = obj.apiENepanet(obj.TempInpFile, rptfile, binfile, obj.LibEPANET);
+                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                fid = fopen(binfile, 'r');
+                value = readEpanetBin(fid, binfile, 0);
+                value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
+                fclose('all');
+                files=dir('@#*');
+                if ~isempty(files); delete('@#*'); end
+                obj.Errcode = obj.apiENopen(obj.TempInpFile, [obj.TempInpFile(1:end-4), '.txt'], [obj.TempInpFile(1:end-4), '.bin'], obj.LibEPANET, obj.ph);
+                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            end
         end
         function value = getUnits(obj)
             % Retrieves the Units of Measurement.
@@ -22852,6 +22872,58 @@ end
 %         end
 %     end
 % end
+function value = readEpanetBinaryFile(fid, binfile, varargin)
+value = struct();
+v = struct();
+if fid~=-1
+    data = fread(fid, 'int32');
+    v.BinNumberReportingPeriods = data(end-2);
+    clear data;
+    % Beginning of file
+    fseek(fid, 0, 'bof');
+    fread(fid, 1, 'uint32');
+    fread(fid, 1, 'uint32');
+    v.BinNumberNodes=fread(fid, 1, 'uint32');
+    v.BinNumberReservoirsTanks=fread(fid, 1, 'uint32');
+    v.BinNumberLinks=fread(fid, 1, 'uint32');
+    v.BinNumberPumps=fread(fid, 1, 'uint32');
+    v.BinNumberValves=fread(fid, 1, 'uint32');
+    fread(fid, 8, 'uint32');
+    fread(fid, 80*3, '*char');
+    fread(fid, 260*2, '*char');
+    fread(fid, 16, '*char');
+    fread(fid, 32, '*char');
+    fread(fid, 4, 'uint32');
+    fread(fid, 32*v.BinNumberNodes, '*char');
+    fread(fid, 32*v.BinNumberLinks, '*char');
+    fread(fid, v.BinNumberLinks*3, 'uint32');
+    fread(fid, v.BinNumberReservoirsTanks, 'uint32'); 
+    fread(fid, v.BinNumberReservoirsTanks, 'float');
+    fread(fid, v.BinNumberNodes, 'float');
+    fread(fid, v.BinNumberLinks*2, 'float');
+    
+    for p=1:v.BinNumberPumps
+        fread(fid, 7, 'float');
+    end
+    
+    fread(fid, 1, 'float');
+    
+    for i=1:v.BinNumberReportingPeriods
+        value.Demand(i, :)         = fread(fid, v.BinNumberNodes, 'float')';
+        value.Head(i, :)           = fread(fid, v.BinNumberNodes, 'float')';
+        value.Pressure(i, :)       = fread(fid, v.BinNumberNodes, 'float')';
+        value.NodeQuality(i, :)    = fread(fid, v.BinNumberNodes, 'float')';
+        value.Flow(i, :)           = fread(fid, v.BinNumberLinks, 'float')';
+        value.Velocity(i, :)       = fread(fid, v.BinNumberLinks, 'float')';
+        value.HeadLoss(i, :)       = fread(fid, v.BinNumberLinks, 'float')';
+        value.LinkQuality(i, :)    = fread(fid, v.BinNumberLinks, 'float')';
+        value.Status(i, :)         = fread(fid, v.BinNumberLinks, 'float')';
+        value.Setting(i, :)        = fread(fid, v.BinNumberLinks, 'float')';
+        value.ReactionRate(i, :)   = fread(fid, v.BinNumberLinks, 'float')';
+        value.FrictionFactor(i, :) = fread(fid, v.BinNumberLinks, 'float')';
+    end
+end
+end
 function value = readEpanetBin(fid, binfile, varargin)
 value=[];
 if fid~=-1
