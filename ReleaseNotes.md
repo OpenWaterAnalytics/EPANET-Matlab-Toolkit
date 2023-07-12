@@ -1,8 +1,9 @@
 ### EPANET Matlab Toolkit (EMT) v2.2.6.1
 
-- Add the example [Fasted Parallel computation](./EX27_Fasted_Parallel_computations.m) 
+- Add the example [Fasted Parallel computation](./EX27_Fasted_Parallel_computation.m) 
 - Update the function `getComputedTimeSeries_ENepanet` to work in parallel
 - Add the function `readEpanetBinaryFile`
+- Add the function `getNodeJunctionBaseDemands` #230 
 
 ### EPANET Matlab Toolkit (EMT) v2.2.5
 
