@@ -378,6 +378,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |openCurrentInp|Open EPANET input file who is loaded|
 |openHydraulicAnalysis|Opens the hydraulics analysis system|
 |openQualityAnalysis|Opens the water quality analysis system|
+|readEpanetBinaryFile|Read binary files|
 |runHydraulicAnalysis|Runs a single period hydraulic analysis, retrieving the current simulation clock time t|
 |reverseLinkNodeIndices|Reverses the node indices that connect a link|
 |runProject|Runs a complete EPANET simulation|
