@@ -41,7 +41,7 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 24:](./EX24_Parallel_computations.m) Parallel computations examples.
 - [Example 25:](./EX25_adjacency_matrix.mlx) Compute the adjacency matrix (connectivity graph).
 - [Example 26:](./EX26_tojson.mlx) Exports values to json format.
-- [Example 27:](./EX27_Fasted_Parallel_computations.m) Fasted Parallel computation.
+- [Example 27:](./EX27_Fasted_Parallel_computation.m) Fasted Parallel computation.
 
 
 ## Toolkit Examples
