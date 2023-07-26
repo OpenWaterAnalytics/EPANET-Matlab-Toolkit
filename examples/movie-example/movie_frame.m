@@ -472,14 +472,17 @@ for i=1:length(NData.snodeh)
         'MarkerFaceColor',SData(i).vsmarkercolor,...
         'MarkerEdgeColor',SData(i).vsmarkercolor);
 end
-
 function [rgb] = color(cmap,v,vmin,vmax)
-
 [m,n] = size(cmap);                  % m is the number of colors in map
 dv = (vmax-vmin)/m;                  % Divide interval into m bins
 if dv > 0                            % Select the bin index where v falls
-   i = max(ceil((v-vmin)/dv), 1);
-   rgb = cmap(i,:);                  % Return the color from the map
+    if vmax > 1
+        i = (max(ceil((v-vmin)/dv), 1)*10) - 4 ;
+        i(find(i>256)) = 256;
+    else
+        i = max(ceil((v-vmin)/dv), 1);
+    end
+    rgb = cmap(i,:);                  % Return the color from the map
 else
-   rgb = cmap(ones(size(v)),:);
+    rgb = cmap(ones(size(v)),:);
 end
