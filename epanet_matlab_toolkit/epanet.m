@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.6.1 - Last Update: 12/07/2023';
+        classversion='v2.2.6.2 - Last Update: 13/09/2023';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -8947,7 +8947,7 @@ classdef epanet <handle
             L = obj.getLinkLength;
             D = obj.getLinkDiameter;
             if obj.Units_SI_Metric
-                unt = 100;
+                unt = 1000;
             else
                 unt = 328.08399;
             end
