@@ -1,10 +1,9 @@
 <a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493)
-
 [![View OpenWaterAnalytics/EPANET-Matlab-Toolkit on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/25100-openwateranalytics-epanet-matlab-toolkit)
 
-EPANET-MATLAB-Toolkit
+EPANET-MATLAB-Toolkit (EMT)
 ==================================
 
 The `EPANET-Matlab Toolkit` is an open-source software, originally developed by the [KIOS Research and Innovation Center of Excellence, University of Cyprus](http://www.kios.ucy.ac.cy/) which operates within the Matlab environment, for providing a programming interface for the latest version of [EPANET](https://github.com/OpenWaterAnalytics/epanet), a hydraulic and quality modeling software created by the US EPA, with Matlab, a  high-level technical computing software. The goal of the EPANET Matlab Toolkit is to serve as a common programming framework for research and development in the growing field of smart water networks.
@@ -12,6 +11,9 @@ The `EPANET-Matlab Toolkit` is an open-source software, originally developed by 
 The `EPANET-Matlab Toolkit` features easy to use commands/wrappers for viewing, modifying, simulating and plotting results produced by the EPANET libraries.  
 
 For support, please use the OWA community forum : http://community.wateranalytics.org/
+
+### EPANET Python Toolkit (EPyT)
+[EPyT: An EPANET-Python Toolkit for Smart Water Network Simulations](https://github.com/OpenWaterAnalytics/EPyT/)
 
 ### Tutorial
 We have prepared a tutorial as part of the CCWI-WDSA 2022 conference. You can find the files in the `tutorial` folder at the following [GitHub repository](https://github.com/KIOS-Research/CCWI2022-EMT-Tutorial).
