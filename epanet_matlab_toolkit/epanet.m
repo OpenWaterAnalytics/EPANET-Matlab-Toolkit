@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.6.2 - Last Update: 13/09/2023';
+        classversion='v2.2.6.3 - Last Update: 30/01/2024';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -23024,7 +23024,7 @@ if fid~=-1
     value.BinDiameterEachLink=fread(fid, value.BinNumberLinks, 'float')';
     
     for p=1:value.BinNumberPumps
-        value.BinPumpIndexListLinks(p)=fread(fid, 1, 'float')';
+        value.BinPumpIndexListLinks(p)=fread(fid, 1, 'uint32')';
         value.BinPumpUtilization(p)=fread(fid, 1, 'float')';
         value.BinAverageEfficiency(p)=fread(fid, 1, 'float')';
         value.BinAverageKwattsOrMillionGallons(p)=fread(fid, 1, 'float')';
@@ -23061,7 +23061,7 @@ end
 if ~isempty(varargin)
     v = struct();
     v.Time = (0:value.BinReportingTimeStepSec:value.BinSimulationDurationSec)';
-    
+
     fields_param = {'BinNodePressure', 'BinNodeDemand', 'BinNodeHead', 'BinNodeQuality', ...
         'BinLinkFlow', 'BinLinkVelocity', 'BinLinkHeadloss', 'BinLinkStatus', 'BinLinkSetting', ...
         'BinLinkReactionRate', 'BinLinkFrictionFactor', 'BinLinkQuality'};
@@ -23070,6 +23070,12 @@ if ~isempty(varargin)
         'ReactionRate', 'FrictionFactor', 'LinkQuality'};
     for i=1:length(fields_param)
         v.(fields_new{i}) = eval(['value.', fields_param{i}]);
+    end
+    energy_params = {'PumpIndexListLinks', ...
+        'PumpUtilization', 'AverageEfficiency', 'AverageKwattsOrMillionGallons', ...
+        'AverageKwatts', 'PeakKwatts', 'AverageCostPerDay'};
+    for i=1:length(energy_params)
+        v.('EnergyReport').(energy_params{i}) = eval(['value.Bin', energy_params{i}]);
     end
     clear value;
     value=v;
