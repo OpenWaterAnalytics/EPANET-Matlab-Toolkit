@@ -4702,6 +4702,8 @@ classdef epanet <handle
             %   linkSet2=d.getLinkNameID([5, 6, 7, 8]);
             %   colorLinkSet2=repmat({'g'}, 1, length(linkSet2));
             %   d.plot('highlightlink', [linkSet1 linkSet2], 'colorlink', [colorLinkSet1 colorLinkSet2])
+            %
+            %   d.plot('highlightlink', highlight_pipes, 'highlightlinkwidth', 6, 'highlightlinkcolor', 'm')
             [value] = plotnet(obj, 'bin', 0, varargin{:});
         end
         function value = getControls(obj, varargin)
@@ -23242,6 +23244,12 @@ lline='yes';
 npoint='yes';
 extend='no';
 legendposition = 'northeast';
+highlightlinkwidth = 0.5;
+highlightlinkcolor = [.5 .5 .5];
+highlightnodewidth = 1.5;
+highlightnodecolor = 'b';
+use_highlightlinkcolor = 0;
+use_highlightnodecolor = 0;
 slegend = 'show';
 for i=1:(nargin/2)
     argument =lower(varargin{2*(i-1)+1});
@@ -23270,6 +23278,16 @@ for i=1:(nargin/2)
                 return
             end
             LinkInd=varargin{2*i};
+        case 'highlightlinkwidth'
+            highlightlinkwidth=varargin{2*i};
+        case 'highlightlinkcolor'
+            highlightlinkcolor=varargin{2*i};
+            use_highlightlinkcolor = 1;
+        case 'highlightnodewidth'
+            highlightnodewidth=varargin{2*i};
+        case 'highlightnodecolor'
+            highlightnodecolor=varargin{2*i};
+            use_highlightnodecolor = 1;
         case 'highlightnode' % Highlight Node
             highlightnode=varargin{2*i};
         case 'highlightlink' % Highlight Link
@@ -23320,13 +23338,21 @@ if axesid==0
 end
 
 if cellfun('isempty', selectColorNode)==1
-    init={'r'};
+    if use_highlightnodecolor
+        init={highlightnodecolor};
+    else
+        init={'r'};
+    end
     for i=1:length(highlightnode)
         selectColorNode=[init selectColorNode];
     end
 end
 if cellfun('isempty', selectColorLink)==1
-    init={'r'};
+    if use_highlightlinkcolor
+        init={highlightlinkcolor};
+    else
+        init={'r'};
+    end
     for i=1:length(highlightlink)
         selectColorLink=[init selectColorLink];
     end
@@ -23415,11 +23441,11 @@ if (strcmpi(lline, 'yes'))
             x2 = double(v.nodecoords{1}(ToNode));
             y2 = double(v.nodecoords{2}(ToNode));
         end
-        
+
         hh=strfind(highlightlinkindex, i);
         
         if ~isempty(hh) && ~isempty(selectColorLink)
-            line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', .5, 'Color', [.5 .5 .5], 'Parent', axesid);
+            line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', highlightlinkwidth, 'Color', highlightlinkcolor, 'Parent', axesid);
         end
         if isempty(hh)
             h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', .5, 'Parent', axesid);
@@ -23461,7 +23487,7 @@ if (strcmpi(lline, 'yes'))
         end
         
         if ~isempty(hh) && isempty(selectColorLink)
-            line([x1, x2], [y1, y2], 'LineWidth', 1, 'Color', 'r', 'Parent', axesid);
+            line([x1, x2], [y1, y2], 'LineWidth', highlightlinkwidth+0.5, 'Color', highlightlinkcolor, 'Parent', axesid);
             text((x1+x2)/2, (y1+y2)/2, v.linknameid(i), 'Fontsize', fontsize, 'Parent', axesid);
         elseif ~isempty(hh) && ~isempty(selectColorLink)
             try tt=length(selectColorLink{hh}); catch; tt=2; end
@@ -23500,8 +23526,8 @@ if (strcmpi(npoint, 'yes'))
         
         hh=strfind(highlightnodeindex, i);
         if isempty(hh)
-            h(:, 4)=plot(x, y, 'o', 'LineWidth', 1.5, 'MarkerEdgeColor', 'b', ...
-                'MarkerFaceColor', 'b', ...
+            h(:, 4)=plot(x, y, 'o', 'LineWidth', highlightnodewidth, 'MarkerEdgeColor', highlightnodecolor, ...
+                'MarkerFaceColor', highlightnodecolor, ...
                 'MarkerSize', 2.5, 'Parent', axesid);
             if ~l(4), legendIndices = [legendIndices 4]; l(4)=1; end
         end
