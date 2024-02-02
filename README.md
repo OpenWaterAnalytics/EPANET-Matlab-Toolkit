@@ -1,8 +1,6 @@
 <a href="http://www.kios.ucy.ac.cy"><img src="https://www.kios.ucy.ac.cy/wp-content/uploads/2021/07/Logotype-KIOS.svg" width="200" height="100"/><a>
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493)
-
-[![View OpenWaterAnalytics/EPANET-Matlab-Toolkit on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/25100-openwateranalytics-epanet-matlab-toolkit)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.831493.svg)](https://doi.org/10.5281/zenodo.831493) [![View OpenWaterAnalytics/EPANET-Matlab-Toolkit on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/25100-openwateranalytics-epanet-matlab-toolkit)
 
 EPANET-MATLAB-Toolkit
 ==================================
