@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.6.4 - Last Update: 01/02/2024';
+        classversion='v2.2.6.5 - Last Update: 02/02/2024';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -9644,7 +9644,6 @@ classdef epanet <handle
             else
                 value = readEpanetBin(fid, binfile, 0);
                 value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
-                value.EnergyReport.DemandCharge = obj.getOptionsDemandCharge;
                 % Remove report bin, files @#
                 warning off;
                 fclose('all');
@@ -9680,7 +9679,6 @@ classdef epanet <handle
                 fid = fopen(binfile, 'r');
                 value = readEpanetBin(fid, binfile, 0);
                 value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
-                value.EnergyReport.DemandCharge = obj.getOptionsDemandCharge;
                 fclose('all');
                 files=dir('@#*');
                 if ~isempty(files); delete('@#*'); end
@@ -23037,7 +23035,7 @@ if fid~=-1
         value.BinAverageCostPerDay(p)=fread(fid, 1, 'float')';
     end
     
-    fread(fid, 1, 'float');
+    value.BinOverallPeakEnergyUsage = fread(fid, 1, 'float');
     
     for i=1:value.BinNumberReportingPeriods
         value.BinNodeDemand(i, :)         = fread(fid, value.BinNumberNodes, 'float')';
@@ -23077,7 +23075,7 @@ if ~isempty(varargin)
     end
     energy_params = {'PumpIndexListLinks', ...
         'PumpUtilization', 'AverageEfficiency', 'AverageKwattsOrMillionGallons', ...
-        'AverageKwatts', 'PeakKwatts', 'AverageCostPerDay'};
+        'AverageKwatts', 'PeakKwatts', 'AverageCostPerDay', 'OverallPeakEnergyUsage'};
     for i=1:length(energy_params)
         v.('EnergyReport').(energy_params{i}) = eval(['value.Bin', energy_params{i}]);
     end
