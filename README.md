@@ -535,9 +535,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |writeMSXReport|Writes water quality simulations results as instructed by the MSX input file to a text file|
 |writeMSXReportExe|Writes water quality simulations results as instructed by the MSX input file to a specific name text file|
 |useMSXHydraulicFile|Uses a previously saved EPANET hydraulics file as the source of hydraulic information|
-|plotMSXConcentrationSpeciesOfLinks|Plots the concentration species of links|
-|plotMSXConcentrationSpeciesOfNodes|Plots the concentration species of nodes|
-|runMSXexe|Writes water quality simulations results as instructed by the MSX input file to a text file using the epanetmsx.exe|
+|plotMSXSpeciesNodeConcentration|Plots the concentration species of links|
+|plotMSXSpeciesLinkConcentration|Plots the concentration species of nodes|
 |unloadMSX|Closes the EPANET-MSX toolkit system|
 |getMSXAtol|Retrieves the absolute concentration tolerance|
 |getMSXRtol|Retrieves the relative concentration tolerance|
