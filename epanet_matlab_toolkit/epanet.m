@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.2.6.1 - Last Update: 12/07/2023';
+        classversion='v2.2.6.5 - Last Update: 02/02/2024';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -4702,6 +4702,8 @@ classdef epanet <handle
             %   linkSet2=d.getLinkNameID([5, 6, 7, 8]);
             %   colorLinkSet2=repmat({'g'}, 1, length(linkSet2));
             %   d.plot('highlightlink', [linkSet1 linkSet2], 'colorlink', [colorLinkSet1 colorLinkSet2])
+            %
+            %   d.plot('highlightlink', highlight_pipes, 'highlightlinkwidth', 6, 'highlightlinkcolor', 'm')
             [value] = plotnet(obj, 'bin', 0, varargin{:});
         end
         function value = getControls(obj, varargin)
@@ -8947,7 +8949,7 @@ classdef epanet <handle
             L = obj.getLinkLength;
             D = obj.getLinkDiameter;
             if obj.Units_SI_Metric
-                unt = 100;
+                unt = 1000;
             else
                 unt = 328.08399;
             end
@@ -23024,7 +23026,7 @@ if fid~=-1
     value.BinDiameterEachLink=fread(fid, value.BinNumberLinks, 'float')';
     
     for p=1:value.BinNumberPumps
-        value.BinPumpIndexListLinks(p)=fread(fid, 1, 'float')';
+        value.BinPumpIndexListLinks(p)=fread(fid, 1, 'uint32')';
         value.BinPumpUtilization(p)=fread(fid, 1, 'float')';
         value.BinAverageEfficiency(p)=fread(fid, 1, 'float')';
         value.BinAverageKwattsOrMillionGallons(p)=fread(fid, 1, 'float')';
@@ -23033,7 +23035,7 @@ if fid~=-1
         value.BinAverageCostPerDay(p)=fread(fid, 1, 'float')';
     end
     
-    fread(fid, 1, 'float');
+    value.BinOverallPeakEnergyUsage = fread(fid, 1, 'float');
     
     for i=1:value.BinNumberReportingPeriods
         value.BinNodeDemand(i, :)         = fread(fid, value.BinNumberNodes, 'float')';
@@ -23061,7 +23063,7 @@ end
 if ~isempty(varargin)
     v = struct();
     v.Time = (0:value.BinReportingTimeStepSec:value.BinSimulationDurationSec)';
-    
+
     fields_param = {'BinNodePressure', 'BinNodeDemand', 'BinNodeHead', 'BinNodeQuality', ...
         'BinLinkFlow', 'BinLinkVelocity', 'BinLinkHeadloss', 'BinLinkStatus', 'BinLinkSetting', ...
         'BinLinkReactionRate', 'BinLinkFrictionFactor', 'BinLinkQuality'};
@@ -23071,6 +23073,13 @@ if ~isempty(varargin)
     for i=1:length(fields_param)
         v.(fields_new{i}) = eval(['value.', fields_param{i}]);
     end
+    energy_params = {'PumpIndexListLinks', ...
+        'PumpUtilization', 'AverageEfficiency', 'AverageKwattsOrMillionGallons', ...
+        'AverageKwatts', 'PeakKwatts', 'AverageCostPerDay', 'OverallPeakEnergyUsage'};
+    for i=1:length(energy_params)
+        v.('EnergyReport').(energy_params{i}) = eval(['value.Bin', energy_params{i}]);
+    end
+    
     clear value;
     value=v;
 end
@@ -23236,6 +23245,12 @@ lline='yes';
 npoint='yes';
 extend='no';
 legendposition = 'northeast';
+highlightlinkwidth = 0.5;
+highlightlinkcolor = [.5 .5 .5];
+highlightnodewidth = 1.5;
+highlightnodecolor = 'b';
+use_highlightlinkcolor = 0;
+use_highlightnodecolor = 0;
 slegend = 'show';
 for i=1:(nargin/2)
     argument =lower(varargin{2*(i-1)+1});
@@ -23264,6 +23279,16 @@ for i=1:(nargin/2)
                 return
             end
             LinkInd=varargin{2*i};
+        case 'highlightlinkwidth'
+            highlightlinkwidth=varargin{2*i};
+        case 'highlightlinkcolor'
+            highlightlinkcolor=varargin{2*i};
+            use_highlightlinkcolor = 1;
+        case 'highlightnodewidth'
+            highlightnodewidth=varargin{2*i};
+        case 'highlightnodecolor'
+            highlightnodecolor=varargin{2*i};
+            use_highlightnodecolor = 1;
         case 'highlightnode' % Highlight Node
             highlightnode=varargin{2*i};
         case 'highlightlink' % Highlight Link
@@ -23314,13 +23339,21 @@ if axesid==0
 end
 
 if cellfun('isempty', selectColorNode)==1
-    init={'r'};
+    if use_highlightnodecolor
+        init={highlightnodecolor};
+    else
+        init={'r'};
+    end
     for i=1:length(highlightnode)
         selectColorNode=[init selectColorNode];
     end
 end
 if cellfun('isempty', selectColorLink)==1
-    init={'r'};
+    if use_highlightlinkcolor
+        init={highlightlinkcolor};
+    else
+        init={'r'};
+    end
     for i=1:length(highlightlink)
         selectColorLink=[init selectColorLink];
     end
@@ -23409,11 +23442,11 @@ if (strcmpi(lline, 'yes'))
             x2 = double(v.nodecoords{1}(ToNode));
             y2 = double(v.nodecoords{2}(ToNode));
         end
-        
+
         hh=strfind(highlightlinkindex, i);
         
         if ~isempty(hh) && ~isempty(selectColorLink)
-            line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', .5, 'Color', [.5 .5 .5], 'Parent', axesid);
+            line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', highlightlinkwidth, 'Color', highlightlinkcolor, 'Parent', axesid);
         end
         if isempty(hh)
             h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', .5, 'Parent', axesid);
@@ -23455,7 +23488,7 @@ if (strcmpi(lline, 'yes'))
         end
         
         if ~isempty(hh) && isempty(selectColorLink)
-            line([x1, x2], [y1, y2], 'LineWidth', 1, 'Color', 'r', 'Parent', axesid);
+            line([x1, x2], [y1, y2], 'LineWidth', highlightlinkwidth+0.5, 'Color', highlightlinkcolor, 'Parent', axesid);
             text((x1+x2)/2, (y1+y2)/2, v.linknameid(i), 'Fontsize', fontsize, 'Parent', axesid);
         elseif ~isempty(hh) && ~isempty(selectColorLink)
             try tt=length(selectColorLink{hh}); catch; tt=2; end
@@ -23494,8 +23527,8 @@ if (strcmpi(npoint, 'yes'))
         
         hh=strfind(highlightnodeindex, i);
         if isempty(hh)
-            h(:, 4)=plot(x, y, 'o', 'LineWidth', 1.5, 'MarkerEdgeColor', 'b', ...
-                'MarkerFaceColor', 'b', ...
+            h(:, 4)=plot(x, y, 'o', 'LineWidth', highlightnodewidth, 'MarkerEdgeColor', highlightnodecolor, ...
+                'MarkerFaceColor', highlightnodecolor, ...
                 'MarkerSize', 2.5, 'Parent', axesid);
             if ~l(4), legendIndices = [legendIndices 4]; l(4)=1; end
         end
