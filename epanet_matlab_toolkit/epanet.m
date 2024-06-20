@@ -2628,6 +2628,7 @@ classdef epanet <handle
             else
                 [Errcode] = calllib(LibEPANET, 'EN_settimeparam', ph, paramcode, timevalue);
             end
+            epanet.apiENgeterror(Errcode, LibEPANET, ph);
         end
         function [Errcode] = apiENsolveH(LibEPANET, ph)
             % Runs a complete hydraulic simulation with results for all time periods
@@ -13802,7 +13803,7 @@ classdef epanet <handle
             %   d.getMSXEquationsTerms
             %
             % See also getMSXEquationsPipes, getMSXEquationsTanks.
-            [value, ~, ~] = getEquations(obj.MSXFile);
+            [value, ~, ~] = getEquations(obj.MSXTempFile);
         end
         function value = getMSXEquationsPipes(obj)
             % Retrieves equation for pipes.
@@ -13813,7 +13814,7 @@ classdef epanet <handle
             %   d.getMSXEquationsPipes
             %
             % See also getMSXEquationsTerms, getMSXEquationsTanks.
-            [~, value, ~] = getEquations(obj.MSXFile);
+            [~, value, ~] = getEquations(obj.MSXTempFile);
         end
         function value = getMSXEquationsTanks(obj)
             % Retrieves equation for tanks.
@@ -13824,7 +13825,7 @@ classdef epanet <handle
             %   d.getMSXEquationsTanks
             %
             % See also getMSXEquationsTerms, getMSXEquationsPipes.
-            [~, ~, value] = getEquations(obj.MSXFile);
+            [~, ~, value] = getEquations(obj.MSXTempFile);
         end
         function value = getMSXOptions(obj)
             % Retrieves all the options.
@@ -13833,7 +13834,7 @@ classdef epanet <handle
             %   d=epanet('net2-cl2.inp');
             %   d.loadMSXFile('net2-cl2.msx');
             %   d.getMSXOptions
-            [value] = get_MSX_Options(obj.MSXFile, '', 1);
+            [value] = get_MSX_Options(obj.MSXTempFile, '', 1);
         end
         function value = getMSXTimeStep(obj)
             % Retrieves the time step.
@@ -13844,7 +13845,7 @@ classdef epanet <handle
             %   d.getMSXTimeStep
             %
             % See also setMSXTimeStep.
-            [value] = get_MSX_Options(obj.MSXFile, 'timestep', 0);
+            [value] = get_MSX_Options(obj.MSXTempFile, 'timestep', 0);
             value = value.TimeStep;
         end
         function value = getMSXSolver(obj)
@@ -13861,7 +13862,7 @@ classdef epanet <handle
             %   d.getMSXSolver
             %
             % See also setMSXSolverEUL, setMSXSolverRK5, setMSXSolverROS2.
-            [value] = get_MSX_Options(obj.MSXFile, 'solver', 0);
+            [value] = get_MSX_Options(obj.MSXTempFile, 'solver', 0);
             value = value.Solver;
         end
         function value = getMSXAreaUnits(obj)
@@ -13879,7 +13880,7 @@ classdef epanet <handle
             %
             % See also setMSXAreaUnitsFT2, setMSXAreaUnitsM2,
             %          setMSXAreaUnitsCM2.
-            [value] = get_MSX_Options(obj.MSXFile, 'area_units', 0);
+            [value] = get_MSX_Options(obj.MSXTempFile, 'area_units', 0);
             value = value.AreaUnits;
         end
         function value = getMSXRateUnits(obj)
@@ -13890,7 +13891,7 @@ classdef epanet <handle
             %   d.getMSXRateUnits
             %
             % See also setMSXRateUnits.
-            [value] = get_MSX_Options(obj.MSXFile, 'rate_units', 0);
+            [value] = get_MSX_Options(obj.MSXTempFile, 'rate_units', 0);
             value = value.RateUnits;
         end
         function value = getMSXRtol(obj)
@@ -13902,7 +13903,7 @@ classdef epanet <handle
             %   d.getMSXRtol
             %
             % See also getMSXAtol.
-            [value] = get_MSX_Options(obj.MSXFile, 'rtol', 0);
+            [value] = get_MSX_Options(obj.MSXTempFile, 'rtol', 0);
             value = value.Rtol;
         end
         function value = getMSXAtol(obj)
@@ -13914,7 +13915,7 @@ classdef epanet <handle
             %   d.getMSXAtol
             %
             % See also getMSXRtol.
-            [value] = get_MSX_Options(obj.MSXFile, 'atol', 0);
+            [value] = get_MSX_Options(obj.MSXTempFile, 'atol', 0);
             value = value.Atol;
         end
         function value = getMSXCoupling(obj)
@@ -13933,7 +13934,7 @@ classdef epanet <handle
             %   d.getMSXCoupling
             %
             % See also setMSXCouplingFULL, setMSXCouplingNONE.
-            [value] = get_MSX_Options(obj.MSXFile, 'COUPLING', 0);
+            [value] = get_MSX_Options(obj.MSXTempFile, 'COUPLING', 0);
             value = value.Coupling;
         end
         function value = getMSXCompiler(obj)
@@ -13951,7 +13952,7 @@ classdef epanet <handle
             %
             % See also setMSXCompilerNONE, setMSXCompilerVC,
             %          setMSXCompilerGC.
-            [value] = get_MSX_Options(obj.MSXFile, 'compiler', 0);
+            [value] = get_MSX_Options(obj.MSXTempFile, 'compiler', 0);
             value = value.Compiler;
         end
         function value = getMSXSpeciesCount(obj)
