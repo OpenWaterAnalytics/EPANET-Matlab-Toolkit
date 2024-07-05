@@ -451,7 +451,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setNodeNameID|Sets the ID name for nodes|
 |setNodeSourcePatternIndex|Sets the values of source pattern indices|
 |setNodeSourceQuality|Sets the values of source qualities|
-|setNodeSourceType|Sets the values of source types|
+|setNodeSourceType|Sets the values of source types: 'CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'|
 |setNodesConnectingLinksID|Sets the ID of a link's start-node(s) and end-node(s). (EPANET Version 2.2)|
 |setNodeTankData| Sets a group of properties for a tank. (EPANET Version 2.2)|
 |setNodeTankBulkReactionCoeff|Sets the values of tank bulk reaction coeff.|
