@@ -6040,7 +6040,7 @@ classdef epanet <handle
             %       t= d.runHydraulicAnalysis;
             %       P = [P; d.getNodePressure];
             %       D = [D; d.getNodeActualDemand];
-            %       H = [H; d.getNodeHydaulicHead];
+            %       H = [H; d.getNodeHydraulicHead];
             %       S = [S; d.getLinkStatus];
             %       F = [F; d.getLinkFlows];
             %       T_H = [T_H; t];
@@ -7297,7 +7297,7 @@ classdef epanet <handle
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
-            % See also getNodeActualDemandSensingNodes, getNodeHydaulicHead, getNodePressure,
+            % See also getNodeActualDemandSensingNodes, getNodeHydraulicHead, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -7318,21 +7318,21 @@ classdef epanet <handle
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
-            % See also getNodeActualDemand, getNodeHydaulicHead, getNodePressure,
+            % See also getNodeActualDemand, getNodeHydraulicHead, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);v=1;
             for i=indices
                 [obj.Errcode, value(v)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);v=v+1;
             end
         end
-        function value = getNodeHydaulicHead(obj, varargin)
+        function value = getNodeHydraulicHead(obj, varargin)
             % Retrieves the computed values of all node hydraulic heads.
             %
             % Example 1:
-            %   d.getNodeHydaulicHead      % Retrieves the computed value of all node hydraulic heads
+            %   d.getNodeHydraulicHead      % Retrieves the computed value of all node hydraulic heads
             %
             % Example 2:
-            %   d.getNodeHydaulicHead(1)   % Retrieves the computed value of the first node hydraulic head
+            %   d.getNodeHydraulicHead(1)   % Retrieves the computed value of the first node hydraulic head
             %
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
@@ -7362,7 +7362,7 @@ classdef epanet <handle
             %       t= d.runHydraulicAnalysis;
             %       P = [P; d.getNodePressure];
             %       D = [D; d.getNodeActualDemand];
-            %       H = [H; d.getNodeHydaulicHead];
+            %       H = [H; d.getNodeHydraulicHead];
             %       S = [S; d.getLinkStatus];
             %       F = [F; d.getLinkFlows];
             %       T_H = [T_H; t];
@@ -7396,7 +7396,7 @@ classdef epanet <handle
             %    d.closeQualityAnalysis;
             %    d.closeHydraulicAnalysis;
             %
-            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodeHydaulicHead
+            % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodeHydraulicHead
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
@@ -7416,7 +7416,7 @@ classdef epanet <handle
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
-            %          getNodeHydaulicHead, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
+            %          getNodeHydraulicHead, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
@@ -7435,7 +7435,7 @@ classdef epanet <handle
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
-            %          getNodeHydaulicHead, getNodeActualQuality, getNodeActualQualitySensingNodes.
+            %          getNodeHydraulicHead, getNodeActualQuality, getNodeActualQualitySensingNodes.
             [indices, value] = getNodeIndices(obj, varargin);j=1;
             for i=indices
                 [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET, obj.ph);
@@ -7451,7 +7451,7 @@ classdef epanet <handle
             % For more, you can type `help getNodePressure` and check examples 3 & 4.
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
-            %          getNodeHydaulicHead, getNodeActualQuality, getNodeMassFlowRate.
+            %          getNodeHydraulicHead, getNodeActualQuality, getNodeMassFlowRate.
             value=zeros(1, length(varargin{1}));v=1;
             for i=varargin{1}
                 [obj.Errcode, value(v)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
@@ -9325,7 +9325,7 @@ classdef epanet <handle
                     value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
                 end
                 if find(strcmpi(varargin, 'head'))
-                    value.Head(k, :) = obj.getNodeHydaulicHead;
+                    value.Head(k, :) = obj.getNodeHydraulicHead;
                 end
                 if find(strcmpi(varargin, 'tankvolume'))
                     value.TankVolume(k, :) = [zeros(1, junctioncount+rescount) obj.getNodeTankVolume];
@@ -9501,7 +9501,7 @@ classdef epanet <handle
                     value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
                 end
                 if find(strcmpi(varargin, 'head'))
-                    value.Head(k, :) = obj.getNodeHydaulicHead;
+                    value.Head(k, :) = obj.getNodeHydraulicHead;
                 end
                 if find(strcmpi(varargin, 'tankvolume'))
                     value.TankVolume(k, :) = [zeros(1, junctioncount+rescount) obj.getNodeTankVolume];
