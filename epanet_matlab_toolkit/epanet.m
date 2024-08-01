@@ -8394,8 +8394,19 @@ classdef epanet <handle
             %   d.getCurvesInfo.CurveYvalue{curveIndex}
             %
             % See also setCurveValue, getCurvesInfo.
-            nfactors=size(curveVector, 1);%x = number of points in curve
-            [obj.Errcode] = obj.apiENsetcurve(index, curveVector(:, 1), curveVector(:, 2), nfactors, obj.LibEPANET, obj.ph);
+            nfactors=size(curveVector, 2)/2;%x = number of set points in curve
+            xarray = [];
+            yarray =[];
+
+            for j = 1:nfactors*2
+                if mod(j, 2) == 1
+                    xarray = [xarray,curveVector(j)];
+                else
+                    yarray = [yarray,curveVector(j)];
+                end
+            end
+    
+            [obj.Errcode] = obj.apiENsetcurve(index, xarray', yarray', nfactors, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function value = setCurveComment(obj, value, varargin)
