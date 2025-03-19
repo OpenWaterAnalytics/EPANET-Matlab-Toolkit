@@ -5,13 +5,13 @@
 /*
  ******************************************************************************
  Project:      OWA EPANET
- Version:      2.2
+ Version:      2.3
  Module:       epanet2.h
  Description:  API function declarations
  Authors:      see AUTHORS
  Copyright:    see AUTHORS
  License:      see LICENSE
- Last Updated: 10/29/2019
+ Last Updated: 02/14/2025
  ******************************************************************************
  */
 
@@ -113,7 +113,7 @@ typedef struct Project *EN_Project;
                 int unitsType, int headLossType);
 
   /**
-  @brief Opens an EPANET input file & reads in network data.
+  @brief Reads an EPANET input file with no errors allowed.
   @param ph an EPANET project handle.
   @param inpFile the name of an existing EPANET-formatted input file.
   @param rptFile the name of a report file to be created (or "" if not needed).
@@ -121,9 +121,25 @@ typedef struct Project *EN_Project;
   @return an error code.
 
   This function should be called immediately after ::EN_createproject if an EPANET-formatted
-  input file will be used to supply network data.
+  input file will be used to supply network data. If errors are detected then the project is
+  not opened and will not accept toolkit function calls.
   */
   int DLLEXPORT EN_open(EN_Project ph, const char *inpFile, const char *rptFile,
+                const char *outFile);
+
+  /**
+  @brief Reads an EPANET input file with errors allowed.
+  @param ph an EPANET project handle.
+  @param inpFile the name of an existing EPANET-formatted input file.
+  @param rptFile the name of a report file to be created (or "" if not needed).
+  @param outFile the name of a binary output file to be created (or "" if not needed).
+  @return an error code.
+
+  This function should be called immediately after ::EN_createproject if an EPANET-formatted
+  input file will be used to supply network data. If formatting errors are detected (error
+  code = 200) then the project remains open and will accept toolkit function calls.
+  */
+  int DLLEXPORT EN_openX(EN_Project ph, const char *inpFile, const char *rptFile,
                 const char *outFile);
 
   /**
@@ -144,7 +160,8 @@ typedef struct Project *EN_Project;
   @param line3 third title line
   @return an error code
   */
-  int  DLLEXPORT EN_settitle(EN_Project ph, char *line1, char *line2, char *line3);
+  int  DLLEXPORT EN_settitle(EN_Project ph, const char *line1, const char *line2,
+      const char *line3);
 
   /**
   @brief Retrieves a descriptive comment assigned to a Node, Link, Pattern or Curve.
@@ -161,10 +178,32 @@ typedef struct Project *EN_Project;
   @param ph an EPANET project handle.
   @param object a type of object (either EN_NODE, EN_LINK, EN_TIMEPAT or EN_CURVE)
   @param index the object's index starting from 1
-  @param[out] comment the comment string assigned to the object
+  @param comment the comment string assigned to the object
   @return an error code
   */
-  int  DLLEXPORT EN_setcomment(EN_Project ph, int object, int index, char *comment);
+  int  DLLEXPORT EN_setcomment(EN_Project ph, int object, int index,
+      const char *comment);
+
+  /**
+  @brief Retrieves a tag string assigned to a Node or Link.
+  @param ph an EPANET project handle.
+  @param object a type of object (either EN_NODE or EN_LINK)
+  @param index the object's index starting from 1
+  @param[out] out_tag the tag string assigned to the object
+  @return an error code
+  */
+  int  DLLEXPORT EN_gettag(EN_Project ph, int object, int index, char *out_tag);
+
+  /**
+  @brief Assigns a tag string to a Node or Link.
+  @param ph an EPANET project handle.
+  @param object a type of object (either EN_NODE or EN_LINK)
+  @param index the object's index starting from 1
+  @param tag the tag string assigned to the object
+  @return an error code
+  */
+  int  DLLEXPORT EN_settag(EN_Project ph, int object, int index,
+      const char *tag);
 
   /**
   @brief Retrieves the number of objects of a given type in a project.
@@ -173,7 +212,7 @@ typedef struct Project *EN_Project;
   @param[out] count number of objects of the specified type
   @return an error code
   */
-  int  DLLEXPORT EN_getcount(EN_Project ph, int object, int *count);
+  int  DLLEXPORT EN_getcount(EN_Project ph, int object, int *out_count);
 
   /**
   @brief Saves a project's data to an EPANET-formatted text file.
@@ -299,7 +338,7 @@ typedef struct Project *EN_Project;
 
   See ::EN_nextH for an example of using this function.
   */
-  int DLLEXPORT EN_runH(EN_Project ph, long *currentTime);
+  int DLLEXPORT EN_runH(EN_Project ph, long *out_currentTime);
 
   /**
   @brief Determines the length of time until the next hydraulic event occurs in an
@@ -333,7 +372,7 @@ typedef struct Project *EN_Project;
   EN_closeH(ph);
   \endcode
   */
-  int DLLEXPORT EN_nextH(EN_Project ph, long *tStep);
+  int DLLEXPORT EN_nextH(EN_Project ph, long *out_tStep);
 
   /**
   @brief Transfers a project's hydraulics results from its temporary hydraulics file
@@ -449,7 +488,7 @@ typedef struct Project *EN_Project;
   hydraulic analysis that preceded the water quality analysis. Treat it as a read-only
   variable.
   */
-  int DLLEXPORT EN_runQ(EN_Project ph, long *currentTime);
+  int DLLEXPORT EN_runQ(EN_Project ph, long *out_currentTime);
 
   /**
   @brief Advances a water quality simulation over the time until the next hydraulic event.
@@ -481,7 +520,7 @@ typedef struct Project *EN_Project;
   EN_closeQ(ph);
   \endcode
   */
-  int DLLEXPORT EN_nextQ(EN_Project ph, long *tStep);
+  int DLLEXPORT EN_nextQ(EN_Project ph, long *out_tStep);
 
   /**
   @brief Advances a water quality simulation by a single water quality time step.
@@ -497,7 +536,7 @@ typedef struct Project *EN_Project;
   Use the argument \b timeLeft to determine when no more calls to ::EN_runQ are needed
   because the end of the simulation period has been reached (i.e., when \b timeLeft = 0).
   */
-  int DLLEXPORT EN_stepQ(EN_Project ph, long *timeLeft);
+  int DLLEXPORT EN_stepQ(EN_Project ph, long *out_timeLeft);
 
   /**
   @brief Closes the water quality solver, freeing all of its allocated memory.
@@ -518,12 +557,24 @@ typedef struct Project *EN_Project;
   ********************************************************************/
 
   /**
+  @brief Set a user-supplied callback function for reporting
+  @param ph an EPANET project handle.
+  @param callback a function pointer with declared signature, which gets called by EPANET for reporting.
+  @return an error code.
+  @details The report callback function must have the signature specified - void(void* userData, EN_Project, char*) -
+           use the userData parameter to pass any client context necessary (a context pointer or wrapper object perhaps).
+           Leave un-set or set the report callback to NULL to revert to EPANET's default behavior.
+  **/
+  int DLLEXPORT EN_setreportcallback(EN_Project ph, void (*callback)(void *userData, void *EN_projectHandle, const char*));
+  int DLLEXPORT EN_setreportcallbackuserdata(EN_Project ph, void *userData);
+
+  /**
   @brief Writes a line of text to a project's report file.
   @param ph an EPANET project handle.
   @param line a text string to write.
   @return an error code.
   */
-  int  DLLEXPORT EN_writeline(EN_Project ph, char *line);
+  int  DLLEXPORT EN_writeline(EN_Project ph, const char *line);
 
   /**
   @brief Writes simulation results in a tabular format to a project's report file.
@@ -548,7 +599,7 @@ typedef struct Project *EN_Project;
   This function allows toolkit clients to retrieve the contents of a project's
   report file while the project is still open.
   */
-  int  DLLEXPORT EN_copyreport(EN_Project ph, char *filename);
+  int  DLLEXPORT EN_copyreport(EN_Project ph, const char *filename);
 
   /**
   @brief Clears the contents of a project's report file.
@@ -586,7 +637,7 @@ typedef struct Project *EN_Project;
   Formatted results of a simulation can be written to a project's report file
   using the ::EN_report function.
   */
-  int  DLLEXPORT EN_setreport(EN_Project ph, char *format);
+  int  DLLEXPORT EN_setreport(EN_Project ph, const char *format);
 
   /**
   @brief Sets the level of hydraulic status reporting.
@@ -616,7 +667,7 @@ typedef struct Project *EN_Project;
   The version number is to be interpreted with implied decimals, i.e.,
   "20100" == "2(.)01(.)00"
   */
-  int  DLLEXPORT EN_getversion(int *version);
+  int  DLLEXPORT EN_getversion(int *out_version);
 
   /**
   @brief Returns the text of an error message generated by an error code.
@@ -625,7 +676,7 @@ typedef struct Project *EN_Project;
   @param maxLen maximum number of characters that errmsg can hold
   @return an error code
 
-  Error message strings should be at least @ref EN_SizeLimits "EN_MAXMSG" characters in length.
+  Error message strings should be greater than @ref EN_SizeLimits "EN_MAXMSG" characters in length.
   */
   int  DLLEXPORT EN_geterror(int errcode, char *out_errmsg, int maxLen);
 
@@ -636,7 +687,17 @@ typedef struct Project *EN_Project;
   @param[out] value the value of the statistic.
   @return an error code
   */
-  int  DLLEXPORT EN_getstatistic(EN_Project ph, int type, double* value);
+  int  DLLEXPORT EN_getstatistic(EN_Project ph, int type, double* out_value);
+
+
+  /**
+  @brief Get information about upcoming time step events, and what causes them.
+  @param ph an EPANET project handle.
+  @param[out] eventType the type of event that will occur (see @ref EN_TimestepEvent).
+  @param[out] duration the amount of time in the future this event will occur
+  @param[out] elementIndex the index of the element causing the event.
+  **/
+  int DLLEXPORT EN_timetonextevent(EN_Project ph, int *eventType, long *duration, int *elementIndex);
 
   /**
   @brief Retrieves the order in which a node or link appears in an @ref OutFile "output file".
@@ -652,7 +713,7 @@ typedef struct Project *EN_Project;
   after the order of nodes or links in a network's database has been changed due to editing
   operations.
   */
-  int  DLLEXPORT EN_getresultindex(EN_Project ph, int type, int index, int *value);
+  int  DLLEXPORT EN_getresultindex(EN_Project ph, int type, int index, int *out_value);
 
   /********************************************************************
 
@@ -667,7 +728,7 @@ typedef struct Project *EN_Project;
   @param[out] value the current value of the option.
   @return an error code
   */
-  int  DLLEXPORT EN_getoption(EN_Project ph, int option, double *value);
+  int  DLLEXPORT EN_getoption(EN_Project ph, int option, double *out_value);
 
   /**
   @brief Sets the value for an anlysis option.
@@ -688,7 +749,7 @@ typedef struct Project *EN_Project;
   Flow units in liters or cubic meters implies that SI metric units are used for all
   other quantities in addition to flow. Otherwise US Customary units are employed.
   */
-  int  DLLEXPORT EN_getflowunits(EN_Project ph, int *units);
+  int  DLLEXPORT EN_getflowunits(EN_Project ph, int *out_units);
 
   /**
   @brief Sets a project's flow units.
@@ -708,7 +769,7 @@ typedef struct Project *EN_Project;
   @param[out] value the current value of the time parameter (in seconds).
   @return an error code.
   */
-  int  DLLEXPORT EN_gettimeparam(EN_Project ph, int param, long *value);
+  int  DLLEXPORT EN_gettimeparam(EN_Project ph, int param, long *out_value);
 
   /**
   @brief Sets the value of a time parameter.
@@ -728,8 +789,8 @@ typedef struct Project *EN_Project;
   @param[out] traceNode index of the node being traced (if applicable).
   @return an error code.
   */
-  int  DLLEXPORT EN_getqualinfo(EN_Project ph, int *qualType, char *out_chemName,
-                 char *out_chemUnits, int *traceNode);
+  int  DLLEXPORT EN_getqualinfo(EN_Project ph, int *out_qualType, char *out_chemName,
+                 char *out_chemUnits, int *out_traceNode);
 
   /**
   @brief Retrieves the type of water quality analysis to be run.
@@ -738,7 +799,7 @@ typedef struct Project *EN_Project;
   @param[out] traceNode the index of node being traced, if <b>qualType = EN_TRACE</b>.
   @return an error code.
   */
-  int  DLLEXPORT EN_getqualtype(EN_Project ph, int *qualType, int *traceNode);
+  int  DLLEXPORT EN_getqualtype(EN_Project ph, int *out_qualType, int *out_traceNode);
 
   /**
   @brief Sets the type of water quality analysis to run.
@@ -754,8 +815,8 @@ typedef struct Project *EN_Project;
 
   Note that the trace node is specified by ID name and not by index.
   */
-  int  DLLEXPORT EN_setqualtype(EN_Project ph, int qualType, char *chemName,
-                 char *chemUnits, char *traceNode);
+  int  DLLEXPORT EN_setqualtype(EN_Project ph, int qualType, const char *chemName,
+                 const char *chemUnits, const char *traceNode);
 
   /********************************************************************
 
@@ -773,7 +834,7 @@ typedef struct Project *EN_Project;
 
   When a new node is created all of its properties (see @ref EN_NodeProperty) are set to 0.
   */
-  int DLLEXPORT EN_addnode(EN_Project ph, char *id, int nodeType, int *index);
+  int DLLEXPORT EN_addnode(EN_Project ph, const char *id, int nodeType, int *out_index);
 
   /**
   @brief Deletes a node from a project.
@@ -797,7 +858,7 @@ typedef struct Project *EN_Project;
   @param[out] index the node's index (starting from 1).
   @return an error code
   */
-  int  DLLEXPORT EN_getnodeindex(EN_Project ph, char *id, int *index);
+  int  DLLEXPORT EN_getnodeindex(EN_Project ph, const char *id, int *out_index);
 
   /**
   @brief Gets the ID name of a node given its index.
@@ -806,7 +867,7 @@ typedef struct Project *EN_Project;
   @param[out] out_id the node's ID name.
   @return an error code
 
-  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID" characters.
+  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID+1" characters.
   */
   int  DLLEXPORT EN_getnodeid(EN_Project ph, int index, char *out_id);
 
@@ -819,7 +880,7 @@ typedef struct Project *EN_Project;
 
   The ID name must not be longer than @ref EN_SizeLimits "EN_MAXID" characters.
   */
-  int DLLEXPORT EN_setnodeid(EN_Project ph, int index, char *newid);
+  int DLLEXPORT EN_setnodeid(EN_Project ph, int index, const char *newid);
 
   /**
   @brief Retrieves a node's type given its index.
@@ -828,7 +889,7 @@ typedef struct Project *EN_Project;
   @param[out] nodeType the node's type (see @ref EN_NodeType).
   @return an error code.
   */
-  int  DLLEXPORT EN_getnodetype(EN_Project ph, int index, int *nodeType);
+  int  DLLEXPORT EN_getnodetype(EN_Project ph, int index, int *out_nodeType);
 
   /**
   @brief Retrieves a property value for a node.
@@ -841,7 +902,21 @@ typedef struct Project *EN_Project;
   Values are returned in units that depend on the units used for flow rate
   (see @ref Units).
   */
-  int  DLLEXPORT EN_getnodevalue(EN_Project ph, int index, int property, double *value);
+
+  int  DLLEXPORT EN_getnodevalues(EN_Project ph, int property, double *out_values);
+
+  /**
+  @brief Retrieves an array of property values for all nodes.
+  @param ph an EPANET project handle.
+  @param property the property to retrieve (see @ref EN_NodeProperty).
+  @param[out] values an array of values for all nodes.
+  @return an error code.
+
+  Values are returned in units that depend on the units used for flow rate
+  (see @ref Units).
+  */
+
+  int  DLLEXPORT EN_getnodevalue(EN_Project ph, int index, int property, double *out_value);
 
   /**
   @brief Sets a property value for a node.
@@ -867,7 +942,7 @@ typedef struct Project *EN_Project;
   These properties have units that depend on the units used for flow rate (see @ref Units).
   */
   int  DLLEXPORT EN_setjuncdata(EN_Project ph, int index, double elev, double dmnd,
-      char *dmndpat);
+      const char *dmndpat);
 
   /**
   @brief Sets a group of properties for a tank node.
@@ -885,7 +960,7 @@ typedef struct Project *EN_Project;
   These properties have units that depend on the units used for flow rate (see @ref Units).
   */
   int  DLLEXPORT EN_settankdata(EN_Project ph, int index, double elev, double initlvl,
-                 double minlvl, double maxlvl, double diam, double minvol, char *volcurve);
+                 double minlvl, double maxlvl, double diam, double minvol, const char *volcurve);
 
   /**
   @brief Gets the (x,y) coordinates of a node.
@@ -895,7 +970,7 @@ typedef struct Project *EN_Project;
   @param[out] y the node's Y-coordinate value.
   @return an error code.
   */
-  int  DLLEXPORT EN_getcoord(EN_Project ph, int index, double *x, double *y);
+  int  DLLEXPORT EN_getcoord(EN_Project ph, int index, double *out_x, double *out_y);
 
   /**
   @brief Sets the (x,y) coordinates of a node.
@@ -924,8 +999,8 @@ typedef struct Project *EN_Project;
 
   Parameters <b>pmin, preq,</b> and \b pexp are only used when the demand model is \b EN_PDA.
   */
-  int DLLEXPORT EN_getdemandmodel(EN_Project ph, int *type, double *pmin,
-                double *preq, double *pexp);
+  int DLLEXPORT EN_getdemandmodel(EN_Project ph, int *out_type, double *out_pmin,
+                double *out_preq, double *out_pexp);
 
   /**
   @brief Sets the type of demand model to use and its parameters.
@@ -963,7 +1038,7 @@ typedef struct Project *EN_Project;
   that no time pattern or category name is associated with the demand.
   */
   int DLLEXPORT EN_adddemand(EN_Project ph, int nodeIndex, double baseDemand,
-                char *demandPattern, char *demandName);
+                const char *demandPattern, const char *demandName);
 
   /**
   @brief deletes a demand from a junction node.
@@ -982,8 +1057,8 @@ typedef struct Project *EN_Project;
   @param[out] demandIndex the index of the demand being sought
   @return an error code
   */
-  int DLLEXPORT EN_getdemandindex(EN_Project ph, int nodeIndex, char *demandName,
-                int *demandIndex);
+  int DLLEXPORT EN_getdemandindex(EN_Project ph, int nodeIndex, const char *demandName,
+                int *out_demandIndex);
 
   /**
   @brief Retrieves the number of demand categories for a junction node.
@@ -992,7 +1067,7 @@ typedef struct Project *EN_Project;
   @param[out] numDemands the number of demand categories assigned to the node.
   @return an error code.
   */
-  int  DLLEXPORT EN_getnumdemands(EN_Project ph, int nodeIndex, int *numDemands);
+  int  DLLEXPORT EN_getnumdemands(EN_Project ph, int nodeIndex, int *out_numDemands);
 
   /**
   @brief Gets the base demand for one of a node's demand categories.
@@ -1003,7 +1078,7 @@ typedef struct Project *EN_Project;
   @return an error code.
   */
   int  DLLEXPORT EN_getbasedemand(EN_Project ph, int nodeIndex, int demandIndex,
-                 double *baseDemand);
+                 double *out_baseDemand);
 
   /**
   @brief Sets the base demand for one of a node's demand categories.
@@ -1028,7 +1103,7 @@ typedef struct Project *EN_Project;
   demand category.
   */
   int  DLLEXPORT EN_getdemandpattern(EN_Project ph, int nodeIndex, int demandIndex,
-       int *patIndex);
+       int *out_patIndex);
 
   /**
   @brief Sets the index of a time pattern used for one of a node's demand categories.
@@ -1051,7 +1126,7 @@ typedef struct Project *EN_Project;
   @param[out] out_demandName The name of the selected category.
   @return an error code.
 
-  \b demandName must be sized to contain at least @ref EN_SizeLimits "EN_MAXID" characters.
+  \b demandName must be sized to contain at least @ref EN_SizeLimits "EN_MAXID+1" characters.
   */
   int DLLEXPORT EN_getdemandname(EN_Project ph, int nodeIndex, int demandIndex, char *out_demandName);
 
@@ -1065,7 +1140,8 @@ typedef struct Project *EN_Project;
 
   The category name must contain no more than @ref EN_SizeLimits "EN_MAXID" characters.
   */
-  int DLLEXPORT EN_setdemandname(EN_Project ph, int nodeIndex, int demandIdx, char *demandName);
+  int DLLEXPORT EN_setdemandname(EN_Project ph, int nodeIndex, int demandIdx,
+                const char *demandName);
 
   /********************************************************************
 
@@ -1098,8 +1174,8 @@ typedef struct Project *EN_Project;
 
   See @ref EN_LinkProperty.
   */
-  int DLLEXPORT EN_addlink(EN_Project ph, char *id, int linkType, char *fromNode,
-                          char *toNode, int *index);
+  int DLLEXPORT EN_addlink(EN_Project ph, const char *id, int linkType, const char *fromNode,
+                          const char *toNode, int *out_index);
 
   /**
   @brief Deletes a link from the project.
@@ -1121,7 +1197,7 @@ typedef struct Project *EN_Project;
   @param[out] index the link's index (starting from 1).
   @return an error code.
   */
-  int  DLLEXPORT EN_getlinkindex(EN_Project ph, char *id, int *index);
+  int  DLLEXPORT EN_getlinkindex(EN_Project ph, const char *id, int *out_index);
 
   /**
   @brief Gets the ID name of a link given its index.
@@ -1130,7 +1206,7 @@ typedef struct Project *EN_Project;
   @param[out] out_id The link's ID name.
   @return an error code.
 
-  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID" characters.
+  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID+1" characters.
   */
   int  DLLEXPORT EN_getlinkid(EN_Project ph, int index, char *out_id);
 
@@ -1143,7 +1219,7 @@ typedef struct Project *EN_Project;
 
   The ID name must not be longer than @ref EN_SizeLimits "EN_MAXID" characters.
   */
-  int DLLEXPORT EN_setlinkid(EN_Project ph, int index, char *newid);
+  int DLLEXPORT EN_setlinkid(EN_Project ph, int index, const char *newid);
 
   /**
   @brief Retrieves a link's type.
@@ -1152,7 +1228,7 @@ typedef struct Project *EN_Project;
   @param[out] linkType the link's type (see @ref EN_LinkType).
   @return an error code.
   */
-  int  DLLEXPORT EN_getlinktype(EN_Project ph, int index, int *linkType);
+  int  DLLEXPORT EN_getlinktype(EN_Project ph, int index, int *out_linkType);
 
   /**
   @brief Changes a link's type.
@@ -1177,7 +1253,7 @@ typedef struct Project *EN_Project;
   @param[out] node2 the index of the link's end node (starting from 1).
   @return an error code.
   */
-  int  DLLEXPORT EN_getlinknodes(EN_Project ph, int index, int *node1, int *node2);
+  int  DLLEXPORT EN_getlinknodes(EN_Project ph, int index, int *out_node1, int *out_node2);
 
   /**
   @brief Sets the indexes of a link's start- and end-nodes.
@@ -1199,7 +1275,18 @@ typedef struct Project *EN_Project;
 
   Values are returned in units that depend on the units used for flow rate (see @ref Units).
   */
-  int  DLLEXPORT EN_getlinkvalue(EN_Project ph, int index, int property, double *value);
+  int  DLLEXPORT EN_getlinkvalue(EN_Project ph, int index, int property, double *out_value);
+
+  /**
+  @brief Retrieves an array of property values for all links.
+  @param ph an EPANET project handle.
+  @param property the property to retrieve (see @ref EN_LinkProperty).
+  @param[out] values an array of values for all links.
+  @return an error code.
+
+  Values are returned in units that depend on the units used for flow rate (see @ref Units).
+  */
+  int  DLLEXPORT EN_getlinkvalues(EN_Project ph, int property, double *out_values);
 
   /**
   @brief Sets a property value for a link.
@@ -1235,10 +1322,10 @@ typedef struct Project *EN_Project;
   @param[out] count the number of vertex points that describe the link's shape.
   @return an error code.
   */
-  int DLLEXPORT EN_getvertexcount(EN_Project ph, int index, int *count);
+  int DLLEXPORT EN_getvertexcount(EN_Project ph, int index, int *out_count);
 
   /**
-  @brief Retrieves the coordinate's of a vertex point assigned to a link.
+  @brief Retrieves the coordinates of a vertex point assigned to a link.
   @param ph an EPANET project handle.
   @param index a link's index (starting from 1).
   @param vertex a vertex point index (starting from 1).
@@ -1246,7 +1333,18 @@ typedef struct Project *EN_Project;
   @param[out] y the vertex's Y-coordinate value.
   @return an error code.
   */
-  int DLLEXPORT EN_getvertex(EN_Project ph, int index, int vertex, double *x, double *y);
+  int DLLEXPORT EN_getvertex(EN_Project ph, int index, int vertex, double *out_x, double *out_y);
+
+  /**
+  @brief Sets the coordinates of a vertex point assigned to a link.
+  @param ph an EPANET project handle.
+  @param index a link's index (starting from 1).
+  @param vertex a vertex point index (starting from 1).
+  @param x the vertex's X-coordinate value.
+  @param y the vertex's Y-coordinate value.
+  @return an error code.
+  */
+  int DLLEXPORT EN_setvertex(EN_Project ph, int index, int vertex, double x, double y);
 
   /**
   @brief Assigns a set of internal vertex points to a link.
@@ -1274,7 +1372,7 @@ typedef struct Project *EN_Project;
   @param[out] pumpType the type of head curve used by the pump (see @ref EN_PumpType).
   @return an error code.
   */
-  int  DLLEXPORT EN_getpumptype(EN_Project ph, int linkIndex, int *pumpType);
+  int  DLLEXPORT EN_getpumptype(EN_Project ph, int linkIndex, int *out_pumpType);
 
   /**
   @brief Retrieves the curve assigned to a pump's head curve.
@@ -1283,7 +1381,7 @@ typedef struct Project *EN_Project;
   @param[out] curveIndex the index of the curve assigned to the pump's head curve.
   @return an error code.
   */
-  int  DLLEXPORT EN_getheadcurveindex(EN_Project ph, int linkIndex, int *curveIndex);
+  int  DLLEXPORT EN_getheadcurveindex(EN_Project ph, int linkIndex, int *out_curveIndex);
 
   /**
   @brief Assigns a curve to a pump's head curve.
@@ -1308,7 +1406,7 @@ typedef struct Project *EN_Project;
 
   The new pattern contains a single time period whose factor is 1.0.
   */
-  int  DLLEXPORT EN_addpattern(EN_Project ph, char *id);
+  int  DLLEXPORT EN_addpattern(EN_Project ph, const char *id);
 
   /**
   @brief Deletes a time pattern from a project.
@@ -1325,7 +1423,7 @@ typedef struct Project *EN_Project;
   @param[out] index the time pattern's index (starting from 1).
   @return an error code.
   */
-  int  DLLEXPORT EN_getpatternindex(EN_Project ph, char *id, int *index);
+  int  DLLEXPORT EN_getpatternindex(EN_Project ph, const char *id, int *out_index);
 
   /**
   @brief Retrieves the ID name of a time pattern given its index.
@@ -1334,7 +1432,7 @@ typedef struct Project *EN_Project;
   @param[out] out_id the time pattern's ID name.
   @return an error code.
 
-  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID" characters.
+  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID+1" characters.
   */
   int  DLLEXPORT EN_getpatternid(EN_Project ph, int index, char *out_id);
 
@@ -1347,7 +1445,7 @@ typedef struct Project *EN_Project;
 
   The new ID name must not exceed @ref EN_SizeLimits "EN_MAXID" characters.
   */
-  int  DLLEXPORT EN_setpatternid(EN_Project ph, int index, char *id);
+  int  DLLEXPORT EN_setpatternid(EN_Project ph, int index, const char *id);
 
   /**
   @brief Retrieves the number of time periods in a time pattern.
@@ -1356,7 +1454,7 @@ typedef struct Project *EN_Project;
   @param[out] len the number of time periods in the pattern.
   @return an error code.
   */
-  int  DLLEXPORT EN_getpatternlen(EN_Project ph, int index, int *len);
+  int  DLLEXPORT EN_getpatternlen(EN_Project ph, int index, int *out_len);
 
   /**
   @brief Retrieves a time pattern's factor for a given time period.
@@ -1366,7 +1464,7 @@ typedef struct Project *EN_Project;
   @param[out] value the pattern factor for the given time period.
   @return an error code.
   */
-  int  DLLEXPORT EN_getpatternvalue(EN_Project ph, int index, int period, double *value);
+  int  DLLEXPORT EN_getpatternvalue(EN_Project ph, int index, int period, double *out_value);
 
   /**
   @brief Sets a time pattern's factor for a given time period.
@@ -1385,7 +1483,7 @@ typedef struct Project *EN_Project;
   @param[out] value The average of all of the time pattern's factors.
   @return an error code.
   */
-  int  DLLEXPORT EN_getaveragepatternvalue(EN_Project ph, int index, double *value);
+  int  DLLEXPORT EN_getaveragepatternvalue(EN_Project ph, int index, double *out_value);
 
   /**
   @brief Sets the pattern factors for a given time pattern.
@@ -1401,6 +1499,15 @@ typedef struct Project *EN_Project;
   use @ref EN_setpatternvalue to revise pattern factors one at a time.
   */
   int  DLLEXPORT EN_setpattern(EN_Project ph, int index, double *values, int len);
+  
+  /**
+  @brief Loads time patterns from a file into a project under a specific pattern ID.
+  @param ph an EPANET project handle.
+  @param filename the name of the file containing pattern data.
+  @param id the ID name of the new pattern to load.
+  @return an error code.
+  */ 
+  int  DLLEXPORT EN_loadpatternfile(EN_Project p, const char *filename, const char *id);
 
   /********************************************************************
 
@@ -1416,7 +1523,7 @@ typedef struct Project *EN_Project;
 
   The new curve contains a single data point (1.0, 1.0).
   */
-  int  DLLEXPORT EN_addcurve(EN_Project ph, char *id);
+  int  DLLEXPORT EN_addcurve(EN_Project ph, const char *id);
 
   /**
   @brief Deletes a data curve from a project.
@@ -1433,7 +1540,7 @@ typedef struct Project *EN_Project;
   @param[out] index The curve's index (starting from 1).
   @return an error code.
   */
-  int  DLLEXPORT EN_getcurveindex(EN_Project ph, char *id, int *index);
+  int  DLLEXPORT EN_getcurveindex(EN_Project ph, const char *id, int *out_index);
 
   /**
   @brief Retrieves the ID name of a curve given its index.
@@ -1442,7 +1549,7 @@ typedef struct Project *EN_Project;
   @param[out] out_id the curve's ID name.
   @return an error code.
 
-  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID" characters.
+  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID+1" characters.
   */
   int  DLLEXPORT EN_getcurveid(EN_Project ph, int index, char *out_id);
 
@@ -1455,7 +1562,7 @@ typedef struct Project *EN_Project;
 
   The new ID name must not exceed @ref EN_SizeLimits "EN_MAXID" characters.
   */
-  int  DLLEXPORT EN_setcurveid(EN_Project ph, int index, char *id);
+  int  DLLEXPORT EN_setcurveid(EN_Project ph, int index, const char *id);
 
   /**
   @brief Retrieves the number of points in a curve.
@@ -1464,7 +1571,7 @@ typedef struct Project *EN_Project;
   @param[out] len The number of data points assigned to the curve.
   @return an error code.
   */
-  int  DLLEXPORT EN_getcurvelen(EN_Project ph, int index, int *len);
+  int  DLLEXPORT EN_getcurvelen(EN_Project ph, int index, int *out_len);
 
   /**
   @brief Retrieves a curve's type.
@@ -1473,7 +1580,16 @@ typedef struct Project *EN_Project;
   @param[out] type the curve's type (see @ref EN_CurveType).
   @return an error code.
   */
-  int  DLLEXPORT EN_getcurvetype(EN_Project ph, int index, int *type);
+  int  DLLEXPORT EN_getcurvetype(EN_Project ph, int index, int *out_type);
+
+  /**
+  @brief Sets a curve's type.
+  @param ph an EPANET project handle.
+  @param index a curve's index (starting from 1).
+  @param type the curve's type (see @ref EN_CurveType).
+  @return an error code.
+  */
+  int  DLLEXPORT EN_setcurvetype(EN_Project ph, int index, int type);
 
   /**
   @brief Retrieves the value of a single data point for a curve.
@@ -1485,7 +1601,7 @@ typedef struct Project *EN_Project;
   @return an error code.
   */
   int  DLLEXPORT EN_getcurvevalue(EN_Project ph, int curveIndex, int pointIndex,
-                 double *x, double *y);
+                 double *out_x, double *out_y);
 
   /**
   @brief Sets the value of a single data point for a curve.
@@ -1511,10 +1627,10 @@ typedef struct Project *EN_Project;
 
   The calling program is responsible for making `xValues` and `yValues` large enough
   to hold `nPoints` number of data points and for sizing `id` to hold at least
-  @ref EN_SizeLimits "EN_MAXID" characters.
+  @ref EN_SizeLimits "EN_MAXID+1" characters.
   */
-  int  DLLEXPORT EN_getcurve(EN_Project ph, int index, char *out_id, int *nPoints,
-                 double *xValues, double *yValues);
+  int  DLLEXPORT EN_getcurve(EN_Project ph, int index, char *out_id, int *out_nPoints,
+                 double *out_xValues, double *out_yValues);
 
   /**
   @brief assigns a set of data points to a curve.
@@ -1553,7 +1669,7 @@ typedef struct Project *EN_Project;
   @return an error code.
   */
   int  DLLEXPORT EN_addcontrol(EN_Project ph, int type, int linkIndex,
-                 double setting, int nodeIndex, double level, int *index);
+                 double setting, int nodeIndex, double level, int *out_index);
 
   /**
   @brief Deletes an existing simple control.
@@ -1576,8 +1692,8 @@ typedef struct Project *EN_Project;
   that triggers the control.
   @return an error code.
   */
-  int  DLLEXPORT EN_getcontrol(EN_Project ph, int index, int *type, int *linkIndex,
-                 double *setting, int *nodeIndex, double *level);
+  int  DLLEXPORT EN_getcontrol(EN_Project ph, int index, int *out_type, int *out_linkIndex,
+                 double *out_setting, int *out_nodeIndex, double *out_level);
 
   /**
   @brief Sets the properties of an existing simple control.
@@ -1595,6 +1711,23 @@ typedef struct Project *EN_Project;
   int  DLLEXPORT EN_setcontrol(EN_Project ph, int index, int type, int linkIndex,
                  double setting, int nodeIndex, double level);
 
+  /**
+  @brief Gets the enabled status of a simple control.
+  @param ph an EPANET project handle.
+  @param index the control's index (starting from 1).
+  @param out_enabled the control will be either EN_TRUE=enabled or EN_FALSE=disabled.
+  @return an error code.
+  */
+  int  DLLEXPORT EN_getcontrolenabled(EN_Project ph, int index, int *out_enabled);
+
+  /**
+  @brief Sets the enabled status of a simple control.
+  @param ph an EPANET project handle.
+  @param index the control's index (starting from 1).
+  @param enabled set the control to either EN_TRUE=enabled or EN_FALSE=disabled.
+  @return an error code.
+  */
+  int  DLLEXPORT EN_setcontrolenabled(EN_Project ph, int index, int enabled);
 
   /********************************************************************
 
@@ -1631,8 +1764,8 @@ typedef struct Project *EN_Project;
   @param[out] priority the rule's priority value.
   @return an error code.
   */
-  int  DLLEXPORT EN_getrule(EN_Project ph, int index, int *nPremises,
-                 int *nThenActions, int *nElseActions, double *priority);
+  int  DLLEXPORT EN_getrule(EN_Project ph, int index, int *out_nPremises,
+                 int *out_nThenActions, int *out_nElseActions, double *out_priority);
 
   /**
   @brief Gets the ID name of a rule-based control given its index.
@@ -1641,7 +1774,7 @@ typedef struct Project *EN_Project;
   @param[out] out_id the rule's ID name.
   @return Error code.
 
-  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID" characters.
+  The ID name must be sized to hold at least @ref EN_SizeLimits "EN_MAXID+1" characters.
   */
   int  DLLEXPORT EN_getruleID(EN_Project ph, int index, char *out_id);
 
@@ -1662,8 +1795,8 @@ typedef struct Project *EN_Project;
   @return an error code.
   */
   int  DLLEXPORT EN_getpremise(EN_Project ph, int ruleIndex, int premiseIndex,
-                 int *logop,  int *object, int *objIndex, int *variable,
-                 int *relop, int *status, double *value);
+                 int *out_logop,  int *out_object, int *out_objIndex, int *out_variable,
+                 int *out_relop, int *out_status, double *out_value);
 
   /**
   @brief Sets the properties of a premise in a rule-based control.
@@ -1729,7 +1862,7 @@ typedef struct Project *EN_Project;
   @return an error code.
   */
   int  DLLEXPORT EN_getthenaction(EN_Project ph, int ruleIndex, int actionIndex,
-                 int *linkIndex, int *status, double *setting);
+                 int *out_linkIndex, int *out_status, double *out_setting);
 
   /**
   @brief Sets the properties of a THEN action in a rule-based control.
@@ -1755,7 +1888,7 @@ typedef struct Project *EN_Project;
   @return an error code.
   */
   int  DLLEXPORT EN_getelseaction(EN_Project ph, int ruleIndex, int actionIndex,
-                 int *linkIndex, int *status, double *setting);
+                 int *out_linkIndex, int *out_status, double *out_setting);
 
   /**
   @brief Sets the properties of an ELSE action in a rule-based control.
@@ -1778,6 +1911,24 @@ typedef struct Project *EN_Project;
   @return an error code.
   */
   int  DLLEXPORT EN_setrulepriority(EN_Project ph, int index, double priority);
+
+  /**
+  @brief Gets the enabled status of a rule-based control.
+  @param ph an EPANET project handle.
+  @param index the rule's index (starting from 1).
+  @param out_enabled the rule will be either EN_TRUE=enabled or EN_FALSE=disabled.
+  @return an error code.
+  */
+  int  DLLEXPORT EN_getruleenabled(EN_Project ph, int index, int *out_enabled);
+
+  /**
+  @brief Sets the enabled status of a rule-based control.
+  @param ph an EPANET project handle.
+  @param index the rule's index (starting from 1).
+  @param enabled set the rule to either EN_TRUE=enabled or EN_FALSE=disabled.
+  @return an error code.
+  */
+  int  DLLEXPORT EN_setruleenabled(EN_Project ph, int index, int enabled);
 
 #if defined(__cplusplus)
 }

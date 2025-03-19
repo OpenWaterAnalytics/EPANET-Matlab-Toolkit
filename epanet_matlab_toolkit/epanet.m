@@ -1884,6 +1884,26 @@ classdef epanet <handle
                 [Errcode, ~, value] = calllib(LibEPANET, 'EN_getresultindex', ph, objecttype, index, int32(0));
             end
         end
+        function [Errcode] = apiENloadpatternfile(LibEPANET, filename, pat, ph)
+            %Loads pattern file
+            %
+            % apiENLoadpatternfile(LibEPANET, ph, filename, patID)
+            %
+            % Parameters:
+            %   LibEPANET  - EPANET library DLL name.
+            %   ph         - EPANET project handle.
+            %   filename   - Name of the pattern file to load.
+            %   patID      - Pattern identifier.
+            %
+            % Returns:
+            %   Errcode    - Error code returned by the EPANET function.
+            
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENloadpatternfile', filename, pat);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_loadpatternfile', ph, filename, pat);
+            end
+        end
         function [Errcode] = apiENresetreport(LibEPANET, ph)
             % Resets a project's report options to their default values.
             %
@@ -13718,6 +13738,14 @@ classdef epanet <handle
             %
             % See also getComputedHydraulicTimeSeries, deleteNode, getLinkResultIndex
             [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_NODE, node_index, obj.LibEPANET, obj.ph);
+        end
+        function loadpatternfile(obj, filename, patID)
+            %minimun example:
+            % start_toolkit;
+            % d = epanet('Net1.inp');
+            % d.loadpatternfile('abc.pat','4')
+            % d.saveInputFile('Net1.inp')
+            [obj.Errcode] = obj.apiENloadpatternfile(obj.LibEPANET, filename, patID, obj.ph)
         end
         function resultindex = getLinkResultIndex(obj, link_index)
             % Retrieves the order in which a link's results

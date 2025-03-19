@@ -3,13 +3,13 @@
 /*
  ******************************************************************************
  Project:      OWA EPANET
- Version:      2.2
+ Version:      2.3
  Module:       epanet2_enums.h
  Description:  enumerations of symbolic constants used by the API functions
  Authors:      see AUTHORS
  Copyright:    see AUTHORS
  License:      see LICENSE
- Last Updated: 11/06/2019
+ Last Updated: 02/14/2025
  ******************************************************************************
 */
 
@@ -63,7 +63,12 @@ typedef enum {
   EN_TANKVOLUME   = 24, //!< Current computed tank volume (read only)
   EN_MAXVOLUME    = 25, //!< Tank maximum volume (read only)
   EN_CANOVERFLOW  = 26, //!< Tank can overflow (= 1) or not (= 0)
-  EN_DEMANDDEFICIT = 27 //!< Amount that full demand is reduced under PDA (read only)
+  EN_DEMANDDEFICIT = 27,//!< Amount that full demand is reduced under PDA (read only)
+  EN_NODE_INCONTROL = 28, //!< Is present in any simple or rule-based control (= 1) or not (= 0)
+  EN_EMITTERFLOW    = 29, //!< Current emitter flow (read only)
+  EN_LEAKAGEFLOW    = 30, //!< Current leakage flow (read only)
+  EN_DEMANDFLOW     = 31, //!< Current consumer demand delivered (read only)
+  EN_FULLDEMAND     = 32  //!< Current consumer demand requested (read only)
 } EN_NodeProperty;
 
 /// Link properties
@@ -94,7 +99,13 @@ typedef enum {
   EN_PUMP_HCURVE  = 19, //!< Pump head v. flow curve index
   EN_PUMP_ECURVE  = 20, //!< Pump efficiency v. flow curve index
   EN_PUMP_ECOST   = 21, //!< Pump average energy price
-  EN_PUMP_EPAT    = 22  //!< Pump energy price time pattern index
+  EN_PUMP_EPAT    = 22, //!< Pump energy price time pattern index
+  EN_LINK_INCONTROL = 23,  //!< Is present in any simple or rule-based control (= 1) or not (= 0)
+  EN_GPV_CURVE    = 24, //!< GPV head loss v. flow curve index
+  EN_PCV_CURVE    = 25, //!< PCV loss coeff. curve index
+  EN_LEAK_AREA    = 26, //!< Pipe leak area (sq mm per 100 length units)
+  EN_LEAK_EXPAN   = 27, //!< Leak expansion rate (sq mm per unit of pressure head)
+  EN_LINK_LEAKAGE = 28  //!< Current leakage rate (read only)
 } EN_LinkProperty;
 
 /// Time parameters
@@ -122,6 +133,18 @@ typedef enum {
   EN_NEXTEVENTTANK = 15  //!< Index of tank with shortest time to become empty or full (read only)
 } EN_TimeParameter;
 
+
+/**
+These are the types of events that can cause a timestep to end.
+**/
+typedef enum {
+  EN_STEP_REPORT       = 0,
+  EN_STEP_HYD          = 1,
+  EN_STEP_WQ           = 2,
+  EN_STEP_TANKEVENT    = 3,
+  EN_STEP_CONTROLEVENT = 4
+} EN_TimestepEvent;
+
 /// Analysis convergence statistics
 /**
 These statistics report the convergence criteria for the most current hydraulic analysis
@@ -135,7 +158,8 @@ typedef enum {
   EN_MAXFLOWCHANGE   = 3, //!< Largest flow change in links
   EN_MASSBALANCE     = 4, //!< Cumulative water quality mass balance ratio
   EN_DEFICIENTNODES  = 5, //!< Number of pressure deficient nodes
-  EN_DEMANDREDUCTION = 6  //!< % demand reduction at pressure deficient nodes
+  EN_DEMANDREDUCTION = 6, //!< % demand reduction at pressure deficient nodes
+  EN_LEAKAGELOSS     = 7  //!< % flow lost to system leakage
 } EN_AnalysisStatistic;
 
 /// Types of network objects
@@ -188,7 +212,8 @@ typedef enum {
   EN_PBV          = 5,  //!< Pressure breaker valve
   EN_FCV          = 6,  //!< Flow control valve
   EN_TCV          = 7,  //!< Throttle control valve
-  EN_GPV          = 8   //!< General purpose valve
+  EN_GPV          = 8,  //!< General purpose valve
+  EN_PCV          = 9   //!< Positional control valve
 } EN_LinkType;
 
 /// Link status
@@ -270,8 +295,22 @@ typedef enum {
   EN_LPM         = 6,   //!< Liters per minute
   EN_MLD         = 7,   //!< Million liters per day
   EN_CMH         = 8,   //!< Cubic meters per hour
-  EN_CMD         = 9    //!< Cubic meters per day
+  EN_CMD         = 9,   //!< Cubic meters per day
+  EN_CMS         = 10   //!< Cubic meters per second
 } EN_FlowUnits;
+
+/// Pressure units
+/**
+The available choices for pressure units for the \b EN_PRESS_UNITS option in @ref EN_getoption
+and @ref EN_setoption. For networks using US Customary units for flow ( \b EN_CFS through
+\b EN_AFD ) pressure units can only be set as PSI. For network using metric units, you can
+select either \b EN_METERS or \b EN_KPA.
+*/
+typedef enum {
+  EN_PSI          = 0,  //!< Pounds per square inch
+  EN_KPA          = 1,  //!< Kilopascals
+  EN_METERS       = 2   //!< Meters
+} EN_PressUnits;
 
 /// Demand models
 /**
@@ -317,7 +356,11 @@ typedef enum {
   EN_BULKORDER      = 19, //!< Bulk water reaction order for pipes
   EN_WALLORDER      = 20, //!< Wall reaction order for pipes (either 0 or 1)
   EN_TANKORDER      = 21, //!< Bulk water reaction order for tanks
-  EN_CONCENLIMIT    = 22  //!< Limiting concentration for growth reactions
+  EN_CONCENLIMIT    = 22, //!< Limiting concentration for growth reactions
+  EN_DEMANDPATTERN  = 23, //!< Name of default demand pattern
+  EN_EMITBACKFLOW   = 24, //!< 1 if emitters can backflow, 0 if not
+  EN_PRESS_UNITS    = 25, //!< Pressure units (see @ref EN_PressUnits)
+  EN_STATUS_REPORT  = 26  //!< Type of status report to produce (see @ref EN_StatusReport)
 } EN_Option;
 
 /// Simple control types
@@ -393,7 +436,8 @@ typedef enum {
   EN_PUMP_CURVE    = 1,   //!< Pump head v. flow curve
   EN_EFFIC_CURVE   = 2,   //!< Pump efficiency v. flow curve
   EN_HLOSS_CURVE   = 3,   //!< Valve head loss v. flow curve
-  EN_GENERIC_CURVE = 4    //!< Generic curve
+  EN_GENERIC_CURVE = 4,   //!< Generic curve
+  EN_VALVE_CURVE   = 5    //!< Valve loss coeff. v. frac. open
 } EN_CurveType;
 
 /// Deletion action codes
@@ -410,7 +454,8 @@ typedef enum {
 /// Status reporting levels
 /**
 These choices specify the level of status reporting written to a project's report
-file during a hydraulic analysis. The level is set using the @ref EN_setstatusreport function.
+file during a hydraulic analysis. The level is set using the @ref EN_setstatusreport
+or the @ref EN_setoption functions.
 */
 typedef enum {
   EN_NO_REPORT = 0,     //!< No status reporting
@@ -463,6 +508,11 @@ typedef enum {
   EN_R_IS_ACTIVE = 3    //!< Control valve is active
 } EN_RuleStatus;
 
-#define EN_MISSING -1.E10  //!< Missing value indicator
+#define EN_MISSING    -1.E10  //!< Missing value indicator
+#define EN_SET_CLOSED -1.E10  //!< Link set closed indicator
+#define EN_SET_OPEN    1.E10  //!< Link set open indicator
+
+#define EN_FALSE 0  // boolean false
+#define EN_TRUE 1   // boolean true
 
 #endif //EPANET2_ENUMS_H
