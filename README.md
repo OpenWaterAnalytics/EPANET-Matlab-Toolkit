@@ -90,6 +90,7 @@ To start, you need to download the folder from GitHub (e.g., `Download ZIP`), se
 
 Minimum Example:
 
+```
 d=epanet('Net1.inp')
 
 d.getNodeCount
@@ -99,6 +100,7 @@ d.getNodeElevations
 Help Functions:
 
 help d.plot
+```
 
 &uparrow; [Back to top](#table-of-contents)
 
