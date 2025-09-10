@@ -2055,9 +2055,9 @@ classdef epanet <handle
             % Returns:
             % an error code, if the control is enabled
             if ph.isNull
-                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetcontrolenabled', index);
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetcontrolenabled', index, 0);
             else
-                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetcontrolenabled', ph, index);
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetcontrolenabled', ph, index, 0);
             end
         end
          function [Errcode] = apiENsetcontrolenabled(index, LibEPANET, ph, enabled)
