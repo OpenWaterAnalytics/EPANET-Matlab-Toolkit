@@ -2047,6 +2047,33 @@ classdef epanet <handle
                 [Errcode] = calllib(LibEPANET, 'EN_setcontrol', ph, cindex, ctype, lindex, setting, nindex, level);
             end
         end
+        function [Errcode, out_enabled] = apiENgetcontrolenabled(index, LibEPANET, ph)
+            % Parameters:
+            % index       The control's index (starting from 1)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            % Returns:
+            % an error code, if the control is enabled
+            if ph.isNull
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetcontrolenabled', index);
+            else
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetcontrolenabled', ph, index);
+            end
+        end
+         function [Errcode] = apiENsetcontrolenabled(index, LibEPANET, ph, enabled)
+            % Parameters:
+            % index       The control's index (starting from 1)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            % enabled     EN_TRUE (= 1) sets the control to enabled, EN_FALSE (= 0) sets it to disabled.
+            % Returns:
+            % an error code.
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetcontrolenabled', index, enabled);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setcontrolenabled', index, ph, enabled);
+            end
+        end
         function [Errcode] = apiENaddrule(rule, LibEPANET, ph)
             % Adds a new rule-based control to a project.
             %
