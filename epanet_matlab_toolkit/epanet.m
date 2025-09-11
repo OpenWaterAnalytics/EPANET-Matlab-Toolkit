@@ -1903,6 +1903,22 @@ classdef epanet <handle
                 [Errcode, ~, value] = calllib(LibEPANET, 'EN_getresultindex', ph, objecttype, index, int32(0));
             end
         end
+        function [eventType, duration, elementIndex] = apiENtimetonextevent(LibEPANET, ph)
+            % Gets information about when the next hydraulic time step occurs.
+
+            % Parameters:
+            % LibEPANET   epanet library DLL name.
+            % ph	an EPANET project handle.
+            % Returns
+            % eventType	the type of event that will occur (see EN_TimestepEvent).
+            % duration	the amount of time in the future this event will occur
+            % elementIndex	the index of the element causing the event.
+            if ph.isNull
+                [eventType, duration, elementIndex] = calllib(LibEPANET, 'ENtimetonextevent', int32(0),int32(0),int32(0));
+            else
+                [eventType, duration, elementIndex] = calllib(LibEPANET, 'EN_timetonextevent', ph, int32(0),int32(0),int32(0));
+            end
+        end
         function [Errcode] = apiENloadpatternfile(LibEPANET, filename, pat, ph)
             %Loads pattern file
             %
