@@ -3119,6 +3119,25 @@ classdef epanet <handle
                 [Errcode, ~, count] = calllib(LibEPANET, 'EN_getvertexcount', ph, index, 0);
             end
         end
+        function [Errcode] = apiENsetvertex(index, vertex, x, y, LibEPANET, ph)
+            % Sets the coordinates of a vertex point assigned to a link.
+
+            % Parameters:
+            % index	a link's index (starting from 1).
+            % vertex	a vertex point index (starting from 1).
+            % x	the vertex's X-coordinate value.
+            % y	the vertex's Y-coordinate value.
+            % ph	an EPANET project handle.
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            if ph.isNull
+                Errcode = calllib(LibEPANET, 'ENsetvertex', index, vertex, x, y);
+            else
+                Errcode = calllib(LibEPANET, 'EN_setvertex', ph, index, vertex, x, y);
+            end
+        end
         function [Errcode] = apiENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET, ph)
             % appends a new demand to a junction node demands list.
             % EPANET Version 2.2
