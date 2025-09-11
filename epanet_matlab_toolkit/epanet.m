@@ -1500,6 +1500,25 @@ classdef epanet <handle
                 [Errcode, ~, type] = calllib(LibEPANET, 'EN_getcurvetype', ph, index, 0);
             end
         end
+        function [Errcode] = apiENsetcurvetype(index, type, LibEPANET, ph)
+            % Sets curve's type (pump, valve, etc.)
+            %
+            % apiENsetcurvetype(index, type, LibEPANET, ph)
+            %
+            % Parameters:
+            % index       a curve's index (starting from 1).
+            % type        the curve's type (see EN_CurveType)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            %
+            % Returns:
+            % an error code.
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetcurvetype', index, type);
+            else
+                [Errcode, ~] = calllib(LibEPANET, 'EN_setcurvetype', ph, index, type);
+            end
+        end
         function [Errcode, index] = apiENgetpatternindex(id, LibEPANET, ph)
             % Retrieves the index of a time pattern given its ID name.
             %
