@@ -1939,6 +1939,23 @@ classdef epanet <handle
                 [Errcode] = calllib(LibEPANET, 'EN_loadpatternfile', ph, filename, pat);
             end
         end
+        function [Errcode] = apiENopenX(inpFile, rptFile, outFile, LibEPANET, ph)
+            % Reads an EPANET input file with errors allowed.
+            %
+            % Parameters
+            % inpFile	the name of an existing EPANET-formatted input file.
+            % rptFile	the name of a report file to be created (or "" if not needed).
+            % outFile	the name of a binary output file to be created (or "" if not needed).
+            % LibEPANET  - EPANET library DLL name.
+            % ph	an EPANET project handle.
+            % Returns
+            % an error code.
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENopenX', inpFile, rptFile, outFile);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_openX', ph, inpFile, rptFile, outFile);
+            end
+        end
         function [Errcode] = apiENresetreport(LibEPANET, ph)
             % Resets a project's report options to their default values.
             %
