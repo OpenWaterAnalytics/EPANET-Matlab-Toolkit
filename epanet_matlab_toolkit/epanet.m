@@ -2048,6 +2048,7 @@ classdef epanet <handle
             end
         end
         function [Errcode, out_enabled] = apiENgetcontrolenabled(index, LibEPANET, ph)
+            % Gets the enabled status of a simple control.
             % Parameters:
             % index       The control's index (starting from 1)
             % LibEPANET   epanet library DLL name.
@@ -2061,6 +2062,7 @@ classdef epanet <handle
             end
         end
          function [Errcode] = apiENsetcontrolenabled(index, LibEPANET, ph, enabled)
+           	% Sets the enabled status of a simple control.
             % Parameters:
             % index       The control's index (starting from 1)
             % LibEPANET   epanet library DLL name.
@@ -2111,6 +2113,35 @@ classdef epanet <handle
                 [Errcode] = calllib(LibEPANET, 'ENdeleterule', index);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_deleterule', ph, index);
+            end
+        end
+        function [Errcode, out_enabled] = apiENgetruleenabled(index, LibEPANET, ph)
+            % Gets the enabled status of a rule-based control.
+            % Parameters:
+            % index       The rule's index (starting from 1)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            % Returns:
+            % an error code, 1 if the rule is enabled 0 if it is disabled
+            if ph.isNull
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetruleenabled', index, 0);
+            else
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetruleenabled', ph, index, 0);
+            end
+        end
+         function [Errcode] = apiENsetruleenabled(index, LibEPANET, ph, enabled)
+            % Sets the enabled status of a rule-based control.
+            % Parameters:
+            % index       The rule's index (starting from 1)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            % enabled     EN_TRUE (= 1) sets the rule to enabled, EN_FALSE (= 0) sets it to disabled.
+            % Returns:
+            % an error code.
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetruleenabled', index, enabled);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setruleenabled', index, ph, enabled);
             end
         end
         function [Errcode, logop, object, objIndex, variable, relop, status, value] = apiENgetpremise(ruleIndex, premiseIndex, LibEPANET, ph)
