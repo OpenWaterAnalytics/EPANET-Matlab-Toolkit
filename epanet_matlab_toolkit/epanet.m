@@ -5120,6 +5120,36 @@ classdef epanet <handle
                 obj.setRulePriority(ruleIndex, str2num(rule_new{i}(end)));
             end
         end
+        function setRuleEnabled(obj, index, enabled)
+            % Enables or disables a rule.
+            % 
+            % inputs:
+            %    index: the rule's index
+            %    enabled: 1 to enable the rule, 0 to disable it
+            %   
+            % Example:
+            %   d.setRuleEnabled(1, 1) - enables the first rule
+            %   d.getRuleEnabled(1)    - returns 1
+            %   d.setRuleEnabled(1, 0) - disables the first rule
+            %   d.getRuleEnabled(1)    - returns 0
+            [obj.Errcode] = obj.apiENsetruleenabled(index,obj.LibEPANET,obj.ph,enabled);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function enabled = getRuleEnabled(obj, index)
+            % Retrieves the enabled/disabled state of a rule.
+            % Returns 1 if the rule is enabled, 0 if disabled.
+            % 
+            % inputs:
+            %    index: the rule's index
+            %    enabled: 1 to enable the rule, 0 to disable it
+            %  
+            % Example:
+            %   d.getRuleEnabled(1)     - returns 1
+            %   d.setRuleEnabled(1, 0)
+            %   d.getRuleEnabled(1)     - returns 0
+            [obj.Errcode, enabled] = obj.apiENgetruleenabled(index,obj.LibEPANET,obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
         function setRuleThenAction(obj, ruleIndex, actionIndex, then_action)
             % Sets rule - based control then actions. (EPANET Version 2.2)
             %
@@ -11312,6 +11342,18 @@ classdef epanet <handle
                 [obj.Errcode] = obj.apiENdeletecontrol(index(i), obj.LibEPANET, obj.ph);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             end
+        end
+        function enabled = getControlState(obj, index)
+            % Retrieves the enabled/disabled state of a control.
+            % Returns 1 if the control is enabled, 0 if disabled.
+            %
+            % Example:
+            %   d.getControlState(1) - returns 1
+            %   d.apiENsetcontrolenabled(1, d.LibEPANET, d.ph, 0)
+            %   d.getControlState(1) - returns 0
+            %
+            [obj.Errcode, enabled] = obj.apiENgetcontrolenabled(index,obj.LibEPANET,obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function setLinkPipeData(obj, Index, Length, Diameter, RoughnessCoeff, MinorLossCoeff)
             % Sets a group of properties for a pipe. (EPANET Version 2.2)
