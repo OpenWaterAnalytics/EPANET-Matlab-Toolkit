@@ -400,16 +400,16 @@ classdef epanet <handle
         RULESTATUS={'OPEN', 'CLOSED', 'ACTIVE'}; % Constants for rule-based controls: 'OPEN', 'CLOSED', 'ACTIVE' % EPANET Version 2.2
         RULEPREMISECHECK={'NODE', 'JUNCTION', 'RESERVOIR', 'TANK', 'LINK', 'PIPE', 'PUMP', 'VALVE', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'JUNCTION' etc. % EPANET Version 2.2
         TYPECONTROL={'LOWLEVEL', 'HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL', 'HILEVEL', 'TIMER', 'TIMEOFDAY'
-        TYPECURVE={'VOLUME', 'PUMP', 'EFFICIENCY', 'HEADLOSS', 'GENERAL'}; % Constants for pump curves: 'PUMP', 'EFFICIENCY', 'VOLUME', 'HEADLOSS' % EPANET Version 2.2
-        TYPELINK={'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'}; % Constants for links: 'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'VALVE'
+        TYPECURVE={'VOLUME', 'PUMP', 'EFFICIENCY', 'HEADLOSS', 'GENERAL', 'VALVE'}; % Constants for pump curves: 'PUMP', 'EFFICIENCY', 'VOLUME', 'HEADLOSS' % EPANET Version 2.2
+        TYPELINK={'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'PCV'}; % Constants for links: 'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'VALVE'
         TYPEMIXMODEL={'MIX1', 'MIX2', 'FIFO', 'LIFO'}; % Constants for mixing models: 'MIX1', 'MIX2', 'FIFO', 'LIFO'
         TYPENODE={'JUNCTION', 'RESERVOIR', 'TANK'}; % Contants for nodes: 'JUNCTION', 'RESERVOIR', 'TANK'
-        TYPEPUMP={'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM'}; % Constants for pumps: 'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM'
+        TYPEPUMP={'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM', 'NO_CURVE'}; % Constants for pumps: 'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM'
         TYPEQUALITY={'NONE', 'CHEM', 'AGE', 'TRACE', 'MULTIS'}; % Constants for quality: 'NONE', 'CHEM', 'AGE', 'TRACE', 'MULTIS'
         TYPEREPORT={'YES', 'NO', 'FULL'}; % Constants for report: 'YES', 'NO', 'FULL'
         TYPESOURCE={'CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'}; % Constants for sources: 'CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'
         TYPESTATS={'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'}; % Constants for statistics: 'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'
-        TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
+        TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD', 'CMS'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
         TYPEHEADLOSS={'HW', 'DW', 'CM'}; % Constants of headloss types: HW: Hazen-Williams, DW: Darcy-Weisbach, CM: Chezy-Manning
         TYPESTATUS = {'CLOSED', 'OPEN'}; % Link status
         TYPEPUMPSTATE = {'XHEAD', '', 'CLOSED', 'OPEN', '', 'XFLOW'}; % Link PUMP status
@@ -10578,6 +10578,23 @@ classdef epanet <handle
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode, obj.LibEPANET, obj.ph);
         end
+        function index = addLinkValvePCV(obj, vID, fromNode, toNode)
+            % Adds a new PCV valve.
+            % Returns the index of the new PCV valve.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   valveID = 'newValvePCV';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   valveIndex = d.addLinkValvePCV(valveID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe,
+            %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PCV, fromNode, toNode, obj.LibEPANET, obj.ph);
+        end
         function [leftPipeIndex ,rightPipeIndex] = splitPipe(obj, pipeID, newPipeID, newNodeID)
             %SPLITPIPE
             % splits a pipe (pipeID), creating two new pipes (pipeID and newPipeID) and adds a
@@ -11637,6 +11654,35 @@ classdef epanet <handle
             end
             index = obj.check_if_numeric(id);
             [obj.Errcode, index] = obj.apiENsetlinktype(index, obj.ToolkitConstants.EN_TCV, condition, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function index = setLinkTypeValvePCV(obj, id, varargin)
+            % Sets the link type valve PCV (pressure control valve) for a specified link.
+            %
+            % condition = 0 | if EN_UNCONDITIONAL: Delete all controls that contain this object
+            % condition = 1 | if EN_CONDITIONAL: Cancel object type change if contained in controls
+            % Default condition is 0.
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                    % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                    % Retrieves the ID of the 1st pipe
+            %   index = d.setLinkTypeValvePCV(linkid);              % Changes the 1st pipe to valve PCV given its ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
+            %   condition = 1;
+            %   index = d.setLinkTypeValvePCV(linkid, condition);   % Changes the 1st pipe to valve PCV given its ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePump, setLinkTypeValveTCV.
+            condition = 0; % default
+            if nargin == 3
+                condition = varargin{1};
+            end
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = obj.apiENsetlinktype(index, obj.ToolkitConstants.EN_PCV, condition, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function setLinkLength(obj, value, varargin)
