@@ -1294,6 +1294,27 @@ classdef epanet <handle
             end
             value = double(value);
         end
+        function [Errcode, out_values] = apiENgetlinkvalues(property, LibEPANET, ph)
+            % Retrieves an array of property values for all links.
+            %
+            % Parameters:
+            % 
+            % property	the property to retrieve (see EN_LinkProperty).
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.          
+            % Returns:
+            % out_values	an array of values for all links.
+            % an error code.
+            % Values are returned in units that depend on the units used for flow rate (see Measurement Units).
+            nlinks = int32(0);
+            [Errcode, nlinks] = calllib(LibEPANET, 'ENgetcount', 2, nlinks);
+            out_values = zeros(nlinks, 1, 'double');
+            if ph.isNull
+                [Errcode, out_values] = calllib(LibEPANET, 'ENgetlinkvalues', property, out_values);
+            else
+                [Errcode, out_values] = calllib(LibEPANET, 'EN_getlinkvalues', ph, property, out_values);
+            end
+        end
         function [Errcode, id] = apiENgetnodeid(index, LibEPANET, ph)
             % Gets the ID name of a node given its index.
             %
