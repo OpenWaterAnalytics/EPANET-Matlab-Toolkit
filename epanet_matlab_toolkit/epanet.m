@@ -8618,6 +8618,110 @@ classdef epanet <handle
             [obj.Errcode] = obj.apiENsetcurvevalue(index, curvePnt, x, y, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function setCurveType(obj, index, type)
+            % Sets the type of a specified curve in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %     type: The desired type of the curve, based on the following categories:
+            %         - 0: Volume
+            %         - 1: Pump
+            %         - 2: Efficiency
+            %         - 3: Headloss
+            %         - 4: General
+            %         - 5: Valve
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveType(1, 0)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index,type,obj.LibEPANET,obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeVolume(obj, index)
+            % Sets the type of a specified curve to Volume in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeVolume(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_VOLUME_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypePump(obj, index)
+            % Sets the type of a specified curve to Pump in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypePump(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_PUMP_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeEfficiency(obj, index)
+            % Sets the type of a specified curve to Efficiency in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeEfficiency(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_EFFIC_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeHeadloss(obj, index)
+            % Sets the type of a specified curve to Headloss in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeHeadloss(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_HLOSS_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeGeneral(obj, index)
+            % Sets the type of a specified curve to General in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeGeneral(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_GENERIC_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeValveCurve(obj, index)
+            % Sets the type of a specified curve to Valve in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeValveCurve(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_VALVE_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
         function value = getPatternIndex(obj, varargin)
             % Retrieves the index of all or some time patterns given their IDs.
             %
