@@ -5162,28 +5162,28 @@ classdef epanet <handle
             %     nodecontrolid = d.getControls(1).NodeID
             %     nodecontrolindex = d.getNodeIndex(nodecontrolid)
             %     x = d.getNodeInControl(nodecontrolindex)
-            %     print(x)            # it will return 1
+            %    
             %
             % Example 2 Retrieving all Nodes:
             %     inpfile = "Net1.inp"
             %     d = epanet(inpfile)
             %
             %     x = d.getNodeInControl()
-            %     print(x)
+            %    
             %
             % Example 3 Retrieving more than one Node:
             %     inpfile = "Net1.inp"
             %     d = epanet(inpfile)
             %
             %     x = d.getNodeInControl(1, 2, 3, 9) #Node with index 9 is the one with control in Net1
-            %     print(x)
+            %    
             %
             % Example 4 Retrieving more than one link using list:
             %     inpfile = "Net1.inp"
             %     d = epanet(inpfile)
             %
             %     x = d.getNodeInControl([1, 2, 3, 9])
-            %     print(x)
+            %     
             if nargin == 1 % if no args, fetch for all nodes
                 nodeCount =  obj.getNodeCount;
                 result = zeros(nodeCount, 1);
@@ -5224,28 +5224,27 @@ classdef epanet <handle
             %     linkcontrolid = d.getControls(1).LinkID
             %     linkcontrolindex = d.getLinkIndex(linkcontrolid)
             %     x = d.getLinkInControl(linkcontrolindex)
-            %     print(x)                   # it will return 1
+            %     
             %
             % Example 2 Retrieving all Links:
             %     inpfile = "Net1.inp"
             %
             %     d = epanet(inpfile)
             %     x = d.getLinkInControl()
-            %     print(x)
+            %    
             %
             % Example 3 Retrieving more than one link:
             %     inpfile = "Net1.inp"
             %
             %     d = epanet(inpfile)
             %     x = d.getLinkInControl(1,2,3,13) #Link with index 13 is the one with control in Net1
-            %     print(x)
+            %   
             %
             % Example 4 Retrieving more than one link using list:
             %     inpfile = "Net1.inp"
             %
             %     d = epanet(inpfile)
-            %     x = d.getLinkInControl([1,2,3,13])
-            %     print(x)
+            %     x = d.getLinkInControl([1,2,3,13]) 
             if nargin == 1 % if no args, fetch for all links
                 linkCount =  obj.getLinkCount;
                 result = zeros(linkCount, 1);
@@ -6316,6 +6315,55 @@ classdef epanet <handle
             % See also getLinkType, getLinksInfo, getLinkInitialStatus,
             %          getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSETTING, varargin{:});
+        end
+        function value = getLinkLeakArea(obj, varargin)
+            % Function to retrieve the leak area for a specified link (pipe).
+            %
+            % Returns:
+            % value: The current leak area value for the specified link.
+            %
+            % Example 1 Retrieving all Links:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %     d.setLinkLeakArea(2,10.5)
+            %     x = d.getLinkLeakArea()
+            %     
+            %
+            % Example 2 Retrieving one link:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %     d.setLinkLeakArea(2,10.5)
+            %     x = d.getLinkLeakArea(2)
+            %     
+            % See also: setLinkLeakArea
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LEAK_AREA, varargin{:});
+        end
+        function value = getLinkExpansionProperties(obj, varargin)
+            % Function to retrieve the expansion properties for a specified link (pipe).
+            %
+            % Returns:
+            % valuet The current expansion property value for the specified link.
+            % Example 1 Retrieving all link expansion properties:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %     d.setLinkExpansionProperties(5,2)
+            %     x = d.getLinkExpansionProperties()
+            % 
+            % Example 2 Retrieving one link expansion property:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %     d.setLinkExpansionProperties(5,2)
+            %     x = d.getLinkExpansionProperties(5)
+            % See also : setLinkExpansionProperties()
+            
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LEAK_EXPAN, varargin{:});
+        end
+        function value = getLinkLeakageRate(obj, varargin)
+            % Retrieves the leakage rate of a specific pipe (link) at a given point in time.
+            %
+            % Returns:
+            %     float: The leakage rate of the specified pipe at the requested time point
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LINK_LEAKAGE, varargin{:});
         end
         function value = getLinkBulkReactionCoeff(obj, varargin)
             % Retrieves the value of all link bulk chemical reaction coefficient.
@@ -7781,6 +7829,46 @@ classdef epanet <handle
                 [obj.Errcode, value(v)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
                 v=v+1;
             end
+        end
+        function value = getNodeEmitterFlow(obj, index)
+            % Retrieves node emitter flow
+            %
+            % Args:
+            %     index : The index of the node for which the emitter flow is to be retrieved.
+            %
+            % Returns:
+            %     value: The amount of leakage flow at the specified node
+            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_EMITTERFLOW, obj.LibEPANET, obj.ph);
+        end
+        function value = getNodeLeakageFlow(obj, index)
+            % Retrieves the leakage flow for a specific node.
+            %
+            % Args:
+            %     index : The index of the node for which the leakage flow is to be retrieved.
+            %
+            % Returns:
+            %     value: The amount of leakage flow at the specified node
+            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_LEAKAGEFLOW, obj.LibEPANET, obj.ph);
+        end
+        function value = getConsumerDemandRequested(obj, index)
+            % Retrieves the requested consumer demand for a specific node.
+
+            % Args:
+            %     index : The index of the node for which the consumer demand is to be retrieved.
+
+            % Returns:
+            %     value: The full demand requested by the consumer at the specified node
+            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_FULLDEMAND, obj.LibEPANET, obj.ph);
+        end
+        function value = getConsumerDemandDelivered(obj, index)
+            % Retrieves the delivered consumer demand for a specific node.
+
+            % Args:
+            %     index : The index of the node for which the delivered consumer demand is to be retrieved.
+
+            % Returns:
+            %     value: The amount of demand delivered to the consumer at the specified node
+            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_DEMANDFLOW, obj.LibEPANET, obj.ph);
         end
         function value = getNodeTankInitialWaterVolume(obj, varargin)
             % Retrieves the tank initial water volume.
@@ -12136,6 +12224,43 @@ classdef epanet <handle
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_INITSETTING, value(j), obj.LibEPANET, obj.ph); j=j+1;
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             end
+        end
+        function setLinkLeakArea(obj, index, value)
+            % Function to set the leak area    for a specified link (pipe).
+            %
+            % input:
+            %     index : The index of the link(pipe) for which to set the leak area (starting from 1)
+            %     value : the value to assign as the leak area to the specified link
+            %
+            % Example:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %
+            %     d.setLinkLeakArea(2,10.5)
+            %     x = d.getLinkLeakArea()
+            %  
+            %
+            % See also: getLinkLeakArea
+            [obj.Errcode] = obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_LEAK_AREA, value, obj.LibEPANET, obj.ph)
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setLinkExpansionProperties(obj, index, value)
+            % Function to set the expansion properties for a specified link (pipe).
+            %
+            % Input:
+            % index : The index of the link (pipe) for which to set the expansion properties. (starting from 1)
+            % value : The value to assign as the expansion property for the specified link.
+            %
+            % Example:
+            %     inpfile = 'Net1.inp'
+            %     d = epanet(inpfile)
+            %     d.setLinkExpansionProperties(5,2)
+            %     x = d.getLinkExpansionProperties()
+            %
+            % See also:
+            %     getLinkExpansionProperties
+            [obj.Errcode] = obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_LEAK_EXPAN, value, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function setLinkBulkReactionCoeff(obj, value, varargin)
             % Sets the value of bulk chemical reaction coefficient.
