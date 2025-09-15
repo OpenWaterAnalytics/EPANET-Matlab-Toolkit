@@ -5150,6 +5150,130 @@ classdef epanet <handle
             [obj.Errcode, enabled] = obj.apiENgetruleenabled(index,obj.LibEPANET,obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function result = getNodeInControl(obj ,varargin)  
+            % Function to determine whether a node apperas in any simple or rule based control
+            %
+            % Return: 1 if the Node has control, 0 otherwise
+            %
+            % Example 1 Retrieving one Node:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     nodecontrolid = d.getControls(1).NodeID
+            %     nodecontrolindex = d.getNodeIndex(nodecontrolid)
+            %     x = d.getNodeInControl(nodecontrolindex)
+            %     print(x)            # it will return 1
+            %
+            % Example 2 Retrieving all Nodes:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %
+            %     x = d.getNodeInControl()
+            %     print(x)
+            %
+            % Example 3 Retrieving more than one Node:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %
+            %     x = d.getNodeInControl(1, 2, 3, 9) #Node with index 9 is the one with control in Net1
+            %     print(x)
+            %
+            % Example 4 Retrieving more than one link using list:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %
+            %     x = d.getNodeInControl([1, 2, 3, 9])
+            %     print(x)
+            if nargin == 1 % if no args, fetch for all nodes
+                nodeCount =  obj.getNodeCount;
+                result = zeros(nodeCount, 1);
+                for i = 1:nodeCount
+                    [obj.Errcode, temp] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
+                    result(i) = temp;  % store value in result
+                end
+            end
+            if nargin == 2 % if arg is a list or a single index
+                nodes = varargin{1};
+                if isscalar(nodes) % single index
+                    [obj.Errcode, result] = obj.apiENgetnodevalue(nodes, obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
+                else % list
+                    result = zeros(length(nodes), 1);
+                    for i = 1:length(nodes)
+                        [obj.Errcode, temp] = obj.apiENgetnodevalue(nodes(i), obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
+                        result(i) = temp;  % store value in result
+                    end
+                end
+            elseif nargin > 2 % Multiple arguments passed individually 
+                nodes = [varargin{:}];  % convert cell array into numeric array
+                result = zeros(length(nodes), 1);
+                for i = 1:length(nodes)
+                    [obj.Errcode, temp] = obj.apiENgetnodevalue(nodes(i), obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
+                    result(i) = temp;
+                end
+            end
+        end
+        function result = getLinkInControl(obj ,varargin)   
+            % Function to determine whether a link apperas in any simple or rule based control
+            %
+            % Return: 1 if the link has control, 0 otherwise
+            %
+            % Example 1 Retrieving one Link:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     linkcontrolid = d.getControls(1).LinkID
+            %     linkcontrolindex = d.getLinkIndex(linkcontrolid)
+            %     x = d.getLinkInControl(linkcontrolindex)
+            %     print(x)                   # it will return 1
+            %
+            % Example 2 Retrieving all Links:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     x = d.getLinkInControl()
+            %     print(x)
+            %
+            % Example 3 Retrieving more than one link:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     x = d.getLinkInControl(1,2,3,13) #Link with index 13 is the one with control in Net1
+            %     print(x)
+            %
+            % Example 4 Retrieving more than one link using list:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     x = d.getLinkInControl([1,2,3,13])
+            %     print(x)
+            if nargin == 1 % if no args, fetch for all links
+                linkCount =  obj.getLinkCount;
+                result = zeros(linkCount, 1);
+                for i = 1:linkCount
+                    [obj.Errcode, temp] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
+                    result(i) = temp;  % store value in result
+                end
+            end
+            if nargin == 2 % if arg is a list or a single index
+                links = varargin{1};
+                if isscalar(links) % single index
+                    [obj.Errcode, result] = obj.apiENgetlinkvalue(links, obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
+                else % list
+                    result = zeros(length(links), 1);
+                    for i = 1:length(links)
+                        [obj.Errcode, temp] = obj.apiENgetlinkvalue(links(i), obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
+                        result(i) = temp;  % store value in result
+                    end
+                end
+             elseif nargin > 2 % individual arguements
+                links = [varargin{:}];  % convert into numeric array
+                result = zeros(length(links), 1);
+                for i = 1:length(links)
+                    [obj.Errcode, temp] = obj.apiENgetlinkvalue(links(i), obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
+                    result(i) = temp;
+                end
+            end
+        end    
         function setRuleThenAction(obj, ruleIndex, actionIndex, then_action)
             % Sets rule - based control then actions. (EPANET Version 2.2)
             %
