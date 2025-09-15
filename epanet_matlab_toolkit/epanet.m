@@ -9239,6 +9239,32 @@ classdef epanet <handle
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENTTANK, obj.LibEPANET, obj.ph);
             %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function [eventType, duration, elementIndex] = getTimeToNextEvent(obj)
+            % Determines the type of event that will cause the end of the current time step,
+            % along with the duration until the event occurs and its index.
+            %
+            % Example:
+            %   d.getTimeToNextEvent
+            % Event Types:
+            %   0: REPORT   - A report generation event.
+            %   1: HYD      - A hydraulic event.
+            %   2: WQ       - A water quality event.
+            %   3: TANK     - A tank level event.
+            %   4: CONTROL  - A control rule event.
+            [eventType, duration, elementIndex] = obj.apiENtimetonextevent(obj.LibEPANET, obj.ph);
+            switch eventType
+                case 0
+                    eventType = 'REPORT';
+                case 1
+                    eventType = 'HYD';
+                case 2
+                    eventType = 'WQ';
+                case 3
+                    eventType = 'TANK';
+                case 4
+                    eventType = 'CONTROL';
+            end
+        end
         function value = getCurvesInfo(obj)
             % Retrieves all the info of curves. (EPANET Version 2.1)
             %
