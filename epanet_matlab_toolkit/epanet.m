@@ -7495,7 +7495,52 @@ classdef epanet <handle
             [obj.Errcode, value.RelativeError] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_RELATIVEERROR, obj.LibEPANET, obj.ph);
             [obj.Errcode, value.DeficientNodes] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEFICIENTNODES, obj.LibEPANET, obj.ph);
             [obj.Errcode, value.DemandReduction] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEMANDREDUCTION, obj.LibEPANET, obj.ph);
+            [obj.Errcode, value.DemandReduction] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_LEAKAGELOSS, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function result = getStatisticTotalLeakageLoss(obj)
+            % Retrieves the total leakage loss statistic from the simulation.
+            %
+            % Returns:
+            %   result : The total amount of leakage loss in the system
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_LEAKAGELOSS, obj.LibEPANET, obj.ph);
+        end
+
+        function result = getStatisticIterations(obj)
+            % Retrieves the number of iterations taken in the simulation.
+            %
+            % Returns:
+            %   result : The total number of iterations performed during hydraulic analysis
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_ITERATIONS, obj.LibEPANET, obj.ph);
+        end
+
+        function result = getStatisticRelativeError(obj)
+            % Retrieves the relative error statistic from the simulation.
+            %
+            % Returns:
+            %   result : The relative error from the last hydraulic iteration
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_RELATIVEERROR, obj.LibEPANET, obj.ph);
+        end
+
+        function result = getStatisticDeficientNodes(obj)
+            % Retrieves the number of deficient nodes in the simulation.
+            %
+            % Returns:
+            %   result : The number of nodes in the system that are unable to meet required demand
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEFICIENTNODES, obj.LibEPANET, obj.ph);
+        end
+
+        function result = getStatisticDemandReduction(obj)
+            % Retrieves the demand reduction statistic from the simulation.
+            %
+            % Returns:
+            %   result : The total demand reduction in the system
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEMANDREDUCTION, obj.LibEPANET, obj.ph);
         end
         function value = getNodePatternIndex(obj, varargin)
             % Retrieves the value of all node demand pattern indices.
