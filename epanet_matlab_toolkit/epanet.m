@@ -8484,6 +8484,37 @@ classdef epanet <handle
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_CHECKFREQ, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function result = getOptionsPressureUnits(obj)
+            % Gets the pressure unit used in EPANET
+            % Example:
+            %   d.getOptionsPressureUnits
+            [obj.Errcode, z] = obj.apiENgetoption(obj.ToolkitConstants.EN_PRESS_UNITS, obj.LibEPANET, obj.ph);
+            if z == obj.ToolkitConstants.EN_PSI
+                result = 'PSI';
+            elseif z == obj.ToolkitConstants.EN_KPA
+                result = 'KPA';
+            elseif z == obj.ToolkitConstants.EN_METERS
+                result = 'METERS';
+            else
+                result = 'UNKNOWN';
+            end
+        end
+        function result = getOptionsStatusReport(obj)
+            % Gets the status report option
+            %
+            % Example:
+            %   d.getOptionsStatusReport
+            [obj.Errcode, z] = obj.apiENgetoption(obj.ToolkitConstants.EN_STATUS_REPORT, obj.LibEPANET, obj.ph);
+            if z == obj.ToolkitConstants.EN_NO_REPORT
+                result = 'NO REPORT';
+            elseif z == obj.ToolkitConstants.EN_NORMAL_REPORT
+                result = 'NORMAL REPORT';
+            elseif z == obj.ToolkitConstants.EN_FULL_REPORT
+                result = 'FULL REPORT';
+            else
+                result = 'UNKNOWN';
+            end
+        end
         function value = getOptionsMaximumCheck(obj)
             % Retrieves the maximum trials for status checking. (EPANET Version 2.2)
             %
@@ -13473,6 +13504,44 @@ classdef epanet <handle
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_TRIALS, value, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function setOptionsStatusReport(obj, value)
+            % Sets the status report option for EPANET
+            % value can be one of:
+            %   EN_NO_REPORT, EN_NORMAL_REPORT, EN_FULL_REPORT
+            %
+            % Example:
+            %   d.setOptionsStatusReport(d.ToolkitConstants.EN_FULL_REPORT)
+            %   d.getOptionsStatusReport()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_STATUS_REPORT, value, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsStatusReportNo(obj)
+            % Sets status report to 'No Report'
+            %
+            % Example:
+            %   d.setOptionsStatusReportNo();
+            %   d.getOptionsStatusReport()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_STATUS_REPORT, obj.ToolkitConstants.EN_NO_REPORT, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsStatusReportNormal(obj)
+            % Sets status report to 'Normal Report'
+            %
+            % Example:
+            %   d.setOptionsStatusReportNormal();
+            %   d.getOptionsStatusReport()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_STATUS_REPORT, obj.ToolkitConstants.EN_NORMAL_REPORT, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsStatusReportFull(obj)
+            % Sets status report to 'Full Report'
+            %
+            % Example:
+            %   d.setOptionsStatusReportFull();
+            %   d.getOptionsStatusReport()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_STATUS_REPORT, obj.ToolkitConstants.EN_FULL_REPORT, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
         function setOptionsAccuracyValue(obj, value)
             % Sets the total normalized flow change for hydraulic convergence.
             %
@@ -13725,6 +13794,81 @@ classdef epanet <handle
             % See also getOptionsLimitingConcentration, setOptionsPipeBulkReactionOrder, setOptionsPipeWallReactionOrder.
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_CONCENLIMIT, value, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function metric = flowUnitsCheck(obj)
+            % Returns the metric of the system (PSI vs KPA/METERS)
+            % Uses the current flow units
+            flowunits = obj.getFlowUnits();
+            if any(strcmpi(flowunits, {'MDG', 'IMGD', 'CFS', 'GPM'}))
+                metric = "PSI";
+            elseif any(strcmpi(flowunits, {'CMH', 'CMS', 'MLD', 'CMD', 'LPS', 'LPM'}))
+                metric = 'KPA AND METERS';
+            else
+                metric = 'UNKNOWN';
+            end
+        end
+        function errorInChangingMetric(obj, wanted, nameofFunction)
+            % Checks if the metric change is not possible and suggests possible solutions
+            % and prints a warning in the MATLAB command window
+            current = obj.flowUnitsCheck();  
+            if strcmpi(current, 'PSI') && strcmpi(wanted, 'KPA AND METERS')
+                fprintf('*** UserWarning: Error in function: %s, the function did not change the metric. ***\n', nameofFunction);
+                fprintf('Please change the metric using one of the following:\n');
+                fprintf(' 1. setFlowUnitsCMH()  -> Cubic meters per hour\n');
+                fprintf(' 2. setFlowUnitsCMS()  -> Cubic meters per second\n');
+                fprintf(' 3. setFlowUnitsMLD()  -> Million liters per day\n');
+                fprintf(' 4. setFlowUnitsCMD()  -> Cubic meters per day\n');
+                fprintf(' 5. setFlowUnitsLPS()  -> Liters per second\n');
+                fprintf(' 6. setFlowUnitsLPM()  -> Liters per minute\n');
+            elseif strcmpi(current, "KPA AND METERS") && strcmpi(wanted, "PSI")
+                fprintf('*** UserWarning: Error in function: %s, the function did not change the metric. ***\n', nameofFunction);
+                fprintf('Please change the metric using one of the following:\n');
+                fprintf(' 1. setFlowUnitsAFD()   -> Acre-feet per day\n');
+                fprintf(' 2. setFlowUnitsIMGD()  -> Imperial million gallons per day\n');
+                fprintf(' 3. setFlowUnitsCFS()   -> Cubic feet per second\n');
+                fprintf(' 4. setFlowUnitsMGD()   -> Million gallons per day\n');
+                fprintf(' 5. setFlowUnitsGPM()   -> Gallons per minute\n');
+            else
+                fprintf('Metric change from "%s" to "%s" is allowed.\n', current, wanted);
+            end
+        end
+        function setOptionsPressureUnits(obj, value)
+            % Sets the pressure unit used in EPANET
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setOptionsPressureUnits(1); % e.g. PSI
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_PRESS_UNITS, value, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsPressureUnitsMeters(obj)
+            % Sets pressure units to METERS (if possible).
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setOptionsPressureUnitsMeters();
+            %   u = d.getOptionsPressureUnits();
+            obj.errorInChangingMetric("KPA AND METERS", "setOptionsPressureUnitsMeters");
+            obj.setOptionsPressureUnits(obj.ToolkitConstants.EN_METERS);
+        end
+        function setOptionsPressureUnitsPSI(obj)
+            % Sets pressure units to PSI (if possible).
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setOptionsPressureUnitsPSI();
+            %   u = d.getOptionsPressureUnits();
+            %
+            obj.errorInChangingMetric("PSI", "setOptionsPressureUnitsPSI");
+            obj.setOptionsPressureUnits(obj.ToolkitConstants.EN_PSI);
+        end
+        function setOptionsPressureUnitsKPA(obj)
+            % Sets pressure units to KPA (if possible).
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setOptionsPressureUnitsKPA();
+            obj.errorInChangingMetric("KPA AND METERS", "setOptionsPressureUnitsKPA");
+            obj.setOptionsPressureUnits(obj.ToolkitConstants.EN_KPA);
         end
         function setTimeSimulationDuration(obj, value)
             % Sets the simulation duration (in seconds).
