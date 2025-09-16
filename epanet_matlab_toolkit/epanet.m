@@ -13542,6 +13542,51 @@ classdef epanet <handle
             obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_STATUS_REPORT, obj.ToolkitConstants.EN_FULL_REPORT, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function value = getOptionsDemandPattern(obj)
+            % Retrieves the default demand pattern.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %  d.getOptionsDemandPattern()
+            %
+            [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_DEMANDPATTERN, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsDemandPattern(obj, value)
+            % Sets the default demand pattern.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %   d.setOptionsDemandPattern(3);
+            %   d.getOptionsDemandPattern()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_DEMANDPATTERN, value, obj.LibEPANET, obj.ph);
+        end
+        function value = getOptionsEmitterBackFlow(obj)
+            % Retrieves the current setting for allowing reverse flow through emitters.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %   x = d.getOptionsEmitterBackFlow();
+            %
+            % Returns:
+            %   1 if reverse flow is allowed (default), 0 if not.
+            [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_EMITBACKFLOW, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsEmitterBackFlowAllowed(obj)
+            % Sets the option to allow reverse flow through emitters.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %   d.setOptionsEmitterBackFlowAllowed();
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_EMITBACKFLOW, 1, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsEmitterBackFlowDisallowed(obj)
+            % Sets the option to prevent reverse flow through emitters.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %   d.setOptionsEmitterBackFlowDisallowed();
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_EMITBACKFLOW, 0, obj.LibEPANET, obj.ph);
+        end
         function setOptionsAccuracyValue(obj, value)
             % Sets the total normalized flow change for hydraulic convergence.
             %
