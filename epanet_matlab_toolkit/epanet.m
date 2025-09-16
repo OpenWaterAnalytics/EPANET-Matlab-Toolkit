@@ -14222,6 +14222,12 @@ classdef epanet <handle
             [obj.Errcode, tstep] = obj.apiENnextQ(obj.LibEPANET, obj.ph);
             tstep = double(tstep);
         end
+        function openX(obj, inpfile, rptfile, outfile)
+            % Enable the opening of input files with formatting error
+            % Example:
+            %   d.openX
+            [obj.Errcode] = obj.apiENopenX(inpfile, rptfile, outfile, obj.LibEPANET, obj.ph);
+        end
         function openHydraulicAnalysis(obj)
             % Opens the hydraulics analysis system.
             %
