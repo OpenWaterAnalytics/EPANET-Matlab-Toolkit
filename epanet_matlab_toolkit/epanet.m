@@ -9679,6 +9679,14 @@ classdef epanet <handle
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             end
         end
+        function result = getPatternAverageDefaultValue(obj)
+            % Retrieves the average value of the default pattern
+            %
+            % Example:
+            %   d.getPatternAverageDefaultValue
+            %
+            [obj.Errcode, result] = obj.apiENgetaveragepatternvalue(0, obj.LibEPANET, obj.ph);
+        end
         function value = getENfunctionsImpemented(obj)
             % Retrieves the epanet EN functions that have been developed.
             %
