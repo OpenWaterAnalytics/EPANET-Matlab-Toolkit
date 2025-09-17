@@ -6219,6 +6219,39 @@ classdef epanet <handle
                 end
             end
         end
+        function values = getLinkValues(obj, property)
+            % Purpose:
+            %   Retrieves property values for all links within the EPANET model 
+            %   during a hydraulic analysis.
+            %
+            % Example Usage:
+            %   d = epanet('Net1.inp');
+            %
+            %   d.openHydraulicAnalysis();
+            %   d.initializeHydraulicAnalysis();
+            %
+            %   tstep = 1;
+            %   P = []; T_H = []; D = []; H = []; F = []; S = [];
+            %
+            %   while tstep > 0
+            %       t = d.runHydraulicAnalysis();
+            %       S = [S; d.getLinkValues(d.ToolkitConstants.EN_FLOW)];
+            %       F = [F; d.getLinkFlows()];
+            %       T_H = [T_H; t];
+            %
+            %       disp(F);
+            %       disp(S);
+            %       disp(T_H);
+            %
+            %       tstep = d.nextHydraulicAnalysisStep();
+            %   end
+            %
+            %   d.closeHydraulicAnalysis();
+            %
+            % Returns:
+            %   values : array of property values for all links
+            [obj.Errcode, values] = obj.apiENgetlinkvalues(property, obj.LibEPANET, obj.ph);
+        end
         function value = getLinkDiameter(obj, varargin)
             % Retrieves the value of link diameters.
             % Pipe/valve diameter
@@ -7506,7 +7539,6 @@ classdef epanet <handle
             %
             [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_LEAKAGELOSS, obj.LibEPANET, obj.ph);
         end
-
         function result = getStatisticIterations(obj)
             % Retrieves the number of iterations taken in the simulation.
             %
@@ -7515,7 +7547,6 @@ classdef epanet <handle
             %
             [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_ITERATIONS, obj.LibEPANET, obj.ph);
         end
-
         function result = getStatisticRelativeError(obj)
             % Retrieves the relative error statistic from the simulation.
             %
@@ -7524,7 +7555,6 @@ classdef epanet <handle
             %
             [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_RELATIVEERROR, obj.LibEPANET, obj.ph);
         end
-
         function result = getStatisticDeficientNodes(obj)
             % Retrieves the number of deficient nodes in the simulation.
             %
@@ -7533,7 +7563,6 @@ classdef epanet <handle
             %
             [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEFICIENTNODES, obj.LibEPANET, obj.ph);
         end
-
         function result = getStatisticDemandReduction(obj)
             % Retrieves the demand reduction statistic from the simulation.
             %
