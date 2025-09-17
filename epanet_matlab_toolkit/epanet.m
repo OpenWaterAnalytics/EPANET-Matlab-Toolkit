@@ -1294,7 +1294,7 @@ classdef epanet <handle
             end
             value = double(value);
         end
-        function [Errcode, out_values] = apiENgetlinkvalues(property, LibEPANET, ph)
+        function [Errcode, out_values] = apiENgetlinkinfo(property, LibEPANET, ph)
             % Retrieves an array of property values for all links.
             %
             % Parameters:
@@ -5843,6 +5843,86 @@ classdef epanet <handle
             pipepump = sum(strcmp(LinkType1, 'PIPE')+strcmp(LinkType1, 'CVPIPE')+strcmp(LinkType1, 'PUMP'));
             value = obj.getLinkCount - pipepump;
         end
+        function values = getLinkValveCurveGPV(obj, varargin)
+            % Retrieves the valve curve for a specified General Purpose Valve (GPV).
+            %
+            % Returns:
+            %   values: 1 if the link is a GPV, 0 if it is not.
+            %
+            % Example for one Valve:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValveGPV(linkid, condition);
+            %   d.setLinkValveCurveGPV(index, 1);
+            %   x = d.getLinkValveCurveGPV(index);
+            %   disp(x);
+            %
+            % Example for all Valves:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValveGPV(linkid, condition);
+            %   d.setLinkValveCurveGPV(index, 1);
+            %   x = d.getLinkValveCurveGPV();
+            %   disp(x);
+            values = obj.getLinkInfo(obj.ToolkitConstants.EN_GPV_CURVE);
+        end
+        function values = getLinkValveCurvePCV(obj, varargin)
+            % Retrieves the valve curve for a specified Pressure Control Valve (PCV).
+            %
+            % Returns:
+            %   values: 1 if the link is a PCV, 0 if it is not.
+            %
+            % Example for one Valve:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValvePCV(linkid, condition);
+            %   d.setLinkValveCurvePCV(index, 1);
+            %   x = d.getLinkValveCurvePCV(index);
+            %   disp(x);
+            %
+            % Example for all Valves:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValvePCV(linkid, condition);
+            %   d.setLinkValveCurvePCV(index, 1);
+            %   x = d.getLinkValveCurvePCV();
+            %   disp(x);
+            values = obj.getLinkInfo(obj.ToolkitConstants.EN_PCV_CURVE);
+        end
+        function setLinkValveCurveGPV(obj, index, value)
+            % Sets the valve curve for a specified General Purpose Valve (GPV).
+            %
+            % Parameters:
+            %   index: The index of the GPV to be set. (starting from 1)
+            %   value: The value to set for the valve curve 
+            %                  (1 for GPV, 0 for not).
+            % Example:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValveGPV(linkid, condition);
+            %   d.setLinkValveCurveGPV(index, 1);
+            obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_GPV_CURVE, value, obj.LibEPANET, obj.ph);
+        end
+        function setLinkValveCurvePCV(obj, index, value)
+            % Sets the valve curve for a specified Pressure Control Valve (PCV).
+            %
+            % Parameters:
+            %   index: The index of the PCV to be set. (starting from 1)
+            %   value: The value to set for the valve curve 
+            %                  (1 for PCV, 0 for not).
+            % Example:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValvePCV(linkid, condition);
+            %   d.setLinkValveCurvePCV(index, 1);
+            obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_PCV_CURVE, value, obj.LibEPANET, obj.ph);
+        end
         function [errmssg, Errcode] = getError(obj, Errcode)
             % Retrieves the text of the message associated with a particular error or warning code.
             %
@@ -6219,7 +6299,7 @@ classdef epanet <handle
                 end
             end
         end
-        function values = getLinkValues(obj, property)
+        function values = getLinkInfo(obj, property)
             % Purpose:
             %   Retrieves property values for all links within the EPANET model 
             %   during a hydraulic analysis.
@@ -6235,7 +6315,7 @@ classdef epanet <handle
             %
             %   while tstep > 0
             %       t = d.runHydraulicAnalysis();
-            %       S = [S; d.getLinkValues(d.ToolkitConstants.EN_FLOW)];
+            %       S = [S; d.getLinkInfo(d.ToolkitConstants.EN_FLOW)];
             %       F = [F; d.getLinkFlows()];
             %       T_H = [T_H; t];
             %
@@ -6250,7 +6330,7 @@ classdef epanet <handle
             %
             % Returns:
             %   values : array of property values for all links
-            [obj.Errcode, values] = obj.apiENgetlinkvalues(property, obj.LibEPANET, obj.ph);
+            [obj.Errcode, values] = obj.apiENgetlinkinfo(property, obj.LibEPANET, obj.ph);
         end
         function value = getLinkDiameter(obj, varargin)
             % Retrieves the value of link diameters.
