@@ -14322,6 +14322,16 @@ classdef epanet <handle
             % See also setFlowUnitsMLD, setFlowUnitsCMH.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CMD, 1, varargin); % cubic meters per day
         end
+        function [Errcode]=setFlowUnitsCMS(obj, varargin)
+            % Sets flow units to CMS(Cubic Meters per second).
+            %
+            % Example:
+            %   d.setFlowUnitsCMS;  
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsMLD, setFlowUnitsCMH.
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CMS, 1, varargin); % cubic meters per second
+        end
         function closeNetwork(obj)
             % Closes down the Toolkit system.
             %
