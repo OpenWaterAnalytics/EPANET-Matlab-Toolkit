@@ -2202,7 +2202,7 @@ classdef epanet <handle
                 [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetruleenabled', ph, index, 0);
             end
         end
-         function [Errcode] = apiENsetruleenabled(index, LibEPANET, ph, enabled)
+        function [Errcode] = apiENsetruleenabled(index, LibEPANET, ph, enabled)
             % Sets the enabled status of a rule-based control.
             % Parameters:
             % index       The rule's index (starting from 1)
@@ -5122,33 +5122,48 @@ classdef epanet <handle
         end
         function setRuleEnabled(obj, index, enabled)
             % Enables or disables a rule.
-            % 
-            % inputs:
-            %    index: the rule's index
-            %    enabled: 1 to enable the rule, 0 to disable it
-            %   
+            %
+            % Parameters:
+            %   index: the rule index (starting from 1)
+            %   enabled: 1 to enable the rule, 0 to disable it
+            %
             % Example:
-            %   d.setRuleEnabled(1, 1) - enables the first rule
-            %   d.getRuleEnabled(1)    - returns 1
-            %   d.setRuleEnabled(1, 0) - disables the first rule
-            %   d.getRuleEnabled(1)    - returns 0
-            [obj.Errcode] = obj.apiENsetruleenabled(index,obj.LibEPANET,obj.ph,enabled);
+            %   d.setRuleEnabled(1, 1)   % enables rule at index 1
+            %   d.getRuleEnabled(1)      % returns 1
+            %   d.setRuleEnabled(1, 0)   % disables rule at index 1
+            %   d.getRuleEnabled(1)      % returns 0
+            %
+            [obj.Errcode] = obj.apiENsetruleenabled(index, obj.LibEPANET, obj.ph, enabled);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function enabled = getRuleEnabled(obj, index)
-            % Retrieves the enabled/disabled state of a rule.
-            % Returns 1 if the rule is enabled, 0 if disabled.
-            % 
-            % inputs:
-            %    index: the rule's index
-            %    enabled: 1 to enable the rule, 0 to disable it
-            %  
+            % Retrieves the enabled/disabled state of one or all rules.
+            %
+            % Usage:
+            %   state = d.getRuleEnabled(1)   % get state of rule at index 1
+            %   state = d.getRuleEnabled()    % get states of all rules
+            %
+            % Returns:
+            %   enabled - 1 if rule is enabled, 0 if disabled
+            %
             % Example:
-            %   d.getRuleEnabled(1)     - returns 1
-            %   d.setRuleEnabled(1, 0)
-            %   d.getRuleEnabled(1)     - returns 0
-            [obj.Errcode, enabled] = obj.apiENgetruleenabled(index,obj.LibEPANET,obj.ph);
-            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            %   inpfile = 'Net1.inp';
+            %   d = epanet(inpfile);
+            %   s1 = d.getRuleEnabled(1);   % single rule
+            %   sall = d.getRuleEnabled();  % all rules
+            %
+            if nargin < 2   % get all rules
+                count = obj.getRuleCount();
+                enabled = zeros(count,1);
+                for i = 1:count
+                    [obj.Errcode, out] = obj.apiENgetruleenabled(i, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                    enabled(i) = out;
+                end
+            else            % single rule
+                [obj.Errcode, enabled] = obj.apiENgetruleenabled(index, obj.LibEPANET, obj.ph);
+                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            end
         end
         function result = getNodeInControl(obj ,varargin)  
             % Function to determine whether a node apperas in any simple or rule based control
@@ -9149,6 +9164,28 @@ classdef epanet <handle
             [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_VALVE_CURVE, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function setVertex(obj, index, vertex, x, y)
+            % setVertex Sets the coordinates of a vertex point assigned to a link.
+            %
+            %   d.setVertex(index, vertex, x, y)
+            %
+            % Parameters:
+            %   index   - Link index (starting from 1).
+            %   vertex  - Vertex index (starting from 1).
+            %   x       - X-coordinate of the vertex.
+            %   y       - Y-coordinate of the vertex.
+            %
+            % Example:
+            %   inpfile = 'Net1.inp';
+            %   d = epanet(inpfile);
+            %   d.setVertex(1, 1, 100, 200)   % sets first vertex of link 1
+            %
+            % Notes:
+            %   Requires that the link has at least one vertex.
+            %
+            obj.Errcode = obj.apiENsetvertex(index, vertex, x, y, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
         function value = getPatternIndex(obj, varargin)
             % Retrieves the index of all or some time patterns given their IDs.
             %
@@ -11775,16 +11812,34 @@ classdef epanet <handle
             end
         end
         function enabled = getControlState(obj, index)
-            % Retrieves the enabled/disabled state of a control.
-            % Returns 1 if the control is enabled, 0 if disabled.
+            % Retrieves the enabled/disabled state of one or all controls.
+            %
+            % Usage:
+            %   state = d.getControlState(1)   % get state of control at index 1
+            %   state = d.getControlState()    % get states of all controls
+            %
+            % Returns:
+            %   enabled: 1 if control is enabled, 0 if disabled
+            %             vector if no index is provided
             %
             % Example:
-            %   d.getControlState(1) - returns 1
-            %   d.apiENsetcontrolenabled(1, d.LibEPANET, d.ph, 0)
-            %   d.getControlState(1) - returns 0
+            %   inpfile = 'Net1.inp';
+            %   d = epanet(inpfile);
+            %   s1 = d.getControlState(1);   % single control
+            %   sall = d.getControlState();  % all controls
             %
-            [obj.Errcode, enabled] = obj.apiENgetcontrolenabled(index,obj.LibEPANET,obj.ph);
-            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            if nargin < 2  
+                count = obj.getControlRulesCount;
+                enabled = zeros(count,1);
+                for i = 1:count
+                    [obj.Errcode, out] = obj.apiENgetcontrolenabled(i, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                    enabled(i) = out;
+                end
+            else            % single control
+                [obj.Errcode, enabled] = obj.apiENgetcontrolenabled(index, obj.LibEPANET, obj.ph);
+                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            end
         end
         function setLinkPipeData(obj, Index, Length, Diameter, RoughnessCoeff, MinorLossCoeff)
             % Sets a group of properties for a pipe. (EPANET Version 2.2)
@@ -12434,7 +12489,7 @@ classdef epanet <handle
             %  
             %
             % See also: getLinkLeakArea
-            [obj.Errcode] = obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_LEAK_AREA, value, obj.LibEPANET, obj.ph)
+            [obj.Errcode] = obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_LEAK_AREA, value, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function setLinkExpansionProperties(obj, index, value)
@@ -14723,13 +14778,13 @@ classdef epanet <handle
             % See also getComputedHydraulicTimeSeries, deleteNode, getLinkResultIndex
             [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_NODE, node_index, obj.LibEPANET, obj.ph);
         end
-        function loadpatternfile(obj, filename, patID)
+        function loadPatternFile(obj, filename, patID)
             %minimun example:
             % start_toolkit;
             % d = epanet('Net1.inp');
             % d.loadpatternfile('abc.pat','4')
             % d.saveInputFile('Net1.inp')
-            [obj.Errcode] = obj.apiENloadpatternfile(obj.LibEPANET, filename, patID, obj.ph)
+            [obj.Errcode] = obj.apiENloadpatternfile(obj.LibEPANET, filename, patID, obj.ph);
         end
         function resultindex = getLinkResultIndex(obj, link_index)
             % Retrieves the order in which a link's results
