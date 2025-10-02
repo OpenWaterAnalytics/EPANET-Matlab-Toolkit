@@ -42,6 +42,7 @@ matlab -nodisplay -r "addpath(genpath('$PWD')); savepath"
 - [List of EPANET 2.1 Functions Supported](#list-of-epanet-21-functions-supported)
 - [List of EPANET 2.012 Functions Supported](#list-of-epanet-2012-functions-supported)
 - [List of EPANET 2.2 Functions Supported](#list-of-epanet-22-functions-supported)
+- [List of EPANET 2.3 Functions Supported](#list-of-epanet-23-functions-supported)
 
 ## How to cite
 
@@ -907,6 +908,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetvertices|Assigns a set of internal vertex points to a link|
 |ENgetresultindex|Retrieves the order in which a node's or link's results were saved to an output file|
 |ENinit|Initializes an EPANET project that isn't opened with an input file|
+
+&uparrow; [Back to top](#table-of-contents)
 
 ## List of EPANET 2.3 Functions Supported
 
