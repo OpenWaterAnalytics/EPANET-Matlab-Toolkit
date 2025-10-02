@@ -1971,6 +1971,20 @@ classdef epanet <handle
             % ph	an EPANET project handle.
             % Returns
             % an error code.
+            if ~isfile(inpFile)  % search for the inp file
+                networksFolder = fullfile(pwd, 'networks');
+                files = dir(fullfile(networksFolder, '**', inpFile)); 
+                if isempty(files)
+                    error('Input file "%s" not found in ./networks or its subfolders.', inpFile);
+                end
+                inpFile = fullfile(files(1).folder, files(1).name); 
+            end
+            if isempty(rptFile)
+                rptFile = fullfile(inpPath, [inpName, '.rpt']);
+            end
+            if isempty(outFile)
+                outFile = fullfile(inpPath, [inpName, '.out']);
+            end
             if ph.isNull
                 [Errcode] = calllib(LibEPANET, 'ENopenX', inpFile, rptFile, outFile);
             else
@@ -14641,7 +14655,8 @@ classdef epanet <handle
         function openX(obj, inpfile, rptfile, outfile)
             % Enable the opening of input files with formatting error
             % Example:
-            %   d.openX
+            %   d = epanet();    
+            %   d.openX('Net1.inp', 'Net1.rpt', 'Net1.out');
             [obj.Errcode] = obj.apiENopenX(inpfile, rptfile, outfile, obj.LibEPANET, obj.ph);
         end
         function openHydraulicAnalysis(obj)
