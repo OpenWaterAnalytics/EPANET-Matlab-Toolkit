@@ -172,16 +172,13 @@ tStep = 1;
 stepCount = 0;
 maxSteps = 2;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% getLinkInfo?? 
-
 % Run hydraulic analysis
 while tStep > 0 && stepCount < maxSteps
     % Run next time step
     t = d.runHydraulicAnalysis();
     
     % Get link flow 
-    flows = d.getLinkInfo(d.ToolkitConstants.EN_FLOW);
+    flows = d.getLinkValues(d.ToolkitConstants.EN_FLOW);
     
     % Save current time
     Time_H = [Time_H; t];

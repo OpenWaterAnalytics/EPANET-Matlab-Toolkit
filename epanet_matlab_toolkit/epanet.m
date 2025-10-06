@@ -1294,7 +1294,7 @@ classdef epanet <handle
             end
             value = double(value);
         end
-        function [Errcode, out_values] = apiENgetlinkinfo(property, LibEPANET, ph)
+        function [Errcode, out_values] = apiENgetlinkvalues(property, LibEPANET, ph)
             % Retrieves an array of property values for all links.
             %
             % Parameters:
@@ -5895,7 +5895,7 @@ classdef epanet <handle
             %   d.setLinkValveCurveGPV(index, 1);
             %   x = d.getLinkValveCurveGPV();
             %   disp(x);
-            values = obj.getLinkInfo(obj.ToolkitConstants.EN_GPV_CURVE);
+            values = obj.getLinkValues(obj.ToolkitConstants.EN_GPV_CURVE);
         end
         function values = getLinkValveCurvePCV(obj, varargin)
             % Retrieves the valve curve for a specified Pressure Control Valve (PCV).
@@ -5920,7 +5920,7 @@ classdef epanet <handle
             %   d.setLinkValveCurvePCV(index, 1);
             %   x = d.getLinkValveCurvePCV();
             %   disp(x);
-            values = obj.getLinkInfo(obj.ToolkitConstants.EN_PCV_CURVE);
+            values = obj.getLinkValues(obj.ToolkitConstants.EN_PCV_CURVE);
         end
         function setLinkValveCurveGPV(obj, index, value)
             % Sets the valve curve for a specified General Purpose Valve (GPV).
@@ -6328,7 +6328,7 @@ classdef epanet <handle
                 end
             end
         end
-        function values = getLinkInfo(obj, property)
+        function values = getLinkValues(obj, property)
             % Purpose:
             %   Retrieves property values for all links within the EPANET model 
             %   during a hydraulic analysis.
@@ -6344,7 +6344,7 @@ classdef epanet <handle
             %
             %   while tstep > 0
             %       t = d.runHydraulicAnalysis();
-            %       S = [S; d.getLinkInfo(d.ToolkitConstants.EN_FLOW)];
+            %       S = [S; d.getLinkValues(d.ToolkitConstants.EN_FLOW)];
             %       F = [F; d.getLinkFlows()];
             %       T_H = [T_H; t];
             %
@@ -6359,7 +6359,7 @@ classdef epanet <handle
             %
             % Returns:
             %   values : array of property values for all links
-            [obj.Errcode, values] = obj.apiENgetlinkinfo(property, obj.LibEPANET, obj.ph);
+            [obj.Errcode, values] = obj.apiENgetlinkvalues(property, obj.LibEPANET, obj.ph);
         end
         function value = getLinkDiameter(obj, varargin)
             % Retrieves the value of link diameters.
