@@ -400,16 +400,16 @@ classdef epanet <handle
         RULESTATUS={'OPEN', 'CLOSED', 'ACTIVE'}; % Constants for rule-based controls: 'OPEN', 'CLOSED', 'ACTIVE' % EPANET Version 2.2
         RULEPREMISECHECK={'NODE', 'JUNCTION', 'RESERVOIR', 'TANK', 'LINK', 'PIPE', 'PUMP', 'VALVE', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'JUNCTION' etc. % EPANET Version 2.2
         TYPECONTROL={'LOWLEVEL', 'HIGHLEVEL', 'TIMER', 'TIMEOFDAY'}; % Constants for control: 'LOWLEVEL', 'HILEVEL', 'TIMER', 'TIMEOFDAY'
-        TYPECURVE={'VOLUME', 'PUMP', 'EFFICIENCY', 'HEADLOSS', 'GENERAL'}; % Constants for pump curves: 'PUMP', 'EFFICIENCY', 'VOLUME', 'HEADLOSS' % EPANET Version 2.2
-        TYPELINK={'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'}; % Constants for links: 'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'VALVE'
+        TYPECURVE={'VOLUME', 'PUMP', 'EFFICIENCY', 'HEADLOSS', 'GENERAL', 'VALVE'}; % Constants for pump curves: 'PUMP', 'EFFICIENCY', 'VOLUME', 'HEADLOSS' % EPANET Version 2.2
+        TYPELINK={'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'PCV'}; % Constants for links: 'CVPIPE', 'PIPE', 'PUMP', 'PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV', 'VALVE'
         TYPEMIXMODEL={'MIX1', 'MIX2', 'FIFO', 'LIFO'}; % Constants for mixing models: 'MIX1', 'MIX2', 'FIFO', 'LIFO'
         TYPENODE={'JUNCTION', 'RESERVOIR', 'TANK'}; % Contants for nodes: 'JUNCTION', 'RESERVOIR', 'TANK'
-        TYPEPUMP={'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM'}; % Constants for pumps: 'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM'
+        TYPEPUMP={'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM', 'NO_CURVE'}; % Constants for pumps: 'CONSTANT_HORSEPOWER', 'POWER_FUNCTION', 'CUSTOM'
         TYPEQUALITY={'NONE', 'CHEM', 'AGE', 'TRACE', 'MULTIS'}; % Constants for quality: 'NONE', 'CHEM', 'AGE', 'TRACE', 'MULTIS'
         TYPEREPORT={'YES', 'NO', 'FULL'}; % Constants for report: 'YES', 'NO', 'FULL'
         TYPESOURCE={'CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'}; % Constants for sources: 'CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'
         TYPESTATS={'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'}; % Constants for statistics: 'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'
-        TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
+        TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD', 'CMS'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
         TYPEHEADLOSS={'HW', 'DW', 'CM'}; % Constants of headloss types: HW: Hazen-Williams, DW: Darcy-Weisbach, CM: Chezy-Manning
         TYPESTATUS = {'CLOSED', 'OPEN'}; % Link status
         TYPEPUMPSTATE = {'XHEAD', '', 'CLOSED', 'OPEN', '', 'XFLOW'}; % Link PUMP status
@@ -1294,6 +1294,27 @@ classdef epanet <handle
             end
             value = double(value);
         end
+        function [Errcode, out_values] = apiENgetlinkvalues(property, LibEPANET, ph)
+            % Retrieves an array of property values for all links.
+            %
+            % Parameters:
+            % 
+            % property	the property to retrieve (see EN_LinkProperty).
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.          
+            % Returns:
+            % out_values	an array of values for all links.
+            % an error code.
+            % Values are returned in units that depend on the units used for flow rate (see Measurement Units).
+            nlinks = int32(0);
+            [Errcode, nlinks] = calllib(LibEPANET, 'ENgetcount', 2, nlinks);
+            out_values = zeros(nlinks, 1, 'double');
+            if ph.isNull
+                [Errcode, out_values] = calllib(LibEPANET, 'ENgetlinkvalues', property, out_values);
+            else
+                [Errcode, out_values] = calllib(LibEPANET, 'EN_getlinkvalues', ph, property, out_values);
+            end
+        end
         function [Errcode, id] = apiENgetnodeid(index, LibEPANET, ph)
             % Gets the ID name of a node given its index.
             %
@@ -1498,6 +1519,25 @@ classdef epanet <handle
                 [Errcode, type] = calllib(LibEPANET, 'ENgetcurvetype', index, 0);
             else
                 [Errcode, ~, type] = calllib(LibEPANET, 'EN_getcurvetype', ph, index, 0);
+            end
+        end
+        function [Errcode] = apiENsetcurvetype(index, type, LibEPANET, ph)
+            % Sets curve's type (pump, valve, etc.)
+            %
+            % apiENsetcurvetype(index, type, LibEPANET, ph)
+            %
+            % Parameters:
+            % index       a curve's index (starting from 1).
+            % type        the curve's type (see EN_CurveType)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            %
+            % Returns:
+            % an error code.
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetcurvetype', index, type);
+            else
+                [Errcode, ~] = calllib(LibEPANET, 'EN_setcurvetype', ph, index, type);
             end
         end
         function [Errcode, index] = apiENgetpatternindex(id, LibEPANET, ph)
@@ -1884,6 +1924,22 @@ classdef epanet <handle
                 [Errcode, ~, value] = calllib(LibEPANET, 'EN_getresultindex', ph, objecttype, index, int32(0));
             end
         end
+        function [eventType, duration, elementIndex] = apiENtimetonextevent(LibEPANET, ph)
+            % Gets information about when the next hydraulic time step occurs.
+
+            % Parameters:
+            % LibEPANET   epanet library DLL name.
+            % ph	an EPANET project handle.
+            % Returns
+            % eventType	the type of event that will occur (see EN_TimestepEvent).
+            % duration	the amount of time in the future this event will occur
+            % elementIndex	the index of the element causing the event.
+            if ph.isNull
+                [eventType, duration, elementIndex] = calllib(LibEPANET, 'ENtimetonextevent', int32(0),int32(0),int32(0));
+            else
+                [eventType, duration, elementIndex] = calllib(LibEPANET, 'EN_timetonextevent', ph, int32(0),int32(0),int32(0));
+            end
+        end
         function [Errcode] = apiENloadpatternfile(LibEPANET, filename, pat, ph)
             %Loads pattern file
             %
@@ -1902,6 +1958,37 @@ classdef epanet <handle
                 [Errcode] = calllib(LibEPANET, 'ENloadpatternfile', filename, pat);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_loadpatternfile', ph, filename, pat);
+            end
+        end
+        function [Errcode] = apiENopenX(inpFile, rptFile, outFile, LibEPANET, ph)
+            % Reads an EPANET input file with errors allowed.
+            %
+            % Parameters
+            % inpFile	the name of an existing EPANET-formatted input file.
+            % rptFile	the name of a report file to be created (or "" if not needed).
+            % outFile	the name of a binary output file to be created (or "" if not needed).
+            % LibEPANET  - EPANET library DLL name.
+            % ph	an EPANET project handle.
+            % Returns
+            % an error code.
+            if ~isfile(inpFile)  % search for the inp file
+                networksFolder = fullfile(pwd, 'networks');
+                files = dir(fullfile(networksFolder, '**', inpFile)); 
+                if isempty(files)
+                    error('Input file "%s" not found in ./networks or its subfolders.', inpFile);
+                end
+                inpFile = fullfile(files(1).folder, files(1).name); 
+            end
+            if isempty(rptFile)
+                rptFile = fullfile(inpPath, [inpName, '.rpt']);
+            end
+            if isempty(outFile)
+                outFile = fullfile(inpPath, [inpName, '.out']);
+            end
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENopenX', inpFile, rptFile, outFile);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_openX', ph, inpFile, rptFile, outFile);
             end
         end
         function [Errcode] = apiENresetreport(LibEPANET, ph)
@@ -2047,6 +2134,35 @@ classdef epanet <handle
                 [Errcode] = calllib(LibEPANET, 'EN_setcontrol', ph, cindex, ctype, lindex, setting, nindex, level);
             end
         end
+        function [Errcode, out_enabled] = apiENgetcontrolenabled(index, LibEPANET, ph)
+            % Gets the enabled status of a simple control.
+            % Parameters:
+            % index       The control's index (starting from 1)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            % Returns:
+            % an error code, if the control is enabled
+            if ph.isNull
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetcontrolenabled', index, 0);
+            else
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetcontrolenabled', ph, index, 0);
+            end
+        end
+         function [Errcode] = apiENsetcontrolenabled(index, LibEPANET, ph, enabled)
+           	% Sets the enabled status of a simple control.
+            % Parameters:
+            % index       The control's index (starting from 1)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            % enabled     EN_TRUE (= 1) sets the control to enabled, EN_FALSE (= 0) sets it to disabled.
+            % Returns:
+            % an error code.
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetcontrolenabled', index, enabled);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setcontrolenabled', index, ph, enabled);
+            end
+        end
         function [Errcode] = apiENaddrule(rule, LibEPANET, ph)
             % Adds a new rule-based control to a project.
             %
@@ -2084,6 +2200,35 @@ classdef epanet <handle
                 [Errcode] = calllib(LibEPANET, 'ENdeleterule', index);
             else
                 [Errcode] = calllib(LibEPANET, 'EN_deleterule', ph, index);
+            end
+        end
+        function [Errcode, out_enabled] = apiENgetruleenabled(index, LibEPANET, ph)
+            % Gets the enabled status of a rule-based control.
+            % Parameters:
+            % index       The rule's index (starting from 1)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            % Returns:
+            % an error code, 1 if the rule is enabled 0 if it is disabled
+            if ph.isNull
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetruleenabled', index, 0);
+            else
+                [Errcode, out_enabled] = calllib(LibEPANET, 'ENgetruleenabled', ph, index, 0);
+            end
+        end
+        function [Errcode] = apiENsetruleenabled(index, LibEPANET, ph, enabled)
+            % Sets the enabled status of a rule-based control.
+            % Parameters:
+            % index       The rule's index (starting from 1)
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.
+            % enabled     EN_TRUE (= 1) sets the rule to enabled, EN_FALSE (= 0) sets it to disabled.
+            % Returns:
+            % an error code.
+            if ph.isNull
+                [Errcode] = calllib(LibEPANET, 'ENsetruleenabled', index, enabled);
+            else
+                [Errcode] = calllib(LibEPANET, 'EN_setruleenabled', index, ph, enabled);
             end
         end
         function [Errcode, logop, object, objIndex, variable, relop, status, value] = apiENgetpremise(ruleIndex, premiseIndex, LibEPANET, ph)
@@ -3040,6 +3185,25 @@ classdef epanet <handle
                 [Errcode, count] = calllib(LibEPANET, 'ENgetvertexcount', index, 0);
             else
                 [Errcode, ~, count] = calllib(LibEPANET, 'EN_getvertexcount', ph, index, 0);
+            end
+        end
+        function [Errcode] = apiENsetvertex(index, vertex, x, y, LibEPANET, ph)
+            % Sets the coordinates of a vertex point assigned to a link.
+
+            % Parameters:
+            % index	a link's index (starting from 1).
+            % vertex	a vertex point index (starting from 1).
+            % x	the vertex's X-coordinate value.
+            % y	the vertex's Y-coordinate value.
+            % ph	an EPANET project handle.
+            % LibEPANET  epanet library DLL name.
+            %
+            % Returns:
+            % an error code.
+            if ph.isNull
+                Errcode = calllib(LibEPANET, 'ENsetvertex', index, vertex, x, y);
+            else
+                Errcode = calllib(LibEPANET, 'EN_setvertex', ph, index, vertex, x, y);
             end
         end
         function [Errcode] = apiENadddemand(nodeIndex, baseDemand, demandPattern, demandName, LibEPANET, ph)
@@ -4970,6 +5134,174 @@ classdef epanet <handle
                 obj.setRulePriority(ruleIndex, str2num(rule_new{i}(end)));
             end
         end
+        function setRuleEnabled(obj, index, enabled)
+            % Enables or disables a rule.
+            %
+            % Parameters:
+            %   index: the rule index (starting from 1)
+            %   enabled: 1 to enable the rule, 0 to disable it
+            %
+            % Example:
+            %   d.setRuleEnabled(1, 1)   % enables rule at index 1
+            %   d.getRuleEnabled(1)      % returns 1
+            %   d.setRuleEnabled(1, 0)   % disables rule at index 1
+            %   d.getRuleEnabled(1)      % returns 0
+            %
+            [obj.Errcode] = obj.apiENsetruleenabled(index, obj.LibEPANET, obj.ph, enabled);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function enabled = getRuleEnabled(obj, index)
+            % Retrieves the enabled/disabled state of one or all rules.
+            %
+            % Usage:
+            %   state = d.getRuleEnabled(1)   % get state of rule at index 1
+            %   state = d.getRuleEnabled()    % get states of all rules
+            %
+            % Returns:
+            %   enabled - 1 if rule is enabled, 0 if disabled
+            %
+            % Example:
+            %   inpfile = 'Net1.inp';
+            %   d = epanet(inpfile);
+            %   s1 = d.getRuleEnabled(1);   % single rule
+            %   sall = d.getRuleEnabled();  % all rules
+            %
+            if nargin < 2   % get all rules
+                count = obj.getRuleCount();
+                enabled = zeros(count,1);
+                for i = 1:count
+                    [obj.Errcode, out] = obj.apiENgetruleenabled(i, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                    enabled(i) = out;
+                end
+            else            % single rule
+                [obj.Errcode, enabled] = obj.apiENgetruleenabled(index, obj.LibEPANET, obj.ph);
+                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            end
+        end
+        function result = getNodeInControl(obj ,varargin)  
+            % Function to determine whether a node apperas in any simple or rule based control
+            %
+            % Return: 1 if the Node has control, 0 otherwise
+            %
+            % Example 1 Retrieving one Node:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     nodecontrolid = d.getControls(1).NodeID
+            %     nodecontrolindex = d.getNodeIndex(nodecontrolid)
+            %     x = d.getNodeInControl(nodecontrolindex)
+            %    
+            %
+            % Example 2 Retrieving all Nodes:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %
+            %     x = d.getNodeInControl()
+            %    
+            %
+            % Example 3 Retrieving more than one Node:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %
+            %     x = d.getNodeInControl(1, 2, 3, 9) #Node with index 9 is the one with control in Net1
+            %    
+            %
+            % Example 4 Retrieving more than one link using list:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %
+            %     x = d.getNodeInControl([1, 2, 3, 9])
+            %     
+            if nargin == 1 % if no args, fetch for all nodes
+                nodeCount =  obj.getNodeCount;
+                result = zeros(nodeCount, 1);
+                for i = 1:nodeCount
+                    [obj.Errcode, temp] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
+                    result(i) = temp;  % store value in result
+                end
+            end
+            if nargin == 2 % if arg is a list or a single index
+                nodes = varargin{1};
+                if isscalar(nodes) % single index
+                    [obj.Errcode, result] = obj.apiENgetnodevalue(nodes, obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
+                else % list
+                    result = zeros(length(nodes), 1);
+                    for i = 1:length(nodes)
+                        [obj.Errcode, temp] = obj.apiENgetnodevalue(nodes(i), obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
+                        result(i) = temp;  % store value in result
+                    end
+                end
+            elseif nargin > 2 % Multiple arguments passed individually 
+                nodes = [varargin{:}];  % convert cell array into numeric array
+                result = zeros(length(nodes), 1);
+                for i = 1:length(nodes)
+                    [obj.Errcode, temp] = obj.apiENgetnodevalue(nodes(i), obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
+                    result(i) = temp;
+                end
+            end
+        end
+        function result = getLinkInControl(obj ,varargin)   
+            % Function to determine whether a link apperas in any simple or rule based control
+            %
+            % Return: 1 if the link has control, 0 otherwise
+            %
+            % Example 1 Retrieving one Link:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     linkcontrolid = d.getControls(1).LinkID
+            %     linkcontrolindex = d.getLinkIndex(linkcontrolid)
+            %     x = d.getLinkInControl(linkcontrolindex)
+            %     
+            %
+            % Example 2 Retrieving all Links:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     x = d.getLinkInControl()
+            %    
+            %
+            % Example 3 Retrieving more than one link:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     x = d.getLinkInControl(1,2,3,13) #Link with index 13 is the one with control in Net1
+            %   
+            %
+            % Example 4 Retrieving more than one link using list:
+            %     inpfile = "Net1.inp"
+            %
+            %     d = epanet(inpfile)
+            %     x = d.getLinkInControl([1,2,3,13]) 
+            if nargin == 1 % if no args, fetch for all links
+                linkCount =  obj.getLinkCount;
+                result = zeros(linkCount, 1);
+                for i = 1:linkCount
+                    [obj.Errcode, temp] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
+                    result(i) = temp;  % store value in result
+                end
+            end
+            if nargin == 2 % if arg is a list or a single index
+                links = varargin{1};
+                if isscalar(links) % single index
+                    [obj.Errcode, result] = obj.apiENgetlinkvalue(links, obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
+                else % list
+                    result = zeros(length(links), 1);
+                    for i = 1:length(links)
+                        [obj.Errcode, temp] = obj.apiENgetlinkvalue(links(i), obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
+                        result(i) = temp;  % store value in result
+                    end
+                end
+             elseif nargin > 2 % individual arguements
+                links = [varargin{:}];  % convert into numeric array
+                result = zeros(length(links), 1);
+                for i = 1:length(links)
+                    [obj.Errcode, temp] = obj.apiENgetlinkvalue(links(i), obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
+                    result(i) = temp;
+                end
+            end
+        end    
         function setRuleThenAction(obj, ruleIndex, actionIndex, then_action)
             % Sets rule - based control then actions. (EPANET Version 2.2)
             %
@@ -5540,6 +5872,86 @@ classdef epanet <handle
             pipepump = sum(strcmp(LinkType1, 'PIPE')+strcmp(LinkType1, 'CVPIPE')+strcmp(LinkType1, 'PUMP'));
             value = obj.getLinkCount - pipepump;
         end
+        function values = getLinkValveCurveGPV(obj, varargin)
+            % Retrieves the valve curve for a specified General Purpose Valve (GPV).
+            %
+            % Returns:
+            %   values: 1 if the link is a GPV, 0 if it is not.
+            %
+            % Example for one Valve:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValveGPV(linkid, condition);
+            %   d.setLinkValveCurveGPV(index, 1);
+            %   x = d.getLinkValveCurveGPV(index);
+            %   disp(x);
+            %
+            % Example for all Valves:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValveGPV(linkid, condition);
+            %   d.setLinkValveCurveGPV(index, 1);
+            %   x = d.getLinkValveCurveGPV();
+            %   disp(x);
+            values = obj.getLinkValues(obj.ToolkitConstants.EN_GPV_CURVE);
+        end
+        function values = getLinkValveCurvePCV(obj, varargin)
+            % Retrieves the valve curve for a specified Pressure Control Valve (PCV).
+            %
+            % Returns:
+            %   values: 1 if the link is a PCV, 0 if it is not.
+            %
+            % Example for one Valve:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValvePCV(linkid, condition);
+            %   d.setLinkValveCurvePCV(index, 1);
+            %   x = d.getLinkValveCurvePCV(index);
+            %   disp(x);
+            %
+            % Example for all Valves:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValvePCV(linkid, condition);
+            %   d.setLinkValveCurvePCV(index, 1);
+            %   x = d.getLinkValveCurvePCV();
+            %   disp(x);
+            values = obj.getLinkValues(obj.ToolkitConstants.EN_PCV_CURVE);
+        end
+        function setLinkValveCurveGPV(obj, index, value)
+            % Sets the valve curve for a specified General Purpose Valve (GPV).
+            %
+            % Parameters:
+            %   index: The index of the GPV to be set. (starting from 1)
+            %   value: The value to set for the valve curve 
+            %                  (1 for GPV, 0 for not).
+            % Example:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValveGPV(linkid, condition);
+            %   d.setLinkValveCurveGPV(index, 1);
+            obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_GPV_CURVE, value, obj.LibEPANET, obj.ph);
+        end
+        function setLinkValveCurvePCV(obj, index, value)
+            % Sets the valve curve for a specified Pressure Control Valve (PCV).
+            %
+            % Parameters:
+            %   index: The index of the PCV to be set. (starting from 1)
+            %   value: The value to set for the valve curve 
+            %                  (1 for PCV, 0 for not).
+            % Example:
+            %   d = epanet('Net1.inp');
+            %   linkid = d.getLinkPipeNameID(1);
+            %   condition = 1;
+            %   index = d.setLinkTypeValvePCV(linkid, condition);
+            %   d.setLinkValveCurvePCV(index, 1);
+            obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_PCV_CURVE, value, obj.LibEPANET, obj.ph);
+        end
         function [errmssg, Errcode] = getError(obj, Errcode)
             % Retrieves the text of the message associated with a particular error or warning code.
             %
@@ -5916,6 +6328,39 @@ classdef epanet <handle
                 end
             end
         end
+        function values = getLinkValues(obj, property)
+            % Purpose:
+            %   Retrieves property values for all links within the EPANET model 
+            %   during a hydraulic analysis.
+            %
+            % Example Usage:
+            %   d = epanet('Net1.inp');
+            %
+            %   d.openHydraulicAnalysis();
+            %   d.initializeHydraulicAnalysis();
+            %
+            %   tstep = 1;
+            %   P = []; T_H = []; D = []; H = []; F = []; S = [];
+            %
+            %   while tstep > 0
+            %       t = d.runHydraulicAnalysis();
+            %       S = [S; d.getLinkValues(d.ToolkitConstants.EN_FLOW)];
+            %       F = [F; d.getLinkFlows()];
+            %       T_H = [T_H; t];
+            %
+            %       disp(F);
+            %       disp(S);
+            %       disp(T_H);
+            %
+            %       tstep = d.nextHydraulicAnalysisStep();
+            %   end
+            %
+            %   d.closeHydraulicAnalysis();
+            %
+            % Returns:
+            %   values : array of property values for all links
+            [obj.Errcode, values] = obj.apiENgetlinkvalues(property, obj.LibEPANET, obj.ph);
+        end
         function value = getLinkDiameter(obj, varargin)
             % Retrieves the value of link diameters.
             % Pipe/valve diameter
@@ -6012,6 +6457,55 @@ classdef epanet <handle
             % See also getLinkType, getLinksInfo, getLinkInitialStatus,
             %          getLinkBulkReactionCoeff, getLinkWallReactionCoeff.
             value = get_link_info(obj, obj.ToolkitConstants.EN_INITSETTING, varargin{:});
+        end
+        function value = getLinkLeakArea(obj, varargin)
+            % Function to retrieve the leak area for a specified link (pipe).
+            %
+            % Returns:
+            % value: The current leak area value for the specified link.
+            %
+            % Example 1 Retrieving all Links:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %     d.setLinkLeakArea(2,10.5)
+            %     x = d.getLinkLeakArea()
+            %     
+            %
+            % Example 2 Retrieving one link:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %     d.setLinkLeakArea(2,10.5)
+            %     x = d.getLinkLeakArea(2)
+            %     
+            % See also: setLinkLeakArea
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LEAK_AREA, varargin{:});
+        end
+        function value = getLinkExpansionProperties(obj, varargin)
+            % Function to retrieve the expansion properties for a specified link (pipe).
+            %
+            % Returns:
+            % valuet The current expansion property value for the specified link.
+            % Example 1 Retrieving all link expansion properties:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %     d.setLinkExpansionProperties(5,2)
+            %     x = d.getLinkExpansionProperties()
+            % 
+            % Example 2 Retrieving one link expansion property:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %     d.setLinkExpansionProperties(5,2)
+            %     x = d.getLinkExpansionProperties(5)
+            % See also : setLinkExpansionProperties()
+            
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LEAK_EXPAN, varargin{:});
+        end
+        function value = getLinkLeakageRate(obj, varargin)
+            % Retrieves the leakage rate of a specific pipe (link) at a given point in time.
+            %
+            % Returns:
+            %     float: The leakage rate of the specified pipe at the requested time point
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LINK_LEAKAGE, varargin{:});
         end
         function value = getLinkBulkReactionCoeff(obj, varargin)
             % Retrieves the value of all link bulk chemical reaction coefficient.
@@ -7143,7 +7637,48 @@ classdef epanet <handle
             [obj.Errcode, value.RelativeError] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_RELATIVEERROR, obj.LibEPANET, obj.ph);
             [obj.Errcode, value.DeficientNodes] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEFICIENTNODES, obj.LibEPANET, obj.ph);
             [obj.Errcode, value.DemandReduction] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEMANDREDUCTION, obj.LibEPANET, obj.ph);
+            [obj.Errcode, value.DemandReduction] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_LEAKAGELOSS, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function result = getStatisticTotalLeakageLoss(obj)
+            % Retrieves the total leakage loss statistic from the simulation.
+            %
+            % Returns:
+            %   result : The total amount of leakage loss in the system
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_LEAKAGELOSS, obj.LibEPANET, obj.ph);
+        end
+        function result = getStatisticIterations(obj)
+            % Retrieves the number of iterations taken in the simulation.
+            %
+            % Returns:
+            %   result : The total number of iterations performed during hydraulic analysis
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_ITERATIONS, obj.LibEPANET, obj.ph);
+        end
+        function result = getStatisticRelativeError(obj)
+            % Retrieves the relative error statistic from the simulation.
+            %
+            % Returns:
+            %   result : The relative error from the last hydraulic iteration
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_RELATIVEERROR, obj.LibEPANET, obj.ph);
+        end
+        function result = getStatisticDeficientNodes(obj)
+            % Retrieves the number of deficient nodes in the simulation.
+            %
+            % Returns:
+            %   result : The number of nodes in the system that are unable to meet required demand
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEFICIENTNODES, obj.LibEPANET, obj.ph);
+        end
+        function result = getStatisticDemandReduction(obj)
+            % Retrieves the demand reduction statistic from the simulation.
+            %
+            % Returns:
+            %   result : The total demand reduction in the system
+            %
+            [obj.Errcode, result] = obj.apiENgetstatistic(obj.ToolkitConstants.EN_DEMANDREDUCTION, obj.LibEPANET, obj.ph);
         end
         function value = getNodePatternIndex(obj, varargin)
             % Retrieves the value of all node demand pattern indices.
@@ -7477,6 +8012,46 @@ classdef epanet <handle
                 [obj.Errcode, value(v)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
                 v=v+1;
             end
+        end
+        function value = getNodeEmitterFlow(obj, index)
+            % Retrieves node emitter flow
+            %
+            % Args:
+            %     index : The index of the node for which the emitter flow is to be retrieved.
+            %
+            % Returns:
+            %     value: The amount of leakage flow at the specified node
+            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_EMITTERFLOW, obj.LibEPANET, obj.ph);
+        end
+        function value = getNodeLeakageFlow(obj, index)
+            % Retrieves the leakage flow for a specific node.
+            %
+            % Args:
+            %     index : The index of the node for which the leakage flow is to be retrieved.
+            %
+            % Returns:
+            %     value: The amount of leakage flow at the specified node
+            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_LEAKAGEFLOW, obj.LibEPANET, obj.ph);
+        end
+        function value = getConsumerDemandRequested(obj, index)
+            % Retrieves the requested consumer demand for a specific node.
+
+            % Args:
+            %     index : The index of the node for which the consumer demand is to be retrieved.
+
+            % Returns:
+            %     value: The full demand requested by the consumer at the specified node
+            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_FULLDEMAND, obj.LibEPANET, obj.ph);
+        end
+        function value = getConsumerDemandDelivered(obj, index)
+            % Retrieves the delivered consumer demand for a specific node.
+
+            % Args:
+            %     index : The index of the node for which the delivered consumer demand is to be retrieved.
+
+            % Returns:
+            %     value: The amount of demand delivered to the consumer at the specified node
+            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_DEMANDFLOW, obj.LibEPANET, obj.ph);
         end
         function value = getNodeTankInitialWaterVolume(obj, varargin)
             % Retrieves the tank initial water volume.
@@ -8047,6 +8622,37 @@ classdef epanet <handle
             [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_CHECKFREQ, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function result = getOptionsPressureUnits(obj)
+            % Gets the pressure unit used in EPANET
+            % Example:
+            %   d.getOptionsPressureUnits
+            [obj.Errcode, z] = obj.apiENgetoption(obj.ToolkitConstants.EN_PRESS_UNITS, obj.LibEPANET, obj.ph);
+            if z == obj.ToolkitConstants.EN_PSI
+                result = 'PSI';
+            elseif z == obj.ToolkitConstants.EN_KPA
+                result = 'KPA';
+            elseif z == obj.ToolkitConstants.EN_METERS
+                result = 'METERS';
+            else
+                result = 'UNKNOWN';
+            end
+        end
+        function result = getOptionsStatusReport(obj)
+            % Gets the status report option
+            %
+            % Example:
+            %   d.getOptionsStatusReport
+            [obj.Errcode, z] = obj.apiENgetoption(obj.ToolkitConstants.EN_STATUS_REPORT, obj.LibEPANET, obj.ph);
+            if z == obj.ToolkitConstants.EN_NO_REPORT
+                result = 'NO REPORT';
+            elseif z == obj.ToolkitConstants.EN_NORMAL_REPORT
+                result = 'NORMAL REPORT';
+            elseif z == obj.ToolkitConstants.EN_FULL_REPORT
+                result = 'FULL REPORT';
+            else
+                result = 'UNKNOWN';
+            end
+        end
         function value = getOptionsMaximumCheck(obj)
             % Retrieves the maximum trials for status checking. (EPANET Version 2.2)
             %
@@ -8468,6 +9074,132 @@ classdef epanet <handle
             [obj.Errcode] = obj.apiENsetcurvevalue(index, curvePnt, x, y, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function setCurveType(obj, index, type)
+            % Sets the type of a specified curve in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %     type: The desired type of the curve, based on the following categories:
+            %         - 0: Volume
+            %         - 1: Pump
+            %         - 2: Efficiency
+            %         - 3: Headloss
+            %         - 4: General
+            %         - 5: Valve
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveType(1, 0)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index,type,obj.LibEPANET,obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeVolume(obj, index)
+            % Sets the type of a specified curve to Volume in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeVolume(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_VOLUME_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypePump(obj, index)
+            % Sets the type of a specified curve to Pump in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypePump(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_PUMP_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeEfficiency(obj, index)
+            % Sets the type of a specified curve to Efficiency in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeEfficiency(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_EFFIC_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeHeadloss(obj, index)
+            % Sets the type of a specified curve to Headloss in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeHeadloss(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_HLOSS_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeGeneral(obj, index)
+            % Sets the type of a specified curve to General in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeGeneral(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_GENERIC_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setCurveTypeValveCurve(obj, index)
+            % Sets the type of a specified curve to Valve in the EPANET model.
+            %
+            % Parameters:
+            %     index: The index of the curve to modify.
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setCurveTypeValveCurve(1)
+            %   d.getCurveType(1)
+            %
+            [obj.Errcode] = obj.apiENsetcurvetype(index, obj.ToolkitConstants.EN_VALVE_CURVE, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setVertex(obj, index, vertex, x, y)
+            % setVertex Sets the coordinates of a vertex point assigned to a link.
+            %
+            %   d.setVertex(index, vertex, x, y)
+            %
+            % Parameters:
+            %   index   - Link index (starting from 1).
+            %   vertex  - Vertex index (starting from 1).
+            %   x       - X-coordinate of the vertex.
+            %   y       - Y-coordinate of the vertex.
+            %
+            % Example:
+            %   inpfile = 'Net1.inp';
+            %   d = epanet(inpfile);
+            %   d.setVertex(1, 1, 100, 200)   % sets first vertex of link 1
+            %
+            % Notes:
+            %   Requires that the link has at least one vertex.
+            %
+            obj.Errcode = obj.apiENsetvertex(index, vertex, x, y, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
         function value = getPatternIndex(obj, varargin)
             % Retrieves the index of all or some time patterns given their IDs.
             %
@@ -8831,6 +9563,32 @@ classdef epanet <handle
             [obj.Errcode, value] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_NEXTEVENTTANK, obj.LibEPANET, obj.ph);
             %             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function [eventType, duration, elementIndex] = getTimeToNextEvent(obj)
+            % Determines the type of event that will cause the end of the current time step,
+            % along with the duration until the event occurs and its index.
+            %
+            % Example:
+            %   d.getTimeToNextEvent
+            % Event Types:
+            %   0: REPORT   - A report generation event.
+            %   1: HYD      - A hydraulic event.
+            %   2: WQ       - A water quality event.
+            %   3: TANK     - A tank level event.
+            %   4: CONTROL  - A control rule event.
+            [eventType, duration, elementIndex] = obj.apiENtimetonextevent(obj.LibEPANET, obj.ph);
+            switch eventType
+                case 0
+                    eventType = 'REPORT';
+                case 1
+                    eventType = 'HYD';
+                case 2
+                    eventType = 'WQ';
+                case 3
+                    eventType = 'TANK';
+                case 4
+                    eventType = 'CONTROL';
+            end
+        end
         function value = getCurvesInfo(obj)
             % Retrieves all the info of curves. (EPANET Version 2.1)
             %
@@ -9111,6 +9869,14 @@ classdef epanet <handle
                 [obj.Errcode, value(i)] = obj.apiENgetaveragepatternvalue(i, obj.LibEPANET, obj.ph);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             end
+        end
+        function result = getPatternAverageDefaultValue(obj)
+            % Retrieves the average value of the default pattern
+            %
+            % Example:
+            %   d.getPatternAverageDefaultValue
+            %
+            [obj.Errcode, result] = obj.apiENgetaveragepatternvalue(0, obj.LibEPANET, obj.ph);
         end
         function value = getENfunctionsImpemented(obj)
             % Retrieves the epanet EN functions that have been developed.
@@ -10428,6 +11194,23 @@ classdef epanet <handle
             %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
             index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_GPV, fromNode, toNode, obj.LibEPANET, obj.ph);
         end
+        function index = addLinkValvePCV(obj, vID, fromNode, toNode)
+            % Adds a new PCV valve.
+            % Returns the index of the new PCV valve.
+            %
+            % % The example is based on d=epanet('NET1.inp');
+            %
+            % Example:
+            %   valveID = 'newValvePCV';
+            %   fromNode = '10';
+            %   toNode = '21';
+            %   valveIndex = d.addLinkValvePCV(valveID, fromNode, toNode);
+            %   d.plot
+            %
+            % See also plot, setLinkNodesIndex, addLinkPipe,
+            %          addLinkValvePRV, deleteLink, setLinkTypeValveFCV.
+            index = obj.apiENaddlink(vID, obj.ToolkitConstants.EN_PCV, fromNode, toNode, obj.LibEPANET, obj.ph);
+        end
         function [leftPipeIndex ,rightPipeIndex] = splitPipe(obj, pipeID, newPipeID, newNodeID)
             %SPLITPIPE
             % splits a pipe (pipeID), creating two new pipes (pipeID and newPipeID) and adds a
@@ -11042,6 +11825,36 @@ classdef epanet <handle
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             end
         end
+        function enabled = getControlState(obj, index)
+            % Retrieves the enabled/disabled state of one or all controls.
+            %
+            % Usage:
+            %   state = d.getControlState(1)   % get state of control at index 1
+            %   state = d.getControlState()    % get states of all controls
+            %
+            % Returns:
+            %   enabled: 1 if control is enabled, 0 if disabled
+            %             vector if no index is provided
+            %
+            % Example:
+            %   inpfile = 'Net1.inp';
+            %   d = epanet(inpfile);
+            %   s1 = d.getControlState(1);   % single control
+            %   sall = d.getControlState();  % all controls
+            %
+            if nargin < 2  
+                count = obj.getControlRulesCount;
+                enabled = zeros(count,1);
+                for i = 1:count
+                    [obj.Errcode, out] = obj.apiENgetcontrolenabled(i, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                    enabled(i) = out;
+                end
+            else            % single control
+                [obj.Errcode, enabled] = obj.apiENgetcontrolenabled(index, obj.LibEPANET, obj.ph);
+                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+            end
+        end
         function setLinkPipeData(obj, Index, Length, Diameter, RoughnessCoeff, MinorLossCoeff)
             % Sets a group of properties for a pipe. (EPANET Version 2.2)
             %
@@ -11489,6 +12302,35 @@ classdef epanet <handle
             [obj.Errcode, index] = obj.apiENsetlinktype(index, obj.ToolkitConstants.EN_TCV, condition, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function index = setLinkTypeValvePCV(obj, id, varargin)
+            % Sets the link type valve PCV (pressure control valve) for a specified link.
+            %
+            % condition = 0 | if EN_UNCONDITIONAL: Delete all controls that contain this object
+            % condition = 1 | if EN_CONDITIONAL: Cancel object type change if contained in controls
+            % Default condition is 0.
+            %
+            % Example 1:
+            %   d.getLinkType(1)                                    % Retrieves the type of the 1st link
+            %   linkid = d.getLinkPipeNameID{1};                    % Retrieves the ID of the 1st pipe
+            %   index = d.setLinkTypeValvePCV(linkid);              % Changes the 1st pipe to valve PCV given its ID
+            %   d.getLinkType(index)
+            %
+            % Example 2:
+            %   linkid = d.getLinkPipeNameID{1};
+            %   condition = 1;
+            %   index = d.setLinkTypeValvePCV(linkid, condition);   % Changes the 1st pipe to valve PCV given its ID and a condition (if possible)
+            %   d.getLinkType(index)
+            %
+            % See also getLinkType, getLinkPipeNameID, setLinkTypePipe,
+            %          setLinkTypePump, setLinkTypeValveTCV.
+            condition = 0; % default
+            if nargin == 3
+                condition = varargin{1};
+            end
+            index = obj.check_if_numeric(id);
+            [obj.Errcode, index] = obj.apiENsetlinktype(index, obj.ToolkitConstants.EN_PCV, condition, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
         function setLinkLength(obj, value, varargin)
             % Sets the values of lengths.
             %
@@ -11644,6 +12486,43 @@ classdef epanet <handle
                 [obj.Errcode] = obj.apiENsetlinkvalue(i, obj.ToolkitConstants.EN_INITSETTING, value(j), obj.LibEPANET, obj.ph); j=j+1;
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             end
+        end
+        function setLinkLeakArea(obj, index, value)
+            % Function to set the leak area    for a specified link (pipe).
+            %
+            % input:
+            %     index : The index of the link(pipe) for which to set the leak area (starting from 1)
+            %     value : the value to assign as the leak area to the specified link
+            %
+            % Example:
+            %     inpfile = "Net1.inp"
+            %     d = epanet(inpfile)
+            %
+            %     d.setLinkLeakArea(2,10.5)
+            %     x = d.getLinkLeakArea()
+            %  
+            %
+            % See also: getLinkLeakArea
+            [obj.Errcode] = obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_LEAK_AREA, value, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setLinkExpansionProperties(obj, index, value)
+            % Function to set the expansion properties for a specified link (pipe).
+            %
+            % Input:
+            % index : The index of the link (pipe) for which to set the expansion properties. (starting from 1)
+            % value : The value to assign as the expansion property for the specified link.
+            %
+            % Example:
+            %     inpfile = 'Net1.inp'
+            %     d = epanet(inpfile)
+            %     d.setLinkExpansionProperties(5,2)
+            %     x = d.getLinkExpansionProperties()
+            %
+            % See also:
+            %     getLinkExpansionProperties
+            [obj.Errcode] = obj.apiENsetlinkvalue(index, obj.ToolkitConstants.EN_LEAK_EXPAN, value, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
         function setLinkBulkReactionCoeff(obj, value, varargin)
             % Sets the value of bulk chemical reaction coefficient.
@@ -12803,6 +13682,89 @@ classdef epanet <handle
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_TRIALS, value, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
+        function setOptionsStatusReport(obj, value)
+            % Sets the status report option for EPANET
+            % value can be one of:
+            %   EN_NO_REPORT, EN_NORMAL_REPORT, EN_FULL_REPORT
+            %
+            % Example:
+            %   d.setOptionsStatusReport(d.ToolkitConstants.EN_FULL_REPORT)
+            %   d.getOptionsStatusReport()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_STATUS_REPORT, value, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsStatusReportNo(obj)
+            % Sets status report to 'No Report'
+            %
+            % Example:
+            %   d.setOptionsStatusReportNo();
+            %   d.getOptionsStatusReport()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_STATUS_REPORT, obj.ToolkitConstants.EN_NO_REPORT, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsStatusReportNormal(obj)
+            % Sets status report to 'Normal Report'
+            %
+            % Example:
+            %   d.setOptionsStatusReportNormal();
+            %   d.getOptionsStatusReport()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_STATUS_REPORT, obj.ToolkitConstants.EN_NORMAL_REPORT, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsStatusReportFull(obj)
+            % Sets status report to 'Full Report'
+            %
+            % Example:
+            %   d.setOptionsStatusReportFull();
+            %   d.getOptionsStatusReport()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_STATUS_REPORT, obj.ToolkitConstants.EN_FULL_REPORT, obj.LibEPANET, obj.ph);
+            obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function value = getOptionsDemandPattern(obj)
+            % Retrieves the default demand pattern.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %  d.getOptionsDemandPattern()
+            %
+            [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_DEMANDPATTERN, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsDemandPattern(obj, value)
+            % Sets the default demand pattern.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %   d.setOptionsDemandPattern(3);
+            %   d.getOptionsDemandPattern()
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_DEMANDPATTERN, value, obj.LibEPANET, obj.ph);
+        end
+        function value = getOptionsEmitterBackFlow(obj)
+            % Retrieves the current setting for allowing reverse flow through emitters.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %   x = d.getOptionsEmitterBackFlow();
+            %
+            % Returns:
+            %   1 if reverse flow is allowed (default), 0 if not.
+            [obj.Errcode, value] = obj.apiENgetoption(obj.ToolkitConstants.EN_EMITBACKFLOW, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsEmitterBackFlowAllowed(obj)
+            % Sets the option to allow reverse flow through emitters.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %   d.setOptionsEmitterBackFlowAllowed();
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_EMITBACKFLOW, 1, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsEmitterBackFlowDisallowed(obj)
+            % Sets the option to prevent reverse flow through emitters.
+            %
+            % Example:
+            %   d = epanet('Richmond_standard.inp');
+            %   d.setOptionsEmitterBackFlowDisallowed();
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_EMITBACKFLOW, 0, obj.LibEPANET, obj.ph);
+        end
         function setOptionsAccuracyValue(obj, value)
             % Sets the total normalized flow change for hydraulic convergence.
             %
@@ -13055,6 +14017,81 @@ classdef epanet <handle
             % See also getOptionsLimitingConcentration, setOptionsPipeBulkReactionOrder, setOptionsPipeWallReactionOrder.
             [obj.Errcode] = obj.apiENsetoption(obj.ToolkitConstants.EN_CONCENLIMIT, value, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+        end
+        function metric = flowUnitsCheck(obj)
+            % Returns the metric of the system (PSI vs KPA/METERS)
+            % Uses the current flow units
+            flowunits = obj.getFlowUnits();
+            if any(strcmpi(flowunits, {'MDG', 'IMGD', 'CFS', 'GPM'}))
+                metric = "PSI";
+            elseif any(strcmpi(flowunits, {'CMH', 'CMS', 'MLD', 'CMD', 'LPS', 'LPM'}))
+                metric = 'KPA AND METERS';
+            else
+                metric = 'UNKNOWN';
+            end
+        end
+        function errorInChangingMetric(obj, wanted, nameofFunction)
+            % Checks if the metric change is not possible and suggests possible solutions
+            % and prints a warning in the MATLAB command window
+            current = obj.flowUnitsCheck();  
+            if strcmpi(current, 'PSI') && strcmpi(wanted, 'KPA AND METERS')
+                fprintf('*** UserWarning: Error in function: %s, the function did not change the metric. ***\n', nameofFunction);
+                fprintf('Please change the metric using one of the following:\n');
+                fprintf(' 1. setFlowUnitsCMH()  -> Cubic meters per hour\n');
+                fprintf(' 2. setFlowUnitsCMS()  -> Cubic meters per second\n');
+                fprintf(' 3. setFlowUnitsMLD()  -> Million liters per day\n');
+                fprintf(' 4. setFlowUnitsCMD()  -> Cubic meters per day\n');
+                fprintf(' 5. setFlowUnitsLPS()  -> Liters per second\n');
+                fprintf(' 6. setFlowUnitsLPM()  -> Liters per minute\n');
+            elseif strcmpi(current, "KPA AND METERS") && strcmpi(wanted, "PSI")
+                fprintf('*** UserWarning: Error in function: %s, the function did not change the metric. ***\n', nameofFunction);
+                fprintf('Please change the metric using one of the following:\n');
+                fprintf(' 1. setFlowUnitsAFD()   -> Acre-feet per day\n');
+                fprintf(' 2. setFlowUnitsIMGD()  -> Imperial million gallons per day\n');
+                fprintf(' 3. setFlowUnitsCFS()   -> Cubic feet per second\n');
+                fprintf(' 4. setFlowUnitsMGD()   -> Million gallons per day\n');
+                fprintf(' 5. setFlowUnitsGPM()   -> Gallons per minute\n');
+            else
+                fprintf('Metric change from "%s" to "%s" is allowed.\n', current, wanted);
+            end
+        end
+        function setOptionsPressureUnits(obj, value)
+            % Sets the pressure unit used in EPANET
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setOptionsPressureUnits(1); % e.g. PSI
+            obj.Errcode = obj.apiENsetoption(obj.ToolkitConstants.EN_PRESS_UNITS, value, obj.LibEPANET, obj.ph);
+        end
+        function setOptionsPressureUnitsMeters(obj)
+            % Sets pressure units to METERS (if possible).
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setOptionsPressureUnitsMeters();
+            %   u = d.getOptionsPressureUnits();
+            obj.errorInChangingMetric("KPA AND METERS", "setOptionsPressureUnitsMeters");
+            obj.setOptionsPressureUnits(obj.ToolkitConstants.EN_METERS);
+        end
+        function setOptionsPressureUnitsPSI(obj)
+            % Sets pressure units to PSI (if possible).
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setOptionsPressureUnitsPSI();
+            %   u = d.getOptionsPressureUnits();
+            %
+            obj.errorInChangingMetric("PSI", "setOptionsPressureUnitsPSI");
+            obj.setOptionsPressureUnits(obj.ToolkitConstants.EN_PSI);
+        end
+        function setOptionsPressureUnitsKPA(obj)
+            % Sets pressure units to KPA (if possible).
+            %
+            % Example:
+            %   d = epanet('Net3.inp');
+            %   d.setOptionsPressureUnitsKPA();
+            obj.errorInChangingMetric("KPA AND METERS", "setOptionsPressureUnitsKPA");
+            obj.setOptionsPressureUnits(obj.ToolkitConstants.EN_KPA);
         end
         function setTimeSimulationDuration(obj, value)
             % Sets the simulation duration (in seconds).
@@ -13463,6 +14500,16 @@ classdef epanet <handle
             % See also setFlowUnitsMLD, setFlowUnitsCMH.
             Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CMD, 1, varargin); % cubic meters per day
         end
+        function [Errcode]=setFlowUnitsCMS(obj, varargin)
+            % Sets flow units to CMS(Cubic Meters per second).
+            %
+            % Example:
+            %   d.setFlowUnitsCMS;  
+            %   d.getFlowUnits
+            %
+            % See also setFlowUnitsMLD, setFlowUnitsCMH.
+            Errcode = obj.setFlowUnits(obj.ToolkitConstants.EN_CMS, 1, varargin); % cubic meters per second
+        end
         function closeNetwork(obj)
             % Closes down the Toolkit system.
             %
@@ -13605,6 +14652,13 @@ classdef epanet <handle
             [obj.Errcode, tstep] = obj.apiENnextQ(obj.LibEPANET, obj.ph);
             tstep = double(tstep);
         end
+        function openX(obj, inpfile, rptfile, outfile)
+            % Enable the opening of input files with formatting error
+            % Example:
+            %   d = epanet();    
+            %   d.openX('Net1.inp', 'Net1.rpt', 'Net1.out');
+            [obj.Errcode] = obj.apiENopenX(inpfile, rptfile, outfile, obj.LibEPANET, obj.ph);
+        end
         function openHydraulicAnalysis(obj)
             % Opens the hydraulics analysis system.
             %
@@ -13739,13 +14793,13 @@ classdef epanet <handle
             % See also getComputedHydraulicTimeSeries, deleteNode, getLinkResultIndex
             [obj.Errcode, resultindex] = obj.apiENgetresultindex(obj.ToolkitConstants.EN_NODE, node_index, obj.LibEPANET, obj.ph);
         end
-        function loadpatternfile(obj, filename, patID)
+        function loadPatternFile(obj, filename, patID)
             %minimun example:
             % start_toolkit;
             % d = epanet('Net1.inp');
             % d.loadpatternfile('abc.pat','4')
             % d.saveInputFile('Net1.inp')
-            [obj.Errcode] = obj.apiENloadpatternfile(obj.LibEPANET, filename, patID, obj.ph)
+            [obj.Errcode] = obj.apiENloadpatternfile(obj.LibEPANET, filename, patID, obj.ph);
         end
         function resultindex = getLinkResultIndex(obj, link_index)
             % Retrieves the order in which a link's results

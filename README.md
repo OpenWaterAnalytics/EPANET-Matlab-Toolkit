@@ -42,6 +42,7 @@ matlab -nodisplay -r "addpath(genpath('$PWD')); savepath"
 - [List of EPANET 2.1 Functions Supported](#list-of-epanet-21-functions-supported)
 - [List of EPANET 2.012 Functions Supported](#list-of-epanet-2012-functions-supported)
 - [List of EPANET 2.2 Functions Supported](#list-of-epanet-22-functions-supported)
+- [List of EPANET 2.3 Functions Supported](#list-of-epanet-23-functions-supported)
 
 ## How to cite
 
@@ -907,5 +908,70 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetvertices|Assigns a set of internal vertex points to a link|
 |ENgetresultindex|Retrieves the order in which a node's or link's results were saved to an output file|
 |ENinit|Initializes an EPANET project that isn't opened with an input file|
+
+&uparrow; [Back to top](#table-of-contents)
+
+## List of EPANET 2.3 Functions Supported
+
+|Function|Description|
+|--------|-----------|
+|ENgetcontrolenabled|Get enabled/disabled flag for a simple control by index (1 = enabled, 0 = disabled)|
+|ENgetlinkvalues|Bulk-retrieve property values for all links for a given link property code|
+|ENgetruleenabled|Get enabled/disabled flag for a rule-based control by rule index|
+|ENloadpatternfile|Load time patterns from an external file into the current project under a specific pattern ID|
+|ENopenX|Open an input file even if it has formatting errors (lenient parsing mode)|
+|ENsetcontrolenabled|Enable/disable a specific simple control by index|
+|ENsetcurvetype|Set the type of a curve object (volume, pump, efficiency, headloss, general, valve)|
+|ENsetruleenabled|Enable/disable a rule by rule index|
+|ENsetvertex|Set the coordinates of a link’s intermediate vertex (polyline point) by vertex index|
+|ENtimetonextevent|Return the type of event that terminates the current time step (hydraulic step, water quality step, tank level event, control event)|
+|addLinkValvePCV|Create a Pressure-Control Valve (PCV) link|
+|setLinkTypeValvePCV|Convert an existing link to PCV type|
+|setCurveType|Set the curve type. includes helpers: setCurveTypeVolume, setCurveTypePump, setCurveTypeEfficiency, setCurveTypeHeadloss, setCurveTypeGeneral, setCurveTypeValveCurve|
+|setVertex|Set intermediate vertex coordinates for a link|
+|getControlState|Retrieve simple control enabled flag (single or all)|
+|getRuleEnabled|Retrieve rule enabled flag (single or all)|
+|setRuleEnabled|Enable/disable rule by index|
+|getLinkInControl|Query which objects are referenced by controls (returns IDs/indices)|
+|getNodeInControl|Query which objects are referenced by controls (returns IDs/indices)|
+|getTimetoNextEvent|Wrapper around ENtimetonextevent (returns enum + time to event)|
+|loadPatternFile|Load a time pattern file into the project (forwards to ENloadpatternfile)|
+|getPatternAverageDefaultValue|Report average value used when a pattern is missing|
+|getOptionsPressureUnits|Retrieve current pressure units|
+|setOptionsPressureUnits|Set pressure units (EN_PSI / EN_KPA / EN_METERS)|
+|setOptionsPressureUnitsMeters|Set pressure units to meters|
+|setOptionsPressureUnitsPSI|Set pressure units to PSI|
+|setOptionsPressureUnitsKPA|Set pressure units to kPa|
+|getOptionsStatusReport|Get current status report level|
+|setOptionsStatusReport|Set status report level (EN_NO_REPORT / EN_NORMAL_REPORT / EN_FULL_REPORT)|
+|setOptionsStatusReportNo|Set report level to no report|
+|setOptionsStatusReportNormal|Set report level to normal|
+|setOptionsStatusReportFull|Set report level to full|
+|getOptionsDemandPattern|Get default demand pattern behavior|
+|setOptionsDemandPattern|Set default demand pattern behavior|
+|getOptionsEmitterBackFlow|Get emitter backflow setting|
+|setOptionsEmitterBackFlowAllowed|Allow emitter backflow|
+|setOptionsEmitterBackFlowDisallowed|Disallow emitter backflow|
+|setFlowUnitsCMS|Set flow units to cubic meters per second|
+|getLinkValveCurveGPV|Get valve curve for GPV link|
+|getLinkValveCurvePCV|Get valve curve for PCV link|
+|setLinkValveCurveGPV|Set valve curve for GPV link|
+|setLinkValveCurvePCV|Set valve curve for PCV link|
+|getLinkLeakArea|Get leakage area for a link|
+|setLinkLeakArea|Set leakage area for a link|
+|getLinkExpansionProperties|Get expansion properties for a link|
+|setLinkExpansionProperties|Set expansion properties for a link|
+|getLinkLeakageRate|Get leakage rate for a link|
+|getNodeLeakageFlow|Get leakage flow at a node|
+|getNodeEmitterFlow|Get emitter flow at a node|
+|getConsumerDemandRequested|Retrieve consumer demand requested|
+|getConsumerDemandDelivered|Retrieve consumer demand delivered|
+|openX|Lenient open for project files|
+|getLinkInfo|Bulk retrieve link property vector|
+|getStatisticIterations|Retrieves the number of iterations taken in the simulation|
+|getStatisticRelativeError|Retrieves the relative error statistic from the simulation|
+|getStatisticDeficientNodes|Retrieve number of deficient nodes|
+|getStatisticDemandReduction|Retrieve demand reduction statistics|
+|getStatisticTotalLeakageLoss|Retrieve total leakage loss value|
 
 &uparrow; [Back to top](#table-of-contents)
