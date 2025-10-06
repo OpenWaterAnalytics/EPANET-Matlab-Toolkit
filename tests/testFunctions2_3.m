@@ -17,7 +17,6 @@ curveIndex = 1;
 disp('Original curve type:');
 disp(d.getCurveType(curveIndex));
 
-disp('Changing curve types');
 d.setCurveType(curveIndex, d.ToolkitConstants.EN_VOLUME_CURVE);
 disp('After setCurveType(EN_VOLUME_CURVE):'); disp(d.getCurveType(curveIndex)');
 
@@ -68,7 +67,7 @@ disp('Rule enabled 1:'); disp(d.getRuleEnabled(1));
 
 disp('Disabling rule 1');
 d.setRuleEnabled(1, 0);
-disp('Rule enabled 1 after disable:'); disp(d.getRuleEnabled(1));
+disp('Rule enabled 1 after disable:'); disp(d.getRuleEnabled());
 
 disp('Links under control:'); disp(d.getLinkInControl()');
 disp('Nodes under control:'); disp(d.getNodeInControl()');
@@ -86,11 +85,11 @@ idx = d.getLinkIndex('testvalve');
 d.getLinkType()
 %% 
 disp('Converting new link at index 42 from GPV to PCV');
-d.addLinkValveGPV('testvalvegpv', '1', '3');
-d.getLinkType(42)
+index = d.addLinkValveGPV('testvalvegpv', '1', '3');
+d.getLinkType(index)
 disp('setLinkTypeValvePCV');
-d.setLinkTypeValvePCV(42);
-d.getLinkType(42)
+d.setLinkTypeValvePCV(index);
+d.getLinkType(index)
 disp('Valve setup complete.');
 
 %% --- Set Intermediate Vertex ---
@@ -99,25 +98,26 @@ xCoords = [100.0, 150.0, 200.0];
 yCoords = [200.0, 250.0, 300.0];
 numVertices = numel(xCoords);
 
-[countBefore] = d.getLinkVerticesCount(1);
+index_link = 1;
+[countBefore] = d.getLinkVerticesCount(index_link);
 disp('Vertex count before setting:'); disp(countBefore);
+linkID = d.getLinkNameID(index_link);
+d.setLinkVertices(linkID, xCoords, yCoords)
 
-d.apiENsetvertices(1, xCoords, yCoords, numVertices, d.LibEPANET, d.ph);
-
-[countAfter] = d.getLinkVerticesCount(1);
+[countAfter] = d.getLinkVerticesCount(index_link);
 disp('Vertex count after setting:'); disp(countAfter);
 
-[old] = d.getLinkVertices(1, 1);
-x1 = old{1}.x(1);             % x of first vertex
-y1 = old{1}.y(1);             % y of first vertex
+[old] = d.getLinkVertices{1};
+x1 = old.x(1);             % x of first vertex
+y1 = old.y(1);             % y of first vertex
 disp('X and Y of Vertex 1 before manual set:'); disp([x1 ,y1]);
 
 disp('Setting vertex 1 to (300, 800)');
 d.setVertex(1, 1, 300.0, 800.0);
 
-[new] = d.getLinkVertices(1, 1);
-x2 = new{1}.x(1);             % x of first vertex
-y2 = new{1}.y(1);             % y of first vertex
+[new] = d.getLinkVertices{1};
+x2 = new.x(1);             % x of first vertex
+y2 = new.y(1);             % y of first vertex
 disp('X and Y of Vertex 1 after manual set:'); disp([x2 ,y2]);
 
 %% --- Options & Units ---
@@ -145,7 +145,8 @@ d.setFlowUnitsCMS();
 disp('Flow units after change:'); disp(d.getFlowUnits());
 disp(' ');
 
-d.setOptionsDemandPattern(2);
+disp('Demand pattern:'); disp(d.getOptionsDemandPattern());
+d.setOptionsDemandPattern(3);
 disp('Demand pattern set to:'); disp(d.getOptionsDemandPattern());
 
 disp('Emitter backflow before:'); disp(d.getOptionsEmitterBackFlow());
@@ -170,6 +171,9 @@ LinkFlows = [];    % Link flows
 tStep = 1;
 stepCount = 0;
 maxSteps = 2;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% getLinkInfo?? 
 
 % Run hydraulic analysis
 while tStep > 0 && stepCount < maxSteps
