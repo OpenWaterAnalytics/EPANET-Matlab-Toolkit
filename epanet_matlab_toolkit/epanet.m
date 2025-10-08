@@ -1785,8 +1785,15 @@ classdef epanet <handle
             else
                 Errcode = calllib(LibEPANET, 'EN_open', ph, inpname, repname, binname);
             end
-            if Errcode && Errcode~=200
-                [~, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
+            if Errcode == 200 % use openX if inp file has errors
+                if ph.isNull
+                    Errcode = calllib(LibEPANET, 'ENopenX', inpname, repname, binname);
+                else
+                    Errcode = calllib(LibEPANET, 'EN_openX', ph, inpname, repname, binname);
+                end
+                if Errcode == 200, Errcode = 0; end % reset the error code   
+            elseif Errcode && Errcode ~= 200
+                [~, errmsg] = calllib(LibEPANET,'ENgeterror',Errcode,char(32*ones(1,79)),79);
                 disp(errmsg);
             end
         end
