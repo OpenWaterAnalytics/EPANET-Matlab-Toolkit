@@ -1314,6 +1314,7 @@ classdef epanet <handle
             else
                 [Errcode, out_values] = calllib(LibEPANET, 'EN_getlinkvalues', ph, property, out_values);
             end
+            out_values = double(out_values);
         end
         function [Errcode, id] = apiENgetnodeid(index, LibEPANET, ph)
             % Gets the ID name of a node given its index.
@@ -5275,12 +5276,7 @@ classdef epanet <handle
             %     d = epanet(inpfile)
             %     x = d.getLinkInControl([1,2,3,13]) 
             if nargin == 1 % if no args, fetch for all links
-                linkCount =  obj.getLinkCount;
-                result = zeros(linkCount, 1);
-                for i = 1:linkCount
-                    [obj.Errcode, temp] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
-                    result(i) = temp;  % store value in result
-                end
+                result = obj.getLinkValues(obj.ToolkitConstants.EN_LINK_INCONTROL);
             end
             if nargin == 2 % if arg is a list or a single index
                 links = varargin{1};
@@ -6313,17 +6309,22 @@ classdef epanet <handle
             % See also getLinkType, getLinkTypeIndex, getLinkDiameter,
             %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = struct();
-            for i=1:obj.getLinkCount
-                [~, value.LinkDiameter(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET, obj.ph);
-                [~, value.LinkLength(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LENGTH, obj.LibEPANET, obj.ph);
-                [~, value.LinkRoughnessCoeff(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_ROUGHNESS, obj.LibEPANET, obj.ph);
-                [~, value.LinkMinorLossCoeff(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_MINORLOSS, obj.LibEPANET, obj.ph);
-                [~, value.LinkInitialStatus(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_INITSTATUS, obj.LibEPANET, obj.ph);
-                [~, value.LinkInitialSetting(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_INITSETTING, obj.LibEPANET, obj.ph);
-                [~, value.LinkBulkReactionCoeff(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_KBULK, obj.LibEPANET, obj.ph);
-                [~, value.LinkWallReactionCoeff(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_KWALL, obj.LibEPANET, obj.ph);
-                [~, value.NodesConnectingLinksIndex(i, 1), value.NodesConnectingLinksIndex(i, 2)] = obj.apiENgetlinknodes(i, obj.LibEPANET, obj.ph);
-                if obj.getVersion > 20101
+            % Retrieve all link values 
+            value.LinkDiameter = obj.getLinkValues(obj.ToolkitConstants.EN_DIAMETER)';
+            value.LinkLength = obj.getLinkValues(obj.ToolkitConstants.EN_LENGTH)';
+            value.LinkRoughnessCoeff = obj.getLinkValues(obj.ToolkitConstants.EN_ROUGHNESS)';
+            value.LinkMinorLossCoeff = obj.getLinkValues(obj.ToolkitConstants.EN_MINORLOSS)';
+            value.LinkInitialStatus = obj.getLinkValues(obj.ToolkitConstants.EN_INITSTATUS)';
+            value.LinkInitialSetting = obj.getLinkValues(obj.ToolkitConstants.EN_INITSETTING)';
+            value.LinkBulkReactionCoeff = obj.getLinkValues(obj.ToolkitConstants.EN_KBULK)';
+            value.LinkWallReactionCoeff = obj.getLinkValues(obj.ToolkitConstants.EN_KWALL)';
+            % Node connections
+            nLinks = obj.getLinkCount;
+            for i = 1:nLinks
+                [~, value.NodesConnectingLinksIndex(i,1), value.NodesConnectingLinksIndex(i,2)] = obj.apiENgetlinknodes(i, obj.LibEPANET, obj.ph);
+            end
+            if obj.getVersion > 20101
+                for i = 1:nLinks
                     [~, value.LinkTypeIndex(i)] = obj.apiENgetlinktype(i, obj.LibEPANET, obj.ph);
                 end
             end
@@ -6591,10 +6592,14 @@ classdef epanet <handle
             % See also getLinkVelocity, getLinkHeadloss, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkEnergy,
             %          getLinkActualQuality, getLinkPumpEfficiency.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_FLOW, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+               [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_FLOW, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_FLOW, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkVelocity(obj, varargin)
@@ -6612,10 +6617,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+               [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkHeadloss(obj, varargin)
@@ -6633,10 +6642,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkVelocity, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+               [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkStatus(obj, varargin)
@@ -6653,11 +6666,16 @@ classdef epanet <handle
             % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
-            %          getLinkPumpState, getLinkSettings.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_STATUS, obj.LibEPANET, obj.ph);
-                j=j+1;
+            %          getLinkPumpState, getLinkSettings
+            if isempty(varargin)
+               [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_STATUS, obj.LibEPANET, obj.ph);
+            else
+                value = zeros(1, length(varargin));
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_STATUS, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkPumpState(obj, varargin)
@@ -6677,11 +6695,7 @@ classdef epanet <handle
             %          getLinkSettings, getLinkEnergy, getLinkPumpEfficiency.
             indices = obj.getLinkPumpIndex; % obj.getLinkIndex;
             if isempty(varargin)
-                value = zeros(1, length(indices)); j = 1;
-                for i=indices
-                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_PUMP_STATE, obj.LibEPANET, obj.ph);
-                    j=j+1;
-                end
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_STATE, obj.LibEPANET, obj.ph);
             else
                 varargin = varargin{1};
                 if ~ismember(varargin, indices)
@@ -6713,10 +6727,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkEnergy.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_SETTING, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_SETTING, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_SETTING, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkEnergy(obj, varargin)
@@ -6734,10 +6752,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkPumpEfficiency.
+            if isempty(varargin)
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
+            else
             [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
-                j=j+1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkActualQuality(obj, varargin)
@@ -6754,10 +6776,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkStatus, getLinkPumpState,
             %          getLinkSettings, getLinkPumpEfficiency.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LINKQUAL, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_LINKQUAL, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LINKQUAL, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkPumpEfficiency(obj, varargin)
@@ -6775,11 +6801,7 @@ classdef epanet <handle
             %          getLinkSettings, getLinkEnergy, getLinkActualQuality.
             indices = obj.getLinkPumpIndex; % obj.getLinkIndex;
             if isempty(varargin)
-                value = zeros(1, length(indices)); j = 1;
-                for i=indices
-                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_PUMP_EFFIC, obj.LibEPANET, obj.ph);
-                    j=j+1;
-                end
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_EFFIC, obj.LibEPANET, obj.ph);
             else
                 varargin = varargin{1};
                 if ~ismember(varargin, indices)
