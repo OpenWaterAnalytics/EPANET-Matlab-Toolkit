@@ -212,7 +212,6 @@ d = epanet('Net1.inp');
 d.getLinksInfo
 
 d.runsCompleteSimulation;
-disp('--- single link (1) ---');
 disp('getLinkFlows(1):');              disp(d.getLinkFlows(1));
 disp('getLinkVelocity(1):');           disp(d.getLinkVelocity(1));
 disp('getLinkHeadloss(1):');           disp(d.getLinkHeadloss(1));
@@ -222,16 +221,41 @@ disp('getLinkSettings(1):');           disp(d.getLinkSettings(1));
 disp('getLinkEnergy(1):');             disp(d.getLinkEnergy(1));
 disp('getLinkActualQuality(1):');      disp(d.getLinkActualQuality(1));
 disp('getLinkPumpEfficiency(1):');     disp(d.getLinkPumpEfficiency(1));
+disp('getLinkDiameter(1):');           disp(d.getLinkDiameter(1));
+disp('getLinkLength(1):');             disp(d.getLinkLength(1));
+disp('getLinkQuality(1):');            disp(d.getLinkQuality(1));
+disp('getLinkRoughnessCoeff(1):');     disp(d.getLinkRoughnessCoeff(1));
+disp('getLinkMinorLossCoeff(1):');     disp(d.getLinkMinorLossCoeff(1));
+disp('getLinkInitialStatus(1):');      disp(d.getLinkInitialStatus(1));
+disp('getLinkInitialSetting(1):');     disp(d.getLinkInitialSetting(1));
+disp('getLinkBulkReactionCoeff(1):');  disp(d.getLinkBulkReactionCoeff(1));
+disp('getLinkWallReactionCoeff(1):');  disp(d.getLinkWallReactionCoeff(1));
+disp('getLinkLeakArea(1):');           disp(d.getLinkLeakArea(1));
+disp('getLinkExpansionProperties(1):'); disp(d.getLinkExpansionProperties(1));
+disp('getLinkLeakageRate(1):');        disp(d.getLinkLeakageRate(1));
 
+%% --- all links ---
 disp('--- all links ---');
-disp('getLinkFlows:');                 disp(d.getLinkFlows');
-disp('getLinkVelocity:');              disp(d.getLinkVelocity');
-disp('getLinkHeadloss:');              disp(d.getLinkHeadloss');
-disp('getLinkStatus:');                disp(d.getLinkStatus');
-disp('getLinkPumpState:');             disp(d.getLinkPumpState');
-disp('getLinkSettings:');              disp(d.getLinkSettings');
-disp('getLinkEnergy:');                disp(d.getLinkEnergy');
-disp('getLinkActualQuality:');         disp(d.getLinkActualQuality');
-disp('getLinkPumpEfficiency:');        disp(d.getLinkPumpEfficiency');
+disp('getLinkFlows:');                  disp(d.getLinkFlows');
+disp('getLinkVelocity:');               disp(d.getLinkVelocity');
+disp('getLinkHeadloss:');               disp(d.getLinkHeadloss');
+disp('getLinkStatus:');                 disp(d.getLinkStatus');
+disp('getLinkPumpState:');              disp(d.getLinkPumpState');
+disp('getLinkSettings:');               disp(d.getLinkSettings');
+disp('getLinkEnergy:');                 disp(d.getLinkEnergy');
+disp('getLinkActualQuality:');          disp(d.getLinkActualQuality');
+disp('getLinkPumpEfficiency:');         disp(d.getLinkPumpEfficiency');
+disp('getLinkDiameter:');               disp(d.getLinkDiameter');
+disp('getLinkLength:');                 disp(d.getLinkLength');
+disp('getLinkQuality:');                disp(d.getLinkQuality');
+disp('getLinkRoughnessCoeff:');         disp(d.getLinkRoughnessCoeff');
+disp('getLinkMinorLossCoeff:');         disp(d.getLinkMinorLossCoeff');
+disp('getLinkInitialStatus:');          disp(d.getLinkInitialStatus');
+disp('getLinkInitialSetting:');         disp(d.getLinkInitialSetting');
+disp('getLinkBulkReactionCoeff:');      disp(d.getLinkBulkReactionCoeff');
+disp('getLinkWallReactionCoeff:');      disp(d.getLinkWallReactionCoeff');
+disp('getLinkLeakArea:');               disp(d.getLinkLeakArea');
+disp('getLinkExpansionProperties:');    disp(d.getLinkExpansionProperties');
+disp('getLinkLeakageRate:');            disp(d.getLinkLeakageRate');
 
 d.unload;
