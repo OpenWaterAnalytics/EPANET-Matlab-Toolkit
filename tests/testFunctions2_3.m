@@ -204,4 +204,34 @@ disp('Total leakage loss:'); disp(d.getStatisticTotalLeakageLoss());
 d.unload;
 
 %% --- Leakage Expansion Demand ---
-% See EX28_Leakage 
+% See EX28_Leakage
+
+%% Test functions where getLinkValue -> getLinkValues
+d = epanet('Net1.inp');
+
+d.getLinksInfo
+
+d.runsCompleteSimulation;
+disp('--- single link (1) ---');
+disp('getLinkFlows(1):');              disp(d.getLinkFlows(1));
+disp('getLinkVelocity(1):');           disp(d.getLinkVelocity(1));
+disp('getLinkHeadloss(1):');           disp(d.getLinkHeadloss(1));
+disp('getLinkStatus(1):');             disp(d.getLinkStatus(1));
+disp('getLinkPumpState(1):');          disp(d.getLinkPumpState(1));
+disp('getLinkSettings(1):');           disp(d.getLinkSettings(1));
+disp('getLinkEnergy(1):');             disp(d.getLinkEnergy(1));
+disp('getLinkActualQuality(1):');      disp(d.getLinkActualQuality(1));
+disp('getLinkPumpEfficiency(1):');     disp(d.getLinkPumpEfficiency(1));
+
+disp('--- all links ---');
+disp('getLinkFlows:');                 disp(d.getLinkFlows');
+disp('getLinkVelocity:');              disp(d.getLinkVelocity');
+disp('getLinkHeadloss:');              disp(d.getLinkHeadloss');
+disp('getLinkStatus:');                disp(d.getLinkStatus');
+disp('getLinkPumpState:');             disp(d.getLinkPumpState');
+disp('getLinkSettings:');              disp(d.getLinkSettings');
+disp('getLinkEnergy:');                disp(d.getLinkEnergy');
+disp('getLinkActualQuality:');         disp(d.getLinkActualQuality');
+disp('getLinkPumpEfficiency:');        disp(d.getLinkPumpEfficiency');
+
+d.unload;
