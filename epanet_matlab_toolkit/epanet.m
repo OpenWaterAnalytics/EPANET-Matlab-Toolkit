@@ -510,12 +510,16 @@ classdef epanet <handle
             end
         end
         function value = get_link_info(obj, constant, varargin)
-            [indices, value] = getLinkIndices(obj, varargin);
-            j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, constant, obj.LibEPANET, obj.ph);
-                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)  % if no args, fetch for all links
+                [~, value] = obj.apiENgetlinkvalues(constant, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);
+                j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, constant, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function set_Node_Link(obj, param, fun, propertie, value, varargin)
