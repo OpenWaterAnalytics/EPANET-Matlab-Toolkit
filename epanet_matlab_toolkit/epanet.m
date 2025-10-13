@@ -7903,6 +7903,10 @@ classdef epanet <handle
                 value(j) = head - elev;
             end
         end
+        function value = getNodeTankElevation(obj, varargin)
+            % Retrieves the elevation of tanks
+            value = get_node_info(obj, obj.ToolkitConstants.EN_ELEVATION, varargin{:});
+        end
         function value = getNodeActualDemand(obj, varargin)
             % Retrieves the computed value of all node actual demands.
             %
