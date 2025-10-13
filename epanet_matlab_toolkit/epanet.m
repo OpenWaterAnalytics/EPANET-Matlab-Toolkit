@@ -7841,6 +7841,29 @@ classdef epanet <handle
                 j=j+1;
             end
         end
+         function value = getNodeTankWaterLevel(obj, varargin)
+            % Retrieves the current tank water level
+            % Example 1:
+            %   d.getNodeTankWaterLevel       % Retrieves the water level value of all tanks
+            %
+            % Example 2:
+            %   d.getNodeTankWaterLevel(11)   % Retrieves the water level value of the eleventh node(tank) 
+            %
+            % Example 3:
+            %   d.getNodeTankWaterLevel(11:13)   % Retrieves the water level value of the eleventh to the thirteenth node(tank) 
+            if isempty(varargin)
+                indices = obj.getNodeTankIndex;
+            else
+                indices = varargin{1};
+            end
+            value = zeros(1, length(indices));
+            for j = 1:length(indices)
+                i = indices(j);
+                [~, head] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_HEAD, obj.LibEPANET, obj.ph);
+                [~, elev] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET, obj.ph);
+                value(j) = head - elev;
+            end
+        end
         function value = getNodeActualDemand(obj, varargin)
             % Retrieves the computed value of all node actual demands.
             %
