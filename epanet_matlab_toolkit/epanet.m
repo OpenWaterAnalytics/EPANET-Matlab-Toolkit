@@ -6326,14 +6326,23 @@ classdef epanet <handle
             %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = struct();
             % Retrieve all link values 
-            value.LinkDiameter = obj.getLinkValues(obj.ToolkitConstants.EN_DIAMETER)';
-            value.LinkLength = obj.getLinkValues(obj.ToolkitConstants.EN_LENGTH)';
-            value.LinkRoughnessCoeff = obj.getLinkValues(obj.ToolkitConstants.EN_ROUGHNESS)';
-            value.LinkMinorLossCoeff = obj.getLinkValues(obj.ToolkitConstants.EN_MINORLOSS)';
-            value.LinkInitialStatus = obj.getLinkValues(obj.ToolkitConstants.EN_INITSTATUS)';
-            value.LinkInitialSetting = obj.getLinkValues(obj.ToolkitConstants.EN_INITSETTING)';
-            value.LinkBulkReactionCoeff = obj.getLinkValues(obj.ToolkitConstants.EN_KBULK)';
-            value.LinkWallReactionCoeff = obj.getLinkValues(obj.ToolkitConstants.EN_KWALL)';
+            [~, value.LinkDiameter] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET, obj.ph);
+            [~, value.LinkLength] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_LENGTH, obj.LibEPANET, obj.ph); 
+            [~, value.LinkRoughnessCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_ROUGHNESS, obj.LibEPANET, obj.ph);  
+            [~, value.LinkMinorLossCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_MINORLOSS, obj.LibEPANET, obj.ph); 
+            [~, value.LinkInitialStatus] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_INITSTATUS, obj.LibEPANET, obj.ph); 
+            [~, value.LinkInitialSetting] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_INITSETTING, obj.LibEPANET, obj.ph);
+            [~, value.LinkBulkReactionCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_KBULK, obj.LibEPANET, obj.ph);  
+            [~, value.LinkWallReactionCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_KWALL, obj.LibEPANET, obj.ph);  
+            % transpose 
+            value.LinkDiameter = value.LinkDiameter';
+            value.LinkLength = value.LinkLength';
+            value.LinkRoughnessCoeff  = value.LinkRoughnessCoeff';
+            value.LinkMinorLossCoeff   = value.LinkMinorLossCoeff';
+            value.LinkInitialStatus    = value.LinkInitialStatus';
+            value.LinkInitialSetting   = value.LinkInitialSetting';
+            value.LinkBulkReactionCoeff= value.LinkBulkReactionCoeff';
+            value.LinkWallReactionCoeff= value.LinkWallReactionCoeff';
             % Node connections
             nLinks = obj.getLinkCount;
             for i = 1:nLinks
