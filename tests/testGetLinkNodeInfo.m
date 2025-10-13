@@ -68,15 +68,15 @@ disp('Running getLinkPumpECost');         d.getLinkPumpECost'
 disp('Running getLinkPumpEPat');          d.getLinkPumpEPat'
 disp('Running getLinkPumpPatternIndex');  d.getLinkPumpPatternIndex'
 
-%% Single pump (1044)
-disp('Running getLinkPumpPower(1044)');         d.getLinkPumpPower(firstPump)
-disp('Running getLinkPumpHCurve(1044)');        d.getLinkPumpHCurve(firstPump)
-disp('Running getLinkPumpECurve(1044)');        d.getLinkPumpECurve(firstPump)
-disp('Running getLinkPumpECost(1044)');         d.getLinkPumpECost(firstPump)
-disp('Running getLinkPumpEPat(1044)');          d.getLinkPumpEPat(firstPump)
-disp('Running getLinkPumpPatternIndex(1044)');  d.getLinkPumpPatternIndex(firstPump)
+%% Single pump (118)
+disp('Running getLinkPumpPower(118)');         d.getLinkPumpPower(firstPump)
+disp('Running getLinkPumpHCurve(118)');        d.getLinkPumpHCurve(firstPump)
+disp('Running getLinkPumpECurve(118)');        d.getLinkPumpECurve(firstPump)
+disp('Running getLinkPumpECost(118)');         d.getLinkPumpECost(firstPump)
+disp('Running getLinkPumpEPat(118)');          d.getLinkPumpEPat(firstPump)
+disp('Running getLinkPumpPatternIndex(118)');  d.getLinkPumpPatternIndex(firstPump)
 
-%% Range of pumps (1044:1046)
+%% Range of pumps
 disp('Running getLinkPumpPower(:)');         d.getLinkPumpPower(firstPump:firstPump+1)
 disp('Running getLinkPumpHCurve(:)');        d.getLinkPumpHCurve(firstPump:firstPump+1)
 disp('Running getLinkPumpECurve(:)');        d.getLinkPumpECurve(firstPump:firstPump+1)
