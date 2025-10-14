@@ -510,12 +510,28 @@ classdef epanet <handle
             end
         end
         function value = get_link_info(obj, constant, varargin)
-            [indices, value] = getLinkIndices(obj, varargin);
-            j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, constant, obj.LibEPANET, obj.ph);
+            if isempty(varargin)  % if no args, fetch for all links
+                [~, value] = obj.apiENgetlinkvalues(constant, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);
+                j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, constant, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
+            end
+        end
+        function value = get_node_info(obj, constant, varargin)
+            if isempty(varargin)
+                indices = obj.getNodeTankIndex;  % all tanks
+            else
+                [indices, ~] = getNodeIndices(obj, varargin);
+            end
+            value = zeros(1, length(indices));
+            for j = 1:length(indices)
+                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(indices(j), constant, obj.LibEPANET, obj.ph);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-                j=j+1;
             end
         end
         function set_Node_Link(obj, param, fun, propertie, value, varargin)
@@ -619,7 +635,7 @@ classdef epanet <handle
             end
         end
         function value = get_node_tank_mixining_model(obj, varargin)
-            obj.NodeTankMixingModelCode = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MIXMODEL, varargin);
+            obj.NodeTankMixingModelCode = get_node_info(obj, obj.ToolkitConstants.EN_MIXMODEL, varargin{:}); %get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MIXMODEL, varargin);
             obj.NodeTankMixingModelType = obj.TYPEMIXMODEL(obj.NodeTankMixingModelCode + 1);
             value={obj.NodeTankMixingModelCode obj.NodeTankMixingModelType};
         end
@@ -1314,6 +1330,7 @@ classdef epanet <handle
             else
                 [Errcode, out_values] = calllib(LibEPANET, 'EN_getlinkvalues', ph, property, out_values);
             end
+            out_values = double(out_values);
         end
         function [Errcode, id] = apiENgetnodeid(index, LibEPANET, ph)
             % Gets the ID name of a node given its index.
@@ -5275,12 +5292,7 @@ classdef epanet <handle
             %     d = epanet(inpfile)
             %     x = d.getLinkInControl([1,2,3,13]) 
             if nargin == 1 % if no args, fetch for all links
-                linkCount =  obj.getLinkCount;
-                result = zeros(linkCount, 1);
-                for i = 1:linkCount
-                    [obj.Errcode, temp] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LINK_INCONTROL, obj.LibEPANET, obj.ph);
-                    result(i) = temp;  % store value in result
-                end
+                result = obj.getLinkValues(obj.ToolkitConstants.EN_LINK_INCONTROL);
             end
             if nargin == 2 % if arg is a list or a single index
                 links = varargin{1};
@@ -6313,17 +6325,31 @@ classdef epanet <handle
             % See also getLinkType, getLinkTypeIndex, getLinkDiameter,
             %          getLinkLength, getLinkRoughnessCoeff, getLinkMinorLossCoeff.
             value = struct();
-            for i=1:obj.getLinkCount
-                [~, value.LinkDiameter(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET, obj.ph);
-                [~, value.LinkLength(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LENGTH, obj.LibEPANET, obj.ph);
-                [~, value.LinkRoughnessCoeff(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_ROUGHNESS, obj.LibEPANET, obj.ph);
-                [~, value.LinkMinorLossCoeff(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_MINORLOSS, obj.LibEPANET, obj.ph);
-                [~, value.LinkInitialStatus(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_INITSTATUS, obj.LibEPANET, obj.ph);
-                [~, value.LinkInitialSetting(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_INITSETTING, obj.LibEPANET, obj.ph);
-                [~, value.LinkBulkReactionCoeff(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_KBULK, obj.LibEPANET, obj.ph);
-                [~, value.LinkWallReactionCoeff(i)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_KWALL, obj.LibEPANET, obj.ph);
-                [~, value.NodesConnectingLinksIndex(i, 1), value.NodesConnectingLinksIndex(i, 2)] = obj.apiENgetlinknodes(i, obj.LibEPANET, obj.ph);
-                if obj.getVersion > 20101
+            % Retrieve all link values 
+            [~, value.LinkDiameter] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_DIAMETER, obj.LibEPANET, obj.ph);
+            [~, value.LinkLength] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_LENGTH, obj.LibEPANET, obj.ph); 
+            [~, value.LinkRoughnessCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_ROUGHNESS, obj.LibEPANET, obj.ph);  
+            [~, value.LinkMinorLossCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_MINORLOSS, obj.LibEPANET, obj.ph); 
+            [~, value.LinkInitialStatus] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_INITSTATUS, obj.LibEPANET, obj.ph); 
+            [~, value.LinkInitialSetting] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_INITSETTING, obj.LibEPANET, obj.ph);
+            [~, value.LinkBulkReactionCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_KBULK, obj.LibEPANET, obj.ph);  
+            [~, value.LinkWallReactionCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_KWALL, obj.LibEPANET, obj.ph);  
+            % transpose 
+            value.LinkDiameter = value.LinkDiameter';
+            value.LinkLength = value.LinkLength';
+            value.LinkRoughnessCoeff  = value.LinkRoughnessCoeff';
+            value.LinkMinorLossCoeff   = value.LinkMinorLossCoeff';
+            value.LinkInitialStatus    = value.LinkInitialStatus';
+            value.LinkInitialSetting   = value.LinkInitialSetting';
+            value.LinkBulkReactionCoeff= value.LinkBulkReactionCoeff';
+            value.LinkWallReactionCoeff= value.LinkWallReactionCoeff';
+            % Node connections
+            nLinks = obj.getLinkCount;
+            for i = 1:nLinks
+                [~, value.NodesConnectingLinksIndex(i,1), value.NodesConnectingLinksIndex(i,2)] = obj.apiENgetlinknodes(i, obj.LibEPANET, obj.ph);
+            end
+            if obj.getVersion > 20101
+                for i = 1:nLinks
                     [~, value.LinkTypeIndex(i)] = obj.apiENgetlinktype(i, obj.LibEPANET, obj.ph);
                 end
             end
@@ -6591,10 +6617,14 @@ classdef epanet <handle
             % See also getLinkVelocity, getLinkHeadloss, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkEnergy,
             %          getLinkActualQuality, getLinkPumpEfficiency.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_FLOW, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+               [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_FLOW, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_FLOW, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkVelocity(obj, varargin)
@@ -6612,10 +6642,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkHeadloss, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+               [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkHeadloss(obj, varargin)
@@ -6633,10 +6667,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkVelocity, getLinkStatus,
             %          getLinkPumpState, getLinkSettings, getLinkActualQuality.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+               [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkStatus(obj, varargin)
@@ -6653,11 +6691,16 @@ classdef epanet <handle
             % For more, you can type `help getLinkFlows` and check examples 3 & 4
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
-            %          getLinkPumpState, getLinkSettings.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_STATUS, obj.LibEPANET, obj.ph);
-                j=j+1;
+            %          getLinkPumpState, getLinkSettings
+            if isempty(varargin)
+               [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_STATUS, obj.LibEPANET, obj.ph);
+            else
+                value = zeros(1, length(varargin));
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_STATUS, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkPumpState(obj, varargin)
@@ -6677,11 +6720,7 @@ classdef epanet <handle
             %          getLinkSettings, getLinkEnergy, getLinkPumpEfficiency.
             indices = obj.getLinkPumpIndex; % obj.getLinkIndex;
             if isempty(varargin)
-                value = zeros(1, length(indices)); j = 1;
-                for i=indices
-                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_PUMP_STATE, obj.LibEPANET, obj.ph);
-                    j=j+1;
-                end
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_STATE, obj.LibEPANET, obj.ph);
             else
                 varargin = varargin{1};
                 if ~ismember(varargin, indices)
@@ -6713,10 +6752,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkEnergy.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_SETTING, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_SETTING, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_SETTING, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkEnergy(obj, varargin)
@@ -6734,10 +6777,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkVelocity, getLinkHeadloss,
             %          getLinkStatus, getLinkPumpState, getLinkPumpEfficiency.
+            if isempty(varargin)
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
+            else
             [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
-                j=j+1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkActualQuality(obj, varargin)
@@ -6754,10 +6801,14 @@ classdef epanet <handle
             %
             % See also getLinkFlows, getLinkStatus, getLinkPumpState,
             %          getLinkSettings, getLinkPumpEfficiency.
-            [indices, value] = getLinkIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LINKQUAL, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_LINKQUAL, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getLinkIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_LINKQUAL, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getLinkPumpEfficiency(obj, varargin)
@@ -6775,11 +6826,7 @@ classdef epanet <handle
             %          getLinkSettings, getLinkEnergy, getLinkActualQuality.
             indices = obj.getLinkPumpIndex; % obj.getLinkIndex;
             if isempty(varargin)
-                value = zeros(1, length(indices)); j = 1;
-                for i=indices
-                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, obj.ToolkitConstants.EN_PUMP_EFFIC, obj.LibEPANET, obj.ph);
-                    j=j+1;
-                end
+                [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_EFFIC, obj.LibEPANET, obj.ph);
             else
                 varargin = varargin{1};
                 if ~ismember(varargin, indices)
@@ -6813,7 +6860,7 @@ classdef epanet <handle
             %
             % See also getLinkPumpHCurve, getLinkPumpECurve, getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_POWER, varargin);
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_POWER, varargin{:}); %get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_POWER, varargin);
         end
         function value = getLinkPumpHCurve(obj, varargin)
             % Retrieves the pump head v. flow curve index. (EPANET Version 2.2)
@@ -6833,7 +6880,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpHCurve, getLinkPumpECurve, getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, varargin);
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_HCURVE, varargin{:}); %get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_HCURVE, varargin);
         end
         function value = getLinkPumpECurve(obj, varargin)
             % Retrieves the pump efficiency v. flow curve index. (EPANET Version 2.2)
@@ -6853,7 +6900,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpECurve, getLinkPumpHCurve, getLinkPumpECost,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, varargin);
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_ECURVE, varargin{:}); %get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECURVE, varargin);
         end
         function value = getLinkPumpECost(obj, varargin)
             % Retrieves the pump average energy price. (EPANET Version 2.2)
@@ -6873,7 +6920,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpECost, getLinkPumpPower, getLinkPumpHCurve,
             %          getLinkPumpEPat, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, varargin);
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_ECOST, varargin{:}); %get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_ECOST, varargin);
         end
         function value = getLinkPumpEPat(obj, varargin)
             % Retrieves the pump energy price time pattern index. (EPANET Version 2.2)
@@ -6893,7 +6940,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpEPat, getLinkPumpHCurve, getLinkPumpECurve,
             %          getLinkPumpECost, getLinkPumpPatternIndex, getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, varargin);
+            value = get_link_info(obj, obj.ToolkitConstants.EN_PUMP_EPAT, varargin{:}); %get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_PUMP_EPAT, varargin);
         end
         function value = getLinkPumpPatternIndex(obj, varargin)
             % Retrieves the pump speed time pattern index. (EPANET Version 2.1)
@@ -6913,7 +6960,7 @@ classdef epanet <handle
             %
             % See also setLinkPumpPatternIndex, getLinkPumpPower, getLinkPumpHCurve,
             %          getLinkPumpECost, getLinkPumpEPat,  getLinkPumpPatternNameID.
-            value = get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, varargin);
+            value = get_link_info(obj, obj.ToolkitConstants.EN_LINKPATTERN, varargin{:}); %get_node_link(obj, 'pump', 'apiENgetlinkvalue', obj.ToolkitConstants.EN_LINKPATTERN, varargin);
         end
         function value = getLinkPumpPatternNameID(obj, varargin)
             % Retrieves pump pattern name ID. (EPANET Version 2.1)
@@ -7819,7 +7866,8 @@ classdef epanet <handle
             %
             % See also setNodeTankInitialLevel, getNodeTankInitialWaterVolume, getNodeTankVolume,
             %          getNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, varargin);
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKLEVEL, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_TANKLEVEL, varargin{:});
         end
         function value = getNodeJunctionActualDemand(obj, varargin)
             % Retrieves the computed value of all actual demands for
@@ -8071,7 +8119,8 @@ classdef epanet <handle
             %
             % See also getNodeTankInitialLevel,  getNodeTankVolume,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_INITVOLUME, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_INITVOLUME, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_INITVOLUME, varargin);
         end
         function value = getNodeTankMixingModelCode(obj, varargin)
             % Retrieves the tank mixing model code.
@@ -8142,7 +8191,8 @@ classdef epanet <handle
             %   d.getNodeTankMixZoneVolume(tankIndex)   % Retrieves the mixing zone volume of the tanks given their indices
             %
             % See also getNodeTankMixingModelCode, getNodeTankMixingModelType.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MIXZONEVOL, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_MIXZONEVOL, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MIXZONEVOL, varargin);
         end
         function value = getNodeTankDiameter(obj, varargin)
             % Retrieves the tank diameters.
@@ -8162,7 +8212,8 @@ classdef epanet <handle
             %
             % See also setNodeTankDiameter, getNodeTankBulkReactionCoeff, getNodeTankInitialLevel,
             %          getNodeTankMixingModelType, getNodeTankVolume, getNodeTankNameID.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKDIAM, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_TANKDIAM, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKDIAM, varargin);
         end
         function value = getNodeTankMinimumWaterVolume(obj, varargin)
             % Retrieves the tank minimum water volume.
@@ -8182,7 +8233,8 @@ classdef epanet <handle
             %
             % See also setNodeTankMinimumWaterVolume, getNodeTankMaximumWaterVolume, getNodeTankInitialWaterVolume,
             %          getNodeTankInitialLevel,  getNodeTankVolume, getNodeTankMixZoneVolume.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_MINVOLUME, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MINVOLUME, varargin);
         end
         function value = getNodeTankVolumeCurveIndex(obj, varargin)
             % Retrieves the tank volume curve index.
@@ -8202,7 +8254,8 @@ classdef epanet <handle
             %
             % See also getNodeTankVolume, getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume,
             %          getNodeTankInitialWaterVolume, getNodeTankMixZoneVolume.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_VOLCURVE, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_VOLCURVE, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_VOLCURVE, varargin);
         end
         function value = getNodeTankMinimumWaterLevel(obj, varargin)
             % Retrieves the tank minimum water level.
@@ -8222,7 +8275,8 @@ classdef epanet <handle
             %
             % See also setNodeTankMinimumWaterLevel, getNodeTankMaximumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_MINLEVEL, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MINLEVEL, varargin);
         end
         function value = getNodeTankMaximumWaterLevel(obj, varargin)
             % Retrieves the tank maximum water level.
@@ -8242,7 +8296,8 @@ classdef epanet <handle
             %
             % See also setNodeTankMaximumWaterLevel, getNodeTankMinimumWaterLevel, getNodeTankInitialLevel,
             %          getNodeTankMaximumWaterVolume, getNodeTankMinimumWaterVolume, getNodeTankVolume.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_MAXLEVEL, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MAXLEVEL, varargin);
         end
         function value = getNodeTankMixingFraction(obj, varargin)
             % Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank.
@@ -8261,7 +8316,8 @@ classdef epanet <handle
             %   d.getNodeTankMixingFraction(tankIndex)   % Retrieves the mixing fraction of the tanks given their indices
             %
             % See also setNodeTankMixingFraction, getNodeTankData.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_MIXFRACTION, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MIXFRACTION, varargin);
         end
         function value = getNodeTankBulkReactionCoeff(obj, varargin)
             % Retrieves the tank bulk rate coefficient.
@@ -8280,7 +8336,8 @@ classdef epanet <handle
             %   d.getNodeTankBulkReactionCoeff(tankIndex)   % Retrieves the bulk rate coefficient of the tanks given their indices
             %
             % See also setNodeTankBulkReactionCoeff, getNodeTankData.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_TANK_KBULK, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANK_KBULK, varargin);
         end
         function value = getNodeTankVolume(obj, varargin)
             % Retrieves the tank volume. (EPANET Version 2.1)
@@ -8299,7 +8356,8 @@ classdef epanet <handle
             %   d.getNodeTankVolume(tankIndex)   % Retrieves the volume of the tanks given their indices
             %
             % See also getNodeTankData.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKVOLUME, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_TANKVOLUME, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_TANKVOLUME, varargin);
         end
         function value = getNodeTankMaximumWaterVolume(obj, varargin)
             % Retrieves the tank maximum water volume. (EPANET Version 2.1)
@@ -8318,7 +8376,8 @@ classdef epanet <handle
             %   d.getNodeTankMaximumWaterVolume(tankIndex)   % Retrieves the maximum water volume of the tanks given their indices
             %
             % See also getNodeTankMinimumWaterVolume, getNodeTankData.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MAXVOLUME, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_MAXVOLUME, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_MAXVOLUME, varargin);
         end
         function value = getNodeTankCanOverFlow(obj, varargin)
             % Retrieves the tank can overflow (= 1) or not (= 0). (EPANET Version 2.2)
@@ -8337,7 +8396,8 @@ classdef epanet <handle
             %   d.getNodeTankCanOverFlow(tankIndex)   % Retrieves the can overflow of the tanks given their indices
             %
             % See also setNodeTankCanOverFlow, getNodeTankData.
-            value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_CANOVERFLOW, varargin);
+            value = get_node_info(obj, obj.ToolkitConstants.EN_CANOVERFLOW, varargin{:});
+            %value = get_node_link(obj, 'tank', 'apiENgetnodevalue', obj.ToolkitConstants.EN_CANOVERFLOW, varargin);
         end
         function value = getNodeDemandDeficit(obj, varargin)
             % Retrieves the amount that full demand is reduced under PDA. (EPANET Version 2.2)
