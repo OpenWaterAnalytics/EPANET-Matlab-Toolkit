@@ -1,10 +1,10 @@
 start_toolkit
 d = epanet('ky10.inp');
-d.getNodeTankCount
-firstTank = d.getNodeTankIndex(1)
+
+d.runsCompleteSimulation;
 
 %% all
-disp('getNodeTankInitialLevel');             d.getNodeTankInitialLevel
+disp('getNodeTankInitialLevel');            d.getNodeTankInitialLevel
 disp('getNodeTankInitialWaterVolume');      d.getNodeTankInitialWaterVolume
 disp('getNodeTankMinimumWaterVolume');      d.getNodeTankMinimumWaterVolume
 disp('getNodeTankDiameter');                d.getNodeTankDiameter
@@ -22,43 +22,42 @@ disp('getNodeTankMixingModelType');         d.getNodeTankMixingModelType
 disp('getNodeTankMixingModelCode');         d.getNodeTankMixingModelCode
 
 %% single
-disp('getNodeTankInitialLevel(923)');            d.getNodeTankInitialLevel(firstTank)
-disp('getNodeTankInitialWaterVolume(923)');      d.getNodeTankInitialWaterVolume(firstTank)
-disp('getNodeTankMinimumWaterVolume(923)');      d.getNodeTankMinimumWaterVolume(firstTank)
-disp('getNodeTankDiameter(923)');                d.getNodeTankDiameter(firstTank)
-disp('getNodeTankMixZoneVolume(923)');           d.getNodeTankMixZoneVolume(firstTank)
-disp('getNodeTankMaximumWaterVolume(923)');      d.getNodeTankMaximumWaterVolume(firstTank)
-disp('getNodeTankVolumeCurveIndex(923)');        d.getNodeTankVolumeCurveIndex(firstTank)
-disp('getNodeTankMinimumWaterLevel(923)');       d.getNodeTankMinimumWaterLevel(firstTank)
-disp('getNodeTankMaximumWaterLevel(923)');       d.getNodeTankMaximumWaterLevel(firstTank)
-disp('getNodeTankMixingFraction(923)');          d.getNodeTankMixingFraction(firstTank)
-disp('getNodeTankBulkReactionCoeff(923)');       d.getNodeTankBulkReactionCoeff(firstTank)
-disp('getNodeTankVolume(923)');                  d.getNodeTankVolume(firstTank)
-disp('getNodeTankCanOverFlow(923)');             d.getNodeTankCanOverFlow(firstTank)
-disp('getNodeTankMixingModelCode(923)');         d.getNodeTankMixingModelCode(firstTank)
-disp('getNodeTankMixingModelType(923)');         d.getNodeTankMixingModelType(firstTank)
-disp('getNodeTankMixingModelCode(923)');          d.getNodeTankMixingModelCode(firstTank)
+disp('getNodeTankInitialLevel(1)');            d.getNodeTankInitialLevel(1)
+disp('getNodeTankInitialWaterVolume(1)');      d.getNodeTankInitialWaterVolume(1)
+disp('getNodeTankMinimumWaterVolume(1)');      d.getNodeTankMinimumWaterVolume(1)
+disp('getNodeTankDiameter(1)');                d.getNodeTankDiameter(1)
+disp('getNodeTankMixZoneVolume(1)');           d.getNodeTankMixZoneVolume(1)
+disp('getNodeTankMaximumWaterVolume(1)');      d.getNodeTankMaximumWaterVolume(1)
+disp('getNodeTankVolumeCurveIndex(1)');        d.getNodeTankVolumeCurveIndex(1)
+disp('getNodeTankMinimumWaterLevel(1)');       d.getNodeTankMinimumWaterLevel(1)
+disp('getNodeTankMaximumWaterLevel(1)');       d.getNodeTankMaximumWaterLevel(1)
+disp('getNodeTankMixingFraction(1)');          d.getNodeTankMixingFraction(1)
+disp('getNodeTankBulkReactionCoeff(1)');       d.getNodeTankBulkReactionCoeff(1)
+disp('getNodeTankVolume(1)');                  d.getNodeTankVolume(1)
+disp('getNodeTankCanOverFlow(1)');             d.getNodeTankCanOverFlow(1)
+disp('getNodeTankMixingModelCode(1)');         d.getNodeTankMixingModelCode(1)
+disp('getNodeTankMixingModelType(1)');         d.getNodeTankMixingModelType(1)
+disp('getNodeTankMixingModelCode(1)');         d.getNodeTankMixingModelCode(1)
 %% range
-disp('getNodeTankInitialLevel(:)');            d.getNodeTankInitialLevel(firstTank:firstTank+3)
-disp('getNodeTankInitialWaterVolume(:)');      d.getNodeTankInitialWaterVolume(firstTank:firstTank+3)
-disp('getNodeTankMinimumWaterVolume(:)');      d.getNodeTankMinimumWaterVolume(firstTank:firstTank+3)
-disp('getNodeTankDiameter(:)');                d.getNodeTankDiameter(firstTank:firstTank+3)
-disp('getNodeTankMixZoneVolume(:)');           d.getNodeTankMixZoneVolume(firstTank:firstTank+3)
-disp('getNodeTankMaximumWaterVolume(:)');      d.getNodeTankMaximumWaterVolume(firstTank:firstTank+3)
-disp('getNodeTankVolumeCurveIndex(:)');        d.getNodeTankVolumeCurveIndex(firstTank:firstTank+3)
-disp('getNodeTankMinimumWaterLevel(:)');       d.getNodeTankMinimumWaterLevel(firstTank:firstTank+3)
-disp('getNodeTankMaximumWaterLevel(:)');       d.getNodeTankMaximumWaterLevel(firstTank:firstTank+3)
-disp('getNodeTankMixingFraction(:)');          d.getNodeTankMixingFraction(firstTank:firstTank+3)
-disp('getNodeTankBulkReactionCoeff(:)');       d.getNodeTankBulkReactionCoeff(firstTank:firstTank+3)
-disp('getNodeTankVolume(:)');                  d.getNodeTankVolume(firstTank:firstTank+3)
-disp('getNodeTankCanOverFlow(:)');             d.getNodeTankCanOverFlow(firstTank:firstTank+3)
-disp('getNodeTankMixingModelCode(:)');         d.getNodeTankMixingModelCode(firstTank:firstTank+3)
-disp('getNodeTankMixingModelType(:)');         d.getNodeTankMixingModelType(firstTank:firstTank+3)
-disp('getNodeTankMixingModelCode(:)');          d.getNodeTankMixingModelCode(firstTank:firstTank+3)
+disp('getNodeTankInitialLevel(:)');            d.getNodeTankInitialLevel(1:4)
+disp('getNodeTankInitialWaterVolume(:)');      d.getNodeTankInitialWaterVolume(1:4)
+disp('getNodeTankMinimumWaterVolume(:)');      d.getNodeTankMinimumWaterVolume(1:4)
+disp('getNodeTankDiameter(:)');                d.getNodeTankDiameter(1:4)
+disp('getNodeTankMixZoneVolume(:)');           d.getNodeTankMixZoneVolume(1:4)
+disp('getNodeTankMaximumWaterVolume(:)');      d.getNodeTankMaximumWaterVolume(1:4)
+disp('getNodeTankVolumeCurveIndex(:)');        d.getNodeTankVolumeCurveIndex(1:4)
+disp('getNodeTankMinimumWaterLevel(:)');       d.getNodeTankMinimumWaterLevel(1:4)
+disp('getNodeTankMaximumWaterLevel(:)');       d.getNodeTankMaximumWaterLevel(1:4)
+disp('getNodeTankMixingFraction(:)');          d.getNodeTankMixingFraction(1:4)
+disp('getNodeTankBulkReactionCoeff(:)');       d.getNodeTankBulkReactionCoeff(1:4)
+disp('getNodeTankVolume(:)');                  d.getNodeTankVolume(1:4)
+disp('getNodeTankCanOverFlow(:)');             d.getNodeTankCanOverFlow(1:4)
+disp('getNodeTankMixingModelCode(:)');         d.getNodeTankMixingModelCode(1:4)
+disp('getNodeTankMixingModelType(:)');         d.getNodeTankMixingModelType(1:4)
+disp('getNodeTankMixingModelCode(:)');          d.getNodeTankMixingModelCode(1:4)
 d.unload;
 
 d = epanet('Net3.inp');
-firstPump = d.getLinkPumpIndex(1)
 
 %% All pumps
 disp('Running getLinkPumpPower');         d.getLinkPumpPower'
@@ -68,21 +67,21 @@ disp('Running getLinkPumpECost');         d.getLinkPumpECost'
 disp('Running getLinkPumpEPat');          d.getLinkPumpEPat'
 disp('Running getLinkPumpPatternIndex');  d.getLinkPumpPatternIndex'
 
-%% Single pump (118)
-disp('Running getLinkPumpPower(118)');         d.getLinkPumpPower(firstPump)
-disp('Running getLinkPumpHCurve(118)');        d.getLinkPumpHCurve(firstPump)
-disp('Running getLinkPumpECurve(118)');        d.getLinkPumpECurve(firstPump)
-disp('Running getLinkPumpECost(118)');         d.getLinkPumpECost(firstPump)
-disp('Running getLinkPumpEPat(118)');          d.getLinkPumpEPat(firstPump)
-disp('Running getLinkPumpPatternIndex(118)');  d.getLinkPumpPatternIndex(firstPump)
+%% Single pump (1)
+disp('Running getLinkPumpPower(1)');         d.getLinkPumpPower(1)
+disp('Running getLinkPumpHCurve(1)');        d.getLinkPumpHCurve(1)
+disp('Running getLinkPumpECurve(1)');        d.getLinkPumpECurve(1)
+disp('Running getLinkPumpECost(1)');         d.getLinkPumpECost(1)
+disp('Running getLinkPumpEPat(1)');          d.getLinkPumpEPat(1)
+disp('Running getLinkPumpPatternIndex(1)');  d.getLinkPumpPatternIndex(1)
 
 %% Range of pumps
-disp('Running getLinkPumpPower(:)');         d.getLinkPumpPower(firstPump:firstPump+1)
-disp('Running getLinkPumpHCurve(:)');        d.getLinkPumpHCurve(firstPump:firstPump+1)
-disp('Running getLinkPumpECurve(:)');        d.getLinkPumpECurve(firstPump:firstPump+1)
-disp('Running getLinkPumpECost(:)');         d.getLinkPumpECost(firstPump:firstPump+1)
-disp('Running getLinkPumpEPat(:)');          d.getLinkPumpEPat(firstPump:firstPump+1)
-disp('Running getLinkPumpPatternIndex(:)');  d.getLinkPumpPatternIndex(firstPump:firstPump+1)
+disp('Running getLinkPumpPower(:)');         d.getLinkPumpPower(1:2)
+disp('Running getLinkPumpHCurve(:)');        d.getLinkPumpHCurve(1:2)
+disp('Running getLinkPumpECurve(:)');        d.getLinkPumpECurve(1:2)
+disp('Running getLinkPumpECost(:)');         d.getLinkPumpECost(1:2)
+disp('Running getLinkPumpEPat(:)');          d.getLinkPumpEPat(1:2)
+disp('Running getLinkPumpPatternIndex(:)');  d.getLinkPumpPatternIndex(1:2)
 
 
 d.unload;
