@@ -522,29 +522,48 @@ classdef epanet <handle
                 end
             end
         end
-        function value = get_node_tank_info(obj, constant, varargin)
+        function value = get_node_tank_info(obj, property, varargin)
+            indices = obj.getNodeTankIndex;
             if isempty(varargin)
-                indices = obj.getNodeTankIndex;  % all tanks
+                value = zeros(1, length(indices));
+                for j = 1:length(indices)
+                    i = indices(j);
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, property, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                end
             else
-                indices = obj.getNodeTankIndex(varargin{1});
-            end
-            value = zeros(1, length(indices));
-            for j = 1:length(indices)
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(indices(j), constant, obj.LibEPANET, obj.ph);
-                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                ids = varargin{1};
+                if ~ismember(ids, indices)
+                    ids = indices(ids);
+                end
+                value = zeros(1, length(ids));
+                for j = 1:length(ids)
+                    idx = ids(j);
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(idx, property, obj.LibEPANET, obj.ph); 
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                end
             end
         end
-        function value = get_link_pump_info(obj, constant, varargin)
+        function value = get_link_pump_info(obj, property, varargin)
+            indices = obj.getLinkPumpIndex;
             if isempty(varargin)
-                indices = obj.getLinkPumpIndex;  % all pumps
+                value = zeros(1, length(indices));
+                for j = 1:length(indices)
+                    i = indices(j);
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, property, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                end
             else
-                indices = obj.getLinkPumpIndex(varargin{1});
-            end   
-            j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(i, constant, obj.LibEPANET, obj.ph);
-                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-                j=j+1;
+                ids = varargin{1};
+                if ~ismember(ids, indices)
+                    ids = indices(ids);
+                end
+                value = zeros(1, length(ids));
+                for j = 1:length(ids)
+                    idx = ids(j);
+                    [obj.Errcode, value(j)] = obj.apiENgetlinkvalue(idx, property, obj.LibEPANET, obj.ph); 
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                end
             end
         end
         function set_Node_Link(obj, param, fun, propertie, value, varargin)
