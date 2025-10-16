@@ -1802,8 +1802,15 @@ classdef epanet <handle
             else
                 Errcode = calllib(LibEPANET, 'EN_open', ph, inpname, repname, binname);
             end
-            if Errcode && Errcode~=200
-                [~, errmsg] = calllib(LibEPANET, 'ENgeterror', Errcode, char(32*ones(1, 79)), 79);
+            if Errcode == 200 % use openX if inp file has errors
+                if ph.isNull
+                    Errcode = calllib(LibEPANET, 'ENopenX', inpname, repname, binname);
+                else
+                    Errcode = calllib(LibEPANET, 'EN_openX', ph, inpname, repname, binname);
+                end
+                % if Errcode == 200, Errcode = 0; end % reset the error code   
+            elseif Errcode && Errcode ~= 200
+                [~, errmsg] = calllib(LibEPANET,'ENgeterror',Errcode,char(32*ones(1,79)),79);
                 disp(errmsg);
             end
         end
@@ -4452,7 +4459,6 @@ classdef epanet <handle
                         warning(['Network name "', inp , '.inp" already exists.'])
                     end
                     obj.Errcode=obj.apiENopen(obj.InputFile, [obj.InputFile(1:end-4), '.txt'], '', obj.LibEPANET, obj.ph);
-                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 else
                     obj.InputFile = varargin{1};
                     % initializes an EPANET project that isn't opened with an input file
@@ -4471,7 +4477,7 @@ classdef epanet <handle
                 rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
                 binfile = [obj.InputFile(1:end-4), '_temp.bin'];
                 obj.Errcode=obj.apiENopen(obj.BinTempfile, rptfile, binfile, obj.LibEPANET, obj.ph);
-                if obj.Errcode
+                if obj.Errcode ~= 0 && obj.Errcode ~= 200
                     error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 else
                     if obj.msg
@@ -4494,7 +4500,17 @@ classdef epanet <handle
                         return;
                     end
                 end
-                
+                % Fetch Errors from report file
+                if obj.Errcode == 200
+                    reportFile = [obj.InputFile(1:end-4), '.txt'];
+                    if exist(reportFile, 'file') == 2
+                        reportText = fileread(reportFile);
+                        warning(reportText);
+                    else
+                        warning('Cannot open report file. Continuing without report.');
+                    end
+                end
+
                 % Get some link data
                 lnkInfo = obj.getLinksInfo;
                 getFields_link_info = fields(lnkInfo);

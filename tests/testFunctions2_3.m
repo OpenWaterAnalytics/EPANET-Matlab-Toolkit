@@ -157,10 +157,9 @@ disp('Emitter backflow allowed:'); disp(d.getOptionsEmitterBackFlow());
 
 d.unload();
 
-%% Load Net1 with openX 
-d = epanet();
+%% Load Net1
+d = epanet('Net1.inp');
 disp('==================== Project I/O & Bulk Retrieval ====================');
-d.openX('Net1.inp', 'dummy.rpt', 'dummy.out');
 
 disp('Link info FLOW:') 
 d.openHydraulicAnalysis();
@@ -202,6 +201,11 @@ disp('Demand reduction:'); disp(d.getStatisticDemandReduction());
 disp('Total leakage loss:'); disp(d.getStatisticTotalLeakageLoss());
 
 d.unload;
+
+%% open broken file using ENopenX in ENopen 
+d = epanet('Net1_broken.inp');
+d.unload
+
 
 %% --- Leakage Expansion Demand ---
 % See EX28_Leakage
