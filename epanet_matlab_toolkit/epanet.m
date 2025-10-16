@@ -3748,6 +3748,26 @@ classdef epanet <handle
             if Errcode==240, value=NaN; end
             value = double(value);
         end
+        function [Errcode, out_values] = apiENgetnodevalues(property, LibEPANET, ph)
+            % Retrieves an array of property values for all nodes.
+            %
+            % Parameters:
+            % 
+            % property	the property to retrieve (see EN_NodeProperty).
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.          
+            % Returns:
+            % out_values	an array of values for all nodes.
+            % an error code.
+            nNodes = int32(0);
+            [Errcode, nNodes] = calllib(LibEPANET, 'ENgetcount', 0, nNodes);
+            out_values = zeros(nNodes, 1, 'double');
+            if ph.isNull
+                [Errcode, out_values] = calllib(LibEPANET, 'ENgetnodevalues', property, out_values);
+            else
+                [Errcode, out_values] = calllib(LibEPANET, 'EN_getnodevalues', ph, property, out_values);
+            end
+        end
         function [Errcode] = apiMSXopen(obj)
             % Opens the EPANET-MSX toolkit system.
             %
