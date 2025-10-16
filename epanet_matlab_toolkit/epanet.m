@@ -3767,6 +3767,7 @@ classdef epanet <handle
             else
                 [Errcode, out_values] = calllib(LibEPANET, 'EN_getnodevalues', ph, property, out_values);
             end
+            out_values = out_values';
         end
         function [Errcode] = apiMSXopen(obj)
             % Opens the EPANET-MSX toolkit system.
