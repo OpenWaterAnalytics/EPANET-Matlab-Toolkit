@@ -4460,7 +4460,7 @@ classdef epanet <handle
                 rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
                 binfile = [obj.InputFile(1:end-4), '_temp.bin'];
                 obj.Errcode=obj.apiENopen(obj.BinTempfile, rptfile, binfile, obj.LibEPANET, obj.ph);
-                if obj.Errcode ~= 200
+                if obj.Errcode ~= 0 && obj.Errcode ~= 200
                     error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
                 else
                     if obj.msg
