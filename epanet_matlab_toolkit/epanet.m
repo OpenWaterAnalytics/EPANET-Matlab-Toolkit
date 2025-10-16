@@ -4484,7 +4484,18 @@ classdef epanet <handle
                         return;
                     end
                 end
-                
+                % Fetch Errors from report file
+                reportFile = [obj.InputFile(1:end-4), '.txt'];
+                fid = fopen(reportFile,'r');
+                if fid == -1
+                    error('Cannot open report file: %s', reportFile);
+                end
+                reportText = fread(fid, '*char')';
+                lines = strsplit(reportText, {'\n','\r\n'});
+                fclose(fid);
+                if length(lines) > 8 % show warning only if it has errors 
+                    warning(reportText);
+                end
                 % Get some link data
                 lnkInfo = obj.getLinksInfo;
                 getFields_link_info = fields(lnkInfo);
