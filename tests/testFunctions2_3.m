@@ -8,7 +8,7 @@ d = epanet('BWSN_Network_1.inp');
 
 disp('pattern count before loading abc.pat: '); disp(d.getPatternCount);
 disp('Loading pattern file abc.pat');
-d.loadPatternFile('abc.pat','5');
+d.loadPatternFile(fullfile(pwd, 'tests/testpat.pat'), '5');
 disp('pattern count after loading abc.pat'); disp(d.getPatternCount);
 
 %% --- Curve Types ---
