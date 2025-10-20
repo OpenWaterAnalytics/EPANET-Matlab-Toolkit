@@ -3766,7 +3766,7 @@ classdef epanet <handle
                 [Errcode, out_values] = calllib(LibEPANET, 'ENgetnodevalues', property, out_values);
             else
                 [Errcode, out_values] = calllib(LibEPANET, 'EN_getnodevalues', ph, property, out_values);
-            end
+            end            
             out_values = out_values';
         end
         function [Errcode] = apiMSXopen(obj)
@@ -7147,6 +7147,20 @@ classdef epanet <handle
                 j=j+1;
             end
         end
+        function values = getNodeValues(obj, property)
+            % Purpose:
+            %   Retrieves property values for all links within the EPANET model 
+            %   during a hydraulic analysis.
+            %
+            % Example Usage:
+            %   d = epanet('Net1.inp');
+            %
+            %   d.getNodeValues(obj.ToolkitConstants.EN_ELEVATION);
+            %
+            % Returns:
+            %   values : array of property values for all links
+            [obj.Errcode, values] = obj.apiENgetnodevalues(property, obj.LibEPANET, obj.ph);
+        end
         function value = getNodesInfo(obj)
             % Retrieves nodes info (elevations, demand patterns, emmitter coeff, initial quality,
             % source quality, source pattern index, source type index, node type index).
@@ -7157,14 +7171,14 @@ classdef epanet <handle
             % See also getNodeElevations, getNodeDemandPatternIndex, getNodeEmitterCoeff,
             %          getNodeInitialQuality, NodeTypeIndex.
             value = struct();
+                [~, value.NodeElevations] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET, obj.ph);
+                [~, value.NodeDemandPatternIndex] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET, obj.ph);
+                [~, value.NodeEmitterCoeff] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET, obj.ph);
+                [~, value.NodeInitialQuality] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET, obj.ph);
+                [~, value.NodeSourceQuality] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEQUAL, obj.LibEPANET, obj.ph);
+                [~, value.NodeSourcePatternIndex] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEPAT, obj.LibEPANET, obj.ph);
+                [~, value.NodeSourceTypeIndex] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
             for i=1:obj.getNodeCount
-                [~, value.NodeElevations(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET, obj.ph);
-                [~, value.NodeDemandPatternIndex(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET, obj.ph);
-                [~, value.NodeEmitterCoeff(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET, obj.ph);
-                [~, value.NodeInitialQuality(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET, obj.ph);
-                [~, value.NodeSourceQuality(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, obj.LibEPANET, obj.ph);
-                [~, value.NodeSourcePatternIndex(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, obj.LibEPANET, obj.ph);
-                [~, value.NodeSourceTypeIndex(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
                 [~, value.NodeTypeIndex(i)] = obj.apiENgetnodetype(i, obj.LibEPANET, obj.ph);
             end
         end
