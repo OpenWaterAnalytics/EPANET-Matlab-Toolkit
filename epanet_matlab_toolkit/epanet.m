@@ -1387,7 +1387,7 @@ classdef epanet <handle
             else
                 [Errcode, out_values] = calllib(LibEPANET, 'EN_getlinkvalues', ph, property, out_values);
             end
-            out_values = double(out_values);
+            out_values = double(out_values');
         end
         function [Errcode, id] = apiENgetnodeid(index, LibEPANET, ph)
             % Gets the ID name of a node given its index.
@@ -6407,15 +6407,6 @@ classdef epanet <handle
             [~, value.LinkInitialSetting] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_INITSETTING, obj.LibEPANET, obj.ph);
             [~, value.LinkBulkReactionCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_KBULK, obj.LibEPANET, obj.ph);  
             [~, value.LinkWallReactionCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_KWALL, obj.LibEPANET, obj.ph);  
-            % transpose 
-            value.LinkDiameter = value.LinkDiameter';
-            value.LinkLength = value.LinkLength';
-            value.LinkRoughnessCoeff  = value.LinkRoughnessCoeff';
-            value.LinkMinorLossCoeff   = value.LinkMinorLossCoeff';
-            value.LinkInitialStatus    = value.LinkInitialStatus';
-            value.LinkInitialSetting   = value.LinkInitialSetting';
-            value.LinkBulkReactionCoeff= value.LinkBulkReactionCoeff';
-            value.LinkWallReactionCoeff= value.LinkWallReactionCoeff';
             % Node connections
             nLinks = obj.getLinkCount;
             for i = 1:nLinks
