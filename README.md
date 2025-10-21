@@ -964,6 +964,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkLeakageRate|Get leakage rate for a link|
 |getNodeLeakageFlow|Get leakage flow at a node|
 |getNodeEmitterFlow|Get emitter flow at a node|
+|getNodeTankWaterLevel|Retrieves the current computed tank water level|
+|getNodeTankElevations|Retrieves the elevation of tanks|
 |getConsumerDemandRequested|Retrieve consumer demand requested|
 |getConsumerDemandDelivered|Retrieve consumer demand delivered|
 |openX|Lenient open for project files|
