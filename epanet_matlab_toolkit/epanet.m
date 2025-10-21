@@ -885,6 +885,31 @@ classdef epanet <handle
                 warning('There was an error loading the EPANET library (DLL).')
             end
         end
+        function error_in_changing_metric(obj, wanted, nameofFunction)
+            % Checks if the metric change is not possible and suggests possible solutions
+            % and prints a warning in the MATLAB command window
+            current = obj.flowUnitsCheck();  
+            if strcmpi(current, 'PSI') && strcmpi(wanted, 'KPA AND METERS')
+                fprintf('*** UserWarning: Error in function: %s, the function did not change the metric. ***\n', nameofFunction);
+                fprintf('Please change the metric using one of the following:\n');
+                fprintf(' 1. setFlowUnitsCMH()  -> Cubic meters per hour\n');
+                fprintf(' 2. setFlowUnitsCMS()  -> Cubic meters per second\n');
+                fprintf(' 3. setFlowUnitsMLD()  -> Million liters per day\n');
+                fprintf(' 4. setFlowUnitsCMD()  -> Cubic meters per day\n');
+                fprintf(' 5. setFlowUnitsLPS()  -> Liters per second\n');
+                fprintf(' 6. setFlowUnitsLPM()  -> Liters per minute\n');
+            elseif strcmpi(current, "KPA AND METERS") && strcmpi(wanted, "PSI")
+                fprintf('*** UserWarning: Error in function: %s, the function did not change the metric. ***\n', nameofFunction);
+                fprintf('Please change the metric using one of the following:\n');
+                fprintf(' 1. setFlowUnitsAFD()   -> Acre-feet per day\n');
+                fprintf(' 2. setFlowUnitsIMGD()  -> Imperial million gallons per day\n');
+                fprintf(' 3. setFlowUnitsCFS()   -> Cubic feet per second\n');
+                fprintf(' 4. setFlowUnitsMGD()   -> Million gallons per day\n');
+                fprintf(' 5. setFlowUnitsGPM()   -> Gallons per minute\n');
+            else
+                fprintf('Metric change from "%s" to "%s" is allowed.\n', current, wanted);
+            end
+        end
     end
     methods (Static)
         function [Errcode] = apiENwriteline(line, LibEPANET, ph)
@@ -14176,31 +14201,6 @@ classdef epanet <handle
                 metric = 'UNKNOWN';
             end
         end
-        function errorInChangingMetric(obj, wanted, nameofFunction)
-            % Checks if the metric change is not possible and suggests possible solutions
-            % and prints a warning in the MATLAB command window
-            current = obj.flowUnitsCheck();  
-            if strcmpi(current, 'PSI') && strcmpi(wanted, 'KPA AND METERS')
-                fprintf('*** UserWarning: Error in function: %s, the function did not change the metric. ***\n', nameofFunction);
-                fprintf('Please change the metric using one of the following:\n');
-                fprintf(' 1. setFlowUnitsCMH()  -> Cubic meters per hour\n');
-                fprintf(' 2. setFlowUnitsCMS()  -> Cubic meters per second\n');
-                fprintf(' 3. setFlowUnitsMLD()  -> Million liters per day\n');
-                fprintf(' 4. setFlowUnitsCMD()  -> Cubic meters per day\n');
-                fprintf(' 5. setFlowUnitsLPS()  -> Liters per second\n');
-                fprintf(' 6. setFlowUnitsLPM()  -> Liters per minute\n');
-            elseif strcmpi(current, "KPA AND METERS") && strcmpi(wanted, "PSI")
-                fprintf('*** UserWarning: Error in function: %s, the function did not change the metric. ***\n', nameofFunction);
-                fprintf('Please change the metric using one of the following:\n');
-                fprintf(' 1. setFlowUnitsAFD()   -> Acre-feet per day\n');
-                fprintf(' 2. setFlowUnitsIMGD()  -> Imperial million gallons per day\n');
-                fprintf(' 3. setFlowUnitsCFS()   -> Cubic feet per second\n');
-                fprintf(' 4. setFlowUnitsMGD()   -> Million gallons per day\n');
-                fprintf(' 5. setFlowUnitsGPM()   -> Gallons per minute\n');
-            else
-                fprintf('Metric change from "%s" to "%s" is allowed.\n', current, wanted);
-            end
-        end
         function setOptionsPressureUnits(obj, value)
             % Sets the pressure unit used in EPANET
             %
@@ -14216,7 +14216,7 @@ classdef epanet <handle
             %   d = epanet('Net3.inp');
             %   d.setOptionsPressureUnitsMeters();
             %   u = d.getOptionsPressureUnits();
-            obj.errorInChangingMetric("KPA AND METERS", "setOptionsPressureUnitsMeters");
+            obj.error_in_changing_metric("KPA AND METERS", "setOptionsPressureUnitsMeters");
             obj.setOptionsPressureUnits(obj.ToolkitConstants.EN_METERS);
         end
         function setOptionsPressureUnitsPSI(obj)
@@ -14227,7 +14227,7 @@ classdef epanet <handle
             %   d.setOptionsPressureUnitsPSI();
             %   u = d.getOptionsPressureUnits();
             %
-            obj.errorInChangingMetric("PSI", "setOptionsPressureUnitsPSI");
+            obj.error_in_changing_metric("PSI", "setOptionsPressureUnitsPSI");
             obj.setOptionsPressureUnits(obj.ToolkitConstants.EN_PSI);
         end
         function setOptionsPressureUnitsKPA(obj)
@@ -14236,7 +14236,7 @@ classdef epanet <handle
             % Example:
             %   d = epanet('Net3.inp');
             %   d.setOptionsPressureUnitsKPA();
-            obj.errorInChangingMetric("KPA AND METERS", "setOptionsPressureUnitsKPA");
+            obj.error_in_changing_metric("KPA AND METERS", "setOptionsPressureUnitsKPA");
             obj.setOptionsPressureUnits(obj.ToolkitConstants.EN_KPA);
         end
         function setTimeSimulationDuration(obj, value)
