@@ -7938,16 +7938,16 @@ classdef epanet <handle
                 value(j) = head - elev;
             end
         end
-        function value = getNodeTankElevation(obj, varargin)
+        function value = getNodeTankElevations(obj, varargin)
             % Retrieves the elevation of tanks
             % Example 1:
-            %   d.getNodeTankElevation       % Retrieves elevation for all tanks
+            %   d.getNodeTankElevations       % Retrieves elevation for all tanks
             %
             % Example 2:
-            %   d.getNodeTankElevation(1)   % Retrieves elevation for tank 1 
+            %   d.getNodeTankElevations(1)   % Retrieves elevation for tank 1 
             %
             % Example 3:
-            %   d.getNodeTankElevation(1:3)   % Retrieves elevation for tank 1 to 3 
+            %   d.getNodeTankElevations(1:3)   % Retrieves elevation for tank 1 to 3 
             value = get_node_tank_info(obj, obj.ToolkitConstants.EN_ELEVATION, varargin{:});
         end
         function value = getNodeActualDemand(obj, varargin)
