@@ -7216,8 +7216,7 @@ classdef epanet <handle
         end
         function values = getNodeValues(obj, property)
             % Purpose:
-            %   Retrieves property values for all links within the EPANET model 
-            %   during a hydraulic analysis.
+            %   Retrieves property values for all nodes within the EPANET model 
             %
             % Example Usage:
             %   d = epanet('Net1.inp');
@@ -7225,7 +7224,7 @@ classdef epanet <handle
             %   d.getNodeValues(obj.ToolkitConstants.EN_ELEVATION);
             %
             % Returns:
-            %   values : array of property values for all links
+            %   values : array of property values for all nodes
             [obj.Errcode, values] = obj.apiENgetnodevalues(property, obj.LibEPANET, obj.ph);
         end
         function value = getNodesInfo(obj)
@@ -8218,7 +8217,7 @@ classdef epanet <handle
             %   d.getNodeEmitterFlow([1, 5, 8])  % Retrieves emitter flow for multiple nodes
             %
             % Example 4:
-            %   d.getConsumerDemandDelivered(1:3)
+            %   d.getNodeLeakageFlow(1:3)
             % See also getNodeLeakageFlow, getConsumerDemandRequested, getConsumerDemandDelivered.
             if isempty(varargin)
                 [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_EMITTERFLOW, obj.LibEPANET, obj.ph);
@@ -8266,7 +8265,7 @@ classdef epanet <handle
             %   d.getConsumerDemandRequested([1, 2, 3])
             %
             % Example 4:
-            %   d.getConsumerDemandDelivered(1:3)
+            %   d.getConsumerDemandRequested(1:3)
             % See also getConsumerDemandDelivered, getNodeActualDemand.
             if isempty(varargin)
                 [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_FULLDEMAND, obj.LibEPANET, obj.ph);
