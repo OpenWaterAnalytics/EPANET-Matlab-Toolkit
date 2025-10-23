@@ -3794,7 +3794,7 @@ classdef epanet <handle
             else
                 [Errcode, ~, value] = calllib(LibEPANET, 'EN_getnodevalue', ph, index, paramcode, value);
             end
-            if Errcode==240, value=0; end
+            if Errcode==240, value=nan; end
             value = double(value);
         end
         function [Errcode, out_values] = apiENgetnodevalues(property, LibEPANET, ph)
@@ -7913,7 +7913,7 @@ classdef epanet <handle
             end
         end
         function value = getNodeSourceType(obj, varargin)
-            % Retrieves the value of all node source type.
+            % Retrieves the value of node source type.
             %
             % Example 1:
             %   d.getNodeSourceType      % Retrieves the value of all node source type
@@ -7922,21 +7922,38 @@ classdef epanet <handle
             %   d.getNodeSourceType(1)   % Retrieves the value of the first node source type
             %
             % See also setNodeSourceType, getNodeSourceQuality,
-            %          getNodeSourcePatternIndex, getNodeSourceTypeIndex.
+            % getNodeSourcePatternIndex, getNodeSourceTypeIndex.
             [indices, ~] = getNodeIndices(obj, varargin);
-            [obj.Errcode, allValues] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
-            if obj.Errcode == 203
-                error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
-                return;
-            end
-            typeIndices = allValues(indices);
-            value = cell(1, length(indices));
-            for j = 1:length(indices)
-                temp = typeIndices(j);
-                if ~isnan(temp)
-                    value{j} = obj.TYPESOURCE(temp + 1);
-                else
-                    value{j} = [];
+            value = strings(1, numel(indices));
+            if isempty(varargin)
+                [obj.Errcode, allValues] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
+                if obj.Errcode == 203
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
+                    return;
+                end
+                typeIndices = allValues(indices);
+                for j = 1:numel(indices)
+                    temp = typeIndices(j);
+                    if ~isnan(temp)
+                        value(j) = obj.TYPESOURCE(temp + 1);
+                    else
+                        value(j) = "";
+                    end
+                end
+            else
+                j = 1;
+                for i = indices
+                    [obj.Errcode, temp] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
+                    if obj.Errcode == 203
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
+                        return;
+                    end
+                    if ~isnan(temp)
+                        value(j) = obj.TYPESOURCE(temp + 1);
+                    else
+                        value(j) = "";
+                    end
+                    j = j + 1;
                 end
             end
         end
@@ -8217,7 +8234,7 @@ classdef epanet <handle
             %   d.getNodeEmitterFlow([1, 5, 8])  % Retrieves emitter flow for multiple nodes
             %
             % Example 4:
-            %   d.getNodeLeakageFlow(1:3)
+            %   d.getNodeEmitterFlow(1:3)
             % See also getNodeLeakageFlow, getConsumerDemandRequested, getConsumerDemandDelivered.
             if isempty(varargin)
                 [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_EMITTERFLOW, obj.LibEPANET, obj.ph);
@@ -8241,7 +8258,7 @@ classdef epanet <handle
             %   d.getNodeLeakageFlow([1, 5, 8])
             %
             % Example 4:
-            %   d.getConsumerDemandDelivered(1:3)
+            %   d.getNodeLeakageFlow(1:3)
             % See also getNodeEmitterFlow, getConsumerDemandRequested, getConsumerDemandDelivered.
             if isempty(varargin)
                 [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_LEAKAGEFLOW, obj.LibEPANET, obj.ph);
