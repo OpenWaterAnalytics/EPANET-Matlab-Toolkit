@@ -3826,8 +3826,29 @@ classdef epanet <handle
             else
                 [Errcode, ~, value] = calllib(LibEPANET, 'EN_getnodevalue', ph, index, paramcode, value);
             end
-            if Errcode==240, value=NaN; end
+            if Errcode==240, value=nan; end
             value = double(value);
+        end
+        function [Errcode, out_values] = apiENgetnodevalues(property, LibEPANET, ph)
+            % Retrieves an array of property values for all nodes.
+            %
+            % Parameters:
+            % 
+            % property	the property to retrieve (see EN_NodeProperty).
+            % LibEPANET   epanet library DLL name.
+            % ph          epanet project handle.          
+            % Returns:
+            % out_values	an array of values for all nodes.
+            % an error code.
+            nNodes = int32(0);
+            [Errcode, nNodes] = calllib(LibEPANET, 'ENgetcount', 0, nNodes);
+            out_values = zeros(nNodes, 1, 'double');
+            if ph.isNull
+                [Errcode, out_values] = calllib(LibEPANET, 'ENgetnodevalues', property, out_values);
+            else
+                [Errcode, out_values] = calllib(LibEPANET, 'EN_getnodevalues', ph, property, out_values);
+            end
+            out_values = out_values';
         end
         function [Errcode] = apiMSXopen(obj)
             % Opens the EPANET-MSX toolkit system.
@@ -5304,12 +5325,7 @@ classdef epanet <handle
             %     x = d.getNodeInControl([1, 2, 3, 9])
             %     
             if nargin == 1 % if no args, fetch for all nodes
-                nodeCount =  obj.getNodeCount;
-                result = zeros(nodeCount, 1);
-                for i = 1:nodeCount
-                    [obj.Errcode, temp] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
-                    result(i) = temp;  % store value in result
-                end
+                [obj.Errcode, result] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
             end
             if nargin == 2 % if arg is a list or a single index
                 nodes = varargin{1};
@@ -5322,6 +5338,7 @@ classdef epanet <handle
                         result(i) = temp;  % store value in result
                     end
                 end
+                result = result';
             elseif nargin > 2 % Multiple arguments passed individually 
                 nodes = [varargin{:}];  % convert cell array into numeric array
                 result = zeros(length(nodes), 1);
@@ -5329,6 +5346,7 @@ classdef epanet <handle
                     [obj.Errcode, temp] = obj.apiENgetnodevalue(nodes(i), obj.ToolkitConstants.EN_NODE_INCONTROL, obj.LibEPANET, obj.ph);
                     result(i) = temp;
                 end
+                result = result';
             end
         end
         function result = getLinkInControl(obj ,varargin)   
@@ -7237,6 +7255,19 @@ classdef epanet <handle
                 j=j+1;
             end
         end
+        function values = getNodeValues(obj, property)
+            % Purpose:
+            %   Retrieves property values for all nodes within the EPANET model 
+            %
+            % Example Usage:
+            %   d = epanet('Net1.inp');
+            %
+            %   d.getNodeValues(obj.ToolkitConstants.EN_ELEVATION);
+            %
+            % Returns:
+            %   values : array of property values for all nodes
+            [obj.Errcode, values] = obj.apiENgetnodevalues(property, obj.LibEPANET, obj.ph);
+        end
         function value = getNodesInfo(obj)
             % Retrieves nodes info (elevations, demand patterns, emmitter coeff, initial quality,
             % source quality, source pattern index, source type index, node type index).
@@ -7247,14 +7278,14 @@ classdef epanet <handle
             % See also getNodeElevations, getNodeDemandPatternIndex, getNodeEmitterCoeff,
             %          getNodeInitialQuality, NodeTypeIndex.
             value = struct();
+            [~, value.NodeElevations] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET, obj.ph);
+            [~, value.NodeDemandPatternIndex] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET, obj.ph);
+            [~, value.NodeEmitterCoeff] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET, obj.ph);
+            [~, value.NodeInitialQuality] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET, obj.ph);
+            [~, value.NodeSourceQuality] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEQUAL, obj.LibEPANET, obj.ph);
+            [~, value.NodeSourcePatternIndex] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEPAT, obj.LibEPANET, obj.ph);
+            [~, value.NodeSourceTypeIndex] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
             for i=1:obj.getNodeCount
-                [~, value.NodeElevations(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET, obj.ph);
-                [~, value.NodeDemandPatternIndex(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET, obj.ph);
-                [~, value.NodeEmitterCoeff(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET, obj.ph);
-                [~, value.NodeInitialQuality(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET, obj.ph);
-                [~, value.NodeSourceQuality(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, obj.LibEPANET, obj.ph);
-                [~, value.NodeSourcePatternIndex(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, obj.LibEPANET, obj.ph);
-                [~, value.NodeSourceTypeIndex(i)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
                 [~, value.NodeTypeIndex(i)] = obj.apiENgetnodetype(i, obj.LibEPANET, obj.ph);
             end
         end
@@ -7272,10 +7303,14 @@ classdef epanet <handle
             %
             % See also setNodeElevations, getNodesInfo, getNodeNameID,
             %          getNodeType, getNodeEmitterCoeff, getNodeInitialQuality.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_ELEVATION, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getDemandModel(obj, varargin)
@@ -7802,11 +7837,15 @@ classdef epanet <handle
             %
             % See also getNodeBaseDemands, getNodeDemandCategoriesNumber,
             %          getNodeDemandPatternIndex, getNodeDemandPatternNameID.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET, obj.ph);
-                obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_PATTERN, obj.LibEPANET, obj.ph);
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getNodeEmitterCoeff(obj, varargin)
@@ -7819,10 +7858,14 @@ classdef epanet <handle
             %   d.getNodeEmitterCoeff(1)   % Retrieves the value of the first node emmitter coefficient
             %
             % See also setNodeEmitterCoeff, getNodesInfo, getNodeElevations.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_EMITTER, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getNodeInitialQuality(obj, varargin)
@@ -7835,10 +7878,14 @@ classdef epanet <handle
             %   d.getNodeInitialQuality(1)   % Retrieves the value of the first node initial quality
             %
             % See also setNodeInitialQuality, getNodesInfo, getNodeSourceQuality.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_INITQUAL, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getNodeSourceQuality(obj, varargin)
@@ -7852,12 +7899,15 @@ classdef epanet <handle
             %
             % See also setNodeSourceQuality, getNodeInitialQuality, getNodeSourcePatternIndex,
             %          getNodeSourceTypeIndex, getNodeSourceType.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, obj.LibEPANET, obj.ph);
-                if isnan(value(j)), value(j)=0; end
-                if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEQUAL, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEQUAL, obj.LibEPANET, obj.ph);
+                    if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end
+                    j=j+1;
+                end
             end
         end
         function value = getNodeSourcePatternIndex(obj, varargin)
@@ -7871,11 +7921,15 @@ classdef epanet <handle
             %
             % See also setNodeSourcePatternIndex, getNodeSourceQuality,
             %          getNodeSourceTypeIndex, getNodeSourceType.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, obj.LibEPANET, obj.ph);
-                if obj.Errcode==203, error(obj.getError(obj.dErrcode)), return; end
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEPAT, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEPAT, obj.LibEPANET, obj.ph);
+                    if obj.Errcode==203, error(obj.getError(obj.dErrcode)), return; end
+                    j=j+1;
+                end
             end
         end
         function value = getNodeSourceTypeIndex(obj, varargin)
@@ -7888,15 +7942,19 @@ classdef epanet <handle
             %   d.getNodeSourceTypeIndex(1)   % Retrieves the value of the first node source type index
             %
             % See also getNodeSourceQuality, getNodeSourcePatternIndex, getNodeSourceType.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
-                if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
+                    if obj.Errcode==203, error(obj.getError(obj.Errcode)), return; end
+                    j=j+1;
+                end
             end
         end
         function value = getNodeSourceType(obj, varargin)
-            % Retrieves the value of all node source type.
+            % Retrieves the value of node source type.
             %
             % Example 1:
             %   d.getNodeSourceType      % Retrieves the value of all node source type
@@ -7905,18 +7963,39 @@ classdef epanet <handle
             %   d.getNodeSourceType(1)   % Retrieves the value of the first node source type
             %
             % See also setNodeSourceType, getNodeSourceQuality,
-            %          getNodeSourcePatternIndex, getNodeSourceTypeIndex.
-            [indices, ~] = getNodeIndices(obj, varargin);j=1;
-            value = cell(1, length(indices));
-            for i=indices
-                [obj.Errcode, temp] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
-                if obj.Errcode==203, error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph)), return; end
-                if ~isnan(temp)
-                    value{j}=obj.TYPESOURCE(temp+1);
-                else
-                    value{j}=[];
+            % getNodeSourcePatternIndex, getNodeSourceTypeIndex.
+            [indices, ~] = getNodeIndices(obj, varargin);
+            value = strings(1, numel(indices));
+            if isempty(varargin)
+                [obj.Errcode, allValues] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
+                if obj.Errcode == 203
+                    error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
+                    return;
                 end
-                j=j+1;
+                typeIndices = allValues(indices);
+                for j = 1:numel(indices)
+                    temp = typeIndices(j);
+                    if ~isnan(temp)
+                        value(j) = obj.TYPESOURCE(temp + 1);
+                    else
+                        value(j) = "";
+                    end
+                end
+            else
+                j = 1;
+                for i = indices
+                    [obj.Errcode, temp] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCETYPE, obj.LibEPANET, obj.ph);
+                    if obj.Errcode == 203
+                        error(obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph));
+                        return;
+                    end
+                    if ~isnan(temp)
+                        value(j) = obj.TYPESOURCE(temp + 1);
+                    else
+                        value(j) = "";
+                    end
+                    j = j + 1;
+                end
             end
         end
         function value = getNodeTankInitialLevel(obj, varargin)
@@ -8004,10 +8083,14 @@ classdef epanet <handle
             %
             % See also getNodeActualDemandSensingNodes, getNodeHydraulicHead, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getNodeActualDemandSensingNodes(obj, varargin)
@@ -8043,10 +8126,14 @@ classdef epanet <handle
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_HEAD, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_HEAD, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_HEAD, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getNodePressure(obj, varargin)
@@ -8103,10 +8190,14 @@ classdef epanet <handle
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodeHydraulicHead
             %          getNodeActualQuality, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getNodeActualQuality(obj, varargin)
@@ -8122,10 +8213,14 @@ classdef epanet <handle
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeHydraulicHead, getNodeMassFlowRate, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getNodeMassFlowRate(obj, varargin)
@@ -8141,10 +8236,14 @@ classdef epanet <handle
             %
             % See also getNodeActualDemand, getNodeActualDemandSensingNodes, getNodePressure,
             %          getNodeHydraulicHead, getNodeActualQuality, getNodeActualQualitySensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getNodeActualQualitySensingNodes(obj, varargin)
@@ -8163,45 +8262,101 @@ classdef epanet <handle
                 v=v+1;
             end
         end
-        function value = getNodeEmitterFlow(obj, index)
-            % Retrieves node emitter flow
+        function value = getNodeEmitterFlow(obj, varargin)
+            % Retrieves the emitter flow for one or more nodes.
             %
-            % Args:
-            %     index : The index of the node for which the emitter flow is to be retrieved.
+            % Example 1:
+            %   d.getNodeEmitterFlow           % Retrieves emitter flow for all nodes
             %
-            % Returns:
-            %     value: The amount of leakage flow at the specified node
-            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_EMITTERFLOW, obj.LibEPANET, obj.ph);
+            % Example 2:
+            %   d.getNodeEmitterFlow(5)        % Retrieves emitter flow for node 5
+            %
+            % Example 3:
+            %   d.getNodeEmitterFlow([1, 5, 8])  % Retrieves emitter flow for multiple nodes
+            %
+            % Example 4:
+            %   d.getNodeEmitterFlow(1:3)
+            % See also getNodeLeakageFlow, getConsumerDemandRequested, getConsumerDemandDelivered.
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_EMITTERFLOW, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);
+                for j = 1:length(indices)
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(indices(j), obj.ToolkitConstants.EN_EMITTERFLOW, obj.LibEPANET, obj.ph);
+                end
+            end
         end
-        function value = getNodeLeakageFlow(obj, index)
-            % Retrieves the leakage flow for a specific node.
+        function value = getNodeLeakageFlow(obj, varargin)
+            % Retrieves the leakage flow for one or more nodes.
             %
-            % Args:
-            %     index : The index of the node for which the leakage flow is to be retrieved.
+            % Example 1:
+            %   d.getNodeLeakageFlow
             %
-            % Returns:
-            %     value: The amount of leakage flow at the specified node
-            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_LEAKAGEFLOW, obj.LibEPANET, obj.ph);
+            % Example 2:
+            %   d.getNodeLeakageFlow(2)
+            %
+            % Example 3:
+            %   d.getNodeLeakageFlow([1, 5, 8])
+            %
+            % Example 4:
+            %   d.getNodeLeakageFlow(1:3)
+            % See also getNodeEmitterFlow, getConsumerDemandRequested, getConsumerDemandDelivered.
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_LEAKAGEFLOW, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);
+                for j = 1:length(indices)
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(indices(j), obj.ToolkitConstants.EN_LEAKAGEFLOW, obj.LibEPANET, obj.ph);
+                end
+            end
         end
-        function value = getConsumerDemandRequested(obj, index)
-            % Retrieves the requested consumer demand for a specific node.
-
-            % Args:
-            %     index : The index of the node for which the consumer demand is to be retrieved.
-
-            % Returns:
-            %     value: The full demand requested by the consumer at the specified node
-            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_FULLDEMAND, obj.LibEPANET, obj.ph);
+        function value = getConsumerDemandRequested(obj, varargin)
+            % Retrieves the full consumer demand requested at one or more nodes.
+            %
+            % Example 1:
+            %   d.getConsumerDemandRequested
+            %
+            % Example 2:
+            %   d.getConsumerDemandRequested(4)
+            %
+            % Example 3:
+            %   d.getConsumerDemandRequested([1, 2, 3])
+            %
+            % Example 4:
+            %   d.getConsumerDemandRequested(1:3)
+            % See also getConsumerDemandDelivered, getNodeActualDemand.
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_FULLDEMAND, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);
+                for j = 1:length(indices)
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(indices(j), obj.ToolkitConstants.EN_FULLDEMAND, obj.LibEPANET, obj.ph);
+                end
+            end
         end
-        function value = getConsumerDemandDelivered(obj, index)
-            % Retrieves the delivered consumer demand for a specific node.
-
-            % Args:
-            %     index : The index of the node for which the delivered consumer demand is to be retrieved.
-
-            % Returns:
-            %     value: The amount of demand delivered to the consumer at the specified node
-            value = obj.apiENgetnodevalue(index, obj.ToolkitConstants.EN_DEMANDFLOW, obj.LibEPANET, obj.ph);
+        function value = getConsumerDemandDelivered(obj, varargin)
+            % Retrieves the delivered consumer demand at one or more nodes.
+            %
+            % Example 1:
+            %   d.getConsumerDemandDelivered
+            %
+            % Example 2:
+            %   d.getConsumerDemandDelivered(3)
+            %
+            % Example 3:
+            %   d.getConsumerDemandDelivered([1, 2, 3])
+            %
+            % Example 4:
+            %   d.getConsumerDemandDelivered(1:3)
+            % See also getConsumerDemandRequested, getNodeActualDemand.
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMANDFLOW, obj.LibEPANET, obj.ph);
+            else
+                [indices, value] = getNodeIndices(obj, varargin);
+                for j = 1:length(indices)
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(indices(j), obj.ToolkitConstants.EN_DEMANDFLOW, obj.LibEPANET, obj.ph);
+                end
+            end
         end
         function value = getNodeTankInitialWaterVolume(obj, varargin)
             % Retrieves the tank initial water volume.
@@ -8513,10 +8668,14 @@ classdef epanet <handle
             %
             % See also setDemandModel, getComputedHydraulicTimeSeries,
             %          getNodeActualDemand, getNodeActualDemandSensingNodes.
-            [indices, value] = getNodeIndices(obj, varargin);j=1;
-            for i=indices
-                [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMANDDEFICIT, obj.LibEPANET, obj.ph);
-                j=j+1;
+            if isempty(varargin)
+                [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMANDDEFICIT, obj.LibEPANET, obj.ph);
+            else    
+                [indices, value] = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, value(j)] = obj.apiENgetnodevalue(i, obj.ToolkitConstants.EN_DEMANDDEFICIT, obj.LibEPANET, obj.ph);
+                    j=j+1;
+                end
             end
         end
         function value = getNodeTankIndex(obj, varargin)
