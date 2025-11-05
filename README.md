@@ -147,6 +147,9 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |deleteProject|Deletes an epanet project|
 |getError|Returns the description of an error code|
 |getAdjacencyMatrix|Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow|
+|openX|Lenient open for project files|
+|getConsumerDemandRequested|Retrieve consumer demand requested|
+|getConsumerDemandDelivered|Retrieve consumer demand delivered|
 |getComputedAnalysisTimeSeries|Computed Hydralic and Quality Time Series|
 |getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
 |getComputedQualityTimeSeries|Computed Quality Time Series|
@@ -156,6 +159,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getCounts|Retrieves the number of network components|
 |getControlRulesCount|Retrieves the number of control rules|
 |getControls|Retrieves the controls|
+|getControlState|Retrieve simple control enabled flag|
 |getCurveCount|Retrieves the number of curves|
 |getCurveIndex|Retrieves index of curve with specific ID|
 |getCurveLengths|Retrieves number of points in a curve|
@@ -177,12 +181,16 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkCount|Retrieves the number of links|
 |getLinkDiameter|Retrieves the value of all link diameters|
 |getLinkEnergy|Current computed pump energy usage (read only)|
+|getLinkExpansionProperties|Get expansion properties for a link|
 |getLinkFlows|Current computed flow rate (read only)|
 |getLinkHeadloss|Current computed head loss (read only)|
+|getLinkInfo|Bulk retrieve link properties|
 |getLinkIndex|Retrieves the indices of all links, or the indices of an ID set of links|
 |getLinkInitialSetting|Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves|
 |getLinkInitialStatus|Retrieves the value of all link initial status|
 |getLinkLength|Retrieves the value of all link lengths|
+|getLinkLeakArea|Get leakage area for a link|
+|getLinkLeakageRate|Get leakage rate for a link|
 |getLinkMinorLossCoeff|Retrieves the value of all link minor loss coefficients|
 |getLinkNameID|Retrieves the ID label(s) of all links, or the IDs of an index set of links|
 |getLinkNodesIndex-getNodesConnectingLinksIndex|Retrieves the indexes of the from/to nodes of all links|
@@ -213,6 +221,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkType|Retrieves the link-type for all links|
 |getLinkTypeIndex|Retrieves the link-type code for all links|
 |getLinkValveCount|Retrieves the number of valves|
+|getLinkValveCurveGPV|Get valve curve for GPV link|
+|getLinkValveCurvePCV|Get valve curve for PCV link|
 |getLinkValveIndex|Retrieves the indices of valves|
 |getLinkValveNameID|Retrieves the valve IDs|
 |getLinkVelocity|Current computed flow velocity (read only)|
@@ -220,6 +230,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getLinkVerticesCount|Retrieves the number of internal vertex points assigned to a link|
 |getLinkVolumes|Get link volumes|
 |getLinkWallReactionCoeff|Pipe wall chemical reaction coefficient|
+|getLinkInControl|Query which links are referenced by controls|
+|getNodeInControl|Query which objects are referenced by controls (returns IDs/indices)|
 |getNodeActualDemand|Retrieves the computed value of all actual demands|
 |getNodeActualDemandSensingNodes|Retrieves the computed demand values at some sensing nodes|
 |getNodeActualQuality|Retrieves the computed values of the actual quality for all nodes|
@@ -234,6 +246,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeDemandPatternNameID|Retrieves the value of all node demand pattern IDs|
 |getNodeElevations|Retrieves the value of all node elevations|
 |getNodeEmitterCoeff|Retrieves the value of all node emmitter coefficients|
+|getNodeEmitterFlow|Get emitter flow at a node|
 |getNodeHydaulicHead|Retrieves the computed values of all hydraulic heads|
 |getNodeIndex|Retrieves the indices of all nodes or some nodes with a specified ID|
 |getNodeInitialQuality|Retrieves the value of all node initial quality|
@@ -256,6 +269,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeSourcePatternIndex|Retrieves the value of all node source pattern index|
 |getNodeSourceQuality|Retrieves the value of all nodes source quality|
 |getNodeSourceType|Retrieves the value of all node source type|
+|getNodeTankElevations|Retrieves the elevation of tanks|
 |getNodeTankData|Retrieves a group of properties for a tank. (EPANET Version 2.2)|
 |getNodeTankBulkReactionCoeff|Retrieves the tank bulk rate coefficient|
 |getNodeTankCanOverFlow|Retrieves the tank can overflow (= 1) or not (= 0)|
@@ -276,6 +290,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getNodeTankReservoirCount|Retrieves the number of tanks|
 |getNodeTankVolume|Retrieves the tank volume|
 |getNodeTankVolumeCurveIndex|Retrieves the tank volume curve index|
+|getNodeTankWaterLevel|Retrieves the current computed tank water level|
 |getNodeType|Retrieves the node-type for all nodes|
 |getNodeTypeIndex|Retrieves the node code-index for all nodes|
 |getNodesConnectingLinksID|Retrieves the id of the from/to nodes of all links|
@@ -302,6 +317,10 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getOptionsPipeWallReactionOrder|Retrieves the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)|
 |getOptionsTankBulkReactionOrder|Retrieves the bulk water reaction order for tanks. (EPANET Version 2.2)|
 |getOptionsLimitingConcentration|Retrieves the limiting concentration for growth reactions. (EPANET Version 2.2)|
+|getOptionsPressureUnits|Retrieve current pressure units|
+|getOptionsStatusReport|Get current status report level|
+|getOptionsDemandPattern|Get default demand pattern behavior|
+|getOptionsEmitterBackFlow|Get emitter backflow setting|
 |getPattern|Retrieves the multiplier factor for all patterns and all times|
 |getPatternAveragePatternValue|Retrieves the average value of a pattern|
 |getPatternComment|Retrieves the comment string assigned to the pattern object|
@@ -316,17 +335,26 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |getQualityType|Retrieves the type of water quality analysis type|
 |getRules|Retrieves the rule - based control statements. (EPANET Version 2.2)|
 |getRuleCount|Retrieves the number of rules. (EPANET Version 2.2)|
+|getRuleEnabled|Retrieve rule enabled flag|
 |getRuleID|Retrieves the ID name of a rule-based control given its index. (EPANET Version 2.2)|
 |getRuleInfo|Retrieves summary information about a rule-based control given it's index. (EPANET Version 2.2)|
 |getStatistic|Retrieves hydraulic simulation statistic|
+|getStatisticIterations|Retrieves the number of iterations taken in the simulation|
+|getStatisticRelativeError|Retrieves the relative error statistic from the simulation|
+|getStatisticDeficientNodes|Retrieve number of deficient nodes|
+|getStatisticDemandReduction|Retrieve demand reduction statistics|
+|getStatisticTotalLeakageLoss|Retrieve total leakage loss value|
 |getTimeHTime|Retrieves the number of htime|
 |getTimeQTime|Retrieves the number of qtime|
 |getTimeHaltFlag|Retrieves the number of  halt flag|
 |getTimeHydraulicStep|Retrieves the value of the hydraulic time step|
 |getTimeNextEvent|Retrieves the number of next event|
+|getTimetoNextEvent|Return the type of event that terminates the current time step|
 |getTimeNextEventTank|Retrieves the index of tank with shortest time to become empty or full|
 |getTimePatternStart|Retrieves the value of pattern start time|
 |getTimePatternStep|Retrieves the value of the pattern time step|
+|loadPatternFile|Load a time pattern file into the project|
+|getPatternAverageDefaultValue|Report average value used when a pattern is missing|
 |getTimeQualityStep|Retrieves the value of the water quality time step|
 |getTimeReportingPeriods|Retrieves the number of reporting periods saved to the binary|
 |getTimeReportingStart|Retrie ves the value of the reporting start time|
@@ -357,6 +385,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |addLinkValveFCV|Adds a new FCV valve|
 |addLinkValveTCV|Adds a new TCV valve|
 |addLinkValveGPV|Adds a new GPV valve|
+|addLinkValvePCV|Adds a new PCV valve|
 |addRules|Adds a new rule-based control to a project. (EPANET Version 2.2)|
 |deleteAllTemps|Delete all temporary files (.inp, .bin) created in networks folder|
 |deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
@@ -400,6 +429,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setDemandModel|Sets the type of demand model to use and its parameters|
 |setFlowUnitsAFD|Sets flow units to AFD|
 |setFlowUnitsCFS|Sets flow units to CFS|
+|setFlowUnitsCMS|Set flow units to CMS|
 |setFlowUnitsCMD|Sets flow units to CMD|
 |setFlowUnitsCMH|Sets flow units to CMH|
 |setFlowUnitsGPM|Sets flow units to GPM|
@@ -411,6 +441,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkBulkReactionCoeff|Sets the values of bulk reactions|
 |setLinkComment|Sets the comment string assigned to the link object|
 |setLinkDiameter|Sets the values of diameters|
+|setLinkExpansionProperties|Set expansion properties for a link|
 |setLinkPipeData|Sets a group of properties for a pipe. (EPANET Version 2.2)|
 |setLinkPumpHeadCurveIndex|Sets the curves index for pumps index|
 |setLinkPumpPatternIndex|Sets the pump speed time pattern index. (EPANET Version 2.2)|
@@ -422,6 +453,8 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkInitialSetting|Sets the values of initial settings|
 |setLinkInitialStatus|Sets the values of initial status|
 |setLinkLength|Sets the values of lengths|
+|setLinkLeakArea|Set leakage area for a link|
+|getNodeLeakageFlow|Get leakage flow at a node|
 |setLinkMinorLossCoeff|Sets the values of minor loss coeff.|
 |setLinkNameID|Sets the ID name for links|
 |setLinkNodesIndex|Sets the indexes of a link's start- and end-nodes. (EPANET Version 2.2)|
@@ -437,7 +470,18 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setLinkTypeValvePRV|Set the link type valve PRV for a specified link|
 |setLinkTypeValvePSV|Set the link type valve PSV for a specified link|
 |setLinkTypeValveTCV|Set the link type valve TCV for a specified link|
+|setLinkTypeValvePCV|Set the link type valve PCV for a specified link|
+|setLinkValveCurveGPV|Set valve curve for GPV link|
+|setLinkValveCurvePCV|Set valve curve for PCV link|
+|setCurveType|Set the type of a curve object (volume, pump, efficiency, headloss, general, valve)|
+|setCurveTypeVolume|Set the type of a curve object to Volume|
+|setCurveTypePump|Set the type of a curve object to Pump|
+|setCurveTypeEfficiency|Set the type of a curve object to Efficiency|
+|setCurveTypeHeadloss|Set the type of a curve object to Headloss|
+|setCurveTypeGeneral|Set the type of a curve object to General|
+|setCurveTypeValveCurve|Set the type of a curve object to Curve|
 |setLinkVertices|Assigns a set of internal vertex points to a link|
+|setVertex|Set intermediate vertex coordinates for a link|
 |setLinkWallReactionCoeff|Sets the values of wall reactions|
 |setNodeBaseDemands|Sets the values of demands|
 |setNodeComment|Sets the comment string assigned to the node object|
@@ -485,6 +529,17 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setOptionsEmitterExponent|Sets the value of emitter exponent|
 |setOptionsMaxTrials|Sets the value of max trials|
 |setOptionsPatternDemandMultiplier|Sets the value of pattern demand multiplier|
+|setOptionsPressureUnits|Set pressure units (EN_PSI / EN_KPA / EN_METERS)|
+|setOptionsPressureUnitsMeters|Set pressure units to meters|
+|setOptionsPressureUnitsPSI|Set pressure units to PSI|
+|setOptionsPressureUnitsKPA|Set pressure units to kPa|
+|setOptionsStatusReport|Set status report level (EN_NO_REPORT / EN_NORMAL_REPORT / EN_FULL_REPORT)|
+|setOptionsStatusReportNo|Set report level to no report|
+|setOptionsStatusReportNormal|Set report level to normal|
+|setOptionsStatusReportFull|Set report level to full|
+|setOptionsDemandPattern|Set default demand pattern behavior|
+|setOptionsEmitterBackFlowAllowed|Allow emitter backflow|
+|setOptionsEmitterBackFlowDisallowed|Disallow emitter backflow|
 |setOptionsQualityTolerance|Sets the value of tolerance|
 |setPattern|Sets all of the multiplier factors for a specific time pattern|
 |setPatternComment|Sets the comment string assigned to the pattern object|
@@ -496,6 +551,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |setReportFormatReset|Clears any report formatting commands that either appeared in the [REPORT] section of the EPANET Input file or were issued with the ENsetreport function|
 |setReportStatus|Sets the level of hydraulic status reporting|
 |setRules|Sets a rule - based control. (EPANET Version 2.2)|
+|setRuleEnabled|Enable/disable rule by index|
 |setRuleElseAction|Sets rule - based control else actions. (EPANET Version 2.2)|
 |setRulePremise|Sets the premise of a rule - based control. (EPANET Version 2.2)|
 |setRulePremiseObejctNameID|Sets the ID of an object in a premise of a rule-based control. (EPANET Version 2.2)|
@@ -917,6 +973,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |--------|-----------|
 |ENgetcontrolenabled|Get enabled/disabled flag for a simple control by index (1 = enabled, 0 = disabled)|
 |ENgetlinkvalues|Bulk-retrieve property values for all links for a given link property code|
+|ENgetnodevalues|Bulk-retrieve property values for all nodes for a given node property code|
 |ENgetruleenabled|Get enabled/disabled flag for a rule-based control by rule index|
 |ENloadpatternfile|Load time patterns from an external file into the current project under a specific pattern ID|
 |ENopenX|Open an input file even if it has formatting errors (lenient parsing mode)|
@@ -925,55 +982,5 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetruleenabled|Enable/disable a rule by rule index|
 |ENsetvertex|Set the coordinates of a link’s intermediate vertex (polyline point) by vertex index|
 |ENtimetonextevent|Return the type of event that terminates the current time step (hydraulic step, water quality step, tank level event, control event)|
-|addLinkValvePCV|Create a Pressure-Control Valve (PCV) link|
-|setLinkTypeValvePCV|Convert an existing link to PCV type|
-|setCurveType|Set the curve type. includes helpers: setCurveTypeVolume, setCurveTypePump, setCurveTypeEfficiency, setCurveTypeHeadloss, setCurveTypeGeneral, setCurveTypeValveCurve|
-|setVertex|Set intermediate vertex coordinates for a link|
-|getControlState|Retrieve simple control enabled flag (single or all)|
-|getRuleEnabled|Retrieve rule enabled flag (single or all)|
-|setRuleEnabled|Enable/disable rule by index|
-|getLinkInControl|Query which objects are referenced by controls (returns IDs/indices)|
-|getNodeInControl|Query which objects are referenced by controls (returns IDs/indices)|
-|getTimetoNextEvent|Wrapper around ENtimetonextevent (returns enum + time to event)|
-|loadPatternFile|Load a time pattern file into the project (forwards to ENloadpatternfile)|
-|getPatternAverageDefaultValue|Report average value used when a pattern is missing|
-|getOptionsPressureUnits|Retrieve current pressure units|
-|setOptionsPressureUnits|Set pressure units (EN_PSI / EN_KPA / EN_METERS)|
-|setOptionsPressureUnitsMeters|Set pressure units to meters|
-|setOptionsPressureUnitsPSI|Set pressure units to PSI|
-|setOptionsPressureUnitsKPA|Set pressure units to kPa|
-|getOptionsStatusReport|Get current status report level|
-|setOptionsStatusReport|Set status report level (EN_NO_REPORT / EN_NORMAL_REPORT / EN_FULL_REPORT)|
-|setOptionsStatusReportNo|Set report level to no report|
-|setOptionsStatusReportNormal|Set report level to normal|
-|setOptionsStatusReportFull|Set report level to full|
-|getOptionsDemandPattern|Get default demand pattern behavior|
-|setOptionsDemandPattern|Set default demand pattern behavior|
-|getOptionsEmitterBackFlow|Get emitter backflow setting|
-|setOptionsEmitterBackFlowAllowed|Allow emitter backflow|
-|setOptionsEmitterBackFlowDisallowed|Disallow emitter backflow|
-|setFlowUnitsCMS|Set flow units to cubic meters per second|
-|getLinkValveCurveGPV|Get valve curve for GPV link|
-|getLinkValveCurvePCV|Get valve curve for PCV link|
-|setLinkValveCurveGPV|Set valve curve for GPV link|
-|setLinkValveCurvePCV|Set valve curve for PCV link|
-|getLinkLeakArea|Get leakage area for a link|
-|setLinkLeakArea|Set leakage area for a link|
-|getLinkExpansionProperties|Get expansion properties for a link|
-|setLinkExpansionProperties|Set expansion properties for a link|
-|getLinkLeakageRate|Get leakage rate for a link|
-|getNodeLeakageFlow|Get leakage flow at a node|
-|getNodeEmitterFlow|Get emitter flow at a node|
-|getNodeTankWaterLevel|Retrieves the current computed tank water level|
-|getNodeTankElevations|Retrieves the elevation of tanks|
-|getConsumerDemandRequested|Retrieve consumer demand requested|
-|getConsumerDemandDelivered|Retrieve consumer demand delivered|
-|openX|Lenient open for project files|
-|getLinkInfo|Bulk retrieve link property vector|
-|getStatisticIterations|Retrieves the number of iterations taken in the simulation|
-|getStatisticRelativeError|Retrieves the relative error statistic from the simulation|
-|getStatisticDeficientNodes|Retrieve number of deficient nodes|
-|getStatisticDemandReduction|Retrieve demand reduction statistics|
-|getStatisticTotalLeakageLoss|Retrieve total leakage loss value|
 
 &uparrow; [Back to top](#table-of-contents)
