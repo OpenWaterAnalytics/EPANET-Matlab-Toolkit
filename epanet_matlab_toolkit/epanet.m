@@ -17204,6 +17204,10 @@ classdef epanet <handle
             end
             obj.BinUnits_SI_Metric=0; obj.BinUnits_US_Customary=0;
             [~, info] = obj.readInpFile;
+            obj.BinLinkGlobalBulkReactionCoeff=[];
+            obj.BinLinkGlobalWallReactionCoeff=[];
+            obj.BinLinkBulkReactionCoeff=[];
+            obj.BinLinkWallReactionCoeff=[];
             for hc=1:length(info)
                 tline = info{hc};
                 if ~ischar(tline),   break,   end
@@ -17363,10 +17367,6 @@ classdef epanet <handle
                         % [REACTIONS] section
                     elseif strcmpi(tok(1:5), '[REAC')
                         sect=15;d=1;
-                        obj.BinLinkGlobalBulkReactionCoeff=[];
-                        obj.BinLinkGlobalWallReactionCoeff=[];
-                        obj.BinLinkBulkReactionCoeff=[];
-                        obj.BinLinkWallReactionCoeff=[];
                         obj.BinCountReactionlines=0;
                         continue;
                         % [TIMES] section
@@ -17441,8 +17441,11 @@ classdef epanet <handle
                     obj.BinNodeJunctionNameID{k}=atline{1};
                     obj.BinNodeJunctionIndex(k)=k;
                     obj.BinNodeJunctionElevation(k)=str2double(atline{2});
-                    if length(atline)>2
-                        if ~isempty(atline{3}) && ~sum(atline{3}==';')
+                    if length(atline)>=2
+                        if length(atline) == 2
+                            obj.BinNodeJunctionsBaseDemands(k)=str2double(atline{2});
+                        end
+                        if length(atline)>2 && ~isempty(atline{3}) && ~sum(atline{3}==';')
                             obj.BinNodeJunctionsBaseDemands(k)=str2double(atline{3});
                             if length(atline)>3
                                 if ~sum(atline{4}==';')
@@ -17545,15 +17548,13 @@ classdef epanet <handle
                     else
                         obj.BinCurveTypes(x)=typecode;
                     end
-                    a = textscan(tline, '%s %f %f');l=1;
-                    aa = regexp(tline, '\s*', 'split');
-                    if isempty(aa{l})
-                        l=l+1;
-                    end
-                    BinCNameID{x}=aa{l};
-                    obj.BinCurveXvalue(x)=a{2};
-                    obj.BinCurveYvalue(x)=a{3};
-                    obj.BinCurveAllLines{b}=tline;
+                    a = textscan(tline, '%s %f %f %*[^\n]', ...
+                        'Delimiter', {' ', '\t'}, ...
+                        'MultipleDelimsAsOne', true);
+                    BinCNameID{x}           = a{1}{1};
+                    obj.BinCurveXvalue(x)   = a{2};
+                    obj.BinCurveYvalue(x)   = a{3};
+                    obj.BinCurveAllLines{b} = tline;
                     x=x+1;b=b+1;
                     % Demands
                 elseif sect==8
@@ -17654,12 +17655,6 @@ classdef epanet <handle
                         obj.BinLinkGlobalBulkReactionCoeff=str2double(atline{3});
                     elseif strcmpi(atline{1}, 'GLOBAL') && strcmpi(atline{2}, 'WALL')
                         obj.BinLinkGlobalWallReactionCoeff=str2double(atline{3});
-                        obj.BinLinkWallReactionCoeff=obj.BinLinkGlobalWallReactionCoeff*ones(1, obj.BinLinkCount);
-                        obj.BinLinkBulkReactionCoeff=obj.BinLinkGlobalBulkReactionCoeff*ones(1, obj.BinLinkCount);
-                        obj.BinLinkWallReactionCoeff(obj.BinLinkPumpIndex)=0;
-                        obj.BinLinkWallReactionCoeff(obj.BinLinkValveIndex)=0;
-                        obj.BinLinkBulkReactionCoeff(obj.BinLinkPumpIndex)=0;
-                        obj.BinLinkBulkReactionCoeff(obj.BinLinkValveIndex)=0;
                     end
                     if strcmpi(atline{1}, 'BULK')
                         LinkIndex = find(strcmpi(obj.BinLinkNameID, atline{2}));
@@ -17702,6 +17697,12 @@ classdef epanet <handle
                     indexV = indexV + 1;
                 end
             end
+            obj.BinLinkWallReactionCoeff=obj.BinLinkGlobalWallReactionCoeff*ones(1, obj.BinLinkCount);
+            obj.BinLinkBulkReactionCoeff=obj.BinLinkGlobalBulkReactionCoeff*ones(1, obj.BinLinkCount);
+            obj.BinLinkWallReactionCoeff(obj.BinLinkPumpIndex)=0;
+            obj.BinLinkWallReactionCoeff(obj.BinLinkValveIndex)=0;
+            obj.BinLinkBulkReactionCoeff(obj.BinLinkPumpIndex)=0;
+            obj.BinLinkBulkReactionCoeff(obj.BinLinkValveIndex)=0;
             if ~sum(obj.BinLinkBulkReactionCoeff)
                 if isempty(obj.BinLinkGlobalBulkReactionCoeff), obj.BinLinkGlobalBulkReactionCoeff=0;end
                 obj.BinLinkBulkReactionCoeff=obj.BinLinkGlobalBulkReactionCoeff*ones(1, obj.BinLinkCount);
@@ -21972,7 +21973,9 @@ for h=1:length(info)
         elseif (isempty(strcmp(nn, 'VOLUME')) || isempty(strcmp(ee, 'EFFICIENCY')) || isempty(strcmp(kk, 'HEADLOSS'))) &&  (tok(1)==';'), Bintypecode=0; % HEADLOSS
             BinCurveAllLines{u}=tline;u=u+1;continue;
         else
-            a = textscan(tline, '%s %f %f');
+            a = textscan(tline, '%s %f %f %*[^\n]', ...
+                        'Delimiter', {' ', '\t'}, ...
+                        'MultipleDelimsAsOne', true);
             %aa=regexp(tline, '\s', 'split');
             BinCNameID{i}=a{1};
             if i==1
@@ -24189,10 +24192,6 @@ if (tok(1) == '[')
         cont=1;return;
     elseif strcmpi(tok(1:5), '[REAC')
         sect=5;
-        value.BinLinkGlobalBulkReactionCoeff=[];
-        value.BinLinkGlobalWallReactionCoeff=[];
-        value.BinLinkBulkReactionCoeff=[];
-        value.BinLinkWallReactionCoeff=[];
         value.BinCountReactionlines=0;
         value.BinLinkPipeCount = length(value.BinLinkPipeNameID);
         value.BinLinkPumpCount = length(value.BinLinkPumpNameID);
