@@ -208,7 +208,7 @@ d.getNodeTankInitialLevel
 
 d.getNodeActualDemand % This is called dynamically in a loop
 d.getNodeActualDemandSensingNodes([1 2 34 25 5])  
-d.getNodeHydaulicHead
+d.getNodeHydraulicHead
 d.getNodePressure
 d.getNodeActualQuality
 d.getNodeMassFlowRate
@@ -698,7 +698,7 @@ while (tstep>0)
     t=d.runHydraulicAnalysis;
     P=[P; d.getNodePressure];
     D=[D; d.getNodeActualDemand];
-    H=[H; d.getNodeHydaulicHead];
+    H=[H; d.getNodeHydraulicHead];
     F=[F; d.getLinkFlows];
     T=[T; t];
     tstep=d.nextHydraulicAnalysisStep;
