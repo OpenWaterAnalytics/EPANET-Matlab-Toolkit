@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.3.01 - Last Update: 24/10/2025';
+        classversion='v2.3.03 - Last Update: 02/01/2026';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -24828,7 +24828,8 @@ if (strcmpi(lline, 'yes'))
             line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', highlightlinkwidth, 'Color', highlightlinkcolor, 'Parent', axesid);
         end
         if isempty(hh)
-            h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', .5, 'Parent', axesid);
+            h(:, 1)=line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], ...
+                'LineWidth', .5, 'Color', 'b', 'Parent', axesid);
             if ~l(1), legendIndices = [legendIndices 1]; l(1)=1; end
         end
         
