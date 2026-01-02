@@ -411,7 +411,7 @@ classdef epanet <handle
         TYPESTATS={'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'}; % Constants for statistics: 'NONE', 'AVERAGE', 'MINIMUM', 'MAXIMUM', 'RANGE'
         TYPEUNITS={'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD', 'CMS'}; % Constants for units: 'CFS', 'GPM', 'MGD', 'IMGD', 'AFD', 'LPS', 'LPM', 'MLD', 'CMH', 'CMD'
         TYPEHEADLOSS={'HW', 'DW', 'CM'}; % Constants of headloss types: HW: Hazen-Williams, DW: Darcy-Weisbach, CM: Chezy-Manning
-        TYPESTATUS = {'CLOSED', 'OPEN'}; % Link status
+        TYPESTATUS = {'CLOSED', 'OPEN', 'ACTIVE'}; % Link status - default status of OPEN (for pipes and pumps) or ACTIVE (for valves)
         TYPEPUMPSTATE = {'XHEAD', '', 'CLOSED', 'OPEN', '', 'XFLOW'}; % Link PUMP status
         %   d.TYPEPUMPSTATE(res.State + 1)
         %   EN_PUMP_XHEAD   = 0,  //!< Pump closed - cannot supply head
@@ -6803,6 +6803,7 @@ classdef epanet <handle
             indices = obj.getLinkPumpIndex; % obj.getLinkIndex;
             if isempty(varargin)
                 [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_STATE, obj.LibEPANET, obj.ph);
+                value = value(indices);
             else
                 varargin = varargin{1};
                 if ~ismember(varargin, indices)
@@ -6909,6 +6910,7 @@ classdef epanet <handle
             indices = obj.getLinkPumpIndex; % obj.getLinkIndex;
             if isempty(varargin)
                 [~, value] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_EFFIC, obj.LibEPANET, obj.ph);
+                value = value(indices);
             else
                 varargin = varargin{1};
                 if ~ismember(varargin, indices)
