@@ -1,6 +1,11 @@
-start_toolkit
+%% EPANET-Matlab Toolkit Test Part 9
+% This file is provided to ensure that all functions can be executed
+% correctly.
+% Press F10 for step-by-step execution. You may also use the breakpoints,  
+% indicated with a short dash (-) on the left of each line number.
+% Last test: 02/01/2026
+start_toolkit;
 d = epanet('ky10.inp');
-
 d.runsCompleteSimulation;
 
 %% all
@@ -25,18 +30,18 @@ disp('getNodeTankMixingModelCode');         d.getNodeTankMixingModelCode
 disp('getNodeTankInitialLevel(1)');            d.getNodeTankInitialLevel(1)
 disp('getNodeTankInitialWaterVolume(1)');      d.getNodeTankInitialWaterVolume(1)
 disp('getNodeTankMinimumWaterVolume(1)');      d.getNodeTankMinimumWaterVolume(1)
-disp('getNodeTankDiameter(1)');                d.getNodeTankDiameter(1)
+disp('getNodeTankDiameter(1)');                d.getNodeTankDiameter(5)
 disp('getNodeTankMixZoneVolume(1)');           d.getNodeTankMixZoneVolume(1)
 disp('getNodeTankMaximumWaterVolume(1)');      d.getNodeTankMaximumWaterVolume(1)
-disp('getNodeTankVolumeCurveIndex(1)');        d.getNodeTankVolumeCurveIndex(1)
+disp('getNodeTankVolumeCurveIndex(1)');        d.getNodeTankVolumeCurveIndex(5)
 disp('getNodeTankMinimumWaterLevel(1)');       d.getNodeTankMinimumWaterLevel(1)
 disp('getNodeTankMaximumWaterLevel(1)');       d.getNodeTankMaximumWaterLevel(1)
 disp('getNodeTankMixingFraction(1)');          d.getNodeTankMixingFraction(1)
 disp('getNodeTankBulkReactionCoeff(1)');       d.getNodeTankBulkReactionCoeff(1)
-disp('getNodeTankVolume(1)');                  d.getNodeTankVolume(1)
+disp('getNodeTankVolume(1)');                  d.getNodeTankVolume(5)
 disp('getNodeTankCanOverFlow(1)');             d.getNodeTankCanOverFlow(1)
 disp('getNodeTankMixingModelCode(1)');         d.getNodeTankMixingModelCode(1)
-disp('getNodeTankMixingModelType(1)');         d.getNodeTankMixingModelType(1)
+disp('getNodeTankMixingModelType(1)');         d.getNodeTankMixingModelType(5)
 disp('getNodeTankMixingModelCode(1)');         d.getNodeTankMixingModelCode(1)
 %% range
 disp('getNodeTankInitialLevel(:)');            d.getNodeTankInitialLevel(1:4)
