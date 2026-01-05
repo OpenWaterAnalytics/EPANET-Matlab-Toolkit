@@ -1,5 +1,5 @@
 classdef epanet <handle
-    %EPANET-Matlab Toolkit version EMT v2.2.6: A Matlab Class for EPANET and EPANET-MSX
+    %EPANET-Matlab Toolkit version EMT v2.3.03: A Matlab Class for EPANET and EPANET-MSX
     %libraries
     %
     %
