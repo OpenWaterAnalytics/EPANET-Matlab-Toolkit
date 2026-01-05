@@ -443,6 +443,85 @@ classdef epanet <handle
         solve = 1;
     end
     methods (Access = private)
+        function plotMSXSpeciesConcentrationPrivate_(obj, kind, elementList, speciesList)
+            if nargin < 4
+                error('plotMSXSpeciesConcentration:InvalidInput', ...
+                    'Provide element indices and species indices.');
+            end
+    
+            elementList = elementList(:).';
+            speciesList = speciesList(:).';
+    
+            SpeciesNameID = obj.getMSXSpeciesNameID;
+    
+            switch lower(string(kind))
+                case "node"
+                    s     = obj.getMSXComputedQualityNode(elementList, speciesList);
+                    ids   = obj.getNodeNameID;
+                    label = "NODE";
+                case "link"
+                    s     = obj.getMSXComputedQualityLink(elementList, speciesList);
+                    ids   = obj.getLinkNameID;
+                    label = "LINK";
+                otherwise
+                    error('plotMSXSpeciesConcentration:InvalidKind', ...
+                        'Kind must be "node" or "link".');
+            end
+    
+            t = s.Time(:);
+    
+            for nd = 1:numel(elementList)
+                idx = elementList(nd);
+                idStr = obj.msxIdToChar_(ids, idx);
+    
+                q = s.Quality{nd};
+                specie = obj.msxQualityToMatrix_(q, t, speciesList);
+    
+                figure('Name', char(label + " " + string(idStr)));
+                plot(t, specie);
+    
+                title(char(label + " " + string(idStr)));
+                ylabel('Quantity');
+                xlabel('Time(s)');
+                legend(SpeciesNameID(speciesList), 'Interpreter', 'none');
+            end
+        end
+    
+        function idStr = msxIdToChar_(~, ids, idx)
+            idStr = ids(idx);
+            if iscell(idStr)
+                idStr = idStr{1};
+            end
+            idStr = char(string(idStr));
+        end
+    
+        function specie = msxQualityToMatrix_(~, q, t, speciesList)
+            nT = numel(t);
+    
+            if iscell(q)
+                specie = zeros(nT, numel(speciesList));
+                for j = 1:numel(speciesList)
+                    v = q{j};
+                    specie(:, j) = v(:);
+                end
+                return
+            end
+    
+            if size(q, 1) ~= nT && size(q, 2) == nT
+                q = q.';
+            end
+    
+            if ~isempty(speciesList) && size(q, 2) >= max(speciesList)
+                specie = q(:, speciesList);
+            else
+                specie = q;
+            end
+    
+            if size(specie, 1) ~= nT
+                specie = reshape(specie, nT, []);
+            end
+        end
+
         function value = msx_computed_quality_species(obj, type_code, indices, varargin)
             
             if obj.getMSXSpeciesCount==0
@@ -4323,11 +4402,11 @@ classdef epanet <handle
             % an error code.
             % t      current simulation time at the end of the step (in seconds).
             % tleft  time left in the simulation (also in seconds).
-            t=int32(0);
-            tleft=int32(0);
-            [Errcode, t, tleft]=calllib(MSXLibEPANET, 'MSXstep', t, tleft);
-            t = double(t);
-            tleft = double(tleft);
+            tbuf     = libpointer('int32Ptr', zeros(2,1,'int32'));  
+            tleftbuf = libpointer('int32Ptr', zeros(2,1,'int32'));  
+            Errcode = calllib(MSXLibEPANET,'MSXstep', tbuf, tleftbuf);
+            t     = typecast(tbuf.Value, 'double');
+            tleft = typecast(tleftbuf.Value, 'double');
         end
         function [Errcode] = apiMSXinit(flag, MSXLibEPANET)
             % Initialize the MSX system before solving for water quality results in step-wise fashion.
@@ -16402,24 +16481,9 @@ classdef epanet <handle
             %   d.plotMSXSpeciesNodeConcentration([1:5], 1) % Plots concentration of nodes 1 to 5 for the first specie over time.
             %
             % See also plotMSXSpeciesLinkConcentration.
-            s=obj.getMSXComputedQualityNode(varargin{1}, varargin{2});
-            nodesID=obj.getNodeNameID;
-            SpeciesNameID=obj.getMSXSpeciesNameID;nd=1;
-            for l=varargin{1}
-                nodeID=nodesID(l);
-                figure('Name', ['NODE ', char(nodeID)]);
-                for i=varargin{2}
-                    specie(:, i)=s.Quality{nd};
-                    time(:, i)=s.Time;
-                end
-                nd=nd+1;
-                plot(time, specie, 'b');
-                title(['NODE ', char(nodeID)]);
-                ylabel('Quantity');
-                xlabel('Time(s)');
-                legend(SpeciesNameID(varargin{2}));
-            end
+            obj.plotMSXSpeciesConcentrationPrivate_('node', varargin{:});
         end
+        
         function plotMSXSpeciesLinkConcentration(obj, varargin)
             % Plots concentration of species for links over time.
             %
@@ -16431,23 +16495,7 @@ classdef epanet <handle
             %   d.plotMSXSpeciesLinkConcentration([1:5], 3) % Plots concentration of nodes 1 to 5 for the specie index 3 over time.
             %
             % See also plotMSXSpeciesNodeConcentration.
-            s=obj.getMSXComputedQualityLink(varargin{1}, varargin{2});
-            linksID=obj.getLinkNameID;
-            SpeciesNameID=obj.getMSXSpeciesNameID;nd=1;
-            for l=varargin{1}
-                linkID=linksID(l);
-                figure('Name', ['LINK ', char(linkID)]);
-                for i=varargin{2}
-                    specie(:, i)=s.Quality{nd};
-                    time(:, i)=s.Time;
-                end
-                nd=nd+1;
-                plot(time, specie, 'b');
-                title(['LINK ', char(linkID)]);
-                ylabel('Quantity');
-                xlabel('Time(s)');
-                legend(SpeciesNameID(varargin{2}));
-            end
+            obj.plotMSXSpeciesConcentrationPrivate_('link', varargin{:});
         end
         function value = getMSXError(obj, Errcode)
             % Retrieves the MSX erorr message for specific erorr code.
@@ -23928,6 +23976,16 @@ end
 warning('off'); try fclose(fid); catch, end; try delete(binfile); catch, end
 try delete(rptfile); catch, end; warning('on');
 end
+function writeOptionsBlock(fid, areaunits, rateunits, solver, coupling, compiler, timestep, rtol, atol)
+fprintf(fid, ['AREA_UNITS', blanks(5), '%s\n'], areaunits);
+fprintf(fid, ['RATE_UNITS', blanks(5), '%s\n'], rateunits);
+fprintf(fid, ['SOLVER',     blanks(5), '%s\n'], solver);
+fprintf(fid, ['COUPLING',   blanks(5), '%s\n'], coupling);
+fprintf(fid, ['COMPILER',   blanks(5), '%s\n'], compiler);
+fprintf(fid, ['TIMESTEP',   blanks(5), '%d\n'], timestep);
+fprintf(fid, ['RTOL',       blanks(5), '%s\n'], rtol);
+fprintf(fid, ['ATOL',       blanks(5), '%s\n'], atol);
+end
 function Errcode=addLinkWarnings(obj, typecode, newLink, toNode)
 % Check if id new already exists
 Nodes = obj.getBinNodesInfo;
@@ -23970,89 +24028,125 @@ t =  regexp(v, '[(\w*)]', 'split');
 cnt=length(t(~cellfun('isempty', t)));
 end
 function setMSXOptions(obj, varargin)
-solver=obj.getMSXSolver;
-areaunits=obj.getMSXAreaUnits;
-rateunits=obj.getMSXRateUnits;
-rtol=obj.getMSXRtol;
-atol=obj.getMSXAtol;
-timestep=obj.getMSXTimeStep;
-coupling=obj.getMSXCoupling;
-compiler=obj.getMSXCompiler;
+options = obj.getMSXOptions;
+solver=options.Solver;
+areaunits=options.AreaUnits;
+rateunits=options.RateUnits;
+rtol=options.Rtol;
+atol=options.Atol;
+timestep=options.TimeStep;
+coupling=options.Coupling;
+compiler=options.Compiler;
 
-for i=1:(nargin/2)
-    argument =lower(varargin{2*(i-1)+1});
+% Parse name/value pairs
+if mod(numel(varargin), 2) ~= 0
+    error('setMSXOptions:InvalidInput', 'Provide name/value pairs.');
+end
+
+for k = 1:2:numel(varargin)
+    argument = lower(string(varargin{k}));
+    value    = varargin{k+1};
+
     switch argument
         case 'areaunits'
-            areaunits=varargin{2*i};
+            areaunits = value;
         case 'rateunits'
-            rateunits=varargin{2*i};
+            rateunits = value;
         case 'solver'
-            solver=varargin{2*i};
+            solver = value;
         case 'timestep'
-            timestep=varargin{2*i};
+            timestep = value;
         case 'atol'
-            atol=varargin{2*i};
+            atol = value;
         case 'rtol'
-            rtol=varargin{2*i};
+            rtol = value;
         case 'coupling'
-            coupling=varargin{2*i};
+            coupling = value;
         case 'compiler'
-            compiler=varargin{2*i};
+            compiler = value;
         otherwise
-            warning('Invalid property found.');
+            warning('setMSXOptions:InvalidProperty', 'Invalid property "%s" found.', varargin{k});
             return
     end
 end
 
-[info, tline] = readAllFile(obj.MSXFile);
+% Normalize types for fprintf
+areaunits = char(string(areaunits));
+rateunits = char(string(rateunits));
+solver    = char(string(solver));
+coupling  = char(string(coupling));
+compiler  = char(string(compiler));
+rtol      = char(string(rtol));
+atol      = char(string(atol));
+
+timestep = double(timestep);
+if ~isscalar(timestep) || ~isfinite(timestep) || timestep <= 0 || fix(timestep) ~= timestep
+    error('setMSXOptions:InvalidTimeStep', 'TIMESTEP must be a positive integer scalar.');
+end
+
+[~, tline] = readAllFile(obj.MSXFile);
 fid2 = writenewTemp(obj.MSXTempFile);
-sect=0;
-for t = 1:length(info)
-    a = info{t};
-    c = cell2mat(a);
-    if isempty(a)
-        % skip
-    elseif isempty(c)
-        % skip
+
+idxOptions = find(strcmpi(strtrim(tline), '[OPTIONS]'), 1);
+idxSpecies = find(strcmpi(strtrim(tline), '[SPECIES]'), 1);
+
+if isempty(idxOptions)
+    % Insert [OPTIONS] if it does not exist
+    if isempty(idxSpecies)
+        for t = 1:numel(tline)
+            fprintf(fid2, '%s\n', tline{t});
+        end
+        fprintf(fid2, '\n[OPTIONS]\n');
+        writeOptionsBlock(fid2, areaunits, rateunits, solver, coupling, compiler, timestep, rtol, atol);
     else
-        u=1;
-        while u < length(a)+1
-            if strcmp(a{u}, '[OPTIONS]')
-                fprintf(fid2, '[OPTIONS]');
-                sect=1;
-                break;
-            elseif strcmp(a{u}, '[SPECIES]')
-                fprintf(fid2, '[SPECIES]');
-                sect=0;
-                break;
-            end
-            % section [OPTIONS]
-            if (sect==1)
-                fprintf(fid2, ['AREA_UNITS', blanks(5), '%s\n'], areaunits);
-                fprintf(fid2, ['RATE_UNITS', blanks(5), '%s\n'], rateunits);
-                fprintf(fid2, ['SOLVER', blanks(5), '%s\n'], solver);
-                fprintf(fid2, ['COUPLING', blanks(5), '%s\n'], coupling);
-                fprintf(fid2, ['COMPILER', blanks(5), '%s\n'], compiler);
-                fprintf(fid2, ['TIMESTEP', blanks(5), '%d\n'], timestep);
-                fprintf(fid2, ['RTOL', blanks(5), '%s\n'], rtol);
-                fprintf(fid2, ['ATOL', blanks(5), '%s\n\n'], atol);
-                sect=2;
-                break;
-            elseif sect==0
-                fprintf(fid2, tline{t});
-                break;
-            end
-            u=u+1;
+        for t = 1:(idxSpecies-1)
+            fprintf(fid2, '%s\n', tline{t});
+        end
+        fprintf(fid2, '[OPTIONS]\n');
+        writeOptionsBlock(fid2, areaunits, rateunits, solver, coupling, compiler, timestep, rtol, atol);
+        fprintf(fid2, '\n');
+        for t = idxSpecies:numel(tline)
+            fprintf(fid2, '%s\n', tline{t});
         end
     end
-    if sect~=2
+else
+    % Replace existing [OPTIONS] block
+    inOptions = false;
+    optionsWritten = false;
+
+    for t = 1:numel(tline)
+        s = strtrim(tline{t});
+
+        if strcmpi(s, '[OPTIONS]')
+            fprintf(fid2, '[OPTIONS]\n');
+            inOptions = true;
+            optionsWritten = false;
+            continue
+        end
+
+        if inOptions && startsWith(s, '[') && endsWith(s, ']')
+            inOptions = false;
+        end
+
+        if inOptions
+            if ~optionsWritten
+                writeOptionsBlock(fid2, areaunits, rateunits, solver, coupling, compiler, timestep, rtol, atol);
+                fprintf(fid2, '\n');
+                optionsWritten = true;
+            end
+            continue
+        end
+
+        fprintf(fid2, '%s\n', tline{t});
+    end
+
+    if inOptions && ~optionsWritten
+        writeOptionsBlock(fid2, areaunits, rateunits, solver, coupling, compiler, timestep, rtol, atol);
         fprintf(fid2, '\n');
     end
 end
-obj.unloadMSX;
-obj.loadMSXlibrary;
+fclose(fid2);
 obj.loadMSXEPANETFile(obj.MSXTempFile);
-% obj.loadMSXFile(obj.MSXTempFile, 1);
 end
 function value = getTimes(obj, r, atline, value)
 tmpt=[0 0];
