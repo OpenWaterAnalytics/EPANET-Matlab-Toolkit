@@ -10826,19 +10826,13 @@ classdef epanet <handle
             obj.closeQualityAnalysis;
         end
         function value = getComputedTimeSeries(obj)
-            obj.saveInputFile();
+            obj.apiENsaveinpfile(obj.TempInpFile, obj.LibEPANET, obj.ph);
             [fid, binfile, ~] = runEPANETexe(obj);
             if fid < 0
                 value = obj.getComputedTimeSeries_ENepanet();
             else
-                value = readEpanetBin(fid, binfile, 0);
+                value = readEpanetBin(fid, binfile, 1);
                 value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
-                % Remove report bin, files @#
-                warning off;
-                fclose('all');
-                files=dir('@#*');
-                if ~isempty(files); delete('@#*'); end
-                warning on;
             end
         end
         function value = getComputedTimeSeries_ENepanet(obj, tempfile, binfile, rptfile)
@@ -10862,7 +10856,6 @@ classdef epanet <handle
             else
                 obj.saveInputFile();
                 obj.closeNetwork();
-
                 obj.Errcode = obj.apiENepanet(obj.TempInpFile, rptfile, binfile, obj.LibEPANET);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
                 fid = fopen(binfile, 'r');
@@ -17183,7 +17176,7 @@ classdef epanet <handle
             % Example:
             %   d.unloadMSX
             obj.apiMSXclose(obj);
-            obj.apiMSXMatlabCleanup(obj);
+            % obj.apiMSXMatlabCleanup(obj);
             fclose('all');
             %disp('MSX unloaded');
         end
@@ -21128,6 +21121,24 @@ classdef epanet <handle
                 end
             end
         end
+        function cleanupEpanetTempFiles(obj)
+            %CLEANUPEPANETTEMPFILES Delete all EPANET temp files that start with '@#' in the OS temp folder.
+            tmpDir = tempdir;
+            pat    = fullfile(tmpDir, '@#*');
+            warnState = warning;
+            warning('off','MATLAB:DELETE:FileNotFound');
+            warning('off','MATLAB:DELETE:Permission');
+            files = dir(pat);
+            for k = 1:numel(files)
+                if ~files(k).isdir
+                    try
+                        delete(fullfile(tmpDir, files(k).name));
+                    catch
+                    end
+                end
+            end
+            warning(warnState);
+        end
     end
 end
 
@@ -24452,119 +24463,243 @@ end
 %     end
 % end
 function value = readEpanetBin(fid, binfile, varargin)
-value=[];
-if fid~=-1
-    data = fread(fid, 'int32');
-    value.BinNumberReportingPeriods = data(end-2);
-    clear data;
-    % Beginning of file
-    fseek(fid, 0, 'bof');
-    value.Binmagicnumber=fread(fid, 1, 'uint32');
-    value.BinLibEPANET=fread(fid, 1, 'uint32');
-    value.BinNumberNodes=fread(fid, 1, 'uint32');
-    value.BinNumberReservoirsTanks=fread(fid, 1, 'uint32');
-    value.BinNumberLinks=fread(fid, 1, 'uint32');
-    value.BinNumberPumps=fread(fid, 1, 'uint32');
-    value.BinNumberValves=fread(fid, 1, 'uint32');
-    value.BinWaterQualityOption=fread(fid, 1, 'uint32');
-    value.BinIndexNodeSourceTracing=fread(fid, 1, 'uint32');
-    value.BinFlowUnitsOption=fread(fid, 1, 'uint32');
-    value.BinPressureUnitsOption=fread(fid, 1, 'uint32');
-    value.BinTimeStatisticsFlag=fread(fid, 1, 'uint32');
-    value.BinReportingStartTimeSec=fread(fid, 1, 'uint32');
-    value.BinReportingTimeStepSec=fread(fid, 1, 'uint32');
-    value.BinSimulationDurationSec=fread(fid, 1, 'uint32');
-    value.BinProblemTitle1=fread(fid, 80, '*char')';
-    value.BinProblemTitle2=fread(fid, 80, '*char')';
-    value.BinProblemTitle3=fread(fid, 80, '*char')';
-    value.BinNameInputFile=fread(fid, 260, '*char')';
-    value.BinNameReportFile=fread(fid, 260, '*char')';
-    value.BinNameChemical=regexprep(fread(fid, 16, '*char')', '[^\w'']', '');
-    value.BinChemicalConcentrationUnits=regexprep(fread(fid, 32, '*char')', '[^\w'']', '');
-    fread(fid, 4, 'uint32');
-    for i=1:value.BinNumberNodes
-        value.BinIDLabelEachNode{i}=fread(fid, 32, '*char')'; % error NODES*32
-        value.BinIDLabelEachNode{i}=value.BinIDLabelEachNode{i}(find(value.BinIDLabelEachNode{i}, 32));
-    end
-    for i=1:value.BinNumberLinks
-        value.BinIDLabelEachLink{i}=fread(fid, 32, '*char')';  % error LINKS*32
-        value.BinIDLabelEachLink{i}=value.BinIDLabelEachLink{i}(find(value.BinIDLabelEachLink{i}, 32));
-    end
-    value.BinIndexStartNodeEachLink=fread(fid, value.BinNumberLinks, 'uint32')';
-    value.BinIndexEndNodeEachLink=fread(fid, value.BinNumberLinks, 'uint32')';
-    value.BinTypeCodeEachLink=fread(fid, value.BinNumberLinks, 'uint32')';
-    value.BinNodeIndexEachReservoirsTank=fread(fid, value.BinNumberReservoirsTanks, 'uint32')'; % error
-    value.BinCrossSectionalAreaEachTank=fread(fid, value.BinNumberReservoirsTanks, 'float')';
-    value.BinElevationEachNode=fread(fid, value.BinNumberNodes, 'float')';
-    value.BinLengthEachLink=fread(fid, value.BinNumberLinks, 'float')';
-    value.BinDiameterEachLink=fread(fid, value.BinNumberLinks, 'float')';
-    
-    for p=1:value.BinNumberPumps
-        value.BinPumpIndexListLinks(p)=fread(fid, 1, 'uint32')';
-        value.BinPumpUtilization(p)=fread(fid, 1, 'float')';
-        value.BinAverageEfficiency(p)=fread(fid, 1, 'float')';
-        value.BinAverageKwattsOrMillionGallons(p)=fread(fid, 1, 'float')';
-        value.BinAverageKwatts(p)=fread(fid, 1, 'float')';
-        value.BinPeakKwatts(p)=fread(fid, 1, 'float')';
-        value.BinAverageCostPerDay(p)=fread(fid, 1, 'float')';
-    end
-    
-    value.BinOverallPeakEnergyUsage = fread(fid, 1, 'float');
-    
-    for i=1:value.BinNumberReportingPeriods
-        value.BinNodeDemand(i, :)         = fread(fid, value.BinNumberNodes, 'float')';
-        value.BinNodeHead(i, :)           = fread(fid, value.BinNumberNodes, 'float')';
-        value.BinNodePressure(i, :)       = fread(fid, value.BinNumberNodes, 'float')';
-        value.BinNodeQuality(i, :)        = fread(fid, value.BinNumberNodes, 'float')';
-        value.BinLinkFlow(i, :)           = fread(fid, value.BinNumberLinks, 'float')';
-        value.BinLinkVelocity(i, :)       = fread(fid, value.BinNumberLinks, 'float')';
-        value.BinLinkHeadloss(i, :)       = fread(fid, value.BinNumberLinks, 'float')';
-        value.BinLinkQuality(i, :)        = fread(fid, value.BinNumberLinks, 'float')';
-        value.BinLinkStatus(i, :)         = fread(fid, value.BinNumberLinks, 'float')';
-        value.BinLinkSetting(i, :)        = fread(fid, value.BinNumberLinks, 'float')';
-        value.BinLinkReactionRate(i, :)   = fread(fid, value.BinNumberLinks, 'float')';
-        value.BinLinkFrictionFactor(i, :) = fread(fid, value.BinNumberLinks, 'float')';
-    end
-    
-    value.BinAverageBulkReactionRate=fread(fid, 1, 'float')';
-    value.BinAverageWallReactionRate=fread(fid, 1, 'float')';
-    value.BinAverageTankReactionRate=fread(fid, 1, 'float')';
-    value.BinAverageSourceInflowRate=fread(fid, 1, 'float')';
-    value.BinNumberReportingPeriods2=fread(fid, 1, 'uint32')';
-    value.BinWarningFlag=fread(fid, 1, 'uint32')';
-    value.BinMagicNumber=fread(fid, 1, 'uint32')';
-end
-if ~isempty(varargin)
-    v = struct();
-    v.Time = (0:value.BinReportingTimeStepSec:value.BinSimulationDurationSec)';
+%READEPANETBIN Read EPANET binary results.
+%   value = readEpanetBin(fid, binfile)
+%   value = readEpanetBin(fid, binfile, 'compact')
+value = [];
 
-    fields_param = {'BinNodePressure', 'BinNodeDemand', 'BinNodeHead', 'BinNodeQuality', ...
-        'BinLinkFlow', 'BinLinkVelocity', 'BinLinkHeadloss', 'BinLinkStatus', 'BinLinkSetting', ...
-        'BinLinkReactionRate', 'BinLinkFrictionFactor', 'BinLinkQuality'};
-    fields_new = {'Pressure', 'Demand', 'Head', 'NodeQuality', ...
-        'Flow', 'Velocity', 'HeadLoss', 'Status', 'Setting', ...
-        'ReactionRate', 'FrictionFactor', 'LinkQuality'};
-    for i=1:length(fields_param)
-        v.(fields_new{i}) = eval(['value.', fields_param{i}]);
-    end
-    energy_params = {'PumpIndexListLinks', ...
-        'PumpUtilization', 'AverageEfficiency', 'AverageKwattsOrMillionGallons', ...
-        'AverageKwatts', 'PeakKwatts', 'AverageCostPerDay', 'OverallPeakEnergyUsage'};
-    for i=1:length(energy_params)
-        v.('EnergyReport').(energy_params{i}) = eval(['value.Bin', energy_params{i}]);
-    end
-    
-    clear value;
-    value=v;
+if fid == -1 || isempty(fid)
+    return
 end
-warning('off'); try fclose(fid); catch, end; try delete(binfile); catch, end
-warning('on');
+
+compact = false;
+if ~isempty(varargin)
+    a = varargin{1};
+    if (ischar(a) || isstring(a)) && strcmpi(string(a), "compact")
+        compact = true;
+    elseif isscalar(a) && (islogical(a) || isnumeric(a))
+        compact = logical(a);
+    end
 end
-function [inpfile, rptfile, binfile]= createTempfiles(BinTempfile)
-inpfile= BinTempfile;
-uuID = char(java.util.UUID.randomUUID);
-rptfile=['@#', uuID, '.txt'];
-binfile=['@#', uuID, '.bin'];
+
+cleaner = onCleanup(@() localCleanup(fid, binfile));
+
+% Get number of reporting periods from the last 12 bytes (uint32 x 3)
+fseek(fid, 0, 'eof');
+fileSize = ftell(fid);
+if fileSize < 12
+    error('readEpanetBin:InvalidFile', 'Binary file is too small.');
+end
+fseek(fid, -12, 'eof');
+nPeriodsEnd = fread(fid, 1, 'uint32=>double');
+warningFlagEnd = fread(fid, 1, 'uint32=>double');
+magicEnd = fread(fid, 1, 'uint32=>double');
+
+% Read header
+fseek(fid, 0, 'bof');
+
+value.Binmagicnumber              = fread(fid, 1, 'uint32=>double');
+value.BinLibEPANET                = fread(fid, 1, 'uint32=>double');
+value.BinNumberNodes              = fread(fid, 1, 'uint32=>double');
+value.BinNumberReservoirsTanks    = fread(fid, 1, 'uint32=>double');
+value.BinNumberLinks              = fread(fid, 1, 'uint32=>double');
+value.BinNumberPumps              = fread(fid, 1, 'uint32=>double');
+value.BinNumberValves             = fread(fid, 1, 'uint32=>double');
+value.BinWaterQualityOption       = fread(fid, 1, 'uint32=>double');
+value.BinIndexNodeSourceTracing   = fread(fid, 1, 'uint32=>double');
+value.BinFlowUnitsOption          = fread(fid, 1, 'uint32=>double');
+value.BinPressureUnitsOption      = fread(fid, 1, 'uint32=>double');
+value.BinTimeStatisticsFlag       = fread(fid, 1, 'uint32=>double');
+value.BinReportingStartTimeSec    = fread(fid, 1, 'uint32=>double');
+value.BinReportingTimeStepSec     = fread(fid, 1, 'uint32=>double');
+value.BinSimulationDurationSec    = fread(fid, 1, 'uint32=>double');
+
+value.BinProblemTitle1            = localReadFixedString(fid, 80);
+value.BinProblemTitle2            = localReadFixedString(fid, 80);
+value.BinProblemTitle3            = localReadFixedString(fid, 80);
+value.BinNameInputFile            = localReadFixedString(fid, 260);
+value.BinNameReportFile           = localReadFixedString(fid, 260);
+value.BinNameChemical             = localReadFixedString(fid, 16);
+value.BinChemicalConcentrationUnits = localReadFixedString(fid, 32);
+
+fread(fid, 4, 'uint32'); % reserved
+
+nNodes = value.BinNumberNodes;
+nLinks = value.BinNumberLinks;
+nTanks = value.BinNumberReservoirsTanks;
+nPumps = value.BinNumberPumps;
+
+% IDs
+% Nodes
+buf = fread(fid, [32, nNodes], '*uint8')';
+buf(buf==0) = 32; % replace null with space
+value.BinIDLabelEachNode = cellstr(strtrim(char(buf)));
+
+% Links
+buf = fread(fid, [32, nLinks], '*uint8')';
+buf(buf==0) = 32;
+value.BinIDLabelEachLink = cellstr(strtrim(char(buf)));
+
+
+% Network topology / properties
+value.BinIndexStartNodeEachLink       = fread(fid, nLinks, 'uint32=>double')';
+value.BinIndexEndNodeEachLink         = fread(fid, nLinks, 'uint32=>double')';
+value.BinTypeCodeEachLink             = fread(fid, nLinks, 'uint32=>double')';
+value.BinNodeIndexEachReservoirsTank  = fread(fid, nTanks, 'uint32=>double')';
+
+value.BinCrossSectionalAreaEachTank   = fread(fid, nTanks, 'single=>single')';
+value.BinElevationEachNode            = fread(fid, nNodes, 'single=>single')';
+value.BinLengthEachLink               = fread(fid, nLinks, 'single=>single')';
+value.BinDiameterEachLink             = fread(fid, nLinks, 'single=>single')';
+
+% Energy report (pumps)
+value.BinPumpIndexListLinks                 = zeros(1, nPumps, 'double');
+value.BinPumpUtilization                    = zeros(1, nPumps, 'single');
+value.BinAverageEfficiency                  = zeros(1, nPumps, 'single');
+value.BinAverageKwattsOrMillionGallons      = zeros(1, nPumps, 'single');
+value.BinAverageKwatts                      = zeros(1, nPumps, 'single');
+value.BinPeakKwatts                         = zeros(1, nPumps, 'single');
+value.BinAverageCostPerDay                  = zeros(1, nPumps, 'single');
+
+for p = 1:nPumps
+    value.BinPumpIndexListLinks(p)            = fread(fid, 1, 'uint32=>double');
+    value.BinPumpUtilization(p)               = fread(fid, 1, 'single=>single');
+    value.BinAverageEfficiency(p)             = fread(fid, 1, 'single=>single');
+    value.BinAverageKwattsOrMillionGallons(p) = fread(fid, 1, 'single=>single');
+    value.BinAverageKwatts(p)                 = fread(fid, 1, 'single=>single');
+    value.BinPeakKwatts(p)                    = fread(fid, 1, 'single=>single');
+    value.BinAverageCostPerDay(p)             = fread(fid, 1, 'single=>single');
+end
+
+value.BinOverallPeakEnergyUsage = fread(fid, 1, 'single=>single');
+
+% Reporting periods count
+value.BinNumberReportingPeriods = nPeriodsEnd;
+nPeriods = value.BinNumberReportingPeriods;
+
+% Preallocate time series arrays (single saves memory)
+value.BinNodeDemand         = zeros(nPeriods, nNodes, 'single');
+value.BinNodeHead           = zeros(nPeriods, nNodes, 'single');
+value.BinNodePressure       = zeros(nPeriods, nNodes, 'single');
+value.BinNodeQuality        = zeros(nPeriods, nNodes, 'single');
+
+value.BinLinkFlow           = zeros(nPeriods, nLinks, 'single');
+value.BinLinkVelocity       = zeros(nPeriods, nLinks, 'single');
+value.BinLinkHeadloss       = zeros(nPeriods, nLinks, 'single');
+value.BinLinkQuality        = zeros(nPeriods, nLinks, 'single');
+value.BinLinkStatus         = zeros(nPeriods, nLinks, 'single');
+value.BinLinkSetting        = zeros(nPeriods, nLinks, 'single');
+value.BinLinkReactionRate   = zeros(nPeriods, nLinks, 'single');
+value.BinLinkFrictionFactor = zeros(nPeriods, nLinks, 'single');
+
+% Read all periods in one shot (much faster)
+nNodeVars = 4;   % Demand, Head, Pressure, Quality
+nLinkVars = 8;   % Flow, Velocity, Headloss, Quality, Status, Setting, ReactionRate, FrictionFactor
+recLen    = nNodeVars*nNodes + nLinkVars*nLinks;
+
+raw = fread(fid, [recLen, nPeriods], 'single=>single');
+if numel(raw) ~= recLen*nPeriods
+    error('readEpanetBin:UnexpectedEOF', 'Binary file ended early while reading time series.');
+end
+
+k = 0;
+
+value.BinNodeDemand   = raw(k+1:k+nNodes, :)'; k = k + nNodes;
+value.BinNodeHead     = raw(k+1:k+nNodes, :)'; k = k + nNodes;
+value.BinNodePressure = raw(k+1:k+nNodes, :)'; k = k + nNodes;
+value.BinNodeQuality  = raw(k+1:k+nNodes, :)'; k = k + nNodes;
+
+value.BinLinkFlow           = raw(k+1:k+nLinks, :)'; k = k + nLinks;
+value.BinLinkVelocity       = raw(k+1:k+nLinks, :)'; k = k + nLinks;
+value.BinLinkHeadloss       = raw(k+1:k+nLinks, :)'; k = k + nLinks;
+value.BinLinkQuality        = raw(k+1:k+nLinks, :)'; k = k + nLinks;
+value.BinLinkStatus         = raw(k+1:k+nLinks, :)'; k = k + nLinks;
+value.BinLinkSetting        = raw(k+1:k+nLinks, :)'; k = k + nLinks;
+value.BinLinkReactionRate   = raw(k+1:k+nLinks, :)'; k = k + nLinks;
+value.BinLinkFrictionFactor = raw(k+1:k+nLinks, :)'; k = k + nLinks;
+
+
+% Trailer
+value.BinAverageBulkReactionRate   = fread(fid, 1, 'single=>single');
+value.BinAverageWallReactionRate   = fread(fid, 1, 'single=>single');
+value.BinAverageTankReactionRate   = fread(fid, 1, 'single=>single');
+value.BinAverageSourceInflowRate   = fread(fid, 1, 'single=>single');
+
+value.BinNumberReportingPeriods2   = fread(fid, 1, 'uint32=>double');
+value.BinWarningFlag               = fread(fid, 1, 'uint32=>double');
+value.BinMagicNumber               = fread(fid, 1, 'uint32=>double');
+
+% Keep the end-of-file values too (useful for debugging)
+value.BinWarningFlag_End = warningFlagEnd;
+value.BinMagicNumber_End = magicEnd;
+
+% Compact output (no eval)
+if compact
+    v = struct();
+
+    startT = value.BinReportingStartTimeSec;
+    stepT  = value.BinReportingTimeStepSec;
+    v.Time = startT + (0:nPeriods-1)'*stepT;
+
+    v.Pressure     = value.BinNodePressure;
+    v.Demand       = value.BinNodeDemand;
+    v.Head         = value.BinNodeHead;
+    v.NodeQuality  = value.BinNodeQuality;
+
+    v.Flow         = value.BinLinkFlow;
+    v.Velocity     = value.BinLinkVelocity;
+    v.HeadLoss     = value.BinLinkHeadloss;
+    v.Status       = value.BinLinkStatus;
+    v.Setting      = value.BinLinkSetting;
+    v.ReactionRate = value.BinLinkReactionRate;
+    v.FrictionFactor = value.BinLinkFrictionFactor;
+    v.LinkQuality  = value.BinLinkQuality;
+
+    v.EnergyReport.PumpIndexListLinks            = value.BinPumpIndexListLinks;
+    v.EnergyReport.PumpUtilization               = value.BinPumpUtilization;
+    v.EnergyReport.AverageEfficiency             = value.BinAverageEfficiency;
+    v.EnergyReport.AverageKwattsOrMillionGallons = value.BinAverageKwattsOrMillionGallons;
+    v.EnergyReport.AverageKwatts                 = value.BinAverageKwatts;
+    v.EnergyReport.PeakKwatts                    = value.BinPeakKwatts;
+    v.EnergyReport.AverageCostPerDay             = value.BinAverageCostPerDay;
+    v.EnergyReport.OverallPeakEnergyUsage        = value.BinOverallPeakEnergyUsage;
+
+    value = v;
+end
+end
+function s = localReadFixedString(fid, n)
+raw = fread(fid, n, 'uint8=>uint8')';
+if isempty(raw)
+    s = '';
+    return
+end
+z = find(raw == 0, 1);
+if ~isempty(z)
+    raw = raw(1:z-1);
+end
+s = strtrim(char(raw));
+end
+function localCleanup(fid, binfile)
+try fclose(fid); catch, end
+if ~isempty(binfile) && ischar(binfile) || isstring(binfile)
+    try
+        if exist(binfile, 'file') == 2
+            delete(binfile);
+        end
+    catch
+    end
+end
+end
+function [inpfile, rptfile, binfile] = createTempfiles(BinTempfile)
+%CREATETEMPFILES Create temp files in the OS temp folder.
+
+inpfile = BinTempfile;
+
+tmpDir = tempdir;              % OS temp folder
+uuID   = char(java.util.UUID.randomUUID);
+
+rptfile = fullfile(tmpDir, ['@#', uuID, '.txt']);
+binfile = fullfile(tmpDir, ['@#', uuID, '.bin']);
 end
 function fid = writenewTemp(Tempfile)
 fid=fopen(Tempfile, 'w');

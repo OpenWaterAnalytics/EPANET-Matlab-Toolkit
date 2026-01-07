@@ -144,6 +144,7 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |appShiftNetwor|Shifts the network in x and y directions|
 |appRotateNetwork|Rotates the network by theta degrees counter-clockwise using as pivot a specific node|
 |createProject|Creates an epanet project|
+|cleanupEpanetTempFiles|Delete all EPANET temp files|
 |deleteProject|Deletes an epanet project|
 |getError|Returns the description of an error code|
 |getAdjacencyMatrix|Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow|
