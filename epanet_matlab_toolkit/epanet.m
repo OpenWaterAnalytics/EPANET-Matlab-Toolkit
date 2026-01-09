@@ -6013,7 +6013,8 @@ classdef epanet <handle
             %   d.getNodeReservoirCount
             %
             % See also getNodeTankCount, getNodeCount.
-            value = sum(strcmp(obj.getNodeType, 'RESERVOIR'));
+            idx = obj.getNodeTypeIndex;
+            value = nnz(idx == obj.ToolkitConstants.EN_RESERVOIR);
         end
         function value = getNodeJunctionCount(obj)
             % Retrieves the number of junction nodes.
@@ -6031,8 +6032,8 @@ classdef epanet <handle
             %   d.getLinkPipeCount
             %
             % See also getLinkPumpCount, getLinkCount.
-            LinkType1=obj.getLinkType;
-            value = sum(strcmp(LinkType1, 'PIPE')+strcmp(LinkType1, 'CVPIPE'));
+            idx = obj.getLinkTypeIndex;
+            value = nnz(idx == obj.ToolkitConstants.EN_PIPE) + nnz(idx == obj.ToolkitConstants.EN_CVPIPE);
         end
         function value = getLinkPumpCount(obj)
             % Retrieves the number of pumps.
@@ -6041,7 +6042,8 @@ classdef epanet <handle
             %   d.getLinkPumpCount
             %
             % See also getLinkPipeCount, getLinkCount.
-            value = sum(strcmp(obj.getLinkType, 'PUMP'));
+            idx = obj.getLinkTypeIndex;
+            value = nnz(idx == obj.ToolkitConstants.EN_PUMP);
         end
         function value = getLinkValveCount(obj)
             % Retrieves the number of valves.
@@ -6050,9 +6052,7 @@ classdef epanet <handle
             %   d.getLinkValveCount
             %
             % See also getLinkPumpCount, getLinkCount.
-            LinkType1=obj.getLinkType;
-            pipepump = sum(strcmp(LinkType1, 'PIPE')+strcmp(LinkType1, 'CVPIPE')+strcmp(LinkType1, 'PUMP'));
-            value = obj.getLinkCount - pipepump;
+            value = obj.getLinkCount - obj.getLinkPumpCount - obj.getLinkPipeCount;
         end
         function values = getLinkValveCurveGPV(obj, varargin)
             % Retrieves the valve curve for a specified General Purpose Valve (GPV).
@@ -10568,7 +10568,7 @@ classdef epanet <handle
             obj.closeHydraulicAnalysis;
         end
         function value = getComputedHydraulicTimeSeries(obj, varargin)
-            % Computes hydraulic simulation and retrieves all time-series.
+            % Computes hydraulic simulation and retrieves time-series.
             %
             % Data that is computed:
             %   1) Time              8)  Velocity
@@ -10577,7 +10577,7 @@ classdef epanet <handle
             %   4) DemandDeficit     11) Setting
             %   5) Head              12) Energy
             %   6) TankVolume        13) Efficiency
-            %   7) Flow
+            %   7) Flow              14) State
             %
             % Example 1:
             %   d.getComputedHydraulicTimeSeries          % Retrieves all the time-series data
@@ -10594,140 +10594,177 @@ classdef epanet <handle
             %   velocity = data.Velocity;
             %
             % See also getComputedQualityTimeSeries, getComputedTimeSeries.
-            obj.openHydraulicAnalysis;
+
+            [obj.Errcode] = obj.apiENopenH(obj.LibEPANET, obj.ph);
             obj.solve = 1;
-            obj.initializeHydraulicAnalysis
-            totalsteps=obj.getTimeSimulationDuration/obj.getTimeHydraulicStep;
-            initnodematrix = zeros(totalsteps, obj.getNodeCount);
-            initlinkmatrix = zeros(totalsteps, obj.getLinkCount);
-            if size(varargin, 2)==0
-                varargin = {'time', 'pressure', 'demand', 'demanddeficit', 'head', 'tankvolume', 'flow', 'velocity', 'headloss', 'status', 'setting', 'energy', 'efficiency', 'state'};
-                %if ~sum(strcmpi(fields(obj.ToolkitConstants), 'EN_EFFICIENCY'))
-                %    varargin{end} = {''};
-                %end
-            else
-                for i = 1:length(varargin)
-                    if isnumeric(varargin{i})
-                        sensingnodes = i;
-                    end
+            obj.initializeHydraulicAnalysis;
+            obj.apiENinitH(obj.ToolkitConstants.EN_SAVE, obj.LibEPANET, obj.ph);
+
+            [~, dur] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_DURATION, obj.LibEPANET, obj.ph);
+            [~, hstep] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HYDSTEP, obj.LibEPANET, obj.ph);
+        
+            % Ensure at least 1 step, and include the initial time point.
+            totalsteps = max(1, floor(dur / hstep) + 1);
+        
+            [~, nNodes] = obj.apiENgetcount(obj.ToolkitConstants.EN_NODECOUNT, obj.LibEPANET, obj.ph);
+            [~, nLinks] = obj.apiENgetcount(obj.ToolkitConstants.EN_LINKCOUNT, obj.LibEPANET, obj.ph);
+        
+            initNode = zeros(totalsteps, nNodes);
+            initLink = zeros(totalsteps, nLinks);
+        
+            % Defaults
+            if isempty(varargin)
+                varargin = {'time','pressure','demand','demanddeficit','head','tankvolume', ...
+                            'flow','velocity','headloss','status','setting','energy', ...
+                            'efficiency','state','demandSensingNodes'};
+            end
+        
+            % Normalize request names once
+            req = varargin;
+            sensingNodes = [];
+            for i = 1:numel(req)
+                if isnumeric(req{i})
+                    sensingNodes = req{i};
+                    req{i} = ''; % ignore numeric entry in name matching
+                elseif isstring(req{i})
+                    req{i} = char(req{i});
                 end
             end
-            if find(strcmpi(varargin, 'time'))
-                value.Time = zeros(totalsteps, 1);
+            req = req;
+        
+            has = @(name) any(strcmpi(req, name));
+        
+            wantTime      = has('time');
+            wantPressure  = has('pressure');
+            wantDemand    = has('demand');
+            wantDeficit   = (obj.getVersion > 20101) && has('demanddeficit');
+            wantHead      = has('head');
+            wantTankVol   = has('tankvolume');
+            wantFlow      = has('flow');
+            wantVelocity  = has('velocity');
+            wantHeadLoss  = has('headloss');
+            wantStatus    = has('status');
+            wantSetting   = has('setting');
+            wantEnergy    = has('energy');
+            wantEff       = (obj.getVersion > 20101) && has('efficiency');
+            wantState     = (obj.getVersion > 20101) && has('state');
+            wantSenseDem  = has('demandsensingnodes') && ~isempty(sensingNodes);
+        
+            % Preallocate only what you request
+            if wantTime,     value.Time     = zeros(totalsteps, 1); end
+            if wantPressure, value.Pressure = initNode; end
+            if wantDemand,   value.Demand   = initNode; end
+            if wantDeficit,  value.DemandDeficit = initNode; end
+            if wantHead,     value.Head     = initNode; end
+            if wantTankVol,  value.TankVolume = initNode; end
+        
+            if wantFlow,     value.Flow     = initLink; end
+            if wantVelocity, value.Velocity = initLink; end
+            if wantHeadLoss, value.HeadLoss = initLink; end
+            if wantStatus
+                value.Status    = initLink;
+                value.StatusStr = strings(totalsteps, nLinks);
             end
-            if find(strcmpi(varargin, 'pressure'))
-                value.Pressure = initnodematrix;
+            if wantSetting,  value.Setting  = initLink; end
+            if wantEnergy,   value.Energy   = initLink; end
+        
+            if wantEff,      value.Efficiency = initLink; end
+            if wantState
+                value.State    = zeros(totalsteps, obj.getLinkPumpCount);
+                value.StateStr = strings(totalsteps, obj.getLinkPumpCount);
             end
-            if find(strcmpi(varargin, 'demand'))
-                value.Demand = initnodematrix;
+        
+            if wantSenseDem
+                value.DemandSensingNodes = zeros(totalsteps, numel(sensingNodes));
+                value.SensingNodesIndices = sensingNodes;
             end
-            if obj.getVersion > 20101
-                if find(strcmpi(varargin, 'demanddeficit'))
-                    value.DemandDeficit = initnodematrix;
+        
+            % Counts used for padding
+            idx = obj.getLinkTypeIndex;
+            pipecount = nnz(idx == obj.ToolkitConstants.EN_PIPE) + nnz(idx == obj.ToolkitConstants.EN_CVPIPE);
+            pumpcount = nnz(idx == obj.ToolkitConstants.EN_PIPE);
+            valvecount    = nLinks - pumpcount - pipecount;
+            [~, tankrescount] = obj.apiENgetcount(obj.ToolkitConstants.EN_TANKCOUNT, obj.LibEPANET, obj.ph);
+
+            junctioncount = Nnodes - tankrescount;
+            rescount      = obj.getNodeReservoirCount;
+            k = 1;
+            tstep = 1;
+        
+            while tstep > 0 && k <= totalsteps
+                [~, t] = obj.apiENrunH(obj.LibEPANET, obj.ph);
+                t = double(t);
+
+                if wantTime
+                    value.Time(k, 1) = t;
                 end
-            end
-            if find(strcmpi(varargin, 'demandSensingNodes'))
-                value.DemandSensingNodes = zeros(totalsteps, length(varargin{sensingnodes}));
-                value.SensingNodesIndices = varargin{sensingnodes};
-            end
-            if find(strcmpi(varargin, 'head'))
-                value.Head = initnodematrix;
-            end
-            if find(strcmpi(varargin, 'tankvolume'))
-                value.TankVolume = initnodematrix;
-            end
-            if find(strcmpi(varargin, 'flow'))
-                value.Flow = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'velocity'))
-                value.Velocity = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'headloss'))
-                value.HeadLoss = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'status'))
-                value.Status = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'setting'))
-                value.Setting = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'energy'))
-                value.Energy = initlinkmatrix;
-            end
-            if obj.getVersion > 20101
-                if find(strcmpi(varargin, 'efficiency'))
-                    value.Efficiency = initlinkmatrix;
-                end
-            end
-            if find(strcmpi(varargin, 'state'))
-                value.State = zeros(totalsteps, obj.getLinkPumpCount);
-            end
-            clear initlinkmatrix initnodematrix;
-            k = 1;tstep = 1;
-            pipecount = obj.getLinkPipeCount;
-            valvecount = obj.getLinkValveCount;
-            junctioncount = obj.getNodeJunctionCount;
-            rescount = obj.getNodeReservoirCount;
-            
-            while (tstep>0)
-                t = obj.runHydraulicAnalysis;
-                if find(strcmpi(varargin, 'time'))
-                    value.Time(k, :) = t;
-                end
-                if find(strcmpi(varargin, 'pressure'))
+                if wantPressure
                     value.Pressure(k, :) = obj.getNodePressure;
+                    [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'demand'))
+                if wantDemand
                     value.Demand(k, :) = obj.getNodeActualDemand;
                 end
-                if obj.getVersion > 20101
-                    if find(strcmpi(varargin, 'demanddeficit'))
-                        value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
-                    end
+                if wantDeficit
+                    value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
                 end
-                if find(strcmpi(varargin, 'demandSensingNodes'))
-                    value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
+                if wantSenseDem
+                    value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(sensingNodes);
                 end
-                if find(strcmpi(varargin, 'head'))
+                if wantHead
                     value.Head(k, :) = obj.getNodeHydraulicHead;
                 end
-                if find(strcmpi(varargin, 'tankvolume'))
-                    value.TankVolume(k, :) = [zeros(1, junctioncount+rescount) obj.getNodeTankVolume];
+                if wantTankVol
+                    value.TankVolume(k, :) = [zeros(1, junctioncount + rescount), obj.getNodeTankVolume];
                 end
-                if find(strcmpi(varargin, 'flow'))
+        
+                if wantFlow
                     value.Flow(k, :) = obj.getLinkFlows;
                 end
-                if find(strcmpi(varargin, 'velocity'))
+                if wantVelocity
                     value.Velocity(k, :) = obj.getLinkVelocity;
                 end
-                if find(strcmpi(varargin, 'headloss'))
+                if wantHeadLoss
                     value.HeadLoss(k, :) = obj.getLinkHeadloss;
                 end
-                if find(strcmpi(varargin, 'status'))
-                    value.Status(k, :) = obj.getLinkStatus;
-                    value.StatusStr(k, :) = obj.TYPESTATUS(value.Status(k, :) + 1);
+                if wantStatus
+                    st = obj.getLinkStatus;
+                    value.Status(k, :) = st;
+                    value.StatusStr(k, :) = obj.TYPESTATUS(st + 1);
                 end
-                if find(strcmpi(varargin, 'setting'))
+                if wantSetting
                     value.Setting(k, :) = obj.getLinkSettings;
                 end
-                if find(strcmpi(varargin, 'energy'))
+                if wantEnergy
                     value.Energy(k, :) = obj.getLinkEnergy;
                 end
-                if obj.getVersion > 20101
-                    if find(strcmpi(varargin, 'efficiency'))
-                        value.Efficiency(k, :) = [zeros(1, pipecount) obj.getLinkPumpEfficiency zeros(1, valvecount)];
-                    end
+        
+                if wantEff
+                    value.Efficiency(k, :) = [zeros(1, pipecount), obj.getLinkPumpEfficiency, zeros(1, valvecount)];
                 end
-                if obj.getVersion > 20101
-                    if find(strcmpi(varargin, 'state'))
-                        value.State(k, :) = obj.getLinkPumpState;
-                        value.StateStr(k, :) = obj.TYPEPUMPSTATE(value.State(k, :) + 1);
-                    end
+                if wantState
+                    ps = obj.getLinkPumpState;
+                    value.State(k, :) = ps;
+                    value.StateStr(k, :) = obj.TYPEPUMPSTATE(ps + 1);
                 end
+        
                 tstep = obj.nextHydraulicAnalysisStep;
-                k = k+1;
+                k = k + 1;
             end
+        
             obj.closeHydraulicAnalysis;
+        
+            % Trim to actual number of computed steps
+            kLast = k - 1;
+            f = fieldnames(value);
+            for i = 1:numel(f)
+                A = value.(f{i});
+                if isnumeric(A) || isstring(A)
+                    if size(A, 1) == totalsteps
+                        value.(f{i}) = A(1:kLast, :);
+                    end
+                end
+            end
         end
         function value = getComputedQualityTimeSeries(obj, varargin)
             % Computes Quality simulation and retrieves all or some time-series.
