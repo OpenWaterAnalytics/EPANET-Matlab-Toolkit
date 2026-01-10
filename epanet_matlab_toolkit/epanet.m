@@ -10682,11 +10682,11 @@ classdef epanet <handle
             % Counts used for padding
             idx = obj.getLinkTypeIndex;
             pipecount = nnz(idx == obj.ToolkitConstants.EN_PIPE) + nnz(idx == obj.ToolkitConstants.EN_CVPIPE);
-            pumpcount = nnz(idx == obj.ToolkitConstants.EN_PIPE);
+            pumpcount = nnz(idx == obj.ToolkitConstants.EN_PUMP);
             valvecount    = nLinks - pumpcount - pipecount;
             [~, tankrescount] = obj.apiENgetcount(obj.ToolkitConstants.EN_TANKCOUNT, obj.LibEPANET, obj.ph);
 
-            junctioncount = Nnodes - tankrescount;
+            junctioncount = nNodes - tankrescount;
             rescount      = obj.getNodeReservoirCount;
             k = 1;
             tstep = 1;
@@ -10699,11 +10699,10 @@ classdef epanet <handle
                     value.Time(k, 1) = t;
                 end
                 if wantPressure
-                    value.Pressure(k, :) = obj.getNodePressure;
-                    [obj.Errcode, value] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET, obj.ph);
+                    [~, value.Pressure(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET, obj.ph);
                 end
                 if wantDemand
-                    value.Demand(k, :) = obj.getNodeActualDemand;
+                    [~, value.Demand(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);
                 end
                 if wantDeficit
                     value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
