@@ -10509,9 +10509,6 @@ classdef epanet <handle
                         value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
                     end
                 end
-                if find(strcmpi(varargin, 'demandSensingNodes'))
-                    value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
-                end
                 if find(strcmpi(varargin, 'head'))
                     value.Head(k, :) = obj.getNodeHydraulicHead;
                 end
@@ -10616,7 +10613,7 @@ classdef epanet <handle
             if isempty(varargin)
                 varargin = {'time','pressure','demand','demanddeficit','head','tankvolume', ...
                             'flow','velocity','headloss','status','setting','energy', ...
-                            'efficiency','state','demandSensingNodes'};
+                            'efficiency','state'};
             end
         
             % Normalize request names once
@@ -10648,7 +10645,6 @@ classdef epanet <handle
             wantEnergy    = has('energy');
             wantEff       = (obj.getVersion > 20101) && has('efficiency');
             wantState     = (obj.getVersion > 20101) && has('state');
-            wantSenseDem  = has('demandsensingnodes') && ~isempty(sensingNodes);
         
             % Preallocate only what you request
             if wantTime,     value.Time     = zeros(totalsteps, 1); end
@@ -10674,15 +10670,12 @@ classdef epanet <handle
                 value.StateStr = strings(totalsteps, obj.getLinkPumpCount);
             end
         
-            if wantSenseDem
-                value.DemandSensingNodes = zeros(totalsteps, numel(sensingNodes));
-                value.SensingNodesIndices = sensingNodes;
-            end
-        
             % Counts used for padding
             idx = obj.getLinkTypeIndex;
             pipecount = nnz(idx == obj.ToolkitConstants.EN_PIPE) + nnz(idx == obj.ToolkitConstants.EN_CVPIPE);
-            pumpcount = nnz(idx == obj.ToolkitConstants.EN_PUMP);
+            find_pumps = idx == obj.ToolkitConstants.EN_PUMP;
+            pumpcount = nnz(find_pumps);
+            pumpindices = find_pumps;
             valvecount    = nLinks - pumpcount - pipecount;
             [~, tankrescount] = obj.apiENgetcount(obj.ToolkitConstants.EN_TANKCOUNT, obj.LibEPANET, obj.ph);
 
@@ -10693,7 +10686,6 @@ classdef epanet <handle
         
             while tstep > 0 && k <= totalsteps
                 [~, t] = obj.apiENrunH(obj.LibEPANET, obj.ph);
-                t = double(t);
 
                 if wantTime
                     value.Time(k, 1) = t;
@@ -10705,53 +10697,53 @@ classdef epanet <handle
                     [~, value.Demand(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);
                 end
                 if wantDeficit
-                    value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
-                end
-                if wantSenseDem
-                    value.DemandSensingNodes(k, :) = obj.getNodeActualDemandSensingNodes(sensingNodes);
+                    [~, value.DemandDeficit(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMANDDEFICIT, obj.LibEPANET, obj.ph);
+
                 end
                 if wantHead
-                    value.Head(k, :) = obj.getNodeHydraulicHead;
+                    [~, value.Head(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_HEAD, obj.LibEPANET, obj.ph);
                 end
                 if wantTankVol
                     value.TankVolume(k, :) = [zeros(1, junctioncount + rescount), obj.getNodeTankVolume];
                 end
         
                 if wantFlow
-                    value.Flow(k, :) = obj.getLinkFlows;
+                    [~, value.Flow(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_FLOW, obj.LibEPANET, obj.ph);
                 end
                 if wantVelocity
-                    value.Velocity(k, :) = obj.getLinkVelocity;
+                    [~, value.Velocity(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET, obj.ph);
                 end
                 if wantHeadLoss
-                    value.HeadLoss(k, :) = obj.getLinkHeadloss;
+                    [~, value.HeadLoss(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET, obj.ph);
                 end
                 if wantStatus
-                    st = obj.getLinkStatus;
+                    [~, st] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_STATUS, obj.LibEPANET, obj.ph);
                     value.Status(k, :) = st;
                     value.StatusStr(k, :) = obj.TYPESTATUS(st + 1);
                 end
                 if wantSetting
-                    value.Setting(k, :) = obj.getLinkSettings;
+                    [~, value.Setting(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_SETTING, obj.LibEPANET, obj.ph);
                 end
                 if wantEnergy
-                    value.Energy(k, :) = obj.getLinkEnergy;
+                    [~, value.Energy(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
                 end
         
                 if wantEff
-                    value.Efficiency(k, :) = [zeros(1, pipecount), obj.getLinkPumpEfficiency, zeros(1, valvecount)];
+                    [~, p_eff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_EFFIC, obj.LibEPANET, obj.ph);
+                    value.Efficiency(k, :) = [zeros(1, pipecount), p_eff(pumpindices), zeros(1, valvecount)];
                 end
                 if wantState
-                    ps = obj.getLinkPumpState;
+                    [~, ps] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_STATE, obj.LibEPANET, obj.ph);
+                    ps = ps(pumpindices);
                     value.State(k, :) = ps;
                     value.StateStr(k, :) = obj.TYPEPUMPSTATE(ps + 1);
                 end
         
-                tstep = obj.nextHydraulicAnalysisStep;
+                [~, ] = obj.apiENnextH(obj.LibEPANET, obj.ph);          
                 k = k + 1;
             end
         
-            obj.closeHydraulicAnalysis;
+            [obj.Errcode] = obj.apiENcloseH(obj.LibEPANET, obj.ph);
         
             % Trim to actual number of computed steps
             kLast = k - 1;
