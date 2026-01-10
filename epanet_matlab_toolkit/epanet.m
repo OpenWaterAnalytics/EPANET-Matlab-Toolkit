@@ -5791,62 +5791,98 @@ classdef epanet <handle
             json_txt = jsonencode(values);
         end
         function value = readEpanetBinaryFile(~, binfile, varargin)
-            fid = fopen(binfile, 'r');
+            fid = fopen(binfile, 'rb');
+            if fid == -1
+                error('Cannot open file: %s', binfile);
+            end
+        
+            c = onCleanup(@() fclose(fid));
+        
             value = struct();
             v = struct();
-            if fid~=-1
-                data = fread(fid, 'int32');
-                v.BinNumberReportingPeriods = data(end-2);
-                clear data;
-                % Beginning of file
-                fseek(fid, 0, 'bof');
-                fread(fid, 1, 'uint32');
-                fread(fid, 1, 'uint32');
-                v.BinNumberNodes=fread(fid, 1, 'uint32');
-                v.BinNumberReservoirsTanks=fread(fid, 1, 'uint32');
-                v.BinNumberLinks=fread(fid, 1, 'uint32');
-                v.BinNumberPumps=fread(fid, 1, 'uint32');
-                v.BinNumberValves=fread(fid, 1, 'uint32');
-                fread(fid, 8, 'uint32');
-                fread(fid, 80*3, '*char');
-                fread(fid, 260*2, '*char');
-                fread(fid, 16, '*char');
-                fread(fid, 32, '*char');
-                fread(fid, 4, 'uint32');
-                fread(fid, 32*v.BinNumberNodes, '*char');
-                fread(fid, 32*v.BinNumberLinks, '*char');
-                fread(fid, v.BinNumberLinks*3, 'uint32');
-                fread(fid, v.BinNumberReservoirsTanks, 'uint32'); 
-                fread(fid, v.BinNumberReservoirsTanks, 'float');
-                fread(fid, v.BinNumberNodes, 'float');
-                fread(fid, v.BinNumberLinks*2, 'float');
-                
-                for p=1:v.BinNumberPumps
-                    fread(fid, 7, 'float');
-                end
-                
-                fread(fid, 1, 'float');
-                
-                for i=1:v.BinNumberReportingPeriods
-                    value.Demand(i, :)         = fread(fid, v.BinNumberNodes, 'float')';
-                    value.Head(i, :)           = fread(fid, v.BinNumberNodes, 'float')';
-                    value.Pressure(i, :)       = fread(fid, v.BinNumberNodes, 'float')';
-                    value.NodeQuality(i, :)    = fread(fid, v.BinNumberNodes, 'float')';
-                    value.Flow(i, :)           = fread(fid, v.BinNumberLinks, 'float')';
-                    value.Velocity(i, :)       = fread(fid, v.BinNumberLinks, 'float')';
-                    value.HeadLoss(i, :)       = fread(fid, v.BinNumberLinks, 'float')';
-                    value.LinkQuality(i, :)    = fread(fid, v.BinNumberLinks, 'float')';
-                    value.Status(i, :)         = fread(fid, v.BinNumberLinks, 'float')';
-                    value.Setting(i, :)        = fread(fid, v.BinNumberLinks, 'float')';
-                    value.ReactionRate(i, :)   = fread(fid, v.BinNumberLinks, 'float')';
-                    value.FrictionFactor(i, :) = fread(fid, v.BinNumberLinks, 'float')';
-                end
+        
+            % Read number of reporting periods (stored near end of file)
+            fseek(fid, -12, 'eof'); % 3 * int32 = 12 bytes
+            tail = fread(fid, 3, 'int32=>int32');
+            v.BinNumberReportingPeriods = tail(1);
+        
+            % Beginning of file
+            fseek(fid, 0, 'bof');
+            fread(fid, 2, 'uint32=>uint32'); % skip
+        
+            v.BinNumberNodes          = fread(fid, 1, 'uint32=>uint32');
+            v.BinNumberReservoirsTanks = fread(fid, 1, 'uint32=>uint32');
+            v.BinNumberLinks          = fread(fid, 1, 'uint32=>uint32');
+            v.BinNumberPumps          = fread(fid, 1, 'uint32=>uint32');
+            v.BinNumberValves         = fread(fid, 1, 'uint32=>uint32');
+        
+            % Skip fixed-size blocks
+            fread(fid, 8, 'uint32=>uint32');
+            fread(fid, 80*3, '*char');
+            fread(fid, 260*2, '*char');
+            fread(fid, 16, '*char');
+            fread(fid, 32, '*char');
+            fread(fid, 4, 'uint32=>uint32');
+        
+            % Skip ID/name sections and other headers
+            fread(fid, 32*double(v.BinNumberNodes), '*char');
+            fread(fid, 32*double(v.BinNumberLinks), '*char');
+            fread(fid, double(v.BinNumberLinks)*3, 'uint32=>uint32');
+            fread(fid, double(v.BinNumberReservoirsTanks), 'uint32=>uint32');
+        
+            % Skip numeric blocks
+            fread(fid, double(v.BinNumberReservoirsTanks), 'single=>single');
+            fread(fid, double(v.BinNumberNodes), 'single=>single');
+            fread(fid, double(v.BinNumberLinks)*2, 'single=>single');
+        
+            % Skip pump curves (7 floats each)
+            if v.BinNumberPumps > 0
+                fread(fid, double(v.BinNumberPumps)*7, 'single=>single');
             end
-            warning('off'); 
-            try fclose('all'); catch, end
-%             try delete(binfile); catch, end
-%             try delete(rptfile); catch, end
-            warning('on');
+        
+            % Skip one float
+            fread(fid, 1, 'single=>single');
+        
+            % Preallocate outputs (store as single for speed + memory)
+            nP = double(v.BinNumberReportingPeriods);
+            nN = double(v.BinNumberNodes);
+            nL = double(v.BinNumberLinks);
+        
+            value.Demand         = zeros(nP, nN, 'single');
+            value.Head           = zeros(nP, nN, 'single');
+            value.Pressure       = zeros(nP, nN, 'single');
+            value.NodeQuality    = zeros(nP, nN, 'single');
+        
+            value.Flow           = zeros(nP, nL, 'single');
+            value.Velocity       = zeros(nP, nL, 'single');
+            value.HeadLoss       = zeros(nP, nL, 'single');
+            value.LinkQuality    = zeros(nP, nL, 'single');
+            value.Status         = zeros(nP, nL, 'single');
+            value.Setting        = zeros(nP, nL, 'single');
+            value.ReactionRate   = zeros(nP, nL, 'single');
+            value.FrictionFactor = zeros(nP, nL, 'single');
+        
+            % Fast block read per period (avoid 12 separate fread calls)
+            nPerPeriod = 4*nN + 8*nL;
+        
+            for i = 1:nP
+                block = fread(fid, nPerPeriod, 'single=>single');
+        
+                idx = 0;
+                value.Demand(i, :)       = block(idx+1:idx+nN).'; idx = idx + nN;
+                value.Head(i, :)         = block(idx+1:idx+nN).'; idx = idx + nN;
+                value.Pressure(i, :)     = block(idx+1:idx+nN).'; idx = idx + nN;
+                value.NodeQuality(i, :)  = block(idx+1:idx+nN).'; idx = idx + nN;
+        
+                value.Flow(i, :)         = block(idx+1:idx+nL).'; idx = idx + nL;
+                value.Velocity(i, :)     = block(idx+1:idx+nL).'; idx = idx + nL;
+                value.HeadLoss(i, :)     = block(idx+1:idx+nL).'; idx = idx + nL;
+                value.LinkQuality(i, :)  = block(idx+1:idx+nL).'; idx = idx + nL;
+                value.Status(i, :)       = block(idx+1:idx+nL).'; idx = idx + nL;
+                value.Setting(i, :)      = block(idx+1:idx+nL).'; idx = idx + nL;
+                value.ReactionRate(i, :) = block(idx+1:idx+nL).'; idx = idx + nL;
+                value.FrictionFactor(i,:)= block(idx+1:idx+nL).';
+            end
         end
         function toJsonFile(obj, values, varargin)
             % Creates a .json file and adds the input values in json format.
@@ -10372,7 +10408,7 @@ classdef epanet <handle
             end
         end
         function value = getComputedAnalysisTimeSeries(obj, varargin)
-            % Computes hydraulic and quality analysis and retrieves all time-series.
+                        % Computes hydraulic and quality analysis and retrieves all time-series.
             %
             % Data that is computed:
             %   1) Time              8)  Velocity
@@ -10389,9 +10425,9 @@ classdef epanet <handle
             %   d.getComputedAnalysisTimeSeries          % Retrieves all the time-series data
             %
             % Example 2:
-            %   d.getComputedAnalysisTimeSeries.Demand          % Retrieves all the time-series demands
-            %   d.getComputedAnalysisTimeSeries.Flow            % Retrieves all the time-series flows
-            %   d.getComputedAnalysisTimeSeries.NodeQuality     % Retrieves all the time-series quality
+            %   d.getComputedAnalysisTimeSeries('Demand')          % Retrieves all the time-series demands
+            %   d.getComputedAnalysisTimeSeries('Flow')            % Retrieves all the time-series flows
+            %   d.getComputedAnalysisTimeSeries('NodeQuality')     % Retrieves all the time-series quality
             %
             % Example 3:
             %   data = d.getComputedAnalysisTimeSeries('Time', ...
@@ -10401,168 +10437,192 @@ classdef epanet <handle
             %   quality = data.NodeQuality;
             %
             % See also getComputedQualityTimeSeries, getComputedTimeSeries.
-            obj.openHydraulicAnalysis;
+        
+            [obj.Errcode] = obj.apiENopenH(obj.LibEPANET, obj.ph);
             obj.solve = 1;
-            obj.initializeHydraulicAnalysis(0);
-            obj.openQualityAnalysis;
-            obj.initializeQualityAnalysis(obj.ToolkitConstants.EN_NOSAVE);
-            sim_duration = obj.getTimeSimulationDuration;
-            totalsteps = sim_duration/obj.getTimeHydraulicStep;
-            initnodematrix = zeros(totalsteps, obj.getNodeCount);
-            initlinkmatrix = zeros(totalsteps, obj.getLinkCount);
-            if size(varargin, 2)==0
-                varargin = {'time', 'pressure', 'demand', 'demanddeficit', 'head', 'tankvolume', 'flow', 'velocity', 'headloss', 'status', 'setting', 'energy', 'efficiency', 'state', 'nodequality', 'linkquality', 'massflowrate'};
-                %if ~sum(strcmpi(fields(obj.ToolkitConstants), 'EN_EFFICIENCY'))
-                %    varargin{end} = {''};
-                %end
+            obj.apiENinitH(obj.ToolkitConstants.EN_SAVE, obj.LibEPANET, obj.ph);
+        
+            obj.apiENopenQ(obj.LibEPANET, obj.ph);
+            obj.apiENinitQ(obj.ToolkitConstants.EN_NOSAVE, obj.LibEPANET, obj.ph);
+        
+            [~, sim_duration] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_DURATION, obj.LibEPANET, obj.ph);
+            [~, hstep]        = obj.apiENgettimeparam(obj.ToolkitConstants.EN_HYDSTEP,  obj.LibEPANET, obj.ph);
+        
+            % Ensure at least 1 step, and include the initial time point.
+            totalsteps = max(1, floor(sim_duration / hstep) + 1);
+        
+            [~, nNodes] = obj.apiENgetcount(obj.ToolkitConstants.EN_NODECOUNT, obj.LibEPANET, obj.ph);
+            [~, nLinks] = obj.apiENgetcount(obj.ToolkitConstants.EN_LINKCOUNT, obj.LibEPANET, obj.ph);
+        
+            initNode = zeros(totalsteps, nNodes);
+            initLink = zeros(totalsteps, nLinks);
+        
+            idx = obj.getLinkTypeIndex;
+            pipecount = nnz(idx == obj.ToolkitConstants.EN_PIPE) + nnz(idx == obj.ToolkitConstants.EN_CVPIPE);
+            find_pumps = idx == obj.ToolkitConstants.EN_PUMP;
+            pumpcount = nnz(find_pumps);
+            pumpindices = find_pumps;
+            valvecount    = nLinks - pumpcount - pipecount;        
+            [~, tankrescount] = obj.apiENgetcount(obj.ToolkitConstants.EN_TANKCOUNT, obj.LibEPANET, obj.ph);
+            junctioncount = nNodes - tankrescount;
+            rescount      = obj.getNodeReservoirCount;
+        
+            isNew = (obj.getVersion > 20101);
+        
+            % Defaults
+            if isempty(varargin)
+                varargin = {'time','pressure','demand','demanddeficit','head','tankvolume', ...
+                            'flow','velocity','headloss','status','setting','energy', ...
+                            'efficiency','state','nodequality','linkquality','massflowrate'};
             else
-                for i = 1:length(varargin)
-                    if isnumeric(varargin{i})
-                        sensingnodes = i;
+                for i = 1:numel(varargin)
+                    if isstring(varargin{i})
+                        varargin{i} = char(varargin{i});
                     end
                 end
             end
-            if find(strcmpi(varargin, 'time'))
-                value.Time = zeros(totalsteps, 1);
+        
+            has = @(name) any(strcmpi(varargin, name));
+        
+            wantTime     = has('time');
+            wantPressure = has('pressure');
+            wantDemand   = has('demand');
+            wantDeficit  = isNew && has('demanddeficit');
+            wantHead     = has('head');
+            wantTankVol  = has('tankvolume');
+        
+            wantFlow     = has('flow');
+            wantVelocity = has('velocity');
+            wantHeadLoss = has('headloss');
+            wantStatus   = has('status');
+            wantSetting  = has('setting');
+            wantEnergy   = has('energy');
+            wantEff      = isNew && has('efficiency');
+            wantState    = isNew && has('state');
+        
+            wantNQ       = has('nodequality');
+            wantLQ       = has('linkquality');
+            wantMFR      = has('massflowrate');
+        
+            % Preallocate only what you request
+            if wantTime,     value.Time     = zeros(totalsteps, 1); end
+            if wantPressure, value.Pressure = initNode; end
+            if wantDemand,   value.Demand   = initNode; end
+            if wantDeficit,  value.DemandDeficit = initNode; end
+            if wantHead,     value.Head     = initNode; end
+            if wantTankVol,  value.TankVolume = initNode; end
+        
+            if wantFlow,     value.Flow     = initLink; end
+            if wantVelocity, value.Velocity = initLink; end
+            if wantHeadLoss, value.HeadLoss = initLink; end
+        
+            if wantStatus
+                value.Status    = initLink;
+                value.StatusStr = strings(totalsteps, nLinks);
             end
-            if find(strcmpi(varargin, 'pressure'))
-                value.Pressure = initnodematrix;
+            if wantSetting,  value.Setting  = initLink; end
+            if wantEnergy,   value.Energy   = initLink; end
+            if wantEff,      value.Efficiency = initLink; end
+        
+            if wantState
+                value.State    = zeros(totalsteps, pumpcount);
+                value.StateStr = strings(totalsteps, pumpcount);
             end
-            if find(strcmpi(varargin, 'demand'))
-                value.Demand = initnodematrix;
-            end
-            if obj.getVersion > 20101
-                if find(strcmpi(varargin, 'demanddeficit'))
-                    value.DemandDeficit = initnodematrix;
+        
+            if wantNQ,  value.NodeQuality  = initNode; end
+            if wantLQ,  value.LinkQuality  = initLink; end
+            if wantMFR, value.MassFlowRate = initNode; end
+        
+            clear initNode initLink
+        
+            k = 1;
+            tstep = 1;
+            tleftQ = 1;
+        
+            while tstep > 0 && k <= totalsteps
+                [~, t]  = obj.apiENrunH(obj.LibEPANET, obj.ph);
+                obj.apiENrunQ(obj.LibEPANET, obj.ph); %#ok<NASGU>
+        
+                if wantTime
+                    value.Time(k, 1) = t;
                 end
-            end
-            if find(strcmpi(varargin, 'demandSensingNodes'))
-                value.DemandSensingNodes = zeros(totalsteps, length(varargin{sensingnodes}));
-                value.SensingNodesIndices = varargin{sensingnodes};
-            end
-            if find(strcmpi(varargin, 'head'))
-                value.Head = initnodematrix;
-            end
-            if find(strcmpi(varargin, 'tankvolume'))
-                value.TankVolume = initnodematrix;
-            end
-            if find(strcmpi(varargin, 'flow'))
-                value.Flow = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'velocity'))
-                value.Velocity = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'headloss'))
-                value.HeadLoss = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'status'))
-                value.Status = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'setting'))
-                value.Setting = initlinkmatrix;
-            end
-            if find(strcmpi(varargin, 'energy'))
-                value.Energy = initlinkmatrix;
-            end
-            if obj.getVersion > 20101
-                if find(strcmpi(varargin, 'efficiency'))
-                    value.Efficiency = initlinkmatrix;
+        
+                if wantPressure
+                    [~, value.Pressure(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_PRESSURE, obj.LibEPANET, obj.ph);
                 end
-            end
-            if find(strcmpi(varargin, 'state'))
-                value.State = zeros(totalsteps, obj.getLinkPumpCount);
-            end
-            if find(strcmpi(varargin, 'nodequality'))
-                value.NodeQuality=initnodematrix;
-            end
-            if find(strcmpi(varargin, 'linkquality'))
-                value.LinkQuality=zeros(totalsteps, obj.getLinkCount);
-            end
-            if find(strcmpi(varargin, 'qualitySensingNodes'))
-                value.QualitySensingNodes=zeros(totalsteps, length(varargin{sensingnodes}));
-                value.SensingNodesIndices=varargin{sensingnodes};
-            end
-            if find(strcmpi(varargin, 'massflowrate'))
-                value.MassFlowRate=initnodematrix;
-            end
-            clear initlinkmatrix initnodematrix;
-            k = 1;tstep = 1;
-            pipecount = obj.getLinkPipeCount;
-            valvecount = obj.getLinkValveCount;
-            junctioncount = obj.getNodeJunctionCount;
-            rescount = obj.getNodeReservoirCount;
-            while (tstep>0)||(t<sim_duration)
-                t = obj.runHydraulicAnalysis;
-                qt = obj.runQualityAnalysis;
+                if wantDemand
+                    [~, value.Demand(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMAND, obj.LibEPANET, obj.ph);
+                end
+                if wantDeficit
+                    [~, value.DemandDeficit(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMANDDEFICIT, obj.LibEPANET, obj.ph);
 
-                if find(strcmpi(varargin, 'time'))
-                    value.Time(k, :) = t;
                 end
-                if find(strcmpi(varargin, 'pressure'))
-                    value.Pressure(k, :) = obj.getNodePressure;
+                if wantHead
+                    [~, value.Head(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_HEAD, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'demand'))
-                    value.Demand(k, :) = obj.getNodeActualDemand;
+                if wantTankVol
+                    value.TankVolume(k, :) = [zeros(1, junctioncount + rescount), obj.getNodeTankVolume];
                 end
-                if obj.getVersion > 20101
-                    if find(strcmpi(varargin, 'demanddeficit'))
-                        value.DemandDeficit(k, :) = obj.getNodeDemandDeficit;
-                    end
+                if wantFlow
+                    [~, value.Flow(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_FLOW, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'head'))
-                    value.Head(k, :) = obj.getNodeHydraulicHead;
+                if wantVelocity
+                    [~, value.Velocity(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_VELOCITY, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'tankvolume'))
-                    value.TankVolume(k, :) = [zeros(1, junctioncount+rescount) obj.getNodeTankVolume];
+                if wantHeadLoss
+                    [~, value.HeadLoss(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_HEADLOSS, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'flow'))
-                    value.Flow(k, :) = obj.getLinkFlows;
+                if wantStatus
+                    st = obj.getLinkStatus;
+                    value.Status(k, :) = st;
+                    value.StatusStr(k, :) = obj.TYPESTATUS(st + 1);
                 end
-                if find(strcmpi(varargin, 'velocity'))
-                    value.Velocity(k, :) = obj.getLinkVelocity;
+                if wantEff
+                    [~, p_eff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_EFFIC, obj.LibEPANET, obj.ph);
+                    value.Efficiency(k, :) = [zeros(1, pipecount), p_eff(pumpindices), zeros(1, valvecount)];
                 end
-                if find(strcmpi(varargin, 'headloss'))
-                    value.HeadLoss(k, :) = obj.getLinkHeadloss;
+                if wantState
+                    [~, ps] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_STATE, obj.LibEPANET, obj.ph);
+                    ps = ps(pumpindices);
+                    value.State(k, :) = ps;
+                    value.StateStr(k, :) = obj.TYPEPUMPSTATE(ps + 1);
                 end
-                if find(strcmpi(varargin, 'status'))
-                    value.Status(k, :) = obj.getLinkStatus;
-                    value.StatusStr(k, :) = obj.TYPESTATUS(value.Status(k, :) + 1);
+                if wantSetting
+                    [~, value.Setting(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_SETTING, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'setting'))
-                    value.Setting(k, :) = obj.getLinkSettings;
+                if wantEnergy
+                    [~, value.Energy(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'energy'))
-                    value.Energy(k, :) = obj.getLinkEnergy;
+                if wantNQ
+                    value.NodeQuality(k, :) = obj.getNodeActualQuality;
                 end
-                if obj.getVersion > 20101
-                    if find(strcmpi(varargin, 'efficiency'))
-                        value.Efficiency(k, :) = [zeros(1, pipecount) obj.getLinkPumpEfficiency zeros(1, valvecount)];
-                    end
+                if wantLQ
+                    value.LinkQuality(k, :) = obj.getLinkActualQuality;
                 end
-                if find(strcmpi(varargin, 'nodequality'))
-                    value.NodeQuality(k, :)=obj.getNodeActualQuality;
+                if wantMFR
+                    value.MassFlowRate(k, :) = obj.getNodeMassFlowRate;
                 end
-                if find(strcmpi(varargin, 'linkquality'))
-                    value.LinkQuality(k, :)=obj.getLinkActualQuality;
-                end
-                if find(strcmpi(varargin, 'massflowrate'))
-                    value.MassFlowRate(k, :)=obj.getNodeMassFlowRate;
-                end
-                if find(strcmpi(varargin, 'qualitySensingNodes'))
-                    value.QualitySensingNodes(k, :)=obj.getNodeActualQualitySensingNodes(varargin{2});
-                end
-                if obj.getVersion > 20101
-                    if find(strcmpi(varargin, 'state'))
-                        value.State(k, :) = obj.getLinkPumpState;
-                        value.StateStr(k, :) = obj.TYPEPUMPSTATE(value.State(k, :) + 1);
-                    end
-                end
-                tstep = obj.nextHydraulicAnalysisStep;
-                qtstep = obj.nextQualityAnalysisStep;
-                k = k+1;
+        
+                tstep  = obj.nextHydraulicAnalysisStep;
+                tleftQ = obj.nextQualityAnalysisStep; %#ok<NASGU>
+        
+                k = k + 1;
             end
+        
             obj.closeQualityAnalysis;
             obj.closeHydraulicAnalysis;
+        
+            % Trim to actual number of computed steps
+            kLast = k - 1;
+            f = fieldnames(value);
+            for i = 1:numel(f)
+                A = value.(f{i});
+                if isnumeric(A) || isstring(A)
+                    if size(A, 1) == totalsteps
+                        value.(f{i}) = A(1:kLast, :);
+                    end
+                end
+            end
         end
         function value = getComputedHydraulicTimeSeries(obj, varargin)
             % Computes hydraulic simulation and retrieves time-series.
@@ -10580,10 +10640,6 @@ classdef epanet <handle
             %   d.getComputedHydraulicTimeSeries          % Retrieves all the time-series data
             %
             % Example 2:
-            %   d.getComputedHydraulicTimeSeries.Demand   % Retrieves all the time-series demands
-            %   d.getComputedHydraulicTimeSeries.Flow     % Retrieves all the time-series flows
-            %
-            % Example 3:
             %   data = d.getComputedHydraulicTimeSeries('Time', ...
             %    'Pressure', 'Velocity');                  %  Retrieves all the time-series Time, Pressure, Velocity
             %   time = data.Time;
@@ -10591,10 +10647,8 @@ classdef epanet <handle
             %   velocity = data.Velocity;
             %
             % See also getComputedQualityTimeSeries, getComputedTimeSeries.
-
             [obj.Errcode] = obj.apiENopenH(obj.LibEPANET, obj.ph);
             obj.solve = 1;
-            obj.initializeHydraulicAnalysis;
             obj.apiENinitH(obj.ToolkitConstants.EN_SAVE, obj.LibEPANET, obj.ph);
 
             [~, dur] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_DURATION, obj.LibEPANET, obj.ph);
@@ -10618,16 +10672,13 @@ classdef epanet <handle
         
             % Normalize request names once
             req = varargin;
-            sensingNodes = [];
             for i = 1:numel(req)
                 if isnumeric(req{i})
-                    sensingNodes = req{i};
                     req{i} = ''; % ignore numeric entry in name matching
                 elseif isstring(req{i})
                     req{i} = char(req{i});
                 end
             end
-            req = req;
         
             has = @(name) any(strcmpi(req, name));
         
@@ -10770,8 +10821,8 @@ classdef epanet <handle
             %   d.getComputedQualityTimeSeries               % Retrieves all the time-series data
             %
             % Example 2:
-            %   d.getComputedQualityTimeSeries.NodeQuality   % Retrieves all the time-series node quality
-            %   d.getComputedQualityTimeSeries.LinkQuality   % Retrieves all the time-series link quality
+            %   d.getComputedQualityTimeSeries('NodeQuality')   % Retrieves all the time-series node quality
+            %   d.getComputedQualityTimeSeries('LinkQuality')   % Retrieves all the time-series link quality
             %
             % Example 3:
             %   data = d.getComputedQualityTimeSeries('Time', ...
@@ -10782,76 +10833,68 @@ classdef epanet <handle
             %
             % See also getComputedHydraulicTimeSeries, getComputedTimeSeries.
             if ~obj.solve
-                obj.solveCompleteHydraulics;
+                obj.apiENsolveH(obj.LibEPANET, obj.ph);
                 obj.solve = 1;
             end
-            obj.openQualityAnalysis;
-            obj.initializeQualityAnalysis;
-            %tleft=obj.nextQualityAnalysisStep;
-            totalsteps=obj.getTimeSimulationDuration/obj.getTimeQualityStep;
-            initnodematrix=zeros(totalsteps, obj.getNodeCount);
-            if size(varargin, 2)==0
-                varargin={'time', 'quality', 'linkquality', 'mass'};
-            else
-                for i=1:length(varargin)
-                    if isnumeric(varargin{i})
-                        sensingnodes=i;
-                    end
+            obj.apiENopenQ(obj.LibEPANET, obj.ph);
+
+            obj.apiENinitQ(obj.ToolkitConstants.EN_SAVE, obj.LibEPANET, obj.ph);
+            
+
+            [~, sim_duration] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_DURATION, obj.LibEPANET, obj.ph);
+            [~, qstep] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_QUALSTEP, obj.LibEPANET, obj.ph);
+            
+            % Ensure at least one step and include initial time
+            totalsteps = max(1, floor(sim_duration / qstep) + 1);
+            
+            [~, nNodes] = obj.apiENgetcount(obj.ToolkitConstants.EN_NODECOUNT, obj.LibEPANET, obj.ph);
+            [~, nLinks] = obj.apiENgetcount(obj.ToolkitConstants.EN_LINKCOUNT, obj.LibEPANET, obj.ph);
+            initnodematrix = zeros(totalsteps, nNodes);
+            
+            % Defaults
+            if isempty(varargin)
+                varargin = {'time','quality','linkquality','mass'};
+            end
+            
+            has = @(name) any(strcmpi(varargin, name));
+            
+            if has('time')
+                value.Time = zeros(totalsteps, 1);
+            end
+            if has('quality')
+                value.NodeQuality = initnodematrix;
+            end
+            if has('linkquality')
+                value.LinkQuality = zeros(totalsteps, nLinks);
+            end
+            if has('mass')
+                value.MassFlowRate = initnodematrix;
+            end
+            
+            clear initnodematrix
+            
+            k = 1;
+            tleft = 1;
+            
+            while tleft > 0 && k <= totalsteps
+                [~, t] = obj.apiENrunQ(obj.LibEPANET, obj.ph);
+
+                if has('time')
+                    value.Time(k, 1) = t;
                 end
-            end
-            if find(strcmpi(varargin, 'time'))
-                value.Time=zeros(totalsteps, 1);
-            end
-            if find(strcmpi(varargin, 'quality'))
-                value.NodeQuality=initnodematrix;
-            end
-            if find(strcmpi(varargin, 'linkquality'))
-                value.LinkQuality=zeros(totalsteps, obj.getLinkCount);
-            end
-            if find(strcmpi(varargin, 'qualitySensingNodes'))
-                value.QualitySensingNodes=zeros(totalsteps, length(varargin{sensingnodes}));
-                value.SensingNodesIndices=varargin{sensingnodes};
-            end
-            if find(strcmpi(varargin, 'demandSensingNodes'))
-                value.DemandSensingNodes=zeros(totalsteps, length(varargin{sensingnodes}));
-                value.SensingNodesIndices=varargin{sensingnodes};
-            end
-            if find(strcmpi(varargin, 'mass'))
-                value.MassFlowRate=initnodematrix;
-            end
-            if find(strcmpi(varargin, 'demand'))
-                value.Demand=initnodematrix;
-            end
-            clear initnodematrix;
-            k=1;t=1;tleft=1;
-            sim_duration = obj.getTimeSimulationDuration;
-            while (tleft>0)||(t<sim_duration)
-                t=obj.runQualityAnalysis;
-                if find(strcmpi(varargin, 'time'))
-                    value.Time(k, :)=t;
+                if has('quality')
+                    [~, value.NodeQuality(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'quality'))
-                    value.NodeQuality(k, :)=obj.getNodeActualQuality;
+                if has('linkquality')
+                    [~, value.LinkQuality(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_QUALITY, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'linkquality'))
-                    value.LinkQuality(k, :)=obj.getLinkActualQuality;
+                if has('mass')
+                    [~, value.MassFlowRate(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET, obj.ph);
                 end
-                if find(strcmpi(varargin, 'mass'))
-                    value.MassFlowRate(k, :)=obj.getNodeMassFlowRate;
-                end
-                if find(strcmpi(varargin, 'demand'))
-                    value.Demand(k, :)=obj.getNodeActualDemand;
-                end
-                if find(strcmpi(varargin, 'qualitySensingNodes'))
-                    value.QualitySensingNodes(k, :)=obj.getNodeActualQualitySensingNodes(varargin{2});
-                end
-                if find(strcmpi(varargin, 'demandSensingNodes'))
-                    value.DemandSensingNodes(k, :)=obj.getNodeActualDemandSensingNodes(varargin{sensingnodes});
-                end
-                tleft = obj.stepQualityAnalysisTimeLeft;
-                k=k+1;
+                [~, tleft] = obj.apiENstepQ(obj.LibEPANET, obj.ph);
+                k = k + 1;
             end
-            obj.closeQualityAnalysis;
+            [obj.Errcode] = obj.apiENcloseQ(obj.LibEPANET, obj.ph);
         end
         function value = getComputedTimeSeries(obj)
             obj.apiENsaveinpfile(obj.TempInpFile, obj.LibEPANET, obj.ph);
@@ -10865,14 +10908,11 @@ classdef epanet <handle
         end
         function value = getComputedTimeSeries_ENepanet(obj, tempfile, binfile, rptfile)
             if nargin < 2 || isempty(binfile)
-                uuID = char(java.util.UUID.randomUUID);
-                rptfile=[obj.TempInpFile(1:end-4), '.txt'];
-                binfile=['@#', uuID, '.bin'];
+                [tempfile, rptfile, binfile]= createTempfiles(obj.BinTempfile);
             end
             if nargin > 2
                 obj.apiENsaveinpfile(tempfile, obj.LibEPANET, obj.ph);
                 calllib(obj.LibEPANET, 'ENepanet', tempfile, rptfile, binfile, lib.pointer);
-                value = struct();
                 try
                     value = obj.readEpanetBinaryFile(binfile, 0);
                 catch
@@ -10882,16 +10922,13 @@ classdef epanet <handle
                     end
                 end
             else
-                obj.saveInputFile();
-                obj.closeNetwork();
+                obj.apiENsaveinpfile(obj.TempInpFile, obj.LibEPANET, obj.ph);
+                % obj.closeNetwork();
                 obj.Errcode = obj.apiENepanet(obj.TempInpFile, rptfile, binfile, obj.LibEPANET);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
                 fid = fopen(binfile, 'r');
-                value = readEpanetBin(fid, binfile, 0);
+                value = readEpanetBin(fid, binfile, 1);
                 value.StatusStr = obj.TYPEBINSTATUS(value.Status + 1);
-                fclose('all');
-                files=dir('@#*');
-                if ~isempty(files); delete('@#*'); end
                 obj.Errcode = obj.apiENopen(obj.TempInpFile, [obj.TempInpFile(1:end-4), '.txt'], [obj.TempInpFile(1:end-4), '.bin'], obj.LibEPANET, obj.ph);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             end
