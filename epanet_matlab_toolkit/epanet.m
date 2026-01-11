@@ -10832,10 +10832,6 @@ classdef epanet <handle
             %   link_quality = data.LinkQuality;
             %
             % See also getComputedHydraulicTimeSeries, getComputedTimeSeries.
-            if ~obj.solve
-                obj.apiENsolveH(obj.LibEPANET, obj.ph);
-                obj.solve = 1;
-            end
             obj.apiENopenQ(obj.LibEPANET, obj.ph);
 
             obj.apiENinitQ(obj.ToolkitConstants.EN_SAVE, obj.LibEPANET, obj.ph);
