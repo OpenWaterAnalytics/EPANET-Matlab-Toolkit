@@ -15122,7 +15122,6 @@ classdef epanet <handle
             %
             % See also runQualityAnalysis, initializeHydraulicAnalysis.
             [obj.Errcode, tstep] = obj.apiENrunH(obj.LibEPANET, obj.ph);
-            tstep = double(tstep);
         end
         function tstep = runQualityAnalysis(obj)
             % Makes available the hydraulic and water quality results that occur at the start of
