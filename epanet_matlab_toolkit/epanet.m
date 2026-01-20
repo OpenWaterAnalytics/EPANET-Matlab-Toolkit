@@ -938,13 +938,18 @@ classdef epanet <handle
             end
         end
         function ENLoadLibrary(obj, varargin)
+            if contains('ph', varargin)
+                header = '_2.h';
+            else
+                header = '.h';
+            end
             if ~libisloaded(obj.LibEPANET)
                 warning('off', 'MATLAB:loadlibrary:TypeNotFound');
                 if ~isdeployed
                     if isunix
-                        loadlibrary(obj.LibEPANET, [obj.LibEPANETpath, obj.LibEPANET, '.h']);
+                        loadlibrary(obj.LibEPANET, [obj.LibEPANETpath, obj.LibEPANET, header]);
                     else
-                        loadlibrary([obj.LibEPANETpath, obj.LibEPANET], [obj.LibEPANETpath, obj.LibEPANET, '.h']);
+                        loadlibrary([obj.LibEPANETpath, obj.LibEPANET], [obj.LibEPANETpath, obj.LibEPANET, header]);
                     end
                 else
                     loadlibrary('epanet2', @mxepanet); %loadlibrary('epanet2', 'epanet2.h', 'mfilename', 'mxepanet.m');
@@ -1459,12 +1464,16 @@ classdef epanet <handle
             % an error code.
             % Values are returned in units that depend on the units used for flow rate (see Measurement Units).
             nlinks = int32(0);
-            [Errcode, nlinks] = calllib(LibEPANET, 'ENgetcount', 2, nlinks);
-            out_values = zeros(nlinks, 1, 'double');
             if ph.isNull
+                [~, nlinks] = calllib(LibEPANET, 'ENgetcount', 2, nlinks);
+                out_values = zeros(nlinks, 1, 'double');
                 [Errcode, out_values] = calllib(LibEPANET, 'ENgetlinkvalues', property, out_values);
             else
-                [Errcode, out_values] = calllib(LibEPANET, 'EN_getlinkvalues', ph, property, out_values);
+                [~, ~, nlinks] = calllib(LibEPANET, 'EN_getcount', ph, 2, nlinks);
+                out_values = zeros(nlinks, 1);
+                out_ptr    = libpointer('doublePtr', out_values);
+                Errcode = calllib(LibEPANET, 'EN_getlinkvalues', ph, property, out_ptr);
+                out_values = out_ptr.Value(:);
             end
             out_values = double(out_values');
         end
@@ -3920,12 +3929,16 @@ classdef epanet <handle
             % out_values	an array of values for all nodes.
             % an error code.
             nNodes = int32(0);
-            [Errcode, nNodes] = calllib(LibEPANET, 'ENgetcount', 0, nNodes);
-            out_values = zeros(nNodes, 1, 'double');
             if ph.isNull
+                [~, nNodes] = calllib(LibEPANET, 'ENgetcount', 0, nNodes);
+                out_values = zeros(nNodes, 1, 'double');
                 [Errcode, out_values] = calllib(LibEPANET, 'ENgetnodevalues', property, out_values);
             else
-                [Errcode, out_values] = calllib(LibEPANET, 'EN_getnodevalues', ph, property, out_values);
+                [~, ~, nNodes] = calllib(LibEPANET, 'EN_getcount', ph, 0, nNodes);
+                out_values = zeros(nNodes, 1);
+                out_ptr    = libpointer('doublePtr', out_values);
+                Errcode = calllib(LibEPANET, 'EN_getnodevalues', ph, property, out_ptr);
+                out_values = out_ptr.Value(:);
             end
             out_values = out_values';
         end
@@ -4587,23 +4600,17 @@ classdef epanet <handle
                 obj.LibEPANETpath = [pwd, '\'];
             end
 
-            %Load EPANET Library
-            obj.ENLoadLibrary;
-            
-            % Create Project - EPANET 2.2 supported function
+           % Create Project - EPANET 2.2 supported function
             obj.ph = libpointer('voidPtr');
+
+            %Load EPANET Library
             if contains('ph', varargin)
-                try
-                    obj.createProject;
-                catch
-                end
+                obj.ENLoadLibrary('ph');
+                obj.createProject;
+            else
+                obj.ENLoadLibrary;
             end
-            if obj.msg == 0
-                try
-                    obj.createProject;
-                catch
-                end
-            end
+
             %Load parameters
             obj.ToolkitConstants = obj.getToolkitConstants;
             
@@ -4676,31 +4683,23 @@ classdef epanet <handle
                 end
                 % Get some node data
                 ndInfo = obj.getNodesInfo;
-                getFields_node_info = fields(ndInfo);
-                for i=1:length(getFields_node_info)
-                    obj.(getFields_node_info{i}) = eval(['ndInfo.', getFields_node_info{i}]);
+                fn = fieldnames(ndInfo);
+                for k = 1:numel(fn)
+                    obj.(fn{k}) = ndInfo.(fn{k});
                 end
-                if obj.getVersion > 20101
-                    % Get demand model type and parameters
-                    demModelInfo = obj.getDemandModel;
-                    getFields_demModelInfo = fields(demModelInfo);
-                    for i=1:length(getFields_demModelInfo)
-                        obj.(getFields_demModelInfo{i}) = eval(['demModelInfo.', getFields_demModelInfo{i}]);
-                    end
+                % Get demand model type and parameters
+                demModelInfo = obj.getDemandModel;
+                fn = fieldnames(demModelInfo);
+                for k = 1:numel(fn)
+                    obj.(fn{k}) = demModelInfo.(fn{k});
                 end
             end
             %Get all the countable network parameters
-            if nargin == 0
-                obj.libFunctions = libfunctions(obj.LibEPANET);
-                if sum(strcmp(obj.libFunctions, 'ENgetqualinfo'))
-                    n = obj.getQualityInfo;
-                    obj.QualityChemUnits = n.QualityChemUnits;
-                    obj.QualityChemName= n.QualityChemName;
-                end
-                return;
-            else
-                obj.NodeCount = obj.getNodeCount;
-            end
+            obj.libFunctions = libfunctions(obj.LibEPANET);
+            n = obj.getQualityInfo;
+            obj.QualityChemUnits = n.QualityChemUnits;
+            obj.QualityChemName= n.QualityChemName;
+            obj.NodeCount = obj.getNodeCount;
             if ~obj.NodeCount
                 return;
             end
@@ -4766,11 +4765,9 @@ classdef epanet <handle
             obj.OptionsQualityTolerance = obj.getOptionsQualityTolerance;
             obj.OptionsEmitterExponent = obj.getOptionsEmitterExponent;
             obj.OptionsPatternDemandMultiplier = obj.getOptionsPatternDemandMultiplier;
-            if obj.getVersion > 20101
-                obj.OptionsHeadError = obj.getOptionsHeadError;
-                obj.OptionsFlowChange = obj.getOptionsFlowChange;
-                obj.OptionsHeadLossFormula = obj.getOptionsHeadLossFormula;
-            end
+            obj.OptionsHeadError = obj.getOptionsHeadError;
+            obj.OptionsFlowChange = obj.getOptionsFlowChange;
+            obj.OptionsHeadLossFormula = obj.getOptionsHeadLossFormula;
             %Get pattern data
             obj.PatternNameID = obj.getPatternNameID;
             obj.PatternIndex = 1:obj.PatternCount; %obj.getPatternIndex;
@@ -4781,11 +4778,9 @@ classdef epanet <handle
             obj.QualityTraceNodeIndex = obj.getQualityTraceNodeIndex;
             %obj.QualityType = obj.getQualityType;
             obj.libFunctions = libfunctions(obj.LibEPANET);
-            if sum(strcmp(obj.libFunctions, 'ENgetqualinfo'))
-                n = obj.getQualityInfo;
-                obj.QualityChemUnits = n.QualityChemUnits;
-                obj.QualityChemName= n.QualityChemName;
-            end
+            n = obj.getQualityInfo;
+            obj.QualityChemUnits = n.QualityChemUnits;
+            obj.QualityChemName= n.QualityChemName;
             %Get time parameters
             obj.TimeSimulationDuration = obj.getTimeSimulationDuration;
             obj.TimeHydraulicStep = obj.getTimeHydraulicStep;
@@ -4800,29 +4795,26 @@ classdef epanet <handle
             obj.TimeReportingPeriods = obj.getTimeReportingPeriods;
             % Get EPANET version
             obj.Version = obj.getVersion;
-            try %EPANET Version 2.1.dll LibEPANET
-                obj.TimeStartTime = obj.getTimeStartTime;
-                obj.TimeHTime = obj.getTimeHTime;
-                obj.TimeHaltFlag = obj.getTimeHaltFlag;
-                obj.TimeNextEvent = obj.getTimeNextEvent;
-                obj.NodeTankMaximumWaterVolume = obj.getNodeTankMaximumWaterVolume;
-                obj.NodeBaseDemands = obj.getNodeBaseDemands;
-                obj.NodeDemandCategoriesNumber = obj.getNodeDemandCategoriesNumber;
-                obj.PatternAverageValue = obj.getPatternAverageValue;
-                n = obj.getStatistic;
-                obj.RelativeError = n.RelativeError;
-                obj.Iterations = n.Iterations;
-                obj.NodeDemandPatternNameID = obj.getNodeDemandPatternNameID;
-                obj.NodeDemandPatternIndex = obj.getNodeDemandPatternIndex;
-                obj.LinkPumpHeadCurveIndex = obj.getLinkPumpHeadCurveIndex;
-                obj.LinkPumpPatternNameID = obj.getLinkPumpPatternNameID;
-                obj.LinkPumpPatternIndex = obj.getLinkPumpPatternIndex;
-                obj.LinkPumpTypeCode = obj.getLinkPumpTypeCode;
-                obj.LinkPumpType = obj.getLinkPumpType;
-                obj.LinkPumpPower = obj.getLinkPumpPower;
-                obj.CurvesInfo = obj.getCurvesInfo;
-            catch
-            end
+            obj.TimeStartTime = obj.getTimeStartTime;
+            obj.TimeHTime = obj.getTimeHTime;
+            obj.TimeHaltFlag = obj.getTimeHaltFlag;
+            obj.TimeNextEvent = obj.getTimeNextEvent;
+            obj.NodeTankMaximumWaterVolume = obj.getNodeTankMaximumWaterVolume;
+            obj.NodeBaseDemands = obj.getNodeBaseDemands;
+            obj.NodeDemandCategoriesNumber = obj.getNodeDemandCategoriesNumber;
+            obj.PatternAverageValue = obj.getPatternAverageValue;
+            n = obj.getStatistic;
+            obj.RelativeError = n.RelativeError;
+            obj.Iterations = n.Iterations;
+            obj.NodeDemandPatternNameID = obj.getNodeDemandPatternNameID;
+            obj.NodeDemandPatternIndex = obj.getNodeDemandPatternIndex;
+            obj.LinkPumpHeadCurveIndex = obj.getLinkPumpHeadCurveIndex;
+            obj.LinkPumpPatternNameID = obj.getLinkPumpPatternNameID;
+            obj.LinkPumpPatternIndex = obj.getLinkPumpPatternIndex;
+            obj.LinkPumpTypeCode = obj.getLinkPumpTypeCode;
+            obj.LinkPumpType = obj.getLinkPumpType;
+            obj.LinkPumpPower = obj.getLinkPumpPower;
+            obj.CurvesInfo = obj.getCurvesInfo;
             %Get data from raw file (for information which cannot be
             %accessed by the epanet library)
             value=obj.getNodeCoordinates;
@@ -4834,13 +4826,12 @@ classdef epanet <handle
             
             % US Customary - SI metric
             infoUnits = obj.getUnits;
-            getFields_infoUnits = fields(infoUnits);
-            for i=1:length(getFields_infoUnits)
-                obj.(getFields_infoUnits{i}) = eval(['infoUnits.', getFields_infoUnits{i}]);
+            fn = fieldnames(infoUnits);
+            for k = 1:numel(fn)
+                obj.(fn{k}) = infoUnits.(fn{k});
             end
             disp(['Input File "', varargin{1}, '" loaded successfully.']);
         end % End of epanet class constructor
-        
         function [obj] = apiMSXMatlabSetup(obj, msxname, varargin)
             arch = computer('arch');
             pwdepanet = fileparts(which(mfilename));
@@ -6542,13 +6533,13 @@ classdef epanet <handle
             [~, value.LinkWallReactionCoeff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_KWALL, obj.LibEPANET, obj.ph);  
             % Node connections
             nLinks = obj.getLinkCount;
+            value.NodesConnectingLinksIndex = zeros(nLinks, 2);
+            value.LinkTypeIndex             = zeros(nLinks, 1);
             for i = 1:nLinks
-                [~, value.NodesConnectingLinksIndex(i,1), value.NodesConnectingLinksIndex(i,2)] = obj.apiENgetlinknodes(i, obj.LibEPANET, obj.ph);
-            end
-            if obj.getVersion > 20101
-                for i = 1:nLinks
-                    [~, value.LinkTypeIndex(i)] = obj.apiENgetlinktype(i, obj.LibEPANET, obj.ph);
-                end
+                [~, n1, n2] = obj.apiENgetlinknodes(i, obj.LibEPANET, obj.ph);
+                value.NodesConnectingLinksIndex(i,:) = [n1, n2];
+                [~, lt] = obj.apiENgetlinktype(i, obj.LibEPANET, obj.ph);
+                value.LinkTypeIndex(i) = lt;
             end
         end
         function values = getLinkValues(obj, property)
@@ -10466,9 +10457,7 @@ classdef epanet <handle
             [~, tankrescount] = obj.apiENgetcount(obj.ToolkitConstants.EN_TANKCOUNT, obj.LibEPANET, obj.ph);
             junctioncount = nNodes - tankrescount;
             rescount      = obj.getNodeReservoirCount;
-        
-            isNew = (obj.getVersion > 20101);
-        
+       
             % Defaults
             if isempty(varargin)
                 varargin = {'time','pressure','demand','demanddeficit','head','tankvolume', ...
@@ -10487,7 +10476,7 @@ classdef epanet <handle
             wantTime     = has('time');
             wantPressure = has('pressure');
             wantDemand   = has('demand');
-            wantDeficit  = isNew && has('demanddeficit');
+            wantDeficit  = has('demanddeficit');
             wantHead     = has('head');
             wantTankVol  = has('tankvolume');
         
@@ -10497,8 +10486,8 @@ classdef epanet <handle
             wantStatus   = has('status');
             wantSetting  = has('setting');
             wantEnergy   = has('energy');
-            wantEff      = isNew && has('efficiency');
-            wantState    = isNew && has('state');
+            wantEff      = has('efficiency');
+            wantState    = has('state');
         
             wantNQ       = has('nodequality');
             wantLQ       = has('linkquality');
@@ -10685,7 +10674,7 @@ classdef epanet <handle
             wantTime      = has('time');
             wantPressure  = has('pressure');
             wantDemand    = has('demand');
-            wantDeficit   = (obj.getVersion > 20101) && has('demanddeficit');
+            wantDeficit   = has('demanddeficit');
             wantHead      = has('head');
             wantTankVol   = has('tankvolume');
             wantFlow      = has('flow');
@@ -10694,8 +10683,8 @@ classdef epanet <handle
             wantStatus    = has('status');
             wantSetting   = has('setting');
             wantEnergy    = has('energy');
-            wantEff       = (obj.getVersion > 20101) && has('efficiency');
-            wantState     = (obj.getVersion > 20101) && has('state');
+            wantEff       = has('efficiency');
+            wantState     = has('state');
         
             % Preallocate only what you request
             if wantTime,     value.Time     = zeros(totalsteps, 1); end
@@ -15261,7 +15250,7 @@ classdef epanet <handle
             %
             %apiENclose(obj.LibEPANET, obj.ph);
             obj.ENMatlabCleanup(obj.LibEPANET);
-            obj.deleteAllTemps;
+            obj.cleanupEpanetTempFiles;
             if obj.msg
                 disp('EPANET Class is unloaded');
             end
@@ -17241,11 +17230,7 @@ classdef epanet <handle
             %disp('MSX unloaded');
         end
         function ToolkitConstants = getToolkitConstants(obj)
-            if obj.getVersion <= 20101
-                fparam = '.h'; % error('This version of EMT support version 2.2 of EPANET.')
-            else
-                fparam = '_enums.h';
-            end
+            fparam = '_enums.h';
             if isunix
                 file = [obj.LibEPANETpath, 'epanet2', fparam];
             else
@@ -20264,30 +20249,26 @@ classdef epanet <handle
             end
             vert_function = 0;
             coord_function = 0;
-            if sum(strcmp(obj.libFunctions, 'ENgetvertexcount'))
-                vertices = obj.getLinkVertices;
-                for i=1:cnt
-                    if ~isempty(vertices{i})
-                        vertx{i} = vertices{i}.x;
-                        verty{i} = vertices{i}.y;
-                    else
-                        vertx{i} = [];
-                        verty{i} = [];
-                    end
+            vertices = obj.getLinkVertices;
+            for i=1:cnt
+                if ~isempty(vertices{i})
+                    vertx{i} = vertices{i}.x;
+                    verty{i} = vertices{i}.y;
+                else
+                    vertx{i} = [];
+                    verty{i} = [];
                 end
-                vert_function = 1;
             end
-            if sum(strcmp(obj.libFunctions, 'ENgetcoord'))
-                try
-                    indices = getNodeIndices(obj, varargin);j=1;
-                    for i=indices
-                        [obj.Errcode, vx(j), vy(j)]=obj.apiENgetcoord(i, obj.LibEPANET, obj.ph); j=j+1;
-                        obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
-                    end
-                catch
+            vert_function = 1;
+            try
+                indices = getNodeIndices(obj, varargin);j=1;
+                for i=indices
+                    [obj.Errcode, vx(j), vy(j)]=obj.apiENgetcoord(i, obj.LibEPANET, obj.ph); j=j+1;
+                    obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
                 end
-                coord_function = 1;
+            catch
             end
+            coord_function = 1;
             n1_value = [];
             n2_value = [];
             if coord_function == 0
