@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.3.03 - Last Update: 02/01/2026';
+        classversion='v2.3.03 - Last Update: 21/01/2026';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -914,7 +914,7 @@ classdef epanet <handle
                 controlTypeIndex, linkIndex, controlSettingValue, nodeIndex, controlLevel, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
-        function ENMatlabCleanup(obj, LibEPANET)
+        function ENMatlabCleanup(obj, LibEPANET, msg)
             % Unload library
             if ~obj.ph.isNull
                 [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_deleteproject', obj.ph);
@@ -933,8 +933,10 @@ classdef epanet <handle
                     end
                 end
             else
-                errstring =['Library ', LibEPANET, '.dll was not loaded.'];
-                disp(errstring);
+                if msg == 1
+                    errstring =['Library ', LibEPANET, '.dll was not loaded.'];
+                    disp(errstring);
+                end
             end
         end
         function ENLoadLibrary(obj, varargin)
@@ -943,31 +945,35 @@ classdef epanet <handle
             else
                 header = '.h';
             end
-            if ~libisloaded(obj.LibEPANET)
-                warning('off', 'MATLAB:loadlibrary:TypeNotFound');
-                if ~isdeployed
-                    if isunix
-                        loadlibrary(obj.LibEPANET, [obj.LibEPANETpath, obj.LibEPANET, header]);
-                    else
-                        loadlibrary([obj.LibEPANETpath, obj.LibEPANET], [obj.LibEPANETpath, obj.LibEPANET, header]);
-                    end
+            warning('off', 'MATLAB:loadlibrary:TypeNotFound');
+            lib_header = [obj.LibEPANETpath, obj.LibEPANET, header];
+            ENMatlabCleanup(obj, obj.LibEPANET, 0)
+            if ~isdeployed
+                if isunix
+                    loadlibrary(obj.LibEPANET, lib_header);
                 else
-                    loadlibrary('epanet2', @mxepanet); %loadlibrary('epanet2', 'epanet2.h', 'mfilename', 'mxepanet.m');
-                end
-                warning('on', 'MATLAB:loadlibrary:TypeNotFound');
-                if ~isempty(varargin), return; end
-            end
-            if libisloaded(obj.LibEPANET)
-                if ~isempty(varargin), return; end
-                [~, obj.Version] = calllib(obj.LibEPANET, 'ENgetversion', 0);
-                if obj.msg
-                    LibEPANETString = ['EPANET version {', num2str(obj.Version), '} loaded (EMT version {', obj.classversion, '}).'];
-                    disp(LibEPANETString);
-                    disp('<a href = "https://doi.org/10.5281/zenodo.831493">Publication DOI: 10.5281/zenodo.831493</a>');
+                    loadlibrary([obj.LibEPANETpath, obj.LibEPANET], lib_header);
                 end
             else
-                warning('There was an error loading the EPANET library (DLL).')
+                loadlibrary('epanet2', @mxepanet); %loadlibrary('epanet2', 'epanet2.h', 'mfilename', 'mxepanet.m');
             end
+            warning('on', 'MATLAB:loadlibrary:TypeNotFound');
+            % if ~isempty(varargin), return; end
+            % if libisloaded(obj.LibEPANET)
+            if contains('ph', varargin)
+                obj.ph = libpointer('voidPtr');
+                [obj.Errcode, obj.ph] = calllib(obj.LibEPANET, 'EN_createproject', obj.ph);
+                setdatatype(obj.ph, 'ProjectPtr')
+            end
+            [~, obj.Version] = obj.apiENgetversion(obj.LibEPANET, obj.ph);
+            if obj.msg
+                LibEPANETString = ['EPANET version {', num2str(obj.Version), '} loaded (EMT version {', obj.classversion, '}).'];
+                disp(LibEPANETString);
+                disp('<a href = "https://doi.org/10.5281/zenodo.831493">Publication DOI: 10.5281/zenodo.831493</a>');
+            end
+            % else
+            %     warning('There was an error loading the EPANET library (DLL).')
+            % end
         end
         function error_in_changing_metric(obj, wanted, nameofFunction)
             % Checks if the metric change is not possible and suggests possible solutions
@@ -4606,7 +4612,6 @@ classdef epanet <handle
             %Load EPANET Library
             if contains('ph', varargin)
                 obj.ENLoadLibrary('ph');
-                obj.createProject;
             else
                 obj.ENLoadLibrary;
             end
@@ -4630,14 +4635,11 @@ classdef epanet <handle
                     warning('Initializes the EPANET project!');
                 end
                 
-                %Save the temporary input file
+                % Build temp file paths
                 obj.BinTempfile=[obj.InputFile(1:end-4), '_temp.inp'];
-                
                 copyfile(obj.InputFile, obj.BinTempfile, 'f');
-                %obj.saveInputFile(obj.BinTempfile); % create a new INP file (Working Copy) using the SAVE command of EPANET
-                
-                obj.closeNetwork;  %apiENclose; %Close input file
-                %Load temporary file
+                % Close input file
+                obj.closeNetwork; 
                 rptfile = [obj.InputFile(1:end-4), '_temp.txt'];
                 binfile = [obj.InputFile(1:end-4), '_temp.bin'];
                 obj.Errcode=obj.apiENopen(obj.BinTempfile, rptfile, binfile, obj.LibEPANET, obj.ph);
@@ -4676,10 +4678,10 @@ classdef epanet <handle
                 end
 
                 % Get some link data
-                lnkInfo = obj.getLinksInfo;
-                getFields_link_info = fields(lnkInfo);
-                for i=1:length(getFields_link_info)
-                    obj.(getFields_link_info{i}) = eval(['lnkInfo.', getFields_link_info{i}]);
+                lnkInfo = obj.getLinksInfo();
+                fn = fieldnames(lnkInfo);      
+                for k = 1:numel(fn)
+                    obj.(fn{k}) = lnkInfo.(fn{k});
                 end
                 % Get some node data
                 ndInfo = obj.getNodesInfo;
@@ -4897,14 +4899,16 @@ classdef epanet <handle
                     mm=1; %for set (write) msx functions
                 end
             end
-            if mm==1
+            if mm == 1
                 if ~iscell(varargin{1})
-                    obj.MSXTempFile=obj.MSXFile;
+                    obj.MSXTempFile = obj.MSXFile;
                 end
             else
+                % Create temp MSX in system temp folder (same approach as INP/RPT/BIN)
                 obj.MSXTempFile=[obj.MSXFile(1:end-4), '_temp.msx'];
                 copyfile(obj.MSXFile, obj.MSXTempFile, 'f');
             end
+
 
             %Open the file
             [obj.Errcode] = obj.apiMSXopen(obj);
@@ -5267,13 +5271,8 @@ classdef epanet <handle
             %
             % See also deleteRules, setRules, getRules, getRuleInfo,
             %          setRuleThenAction, setRuleElseAction, setRulePriority.
-            
-            %rule_new = split(rule, '\n ');
-            rule_new = regexp(rule, '\\n', 'split');
-            rule_final = [];
-            for i=1:length(rule_new)
-                rule_final = [rule_final rule_new{i} newline];
-            end
+            rule_new   = regexp(rule, '\\n', 'split');
+            rule_final = strjoin(rule_new, newline);
             [obj.Errcode] = obj.apiENaddrule(rule_final, obj.LibEPANET, obj.ph);
             obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
         end
@@ -7651,7 +7650,7 @@ classdef epanet <handle
             %          setNodeNameID, setNodeCoordinates.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getNodeIndices(obj, varargin); end
             j=1;
-            if length(indices) == 1
+            if isscalar(indices)
                 [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_NODE, indices, value, obj.LibEPANET, obj.ph);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             else
@@ -9473,7 +9472,7 @@ classdef epanet <handle
             % See also getCurveComment, getCurveIndex, getCurvesInfo.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getCurveIndices(obj, varargin); end
             j=1;
-            if length(indices) == 1
+            if isscalar(indices)
                 [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_CURVE, indices, value, obj.LibEPANET, obj.ph);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             else
@@ -12476,7 +12475,7 @@ classdef epanet <handle
             % See also getLinkComment, setLinkNameID, setLinkPipeData.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
-            if length(indices) == 1
+            if isscalar(indices)
                 [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_LINK, indices, value, obj.LibEPANET, obj.ph);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             else
@@ -12820,7 +12819,7 @@ classdef epanet <handle
             %          setLinkPipeData, addLink, deleteLink.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getLinkIndices(obj, varargin); end
             j=1;
-            if length(indices) == 1
+            if isscalar(indices)
                 [obj.Errcode] = apiENsetlinkid(indices, value, obj.LibEPANET, obj.ph);
                 obj.apiENgeterror(obj.Errcode, obj.LibEPANET, obj.ph);
             else
@@ -14662,7 +14661,7 @@ classdef epanet <handle
             % See also getPatternComment, setPatternNameID, setPattern.
             if nargin==3, indices = value; value=varargin{1}; else, indices = getPatternIndices(obj, varargin); end
             j=1;
-            if length(indices) == 1
+            if isscalar(indices)
                 [obj.Errcode] = obj.apiENsetcomment(obj.ToolkitConstants.EN_TIMEPAT, indices, value, obj.LibEPANET, obj.ph);
             else
                 for i=indices
@@ -15249,7 +15248,7 @@ classdef epanet <handle
             % See also epanet, saveInputFile, closeNetwork.
             %
             %apiENclose(obj.LibEPANET, obj.ph);
-            obj.ENMatlabCleanup(obj.LibEPANET);
+            obj.ENMatlabCleanup(obj.LibEPANET, 1);
             obj.cleanupEpanetTempFiles;
             if obj.msg
                 disp('EPANET Class is unloaded');
@@ -15289,6 +15288,10 @@ classdef epanet <handle
             %   d.loadMSXFile('net2-cl2.msx', 'epanetmsx'); ||
             %   d.loadMSXFile('net2-cl2.msx', 'epanetmsx', 'loadfile'); ||
             %   d.loadMSXFile('net2-cl2.msx', 'loadfile');
+            if ~obj.ph.isNull 
+                warning("MSX: Not works with project handle (ph). Please use d = epanet('net2-cl2.inp')");
+                return
+            end
             if isempty(varargin)
                 obj.apiMSXMatlabSetup(msxname);
             else
@@ -17176,47 +17179,58 @@ classdef epanet <handle
         end
         function msx = writeMSXFile(~, msx)
             % Checkout example: /examples/EX14_write_msx_file.mlx
-            space=5;
+        
+            space = 5;
             f = writenewTemp(msx.FILENAME);
-            fprintf(f, '[TITLE]\n');
-            if isfield(msx, 'title')
-                fprintf(f, msx.TITLE);
+        
+            % ---- TITLE ----
+            fprintf(f, "[TITLE]\n");
+            if isfield(msx, "TITLE")
+                fprintf(f, "%s", msx.TITLE);
+            elseif isfield(msx, "title")
+                fprintf(f, "%s", msx.title);
             end
-            
-            fprintf(f, '\n\n[OPTIONS]\n');
-            options = {'AREA_UNITS', 'RATE_UNITS', 'SOLVER', 'COUPLING', 'COMPILER', ...
-                'TIMESTEP', 'ATOL', 'RTOL'};
-            spaces=blanks(space);
-            
-            for i=1:length(options)
-                if isfield(msx, options{i})
-                    fprintf(f, num2str(options{i}));
-                    fprintf(f, spaces);
-                    fprintf(f, num2str(msx.(options{i})));
-                    fprintf(f, '\n');
+        
+            % ---- OPTIONS ----
+            fprintf(f, "\n\n[OPTIONS]\n");
+            options = ["AREA_UNITS","RATE_UNITS","SOLVER","COUPLING","COMPILER", ...
+                       "TIMESTEP","ATOL","RTOL"];
+            pad = blanks(space);
+        
+            for i = 1:numel(options)
+                opt = options{i};
+                if isfield(msx, opt)
+                    fprintf(f, "%s%s%s\n", opt, pad, num2str(msx.(opt)));
                 end
             end
-            
-            FIELDS = {'SPECIES', 'COEFFICIENTS', 'TERMS', 'PIPES', ...
-                'TANKS', 'SOURCES', 'QUALITY', 'GLOBAL', 'PARAMETERS', 'PATTERNS'};
-            for sect=FIELDS
-                section = char(sect);
-                if ~strcmpi(section, 'GLOBAL')
-                    fprintf(f, ['\n[', section, ']\n']);
+        
+            % ---- SECTIONS ----
+            fields = ["SPECIES","COEFFICIENTS","TERMS","PIPES","TANKS", ...
+                      "SOURCES","QUALITY","GLOBAL","PARAMETERS","PATTERNS"];
+        
+            for i = 1:numel(fields)
+                sect = fields{i};
+        
+                if ~strcmpi(sect, "GLOBAL")
+                    fprintf(f, "\n[%s]\n", sect);
                 end
-                sp_field = upper(section);
-                if isfield(msx, upper(section))
-                    species_all = eval(['msx.', sp_field]);
-                    for i=1:length(species_all)
-                        fprintf(f, char(species_all{i}));
-                        fprintf(f, '\n');
+        
+                if isfield(msx, upper(sect))
+                    entries = msx.(upper(sect));
+                    if isstring(entries)
+                        entries = cellstr(entries);
+                    end
+                    if iscell(entries) && ~isempty(entries)
+                        fprintf(f, "%s\n", entries{:});
                     end
                 end
             end
-            
-            fprintf(f, '[REPORT]\n');
-            fprintf(f, 'NODES ALL\n');
-            fprintf(f, 'LINKS ALL\n');
+        
+            % ---- REPORT ----
+            fprintf(f, "[REPORT]\n");
+            fprintf(f, "NODES ALL\n");
+            fprintf(f, "LINKS ALL\n");
+        
             fclose(f);
         end
         function unloadMSX(obj)
@@ -17656,12 +17670,6 @@ classdef epanet <handle
                     end
                     if length(atline)>2
                         if ~isempty(obj.BinNodeJunctionsBaseDemandsID)
-                            if strcmp(obj.BinNodeJunctionsBaseDemandsID{end}, atline{1})
-                                obj.BinNodeJunDemandPatternNameID{indd}=atline{3};
-                            else
-                                obj.BinNodeJunDemandPatternNameID{indd}=atline{3};
-                            end
-                        else
                             obj.BinNodeJunDemandPatternNameID{indd}=atline{3};
                         end
                     else
@@ -20115,8 +20123,6 @@ classdef epanet <handle
                     if ~isempty(value.BinNodeJunctionsBaseDemandsID)
                         if strcmp(value.BinNodeJunctionsBaseDemandsID{end}, atline{1})
                             value.BinNodeJunctionsBaseDemands(indd)=single(str2double(atline{2}));
-                        else
-                            value.BinNodeJunctionsBaseDemands(indd)=single(str2double(atline{2}));
                         end
                     else
                         value.BinNodeJunctionsBaseDemands(indd)=single(str2double(atline{2}));
@@ -21163,17 +21169,38 @@ classdef epanet <handle
             end
         end
         function cleanupEpanetTempFiles(obj)
-            %CLEANUPEPANETTEMPFILES Delete all EPANET temp files that start with '@#' in the OS temp folder.
+            %CLEANUPEPANETTEMPFILES Delete EPANET temp files and folders in the OS temp folder.
+            % Deletes:
+            %   1) Files that start with '@#'
+            %   2) Folders that start with 'epanetEMT_' (and their contents)
+        
             tmpDir = tempdir;
-            pat    = fullfile(tmpDir, '@#*');
+        
             warnState = warning;
             warning('off','MATLAB:DELETE:FileNotFound');
             warning('off','MATLAB:DELETE:Permission');
-            files = dir(pat);
+            warning('off','MATLAB:RMDIR:DirectoryNotFound');
+            warning('off','MATLAB:RMDIR:NoDirectoriesRemoved');
+        
+            % Delete files: @#*
+            files = dir(fullfile(tmpDir, '@#*'));
             for k = 1:numel(files)
                 if ~files(k).isdir
                     try
                         delete(fullfile(tmpDir, files(k).name));
+                    catch
+                    end
+                end
+            end
+        
+            % Delete folders: epanetEMT_*
+            fclose all;
+            dirs = dir(fullfile(tmpDir, 'epanetEMT_*'));
+            for k = 1:numel(dirs)
+                if dirs(k).isdir
+                    folderPath = fullfile(tmpDir, dirs(k).name);
+                    try
+                        rmdir(folderPath, 's');
                     catch
                     end
                 end
@@ -25232,8 +25259,6 @@ if (strcmpi(npoint, 'yes'))
                     nmplot=nm{1};
                 end
                 if iscell(nm{1})
-                    plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, 'MarkerSize', 5, 'Parent', axesid);
-                else
                     plot(x, y, 'o', 'LineWidth', 2, 'MarkerEdgeColor', nmplot, 'MarkerFaceColor', nmplot, 'MarkerSize', 5, 'Parent', axesid);
                 end
                 if sum(find(i==v.resindex))
