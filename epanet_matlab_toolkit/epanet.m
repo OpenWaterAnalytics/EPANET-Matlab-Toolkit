@@ -3006,7 +3006,7 @@ classdef epanet <handle
                 [Errcode] = calllib(LibEPANET, 'EN_solveQ', ph);
             end
         end
-        function [Errcode, tleft] = apiENstepQ(LibEPANET, ph)
+        function [Errcode, tstep] = apiENstepQ(LibEPANET, ph)
             % Advances a water quality simulation by a single water quality time step.
             %
             % apiENstepQ(LibEPANET, ph)
@@ -3021,13 +3021,13 @@ classdef epanet <handle
             %
             % See also apiENrunQ, apiENnextQ
             % OWA-EPANET Toolkit: http://wateranalytics.org/EPANET/group___hydraulics.html
-            tleft=int32(0);
+            tstep = libpointer('int32Ptr', zeros(2,1,'int32'));  
             if ph.isNull
-                [Errcode, tleft]=calllib(LibEPANET, 'ENstepQ', tleft);
+                [Errcode, ~]=calllib(LibEPANET, 'ENstepQ', tstep);
             else
-                [Errcode, ~, tleft] = calllib(LibEPANET, 'EN_stepQ', ph, tleft);
+                [Errcode, ~, ~] = calllib(LibEPANET, 'EN_stepQ', ph, tstep);
             end
-            tleft=double(tleft);
+            tstep = typecast(tstep.Value, 'double');
         end
         function [Errcode] = apiENusehydfile(hydfname, LibEPANET, ph)
             % Uses a previously saved binary hydraulics file to supply a project's hydraulics.
@@ -10821,11 +10821,11 @@ classdef epanet <handle
             %   link_quality = data.LinkQuality;
             %
             % See also getComputedHydraulicTimeSeries, getComputedTimeSeries.
+            obj.apiENsolveH(obj.LibEPANET, obj.ph);
             obj.apiENopenQ(obj.LibEPANET, obj.ph);
 
             obj.apiENinitQ(obj.ToolkitConstants.EN_SAVE, obj.LibEPANET, obj.ph);
             
-
             [~, sim_duration] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_DURATION, obj.LibEPANET, obj.ph);
             [~, qstep] = obj.apiENgettimeparam(obj.ToolkitConstants.EN_QUALSTEP, obj.LibEPANET, obj.ph);
             
@@ -10859,9 +10859,9 @@ classdef epanet <handle
             clear initnodematrix
             
             k = 1;
-            tleft = 1;
+            tstep = 1;
             
-            while tleft > 0 && k <= totalsteps
+            while tstep >= 0 && k <= totalsteps
                 [~, t] = obj.apiENrunQ(obj.LibEPANET, obj.ph);
 
                 if has('time')
@@ -10876,7 +10876,7 @@ classdef epanet <handle
                 if has('mass')
                     [~, value.MassFlowRate(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET, obj.ph);
                 end
-                [~, tleft] = obj.apiENstepQ(obj.LibEPANET, obj.ph);
+                [Errcode, tstep] = obj.apiENstepQ(obj.LibEPANET, obj.ph);
                 k = k + 1;
             end
             [obj.Errcode] = obj.apiENcloseQ(obj.LibEPANET, obj.ph);
