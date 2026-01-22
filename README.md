@@ -135,690 +135,690 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 
 ![](emt_tree.png)
 
-|Function|Description|
-|---------|---------|
-|epanet|Load Input file and open the EPANET Toolkit system|
-|unload|Unload library and close the EPANET Toolkit system|
-|loadEPANETFile|Re-Load EPANET file - parfor|
-|loadMSXEPANETFile|Re-Load EPANET MSX file - parfor|
-|loadlibrary|Load the EPANET library - parfor|
-|loadMSXlibrary|Load the EPANET MSX library - parfor|
-|appShiftNetwor|Shifts the network in x and y directions|
-|appRotateNetwork|Rotates the network by theta degrees counter-clockwise using as pivot a specific node|
-|createProject|Creates an epanet project|
-|cleanupEpanetTempFiles|Delete all EPANET temp files|
-|deleteProject|Deletes an epanet project|
-|getError|Returns the description of an error code|
-|getAdjacencyMatrix|Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow|
-|openX|Lenient open for project files|
-|getConsumerDemandRequested|Retrieve consumer demand requested|
-|getConsumerDemandDelivered|Retrieve consumer demand delivered|
-|getComputedAnalysisTimeSeries|Computed Hydralic and Quality Time Series|
-|getComputedHydraulicTimeSeries|Computed Hydraulic Time Series|
-|getComputedQualityTimeSeries|Computed Quality Time Series|
-|getComputedTimeSeries|Computed Hydraulic & Quality Time Series using the bimary file who created from executable|
-|getComputedTimeSeries_ENepanet|Computed Hydraulic & Quality Time Series via ENepanet binary file|
-|getConnectivityMatrix|Return connectivity matrix of the network|
-|getCounts|Retrieves the number of network components|
-|getControlRulesCount|Retrieves the number of control rules|
-|getControls|Retrieves the controls|
-|getControlState|Retrieve simple control enabled flag|
-|getCurveCount|Retrieves the number of curves|
-|getCurveIndex|Retrieves index of curve with specific ID|
-|getCurveLengths|Retrieves number of points in a curve|
-|getCurveNameID|Retrieves curve id|
-|getCurveType|Retrieves the curve-type (VOLUME, PUMP, EFFICIENCY, HEADLOSS, GENERAL)|
-|getCurveTypeIndex|Retrieves the curve-type index for all curves|
-|getCurveValue|Retrieves (x,y) values of specific curve index|
-|getCurveXY|Retrieves (x,y) values of all curves|
-|getDemandModel|Retrieves the type of demand model in use and its parameters|
-|getEN_functionsImpemented|Retrieves the epanet EN_ functions that have been developed|
-|getENfunctionsImpemented|Retrieves the epanet functions that have been developed|
-|getFlowDirections|Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow|
-|getFlowUnits|Retrieves the units used to express all flow rates|
-|getGraph|Retrieves the graph of the current epanet network|
-|getLibFunctions|Retrieves the functions of DLL|
-|getLinkActualQuality|Current computed link quality (read only)|
-|getLinkBulkReactionCoeff|Bulk chemical reaction coefficient|
-|getLinkComment|Retrieves the comment string assigned to the link object|
-|getLinkCount|Retrieves the number of links|
-|getLinkDiameter|Retrieves the value of all link diameters|
-|getLinkEnergy|Current computed pump energy usage (read only)|
-|getLinkExpansionProperties|Get expansion properties for a link|
-|getLinkFlows|Current computed flow rate (read only)|
-|getLinkHeadloss|Current computed head loss (read only)|
-|getLinkInfo|Bulk retrieve link properties|
-|getLinkIndex|Retrieves the indices of all links, or the indices of an ID set of links|
-|getLinkInitialSetting|Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves|
-|getLinkInitialStatus|Retrieves the value of all link initial status|
-|getLinkLength|Retrieves the value of all link lengths|
-|getLinkLeakArea|Get leakage area for a link|
-|getLinkLeakageRate|Get leakage rate for a link|
-|getLinkMinorLossCoeff|Retrieves the value of all link minor loss coefficients|
-|getLinkNameID|Retrieves the ID label(s) of all links, or the IDs of an index set of links|
-|getLinkNodesIndex-getNodesConnectingLinksIndex|Retrieves the indexes of the from/to nodes of all links|
-|getLinkPipeCount|Retrieves the number of pipes|
-|getLinkPipeIndex|Retrieves the indices of pipes|
-|getLinkPipeNameID|Retrieves the pipe IDs|
-|getLinkPumpCount|Retrieves the number of pumps|
-|getLinkPumpEfficiency|Retrieves the value of all computed efficiency|
-|getLinkPumpHeadCurveIndex|Retrieves index of a head curve for specific link index|
-|getLinkPumpIndex|Retrieves the indices of pumps|
-|getLinkPumpNameID|Retrieves the pump IDs|
-|getLinkPumpPatternIndex|Pump speed time pattern index|
-|getLinkPumpPatternNameID|Retrieves the pump pattern IDs|
-|getLinkPumpPower|Pump constant power rating|
-|getLinkPumpHCurve|Pump head v. flow curve index|
-|getLinkPumpECurve|Pump efficiency v. flow curve index|
-|getLinkPumpECost|Pump average energy price|
-|getLinkPumpEPat|Pump energy price time pattern index|
-|getLinkPumpType|Retrieves the type of a pump for specific link index|
-|getLinkPumpTypeCode|Retrieves the type code of a pump for specific link index|
-|getLinkPumpState|Current computed pump state (read only) (see @ref EN_PumpStateType)|
-|getLinkPumpSwitches|Calculates the number of pump switches|
-|getLinkQuality|Retrieves the value of link quality|
-|getLinkResultIndex|Retrieves the order in which a link's results were saved to an output file. (EPANET Version 2.2)|
-|getLinkRoughnessCoeff|Retrieves the value of all link roughness|
-|getLinkSettings|Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves|
-|getLinkStatus|Current link status (see @ref EN_LinkStatusType)|
-|getLinkType|Retrieves the link-type for all links|
-|getLinkTypeIndex|Retrieves the link-type code for all links|
-|getLinkValveCount|Retrieves the number of valves|
-|getLinkValveCurveGPV|Get valve curve for GPV link|
-|getLinkValveCurvePCV|Get valve curve for PCV link|
-|getLinkValveIndex|Retrieves the indices of valves|
-|getLinkValveNameID|Retrieves the valve IDs|
-|getLinkVelocity|Current computed flow velocity (read only)|
-|getLinkVertices|Retrieves the coordinate's of a vertex point assigned to a link.|
-|getLinkVerticesCount|Retrieves the number of internal vertex points assigned to a link|
-|getLinkVolumes|Get link volumes|
-|getLinkWallReactionCoeff|Pipe wall chemical reaction coefficient|
-|getLinkInControl|Query which links are referenced by controls|
-|getNodeInControl|Query which objects are referenced by controls (returns IDs/indices)|
-|getNodeActualDemand|Retrieves the computed value of all actual demands|
-|getNodeActualDemandSensingNodes|Retrieves the computed demand values at some sensing nodes|
-|getNodeActualQuality|Retrieves the computed values of the actual quality for all nodes|
-|getNodeActualQualitySensingNodes|Retrieves the computed quality values at some sensing nodes|
-|getNodeBaseDemands|Retrieves the value of all node base demands|
-|getNodeComment|Retrieves the comment string assigned to the node object|
-|getNodeCoordinates|Retrieves coordinate x, y, and x, y vertices for a node|
-|getNodeCount|Retrieves the number of nodes|
-|getNodePatternIndex|Retrieves the value of all node pattern indices|
-|getNodeDemandDeficit|Retrieves the amount that full demand is reduced under PDA. (EPANET Version 2.2)|
-|getNodeDemandPatternIndex|Retrieves the value of all node demand pattern indices|
-|getNodeDemandPatternNameID|Retrieves the value of all node demand pattern IDs|
-|getNodeElevations|Retrieves the value of all node elevations|
-|getNodeEmitterCoeff|Retrieves the value of all node emmitter coefficients|
-|getNodeEmitterFlow|Get emitter flow at a node|
-|getNodeHydaulicHead|Retrieves the computed values of all hydraulic heads|
-|getNodeIndex|Retrieves the indices of all nodes or some nodes with a specified ID|
-|getNodeInitialQuality|Retrieves the value of all node initial quality|
-|getNodeJunctionActualDemand|Retrieves the computed value of all actual demands for junctions|
-|getNodeJunctionBaseDemands|Retrieves the value of all junction base demands|
-|getNodeJunctionCount|Retrieves the number of junctions|
-|getNodeJunctionDemandName|Gets the name of a node's demand category|
-|getNodeJunctionIndex|Retrieves the junctions indices|
-|getNodeJunctionNameID|Retrieves the junctions IDs|
-|getNodeJunctionDemandIndex|Retrieves the demand index of the junctions. (EPANET Version 2.2)|
-|getNodeLinks|Retrieves the links which a specific node is connected to|
-|getNodeMassFlowRate|Retrieves the computed mass flow rates per minute of chemical sources|
-|getNodeNameID|Retrieves the ID label of all nodes or some nodes with a specified index|
-|getNodeDemandCategoriesNumber|Retrieves the number of demand categories for a node|
-|getNodePressure|Retrieves the computed values of all node pressures|
-|getNodeReservoirCount|Retrieves the number of reservoirs|
-|getNodeReservoirIndex|Retrieves the indices of reservoirs|
-|getNodeReservoirNameID|Retrieves the reservoirs IDs|
-|getNodeResultIndex|Retrieves the order in which a node's results were saved to an output file. (EPANET Version 2.2)|
-|getNodeSourcePatternIndex|Retrieves the value of all node source pattern index|
-|getNodeSourceQuality|Retrieves the value of all nodes source quality|
-|getNodeSourceType|Retrieves the value of all node source type|
-|getNodeTankElevations|Retrieves the elevation of tanks|
-|getNodeTankData|Retrieves a group of properties for a tank. (EPANET Version 2.2)|
-|getNodeTankBulkReactionCoeff|Retrieves the tank bulk rate coefficient|
-|getNodeTankCanOverFlow|Retrieves the tank can overflow (= 1) or not (= 0)|
-|getNodeTankCount|Retrieves the number of tanks|
-|getNodeTankDiameter|Retrieves the tank diameters|
-|getNodeTankIndex|Retrieves the indices of tanks|
-|getNodeTankInitialLevel|Retrieves the value of all tank initial water levels|
-|getNodeTankInitialWaterVolume|Retrieves the tank initial volume|
-|getNodeTankMaximumWaterVolume|Retrieves maximum water volume|
-|getNodeTankMaximumWaterLevel|Retrieves the tank maximum water level|
-|getNodeTankMixingFraction|Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank|
-|getNodeTankMinimumWaterLevel|Retrieves the tank minimum water level|
-|getNodeTankMinimumWaterVolume|Retrieves the tank minimum volume|
-|getNodeTankMixZoneVolume|Retrieves the tank mixing zone volume|
-|getNodeTankMixingModelCode|Retrieves the tank mixing model code|
-|getNodeTankMixingModelType|Retrieves the tank mixing model type (mix1, mix2, fifo, lifo)|
-|getNodeTankNameID|Retrieves the tanks IDs|
-|getNodeTankReservoirCount|Retrieves the number of tanks|
-|getNodeTankVolume|Retrieves the tank volume|
-|getNodeTankVolumeCurveIndex|Retrieves the tank volume curve index|
-|getNodeTankWaterLevel|Retrieves the current computed tank water level|
-|getNodeType|Retrieves the node-type for all nodes|
-|getNodeTypeIndex|Retrieves the node code-index for all nodes|
-|getNodesConnectingLinksID|Retrieves the id of the from/to nodes of all links|
-|getOptionsAccuracyValue|Retrieve the analysis convergence criterion (0.001)|
-|getOptionsDemandCharge|Retrieve energy price pattern|
-|getOptionsSpecificGravity|Retrieves the specific gravity (EPANET Version 2.2)|
-|getOptionsSpecificViscosity|Retrieves the specific viscosity (EPANET Version 2.2)|
-|getOptionsExtraTrials|Retrieves the extra trials allowed if hydraulics don't converge (EPANET Version 2.2)|
-|getOptionsCheckFrequency|Retrieves the frequency of hydraulic status checks (EPANET Version 2.2)|
-|getOptionsMaximumCheck|Retrieves the maximum trials for status checking. (EPANET Version 2.2)|
-|getOptionsEmitterExponent|Retrieve power exponent for the emmitters (0.5)|
-|getOptionsFlowChange|Retrieve flow change|
-|getOptionsGlobalEffic|Retrieve global efficiency pumps|
-|getOptionsGlobalPrice|Retrieve global average energy price per kW-Hour|
-|getOptionsGlobalPattern|Retrieve global pattern|
-|getOptionsHeadError|Retrieve the head error|
-|getOptionsHeadLossFormula|Retrieve headloss formula code (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)|
-|getOptionsMaxTrials|Retrieve maximum number of analysis trials|
-|getOptionsPatternDemandMultiplier|Retrieve the demand multiplier (x1)|
-|getOptionsQualityTolerance|Retrieve the water quality analysis tolerance|
-|getOptionsDampLimit|Retrieves the accuracy level where solution damping begins. (EPANET Version 2.2)|
-|getOptionsSpecificDiffusivity|Retrieves the specific diffusivity (relative to chlorine at 20 deg C). (EPANET Version 2.2)|
-|getOptionsPipeBulkReactionOrder|Retrieves the bulk water reaction order for pipes. (EPANET Version 2.2)|
-|getOptionsPipeWallReactionOrder|Retrieves the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)|
-|getOptionsTankBulkReactionOrder|Retrieves the bulk water reaction order for tanks. (EPANET Version 2.2)|
-|getOptionsLimitingConcentration|Retrieves the limiting concentration for growth reactions. (EPANET Version 2.2)|
-|getOptionsPressureUnits|Retrieve current pressure units|
-|getOptionsStatusReport|Get current status report level|
-|getOptionsDemandPattern|Get default demand pattern behavior|
-|getOptionsEmitterBackFlow|Get emitter backflow setting|
-|getPattern|Retrieves the multiplier factor for all patterns and all times|
-|getPatternAveragePatternValue|Retrieves the average value of a pattern|
-|getPatternComment|Retrieves the comment string assigned to the pattern object|
-|getPatternCount|Retrieves the number of patterns|
-|getPatternIndex|Retrieves the index of all or some time patterns IDs|
-|getPatternLengths|Retrieves the number of time periods in all or some patterns|
-|getPatternNameID|Retrieves the patterns IDs|
-|getPatternValue|Retrieves the multiplier factor for a certain pattern and time|
-|getQualityCode|Retrieves the code of water quality analysis type|
-|getQualityInfo|Retrieves the quality info - bug in ENgetqualinfo|
-|getQualityTraceNodeIndex|Retrieves the trace node index of water quality analysis type|
-|getQualityType|Retrieves the type of water quality analysis type|
-|getRules|Retrieves the rule - based control statements. (EPANET Version 2.2)|
-|getRuleCount|Retrieves the number of rules. (EPANET Version 2.2)|
-|getRuleEnabled|Retrieve rule enabled flag|
-|getRuleID|Retrieves the ID name of a rule-based control given its index. (EPANET Version 2.2)|
-|getRuleInfo|Retrieves summary information about a rule-based control given it's index. (EPANET Version 2.2)|
-|getStatistic|Retrieves hydraulic simulation statistic|
-|getStatisticIterations|Retrieves the number of iterations taken in the simulation|
-|getStatisticRelativeError|Retrieves the relative error statistic from the simulation|
-|getStatisticDeficientNodes|Retrieve number of deficient nodes|
-|getStatisticDemandReduction|Retrieve demand reduction statistics|
-|getStatisticTotalLeakageLoss|Retrieve total leakage loss value|
-|getTimeHTime|Retrieves the number of htime|
-|getTimeQTime|Retrieves the number of qtime|
-|getTimeHaltFlag|Retrieves the number of  halt flag|
-|getTimeHydraulicStep|Retrieves the value of the hydraulic time step|
-|getTimeNextEvent|Retrieves the number of next event|
-|getTimetoNextEvent|Return the type of event that terminates the current time step|
-|getTimeNextEventTank|Retrieves the index of tank with shortest time to become empty or full|
-|getTimePatternStart|Retrieves the value of pattern start time|
-|getTimePatternStep|Retrieves the value of the pattern time step|
-|loadPatternFile|Load a time pattern file into the project|
-|getPatternAverageDefaultValue|Report average value used when a pattern is missing|
-|getTimeQualityStep|Retrieves the value of the water quality time step|
-|getTimeReportingPeriods|Retrieves the number of reporting periods saved to the binary|
-|getTimeReportingStart|Retrie ves the value of the reporting start time|
-|getTimeReportingStep|Retrieves the value of the reporting time step|
-|getTimeRuleControlStep|Retrieves the time step for evaluating rule-based controls|
-|getTimeSimulationDuration|Retrieves the value of simulation duration|
-|getTimeStartTime|Retrieves the number of start time|
-|getTimeStatisticsType|Retrieves the type of time series post-processing ('NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE')|
-|getTimeStatisticsIndex|Retrieves the type of time series post-processing|
-|getTitle|Retrieves the title lines of the project|
-|getUnits|Retrieves the Units of Measurement|
-|getVersion|Retrieve the current EPANET version of DLL|
-|getNodesInfo|Retrieves nodes info e.g. elevations, demand pattern indices, emitter coeff. , initial quality, source quality, source pattern indices, source type code, type indices|
-|getLinksInfo|Retrieves links info e.g. diameters, lengths, roughness coeff. , minor loss coeff. , initial status, initial settings, bulk reaction coeff. , wall reaction coeff. , nodes connecting link indices, type indices|
-|addControls|Adds a new simple control. (EPANET Version 2.2)|
-|addCurve|Adds a new curve appended to the end of the existing curves|
-|addPattern|Adds a new time pattern to the network|
-|addNodeJunction|Adds a new junction|
-|addNodeJunctionDemand|Adds a new demand to a junction given the junction index, base demand, demand time pattern and demand name category. (EPANET Version 2.2)|
-|addNodeReservoir|Adds a new reservoir|
-|addNodeTank|Adds a new tank|
-|addLinkPipeCV|Adds a new CV pipe|
-|addLinkPipe|Adds a new pipe|
-|addLinkPump|Adds a new pump|
-|addLinkValvePRV|Adds a new PRV valve|
-|addLinkValvePSV|Adds a new PSV valve|
-|addLinkValvePBV|Adds a new PBV valve|
-|addLinkValveFCV|Adds a new FCV valve|
-|addLinkValveTCV|Adds a new TCV valve|
-|addLinkValveGPV|Adds a new GPV valve|
-|addLinkValvePCV|Adds a new PCV valve|
-|addRules|Adds a new rule-based control to a project. (EPANET Version 2.2)|
-|deleteAllTemps|Delete all temporary files (.inp, .bin) created in networks folder|
-|deleteControls|Deletes an existing simple control. (EPANET Version 2.2)|
-|deleteCurve|Deletes a data curve from the project|
-|deleteLink|Deletes a link|
-|deleteNode|Deletes a node|
-|deleteNodeJunctionDemand|Deletes a demand from a junction given the junction index and demand index(EPANET Version 2.2)|
-|deletePattern|Deletes a time pattern from a project|
-|deletePatternAll|Deletes all time patterns from a project|
-|deleteRules|Deletes an existing rule-based control given it's index. (EPANET Version 2.2)|
-|clearReport|Clears the contents of a project's report file. (EPANET Version 2.2)|
-|copyReport|Copies the current contents of a project's report file to another file. (EPANET Version 2.2)|
-|closeHydraulicAnalysis|Closes the hydraulic analysis system, freeing all allocated memory|
-|closeNetwork|Closes down the Toolkit system|
-|closeQualityAnalysis|Closes the water quality analysis system, freeing all allocated memory|
-|runsCompleteSimulation|Runs a complete hydraulic and water simulation to create binary & report files with default name net_temp.bin or you can use argument to run via ENepanet|
-|initializeEPANET|Initializes an EPANET project that isn't opened with an input file|
-|initializeHydraulicAnalysis|Initializes storage tank levels, link status and settings, and the simulation clock time prior to running a hydraulic analysis|
-|initializeQualityAnalysis|Initializes water quality and the simulation clock time prior to running a water quality analysis|
-|nextHydraulicAnalysisStep|Determines the length of time until the next hydraulic event occurs in an extended period simulation|
-|nextQualityAnalysisStep|Advances the water quality simulation to the start of the next hydraulic time period|
-|openAnyInp|Open as on matlab editor any EPANET input file|
-|openCurrentInp|Open EPANET input file who is loaded|
-|openHydraulicAnalysis|Opens the hydraulics analysis system|
-|openQualityAnalysis|Opens the water quality analysis system|
-|readEpanetBinaryFile|Read binary files|
-|runHydraulicAnalysis|Runs a single period hydraulic analysis, retrieving the current simulation clock time t|
-|reverseLinkNodeIndices|Reverses the node indices that connect a link|
-|runProject|Runs a complete EPANET simulation|
-|runQualityAnalysis|Makes available the hydraulic and water quality results that occur at the start of the next time period of a water quality analysis, where the start of the period is returned in t|
-|saveHydraulicFile|Saves the current contents of the binary hydraulics file to a file|
-|saveHydraulicsOutputReportingFile|Transfers results of a hydraulic simulation from the binary Hydraulics file to the binary Output file, where results are only reported at uniform reporting intervals|
-|saveInputFile|Writes all current network input data to a file using the format of an EPANET input file|
-|plot|Plot the network input file|
-|plotDiGraph|Plots the network with flow directions|
-|plotGraph|Plots the graph of the current epanet network|
-|setControls|Sets the parameters of a simple control statement|
-|setCurve|Sets x,y values for a specific curve|
-|setCurveNameID|Sets the name ID of a curve given it's index and the new ID. (EPANET Version 2.2)|
-|setCurveValue|Retrieves x,y point for a specific point number and curve|
-|setDemandModel|Sets the type of demand model to use and its parameters|
-|setFlowUnitsAFD|Sets flow units to AFD|
-|setFlowUnitsCFS|Sets flow units to CFS|
-|setFlowUnitsCMS|Set flow units to CMS|
-|setFlowUnitsCMD|Sets flow units to CMD|
-|setFlowUnitsCMH|Sets flow units to CMH|
-|setFlowUnitsGPM|Sets flow units to GPM|
-|setFlowUnitsIMGD|Sets flow units to IMGD|
-|setFlowUnitsLPM|Sets flow units to LPM|
-|setFlowUnitsLPS|Sets flow units to LPS|
-|setFlowUnitsMGD|Sets flow units to MGD|
-|setFlowUnitsMLD|Sets flow units to MLD|
-|setLinkBulkReactionCoeff|Sets the values of bulk reactions|
-|setLinkComment|Sets the comment string assigned to the link object|
-|setLinkDiameter|Sets the values of diameters|
-|setLinkExpansionProperties|Set expansion properties for a link|
-|setLinkPipeData|Sets a group of properties for a pipe. (EPANET Version 2.2)|
-|setLinkPumpHeadCurveIndex|Sets the curves index for pumps index|
-|setLinkPumpPatternIndex|Sets the pump speed time pattern index. (EPANET Version 2.2)|
-|setLinkPumpPower|Sets the power for pumps. (EPANET Version 2.2)|
-|setLinkPumpHCurve|Sets the pump head v. flow curve index. (EPANET Version 2.2)|
-|setLinkPumpECurve|Sets the pump efficiency v. flow curve index. (EPANET Version 2.2)|
-|setLinkPumpECost|Sets the pump average energy price. (EPANET Version 2.2)|
-|setLinkPumpEPat|Sets the pump energy price time pattern index. (EPANET Version 2.2)|
-|setLinkInitialSetting|Sets the values of initial settings|
-|setLinkInitialStatus|Sets the values of initial status|
-|setLinkLength|Sets the values of lengths|
-|setLinkLeakArea|Set leakage area for a link|
-|getNodeLeakageFlow|Get leakage flow at a node|
-|setLinkMinorLossCoeff|Sets the values of minor loss coeff.|
-|setLinkNameID|Sets the ID name for links|
-|setLinkNodesIndex|Sets the indexes of a link's start- and end-nodes. (EPANET Version 2.2)|
-|setLinkRoughnessCoeff|Sets the values of roughness coeff.|
-|setLinkSettings|Sets the values of settings|
-|setLinkStatus|Sets the values of status|
-|setLinkTypePipe|Set the link type pipe for a specified link|
-|setLinkTypePipeCV|Set the link type cvpipe for a specified link|
-|setLinkTypePump|Set the link type pump for a specified link|
-|setLinkTypeValveFCV|Set the link type valve FCV for a specified link|
-|setLinkTypeValveGPV|Set the link type valve PCV for a specified link|
-|setLinkTypeValvePBV|Set the link type valve PBV for a specified link|
-|setLinkTypeValvePRV|Set the link type valve PRV for a specified link|
-|setLinkTypeValvePSV|Set the link type valve PSV for a specified link|
-|setLinkTypeValveTCV|Set the link type valve TCV for a specified link|
-|setLinkTypeValvePCV|Set the link type valve PCV for a specified link|
-|setLinkValveCurveGPV|Set valve curve for GPV link|
-|setLinkValveCurvePCV|Set valve curve for PCV link|
-|setCurveType|Set the type of a curve object (volume, pump, efficiency, headloss, general, valve)|
-|setCurveTypeVolume|Set the type of a curve object to Volume|
-|setCurveTypePump|Set the type of a curve object to Pump|
-|setCurveTypeEfficiency|Set the type of a curve object to Efficiency|
-|setCurveTypeHeadloss|Set the type of a curve object to Headloss|
-|setCurveTypeGeneral|Set the type of a curve object to General|
-|setCurveTypeValveCurve|Set the type of a curve object to Curve|
-|setLinkVertices|Assigns a set of internal vertex points to a link|
-|setVertex|Set intermediate vertex coordinates for a link|
-|setLinkWallReactionCoeff|Sets the values of wall reactions|
-|setNodeBaseDemands|Sets the values of demands|
-|setNodeComment|Sets the comment string assigned to the node object|
-|setNodeCoordinates|Sets node coordinates|
-|setNodeDemandPatternIndex|Sets the values of demand pattern indices|
-|setNodeElevations|Sets the values of elevations|
-|setNodeEmitterCoeff|Sets the values of emitter coeff.|
-|setNodeInitialQuality|Sets the values of initial qualities|
-|setNodeJunctionData|Sets a group of properties for a junction node. (EPANET Version 2.2)|
-|setNodeJunctionDemandName|Assigns a name to a node's demand category|
-|setNodeNameID|Sets the ID name for nodes|
-|setNodeSourcePatternIndex|Sets the values of source pattern indices|
-|setNodeSourceQuality|Sets the values of source qualities|
-|setNodeSourceType|Sets the values of source types: 'CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'|
-|setNodesConnectingLinksID|Sets the ID of a link's start-node(s) and end-node(s). (EPANET Version 2.2)|
-|setNodeTankData| Sets a group of properties for a tank. (EPANET Version 2.2)|
-|setNodeTankBulkReactionCoeff|Sets the values of tank bulk reaction coeff.|
-|setNodeTankDiameter|Sets the values of tanks diameter|
-|setNodeTankCanOverFlow|Sets the value of tank can overflow (= 1) or not (= 0)|
-|setNodeTankInitialLevel|Sets the values of tanks initial level|
-|setNodeTankMaximumWaterLevel|Sets the values of tanks maximum water level|
-|setNodeTankMinimumWaterLevel|Sets the values of tanks minimum water level|
-|setNodeTankMixingFraction|Sets the values of tanks mix fraction|
-|setNodeTankMinimumWaterVolume|Sets the values of tanks minimum water volume|
-|setNodeTankMixingModelType|Sets the values of tanks model|
-|setNodeTypeJunction|Transforms a node to junction|
-|setNodeTypeReservoir|Transforms a node to reservoir|
-|setNodeTypeTank|Transforms a node to tank|
-|setOptionsAccuracyValue|Sets the value of accurancy|
-|setOptionsGlobalEffic|Sets the value of global pump efficiency(percent) (EPANET Version 2.2)|
-|setOptionsGlobalPrice|Sets the value of global energy price per KWH (EPANET Version 2.2)|
-|setOptionsGlobalPattern|Sets the index of a global energy price pattern (EPANET Version 2.2)|
-|setOptionsDemandCharge|Sets the energy demand charge per max. KW usage (EPANET Version 2.2)|
-|setOptionsSpecificGravity|Sets the specific gravity (EPANET Version 2.2)|
-|setOptionsSpecificViscosity|Sets the specific viscosity (EPANET Version 2.2)|
-|setOptionsExtraTrials|Sets the extra trials allowed if hydraulics don't converge (EPANET Version 2.2)|
-|setOptionsMaximumCheck|Sets the maximum trials for status checking. (EPANET Version 2.2)|
-|setOptionsCheckFrequency|Sets the frequency of hydraulic status checks (EPANET Version 2.2)|
-|setOptionsDampLimit|Sets the accuracy level where solution damping begins. (EPANET Version 2.2)|
-|setOptionsSpecificDiffusivity|Sets the specific diffusivity (relative to chlorine at 20 deg C). (EPANET Version 2.2)|
-|setOptionsPipeBulkReactionOrder|Sets the bulk water reaction order for pipes. (EPANET Version 2.2)|
-|setOptionsPipeWallReactionOrder|Sets the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)|
-|setOptionsTankBulkReactionOrder|Sets the bulk water reaction order for tanks. (EPANET Version 2.2)|
-|setOptionsLimitingConcentration|Sets the limiting concentration for growth reactions. (EPANET Version 2.2)|
-|setOptionsEmitterExponent|Sets the value of emitter exponent|
-|setOptionsMaxTrials|Sets the value of max trials|
-|setOptionsPatternDemandMultiplier|Sets the value of pattern demand multiplier|
-|setOptionsPressureUnits|Set pressure units (EN_PSI / EN_KPA / EN_METERS)|
-|setOptionsPressureUnitsMeters|Set pressure units to meters|
-|setOptionsPressureUnitsPSI|Set pressure units to PSI|
-|setOptionsPressureUnitsKPA|Set pressure units to kPa|
-|setOptionsStatusReport|Set status report level (EN_NO_REPORT / EN_NORMAL_REPORT / EN_FULL_REPORT)|
-|setOptionsStatusReportNo|Set report level to no report|
-|setOptionsStatusReportNormal|Set report level to normal|
-|setOptionsStatusReportFull|Set report level to full|
-|setOptionsDemandPattern|Set default demand pattern behavior|
-|setOptionsEmitterBackFlowAllowed|Allow emitter backflow|
-|setOptionsEmitterBackFlowDisallowed|Disallow emitter backflow|
-|setOptionsQualityTolerance|Sets the value of tolerance|
-|setPattern|Sets all of the multiplier factors for a specific time pattern|
-|setPatternComment|Sets the comment string assigned to the pattern object|
-|setPatternNameID|Sets the name ID of a time pattern given it's index and the new ID. (EPANET Version 2.2)|
-|setPatternMatrix|Sets all of the multiplier factors for all patterns|
-|setPatternValue|Sets the multiplier factor for a specific period within a time pattern|
-|setQualityType|Sets the type of water quality analysis called for|
-|setReport|Issues a report formatting command. Formatting commands are the same as used in the [REPORT] section of the EPANET Input file|
-|setReportFormatReset|Clears any report formatting commands that either appeared in the [REPORT] section of the EPANET Input file or were issued with the ENsetreport function|
-|setReportStatus|Sets the level of hydraulic status reporting|
-|setRules|Sets a rule - based control. (EPANET Version 2.2)|
-|setRuleEnabled|Enable/disable rule by index|
-|setRuleElseAction|Sets rule - based control else actions. (EPANET Version 2.2)|
-|setRulePremise|Sets the premise of a rule - based control. (EPANET Version 2.2)|
-|setRulePremiseObejctNameID|Sets the ID of an object in a premise of a rule-based control. (EPANET Version 2.2)|
-|setRulePremiseStatus|Sets the status being compared to in a premise of a rule-based control. (EPANET Version 2.2)|
-|setRulePremiseValue|Sets the value being compared to in a premise of a rule-based control. (EPANET Version 2.2)|
-|setRulePriority|Sets rule - based control priority. (EPANET Version 2.2)|
-|setRuleThenAction|Sets rule - based control then actions. (EPANET Version 2.2)|
-|setTimeHydraulicStep|Sets the hydraulic step|
-|setTimePatternStart|Sets the pattern start|
-|setTimePatternStep|Sets the pattern step|
-|setTimeQualityStep|Sets the quality step|
-|setTimeReportingStart|Sets the reporting start|
-|setTimeReportingStep|Sets the reporting step|
-|setTimeRuleControlStep|Sets the rule control step|
-|setTimeSimulationDuration|Sets the simulation duration|
-|setTimeStatisticsType|Sets the statistic type|
-|setTitle|Sets the title lines of the project|
-|solveCompleteHydraulics|Runs a complete hydraulic simulation with results for all time periods written to the binary Hydraulics file|
-|solveCompleteQuality|Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file|
-|splitPipe|Splits a pipe, creating two new pipes and adds a junction in between them|
-|stepQualityAnalysisTimeLeft|Advances the water quality simulation one water quality time step. The time remaining in the overall simulation is returned in tleft|
-|toJson|Creates json text variable|
-|toJsonFile|Creates a .json file and adds the input values in json format|
-|useHydraulicFile|Uses the contents of the specified file as the current binary hydraulics file|
-|writeLineInReportFile|Writes a line of text to the EPANET report file|
-|writeReport|Writes a formatted text report on simulation results to the Report file|
+|Function| Description                                                                                                                                                                                                      |
+|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|epanet| Load Input file and open the EPANET Toolkit system                                                                                                                                                               |
+|unload| Unload library and close the EPANET Toolkit system                                                                                                                                                               |
+|loadEPANETFile| Re-Load EPANET file - parfor                                                                                                                                                                                     |
+|loadMSXEPANETFile| Re-Load EPANET MSX file - parfor                                                                                                                                                                                 |
+|loadlibrary| Load the EPANET library - parfor                                                                                                                                                                                 |
+|loadMSXlibrary| Load the EPANET MSX library - parfor                                                                                                                                                                             |
+|appShiftNetwor| Shifts the network in x and y directions                                                                                                                                                                         |
+|appRotateNetwork| Rotates the network by theta degrees counter-clockwise using as pivot a specific node                                                                                                                            |
+|createProject| Creates an epanet project                                                                                                                                                                                        |
+|cleanupEpanetTempFiles| Delete all EPANET temp files                                                                                                                                                                                     |
+|deleteProject| Deletes an epanet project                                                                                                                                                                                        |
+|getError| Returns the description of an error code                                                                                                                                                                         |
+|getAdjacencyMatrix| Compute the adjacency matrix (connectivity graph) considering the flows, using mean flow                                                                                                                         |
+|openX| Open an input file even if it has formatting errors (lenient parsing mode)                                                                                                                                                                                  |
+|getConsumerDemandRequested| Retrieve consumer demand requested    (read only)                                                                                                                                                                           |
+|getConsumerDemandDelivered| Retrieve consumer demand delivered    (read only)                                                                                                                                                                           |
+|getComputedAnalysisTimeSeries| Computed Hydralic and Quality Time Series                                                                                                                                                                        |
+|getComputedHydraulicTimeSeries| Computed Hydraulic Time Series                                                                                                                                                                                   |
+|getComputedQualityTimeSeries| Computed Quality Time Series                                                                                                                                                                                     |
+|getComputedTimeSeries| Computed Hydraulic & Quality Time Series using the bimary file who created from executable                                                                                                                       |
+|getComputedTimeSeries_ENepanet| Computed Hydraulic & Quality Time Series via ENepanet binary file                                                                                                                                                |
+|getConnectivityMatrix| Return connectivity matrix of the network                                                                                                                                                                        |
+|getCounts| Retrieves the number of network components                                                                                                                                                                       |
+|getControlRulesCount| Retrieves the number of control rules                                                                                                                                                                            |
+|getControls| Retrieves the controls                                                                                                                                                                                           |
+|getControlState| Retrieve simple control enabled flag                                                                                                                                                                             |
+|getCurveCount| Retrieves the number of curves                                                                                                                                                                                   |
+|getCurveIndex| Retrieves index of curve with specific ID                                                                                                                                                                        |
+|getCurveLengths| Retrieves number of points in a curve                                                                                                                                                                            |
+|getCurveNameID| Retrieves curve id                                                                                                                                                                                               |
+|getCurveType| Retrieves the curve-type (VOLUME, PUMP, EFFICIENCY, HEADLOSS, GENERAL)                                                                                                                                           |
+|getCurveTypeIndex| Retrieves the curve-type index for all curves                                                                                                                                                                    |
+|getCurveValue| Retrieves (x,y) values of specific curve index                                                                                                                                                                   |
+|getCurveXY| Retrieves (x,y) values of all curves                                                                                                                                                                             |
+|getDemandModel| Retrieves the type of demand model in use and its parameters                                                                                                                                                     |
+|getEN_functionsImpemented| Retrieves the epanet EN_ functions that have been developed                                                                                                                                                      |
+|getENfunctionsImpemented| Retrieves the epanet functions that have been developed                                                                                                                                                          |
+|getFlowDirections| Compute the adjacency matrix (connectivity graph) considering the flows, at different time steps or the mean flow                                                                                                |
+|getFlowUnits| Retrieves the units used to express all flow rates                                                                                                                                                               |
+|getGraph| Retrieves the graph of the current epanet network                                                                                                                                                                |
+|getLibFunctions| Retrieves the functions of DLL                                                                                                                                                                                   |
+|getLinkActualQuality| Current computed link quality (read only)                                                                                                                                                                        |
+|getLinkBulkReactionCoeff| Bulk chemical reaction coefficient                                                                                                                                                                               |
+|getLinkComment| Retrieves the comment string assigned to the link object                                                                                                                                                         |
+|getLinkCount| Retrieves the number of links                                                                                                                                                                                    |
+|getLinkDiameter| Retrieves the value of all link diameters                                                                                                                                                                        |
+|getLinkEnergy| Current computed pump energy usage (read only)                                                                                                                                                                   |
+|getLinkExpansionProperties| Get expansion properties for a link                                                                                                                                                                              |
+|getLinkFlows| Current computed flow rate (read only)                                                                                                                                                                           |
+|getLinkHeadloss| Current computed head loss (read only)                                                                                                                                                                           |
+|getLinkInfo| Bulk retrieve link properties                                                                                                                                                                                    |
+|getLinkIndex| Retrieves the indices of all links, or the indices of an ID set of links                                                                                                                                         |
+|getLinkInitialSetting| Retrieves the value of all link roughness for pipes or initial speed for pumps or initial setting for valves                                                                                                     |
+|getLinkInitialStatus| Retrieves the value of all link initial status                                                                                                                                                                   |
+|getLinkLength| Retrieves the value of all link lengths                                                                                                                                                                          |
+|getLinkLeakArea| Get leakage area for a link                                                                                                                                                                                      |
+|getLinkLeakageRate| Get leakage rate for a link  (read only)                                                                                                                                                                         |
+|getLinkMinorLossCoeff| Retrieves the value of all link minor loss coefficients                                                                                                                                                          |
+|getLinkNameID| Retrieves the ID label(s) of all links, or the IDs of an index set of links                                                                                                                                      |
+|getLinkNodesIndex-getNodesConnectingLinksIndex| Retrieves the indexes of the from/to nodes of all links                                                                                                                                                          |
+|getLinkPipeCount| Retrieves the number of pipes                                                                                                                                                                                    |
+|getLinkPipeIndex| Retrieves the indices of pipes                                                                                                                                                                                   |
+|getLinkPipeNameID| Retrieves the pipe IDs                                                                                                                                                                                           |
+|getLinkPumpCount| Retrieves the number of pumps                                                                                                                                                                                    |
+|getLinkPumpEfficiency| Retrieves the value of all computed efficiency                                                                                                                                                                   |
+|getLinkPumpHeadCurveIndex| Retrieves index of a head curve for specific link index                                                                                                                                                          |
+|getLinkPumpIndex| Retrieves the indices of pumps                                                                                                                                                                                   |
+|getLinkPumpNameID| Retrieves the pump IDs                                                                                                                                                                                           |
+|getLinkPumpPatternIndex| Pump speed time pattern index                                                                                                                                                                                    |
+|getLinkPumpPatternNameID| Retrieves the pump pattern IDs                                                                                                                                                                                   |
+|getLinkPumpPower| Pump constant power rating                                                                                                                                                                                       |
+|getLinkPumpHCurve| Pump head v. flow curve index                                                                                                                                                                                    |
+|getLinkPumpECurve| Pump efficiency v. flow curve index                                                                                                                                                                              |
+|getLinkPumpECost| Pump average energy price                                                                                                                                                                                        |
+|getLinkPumpEPat| Pump energy price time pattern index                                                                                                                                                                             |
+|getLinkPumpType| Retrieves the type of a pump for specific link index                                                                                                                                                             |
+|getLinkPumpTypeCode| Retrieves the type code of a pump for specific link index                                                                                                                                                        |
+|getLinkPumpState| Current computed pump state (read only) (see @ref EN_PumpStateType)                                                                                                                                              |
+|getLinkPumpSwitches| Calculates the number of pump switches                                                                                                                                                                           |
+|getLinkQuality| Retrieves the value of link quality                                                                                                                                                                              |
+|getLinkResultIndex| Retrieves the order in which a link's results were saved to an output file. (EPANET Version 2.2)                                                                                                                 |
+|getLinkRoughnessCoeff| Retrieves the value of all link roughness                                                                                                                                                                        |
+|getLinkSettings| Retrieves the value of all computed link roughness for pipes or actual speed for pumps or actual setting for valves                                                                                              |
+|getLinkStatus| Current link status (see @ref EN_LinkStatusType)                                                                                                                                                                 |
+|getLinkType| Retrieves the link-type for all links                                                                                                                                                                            |
+|getLinkTypeIndex| Retrieves the link-type code for all links                                                                                                                                                                       |
+|getLinkValveCount| Retrieves the number of valves                                                                                                                                                                                   |
+|getLinkValveCurveGPV| Get valve curve for GPV link                                                                                                                                                                                     |
+|getLinkValveCurvePCV| Get valve curve for PCV link                                                                                                                                                                                     |
+|getLinkValveIndex| Retrieves the indices of valves                                                                                                                                                                                  |
+|getLinkValveNameID| Retrieves the valve IDs                                                                                                                                                                                          |
+|getLinkVelocity| Current computed flow velocity (read only)                                                                                                                                                                       |
+|getLinkVertices| Retrieves the coordinate's of a vertex point assigned to a link.                                                                                                                                                 |
+|getLinkVerticesCount| Retrieves the number of internal vertex points assigned to a link                                                                                                                                                |
+|getLinkVolumes| Get link volumes                                                                                                                                                                                                 |
+|getLinkWallReactionCoeff| Pipe wall chemical reaction coefficient                                                                                                                                                                          |
+|getLinkInControl| Query which links are referenced by controls                                                                                                                                                                     |
+|getNodeInControl| Query which objects are referenced by controls (returns IDs/indices)                                                                                                                                             |
+|getNodeActualDemand| Retrieves the computed value of all actual demands                                                                                                                                                               |
+|getNodeActualDemandSensingNodes| Retrieves the computed demand values at some sensing nodes                                                                                                                                                       |
+|getNodeActualQuality| Retrieves the computed values of the actual quality for all nodes                                                                                                                                                |
+|getNodeActualQualitySensingNodes| Retrieves the computed quality values at some sensing nodes                                                                                                                                                      |
+|getNodeBaseDemands| Retrieves the value of all node base demands                                                                                                                                                                     |
+|getNodeComment| Retrieves the comment string assigned to the node object                                                                                                                                                         |
+|getNodeCoordinates| Retrieves coordinate x, y, and x, y vertices for a node                                                                                                                                                          |
+|getNodeCount| Retrieves the number of nodes                                                                                                                                                                                    |
+|getNodePatternIndex| Retrieves the value of all node pattern indices                                                                                                                                                                  |
+|getNodeDemandDeficit| Retrieves the amount that full demand is reduced under PDA. (EPANET Version 2.2)                                                                                                                                 |
+|getNodeDemandPatternIndex| Retrieves the value of all node demand pattern indices                                                                                                                                                           |
+|getNodeDemandPatternNameID| Retrieves the value of all node demand pattern IDs                                                                                                                                                               |
+|getNodeElevations| Retrieves the value of all node elevations                                                                                                                                                                       |
+|getNodeEmitterCoeff| Retrieves the value of all node emmitter coefficients                                                                                                                                                            |
+|getNodeEmitterFlow| Get emitter flow at a node   (read only)                                                                                                                                                                         |
+|getNodeHydaulicHead| Retrieves the computed values of all hydraulic heads                                                                                                                                                             |
+|getNodeIndex| Retrieves the indices of all nodes or some nodes with a specified ID                                                                                                                                             |
+|getNodeInitialQuality| Retrieves the value of all node initial quality                                                                                                                                                                  |
+|getNodeJunctionActualDemand| Retrieves the computed value of all actual demands for junctions                                                                                                                                                 |
+|getNodeJunctionBaseDemands| Retrieves the value of all junction base demands                                                                                                                                                                 |
+|getNodeJunctionCount| Retrieves the number of junctions                                                                                                                                                                                |
+|getNodeJunctionDemandName| Gets the name of a node's demand category                                                                                                                                                                        |
+|getNodeJunctionIndex| Retrieves the junctions indices                                                                                                                                                                                  |
+|getNodeJunctionNameID| Retrieves the junctions IDs                                                                                                                                                                                      |
+|getNodeJunctionDemandIndex| Retrieves the demand index of the junctions. (EPANET Version 2.2)                                                                                                                                                |
+|getNodeLinks| Retrieves the links which a specific node is connected to                                                                                                                                                        |
+|getNodeMassFlowRate| Retrieves the computed mass flow rates per minute of chemical sources                                                                                                                                            |
+|getNodeNameID| Retrieves the ID label of all nodes or some nodes with a specified index                                                                                                                                         |
+|getNodeDemandCategoriesNumber| Retrieves the number of demand categories for a node                                                                                                                                                             |
+|getNodePressure| Retrieves the computed values of all node pressures                                                                                                                                                              |
+|getNodeReservoirCount| Retrieves the number of reservoirs                                                                                                                                                                               |
+|getNodeReservoirIndex| Retrieves the indices of reservoirs                                                                                                                                                                              |
+|getNodeReservoirNameID| Retrieves the reservoirs IDs                                                                                                                                                                                     |
+|getNodeResultIndex| Retrieves the order in which a node's results were saved to an output file. (EPANET Version 2.2)                                                                                                                 |
+|getNodeSourcePatternIndex| Retrieves the value of all node source pattern index                                                                                                                                                             |
+|getNodeSourceQuality| Retrieves the value of all nodes source quality                                                                                                                                                                  |
+|getNodeSourceType| Retrieves the value of all node source type                                                                                                                                                                      |
+|getNodeTankElevations| Retrieves the elevation of tanks                                                                                                                                                                                 |
+|getNodeTankData| Retrieves a group of properties for a tank. (EPANET Version 2.2)                                                                                                                                                 |
+|getNodeTankBulkReactionCoeff| Retrieves the tank bulk rate coefficient                                                                                                                                                                         |
+|getNodeTankCanOverFlow| Retrieves the tank can overflow (= 1) or not (= 0)                                                                                                                                                               |
+|getNodeTankCount| Retrieves the number of tanks                                                                                                                                                                                    |
+|getNodeTankDiameter| Retrieves the tank diameters                                                                                                                                                                                     |
+|getNodeTankIndex| Retrieves the indices of tanks                                                                                                                                                                                   |
+|getNodeTankInitialLevel| Retrieves the value of all tank initial water levels                                                                                                                                                             |
+|getNodeTankInitialWaterVolume| Retrieves the tank initial volume                                                                                                                                                                                |
+|getNodeTankMaximumWaterVolume| Retrieves maximum water volume                                                                                                                                                                                   |
+|getNodeTankMaximumWaterLevel| Retrieves the tank maximum water level                                                                                                                                                                           |
+|getNodeTankMixingFraction| Retrieves the tank Fraction of total volume occupied by the inlet/outlet zone in a 2-compartment tank                                                                                                            |
+|getNodeTankMinimumWaterLevel| Retrieves the tank minimum water level                                                                                                                                                                           |
+|getNodeTankMinimumWaterVolume| Retrieves the tank minimum volume                                                                                                                                                                                |
+|getNodeTankMixZoneVolume| Retrieves the tank mixing zone volume                                                                                                                                                                            |
+|getNodeTankMixingModelCode| Retrieves the tank mixing model code                                                                                                                                                                             |
+|getNodeTankMixingModelType| Retrieves the tank mixing model type (mix1, mix2, fifo, lifo)                                                                                                                                                    |
+|getNodeTankNameID| Retrieves the tanks IDs                                                                                                                                                                                          |
+|getNodeTankReservoirCount| Retrieves the number of tanks                                                                                                                                                                                    |
+|getNodeTankVolume| Retrieves the tank volume                                                                                                                                                                                        |
+|getNodeTankVolumeCurveIndex| Retrieves the tank volume curve index                                                                                                                                                                            |
+|getNodeTankWaterLevel| Retrieves the current computed tank water level                                                                                                                                                                  |
+|getNodeType| Retrieves the node-type for all nodes                                                                                                                                                                            |
+|getNodeTypeIndex| Retrieves the node code-index for all nodes                                                                                                                                                                      |
+|getNodesConnectingLinksID| Retrieves the id of the from/to nodes of all links                                                                                                                                                               |
+|getOptionsAccuracyValue| Retrieve the analysis convergence criterion (0.001)                                                                                                                                                              |
+|getOptionsDemandCharge| Retrieve energy price pattern                                                                                                                                                                                    |
+|getOptionsSpecificGravity| Retrieves the specific gravity (EPANET Version 2.2)                                                                                                                                                              |
+|getOptionsSpecificViscosity| Retrieves the specific viscosity (EPANET Version 2.2)                                                                                                                                                            |
+|getOptionsExtraTrials| Retrieves the extra trials allowed if hydraulics don't converge (EPANET Version 2.2)                                                                                                                             |
+|getOptionsCheckFrequency| Retrieves the frequency of hydraulic status checks (EPANET Version 2.2)                                                                                                                                          |
+|getOptionsMaximumCheck| Retrieves the maximum trials for status checking. (EPANET Version 2.2)                                                                                                                                           |
+|getOptionsEmitterExponent| Retrieve power exponent for the emmitters (0.5)                                                                                                                                                                  |
+|getOptionsFlowChange| Retrieve flow change                                                                                                                                                                                             |
+|getOptionsGlobalEffic| Retrieve global efficiency pumps                                                                                                                                                                                 |
+|getOptionsGlobalPrice| Retrieve global average energy price per kW-Hour                                                                                                                                                                 |
+|getOptionsGlobalPattern| Retrieve global pattern                                                                                                                                                                                          |
+|getOptionsHeadError| Retrieve the head error                                                                                                                                                                                          |
+|getOptionsHeadLossFormula| Retrieve headloss formula code (Hazen-Williams, Darcy-Weisbach or Chezy-Manning)                                                                                                                                 |
+|getOptionsMaxTrials| Retrieve maximum number of analysis trials                                                                                                                                                                       |
+|getOptionsPatternDemandMultiplier| Retrieve the demand multiplier (x1)                                                                                                                                                                              |
+|getOptionsQualityTolerance| Retrieve the water quality analysis tolerance                                                                                                                                                                    |
+|getOptionsDampLimit| Retrieves the accuracy level where solution damping begins. (EPANET Version 2.2)                                                                                                                                 |
+|getOptionsSpecificDiffusivity| Retrieves the specific diffusivity (relative to chlorine at 20 deg C). (EPANET Version 2.2)                                                                                                                      |
+|getOptionsPipeBulkReactionOrder| Retrieves the bulk water reaction order for pipes. (EPANET Version 2.2)                                                                                                                                          |
+|getOptionsPipeWallReactionOrder| Retrieves the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)                                                                                                                                |
+|getOptionsTankBulkReactionOrder| Retrieves the bulk water reaction order for tanks. (EPANET Version 2.2)                                                                                                                                          |
+|getOptionsLimitingConcentration| Retrieves the limiting concentration for growth reactions. (EPANET Version 2.2)                                                                                                                                  |
+|getOptionsPressureUnits| Retrieve current pressure units                                                                                                                                                                                  |
+|getOptionsStatusReport| Get current status report level                                                                                                                                                                                  |
+|getOptionsDemandPattern| Get default demand pattern behavior                                                                                                                                                                              |
+|getOptionsEmitterBackFlow| Get emitter backflow setting                                                                                                                                                                                     |
+|getPattern| Retrieves the multiplier factor for all patterns and all times                                                                                                                                                   |
+|getPatternAveragePatternValue| Retrieves the average value of a pattern                                                                                                                                                                         |
+|getPatternComment| Retrieves the comment string assigned to the pattern object                                                                                                                                                      |
+|getPatternCount| Retrieves the number of patterns                                                                                                                                                                                 |
+|getPatternIndex| Retrieves the index of all or some time patterns IDs                                                                                                                                                             |
+|getPatternLengths| Retrieves the number of time periods in all or some patterns                                                                                                                                                     |
+|getPatternNameID| Retrieves the patterns IDs                                                                                                                                                                                       |
+|getPatternValue| Retrieves the multiplier factor for a certain pattern and time                                                                                                                                                   |
+|getQualityCode| Retrieves the code of water quality analysis type                                                                                                                                                                |
+|getQualityInfo| Retrieves the quality info - bug in ENgetqualinfo                                                                                                                                                                |
+|getQualityTraceNodeIndex| Retrieves the trace node index of water quality analysis type                                                                                                                                                    |
+|getQualityType| Retrieves the type of water quality analysis type                                                                                                                                                                |
+|getRules| Retrieves the rule - based control statements. (EPANET Version 2.2)                                                                                                                                              |
+|getRuleCount| Retrieves the number of rules. (EPANET Version 2.2)                                                                                                                                                              |
+|getRuleEnabled| Retrieve rule enabled flag                                                                                                                                                                                       |
+|getRuleID| Retrieves the ID name of a rule-based control given its index. (EPANET Version 2.2)                                                                                                                              |
+|getRuleInfo| Retrieves summary information about a rule-based control given it's index. (EPANET Version 2.2)                                                                                                                  |
+|getStatistic| Retrieves hydraulic simulation statistic                                                                                                                                                                         |
+|getStatisticIterations| Retrieves the number of iterations taken in the simulation                                                                                                                                                       |
+|getStatisticRelativeError| Retrieves the relative error statistic from the simulation                                                                                                                                                       |
+|getStatisticDeficientNodes| Retrieve number of deficient nodes                                                                                                                                                                               |
+|getStatisticDemandReduction| Retrieve demand reduction statistics                                                                                                                                                                             |
+|getStatisticTotalLeakageLoss| Retrieve total leakage loss value                                                                                                                                                                                |
+|getTimeHTime| Retrieves the number of htime                                                                                                                                                                                    |
+|getTimeQTime| Retrieves the number of qtime                                                                                                                                                                                    |
+|getTimeHaltFlag| Retrieves the number of  halt flag                                                                                                                                                                               |
+|getTimeHydraulicStep| Retrieves the value of the hydraulic time step                                                                                                                                                                   |
+|getTimeNextEvent| Retrieves the number of next event                                                                                                                                                                               |
+|getTimetoNextEvent| Return the type of event that terminates the current time step                                                                                                                                                   |
+|getTimeNextEventTank| Retrieves the index of tank with shortest time to become empty or full                                                                                                                                           |
+|getTimePatternStart| Retrieves the value of pattern start time                                                                                                                                                                        |
+|getTimePatternStep| Retrieves the value of the pattern time step                                                                                                                                                                     |
+|loadPatternFile| Load a time pattern file into the project                                                                                                                                                                        |
+|getPatternAverageDefaultValue| Report average value used when a pattern is missing                                                                                                                                                              |
+|getTimeQualityStep| Retrieves the value of the water quality time step                                                                                                                                                               |
+|getTimeReportingPeriods| Retrieves the number of reporting periods saved to the binary                                                                                                                                                    |
+|getTimeReportingStart| Retrie ves the value of the reporting start time                                                                                                                                                                 |
+|getTimeReportingStep| Retrieves the value of the reporting time step                                                                                                                                                                   |
+|getTimeRuleControlStep| Retrieves the time step for evaluating rule-based controls                                                                                                                                                       |
+|getTimeSimulationDuration| Retrieves the value of simulation duration                                                                                                                                                                       |
+|getTimeStartTime| Retrieves the number of start time                                                                                                                                                                               |
+|getTimeStatisticsType| Retrieves the type of time series post-processing ('NONE','AVERAGE','MINIMUM','MAXIMUM', 'RANGE')                                                                                                                |
+|getTimeStatisticsIndex| Retrieves the type of time series post-processing                                                                                                                                                                |
+|getTitle| Retrieves the title lines of the project                                                                                                                                                                         |
+|getUnits| Retrieves the Units of Measurement                                                                                                                                                                               |
+|getVersion| Retrieve the current EPANET version of DLL                                                                                                                                                                       |
+|getNodesInfo| Retrieves nodes info e.g. elevations, demand pattern indices, emitter coeff. , initial quality, source quality, source pattern indices, source type code, type indices                                           |
+|getLinksInfo| Retrieves links info e.g. diameters, lengths, roughness coeff. , minor loss coeff. , initial status, initial settings, bulk reaction coeff. , wall reaction coeff. , nodes connecting link indices, type indices |
+|addControls| Adds a new simple control. (EPANET Version 2.2)                                                                                                                                                                  |
+|addCurve| Adds a new curve appended to the end of the existing curves                                                                                                                                                      |
+|addPattern| Adds a new time pattern to the network                                                                                                                                                                           |
+|addNodeJunction| Adds a new junction                                                                                                                                                                                              |
+|addNodeJunctionDemand| Adds a new demand to a junction given the junction index, base demand, demand time pattern and demand name category. (EPANET Version 2.2)                                                                        |
+|addNodeReservoir| Adds a new reservoir                                                                                                                                                                                             |
+|addNodeTank| Adds a new tank                                                                                                                                                                                                  |
+|addLinkPipeCV| Adds a new CV pipe                                                                                                                                                                                               |
+|addLinkPipe| Adds a new pipe                                                                                                                                                                                                  |
+|addLinkPump| Adds a new pump                                                                                                                                                                                                  |
+|addLinkValvePRV| Adds a new PRV valve                                                                                                                                                                                             |
+|addLinkValvePSV| Adds a new PSV valve                                                                                                                                                                                             |
+|addLinkValvePBV| Adds a new PBV valve                                                                                                                                                                                             |
+|addLinkValveFCV| Adds a new FCV valve                                                                                                                                                                                             |
+|addLinkValveTCV| Adds a new TCV valve                                                                                                                                                                                             |
+|addLinkValveGPV| Adds a new GPV valve                                                                                                                                                                                             |
+|addLinkValvePCV| Adds a new PCV valve                                                                                                                                                                                             |
+|addRules| Adds a new rule-based control to a project. (EPANET Version 2.2)                                                                                                                                                 |
+|deleteAllTemps| Delete all temporary files (.inp, .bin) created in networks folder                                                                                                                                               |
+|deleteControls| Deletes an existing simple control. (EPANET Version 2.2)                                                                                                                                                         |
+|deleteCurve| Deletes a data curve from the project                                                                                                                                                                            |
+|deleteLink| Deletes a link                                                                                                                                                                                                   |
+|deleteNode| Deletes a node                                                                                                                                                                                                   |
+|deleteNodeJunctionDemand| Deletes a demand from a junction given the junction index and demand index(EPANET Version 2.2)                                                                                                                   |
+|deletePattern| Deletes a time pattern from a project                                                                                                                                                                            |
+|deletePatternAll| Deletes all time patterns from a project                                                                                                                                                                         |
+|deleteRules| Deletes an existing rule-based control given it's index. (EPANET Version 2.2)                                                                                                                                    |
+|clearReport| Clears the contents of a project's report file. (EPANET Version 2.2)                                                                                                                                             |
+|copyReport| Copies the current contents of a project's report file to another file. (EPANET Version 2.2)                                                                                                                     |
+|closeHydraulicAnalysis| Closes the hydraulic analysis system, freeing all allocated memory                                                                                                                                               |
+|closeNetwork| Closes down the Toolkit system                                                                                                                                                                                   |
+|closeQualityAnalysis| Closes the water quality analysis system, freeing all allocated memory                                                                                                                                           |
+|runsCompleteSimulation| Runs a complete hydraulic and water simulation to create binary & report files with default name net_temp.bin or you can use argument to run via ENepanet                                                        |
+|initializeEPANET| Initializes an EPANET project that isn't opened with an input file                                                                                                                                               |
+|initializeHydraulicAnalysis| Initializes storage tank levels, link status and settings, and the simulation clock time prior to running a hydraulic analysis                                                                                   |
+|initializeQualityAnalysis| Initializes water quality and the simulation clock time prior to running a water quality analysis                                                                                                                |
+|nextHydraulicAnalysisStep| Determines the length of time until the next hydraulic event occurs in an extended period simulation                                                                                                             |
+|nextQualityAnalysisStep| Advances the water quality simulation to the start of the next hydraulic time period                                                                                                                             |
+|openAnyInp| Open as on matlab editor any EPANET input file                                                                                                                                                                   |
+|openCurrentInp| Open EPANET input file who is loaded                                                                                                                                                                             |
+|openHydraulicAnalysis| Opens the hydraulics analysis system                                                                                                                                                                             |
+|openQualityAnalysis| Opens the water quality analysis system                                                                                                                                                                          |
+|readEpanetBinaryFile| Read binary files                                                                                                                                                                                                |
+|runHydraulicAnalysis| Runs a single period hydraulic analysis, retrieving the current simulation clock time t                                                                                                                          |
+|reverseLinkNodeIndices| Reverses the node indices that connect a link                                                                                                                                                                    |
+|runProject| Runs a complete EPANET simulation                                                                                                                                                                                |
+|runQualityAnalysis| Makes available the hydraulic and water quality results that occur at the start of the next time period of a water quality analysis, where the start of the period is returned in t                              |
+|saveHydraulicFile| Saves the current contents of the binary hydraulics file to a file                                                                                                                                               |
+|saveHydraulicsOutputReportingFile| Transfers results of a hydraulic simulation from the binary Hydraulics file to the binary Output file, where results are only reported at uniform reporting intervals                                            |
+|saveInputFile| Writes all current network input data to a file using the format of an EPANET input file                                                                                                                         |
+|plot| Plot the network input file                                                                                                                                                                                      |
+|plotDiGraph| Plots the network with flow directions                                                                                                                                                                           |
+|plotGraph| Plots the graph of the current epanet network                                                                                                                                                                    |
+|setControls| Sets the parameters of a simple control statement                                                                                                                                                                |
+|setCurve| Sets x,y values for a specific curve                                                                                                                                                                             |
+|setCurveNameID| Sets the name ID of a curve given it's index and the new ID. (EPANET Version 2.2)                                                                                                                                |
+|setCurveValue| Retrieves x,y point for a specific point number and curve                                                                                                                                                        |
+|setDemandModel| Sets the type of demand model to use and its parameters                                                                                                                                                          |
+|setFlowUnitsAFD| Sets flow units to AFD                                                                                                                                                                                           |
+|setFlowUnitsCFS| Sets flow units to CFS                                                                                                                                                                                           |
+|setFlowUnitsCMS| Set flow units to CMS                                                                                                                                                                                            |
+|setFlowUnitsCMD| Sets flow units to CMD                                                                                                                                                                                           |
+|setFlowUnitsCMH| Sets flow units to CMH                                                                                                                                                                                           |
+|setFlowUnitsGPM| Sets flow units to GPM                                                                                                                                                                                           |
+|setFlowUnitsIMGD| Sets flow units to IMGD                                                                                                                                                                                          |
+|setFlowUnitsLPM| Sets flow units to LPM                                                                                                                                                                                           |
+|setFlowUnitsLPS| Sets flow units to LPS                                                                                                                                                                                           |
+|setFlowUnitsMGD| Sets flow units to MGD                                                                                                                                                                                           |
+|setFlowUnitsMLD| Sets flow units to MLD                                                                                                                                                                                           |
+|setLinkBulkReactionCoeff| Sets the values of bulk reactions                                                                                                                                                                                |
+|setLinkComment| Sets the comment string assigned to the link object                                                                                                                                                              |
+|setLinkDiameter| Sets the values of diameters                                                                                                                                                                                     |
+|setLinkExpansionProperties| Set expansion properties for a link                                                                                                                                                                              |
+|setLinkPipeData| Sets a group of properties for a pipe. (EPANET Version 2.2)                                                                                                                                                      |
+|setLinkPumpHeadCurveIndex| Sets the curves index for pumps index                                                                                                                                                                            |
+|setLinkPumpPatternIndex| Sets the pump speed time pattern index. (EPANET Version 2.2)                                                                                                                                                     |
+|setLinkPumpPower| Sets the power for pumps. (EPANET Version 2.2)                                                                                                                                                                   |
+|setLinkPumpHCurve| Sets the pump head v. flow curve index. (EPANET Version 2.2)                                                                                                                                                     |
+|setLinkPumpECurve| Sets the pump efficiency v. flow curve index. (EPANET Version 2.2)                                                                                                                                               |
+|setLinkPumpECost| Sets the pump average energy price. (EPANET Version 2.2)                                                                                                                                                         |
+|setLinkPumpEPat| Sets the pump energy price time pattern index. (EPANET Version 2.2)                                                                                                                                              |
+|setLinkInitialSetting| Sets the values of initial settings                                                                                                                                                                              |
+|setLinkInitialStatus| Sets the values of initial status                                                                                                                                                                                |
+|setLinkLength| Sets the values of lengths                                                                                                                                                                                       |
+|setLinkLeakArea| Set leakage area for a link                                                                                                                                                                                      |
+|getNodeLeakageFlow| Get leakage flow at a node      (read only)                                                                                                                                                                      |
+|setLinkMinorLossCoeff| Sets the values of minor loss coeff.                                                                                                                                                                             |
+|setLinkNameID| Sets the ID name for links                                                                                                                                                                                       |
+|setLinkNodesIndex| Sets the indexes of a link's start- and end-nodes. (EPANET Version 2.2)                                                                                                                                          |
+|setLinkRoughnessCoeff| Sets the values of roughness coeff.                                                                                                                                                                              |
+|setLinkSettings| Sets the values of settings                                                                                                                                                                                      |
+|setLinkStatus| Sets the values of status                                                                                                                                                                                        |
+|setLinkTypePipe| Set the link type pipe for a specified link                                                                                                                                                                      |
+|setLinkTypePipeCV| Set the link type cvpipe for a specified link                                                                                                                                                                    |
+|setLinkTypePump| Set the link type pump for a specified link                                                                                                                                                                      |
+|setLinkTypeValveFCV| Set the link type valve FCV for a specified link                                                                                                                                                                 |
+|setLinkTypeValveGPV| Set the link type valve PCV for a specified link                                                                                                                                                                 |
+|setLinkTypeValvePBV| Set the link type valve PBV for a specified link                                                                                                                                                                 |
+|setLinkTypeValvePRV| Set the link type valve PRV for a specified link                                                                                                                                                                 |
+|setLinkTypeValvePSV| Set the link type valve PSV for a specified link                                                                                                                                                                 |
+|setLinkTypeValveTCV| Set the link type valve TCV for a specified link                                                                                                                                                                 |
+|setLinkTypeValvePCV| Set the link type valve PCV for a specified link                                                                                                                                                                 |
+|setLinkValveCurveGPV| Set valve curve for GPV link                                                                                                                                                                                     |
+|setLinkValveCurvePCV| Set valve curve for PCV link                                                                                                                                                                                     |
+|setCurveType| Set the type of a curve object (volume, pump, efficiency, headloss, general, valve)                                                                                                                              |
+|setCurveTypeVolume| Set the type of a curve object to Volume                                                                                                                                                                         |
+|setCurveTypePump| Set the type of a curve object to Pump                                                                                                                                                                           |
+|setCurveTypeEfficiency| Set the type of a curve object to Efficiency                                                                                                                                                                     |
+|setCurveTypeHeadloss| Set the type of a curve object to Headloss                                                                                                                                                                       |
+|setCurveTypeGeneral| Set the type of a curve object to General                                                                                                                                                                        |
+|setCurveTypeValveCurve| Set the type of a curve object to Curve                                                                                                                                                                          |
+|setLinkVertices| Assigns a set of internal vertex points to a link                                                                                                                                                                |
+|setVertex| Set intermediate vertex coordinates for a link                                                                                                                                                                   |
+|setLinkWallReactionCoeff| Sets the values of wall reactions                                                                                                                                                                                |
+|setNodeBaseDemands| Sets the values of demands                                                                                                                                                                                       |
+|setNodeComment| Sets the comment string assigned to the node object                                                                                                                                                              |
+|setNodeCoordinates| Sets node coordinates                                                                                                                                                                                            |
+|setNodeDemandPatternIndex| Sets the values of demand pattern indices                                                                                                                                                                        |
+|setNodeElevations| Sets the values of elevations                                                                                                                                                                                    |
+|setNodeEmitterCoeff| Sets the values of emitter coeff.                                                                                                                                                                                |
+|setNodeInitialQuality| Sets the values of initial qualities                                                                                                                                                                             |
+|setNodeJunctionData| Sets a group of properties for a junction node. (EPANET Version 2.2)                                                                                                                                             |
+|setNodeJunctionDemandName| Assigns a name to a node's demand category                                                                                                                                                                       |
+|setNodeNameID| Sets the ID name for nodes                                                                                                                                                                                       |
+|setNodeSourcePatternIndex| Sets the values of source pattern indices                                                                                                                                                                        |
+|setNodeSourceQuality| Sets the values of source qualities                                                                                                                                                                              |
+|setNodeSourceType| Sets the values of source types: 'CONCEN', 'MASS', 'SETPOINT', 'FLOWPACED'                                                                                                                                       |
+|setNodesConnectingLinksID| Sets the ID of a link's start-node(s) and end-node(s). (EPANET Version 2.2)                                                                                                                                      |
+|setNodeTankData| Sets a group of properties for a tank. (EPANET Version 2.2)                                                                                                                                                      |
+|setNodeTankBulkReactionCoeff| Sets the values of tank bulk reaction coeff.                                                                                                                                                                     |
+|setNodeTankDiameter| Sets the values of tanks diameter                                                                                                                                                                                |
+|setNodeTankCanOverFlow| Sets the value of tank can overflow (= 1) or not (= 0)                                                                                                                                                           |
+|setNodeTankInitialLevel| Sets the values of tanks initial level                                                                                                                                                                           |
+|setNodeTankMaximumWaterLevel| Sets the values of tanks maximum water level                                                                                                                                                                     |
+|setNodeTankMinimumWaterLevel| Sets the values of tanks minimum water level                                                                                                                                                                     |
+|setNodeTankMixingFraction| Sets the values of tanks mix fraction                                                                                                                                                                            |
+|setNodeTankMinimumWaterVolume| Sets the values of tanks minimum water volume                                                                                                                                                                    |
+|setNodeTankMixingModelType| Sets the values of tanks model                                                                                                                                                                                   |
+|setNodeTypeJunction| Transforms a node to junction                                                                                                                                                                                    |
+|setNodeTypeReservoir| Transforms a node to reservoir                                                                                                                                                                                   |
+|setNodeTypeTank| Transforms a node to tank                                                                                                                                                                                        |
+|setOptionsAccuracyValue| Sets the value of accurancy                                                                                                                                                                                      |
+|setOptionsGlobalEffic| Sets the value of global pump efficiency(percent) (EPANET Version 2.2)                                                                                                                                           |
+|setOptionsGlobalPrice| Sets the value of global energy price per KWH (EPANET Version 2.2)                                                                                                                                               |
+|setOptionsGlobalPattern| Sets the index of a global energy price pattern (EPANET Version 2.2)                                                                                                                                             |
+|setOptionsDemandCharge| Sets the energy demand charge per max. KW usage (EPANET Version 2.2)                                                                                                                                             |
+|setOptionsSpecificGravity| Sets the specific gravity (EPANET Version 2.2)                                                                                                                                                                   |
+|setOptionsSpecificViscosity| Sets the specific viscosity (EPANET Version 2.2)                                                                                                                                                                 |
+|setOptionsExtraTrials| Sets the extra trials allowed if hydraulics don't converge (EPANET Version 2.2)                                                                                                                                  |
+|setOptionsMaximumCheck| Sets the maximum trials for status checking. (EPANET Version 2.2)                                                                                                                                                |
+|setOptionsCheckFrequency| Sets the frequency of hydraulic status checks (EPANET Version 2.2)                                                                                                                                               |
+|setOptionsDampLimit| Sets the accuracy level where solution damping begins. (EPANET Version 2.2)                                                                                                                                      |
+|setOptionsSpecificDiffusivity| Sets the specific diffusivity (relative to chlorine at 20 deg C). (EPANET Version 2.2)                                                                                                                           |
+|setOptionsPipeBulkReactionOrder| Sets the bulk water reaction order for pipes. (EPANET Version 2.2)                                                                                                                                               |
+|setOptionsPipeWallReactionOrder| Sets the wall reaction order for pipes (either 0 or 1). (EPANET Version 2.2)                                                                                                                                     |
+|setOptionsTankBulkReactionOrder| Sets the bulk water reaction order for tanks. (EPANET Version 2.2)                                                                                                                                               |
+|setOptionsLimitingConcentration| Sets the limiting concentration for growth reactions. (EPANET Version 2.2)                                                                                                                                       |
+|setOptionsEmitterExponent| Sets the value of emitter exponent                                                                                                                                                                               |
+|setOptionsMaxTrials| Sets the value of max trials                                                                                                                                                                                     |
+|setOptionsPatternDemandMultiplier| Sets the value of pattern demand multiplier                                                                                                                                                                      |
+|setOptionsPressureUnits| Set pressure units (EN_PSI / EN_KPA / EN_METERS)                                                                                                                                                                 |
+|setOptionsPressureUnitsMeters| Set pressure units to meters                                                                                                                                                                                     |
+|setOptionsPressureUnitsPSI| Set pressure units to PSI                                                                                                                                                                                        |
+|setOptionsPressureUnitsKPA| Set pressure units to kPa                                                                                                                                                                                        |
+|setOptionsStatusReport| Set status report level (EN_NO_REPORT / EN_NORMAL_REPORT / EN_FULL_REPORT)                                                                                                                                       |
+|setOptionsStatusReportNo| Set report level to no report                                                                                                                                                                                    |
+|setOptionsStatusReportNormal| Set report level to normal                                                                                                                                                                                       |
+|setOptionsStatusReportFull| Set report level to full                                                                                                                                                                                         |
+|setOptionsDemandPattern| Set default demand pattern behavior                                                                                                                                                                              |
+|setOptionsEmitterBackFlowAllowed| Allow emitter backflow                                                                                                                                                                                           |
+|setOptionsEmitterBackFlowDisallowed| Disallow emitter backflow                                                                                                                                                                                        |
+|setOptionsQualityTolerance| Sets the value of tolerance                                                                                                                                                                                      |
+|setPattern| Sets all of the multiplier factors for a specific time pattern                                                                                                                                                   |
+|setPatternComment| Sets the comment string assigned to the pattern object                                                                                                                                                           |
+|setPatternNameID| Sets the name ID of a time pattern given it's index and the new ID. (EPANET Version 2.2)                                                                                                                         |
+|setPatternMatrix| Sets all of the multiplier factors for all patterns                                                                                                                                                              |
+|setPatternValue| Sets the multiplier factor for a specific period within a time pattern                                                                                                                                           |
+|setQualityType| Sets the type of water quality analysis called for                                                                                                                                                               |
+|setReport| Issues a report formatting command. Formatting commands are the same as used in the [REPORT] section of the EPANET Input file                                                                                    |
+|setReportFormatReset| Clears any report formatting commands that either appeared in the [REPORT] section of the EPANET Input file or were issued with the ENsetreport function                                                         |
+|setReportStatus| Sets the level of hydraulic status reporting                                                                                                                                                                     |
+|setRules| Sets a rule - based control. (EPANET Version 2.2)                                                                                                                                                                |
+|setRuleEnabled| Enable/disable rule by index                                                                                                                                                                                     |
+|setRuleElseAction| Sets rule - based control else actions. (EPANET Version 2.2)                                                                                                                                                     |
+|setRulePremise| Sets the premise of a rule - based control. (EPANET Version 2.2)                                                                                                                                                 |
+|setRulePremiseObejctNameID| Sets the ID of an object in a premise of a rule-based control. (EPANET Version 2.2)                                                                                                                              |
+|setRulePremiseStatus| Sets the status being compared to in a premise of a rule-based control. (EPANET Version 2.2)                                                                                                                     |
+|setRulePremiseValue| Sets the value being compared to in a premise of a rule-based control. (EPANET Version 2.2)                                                                                                                      |
+|setRulePriority| Sets rule - based control priority. (EPANET Version 2.2)                                                                                                                                                         |
+|setRuleThenAction| Sets rule - based control then actions. (EPANET Version 2.2)                                                                                                                                                     |
+|setTimeHydraulicStep| Sets the hydraulic step                                                                                                                                                                                          |
+|setTimePatternStart| Sets the pattern start                                                                                                                                                                                           |
+|setTimePatternStep| Sets the pattern step                                                                                                                                                                                            |
+|setTimeQualityStep| Sets the quality step                                                                                                                                                                                            |
+|setTimeReportingStart| Sets the reporting start                                                                                                                                                                                         |
+|setTimeReportingStep| Sets the reporting step                                                                                                                                                                                          |
+|setTimeRuleControlStep| Sets the rule control step                                                                                                                                                                                       |
+|setTimeSimulationDuration| Sets the simulation duration                                                                                                                                                                                     |
+|setTimeStatisticsType| Sets the statistic type                                                                                                                                                                                          |
+|setTitle| Sets the title lines of the project                                                                                                                                                                              |
+|solveCompleteHydraulics| Runs a complete hydraulic simulation with results for all time periods written to the binary Hydraulics file                                                                                                     |
+|solveCompleteQuality| Runs a complete water quality simulation with results at uniform reporting intervals written to EPANET's binary Output file                                                                                      |
+|splitPipe| Splits a pipe, creating two new pipes and adds a junction in between them                                                                                                                                        |
+|stepQualityAnalysisTimeLeft| Advances the water quality simulation one water quality time step. The time remaining in the overall simulation is returned in tleft                                                                             |
+|toJson| Creates json text variable                                                                                                                                                                                       |
+|toJsonFile| Creates a .json file and adds the input values in json format                                                                                                                                                    |
+|useHydraulicFile| Uses the contents of the specified file as the current binary hydraulics file                                                                                                                                    |
+|writeLineInReportFile| Writes a line of text to the EPANET report file                                                                                                                                                                  |
+|writeReport| Writes a formatted text report on simulation results to the Report file                                                                                                                                          |
 |<b> MSX Functions </b>
-|loadMSXFile|Opens the EPANET-MSX toolkit system|
-|addMSXPattern|Adds a new, empty MSX source time pattern to the project|
-|initializeMSXQualityAnalysis|Initializes the MSX system before solving for water quality results in step-wise fashion|
-|saveMSXFile|Saves the data associated with the current MSX project into a new MSX input file|
-|saveMSXQualityFile|Saves water quality results computed for each node, link and reporting time period to a named binary file|
-|solveMSXCompleteHydraulics|Solves for system hydraulics over the entire simulation period saving results to an internal scratch file|
-|solveMSXCompleteQuality|Solves for water quality over the entire simulation period and saves the results to an internal scratch file|
-|stepMSXQualityAnalysisTimeLeft|Advances the water quality solution through a single water quality time step when performing a step-wise simulation|
-|writeMSXFile|Write a new MSX file|
-|writeMSXReport|Writes water quality simulations results as instructed by the MSX input file to a text file|
-|writeMSXReportExe|Writes water quality simulations results as instructed by the MSX input file to a specific name text file|
-|useMSXHydraulicFile|Uses a previously saved EPANET hydraulics file as the source of hydraulic information|
-|plotMSXSpeciesNodeConcentration|Plots the concentration species of links|
-|plotMSXSpeciesLinkConcentration|Plots the concentration species of nodes|
-|unloadMSX|Closes the EPANET-MSX toolkit system|
-|getMSXAtol|Retrieves the absolute concentration tolerance|
-|getMSXRtol|Retrieves the relative concentration tolerance|
-|getMSXComputedQualitySpecie|Retrieves the quality values for specific specie (e.g getMSXComputedQualitySpecie('CL2'))|
-|getMSXComputedLinkQualitySpecie|Returns the link quality for specific specie|
-|getMSXComputedNodeQualitySpecie|Returns the node quality for specific specie|
-|getMSXComputedQualityLink|Retrieves the concentration of a chemical species at a specific link of the network at the current simulation time step|
-|getMSXComputedQualityNode|Retrieves the concentration of a chemical species at a specific node of the network at the current simulation time step.|
-|getMSXComputedTimeSeries|Retrieves the concentration of chemical species|
-|getMSXConstantsCount|Retrieves the number of constants|
-|getMSXConstantsIndex|Retrieves the internal index number of constants (given its ID name)|
-|getMSXConstantsNameID|Retrieves the ID name of constants (given its internal index number)|
-|getMSXConstantsValue|Retrieves the value of a particular reaction constant|
-|getMSXError|Returns the text for an error message given its error code|
-|getMSXLinkInitqualValue|Retrieves the initial concentration of chemical species assigned to links of the pipe network|
-|getMSXNodeInitqualValue|Retrieves the initial concentration of chemical species assigned to nodes|
-|getMSXOptions|Retrieves all the msx option parameters|
-|getMSXParametersCount|Retrieves the number of parameters|
-|getMSXParametersIndex|Retrieves the indices of parameters|
-|getMSXParametersNameID|Retrieves the ID name of parameters|
-|getMSXParametersPipesValue|Retrieves the value of reaction parameters for pipes|
-|getMSXParametersTanksValue|Retrieves the value of reaction parameters for tanks|
-|getMSXPattern|Retrieves the multiplier factor for all patterns and all times|
-|getMSXPatternValue|Retrieves the multiplier at a specific time period for a given source time pattern|
-|getMSXPatternsCount|Retrieves the number of patterns|
-|getMSXPatternsIndex|Retrieves the indices of patterns|
-|getMSXPatternsLengths|Retrieves the number of time periods in all or some patterns|
-|getMSXPatternsNameID|Retrieves the patterns IDs|
-|getMSXSourceLevel|Retrieves the value of all nodes source level|
-|getMSXSourceNodeNameID|Retrieves the ID label of all nodes|
-|getMSXSourcePatternIndex|Retrieves the value of all node source pattern index|
-|getMSXSourceType|Retrieves the value of all node source type|
-|getMSXSources|Retrieves the source info|
-|getMSXSpeciesATOL|Retrieves the atol|
-|getMSXSpeciesRTOL|Retrieves the rtol|
-|getMSXSpeciesConcentration|Retrieves the concentration of chemical species for nodes and links|
-|getMSXSpeciesCount|Retrieves the number of species|
-|getMSXSpeciesIndex|Retrieves the indices of species|
-|getMSXSpeciesNameID|Retrieves the species IDs|
-|getMSXSpeciesType|Retrieves the type of all species (BULK/WALL)|
-|getMSXSpeciesUnits|Retrieves the species mass units|
-|getMSXTimeStep|Retrieves the time step|
-|getMSXRateUnits|Retrieves the rate/time units (SEC/MIN/HR/DAY)|
-|getMSXAreaUnits|Retrieves the area units (FT2/M2/CM2)|
-|getMSXCompiler|Retrieves the compiler (NONE/VC/GC)|
-|getMSXCoupling|Retrieves the coupling (FULL/NONE)|
-|getMSXEquationsPipes|Retrieves the species dynamics in pipes|
-|getMSXEquationsTanks|Retrieves the species dynamics in tanks|
-|getMSXEquationsTerms|Retrieves the species dynamics in terms|
-|getMSXSolver|Retrieves the solver (EUL/RK5/ROS2)|
-|setMSXAreaUnitsCM2|Sets area units to CM2|
-|setMSXAreaUnitsFT2|Sets area units to FT2|
-|setMSXAreaUnitsM2|Sets area units to M2|
-|setMSXAtol|Sets the value of Atol|
-|setMSXRtol|Sets the value of Rtol|
-|setMSXCompilerGC|Sets compilet to GC|
-|setMSXCompilerNONE|Sets compiler to None|
-|setMSXCompilerVC|Sets compiler to VC|
-|setMSXConstantsValue|Assigns a new value to a specific reaction constant|
-|setMSXCouplingFULL|Sets coupling option to FULL|
-|setMSXCouplingNONE|Sets coupling option to NONE|
-|setMSXLinkInitqualValue|Assigns an initial concentration of chemical species to links|
-|setMSXNodeInitqualValue|Assigns an initial concentration of chemical species to nodes|
-|setMSXParametersPipesValue|Assigns a value to a particular reaction parameter for given pipes|
-|setMSXParametersTanksValue|Assigns a value to a particular reaction parameter for given tanks|
-|setMSXPattern|Sets all of the multiplier factors for a specific time pattern|
-|setMSXPatternMatrix|Sets all of the multiplier factors for all patterns|
-|setMSXPatternValue|Assigns a new value to the multiplier for a specific time period in a given MSX source time pattern|
-|setMSXRateUnitsDAY|Sets rate units to DAY|
-|setMSXRateUnitsHR|Sets rate units to HR|
-|setMSXRateUnitsMIN|Sets rate units to MIN|
-|setMSXRateUnitsSEC|Sets rate units to SEC|
-|setMSXSolverEUL|Sets solver to EUL (standard Euler integrator)|
-|setMSXSolverRK5|Sets solver to RK5 (Runge-Kutta 5th order integrator)|
-|setMSXSolverROS2|Sets solver to ROS2 (2nd order Rosenbrock integrator)|
-|setMSXSources|Sets the attributes of an external source of a particular chemical species to a specific node of the pipe network|
-|setMSXTimeStep|Sets time step|
+|loadMSXFile| Opens the EPANET-MSX toolkit system                                                                                                                                                                              |
+|addMSXPattern| Adds a new, empty MSX source time pattern to the project                                                                                                                                                         |
+|initializeMSXQualityAnalysis| Initializes the MSX system before solving for water quality results in step-wise fashion                                                                                                                         |
+|saveMSXFile| Saves the data associated with the current MSX project into a new MSX input file                                                                                                                                 |
+|saveMSXQualityFile| Saves water quality results computed for each node, link and reporting time period to a named binary file                                                                                                        |
+|solveMSXCompleteHydraulics| Solves for system hydraulics over the entire simulation period saving results to an internal scratch file                                                                                                        |
+|solveMSXCompleteQuality| Solves for water quality over the entire simulation period and saves the results to an internal scratch file                                                                                                     |
+|stepMSXQualityAnalysisTimeLeft| Advances the water quality solution through a single water quality time step when performing a step-wise simulation                                                                                              |
+|writeMSXFile| Write a new MSX file                                                                                                                                                                                             |
+|writeMSXReport| Writes water quality simulations results as instructed by the MSX input file to a text file                                                                                                                      |
+|writeMSXReportExe| Writes water quality simulations results as instructed by the MSX input file to a specific name text file                                                                                                        |
+|useMSXHydraulicFile| Uses a previously saved EPANET hydraulics file as the source of hydraulic information                                                                                                                            |
+|plotMSXSpeciesNodeConcentration| Plots the concentration species of links                                                                                                                                                                         |
+|plotMSXSpeciesLinkConcentration| Plots the concentration species of nodes                                                                                                                                                                         |
+|unloadMSX| Closes the EPANET-MSX toolkit system                                                                                                                                                                             |
+|getMSXAtol| Retrieves the absolute concentration tolerance                                                                                                                                                                   |
+|getMSXRtol| Retrieves the relative concentration tolerance                                                                                                                                                                   |
+|getMSXComputedQualitySpecie| Retrieves the quality values for specific specie (e.g getMSXComputedQualitySpecie('CL2'))                                                                                                                        |
+|getMSXComputedLinkQualitySpecie| Returns the link quality for specific specie                                                                                                                                                                     |
+|getMSXComputedNodeQualitySpecie| Returns the node quality for specific specie                                                                                                                                                                     |
+|getMSXComputedQualityLink| Retrieves the concentration of a chemical species at a specific link of the network at the current simulation time step                                                                                          |
+|getMSXComputedQualityNode| Retrieves the concentration of a chemical species at a specific node of the network at the current simulation time step.                                                                                         |
+|getMSXComputedTimeSeries| Retrieves the concentration of chemical species                                                                                                                                                                  |
+|getMSXConstantsCount| Retrieves the number of constants                                                                                                                                                                                |
+|getMSXConstantsIndex| Retrieves the internal index number of constants (given its ID name)                                                                                                                                             |
+|getMSXConstantsNameID| Retrieves the ID name of constants (given its internal index number)                                                                                                                                             |
+|getMSXConstantsValue| Retrieves the value of a particular reaction constant                                                                                                                                                            |
+|getMSXError| Returns the text for an error message given its error code                                                                                                                                                       |
+|getMSXLinkInitqualValue| Retrieves the initial concentration of chemical species assigned to links of the pipe network                                                                                                                    |
+|getMSXNodeInitqualValue| Retrieves the initial concentration of chemical species assigned to nodes                                                                                                                                        |
+|getMSXOptions| Retrieves all the msx option parameters                                                                                                                                                                          |
+|getMSXParametersCount| Retrieves the number of parameters                                                                                                                                                                               |
+|getMSXParametersIndex| Retrieves the indices of parameters                                                                                                                                                                              |
+|getMSXParametersNameID| Retrieves the ID name of parameters                                                                                                                                                                              |
+|getMSXParametersPipesValue| Retrieves the value of reaction parameters for pipes                                                                                                                                                             |
+|getMSXParametersTanksValue| Retrieves the value of reaction parameters for tanks                                                                                                                                                             |
+|getMSXPattern| Retrieves the multiplier factor for all patterns and all times                                                                                                                                                   |
+|getMSXPatternValue| Retrieves the multiplier at a specific time period for a given source time pattern                                                                                                                               |
+|getMSXPatternsCount| Retrieves the number of patterns                                                                                                                                                                                 |
+|getMSXPatternsIndex| Retrieves the indices of patterns                                                                                                                                                                                |
+|getMSXPatternsLengths| Retrieves the number of time periods in all or some patterns                                                                                                                                                     |
+|getMSXPatternsNameID| Retrieves the patterns IDs                                                                                                                                                                                       |
+|getMSXSourceLevel| Retrieves the value of all nodes source level                                                                                                                                                                    |
+|getMSXSourceNodeNameID| Retrieves the ID label of all nodes                                                                                                                                                                              |
+|getMSXSourcePatternIndex| Retrieves the value of all node source pattern index                                                                                                                                                             |
+|getMSXSourceType| Retrieves the value of all node source type                                                                                                                                                                      |
+|getMSXSources| Retrieves the source info                                                                                                                                                                                        |
+|getMSXSpeciesATOL| Retrieves the atol                                                                                                                                                                                               |
+|getMSXSpeciesRTOL| Retrieves the rtol                                                                                                                                                                                               |
+|getMSXSpeciesConcentration| Retrieves the concentration of chemical species for nodes and links                                                                                                                                              |
+|getMSXSpeciesCount| Retrieves the number of species                                                                                                                                                                                  |
+|getMSXSpeciesIndex| Retrieves the indices of species                                                                                                                                                                                 |
+|getMSXSpeciesNameID| Retrieves the species IDs                                                                                                                                                                                        |
+|getMSXSpeciesType| Retrieves the type of all species (BULK/WALL)                                                                                                                                                                    |
+|getMSXSpeciesUnits| Retrieves the species mass units                                                                                                                                                                                 |
+|getMSXTimeStep| Retrieves the time step                                                                                                                                                                                          |
+|getMSXRateUnits| Retrieves the rate/time units (SEC/MIN/HR/DAY)                                                                                                                                                                   |
+|getMSXAreaUnits| Retrieves the area units (FT2/M2/CM2)                                                                                                                                                                            |
+|getMSXCompiler| Retrieves the compiler (NONE/VC/GC)                                                                                                                                                                              |
+|getMSXCoupling| Retrieves the coupling (FULL/NONE)                                                                                                                                                                               |
+|getMSXEquationsPipes| Retrieves the species dynamics in pipes                                                                                                                                                                          |
+|getMSXEquationsTanks| Retrieves the species dynamics in tanks                                                                                                                                                                          |
+|getMSXEquationsTerms| Retrieves the species dynamics in terms                                                                                                                                                                          |
+|getMSXSolver| Retrieves the solver (EUL/RK5/ROS2)                                                                                                                                                                              |
+|setMSXAreaUnitsCM2| Sets area units to CM2                                                                                                                                                                                           |
+|setMSXAreaUnitsFT2| Sets area units to FT2                                                                                                                                                                                           |
+|setMSXAreaUnitsM2| Sets area units to M2                                                                                                                                                                                            |
+|setMSXAtol| Sets the value of Atol                                                                                                                                                                                           |
+|setMSXRtol| Sets the value of Rtol                                                                                                                                                                                           |
+|setMSXCompilerGC| Sets compilet to GC                                                                                                                                                                                              |
+|setMSXCompilerNONE| Sets compiler to None                                                                                                                                                                                            |
+|setMSXCompilerVC| Sets compiler to VC                                                                                                                                                                                              |
+|setMSXConstantsValue| Assigns a new value to a specific reaction constant                                                                                                                                                              |
+|setMSXCouplingFULL| Sets coupling option to FULL                                                                                                                                                                                     |
+|setMSXCouplingNONE| Sets coupling option to NONE                                                                                                                                                                                     |
+|setMSXLinkInitqualValue| Assigns an initial concentration of chemical species to links                                                                                                                                                    |
+|setMSXNodeInitqualValue| Assigns an initial concentration of chemical species to nodes                                                                                                                                                    |
+|setMSXParametersPipesValue| Assigns a value to a particular reaction parameter for given pipes                                                                                                                                               |
+|setMSXParametersTanksValue| Assigns a value to a particular reaction parameter for given tanks                                                                                                                                               |
+|setMSXPattern| Sets all of the multiplier factors for a specific time pattern                                                                                                                                                   |
+|setMSXPatternMatrix| Sets all of the multiplier factors for all patterns                                                                                                                                                              |
+|setMSXPatternValue| Assigns a new value to the multiplier for a specific time period in a given MSX source time pattern                                                                                                              |
+|setMSXRateUnitsDAY| Sets rate units to DAY                                                                                                                                                                                           |
+|setMSXRateUnitsHR| Sets rate units to HR                                                                                                                                                                                            |
+|setMSXRateUnitsMIN| Sets rate units to MIN                                                                                                                                                                                           |
+|setMSXRateUnitsSEC| Sets rate units to SEC                                                                                                                                                                                           |
+|setMSXSolverEUL| Sets solver to EUL (standard Euler integrator)                                                                                                                                                                   |
+|setMSXSolverRK5| Sets solver to RK5 (Runge-Kutta 5th order integrator)                                                                                                                                                            |
+|setMSXSolverROS2| Sets solver to ROS2 (2nd order Rosenbrock integrator)                                                                                                                                                            |
+|setMSXSources| Sets the attributes of an external source of a particular chemical species to a specific node of the pipe network                                                                                                |
+|setMSXTimeStep| Sets time step                                                                                                                                                                                                   |
 |<b>Bin Functions</b>
-|BinClose|Close binary files and delete|
-|BinUpdateClass|Run all bin functions and update the results|
-|Binplot|Plot the network input file|
-|addBinControl|Adds a new control to the network|
-|addBinCurveEfficiency|Adds a new curve efficiency to the network|
-|addBinCurveHeadloss|Adds a new curve headloss to the network|
-|addBinCurvePump|Adds a new curve pump to the network|
-|addBinCurveVolume|Adds a new curve volume to the network|
-|addBinJunction|Adds a new junction to the network|
-|addBinNodeJunction|Adds a new junction to the network|
-|addBinPattern|Adds a new time pattern to the network|
-|addBinPipe|Adds a new pipe to the network|
-|addBinLinkPipe|Adds a new pipe to the network|
-|addBinPump|Adds a new pump to the network|
-|addBinLinkPump|Adds a new pump to the network|
-|addBinReservoir|Adds a new reservoir to the network|
-|addBinNodeReservoir|Adds a new reservoir to the network|
-|addBinTank|Adds a new tank to the network|
-|addBinNodeTank|Adds a new tank to the network|
-|addBinValveFCV|Adds a new valve FCV to the network|
-|addBinValveGPV|Adds a new valve GPV to the network|
-|addBinValvePBV|Adds a new valve PBV to the network|
-|addBinValvePRV|Adds a new valve PRV to the network|
-|addBinValvePSV|Adds a new valve PSV to the network|
-|addBinValveTCV|Adds a new valve TCV to the network|
-|addBinLinkValve|Adds a new valve to the network|
-|addBinLinkVertices|Adds interior vertex points to network links|
-|removeBinControlLinkID|Removes a specific control based on link ID|
-|removeBinControlNodeID|Removes a specific control based on node ID|
-|removeBinCurveID|Removes a specific curve based on ID|
-|removeBinLinkID|Removes a specific link based on ID|
-|removeBinNodeID|Removes a specific node based on ID|
-|removeBinRulesControlLinkID|Removes a specific rule based on link ID|
-|removeBinRulesControlNodeID|Removes a specific rule based on node ID|
-|deleteBinLinkVertices|Deletes interior vertex points of network links|
-|saveBinInpFile|Writes all current network input data to a file using the format of an EPANET input file|
-|getBinComputedAllParameters|Computes hydraulic and quality time series|
-|getBinComputedAverageBulkReactionRate|Computes the average bulk reaction rate|
-|getBinComputedAverageCostPerDay|Computes the average cost per day|
-|getBinComputedAverageEfficiency|Computes the average efficiency|
-|getBinComputedAverageKwatts|Computes the average Kwatts|
-|getBinComputedAverageKwattsOrMillionGallons|Computes the average Kwatts or million gallons|
-|getBinComputedAverageSourceInflow|Computes the average source inflow|                                                                                             
-|getBinComputedAverageTankReactionRate|Computes the average tank reaction rate|
-|getBinComputedAverageWallReactionRate|Computes average wall reaction rate|
-|getBinComputedLinkFlow|Computes the flow of links|
-|getBinComputedLinkFrictionFactor|Computes the link friction factor|
-|getBinComputedLinkHeadloss|Computes the headloss of links|
-|getBinComputedLinkQuality|Computes the quality of links|
-|getBinComputedLinkReactionRate|Computes the reaction rate of links|
-|getBinComputedLinkSetting|Computes the setting of links|
-|getBinComputedLinkStatus|Computes the status of links|
-|getBinComputedLinkVelocity|Computes the velocity of links|
-|getBinComputedNodeDemand|Computes the demand of nodes|
-|getBinComputedNodeHead|Computes the head of nodes|
-|getBinComputedNodePressure|Computes the pressure of nodes|
-|getBinComputedNodeQuality|Computes the quality of nodes|
-|getBinComputedPeakKwatts|Computes the peak Kwatts|
-|getBinComputedPumpIndexListLinks|Retrieves the pump indices|
-|getBinComputedPumpUtilization|Computes the pump utilization|
-|getBinDiameterEachLink|Retrieves the diameter of each link|
-|getBinLengthEachLink|Retrieves the length of each link|
-|getBinLinkIndex|Retrieves the indices of all links|
-|getBinLinkNameID|Retrieves the ID label(s) of all links|
-|getBinElevationEachNode|Retrieves the elevation of each node|
-|getBinNodeCoordinates|Retrieves coordinate x, y, and x, y vertices for a node|
-|getBinNodeIndex|Retrieves the indices of all nodes|
-|getBinNodeNameID|Retrieves the ID label(s) of all nodes|
-|getBinNumberReportingPeriods|Retrieves the number of reporting periods|
-|getBinControlsInfo|Retrieves the controls info|
-|getBinCurvesInfo|Retrieves the curves info|
-|getBinLinksInfo|Retrieves the links info|
-|getBinLimitingPotential|Retrieves limiting potential|
-|getBinNodesInfo|Retrieves the nodes info|
-|getBinNodeSourceInfo|Retrieves the sources info|
-|getBinOptionsInfo|Retrieves the options info|
-|getBinPatternsInfo|Retrieves the patterns info|
-|getBinRulesControlsInfo|Retrieves the controls info|
-|getBinTimesInfo|Retrieves the times info|
-|getBinPatternIndex|Retrieves the indices of all patterns|
-|getBinSimulationDuration|Retrieves the value of simulation duration|
-|getBinSections|Retrieves some basic sections from inp file|
-|getBinUnits|Retrieves the units used to express all flow rates|
-|getBinLinkVertices|Retrieves the link vertices|
-|getBinLinkVerticesCount|Retrieves the number of vertices|
-|setBinFlowUnitsAFD|Sets flow units to AFD|
-|setBinFlowUnitsCFS|Sets flow units to CFS|
-|setBinFlowUnitsCMD|Sets flow units to CMD|
-|setBinFlowUnitsCMH|Sets flow units to CMH|
-|setBinFlowUnitsGPM|Sets flow units to GPM|
-|setBinFlowUnitsIMGD|Sets flow units to IMGD|
-|setBinFlowUnitsLPM|Sets flow units to LPM|
-|setBinFlowUnitsLPS|Sets flow units to LPS|
-|setBinFlowUnitsMGD|Sets flow units to MGD|
-|setBinFlowUnitsMLD|Sets flow units to MLD|
-|setBinHeadlossCM|Sets headloss to C-M|
-|setBinHeadlossDW|Sets headloss to D-W|
-|setBinHeadlossHW|Sets headloss to H-W|
-|setBinLinkGlobalBulkReactionCoeff|Sets the global bulk reaction rate coeff.|
-|setBinLinkGlobalWallReactionCoeff|Sets the global wall reaction rate coeff.|
-|setBinLimitingPotential|Sets limiting potential|
-|setBinLinkPipeDiameters|Sets the values of pipe diameters|
-|setBinLinkPipeLengths|Sets the values of pipe lengths|
-|setBinLinkPipeMinorLoss|Sets the values of pipe minor losses|
-|setBinLinkPipeRoughness|Sets the values of pipe roughness|
-|setBinLinkPipeStatus|Sets the values of pipe status|
-|setBinLinkPipesParameters|Sets the values of pipe parameters (diameters, lengths, minor losses, roughness, status)|
-|setBinLinkPumpStatus|Sets the values of pump status|
-|setBinLinkReactionCoeff|Sets the values of bulk and wall reaction coeff.|
-|setBinLinkValvesParameters|Sets the values of valve parameters (diameters, types, settings, minor losses)|
-|setBinNodeJunDemandPatternNameID|Sets the names of demand pattern IDs for junctions|
-|setBinNodeInitialQuality|Sets the values of initial qualities|
-|setBinNodeJunctionElevation|Sets the values of elevations for junctions|
-|setBinNodeJunctionsBaseDemands|Sets the values of base demands|
-|setBinNodeJunctionsParameters|Sets the values of junction parameters (elevations, base demands, demand patterns)|
-|setBinNodeResDemandPatternNameID|Sets the names of demand pattern IDs for reservoirs|
-|setBinNodeReservoirElevation|Sets the values of elevations for reservoirs|
-|setBinNodeReservoirParameters|Sets the values of reservoir parameters (elevations, patterns)|
-|setBinNodeSourceQuality|Sets the values of source qualities|
-|setBinNodeTankDiameter|Sets the values of tanks diameter|
-|setBinNodeTankElevation|Sets the values of tanks elevation|
-|setBinNodeTankInitialLevel|Sets the values of tanks initial level|
-|setBinNodeTankMaximumWaterLevel|Sets the values of tanks maximum water level|
-|setBinNodeTankMinimumWaterLevel|Sets the values of tanks minimum water level|
-|setBinNodeTankMinimumWaterVolume|Sets the values of tanks minimum water volume|
-|setBinNodeTankParameters|Sets the values of reservoir parameters (elevations, initialLevels, minLevels, maxLevels, diameters, minVolume, mixfraction)|
-|setBinPattern|Sets all of the multiplier factors for a specific time pattern|
-|setBinQualityAge|Sets the type of water quality analysis to Age|
-|setBinQualityChem|Sets the type of water quality analysis to Chem|
-|setBinQualityNone|Sets the type of water quality analysis to None|
-|setBinQualityTrace|Sets the type of water quality analysis to Trace|
-|setBinQualType|Sets the type of water quality analysis to any chem e.g. chlorine|
-|setBinTimeHydraulicStep|Sets the hydraulic step|
-|setBinTimePatternStart|Sets the pattern start|
-|setBinTimePatternStep|Sets the pattern step|
-|setBinTimeQualityStep|Sets the quality step|
-|setBinTimeReportingStart|Sets the reporting start|
-|setBinTimeReportingStep|Sets the reporting step|
-|setBinTimeSimulationDuration|Sets the simulation duration|
-|setBinTimeStatisticsAverage|Sets the statistic type to Average|
-|setBinTimeStatisticsMaximum|Sets the statistic type to Maximum|
-|setBinTimeStatisticsMinimum|Sets the statistic type to Minimum|
-|setBinTimeStatisticsNone|Sets the statistic type to None|
-|setBinTimeStatisticsRange|Sets the statistic type to Range|
-|setBinLinkVertices|Sets interior vertex points of network links|
+|BinClose| Close binary files and delete                                                                                                                                                                                    |
+|BinUpdateClass| Run all bin functions and update the results                                                                                                                                                                     |
+|Binplot| Plot the network input file                                                                                                                                                                                      |
+|addBinControl| Adds a new control to the network                                                                                                                                                                                |
+|addBinCurveEfficiency| Adds a new curve efficiency to the network                                                                                                                                                                       |
+|addBinCurveHeadloss| Adds a new curve headloss to the network                                                                                                                                                                         |
+|addBinCurvePump| Adds a new curve pump to the network                                                                                                                                                                             |
+|addBinCurveVolume| Adds a new curve volume to the network                                                                                                                                                                           |
+|addBinJunction| Adds a new junction to the network                                                                                                                                                                               |
+|addBinNodeJunction| Adds a new junction to the network                                                                                                                                                                               |
+|addBinPattern| Adds a new time pattern to the network                                                                                                                                                                           |
+|addBinPipe| Adds a new pipe to the network                                                                                                                                                                                   |
+|addBinLinkPipe| Adds a new pipe to the network                                                                                                                                                                                   |
+|addBinPump| Adds a new pump to the network                                                                                                                                                                                   |
+|addBinLinkPump| Adds a new pump to the network                                                                                                                                                                                   |
+|addBinReservoir| Adds a new reservoir to the network                                                                                                                                                                              |
+|addBinNodeReservoir| Adds a new reservoir to the network                                                                                                                                                                              |
+|addBinTank| Adds a new tank to the network                                                                                                                                                                                   |
+|addBinNodeTank| Adds a new tank to the network                                                                                                                                                                                   |
+|addBinValveFCV| Adds a new valve FCV to the network                                                                                                                                                                              |
+|addBinValveGPV| Adds a new valve GPV to the network                                                                                                                                                                              |
+|addBinValvePBV| Adds a new valve PBV to the network                                                                                                                                                                              |
+|addBinValvePRV| Adds a new valve PRV to the network                                                                                                                                                                              |
+|addBinValvePSV| Adds a new valve PSV to the network                                                                                                                                                                              |
+|addBinValveTCV| Adds a new valve TCV to the network                                                                                                                                                                              |
+|addBinLinkValve| Adds a new valve to the network                                                                                                                                                                                  |
+|addBinLinkVertices| Adds interior vertex points to network links                                                                                                                                                                     |
+|removeBinControlLinkID| Removes a specific control based on link ID                                                                                                                                                                      |
+|removeBinControlNodeID| Removes a specific control based on node ID                                                                                                                                                                      |
+|removeBinCurveID| Removes a specific curve based on ID                                                                                                                                                                             |
+|removeBinLinkID| Removes a specific link based on ID                                                                                                                                                                              |
+|removeBinNodeID| Removes a specific node based on ID                                                                                                                                                                              |
+|removeBinRulesControlLinkID| Removes a specific rule based on link ID                                                                                                                                                                         |
+|removeBinRulesControlNodeID| Removes a specific rule based on node ID                                                                                                                                                                         |
+|deleteBinLinkVertices| Deletes interior vertex points of network links                                                                                                                                                                  |
+|saveBinInpFile| Writes all current network input data to a file using the format of an EPANET input file                                                                                                                         |
+|getBinComputedAllParameters| Computes hydraulic and quality time series                                                                                                                                                                       |
+|getBinComputedAverageBulkReactionRate| Computes the average bulk reaction rate                                                                                                                                                                          |
+|getBinComputedAverageCostPerDay| Computes the average cost per day                                                                                                                                                                                |
+|getBinComputedAverageEfficiency| Computes the average efficiency                                                                                                                                                                                  |
+|getBinComputedAverageKwatts| Computes the average Kwatts                                                                                                                                                                                      |
+|getBinComputedAverageKwattsOrMillionGallons| Computes the average Kwatts or million gallons                                                                                                                                                                   |
+|getBinComputedAverageSourceInflow| Computes the average source inflow                                                                                                                                                                               |                                                                                             
+|getBinComputedAverageTankReactionRate| Computes the average tank reaction rate                                                                                                                                                                          |
+|getBinComputedAverageWallReactionRate| Computes average wall reaction rate                                                                                                                                                                              |
+|getBinComputedLinkFlow| Computes the flow of links                                                                                                                                                                                       |
+|getBinComputedLinkFrictionFactor| Computes the link friction factor                                                                                                                                                                                |
+|getBinComputedLinkHeadloss| Computes the headloss of links                                                                                                                                                                                   |
+|getBinComputedLinkQuality| Computes the quality of links                                                                                                                                                                                    |
+|getBinComputedLinkReactionRate| Computes the reaction rate of links                                                                                                                                                                              |
+|getBinComputedLinkSetting| Computes the setting of links                                                                                                                                                                                    |
+|getBinComputedLinkStatus| Computes the status of links                                                                                                                                                                                     |
+|getBinComputedLinkVelocity| Computes the velocity of links                                                                                                                                                                                   |
+|getBinComputedNodeDemand| Computes the demand of nodes                                                                                                                                                                                     |
+|getBinComputedNodeHead| Computes the head of nodes                                                                                                                                                                                       |
+|getBinComputedNodePressure| Computes the pressure of nodes                                                                                                                                                                                   |
+|getBinComputedNodeQuality| Computes the quality of nodes                                                                                                                                                                                    |
+|getBinComputedPeakKwatts| Computes the peak Kwatts                                                                                                                                                                                         |
+|getBinComputedPumpIndexListLinks| Retrieves the pump indices                                                                                                                                                                                       |
+|getBinComputedPumpUtilization| Computes the pump utilization                                                                                                                                                                                    |
+|getBinDiameterEachLink| Retrieves the diameter of each link                                                                                                                                                                              |
+|getBinLengthEachLink| Retrieves the length of each link                                                                                                                                                                                |
+|getBinLinkIndex| Retrieves the indices of all links                                                                                                                                                                               |
+|getBinLinkNameID| Retrieves the ID label(s) of all links                                                                                                                                                                           |
+|getBinElevationEachNode| Retrieves the elevation of each node                                                                                                                                                                             |
+|getBinNodeCoordinates| Retrieves coordinate x, y, and x, y vertices for a node                                                                                                                                                          |
+|getBinNodeIndex| Retrieves the indices of all nodes                                                                                                                                                                               |
+|getBinNodeNameID| Retrieves the ID label(s) of all nodes                                                                                                                                                                           |
+|getBinNumberReportingPeriods| Retrieves the number of reporting periods                                                                                                                                                                        |
+|getBinControlsInfo| Retrieves the controls info                                                                                                                                                                                      |
+|getBinCurvesInfo| Retrieves the curves info                                                                                                                                                                                        |
+|getBinLinksInfo| Retrieves the links info                                                                                                                                                                                         |
+|getBinLimitingPotential| Retrieves limiting potential                                                                                                                                                                                     |
+|getBinNodesInfo| Retrieves the nodes info                                                                                                                                                                                         |
+|getBinNodeSourceInfo| Retrieves the sources info                                                                                                                                                                                       |
+|getBinOptionsInfo| Retrieves the options info                                                                                                                                                                                       |
+|getBinPatternsInfo| Retrieves the patterns info                                                                                                                                                                                      |
+|getBinRulesControlsInfo| Retrieves the controls info                                                                                                                                                                                      |
+|getBinTimesInfo| Retrieves the times info                                                                                                                                                                                         |
+|getBinPatternIndex| Retrieves the indices of all patterns                                                                                                                                                                            |
+|getBinSimulationDuration| Retrieves the value of simulation duration                                                                                                                                                                       |
+|getBinSections| Retrieves some basic sections from inp file                                                                                                                                                                      |
+|getBinUnits| Retrieves the units used to express all flow rates                                                                                                                                                               |
+|getBinLinkVertices| Retrieves the link vertices                                                                                                                                                                                      |
+|getBinLinkVerticesCount| Retrieves the number of vertices                                                                                                                                                                                 |
+|setBinFlowUnitsAFD| Sets flow units to AFD                                                                                                                                                                                           |
+|setBinFlowUnitsCFS| Sets flow units to CFS                                                                                                                                                                                           |
+|setBinFlowUnitsCMD| Sets flow units to CMD                                                                                                                                                                                           |
+|setBinFlowUnitsCMH| Sets flow units to CMH                                                                                                                                                                                           |
+|setBinFlowUnitsGPM| Sets flow units to GPM                                                                                                                                                                                           |
+|setBinFlowUnitsIMGD| Sets flow units to IMGD                                                                                                                                                                                          |
+|setBinFlowUnitsLPM| Sets flow units to LPM                                                                                                                                                                                           |
+|setBinFlowUnitsLPS| Sets flow units to LPS                                                                                                                                                                                           |
+|setBinFlowUnitsMGD| Sets flow units to MGD                                                                                                                                                                                           |
+|setBinFlowUnitsMLD| Sets flow units to MLD                                                                                                                                                                                           |
+|setBinHeadlossCM| Sets headloss to C-M                                                                                                                                                                                             |
+|setBinHeadlossDW| Sets headloss to D-W                                                                                                                                                                                             |
+|setBinHeadlossHW| Sets headloss to H-W                                                                                                                                                                                             |
+|setBinLinkGlobalBulkReactionCoeff| Sets the global bulk reaction rate coeff.                                                                                                                                                                        |
+|setBinLinkGlobalWallReactionCoeff| Sets the global wall reaction rate coeff.                                                                                                                                                                        |
+|setBinLimitingPotential| Sets limiting potential                                                                                                                                                                                          |
+|setBinLinkPipeDiameters| Sets the values of pipe diameters                                                                                                                                                                                |
+|setBinLinkPipeLengths| Sets the values of pipe lengths                                                                                                                                                                                  |
+|setBinLinkPipeMinorLoss| Sets the values of pipe minor losses                                                                                                                                                                             |
+|setBinLinkPipeRoughness| Sets the values of pipe roughness                                                                                                                                                                                |
+|setBinLinkPipeStatus| Sets the values of pipe status                                                                                                                                                                                   |
+|setBinLinkPipesParameters| Sets the values of pipe parameters (diameters, lengths, minor losses, roughness, status)                                                                                                                         |
+|setBinLinkPumpStatus| Sets the values of pump status                                                                                                                                                                                   |
+|setBinLinkReactionCoeff| Sets the values of bulk and wall reaction coeff.                                                                                                                                                                 |
+|setBinLinkValvesParameters| Sets the values of valve parameters (diameters, types, settings, minor losses)                                                                                                                                   |
+|setBinNodeJunDemandPatternNameID| Sets the names of demand pattern IDs for junctions                                                                                                                                                               |
+|setBinNodeInitialQuality| Sets the values of initial qualities                                                                                                                                                                             |
+|setBinNodeJunctionElevation| Sets the values of elevations for junctions                                                                                                                                                                      |
+|setBinNodeJunctionsBaseDemands| Sets the values of base demands                                                                                                                                                                                  |
+|setBinNodeJunctionsParameters| Sets the values of junction parameters (elevations, base demands, demand patterns)                                                                                                                               |
+|setBinNodeResDemandPatternNameID| Sets the names of demand pattern IDs for reservoirs                                                                                                                                                              |
+|setBinNodeReservoirElevation| Sets the values of elevations for reservoirs                                                                                                                                                                     |
+|setBinNodeReservoirParameters| Sets the values of reservoir parameters (elevations, patterns)                                                                                                                                                   |
+|setBinNodeSourceQuality| Sets the values of source qualities                                                                                                                                                                              |
+|setBinNodeTankDiameter| Sets the values of tanks diameter                                                                                                                                                                                |
+|setBinNodeTankElevation| Sets the values of tanks elevation                                                                                                                                                                               |
+|setBinNodeTankInitialLevel| Sets the values of tanks initial level                                                                                                                                                                           |
+|setBinNodeTankMaximumWaterLevel| Sets the values of tanks maximum water level                                                                                                                                                                     |
+|setBinNodeTankMinimumWaterLevel| Sets the values of tanks minimum water level                                                                                                                                                                     |
+|setBinNodeTankMinimumWaterVolume| Sets the values of tanks minimum water volume                                                                                                                                                                    |
+|setBinNodeTankParameters| Sets the values of reservoir parameters (elevations, initialLevels, minLevels, maxLevels, diameters, minVolume, mixfraction)                                                                                     |
+|setBinPattern| Sets all of the multiplier factors for a specific time pattern                                                                                                                                                   |
+|setBinQualityAge| Sets the type of water quality analysis to Age                                                                                                                                                                   |
+|setBinQualityChem| Sets the type of water quality analysis to Chem                                                                                                                                                                  |
+|setBinQualityNone| Sets the type of water quality analysis to None                                                                                                                                                                  |
+|setBinQualityTrace| Sets the type of water quality analysis to Trace                                                                                                                                                                 |
+|setBinQualType| Sets the type of water quality analysis to any chem e.g. chlorine                                                                                                                                                |
+|setBinTimeHydraulicStep| Sets the hydraulic step                                                                                                                                                                                          |
+|setBinTimePatternStart| Sets the pattern start                                                                                                                                                                                           |
+|setBinTimePatternStep| Sets the pattern step                                                                                                                                                                                            |
+|setBinTimeQualityStep| Sets the quality step                                                                                                                                                                                            |
+|setBinTimeReportingStart| Sets the reporting start                                                                                                                                                                                         |
+|setBinTimeReportingStep| Sets the reporting step                                                                                                                                                                                          |
+|setBinTimeSimulationDuration| Sets the simulation duration                                                                                                                                                                                     |
+|setBinTimeStatisticsAverage| Sets the statistic type to Average                                                                                                                                                                               |
+|setBinTimeStatisticsMaximum| Sets the statistic type to Maximum                                                                                                                                                                               |
+|setBinTimeStatisticsMinimum| Sets the statistic type to Minimum                                                                                                                                                                               |
+|setBinTimeStatisticsNone| Sets the statistic type to None                                                                                                                                                                                  |
+|setBinTimeStatisticsRange| Sets the statistic type to Range                                                                                                                                                                                 |
+|setBinLinkVertices| Sets interior vertex points of network links                                                                                                                                                                     |
 
 &uparrow; [Back to top](#table-of-contents)
 
