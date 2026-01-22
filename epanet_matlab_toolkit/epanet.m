@@ -10410,6 +10410,9 @@ classdef epanet <handle
             %   7) Flow              14) NodeQuality
             %                        15) LinkQuality
             %                        16) MassFlowRate
+            %   17) LinkLeakageRate  18) EmitterFlow
+            %   19) DemandDelivered  20) DemandRequested
+            %   21) NodeLeakageFlow
             %
             % Example 1:
             %   d.getComputedAnalysisTimeSeries          % Retrieves all the time-series data
@@ -10461,7 +10464,9 @@ classdef epanet <handle
             if isempty(varargin)
                 varargin = {'time','pressure','demand','demanddeficit','head','tankvolume', ...
                             'flow','velocity','headloss','status','setting','energy', ...
-                            'efficiency','state','nodequality','linkquality','massflowrate'};
+                            'efficiency','state','nodequality','linkquality','massflowrate', ...
+                            'linkleakagerate', 'nodeleakageflow', 'emitterflow', ...
+                            'demanddelivered', 'demandrequested'};
             else
                 for i = 1:numel(varargin)
                     if isstring(varargin{i})
@@ -10492,6 +10497,12 @@ classdef epanet <handle
             wantLQ       = has('linkquality');
             wantMFR      = has('massflowrate');
         
+            wantLinkLeakrate = has('linkleakagerate');
+            wantNodeLeakFlow = has('nodeleakageflow');
+            wantEmitterFlow  = has('emitterflow');
+            wantDemandDelivered = has('demanddelivered');
+            wantDemandRequested = has('demandrequested');
+
             % Preallocate only what you request
             if wantTime,     value.Time     = zeros(totalsteps, 1); end
             if wantPressure, value.Pressure = initNode; end
@@ -10520,16 +10531,20 @@ classdef epanet <handle
             if wantNQ,  value.NodeQuality  = initNode; end
             if wantLQ,  value.LinkQuality  = initLink; end
             if wantMFR, value.MassFlowRate = initNode; end
-        
+           
+            if wantLinkLeakrate,     value.LinkLeakageRate = initLink; end
+            if wantNodeLeakFlow,     value.NodeLeakageFlow = initNode; end
+            if wantEmitterFlow,     value.EmitterFlow = initNode; end
+            if wantDemandDelivered,     value.DemandDelivered = initNode; end
+            if wantDemandRequested,     value.DemandRequested = initNode; end
+            
             clear initNode initLink
         
-            k = 1;
-            tstep = 1;
-            tleftQ = 1;
-        
-            while tstep > 0 && k <= totalsteps
+            k = 1;      
+            t = 0;
+            while (t ~= sim_duration)
                 [~, t]  = obj.apiENrunH(obj.LibEPANET, obj.ph);
-                obj.apiENrunQ(obj.LibEPANET, obj.ph); %#ok<NASGU>
+                obj.apiENrunQ(obj.LibEPANET, obj.ph);
         
                 if wantTime
                     value.Time(k, 1) = t;
@@ -10591,8 +10606,24 @@ classdef epanet <handle
                     value.MassFlowRate(k, :) = obj.getNodeMassFlowRate;
                 end
         
+                if wantLinkLeakrate 
+                    [~, value.LinkLeakageRate(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_LINK_LEAKAGE, obj.LibEPANET, obj.ph);
+                end
+                if wantEmitterFlow 
+                    [~, value.EmitterFlow(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_EMITTERFLOW, obj.LibEPANET, obj.ph);
+                end
+                if wantDemandDelivered 
+                    [~, value.DemandDelivered(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMANDFLOW, obj.LibEPANET, obj.ph);
+                end
+                if wantDemandRequested 
+                    [~, value.DemandRequested(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_FULLDEMAND, obj.LibEPANET, obj.ph);
+                end
+                if wantNodeLeakFlow
+                    [~, value.NodeLeakageFlow(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_LEAKAGEFLOW, obj.LibEPANET, obj.ph);
+                end
+
                 tstep  = obj.nextHydraulicAnalysisStep;
-                tleftQ = obj.nextQualityAnalysisStep; %#ok<NASGU>
+                tleftQ = obj.nextQualityAnalysisStep;
         
                 k = k + 1;
             end
@@ -10623,6 +10654,9 @@ classdef epanet <handle
             %   5) Head              12) Energy
             %   6) TankVolume        13) Efficiency
             %   7) Flow              14) State
+            %   15) LinkLeakageRate  16) EmitterFlow
+            %   17) DemandDelivered  18) DemandRequested
+            %   19) NodeLeakageFlow
             %
             % Example 1:
             %   d.getComputedHydraulicTimeSeries          % Retrieves all the time-series data
@@ -10655,9 +10689,10 @@ classdef epanet <handle
             if isempty(varargin)
                 varargin = {'time','pressure','demand','demanddeficit','head','tankvolume', ...
                             'flow','velocity','headloss','status','setting','energy', ...
-                            'efficiency','state'};
+                            'efficiency','state', 'linkleakagerate', 'nodeleakageflow', 'emitterflow', ...
+                            'demanddelivered', 'demandrequested'};
             end
-        
+
             % Normalize request names once
             req = varargin;
             for i = 1:numel(req)
@@ -10684,6 +10719,11 @@ classdef epanet <handle
             wantEnergy    = has('energy');
             wantEff       = has('efficiency');
             wantState     = has('state');
+            wantLinkLeakrate = has('linkleakagerate');
+            wantNodeLeakFlow = has('nodeleakageflow');
+            wantEmitterFlow  = has('emitterflow');
+            wantDemandDelivered = has('demanddelivered');
+            wantDemandRequested = has('demandrequested');
         
             % Preallocate only what you request
             if wantTime,     value.Time     = zeros(totalsteps, 1); end
@@ -10708,7 +10748,12 @@ classdef epanet <handle
                 value.State    = zeros(totalsteps, obj.getLinkPumpCount);
                 value.StateStr = strings(totalsteps, obj.getLinkPumpCount);
             end
-        
+            if wantLinkLeakrate,     value.LinkLeakageRate = initLink; end
+            if wantNodeLeakFlow,     value.NodeLeakageFlow = initNode; end
+            if wantEmitterFlow,     value.EmitterFlow = initNode; end
+            if wantDemandDelivered,     value.DemandDelivered = initNode; end
+            if wantDemandRequested,     value.DemandRequested = initNode; end
+
             % Counts used for padding
             idx = obj.getLinkTypeIndex;
             pipecount = nnz(idx == obj.ToolkitConstants.EN_PIPE) + nnz(idx == obj.ToolkitConstants.EN_CVPIPE);
@@ -10721,9 +10766,10 @@ classdef epanet <handle
             junctioncount = nNodes - tankrescount;
             rescount      = obj.getNodeReservoirCount;
             k = 1;
-            tstep = 1;
+            tstep = 1; 
+            t = 0;
         
-            while tstep > 0 && k <= totalsteps
+            while tstep > 0 && (t ~= dur)
                 [~, t] = obj.apiENrunH(obj.LibEPANET, obj.ph);
 
                 if wantTime
@@ -10766,7 +10812,6 @@ classdef epanet <handle
                 if wantEnergy
                     [~, value.Energy(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_ENERGY, obj.LibEPANET, obj.ph);
                 end
-        
                 if wantEff
                     [~, p_eff] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_PUMP_EFFIC, obj.LibEPANET, obj.ph);
                     value.Efficiency(k, :) = [zeros(1, pipecount), p_eff(pumpindices), zeros(1, valvecount)];
@@ -10777,7 +10822,21 @@ classdef epanet <handle
                     value.State(k, :) = ps;
                     value.StateStr(k, :) = obj.TYPEPUMPSTATE(ps + 1);
                 end
-        
+                if wantLinkLeakrate 
+                    [~, value.LinkLeakageRate(k, :)] = obj.apiENgetlinkvalues(obj.ToolkitConstants.EN_LINK_LEAKAGE, obj.LibEPANET, obj.ph);
+                end
+                if wantEmitterFlow 
+                    [~, value.EmitterFlow(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_EMITTERFLOW, obj.LibEPANET, obj.ph);
+                end
+                if wantDemandDelivered 
+                    [~, value.DemandDelivered(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_DEMANDFLOW, obj.LibEPANET, obj.ph);
+                end
+                if wantDemandRequested 
+                    [~, value.DemandRequested(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_FULLDEMAND, obj.LibEPANET, obj.ph);
+                end
+                if wantNodeLeakFlow
+                    [~, value.NodeLeakageFlow(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_LEAKAGEFLOW, obj.LibEPANET, obj.ph);
+                end
                 [~, ] = obj.apiENnextH(obj.LibEPANET, obj.ph);          
                 k = k + 1;
             end
@@ -10858,11 +10917,9 @@ classdef epanet <handle
             clear initnodematrix
             
             k = 1;
-            tstep = 1;
-            
-            while tstep >= 0 && k <= totalsteps
+            t = 0;
+            while (t ~= sim_duration)
                 [~, t] = obj.apiENrunQ(obj.LibEPANET, obj.ph);
-
                 if has('time')
                     value.Time(k, 1) = t;
                 end
@@ -10875,7 +10932,7 @@ classdef epanet <handle
                 if has('mass')
                     [~, value.MassFlowRate(k, :)] = obj.apiENgetnodevalues(obj.ToolkitConstants.EN_SOURCEMASS, obj.LibEPANET, obj.ph);
                 end
-                [Errcode, tstep] = obj.apiENstepQ(obj.LibEPANET, obj.ph);
+                [~, ] = obj.apiENstepQ(obj.LibEPANET, obj.ph);
                 k = k + 1;
             end
             [obj.Errcode] = obj.apiENcloseQ(obj.LibEPANET, obj.ph);
@@ -25182,7 +25239,7 @@ if (strcmpi(lline, 'yes'))
                     line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', nm{1}, 'Parent', axesid);
                 end
             else
-                line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', 1, 'Color', char(selectColorLink(hh)), 'Parent', axesid);
+                line([x1 v.nodecoords{3}{i} x2], [y1 v.nodecoords{4}{i} y2], 'LineWidth', highlightlinkwidth, 'Color', char(selectColorLink(hh)), 'Parent', axesid);
             end
         end
         % Show Link id
