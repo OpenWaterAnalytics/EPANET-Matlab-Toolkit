@@ -2,7 +2,7 @@
 clear; close('all'); clc;
 start_toolkit;
 
-inpname = 'Battle of the Calibration Networks System.inp';  %Net1 net2-cl2 Net3 example BWSN_Network_1
+inpname = 'BWSN_Network_1.inp';  %Net1 net2-cl2 Net3 example BWSN_Network_1
 d = epanet(inpname);
 
 t_d = 1;
