@@ -64,8 +64,8 @@ DOI={10.5281/zenodo.831493}}
 
 ## Requirements
 
-* [Matlab](http://www.mathworks.com/)
-* [EPANET 2.2](https://github.com/OpenWaterAnalytics/epanet)
+* [MATLAB R2024a](http://www.mathworks.com/) or later
+* [EPANET 2.3](https://github.com/OpenWaterAnalytics/EPANET)
 
 &uparrow; [Back to top](#table-of-contents)
 
