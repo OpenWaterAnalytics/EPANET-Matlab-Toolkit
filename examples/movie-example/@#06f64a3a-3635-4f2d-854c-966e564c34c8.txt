@@ -1,0 +1,36 @@
+  Page 1                                    Fri Jan  2 23:10:57 2026
+
+  ******************************************************************
+  *                           E P A N E T                          *
+  *                   Hydraulic and Water Quality                  *
+  *                   Analysis for Pipe Networks                   *
+  *                          Version 2.3.03                        *
+  ******************************************************************
+  
+  Analysis begun Fri Jan  2 23:10:57 2026
+
+    21:00:00: System ill-conditioned at node J34
+    21:00:00: Reservoir R1 is closed
+    21:00:00: Tank T3 is closed at 5.30 m
+    21:00:00: Tank T1 is closed at 6.50 m
+    21:00:00: Tank T7 is emptying at 4.92 m
+    21:00:00: Tank T6 is filling at 5.41 m
+    21:00:00: Tank T5 is closed at 4.50 m
+    21:00:00: Tank T2 is closed at 5.50 m
+    21:00:00: Tank T4 is closed at 4.50 m
+    21:00:00: Pipe P1044 changed from open to temporarily closed
+    21:00:00: Pipe P15 changed from open to temporarily closed
+    21:00:00: CV P446 changed from open to closed
+    21:00:00: Pump PU1 changed from open to closed
+    21:00:00: Pump PU2 changed from open to closed
+    21:00:00: Pump PU4 changed from open to closed
+    21:00:00: Pump PU5 changed from open to closed
+    21:00:00: Pump PU6 changed from open to closed
+    21:00:00: Pump PU7 changed from open to closed
+    21:00:00: Pump PU8 changed from open to closed
+    21:00:00: Pump PU10 changed from open to closed
+    21:00:00: Pump PU11 changed from open to closed
+    21:00:00: PRV v1 changed from active to closed
+    21:00:00: TCV V2 changed from open to closed
+   
+  Error 110: cannot solve network hydraulic equations

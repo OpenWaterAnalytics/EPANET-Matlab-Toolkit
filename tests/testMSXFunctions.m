@@ -3,7 +3,7 @@
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints, 
 % indicated with a short dash (-) on the left of each line number.
-
+% Last test: 05/01/2026
 % Execute "addpath(genpath(pwd))" in main folder before running this, to load all EPANET
 % functions
 clc; clear; close all; clear class;
@@ -39,7 +39,7 @@ pause
 
 % New functions - Read MSX File
 d.getMSXTimeStep
-d.setMSXTimeStep(3600) 
+d.setMSXTimeStep(3600)
 d.getMSXTimeStep
 
 d.getMSXAreaUnits
@@ -94,7 +94,7 @@ d.getMSXEquationsTerms
 d.getMSXEquationsPipes
 d.getMSXEquationsTanks
 d.getMSXTimeStep
-d.getMSXSpeciesCount
+d.getMSXSpeciesCount  
 d.getMSXConstantsCount
 d.getMSXParametersCount
 d.getMSXPatternsCount
@@ -262,19 +262,14 @@ d.getMSXPatternValue(1,5)
 %% SAVE, USE FILES
 d.saveMSXFile('testMSX.msx');                                                               
           
-d.saveMSXQualityFile('testMSXQuality.bin')
+d.saveMSXQualityFile('testMSXQuality.bin');
 d.solveCompleteHydraulics;
 
-d.saveHydraulicsOutputReportingFile
-d.saveHydraulicFile('testMSXHydraulics.hyd')
+d.saveHydraulicsOutputReportingFile;
+d.saveHydraulicFile('testMSXHydraulics.hyd');
 
-d.useMSXHydraulicFile('testMSXHydraulics.hyd')
+d.useMSXHydraulicFile('testMSXHydraulics.hyd');
 
-% % initializeMSXQualityAnalysis
-% % stepMSXQualityAnalysisTimeLeft
-
-d.unloadMSX
-
-d.unload
+d.unload;
 delete('testMSX.msx','*.hyd','*.bin','*bat*','*_temp*','reportmsx.txt')
 fprintf('Test finished.\n')

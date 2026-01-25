@@ -42,6 +42,7 @@ EPANET-MATLAB-Toolkit - Examples
 - [Example 25:](./EX25_adjacency_matrix.mlx) Compute the adjacency matrix (connectivity graph).
 - [Example 26:](./EX26_tojson.mlx) Exports values to json format.
 - [Example 27:](./EX27_Fasted_Parallel_computation.m) Fasted Parallel computation.
+- [Example 28:](./EX28_Leakage.mlx) Fasted Parallel computation.
 
 
 ## Toolkit Examples
@@ -65,5 +66,6 @@ alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border=
 alt="How to install MinGW-w64 compiler #Matlab" width="240" height="180" border="0" /></a>
 
 &uparrow; [Back to top](#table-of-contents)
+
 
 

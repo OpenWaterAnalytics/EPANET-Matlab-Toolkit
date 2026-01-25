@@ -3,6 +3,7 @@
 % correctly.
 % Press F10 for step-by-step execution. You may also use the breakpoints,  
 % indicated with a short dash (-) on the left of each line number.
+% Last test: 02/01/2026
 clc; clear; close all; clear class;
 start_toolkit;
 
@@ -138,7 +139,7 @@ index=2;
 while (tstep>0)
     t=d.runHydraulicAnalysis;
     D=[D; d.getNodeActualDemand(index)];
-    H=[H; d.getNodeHydaulicHead(index)];
+    H=[H; d.getNodeHydraulicHead(index)];
     P=[P; d.getNodePressure(index)];
     Q=[Q; d.getNodeActualQuality(index)];
     T=[T; t];

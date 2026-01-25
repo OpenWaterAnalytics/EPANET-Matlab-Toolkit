@@ -1,3 +1,208 @@
+### EPANET Matlab Toolkit (EMT) v2.3.3.0
+
+It introduces full support for new EPANET 2.3 API calls, pressure-driven analysis (PDA), leakage modeling, extended curve and valve types, new units, enhanced control/rule handling, and expanded project I/O capabilities.  
+
+- Restores initial fully-open valve status handling
+- Fixes PCV update behavior via API and controls
+- Fixes `EN_setpipedata` minor loss coefficient assignment
+- Fixes `EN_setlinkvalue` Open/Closed status assignment
+
+New test file: [testFunctions2_3](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/dev/tests/testFunctions2_3.m)
+
+Leakage example: [EX28_Leakage](https://github.com/OpenWaterAnalytics/EPANET-Matlab-Toolkit/blob/dev/examples/m-files/EX28_Leakage.m)
+
+#### List of New EPANET 2.3 Functions Supported
+| Function              | Description
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apiENgetcontrolenabled` | Get enabled/disabled flag for a simple control by index. Returns boolean/int (1 = enabled, 0 = disabled).                                                  |
+| `apiENsetcontrolenabled` | Enable or disable a specific simple control by index.                                                                                                      |
+| `apiENgetruleenabled`    | Get enabled/disabled flag for a rule-based control by rule index.                                                                                          |
+| `apiENsetruleenabled`    | Enable or disable a rule by rule index.                                                                                                                    |
+| `apiENgetlinkvalues`     | Bulk-retrieve property values for all links for a given link property code. Returns an array/vector.                                                       |
+| `apiENgetnodevalues`     | Bulk-retrieve property values for all nodes for a given node property code. Returns an array/vector.                                                       |
+| `apiENsetcurvetype`      | Set the type of a curve object (volume, pump, efficiency, headloss, generic, valve).                                                                       |
+| `apiENsetvertex`         | Set the coordinates of a link’s intermediate vertex (polyline point) by vertex index.                                                                      |
+| `apiENtimetonextevent`   | Return the type of event that terminates the current time step (e.g., hydraulic step, WQ step, tank level event, control event) and the time to the event. |
+| `apiENloadpatternfile`   | Load time patterns from an external file into the current project under a specific pattern ID.                                                             |
+| `apiENopenX`             | Open an input file even if it has certain formatting errors (lenient parsing mode).                                                                        |
+
+
+#### EMT Functions added/updated
+
+##### Valve Links
+| Function               | Description                                                                   |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| `addLinkValvePCV`      | Create a new **Pressure Control Valve (PCV)** link between two nodes.         |
+| `setLinkTypeValvePCV`  | Convert an existing link to a **PCV (Pressure Control Valve)** type.          |
+| `getLinkValveCurveGPV` | Retrieve the control curve associated with a **GPV (General Purpose Valve)**. |
+| `setLinkValveCurveGPV` | Assign or update the control curve for a **GPV** valve.                       |
+| `getLinkValveCurvePCV` | Retrieve the control curve associated with a **PCV** valve.                   |
+| `setLinkValveCurvePCV` | Assign or update the control curve for a **PCV** valve.                       |
+
+##### Curves
+| Function                 | Description                                    |
+| ------------------------ | ---------------------------------------------- |
+| `setCurveType`           | Set the type of a curve object.                |
+| `setCurveTypeVolume`     | Set the type of a curve object to Volume.          |
+| `setCurveTypePump`       | Set the type of a curve object to Pump.            |
+| `setCurveTypeEfficiency` | Set the type of a curve object to Efficiency.     |
+| `setCurveTypeHeadloss`   | Set the type of a curve object to Headloss.        |
+| `setCurveTypeGeneral`    | Set the type of a curve object to General. |
+| `setCurveTypeValveCurve` | Set the type of a curve object to Curve.   |
+
+
+##### Controls & Rules
+| Function           | Description                                                             |
+| ------------------ | ---------------------------------------------------------------------- |
+| `getControlState`  | Retrieve simple control enabled flag. |
+| `getRuleEnabled`   | Retrieve rule enabled flag.             |
+| `setRuleEnabled`   | Enable or disable a rule-based control.                                 |
+| `getLinkInControl` | Identify links referenced by control rules.                             |
+| `getNodeInControl` | Identify nodes referenced by control rules.                             |
+
+
+##### Events
+| Function             | Description                                                                                                                   |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `getTimetoNextEvent` | Return the type of event that terminates the current time step. |
+
+##### Patterns
+| Function                        | Description                                |
+| ------------------------------- |--------------------------------------------|
+| `loadPatternFile`               | Load a time pattern file into the project. |
+| `getPatternAverageDefaultValue` | Report average value used when a pattern is missing.                                          |
+
+
+##### Options & Units
+| Function                  | Description                                |
+| ------------------------- |--------------------------------------------|
+| `getOptionsPressureUnits`   | Retrieve current pressure units. |
+| `setOptionsPressureUnits` | Set pressure units (EN_PSI / EN_KPA / EN_METERS).                                          |
+| `setOptionsPressureUnitsMeters` | Set pressure units to meters.                                          |
+| `setOptionsPressureUnitsPSI` | Set pressure units to PSI.                                          |
+| `setOptionsPressureUnitsKPA` | Set pressure units to kPa.                                          |
+| `getOptionsStatusReport` | Get current status report level.                                          |
+| `setOptionsStatusReport` | Set status report level (EN_NO_REPORT / EN_NORMAL_REPORT / EN_FULL_REPORT).                                          |
+| `setOptionsStatusReportNo` | Set report level to no report.                                          |
+| `setOptionsStatusReportNormal` | Set report level to normal.                                          |
+| `setOptionsStatusReportFull` | Set report level to full.                                          |
+| `getOptionsDemandPattern` | Get default demand pattern behavior.                                          |
+| `setOptionsDemandPattern` | Set default demand pattern behavior.                                          |
+| `getOptionsEmitterBackFlow` | Get emitter backflow setting.                                          |
+| `setOptionsEmitterBackFlowAllowed` | Allow emitter backflow.                                          |
+| `setOptionsEmitterBackFlowDisallowed` | Disallow emitter backflow.                                          |
+| `setFlowUnitsCMS` | Set flow units to CMS.                                          |
+
+##### Leakage & Demand
+| Function                        | Description                                     |
+| ------------------------------- |-------------------------------------------------|
+| `getLinkLeakArea`               | Get leakage area for a link.                    |
+| `setLinkLeakArea` | Set leakage area for a link.                    |
+| `getLinkExpansionProperties` | Get expansion properties for a link.            |
+| `setLinkExpansionProperties` | Set expansion properties for a link.            |
+| `getLinkLeakageRate` | Get leakage rate for a link (read only).        |
+| `getNodeLeakageFlow` | Get leakage flow at a node (read only).         |
+| `getNodeEmitterFlow` | Get emitter flow at a node (read only).         |
+| `getConsumerDemandRequested` | Retrieve consumer demand requested (read only). |
+| `getConsumerDemandDelivered` | Retrieve consumer demand delivered (read only). |
+
+##### Project I/O
+| Function                        | Description                                |
+| ------------------------------- |--------------------------------------------|
+| `openX`               | Open an input file even if it has formatting errors (lenient parsing mode). |
+
+
+##### Statistics
+| Function                       | Description                                                |
+| ------------------------------ |------------------------------------------------------------|
+| `getStatisticIterations`       | Retrieves the number of iterations taken in the simulation . |
+| `getStatisticRelativeError`    | Retrieves the relative error statistic from the simulation. |
+| `getStatisticDeficientNodes`   | Retrieve number of deficient nodes.                        |
+| `getStatisticDemandReduction`  | Retrieve demand reduction statistics.                      |
+| `getStatisticTotalLeakageLoss` | Retrieve total leakage loss value.                   |
+
+
+##### Constants / Enums
+
+`d.ToolkitConstants.EN_`
+
+```
+EN_NODE_INCONTROL = 28 
+EN_EMITTERFLOW = 29 
+EN_LEAKAGEFLOW = 30 
+EN_DEMANDFLOW = 31 
+EN_FULLDEMAND = 32 
+EN_LINK_INCONTROL = 23 
+EN_GPV_CURVE = 24 
+EN_PCV_CURVE = 25 
+EN_LEAK_AREA = 26 
+EN_LEAK_EXPAN = 27 
+EN_LINK_LEAKAGE = 28
+```
+###### Link & unit types
+```
+EN_PCV = 9 
+EN_CMS = 10
+```
+###### Pressure unit type
+```
+EN_PSI = 0 
+EN_KPA = 1 
+EN_METERS = 2
+```
+###### Demand model
+```
+EN_DDA = 0 # demand-driven 
+EN_PDA = 1 # pressure-driven
+```
+###### Option codes
+```
+EN_DEMANDPATTERN = 23 
+EN_EMITBACKFLOW = 24 
+EN_PRESS_UNITS = 25 
+EN_STATUS_REPORT = 26
+```
+###### Pump curve type
+```
+EN_CONST_HP = 0 # Constant horsepower 
+EN_POWER_FUNC= 1 # Power function 
+EN_CUSTOM = 2 # User-defined 
+EN_NOCURVE = 3 # No pump curve
+```
+###### Curve classes
+```
+EN_VOLUME_CURVE = 0 
+EN_PUMP_CURVE = 1 
+EN_EFFIC_CURVE = 2 
+EN_HLOSS_CURVE = 3 
+EN_GENERIC_CURVE= 4 
+EN_VALVE_CURVE = 5
+EN_UNCONDITIONAL = 0 
+EN_CONDITIONAL = 1
+```
+
+###### Status report level
+```
+EN_NO_REPORT = 0 
+EN_NORMAL_REPORT= 1 
+EN_FULL_REPORT = 2
+```
+
+###### Statistics (added leakage loss)
+``` EN_LEAKAGELOSS = 7 ```
+
+###### Timestep end events
+``` 
+EN_STEP_REPORT = 0 
+EN_STEP_HYD = 1 
+EN_STEP_WQ = 2 
+EN_STEP_TANKEVENT = 3 
+EN_STEP_CONTROLEVENT= 4
+EN_MISSING = -1.0E10 
+EN_SET_CLOSED= -1.0E10 
+EN_SET_OPEN = 1.0E10
+```
+
 ### EPANET Matlab Toolkit (EMT) v2.2.6.1
 
 - Add the example [Fasted Parallel computation](./EX27_Fasted_Parallel_computation.m) 
