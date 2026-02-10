@@ -43,6 +43,7 @@ matlab -nodisplay -r "addpath(genpath('$PWD')); savepath"
 - [List of EPANET 2.012 Functions Supported](#list-of-epanet-2012-functions-supported)
 - [List of EPANET 2.2 Functions Supported](#list-of-epanet-22-functions-supported)
 - [List of EPANET 2.3 Functions Supported](#list-of-epanet-23-functions-supported)
+- [List of EPANET MSX Functions API](#list-of-epanet-msx-functions-api)
 
 ## How to cite
 
@@ -986,4 +987,41 @@ The `EPANET-Matlab Toolkit` is based/inspired on the [EPANET-Matlab Toolkit](htt
 |ENsetvertex|Set the coordinates of a link’s intermediate vertex (polyline point) by vertex index|
 |ENtimetonextevent|Return the type of event that terminates the current time step (hydraulic step, water quality step, tank level event, control event)|
 
+## List of EPANET MSX Functions API
+
+| Function           | Description                                                                                                                              |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| MSXaddpattern      | Adds a new empty MSX source time pattern to an MSX project |
+| MSXclose           | Close .msx file |
+| MSXerror           | Retrieves the MSX erorr message for specific erorr code |
+| MSXgetID           | Retrieves the ID name of an object given its internal index number |
+| MSXgetIDlen        | Retrieves the number of characters in the ID name of an MSX object given its internal index number |
+| MSXgetconstant     | Retrieves the value of a particular rection constant |
+| MSXgetcount        | Retrieves the number of objects of a specific type |
+| MSXgeterror        | Returns the text for an error message given its error code |
+| MSXgetindex        | Retrieves the number of objects of a specific type |
+| MSXgetinitqual     | Retrieves the intial concetration of a particular chemical species assigned to a specific node or link of the pipe network |
+| MSXgetparameter    | Retrieves the value of a particular reaction parameter for a given pipe |
+| MSXgetpatternlen   | Retrieves the number of time periods within a source time pattern |
+| MSXgetpatternvalue | Retrieves the multiplier at a specific time period for a given source time pattern |
+| MSXgetqual         | Retrieves a chemical species concentration at a given node or the average concentration along a link at the current sumulation time step |
+| MSXgetsource       | Retrieves information on any external source of a particular chemical species assigned to a specific node or link of the pipe network |
+| MSXgetspecies      | Retrieves the attributes of a chemical species given its internal index number |
+| MSXinit            | Initialize the MSX system before solving for water quality results in the step-wise fashion |
+| MSXopen            | Opens .MSX file |
+| MSXreport          | Writes water quality simulations results as instructed by MSX input file to a text file |
+| MSXsavemsxfile     | Saves the data associated with the current MSX project into a new MSX input file |
+| MSXsaveoutfile     | Saves water quality results computed for each node, link and reporting time period to a named binary file |
+| MSXsetconstant     | Assigns a new value to a specific reaction constant |
+| MSXsetinitqual     | Assigns an initial concetration of a particular chemical species node or link of the pipe network |
+| MSXsetparameter    | Assigns a value to a particular reaction parameter for a given pipe or tank within the pipe network |
+| MSXsetpattern      | Assigns a new set of multipliers to a given MSX source time pattern |
+| MSXsetpatternvalue | Assigns a new value to the multiplier for a specific time period in a given MSX source time pattern |
+| MSXsetsource       | Sets the attributes of an external source of particular chemical species to specific node of the pipe network |
+| MSXsolveH          | Solves for system hydraulics over the entire simulation period saving results to an internal scratch file |
+| MSXsolveQ          | Solves for water quality over the entire simulation period and saves the results to an internal scratch file |
+| MSXstep            | Advances the water quality solution through a single water quality time step when performing a step-wise simulation |
+| MSXusehydfile      | Uses a previously saved EPANET hydraulics file as the source of hydraulic information |
+
 &uparrow; [Back to top](#table-of-contents)
+

@@ -390,7 +390,7 @@ classdef epanet <handle
         
     end
     properties (Constant = true)
-        classversion='v2.3.3.0 - Last Update: 22/01/2026';
+        classversion='v2.3.4.0 - Last Update: 10/02/2026';
         
         LOGOP={'IF', 'AND', 'OR'} % Constants for rule-based controls: 'IF', 'AND', 'OR' % EPANET Version 2.2
         RULEOBJECT={'NODE', 'LINK', 'SYSTEM'}; % Constants for rule-based controls: 'NODE', 'LINK', 'SYSTEM' % EPANET Version 2.2
@@ -4530,12 +4530,13 @@ classdef epanet <handle
             elseif strcmpi(arch, 'win32')
                 obj.LibEPANETpath = [pwdepanet, '/32bit/'];
             end
-            if isunix
+            if isunix && ~ismac
                 obj.LibEPANETpath = [pwdepanet, '/glnx/'];
                 obj.LibEPANET = 'libepanet';
             end
             if ismac
                 obj.LibEPANETpath = [pwdepanet, '/mac/'];
+                obj.LibEPANET = 'libepanet';
             end
             if nargin>0
                 if ~isdeployed
