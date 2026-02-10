@@ -4530,12 +4530,13 @@ classdef epanet <handle
             elseif strcmpi(arch, 'win32')
                 obj.LibEPANETpath = [pwdepanet, '/32bit/'];
             end
-            if isunix
+            if isunix && ~ismac
                 obj.LibEPANETpath = [pwdepanet, '/glnx/'];
                 obj.LibEPANET = 'libepanet';
             end
-            if isunix && ~ismac
+            if ismac
                 obj.LibEPANETpath = [pwdepanet, '/mac/'];
+                obj.LibEPANET = 'libepanet';
             end
             if nargin>0
                 if ~isdeployed
