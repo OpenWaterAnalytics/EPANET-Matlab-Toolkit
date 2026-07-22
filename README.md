@@ -18,7 +18,7 @@ For support, please use the OWA community forum : http://community.wateranalytic
 We have prepared a tutorial as part of the CCWI-WDSA 2022 conference. You can find the files in the `tutorial` folder at the following [GitHub repository](https://github.com/KIOS-Research/CCWI2022-EMT-Tutorial).
 
 ### How to use EMT with CodeOcean using postInstall functionality: 
-https://help.codeocean.com/en/articles/1110985-installing-user-provided-matlab-toolboxes
+https://docs.codeocean.com/osl-guide/tips-and-tricks/language-specific-issues/installing-user-provided-matlab-toolboxes#sedumi
 ```
 #!/usr/bin/env bash
 set -e
